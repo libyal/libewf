@@ -37,19 +37,12 @@
 extern "C" {
 #endif
 
-#define PROCESS_STATUS_ABORTED		(int) 'a'
-#define PROCESS_STATUS_COMPLETED	(int) 'c'
-#define PROCESS_STATUS_FAILED		(int) 'f'
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define process_status_ctime( timestamp, string, length ) \
-        date_time_wctime( timestamp, string, length )
-
-#else
-#define process_status_ctime( timestamp, string, length ) \
-        date_time_ctime( timestamp, string, length )
-
-#endif
+enum PROCESS_STATUS
+{
+	PROCESS_STATUS_ABORTED		= (int) 'a',
+	PROCESS_STATUS_COMPLETED	= (int) 'c',
+	PROCESS_STATUS_FAILED		= (int) 'f'
+};
 
 typedef struct process_status process_status_t;
 
@@ -71,6 +64,10 @@ struct process_status
 	 */
 	FILE *output_stream;
 
+	/* Value to indicate if the status information should be printed to the output stream
+	 */
+	uint8_t print_status_information;
+
 	/* The start timestamp
 	 */
 	time_t start_timestamp;
@@ -88,7 +85,40 @@ struct process_status
 	int8_t last_percentage;
 };
 
-extern process_status_t *process_status;
+int process_status_initialize(
+     process_status_t **process_status,
+     const system_character_t *status_process_string,
+     const system_character_t *status_update_string,
+     const system_character_t *status_summary_string,
+     FILE *output_stream,
+     uint8_t print_status_information,
+     liberror_error_t **error );
+
+int process_status_free(
+     process_status_t **process_status,
+     liberror_error_t **error );
+
+int process_status_start(
+     process_status_t *process_status,
+     liberror_error_t **error );
+
+int process_status_update(
+     process_status_t *process_status,
+     size64_t bytes_read,
+     size64_t bytes_total,
+     liberror_error_t **error );
+
+int process_status_update_unknown_total(
+     process_status_t *process_status,
+     size64_t bytes_read,
+     size64_t bytes_total,
+     liberror_error_t **error );
+
+int process_status_stop(
+     process_status_t *process_status,
+     size64_t bytes_total,
+     int status,
+     liberror_error_t **error );
 
 void process_status_timestamp_fprint(
       FILE *stream,
@@ -102,34 +132,6 @@ void process_status_bytes_per_second_fprint(
 void process_status_bytes_fprint(
       FILE *stream,
       size64_t bytes );
-
-int process_status_initialize(
-     process_status_t **process_status,
-     const system_character_t *status_process_string,
-     const system_character_t *status_update_string,
-     const system_character_t *status_summary_string,
-     FILE *output_stream );
-
-int process_status_free(
-     process_status_t **process_status );
-
-int process_status_start(
-     process_status_t *process_status );
-
-int process_status_update(
-     process_status_t *process_status,
-     size64_t bytes_read,
-     size64_t bytes_total );
-
-int process_status_update_unknown_total(
-     process_status_t *process_status,
-     size64_t bytes_read,
-     size64_t bytes_total );
-
-int process_status_stop(
-     process_status_t *process_status,
-     size64_t bytes_total,
-     int status );
 
 #if defined( __cplusplus )
 }

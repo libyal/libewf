@@ -192,11 +192,17 @@ int export_handle_get_input_chunk_size(
      size32_t *chunk_size,
      liberror_error_t **error );
 
+int export_handle_set_header_codepage(
+     export_handle_t *export_handle,
+     int header_codepage,
+     liberror_error_t **error );
+
 int export_handle_set_output_values(
      export_handle_t *export_handle,
      system_character_t *acquiry_operating_system,
      system_character_t *acquiry_software,
      system_character_t *acquiry_software_version,
+     int header_codepage,
      size64_t media_size,
      int8_t compression_level,
      uint8_t compression_flags,

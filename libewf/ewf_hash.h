@@ -39,7 +39,7 @@ struct ewf_hash
 	 */
 	uint8_t md5_hash[ 16 ];
 
-	/* TODO: unknown find out
+	/* Unknown
 	 */
 	uint8_t unknown1[ 16 ];
 

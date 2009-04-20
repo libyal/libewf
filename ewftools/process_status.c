@@ -30,11 +30,8 @@
 
 #include "byte_size_string.h"
 #include "date_time.h"
-#include "notify.h"
 #include "process_status.h"
 #include "system_string.h"
-
-process_status_t *process_status = NULL;
 
 /* Initializes the process status information
  * Returns 1 if successful or -1 on error
@@ -44,13 +41,19 @@ int process_status_initialize(
      const system_character_t *status_process_string,
      const system_character_t *status_update_string,
      const system_character_t *status_summary_string,
-     FILE *output_stream )
+     FILE *output_stream,
+     uint8_t print_status_information,
+     liberror_error_t **error )
 {
 	static char *function = "process_status_initialize";
 
 	if( process_status == NULL )
 	{
-		notify_warning_printf( "%s: invalid process status.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
 		 function );
 
 		return( -1 );
@@ -62,7 +65,11 @@ int process_status_initialize(
 
 		if( *process_status == NULL )
 		{
-			notify_warning_printf( "%s: unable to create process status.\n",
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create process status.",
 			 function );
 
 			return( -1 );
@@ -72,15 +79,25 @@ int process_status_initialize(
 		     0,
 		     sizeof( process_status_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear process status.\n",
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear process status.",
 			 function );
+
+			memory_free(
+			 *process_status );
+
+			*process_status = NULL;
 
 			return( -1 );
 		}
-		( *process_status )->status_process_string = status_process_string;
-		( *process_status )->status_update_string  = status_update_string;
-		( *process_status )->status_summary_string = status_summary_string;
-		( *process_status )->output_stream         = output_stream;
+		( *process_status )->status_process_string    = status_process_string;
+		( *process_status )->status_update_string     = status_update_string;
+		( *process_status )->status_summary_string    = status_summary_string;
+		( *process_status )->output_stream            = output_stream;
+		( *process_status )->print_status_information = print_status_information;
 	}
 	return( 1 );
 }
@@ -89,13 +106,18 @@ int process_status_initialize(
  * Returns 1 if successful or -1 on error
  */
 int process_status_free(
-     process_status_t **process_status )
+     process_status_t **process_status,
+     liberror_error_t **error )
 {
 	static char *function = "process_status_free";
 
 	if( process_status == NULL )
 	{
-		notify_warning_printf( "%s: invalid process status.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
 		 function );
 
 		return( -1 );
@@ -106,6 +128,378 @@ int process_status_free(
 		 *process_status );
 
 		*process_status = NULL;
+	}
+	return( 1 );
+}
+
+/* Starts the process status information
+ * Returns 1 if successful or -1 on error
+ */
+int process_status_start(
+     process_status_t *process_status,
+     liberror_error_t **error )
+{
+	system_character_t time_string[ 32 ];
+
+	static char *function = "process_status_start";
+
+	if( process_status == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
+		 function );
+
+		return( -1 );
+	}
+	process_status->last_percentage = -1;
+	process_status->start_timestamp = date_time_time(
+	                                   NULL );
+
+	if( ( process_status->output_stream != NULL )
+	 && ( process_status->print_status_information != 0 )
+	 && ( process_status->status_process_string != NULL ) )
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		if( date_time_wctime(
+		     &( process_status->start_timestamp ),
+		     time_string,
+		     32 ) == NULL )
+#else
+		if( date_time_ctime(
+		     &( process_status->start_timestamp ),
+		     time_string,
+		     32 ) == NULL )
+#endif
+		{
+			fprintf(
+			 stderr,
+			 "%" PRIs_SYSTEM " started.\n",
+			 process_status->status_process_string );
+		}
+		else
+		{
+			fprintf(
+			 stderr,
+			 "%" PRIs_SYSTEM " started at: %" PRIs_SYSTEM "\n",
+			 process_status->status_process_string,
+			 time_string );
+		}
+		fprintf(
+		 stderr,
+		 "This could take a while.\n\n" );
+	}
+	return( 1 );
+}
+
+/* Updates the process status information
+ * Returns 1 if successful or -1 on error
+ */
+int process_status_update(
+     process_status_t *process_status,
+     size64_t bytes_read,
+     size64_t bytes_total,
+     liberror_error_t **error )
+{
+	static char *function    = "process_status_update";
+	time_t seconds_current   = 0;
+	time_t seconds_total     = 0;
+	time_t seconds_remaining = 0;
+	time_t timestamp_current = 0;
+	int8_t new_percentage    = 0;
+
+	if( process_status == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( process_status->output_stream != NULL )
+	 && ( process_status->print_status_information != 0 )
+	 && ( process_status->status_update_string != NULL ) )
+	{
+		if( ( bytes_total > 0 )
+		 && ( bytes_read > 0 ) )
+		{
+			new_percentage = (int8_t) ( ( bytes_read * 100 ) / bytes_total );
+		}
+		/* Estimate the remaining time
+		 */
+		timestamp_current = time( NULL );
+
+		if( ( new_percentage > process_status->last_percentage )
+		 && ( timestamp_current > process_status->last_timestamp ) )
+		{
+			process_status->last_percentage = new_percentage;
+
+			fprintf(
+			 process_status->output_stream,
+			 "Status: at %" PRIu8 "%%.\n",
+			 new_percentage );
+
+			fprintf(
+			 process_status->output_stream,
+			 "        %" PRIs_SYSTEM "",
+			 process_status->status_update_string );
+
+			process_status_bytes_fprint(
+			 process_status->output_stream,
+			 bytes_read );
+
+			fprintf(
+			 process_status->output_stream,
+			 " of total" );
+
+			process_status_bytes_fprint(
+			 process_status->output_stream,
+			 bytes_total );
+
+			fprintf(
+			 process_status->output_stream,
+			 ".\n" );
+
+			if( ( timestamp_current > process_status->start_timestamp )
+			 && ( new_percentage > 0 ) )
+			{
+				process_status->last_timestamp = timestamp_current;
+
+				seconds_current   = timestamp_current - process_status->start_timestamp;
+				seconds_total     = ( ( seconds_current * 100 ) / new_percentage );
+				seconds_remaining = seconds_total - seconds_current;
+
+				/* Negative time means nearly finished
+				 */
+				if( seconds_remaining < 0 )
+				{
+					seconds_remaining = 0;
+				}
+				fprintf(
+				 process_status->output_stream,
+				 "        completion" );
+
+				process_status_timestamp_fprint(
+				 process_status->output_stream,
+				 seconds_remaining );
+
+				process_status_bytes_per_second_fprint(
+				 process_status->output_stream,
+				 bytes_total,
+				 seconds_total );
+
+				fprintf(
+				 process_status->output_stream,
+				 ".\n" );
+			}
+			fprintf(
+			 process_status->output_stream,
+			 "\n" );
+		}
+	}
+	return( 1 );
+}
+
+/* Updates the process status information when the total amount of bytes is unknown
+ * Returns 1 if successful or -1 on error
+ */
+int process_status_update_unknown_total(
+     process_status_t *process_status,
+     size64_t bytes_read,
+     size64_t bytes_total,
+     liberror_error_t **error )
+{
+	static char *function    = "process_status_update_unknown_total";
+	time_t seconds_current   = 0;
+	time_t timestamp_current = 0;
+
+	if( process_status == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( process_status->output_stream != NULL )
+	 && ( process_status->print_status_information != 0 )
+	 && ( process_status->status_update_string != NULL ) )
+	{
+		timestamp_current = time( NULL );
+
+		if( timestamp_current > process_status->last_timestamp )
+		{
+			/* Update state
+			 * - if no status was printed before
+			 * - or input has grown > 10 MiB
+			 * - or the last update was 30 seconds ago
+			 */
+			if( ( process_status->last_bytes_total == 0 )
+			 || ( bytes_read > ( process_status->last_bytes_total + ( 10 * 1024 * 1024 ) ) )
+			 || ( ( timestamp_current - process_status->last_timestamp ) > 30 ) )
+			{
+				process_status->last_timestamp   = timestamp_current;
+				process_status->last_bytes_total = bytes_read;
+
+				fprintf(
+				 process_status->output_stream,
+				 "Status: %" PRIs_SYSTEM "",
+				 process_status->status_update_string );
+
+				process_status_bytes_fprint(
+				 process_status->output_stream,
+				 bytes_read );
+
+				fprintf(
+				 process_status->output_stream,
+				 "\n" );
+
+				seconds_current = timestamp_current - process_status->start_timestamp;
+
+				fprintf(
+				 process_status->output_stream,
+				 "       " );
+
+				process_status_timestamp_fprint(
+				 process_status->output_stream,
+				 seconds_current );
+
+				process_status_bytes_per_second_fprint(
+				 process_status->output_stream,
+				 bytes_read,
+				 seconds_current );
+
+				fprintf(
+				 process_status->output_stream,
+				 ".\n\n" );
+			}
+		}
+	}
+	return( 1 );
+}
+
+/* Stops the process status information
+ * Returns 1 if successful or -1 on error
+ */
+int process_status_stop(
+     process_status_t *process_status,
+     size64_t bytes_total,
+     int status,
+     liberror_error_t **error )
+{
+	system_character_t time_string[ 32 ];
+
+	static char *function                   = "process_status_start";
+	const system_character_t *status_string = NULL;
+	time_t seconds_total                    = 0;
+
+	if( process_status == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( status != PROCESS_STATUS_ABORTED )
+	 && ( status != PROCESS_STATUS_COMPLETED )
+	 && ( status != PROCESS_STATUS_FAILED ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported status.",
+		 function );
+
+		return( -1 );
+	}
+	process_status->last_timestamp = date_time_time(
+	                                  NULL );
+
+	if( ( process_status->output_stream != NULL )
+	 && ( process_status->print_status_information != 0 )
+	 && ( process_status->status_process_string != NULL ) )
+	{
+		if( status == PROCESS_STATUS_ABORTED )
+		{
+			status_string = _SYSTEM_CHARACTER_T_STRING( "aborted" );
+		}
+		else if( status == PROCESS_STATUS_COMPLETED )
+		{
+			status_string = _SYSTEM_CHARACTER_T_STRING( "completed" );
+		}
+		else if( status == PROCESS_STATUS_FAILED )
+		{
+			status_string = _SYSTEM_CHARACTER_T_STRING( "failed" );
+		}
+		fprintf(
+		 process_status->output_stream,
+		 "%" PRIs_SYSTEM " %" PRIs_SYSTEM "",
+		 process_status->status_process_string,
+		 status_string );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		if( date_time_wctime(
+		     &( process_status->last_timestamp ),
+		     time_string,
+		     32 ) == NULL )
+#else
+		if( date_time_ctime(
+		     &( process_status->last_timestamp ),
+		     time_string,
+		     32 ) == NULL )
+#endif
+		{
+			fprintf(
+			 process_status->output_stream,
+			 " at: %" PRIs_SYSTEM "\n",
+			 time_string );
+		}
+		else
+		{
+			fprintf(
+			 process_status->output_stream,
+			 ".\n" );
+		}
+		if( ( status == PROCESS_STATUS_COMPLETED )
+	 	 && ( process_status->status_summary_string != NULL ) )
+		{
+			seconds_total = process_status->last_timestamp - process_status->start_timestamp;
+
+			fprintf(
+			process_status->output_stream,
+			"%" PRIs_SYSTEM ":",
+			process_status->status_summary_string );
+
+			process_status_bytes_fprint(
+			process_status->output_stream,
+			bytes_total );
+
+			process_status_timestamp_fprint(
+			process_status->output_stream,
+			seconds_total );
+
+			process_status_bytes_per_second_fprint(
+			process_status->output_stream,
+			bytes_total,
+			seconds_total );
+
+			fprintf(
+			process_status->output_stream,
+			".\n" );
+		}
 	}
 	return( 1 );
 }
@@ -206,7 +600,8 @@ void process_status_bytes_per_second_fprint(
 			fprintf(
 			 stream,
 			 " %" PRIs_SYSTEM "/s (%" PRIu64 " bytes/second)",
-			 bytes_per_second_string, bytes_per_second );
+			 bytes_per_second_string,
+			 bytes_per_second );
 		}
 		else
 		{
@@ -247,7 +642,8 @@ void process_status_bytes_fprint(
 		fprintf(
 		 stream,
 		 " %" PRIs_SYSTEM " (%" PRIi64 " bytes)",
-		 bytes_string, bytes );
+		 bytes_string,
+		 bytes );
 	}
 	else
 	{
@@ -256,328 +652,5 @@ void process_status_bytes_fprint(
 		 " %" PRIi64 " bytes",
 		 bytes );
 	}
-}
-
-/* Starts the process status information
- * Returns 1 if successful or -1 on error
- */
-int process_status_start(
-     process_status_t *process_status )
-{
-	system_character_t time_string[ 32 ];
-
-	static char *function = "process_status_start";
-
-	if( process_status == NULL )
-	{
-		notify_warning_printf( "%s: invalid process status.\n",
-		 function );
-
-		return( -1 );
-	}
-	process_status->last_percentage = -1;
-	process_status->start_timestamp = date_time_time(
-	                                   NULL );
-
-	if( ( process_status->output_stream != NULL )
-	 && ( process_status->status_process_string != NULL ) )
-	{
-		if( process_status_ctime(
-		     &( process_status->start_timestamp ),
-		     time_string,
-		     32 ) == NULL )
-		{
-			fprintf( stderr, "%" PRIs_SYSTEM " started.\n",
-			 process_status->status_process_string );
-		}
-		else
-		{
-			fprintf( stderr, "%" PRIs_SYSTEM " started at: %" PRIs_SYSTEM "\n",
-			 process_status->status_process_string, time_string );
-		}
-		fprintf( stderr, "This could take a while.\n\n" );
-	}
-	return( 1 );
-}
-
-/* Updates the process status information
- * Returns 1 if successful or -1 on error
- */
-int process_status_update(
-     process_status_t *process_status,
-     size64_t bytes_read,
-     size64_t bytes_total )
-{
-	static char *function    = "process_status_update";
-	time_t seconds_current   = 0;
-	time_t seconds_total     = 0;
-	time_t seconds_remaining = 0;
-	time_t timestamp_current = 0;
-	int8_t new_percentage    = 0;
-
-	if( process_status == NULL )
-	{
-		notify_warning_printf( "%s: invalid process status.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( process_status->output_stream != NULL )
-	 && ( process_status->status_update_string != NULL ) )
-	{
-		if( ( bytes_total > 0 )
-		 && ( bytes_read > 0 ) )
-		{
-			new_percentage = (int8_t) ( ( bytes_read * 100 ) / bytes_total );
-		}
-		/* Estimate the remaining time
-		 */
-		timestamp_current = time( NULL );
-
-		if( ( new_percentage > process_status->last_percentage )
-		 && ( timestamp_current > process_status->last_timestamp ) )
-		{
-			process_status->last_percentage = new_percentage;
-
-			fprintf(
-			 process_status->output_stream,
-			 "Status: at %" PRIu8 "%%.\n",
-			 new_percentage );
-
-			fprintf(
-			 process_status->output_stream,
-			 "        %" PRIs_SYSTEM "",
-			 process_status->status_update_string );
-
-			process_status_bytes_fprint(
-			 process_status->output_stream,
-			 bytes_read );
-
-			fprintf(
-			 process_status->output_stream,
-			 " of total" );
-
-			process_status_bytes_fprint(
-			 process_status->output_stream,
-			 bytes_total );
-
-			fprintf(
-			 process_status->output_stream,
-			 ".\n" );
-
-			if( ( timestamp_current > process_status->start_timestamp )
-			 && ( new_percentage > 0 ) )
-			{
-				process_status->last_timestamp = timestamp_current;
-
-				seconds_current   = timestamp_current - process_status->start_timestamp;
-				seconds_total     = ( ( seconds_current * 100 ) / new_percentage );
-				seconds_remaining = seconds_total - seconds_current;
-
-				/* Negative time means nearly finished
-				 */
-				if( seconds_remaining < 0 )
-				{
-					seconds_remaining = 0;
-				}
-				fprintf(
-				 process_status->output_stream,
-				 "        completion" );
-
-				process_status_timestamp_fprint(
-				 process_status->output_stream,
-				 seconds_remaining );
-
-				process_status_bytes_per_second_fprint(
-				 process_status->output_stream,
-				 bytes_total,
-				 seconds_total );
-
-				fprintf(
-				 process_status->output_stream,
-				 ".\n" );
-			}
-			fprintf(
-			 process_status->output_stream,
-			 "\n" );
-		}
-	}
-	return( 1 );
-}
-
-/* Updates the process status information when the total amount of bytes is unknown
- * Returns 1 if successful or -1 on error
- */
-int process_status_update_unknown_total(
-     process_status_t *process_status,
-     size64_t bytes_read,
-     size64_t bytes_total )
-{
-	static char *function    = "process_status_update_unknown_total";
-	time_t seconds_current   = 0;
-	time_t timestamp_current = 0;
-
-	if( process_status == NULL )
-	{
-		notify_warning_printf( "%s: invalid process status.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( process_status->output_stream != NULL )
-	 && ( process_status->status_update_string != NULL ) )
-	{
-		timestamp_current = time( NULL );
-
-		if( timestamp_current > process_status->last_timestamp )
-		{
-			/* Update state
-			 * - if no status was printed before
-			 * - or input has grown > 10 MiB
-			 * - or the last update was 30 seconds ago
-			 */
-			if( ( process_status->last_bytes_total == 0 )
-			 || ( bytes_read > ( process_status->last_bytes_total + ( 10 * 1024 * 1024 ) ) )
-			 || ( ( timestamp_current - process_status->last_timestamp ) > 30 ) )
-			{
-				process_status->last_timestamp   = timestamp_current;
-				process_status->last_bytes_total = bytes_read;
-
-				fprintf(
-				 process_status->output_stream,
-				 "Status: %" PRIs_SYSTEM "",
-				 process_status->status_update_string );
-
-				process_status_bytes_fprint(
-				 process_status->output_stream,
-				 bytes_read );
-
-				fprintf(
-				 process_status->output_stream,
-				 "\n" );
-
-				seconds_current = timestamp_current - process_status->start_timestamp;
-
-				fprintf(
-				 process_status->output_stream,
-				 "       " );
-
-				process_status_timestamp_fprint(
-				 process_status->output_stream,
-				 seconds_current );
-
-				process_status_bytes_per_second_fprint(
-				 process_status->output_stream,
-				 bytes_read,
-				 seconds_current );
-
-				fprintf(
-				 process_status->output_stream,
-				 ".\n\n" );
-			}
-		}
-	}
-	return( 1 );
-}
-
-/* Stops the process status information
- * Returns 1 if successful or -1 on error
- */
-int process_status_stop(
-     process_status_t *process_status,
-     size64_t bytes_total,
-     int status )
-{
-	system_character_t time_string[ 32 ];
-
-	static char *function                   = "process_status_start";
-	const system_character_t *status_string = NULL;
-	time_t seconds_total                    = 0;
-
-	if( process_status == NULL )
-	{
-		notify_warning_printf( "%s: invalid process status.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( status != PROCESS_STATUS_ABORTED )
-	 && ( status != PROCESS_STATUS_COMPLETED )
-	 && ( status != PROCESS_STATUS_FAILED ) )
-	{
-		notify_warning_printf( "%s: unsupported status.\n",
-		 function );
-
-		return( -1 );
-	}
-	process_status->last_timestamp = date_time_time(
-	                                  NULL );
-
-	if( ( process_status->output_stream != NULL )
-	 && ( process_status->status_process_string != NULL ) )
-	{
-		if( status == PROCESS_STATUS_ABORTED )
-		{
-			status_string = _SYSTEM_CHARACTER_T_STRING( "aborted" );
-		}
-		else if( status == PROCESS_STATUS_COMPLETED )
-		{
-			status_string = _SYSTEM_CHARACTER_T_STRING( "completed" );
-		}
-		else if( status == PROCESS_STATUS_FAILED )
-		{
-			status_string = _SYSTEM_CHARACTER_T_STRING( "failed" );
-		}
-		fprintf(
-		 process_status->output_stream,
-		 "%" PRIs_SYSTEM " %" PRIs_SYSTEM "",
-		 process_status->status_process_string,
-		 status_string );
-
-		if( process_status_ctime(
-		     &( process_status->last_timestamp ),
-		     time_string,
-		     32 ) != NULL )
-		{
-			fprintf(
-			 process_status->output_stream,
-			 " at: %" PRIs_SYSTEM "\n",
-			 time_string );
-		}
-		else
-		{
-			fprintf(
-			 process_status->output_stream,
-			 ".\n" );
-		}
-		if( ( status == PROCESS_STATUS_COMPLETED )
-	 	 && ( process_status->status_summary_string != NULL ) )
-		{
-			seconds_total = process_status->last_timestamp - process_status->start_timestamp;
-
-			fprintf(
-			process_status->output_stream,
-			"%" PRIs_SYSTEM ":",
-			process_status->status_summary_string );
-
-			process_status_bytes_fprint(
-			process_status->output_stream,
-			bytes_total );
-
-			process_status_timestamp_fprint(
-			process_status->output_stream,
-			seconds_total );
-
-			process_status_bytes_per_second_fprint(
-			process_status->output_stream,
-			bytes_total,
-			seconds_total );
-
-			fprintf(
-			process_status->output_stream,
-			".\n" );
-		}
-	}
-	return( 1 );
 }
 

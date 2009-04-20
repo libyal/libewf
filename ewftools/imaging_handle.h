@@ -138,6 +138,7 @@ int imaging_handle_set_output_values(
      system_character_t *acquiry_operating_system,
      system_character_t *acquiry_software,
      system_character_t *acquiry_software_version,
+     int header_codepage,
      uint32_t bytes_per_sector,
      size64_t media_size,
      uint8_t media_type,

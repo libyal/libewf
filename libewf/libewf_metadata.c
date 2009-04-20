@@ -3101,9 +3101,10 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse xheader.",
 		 function );
 
-		/* TODO error_tollerance */
-
-		return( -1 );
+		libewf_notify_error_backtrace(
+		 *error );
+		liberror_error_free(
+		 error );
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header2 != NULL )
@@ -3121,9 +3122,10 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse header2.",
 		 function );
 
-		/* TODO error_tollerance */
-
-		return( -1 );
+		libewf_notify_error_backtrace(
+		 *error );
+		liberror_error_free(
+		 error );
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header != NULL )
@@ -3142,9 +3144,10 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse header.",
 		 function );
 
-		/* TODO error_tollerance */
-
-		return( -1 );
+		libewf_notify_error_backtrace(
+		 *error );
+		liberror_error_free(
+		 error );
 	}
 	if( internal_handle->header_values == NULL )
 	{
@@ -3721,9 +3724,10 @@ int libewf_handle_parse_hash_values(
 		 "%s: unable to parse xhash for values.",
 		 function );
 
-		/* TODO error_tollerance */
-
-		return( -1 );
+		libewf_notify_error_backtrace(
+		 *error );
+		liberror_error_free(
+		 error );
 	}
 	else if( ( internal_handle->hash_sections->md5_digest_set != 0 )
 	      || ( internal_handle->hash_sections->sha1_digest_set != 0 ) )
@@ -3742,9 +3746,10 @@ int libewf_handle_parse_hash_values(
 			 "%s: unable to parse MD5 hash for its value.",
 			 function );
 
-			/* TODO error_tollerance */
-
-			return( -1 );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 		}
 		if( ( internal_handle->hash_sections->sha1_digest_set != 0 )
 		 && ( libewf_hash_values_parse_sha1_hash(
@@ -3760,9 +3765,10 @@ int libewf_handle_parse_hash_values(
 			 "%s: unable to parse SHA1 hash for its value.",
 			 function );
 
-			/* TODO error_tollerance */
-
-			return( -1 );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 		}
 	}
 	else if( ( internal_handle->hash_sections->md5_hash_set != 0 )
@@ -3779,9 +3785,10 @@ int libewf_handle_parse_hash_values(
 		 "%s: unable to parse MD5 hash for its value.",
 		 function );
 
-		/* TODO error_tollerance */
-
-		return( -1 );
+		libewf_notify_error_backtrace(
+		 *error );
+		liberror_error_free(
+		 error );
 	}
 	return( 1 );
 }

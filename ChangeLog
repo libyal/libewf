@@ -109,8 +109,6 @@ ewftools:
   - implement libpff log handle
 * liberror
   - implement use of liberror
-  - complete liberror usage in glob.[ch] and update libpff version
-  - process_status.[ch]
   - date_time.[ch]
   - ewfcommon.[ch]
   - ewfinput.[ch]
@@ -147,9 +145,9 @@ ewftools:
 * ewfexport
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
+  - allow different input and output header codepages?
 * ewfinfo
   - format extents header value in more table like manner
-  - compare GUID output with EnCase
 * ewfverify
 * ewfdebug
   - create a tool to analyse a single segment file
@@ -219,7 +217,6 @@ Deployment
 Other:
 * check error tollerance
 * check TODO
-* check DLL import definitions in ewftools
 
 Next beta release:
 * check sprintf use
@@ -227,8 +224,14 @@ Next beta release:
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
 * fix ewfexport different input and output chunk sizes for low level functions
-* add set_header_codepage to ewftools
-* have segment file number in libewf_raw_read_chunk for warning output?
+
+Version: 20090418
+* changes for local use of libewf in libsmio
+* updated process_status to use liberror
+* worked on glob to use liberror
+* updated libuna
+* worked on adding set_header_codepage to ewftools
+* worked on error tollerance
 
 Version: 20090415
 * fixed == in configure.ac

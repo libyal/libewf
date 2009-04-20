@@ -2757,9 +2757,12 @@ int libewf_header_values_generate_header_string_type1(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			acquiry_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			acquiry_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -2791,9 +2794,12 @@ int libewf_header_values_generate_header_string_type1(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			system_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			system_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -3126,9 +3132,12 @@ int libewf_header_values_generate_header_string_type2(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			acquiry_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			acquiry_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -3160,9 +3169,12 @@ int libewf_header_values_generate_header_string_type2(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			system_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			system_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -3496,9 +3508,12 @@ int libewf_header_values_generate_header_string_type3(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			acquiry_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			acquiry_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -3530,9 +3545,12 @@ int libewf_header_values_generate_header_string_type3(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			system_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			system_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -3841,9 +3859,12 @@ int libewf_header_values_generate_header_string_type4(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			acquiry_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			acquiry_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -3875,9 +3896,12 @@ int libewf_header_values_generate_header_string_type4(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			system_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			system_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -4189,9 +4213,12 @@ int libewf_header_values_generate_header_string_type5(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			acquiry_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			acquiry_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -4223,9 +4250,12 @@ int libewf_header_values_generate_header_string_type5(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			system_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			system_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -4549,9 +4579,12 @@ int libewf_header_values_generate_header_string_type6(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			acquiry_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			acquiry_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -4583,9 +4616,12 @@ int libewf_header_values_generate_header_string_type6(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			system_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			system_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -4922,9 +4958,12 @@ int libewf_header_values_generate_header_string_type7(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			acquiry_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			acquiry_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{
@@ -4956,9 +4995,12 @@ int libewf_header_values_generate_header_string_type7(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			system_date = _LIBEWF_STRING( "" );
+			libewf_notify_error_backtrace(
+			 *error );
+			liberror_error_free(
+			 error );
 
-			/* TODO */
+			system_date = _LIBEWF_STRING( "" );
 		}
 		else
 		{

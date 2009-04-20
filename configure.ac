@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090415],
+ [20090418],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090415])
+ [20090418])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -149,12 +149,13 @@ dnl Headers included in and ewftools/ewfsignal.h
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([sys/signal.h])
 
-dnl Other headers
+dnl Headers included in and ewftools/system_string.h
 AC_CHECK_HEADERS([langinfo.h])
 AC_CHECK_HEADERS([locale.h])
 
+dnl Other headers
 AC_CHECK_HEADERS([errno.h])
-AC_CHECK_HEADERS([locale.h])
+
 AC_CHECK_HEADERS([sys/utsname.h])
 
 AC_CHECK_HEADERS([openssl/opensslv.h])

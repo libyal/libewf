@@ -703,6 +703,61 @@ int info_handle_get_hash_value(
 	return( result );
 }
 
+/* Sets the header codepage
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_set_header_codepage(
+     info_handle_t *info_handle,
+     int header_codepage,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_set_header_codepage";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid info handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_set_header_codepage(
+	     info_handle->input_handle,
+	     header_codepage,
+	     error ) != 1 )
+#else
+	if( libewf_set_header_codepage(
+	     info_handle->input_handle,
+	     header_codepage ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header codepage.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Print the header values to a stream
  * Returns 1 if successful or -1 on error
  */
@@ -1859,7 +1914,7 @@ int info_handle_media_information_fprint(
 		{
 			if( guid_to_string(
 			     (guid_t *) guid,
-			     LIBEWF_ENDIAN_LITTLE,
+			     _ENDIAN_LITTLE,
 			     guid_string,
 			     GUID_STRING_SIZE,
 			     NULL ) == 1 )

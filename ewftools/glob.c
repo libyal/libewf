@@ -273,7 +273,11 @@ int glob_resolve(
 	{
 		if( patterns[ iterator ] == NULL )
 		{
-			notify_warning_printf( "%s: invalid pattern.\n",
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_MISSING_VALUE,
+			 "%s: missing pattern value.",
 			 function );
 
 			return( -1 );
@@ -290,7 +294,11 @@ int glob_resolve(
 		     find_extension,
 		     _MAX_EXT ) != 0 )
 		{
-			notify_warning_printf( "%s: unable to split path.\n",
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to split path.",
 			 function );
 
 			return( -1 );
@@ -308,7 +316,11 @@ int glob_resolve(
 				     glob->amount_of_results + 1,
 				     error ) != 1 )
 				{
-					notify_warning_printf( "%s: unable to resize glob.\n",
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_RESIZE_FAILED,
+					 "%s: unable to resize glob.",
 					 function );
 
 					return( -1 );
@@ -321,7 +333,11 @@ int glob_resolve(
 				     find_data.name,
 				     _SYSTEM_CHARACTER_T_STRING( "" )  ) != 0 )
 				{
-					notify_warning_printf( "%s: unable to make path.\n",
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to make path.",
 					 function );
 
 					return( -1 );
@@ -334,7 +350,11 @@ int glob_resolve(
 
 				if( glob->result[ glob->amount_of_results - 1 ] == NULL )
 				{
-					notify_warning_printf( "%s: unable to create glob result.\n",
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create glob result.",
 					 function );
 
 					return( -1 );
@@ -344,7 +364,11 @@ int glob_resolve(
 				     find_path,
 				     find_path_length ) == NULL )
 				{
-					notify_warning_printf( "%s: unable to set glob result.\n",
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set glob result.",
 					 function );
 
 					memory_free(
@@ -360,7 +384,11 @@ int glob_resolve(
 
 				if( globs_found > (int32_t) UINT16_MAX )
 				{
-					notify_warning_printf( "%s: too many globs found.\n",
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+					 "%s: too many globs found.",
 					 function );
 
 					return( -1 );
@@ -372,7 +400,11 @@ int glob_resolve(
 
 			if( errno != ENOENT )
 			{
-				notify_warning_printf( "%s: error finding next file entry.\n",
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: error finding next file entry.",
 				 function );
 
 				return( -1 );
@@ -380,7 +412,11 @@ int glob_resolve(
 			if( glob_findclose(
 			     find_handle ) != 0 )
 			{
-				notify_warning_printf( "%s: error closing find handle.\n",
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: error closing find handle.",
 				 function );
 
 				return( -1 );
@@ -388,7 +424,11 @@ int glob_resolve(
 		}
 		else if( errno != ENOENT )
 		{
-			notify_warning_printf( "%s: error finding file entry.\n",
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: error finding file entry.",
 			 function );
 
 			return( -1 );

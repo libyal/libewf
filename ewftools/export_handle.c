@@ -1639,6 +1639,61 @@ int export_handle_get_input_chunk_size(
 	return( 1 );
 }
 
+/* Sets the header codepage
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_set_header_codepage(
+     export_handle_t *export_handle,
+     int header_codepage,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_header_codepage";
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid export handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_set_header_codepage(
+	     export_handle->input_handle,
+	     header_codepage,
+	     error ) != 1 )
+#else
+	if( libewf_set_header_codepage(
+	     export_handle->input_handle,
+	     header_codepage ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header codepage.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the output values of the export handle
  * Returns 1 if successful or -1 on error
  */
@@ -1647,6 +1702,7 @@ int export_handle_set_output_values(
      system_character_t *acquiry_operating_system,
      system_character_t *acquiry_software,
      system_character_t *acquiry_software_version,
+     int header_codepage,
      size64_t media_size,
      int8_t compression_level,
      uint8_t compression_flags,
@@ -1832,6 +1888,26 @@ int export_handle_set_output_values(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: acquiry software version.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( HAVE_V2_API )
+		if( libewf_handle_set_header_codepage(
+		     export_handle->ewf_output_handle,
+		     header_codepage,
+		     error ) != 1 )
+#else
+		if( libewf_set_header_codepage(
+		     export_handle->ewf_output_handle,
+		     header_codepage ) != 1 )
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header codepage.",
 			 function );
 
 			return( -1 );
@@ -2664,11 +2740,13 @@ int export_handle_crc_errors_fprint(
 
 				result = -1;
 			}
+			last_sector = first_sector + amount_of_sectors;
+
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRId64 " - %" PRId64 " (amount: %" PRIu32 ")",
-			 (uint64_t) first_sector,
-			 (uint64_t) ( first_sector + amount_of_sectors ),
+			 first_sector,
+			 last_sector,
 			 amount_of_sectors );
 
 #if defined( HAVE_V2_API )
@@ -2676,8 +2754,8 @@ int export_handle_crc_errors_fprint(
 			 stream,
 			 " in segment file(s):" );
 
-			last_sector   = ( first_sector + amount_of_sectors ) * export_handle->bytes_per_sector;
 			first_sector *= export_handle->bytes_per_sector;
+			last_sector  *= export_handle->bytes_per_sector;
 
 			while( first_sector < last_sector )
 			{

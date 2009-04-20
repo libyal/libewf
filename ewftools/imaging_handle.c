@@ -927,6 +927,7 @@ int imaging_handle_set_output_values(
      system_character_t *acquiry_operating_system,
      system_character_t *acquiry_software,
      system_character_t *acquiry_software_version,
+     int header_codepage,
      uint32_t bytes_per_sector,
      size64_t media_size,
      uint8_t media_type,
@@ -1126,6 +1127,26 @@ int imaging_handle_set_output_values(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header value: acquiry software version.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_set_header_codepage(
+	     imaging_handle->output_handle,
+	     header_codepage,
+	     error ) != 1 )
+#else
+	if( libewf_set_header_codepage(
+	     imaging_handle->output_handle,
+	     header_codepage ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header codepage.",
 		 function );
 
 		return( -1 );

@@ -151,6 +151,11 @@ int verification_handle_get_hash_value(
      size_t hash_value_size,
      liberror_error_t **error );
 
+int verification_handle_set_header_codepage(
+     verification_handle_t *verification_handle,
+     int header_codepage,
+     liberror_error_t **error );
+
 int verification_handle_set_input_values(
      verification_handle_t *verification_handle,
      int wipe_chunk_on_error,

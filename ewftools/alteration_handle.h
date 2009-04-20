@@ -116,6 +116,11 @@ int alteration_handle_get_chunk_size(
      size32_t *chunk_size,
      liberror_error_t **error );
 
+int alteration_handle_set_header_codepage(
+     alteration_handle_t *alteration_handle,
+     int header_codepage,
+     liberror_error_t **error );
+
 int alteration_handle_set_output_values(
      alteration_handle_t *alteration_handle,
      system_character_t *delta_segment_filename,

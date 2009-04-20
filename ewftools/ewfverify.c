@@ -102,7 +102,7 @@ ssize64_t ewfverify_read_input(
            verification_handle_t *verification_handle,
            uint8_t wipe_chunk_on_error,
            size_t process_buffer_size,
-           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ),
+           process_status_t *process_status,
            liberror_error_t **error )
 {
 	storage_media_buffer_t *storage_media_buffer = NULL;
@@ -110,7 +110,7 @@ ssize64_t ewfverify_read_input(
 	size64_t media_size                          = 0;
 	size32_t chunk_size                          = 0;
 	size_t read_size                             = 0;
-	ssize64_t total_read_count                   = 0;
+	ssize64_t verify_count                       = 0;
 	ssize_t process_count                        = 0;
 	ssize_t read_count                           = 0;
 
@@ -132,6 +132,17 @@ ssize64_t ewfverify_read_input(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid process buffer size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( process_status == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
 		 function );
 
 		return( -1 );
@@ -213,13 +224,13 @@ ssize64_t ewfverify_read_input(
 		return( -1 );
 	}
 
-	while( total_read_count < (ssize64_t) media_size )
+	while( verify_count < (ssize64_t) media_size )
 	{
 		read_size = process_buffer_size;
 
-		if( ( media_size - total_read_count ) < read_size )
+		if( ( media_size - verify_count ) < read_size )
 		{
-			read_size = (size_t) ( media_size - total_read_count );
+			read_size = (size_t) ( media_size - verify_count );
 		}
 		read_count = verification_handle_read_buffer(
 		              verification_handle,
@@ -300,7 +311,7 @@ ssize64_t ewfverify_read_input(
 			storage_media_buffer->compression_buffer_amount = process_count;
 		}
 #endif
-		total_read_count += (ssize64_t) process_count;
+		verify_count += (ssize64_t) process_count;
 
 		if( verification_handle_update_integrity_hash(
 		     verification_handle,
@@ -321,12 +332,20 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-		if( callback != NULL )
+		 if( process_status_update(
+		      process_status,
+		      (size64_t) verify_count,
+		      media_size,
+		      error ) != 1 )
 		{
-			callback(
-			 process_status,
-			 (size64_t) total_read_count,
-			 media_size );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			return( -1 );
 		}
 		if( ewfverify_abort != 0 )
 		{
@@ -346,7 +365,7 @@ ssize64_t ewfverify_read_input(
 
 		return( -1 );
 	}
-	return( total_read_count );
+	return( verify_count );
 }
 
 /* Signal handler for ewfverify
@@ -401,6 +420,9 @@ int main( int argc, char * const argv[] )
 #if !defined( HAVE_GLOB_H )
 	glob_t *glob                                    = NULL;
 #endif
+
+	process_status_t *process_status                = NULL;
+
 	system_character_t *calculated_md5_hash_string  = NULL;
 	system_character_t *calculated_sha1_hash_string = NULL;
 	system_character_t *log_filename                = NULL;
@@ -411,7 +433,6 @@ int main( int argc, char * const argv[] )
 	verification_handle_t *verification_handle      = NULL;
 
 	FILE *log_file_stream                           = NULL;
-	void *callback                                  = &process_status_update;
 
 	system_integer_t option                         = 0;
 	ssize64_t verify_count                          = 0;
@@ -420,6 +441,7 @@ int main( int argc, char * const argv[] )
 	uint32_t amount_of_crc_errors                   = 0;
 	uint8_t calculate_md5                           = 1;
 	uint8_t calculate_sha1                          = 0;
+	uint8_t print_status_information                = 1;
 	uint8_t wipe_chunk_on_error                     = 0;
 	uint8_t verbose                                 = 0;
 	int amount_of_filenames                         = 0;
@@ -541,7 +563,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'q':
-				callback = NULL;
+				print_status_information = 0;
 
 				break;
 
@@ -654,6 +676,32 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( verification_handle_set_header_codepage(
+	     verification_handle,
+	     header_codepage,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set header codepage in verification handle.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		verification_handle_free(
+		 &verification_handle,
+		 NULL );
+
+#if !defined( HAVE_GLOB_H )
+		glob_free(
+		 &glob,
+		 NULL );
+#endif
+
+		return( EXIT_FAILURE );
+	}
 	result = verification_handle_open_input(
 	          verification_handle,
 	          argv_filenames,
@@ -703,11 +751,18 @@ int main( int argc, char * const argv[] )
 		     _SYSTEM_CHARACTER_T_STRING( "Verify" ),
 		     _SYSTEM_CHARACTER_T_STRING( "verified" ),
 		     _SYSTEM_CHARACTER_T_STRING( "Read" ),
-		     stdout ) != 1 )
+		     stdout,
+		     print_status_information,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to initialize process status.\n" );
+
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 
 			verification_handle_close(
 			 verification_handle,
@@ -719,14 +774,21 @@ int main( int argc, char * const argv[] )
 			return( EXIT_FAILURE );
 		}
 		if( process_status_start(
-		     process_status ) != 1 )
+		     process_status,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to start process status.\n" );
 
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
 			process_status_free(
-			 &process_status );
+			 &process_status,
+			 NULL );
 
 			verification_handle_close(
 			 verification_handle,
@@ -743,7 +805,7 @@ int main( int argc, char * const argv[] )
 		                verification_handle,
 		                wipe_chunk_on_error,
 		                (size_t) process_buffer_size,
-		                callback,
+		                process_status,
 		                &error );
 
 		if( verify_count <= -1 )
@@ -767,14 +829,21 @@ int main( int argc, char * const argv[] )
 	if( process_status_stop(
 	     process_status,
 	     (size64_t) verify_count,
-	     status ) != 1 )
+	     status,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to stop process status.\n" );
 
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
 		process_status_free(
-		 &process_status );
+		 &process_status,
+		 NULL );
 
 		verification_handle_close(
 		 verification_handle,
@@ -786,11 +855,17 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	if( process_status_free(
-	     &process_status ) != 1 )
+	     &process_status,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to free process status.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
 		verification_handle_close(
 		 verification_handle,

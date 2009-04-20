@@ -36,13 +36,13 @@
  * The string must be at least 32 characters of length
  * Returns the pointer to the string if successful or NULL on error
  */
-char *libewf_date_time_ctime(
+char *_date_time_ctime(
        const time_t *timestamp,
        char *string,
        size_t length )
 {
 	char *ctime_string    = NULL;
-	static char *function = "libewf_date_time_ctime";
+	static char *function = "_date_time_ctime";
 
 	if( timestamp == NULL )
 	{
@@ -100,14 +100,14 @@ char *libewf_date_time_ctime(
 #if defined( date_time_localtime_r ) || defined( HAVE_LOCALTIME )
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-struct tm *libewf_date_time_localtime(
+struct tm *_date_time_localtime(
             const time_t *timestamp )
 {
 #if !defined( date_time_localtime_r ) && defined( HAVE_LOCALTIME )
 	struct tm *static_time_elements = NULL;
 #endif
 	struct tm *time_elements        = NULL;
-	static char *function           = "libewf_date_time_localtime";
+	static char *function           = "_date_time_localtime";
 
 	if( timestamp == NULL )
 	{
@@ -180,14 +180,14 @@ struct tm *libewf_date_time_localtime(
 #if defined( date_time_gmtime_r ) || defined( HAVE_GMTIME )
 /* Returns a structured representation of a time using UTC (GMT), or NULL on error
  */
-struct tm *libewf_date_time_gmtime(
+struct tm *_date_time_gmtime(
             const time_t *timestamp )
 {
 #if !defined( date_time_gmtime_r ) && defined( HAVE_GMTIME )
 	struct tm *static_time_elements = NULL;
 #endif
 	struct tm *time_elements        = NULL;
-	static char *function           = "libewf_date_time_gmtime";
+	static char *function           = "_date_time_gmtime";
 
 	if( timestamp == NULL )
 	{

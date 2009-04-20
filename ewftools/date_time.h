@@ -81,13 +81,13 @@ extern "C" {
 #endif
 
 #elif defined( HAVE_CTIME )
-char *libewf_date_time_ctime(
+char *_date_time_ctime(
        const time_t *timestamp,
        char *string,
        size_t length );
 
 #define date_time_ctime( timestamp, string, size ) \
-	libewf_date_time_ctime( timestamp, string, size )
+	_date_time_ctime( timestamp, string, size )
 #endif
 
 #if defined( HAVE_MKTIME )
@@ -102,19 +102,19 @@ char *libewf_date_time_ctime(
 #endif
 
 #if defined( date_time_localtime_r ) || defined( HAVE_LOCALTIME )
-struct tm *libewf_date_time_localtime(
+struct tm *_date_time_localtime(
             const time_t *timestamp );
 
 #define date_time_localtime( timestamp ) \
-	libewf_date_time_localtime( timestamp )
+	_date_time_localtime( timestamp )
 #endif
 
 #if defined( date_time_gmtime_r ) || defined( HAVE_GMTIME )
-struct tm *libewf_date_time_gmtime(
+struct tm *_date_time_gmtime(
             const time_t *timestamp );
 
 #define date_time_gmtime( timestamp ) \
-	libewf_date_time_gmtime( timestamp )
+	_date_time_gmtime( timestamp )
 #endif
 
 #if defined( __cplusplus )

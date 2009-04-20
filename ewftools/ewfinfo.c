@@ -399,6 +399,32 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( info_handle_set_header_codepage(
+	     info_handle,
+	     header_codepage,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set header codepage in info handle.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		info_handle_free(
+		 &info_handle,
+		 NULL );
+
+#if !defined( HAVE_GLOB_H )
+		glob_free(
+		 &glob,
+		 NULL );
+#endif
+
+		return( EXIT_FAILURE );
+	}
 	result = info_handle_open_input(
 	          info_handle,
 	          argv_filenames,

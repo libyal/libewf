@@ -61,7 +61,7 @@ alteration_handle_t *ewfalter_alteration_handle = NULL;
 int ewfalter_abort                              = 0;
 
 /* Prints the executable usage information to the stream
- *  */
+ */
 void usage_fprint(
       FILE *stream )
 {
@@ -764,6 +764,32 @@ int main( int argc, char * const argv[] )
 		 error );
 		liberror_error_free(
 		 &error );
+
+#if !defined( HAVE_GLOB_H )
+		glob_free(
+		 &glob,
+		 NULL );
+#endif
+
+		return( EXIT_FAILURE );
+	}
+	if( alteration_handle_set_header_codepage(
+	     alteration_handle,
+	     header_codepage,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set header codepage in alteration handle.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		alteration_handle_free(
+		 &alteration_handle,
+		 NULL );
 
 #if !defined( HAVE_GLOB_H )
 		glob_free(

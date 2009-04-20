@@ -192,8 +192,6 @@ ssize_t libewf_section_start_read(
 		 stored_crc,
 		 calculated_crc );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -1323,8 +1321,6 @@ ssize_t libewf_section_volume_s01_read(
 		 stored_crc,
 		 calculated_crc );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1684,8 +1680,6 @@ ssize_t libewf_section_volume_e01_read(
 
 		memory_free(
 		 volume );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -2280,8 +2274,6 @@ ssize_t libewf_section_table_read(
 		 stored_crc,
 		 calculated_crc );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 	endian_little_convert_32bit(
@@ -2467,11 +2459,6 @@ ssize_t libewf_section_table_read(
 		libewf_notify_verbose_printf(
 		 "%s: table contains no offsets.\n",
 		 function );
-
-		/* TODO error_tollerance
-		 * mark all offset that should be in the table with an error flag?
-		 * how do you now which offsets should be in the table?
-		 */
 	}
 	if( section_size < (size_t) section_read_count )
 	{
@@ -2490,7 +2477,7 @@ ssize_t libewf_section_table_read(
 		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
 			libewf_notify_verbose_printf(
-			 "%s: unexpected data found after table offsets.\n",
+			 "%s: data found after table offsets.\n",
 			 function );
 		}
 		if( libbfio_pool_seek_offset(
@@ -2633,8 +2620,6 @@ ssize_t libewf_section_table2_read(
 		 function,
 		 stored_crc,
 		 calculated_crc );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -3541,8 +3526,6 @@ ssize_t libewf_section_session_read(
 		 stored_crc,
 		 calculated_crc );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -3638,8 +3621,6 @@ ssize_t libewf_section_session_read(
 			 function,
 			 stored_crc,
 			 calculated_crc );
-
-			/* TODO error_tollerance */
 
 			return( -1 );
 		}
@@ -4055,8 +4036,6 @@ ssize_t libewf_section_data_read(
 		 stored_crc,
 		 calculated_crc );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -4085,8 +4064,6 @@ ssize_t libewf_section_data_read(
 	 data->signature,
 	 5 );
 #endif
-	/* TODO add more checks
-	 */
 	if( media_values->media_type != data->media_type )
 	{
 		liberror_error_set(
@@ -4098,8 +4075,6 @@ ssize_t libewf_section_data_read(
 
 		memory_free(
 		 data );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -4121,8 +4096,6 @@ ssize_t libewf_section_data_read(
 		memory_free(
 		 data );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 	endian_little_convert_32bit(
@@ -4140,8 +4113,6 @@ ssize_t libewf_section_data_read(
 
 		memory_free(
 		 data );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -4161,8 +4132,6 @@ ssize_t libewf_section_data_read(
 		memory_free(
 		 data );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 	endian_little_convert_32bit(
@@ -4180,8 +4149,6 @@ ssize_t libewf_section_data_read(
 
 		memory_free(
 		 data );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -4201,8 +4168,6 @@ ssize_t libewf_section_data_read(
 		memory_free(
 		 data );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 	if( media_values->media_flags != data->media_flags )
@@ -4216,8 +4181,6 @@ ssize_t libewf_section_data_read(
 
 		memory_free(
 		 data );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -4235,8 +4198,6 @@ ssize_t libewf_section_data_read(
 
 		memory_free(
 		 data );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -4578,8 +4539,6 @@ ssize_t libewf_section_error2_read(
 		 stored_crc,
 		 calculated_crc );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -4674,8 +4633,6 @@ ssize_t libewf_section_error2_read(
 
 			memory_free(
 			 error2_sectors );
-
-			/* TODO error_tollerance */
 
 			return( -1 );
 		}
@@ -5063,8 +5020,6 @@ ssize_t libewf_section_digest_read(
 		 stored_crc,
 		 calculated_crc );
 
-		/* TODO error_tollerance */
-
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -5390,8 +5345,6 @@ ssize_t libewf_section_hash_read(
 		 function,
 		 stored_crc,
 		 calculated_crc );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}
@@ -6258,8 +6211,6 @@ ssize_t libewf_section_delta_chunk_read(
 		 function,
 		 stored_crc,
 		 calculated_crc );
-
-		/* TODO error_tollerance */
 
 		return( -1 );
 	}

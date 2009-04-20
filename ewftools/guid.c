@@ -53,8 +53,8 @@ int guid_to_string(
 
 		return( -1 );
 	}
-	if( ( byte_order != LIBEWF_ENDIAN_BIG )
-	 && ( byte_order != LIBEWF_ENDIAN_LITTLE ) )
+	if( ( byte_order != _ENDIAN_BIG )
+	 && ( byte_order != _ENDIAN_LITTLE ) )
 	{
 		liberror_error_set(
 		 error,
@@ -101,7 +101,7 @@ int guid_to_string(
 	/* Create the GUID string
 	 * It is stored as uint32 - uint16 - uint16 - 8 byte array
 	 */
-	if( byte_order == LIBEWF_ENDIAN_BIG )
+	if( byte_order == _ENDIAN_BIG )
 	{
 		print_count = system_string_snprintf(
 			       string,
@@ -128,7 +128,7 @@ int guid_to_string(
 			       guid[ 8 ], guid[ 9 ],
 			       guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
 	}
-	else if( byte_order == LIBEWF_ENDIAN_LITTLE )
+	else if( byte_order == _ENDIAN_LITTLE )
 	{
 		print_count = system_string_snprintf(
 			       string,

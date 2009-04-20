@@ -1111,12 +1111,12 @@ ssize64_t ewfacquire_read_input(
            size_t calculated_md5_hash_string_size,
            system_character_t *calculated_sha1_hash_string,
            size_t calculated_sha1_hash_string_size,
-           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ),
+           process_status_t *process_status,
            liberror_error_t **error )
 {
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	static char *function                        = "ewfacquire_read_input";
-	ssize64_t total_write_count                  = 0;
+	ssize64_t acquiry_count                      = 0;
 	size_t write_size                            = 0;
 	ssize_t read_count                           = 0;
 	ssize_t process_count                        = 0;
@@ -1153,6 +1153,17 @@ ssize64_t ewfacquire_read_input(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid process buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( process_status == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid process status.",
 		 function );
 
 		return( -1 );
@@ -1262,20 +1273,20 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	while( total_write_count < (ssize64_t) acquiry_size )
+	while( acquiry_count < (ssize64_t) acquiry_size )
 	{
 		write_size = process_buffer_size;
 
-		if( ( acquiry_size - total_write_count ) < write_size )
+		if( ( acquiry_size - acquiry_count ) < write_size )
 		{
-			write_size = (size_t) ( acquiry_size - total_write_count );
+			write_size = (size_t) ( acquiry_size - acquiry_count );
 		}
 		read_count = ewfacquire_read_buffer(
 		              imaging_handle,
 		              device_handle,
 		              storage_media_buffer->raw_buffer,
 		              storage_media_buffer->raw_buffer_size,
-		              total_write_count,
+		              acquiry_count,
 		              write_size,
 		              read_error_retry,
 		              byte_error_granularity,
@@ -1401,16 +1412,22 @@ ssize64_t ewfacquire_read_input(
 
 			return( -1 );
 		}
-		total_write_count += read_count;
+		acquiry_count += read_count;
 
-		/* Callback for status update
-		 */
-		if( callback != NULL )
+		 if( process_status_update(
+		      process_status,
+		      (size64_t) acquiry_count,
+		      write_size,
+		      error ) != 1 )
 		{
-			callback(
-		         process_status,
-		         (size64_t) total_write_count,
-		         write_size );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			return( -1 );
 		}
 		if( ewfacquire_abort != 0 )
 		{
@@ -1449,9 +1466,9 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	total_write_count += write_count;
+	acquiry_count += write_count;
 
-	return( total_write_count );
+	return( acquiry_count );
 }
 
 /* Signal handler for ewfacquire
@@ -1506,6 +1523,8 @@ int main( int argc, char * const argv[] )
 
 	liberror_error_t *error                         = NULL;
 
+	process_status_t *process_status                = NULL;
+
 	system_character_t *acquiry_software_version    = NULL;
 	system_character_t *calculated_md5_hash_string  = NULL;
 	system_character_t *calculated_sha1_hash_string = NULL;
@@ -1526,7 +1545,6 @@ int main( int argc, char * const argv[] )
 	system_character_t *target_filename             = NULL;
 
 	FILE *log_file_stream                           = NULL;
-	void *callback                                  = &process_status_update;
 
 	system_integer_t option                         = 0;
 	ssize64_t write_count                           = 0;
@@ -1546,6 +1564,7 @@ int main( int argc, char * const argv[] )
 	uint8_t compression_flags                       = 0;
 	uint8_t libewf_format                           = LIBEWF_FORMAT_ENCASE5;
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
+	uint8_t print_status_information                = 1;
 	uint8_t read_error_retry                        = 2;
 	uint8_t swap_byte_pairs                         = 0;
 	uint8_t verbose                                 = 0;
@@ -1897,7 +1916,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'q':
-				callback = NULL;
+				print_status_information = 0;
 
 				break;
 
@@ -3038,6 +3057,7 @@ int main( int argc, char * const argv[] )
 			  acquiry_operating_system,
 			  program,
 			  acquiry_software_version,
+		          header_codepage,
 		          bytes_per_sector,
 		          acquiry_size,
 		          media_type,
@@ -3159,11 +3179,18 @@ int main( int argc, char * const argv[] )
 		     _SYSTEM_CHARACTER_T_STRING( "Acquiry" ),
 		     _SYSTEM_CHARACTER_T_STRING( "acquired" ),
 		     _SYSTEM_CHARACTER_T_STRING( "Written" ),
-		     stdout ) != 1 )
+		     stdout,
+		     print_status_information,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to initialize process status.\n" );
+
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 
 			if( calculate_sha1 == 1 )
 			{
@@ -3192,14 +3219,21 @@ int main( int argc, char * const argv[] )
 			return( EXIT_FAILURE );
 		}
 		if( process_status_start(
-		     process_status ) != 1 )
+		     process_status,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to start process status.\n" );
 
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
 			process_status_free(
-			 &process_status );
+			 &process_status,
+			 NULL );
 
 			if( calculate_sha1 == 1 )
 			{
@@ -3245,7 +3279,7 @@ int main( int argc, char * const argv[] )
 			       DIGEST_HASH_STRING_SIZE_MD5,
 			       calculated_sha1_hash_string,
 			       DIGEST_HASH_STRING_SIZE_SHA1,
-			       callback,
+			       process_status,
 			       &error );
 
 		if( write_count <= -1 )
@@ -3278,7 +3312,8 @@ int main( int argc, char * const argv[] )
 		 &error );
 
 		process_status_free(
-		 &process_status );
+		 &process_status,
+		 NULL );
 
 		if( calculate_sha1 == 1 )
 		{
@@ -3317,7 +3352,8 @@ int main( int argc, char * const argv[] )
 		 &error );
 
 		process_status_free(
-		 &process_status );
+		 &process_status,
+		 NULL );
 
 		if( calculate_sha1 == 1 )
 		{
@@ -3349,14 +3385,21 @@ int main( int argc, char * const argv[] )
 	if( process_status_stop(
 	     process_status,
 	     (size64_t) write_count,
-	     status ) != 1 )
+	     status,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to stop process status.\n" );
 
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
 		process_status_free(
-		 &process_status );
+		 &process_status,
+		 NULL );
 
 		if( calculate_sha1 == 1 )
 		{
@@ -3378,11 +3421,17 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	if( process_status_free(
-	     &process_status ) != 1 )
+	     &process_status,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to free process status.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
 		if( calculate_sha1 == 1 )
 		{
