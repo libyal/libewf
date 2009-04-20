@@ -399,6 +399,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+#if defined( HAVE_V2_API )
 	if( info_handle_set_header_codepage(
 	     info_handle,
 	     header_codepage,
@@ -425,6 +426,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+#endif
 	result = info_handle_open_input(
 	          info_handle,
 	          argv_filenames,

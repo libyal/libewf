@@ -1968,7 +1968,6 @@ LIBEWF_EXTERN int libewf_handle_set_header_value(
  */
 LIBEWF_EXTERN int libewf_handle_parse_header_values(
                    libewf_handle_t *handle,
-                   uint8_t date_format,
                    libewf_error_t **error );
 
 /* Copies the header values from the source to the destination handle

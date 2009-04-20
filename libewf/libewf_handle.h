@@ -102,6 +102,12 @@ struct libewf_internal_handle
 	 */
 	libewf_values_table_t *header_values;
 
+#if defined( HAVE_V1_API )
+	/* The header values date format
+	 */
+	int header_values_date_format;
+#endif
+
 	/* The hash values
 	 */
 	libewf_values_table_t *hash_values;

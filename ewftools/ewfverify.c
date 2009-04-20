@@ -676,6 +676,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+#if defined( HAVE_V2_API )
 	if( verification_handle_set_header_codepage(
 	     verification_handle,
 	     header_codepage,
@@ -702,6 +703,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+#endif
 	result = verification_handle_open_input(
 	          verification_handle,
 	          argv_filenames,

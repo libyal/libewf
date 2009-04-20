@@ -75,30 +75,39 @@ int libewf_header_values_realloc(
 void libewf_header_values_free(
       libewf_values_table_t *header_values );
 
+int libewf_header_values_date_string_copy_from_timestamp(
+     libewf_character_t *date_string,
+     size_t date_string_size,
+     time_t timestamp,
+     uint8_t date_format,
+     liberror_error_t **error );
+
 int libewf_convert_date_header_value(
      libewf_character_t *header_value,
      size_t header_value_length,
-     libewf_character_t **date_time_values_string,
-     size_t *date_time_values_string_size,
+     uint8_t date_format,
+     libewf_character_t **date_string,
+     size_t *date_string_size,
      liberror_error_t **error );
 
 int libewf_generate_date_header_value(
      time_t timestamp,
-     libewf_character_t **date_time_values_string,
-     size_t *date_time_values_string_size,
+     libewf_character_t **date_string,
+     size_t *date_string_size,
      liberror_error_t **error );
 
 int libewf_convert_date_header2_value(
      libewf_character_t *header_value,
      size_t header_value_length,
-     libewf_character_t **date_time_values_string,
-     size_t *date_time_values_string_size,
+     uint8_t date_format,
+     libewf_character_t **date_string,
+     size_t *date_string_size,
      liberror_error_t **error );
 
 int libewf_generate_date_header2_value(
      time_t timestamp,
-     libewf_character_t **date_time_values_string,
-     size_t *date_time_values_string_size,
+     libewf_character_t **date_string,
+     size_t *date_string_size,
      liberror_error_t **error );
 
 int libewf_header_values_copy(
@@ -110,6 +119,7 @@ int libewf_header_values_parse_header_string(
      libewf_values_table_t **header_values,
      libewf_character_t *header_string,
      size_t header_string_size,
+     uint8_t date_format,
      liberror_error_t **error );
 
 int libewf_header_values_parse_header(
@@ -117,12 +127,14 @@ int libewf_header_values_parse_header(
      uint8_t *header,
      size_t header_size,
      int codepage,
+     uint8_t date_format,
      liberror_error_t **error );
 
 int libewf_header_values_parse_header2(
      libewf_values_table_t **header_values,
      uint8_t *header2,
      size_t header2_size,
+     uint8_t date_format,
      liberror_error_t **error );
 
 int libewf_header_values_convert_header_string_to_header(
@@ -289,26 +301,29 @@ int libewf_header_values_generate_header2_encase6(
 int libewf_convert_date_xheader_value(
      libewf_character_t *header_value,
      size_t header_value_length,
-     libewf_character_t **date_time_values_string,
-     size_t *date_time_values_string_size,
+     uint8_t date_format,
+     libewf_character_t **date_string,
+     size_t *date_string_size,
      liberror_error_t **error );
 
 int libewf_generate_date_xheader_value(
      time_t timestamp,
-     libewf_character_t **date_time_values_string,
-     size_t *date_time_values_string_size,
+     libewf_character_t **date_string,
+     size_t *date_string_size,
      liberror_error_t **error );
 
 int libewf_header_values_parse_header_string_xml(
      libewf_values_table_t **header_values,
      libewf_character_t *header_string_xml,
      size_t header_string_xml_size,
+     uint8_t date_format,
      liberror_error_t **error );
 
 int libewf_header_values_parse_xheader(
      libewf_values_table_t **header_values,
      uint8_t *xheader,
      size_t size,
+     uint8_t date_format,
      liberror_error_t **error );
 
 int libewf_header_values_convert_header_string_xml_to_xheader(

@@ -1,6 +1,15 @@
 library:
 * added support for EnCase 6.12 SHA-1 digest hash
 * update for version 2 of the API
+  - date format no longer supported by library
+    library returns string in "YYYY MM DD hh mm ss ZZZ"
+    YYYY = 4 digit year string
+    MM = 2 digit month string
+    DD = 2 digit day string
+    hh = 2 digit hours string
+    mm = 2 digit minutes string
+    ss = 2 digit seconds string
+    ZZZ = timezone string only available in EWFX
 
 ewftools:
 * ewfacquire supports \\.\PhysicalDrive# on Windows

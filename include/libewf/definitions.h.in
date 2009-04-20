@@ -108,6 +108,8 @@ enum LIBEWF_VOLUME_TYPES
 	LIBEWF_VOLUME_TYPE_PHYSICAL		= 0x01
 };
 
+#if @HAVE_V1_API@
+
 /* The date representation formats
  */
 enum LIBEWF_DATE_FORMATS
@@ -117,6 +119,8 @@ enum LIBEWF_DATE_FORMATS
 	LIBEWF_DATE_FORMAT_ISO8601		= 0x03,
 	LIBEWF_DATE_FORMAT_CTIME		= 0x04
 };
+
+#endif
 
 /* The compression types
  */

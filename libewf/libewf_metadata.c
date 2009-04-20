@@ -2532,13 +2532,15 @@ int libewf_handle_set_header_codepage(
 		return( -1 );
 	}
 	if( ( header_codepage != LIBEWF_CODEPAGE_ASCII )
-	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1250 )
-	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1251 )
-	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1252 )
-	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1253 )
-	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1254 )
-	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1256 )
-	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1257 ) )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1250 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1251 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1252 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1253 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1254 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1255 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1256 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1257 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1258 ) )
 	{
 		liberror_error_set(
 		 error,
@@ -2834,6 +2836,8 @@ int libewf_handle_get_header_value(
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value.",
 		 function );
+
+		return( -1 );
 	}
 	return( result );
 }
@@ -3041,7 +3045,6 @@ int libewf_handle_copy_header_values(
  */
 int libewf_handle_parse_header_values(
      libewf_handle_t *handle,
-     uint8_t date_format,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -3091,7 +3094,6 @@ int libewf_handle_parse_header_values(
 	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->xheader,
 	       internal_handle->header_sections->xheader_size,
-	       date_format,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -3112,7 +3114,6 @@ int libewf_handle_parse_header_values(
 	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->header2,
 	       internal_handle->header_sections->header2_size,
-	       date_format,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -3134,7 +3135,6 @@ int libewf_handle_parse_header_values(
 	       internal_handle->header_sections->header,
 	       internal_handle->header_sections->header_size,
 	       internal_handle->header_sections->header_codepage,
-	       date_format,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(

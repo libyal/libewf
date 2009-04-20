@@ -293,7 +293,6 @@ LIBEWF_EXTERN int libewf_handle_set_header_value(
 
 LIBEWF_EXTERN int libewf_handle_parse_header_values(
                    libewf_handle_t *handle,
-                   uint8_t date_format,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_copy_header_values(

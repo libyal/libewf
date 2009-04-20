@@ -110,6 +110,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_date_time_values.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_debug.c"
 				>
 			</File>
@@ -289,6 +293,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_date_time.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_date_time_values.h"
 				>
 			</File>
 			<File

@@ -27,13 +27,15 @@ Further analysis of the EWF format:
 Features
 * tools and library support read/write of EnCase 6.12 SHA1
 * what about header values parsing with preservation of timestamps?
-  - store a timestamp string in the header value and convert them in ewfinfo
-  - use internal format of date/time string convert them in interface
+  - use ISO8601 as default, need to fix timezone for this
+  - libewf_header_values_date_string_copy_from_timestamp and 
+    libewf_date_time_values_copy_to_timestamp add timezone and
+    daylight savings support?
+  - change localtime to gmtime in libewf_date_time_values_copy_to_string
+  - allow arbitrary length of ewfx date values (CET or CEST)
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
-* ewfx: add daylight savings correction to date/time strings
-  or determine UTC correction (localtime - gmtime)
 
 Recovery and analysis:
 * imaging: detect disk full and ask for new segment file location?
@@ -215,7 +217,6 @@ Deployment
   - remove enable-v1-api after testing?
 
 Other:
-* check error tollerance
 * check TODO
 
 Next beta release:
@@ -224,6 +225,11 @@ Next beta release:
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
 * fix ewfexport different input and output chunk sizes for low level functions
+* check if ->tm_gmtoff works in WINAPI
+
+* ewfx: add daylight savings correction to date/time strings
+  or determine UTC correction (localtime - gmtime)
+  - fix date_format in ewfinfo for APIv2
 
 Version: 20090418
 * changes for local use of libewf in libsmio
@@ -232,6 +238,9 @@ Version: 20090418
 * updated libuna
 * worked on adding set_header_codepage to ewftools
 * worked on error tollerance
+* worked on preservation of timestamps in header values
+* fixed error in libewf_set_header_codepage
+* EWFX date values now contain +/- UTC/GMT difference
 
 Version: 20090415
 * fixed == in configure.ac

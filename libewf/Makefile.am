@@ -22,6 +22,7 @@ libewf_la_SOURCES = \
 	libewf_chunk_offset.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_date_time.c libewf_date_time.h \
+	libewf_date_time_values.c libewf_date_time_values.h \
 	libewf_debug.c libewf_debug.h \
 	libewf_definitions.h \
 	libewf_error.c libewf_error.h \

@@ -113,6 +113,10 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
+#if defined( HAVE_V1_API )
+		internal_handle->header_values_date_format = LIBEWF_DATE_FORMAT_CTIME;
+#endif
+
 		/* The segment table is initially filled with a single entry
 		 */
 		if( libewf_segment_table_initialize(
