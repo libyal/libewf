@@ -155,7 +155,6 @@ int libewf_segment_file_read_sections(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
-     size64_t *segment_file_size,
      liberror_error_t **error )
 {
 	ewf_section_t section;
@@ -217,7 +216,6 @@ int libewf_segment_file_read_sections(
 		          &( io_handle->compression_level ),
 		          &( io_handle->format ),
 		          &( io_handle->ewf_format ),
-		          segment_file_size,
 		          &section,
 		          &previous_offset,
 		          error );

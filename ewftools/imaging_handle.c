@@ -1333,6 +1333,7 @@ int imaging_handle_get_output_values(
      int8_t *compression_level,
      uint8_t *compression_flags,
      uint8_t *libewf_format,
+     size64_t *segment_file_size,
      uint32_t *sectors_per_chunk,
      uint32_t *sector_error_granularity,
      liberror_error_t **error )
@@ -1412,7 +1413,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: description.",
 		 function );
 
@@ -1431,7 +1432,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: evidence number.",
 		 function );
 
@@ -1450,7 +1451,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: examiner name.",
 		 function );
 
@@ -1469,7 +1470,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: notes.",
 		 function );
 
@@ -1489,7 +1490,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -1509,7 +1510,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media size.",
 		 function );
 
@@ -1529,7 +1530,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media type.",
 		 function );
 
@@ -1549,7 +1550,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve volume type.",
 		 function );
 
@@ -1571,7 +1572,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve compression values.",
 		 function );
 
@@ -1591,8 +1592,28 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve format.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_segment_file_size(
+	     imaging_handle->output_handle,
+	     segment_file_size,
+	     error ) != 1 )
+#else
+	if( libewf_get_segment_file_size(
+	     imaging_handle->output_handle,
+	     segment_file_size ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment file size.",
 		 function );
 
 		return( -1 );
@@ -1611,7 +1632,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve sectors per chunk.",
 		 function );
 
@@ -1631,7 +1652,7 @@ int imaging_handle_get_output_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve error granularity.",
 		 function );
 

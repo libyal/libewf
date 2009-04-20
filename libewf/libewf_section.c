@@ -6707,7 +6707,6 @@ int libewf_section_read(
      int8_t *compression_level,
      uint8_t *format,
      uint8_t *ewf_format,
-     size64_t *segment_file_size,
      ewf_section_t *section,
      off64_t *section_start_offset,
      liberror_error_t **error )
@@ -6924,13 +6923,6 @@ int libewf_section_read(
 	       "done",
 	       5 ) == 0 ) )
 	{
-		/* Determine the size of the largest segment file for read and write mode only
-		 */
-		if( ( segment_file_size != NULL )
-		 && ( (off64_t) *segment_file_size < ( *section_start_offset + (off64_t) sizeof( ewf_section_t ) ) ) )
-		{
-			*segment_file_size = (size64_t) ( *section_start_offset + sizeof( ewf_section_t ) );
-		}
 	}
 	/* Read the header2 section
 	 * The \0 byte is included in the compare

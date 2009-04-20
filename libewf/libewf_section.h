@@ -369,7 +369,6 @@ int libewf_section_read(
      int8_t *compression_level,
      uint8_t *format,
      uint8_t *ewf_format,
-     size64_t *segment_file_size,
      ewf_section_t *section,
      off64_t *section_start_offset,
      liberror_error_t **error );

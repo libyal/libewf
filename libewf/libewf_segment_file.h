@@ -66,7 +66,6 @@ int libewf_segment_file_read_sections(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
-     size64_t *segment_file_size,
      liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_headers(

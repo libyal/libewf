@@ -218,7 +218,9 @@ Next beta release:
   - force set header value to require string formatted in the date format ?
 
 * resume acquiry
-  - get segment file size
+  - improve resume write initialize in library
+  - move segment file size from write io handle to segment table or io handle ?
+    set segment file size on read
 
 Version: 20090419
 * worked on date and time strings

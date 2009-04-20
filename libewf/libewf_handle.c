@@ -1255,7 +1255,6 @@ int libewf_handle_open_file_io_pool(
 	libbfio_handle_t *file_io_handle          = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_open_file_io_pool";
-	size64_t *segment_file_size               = NULL;
 	uint16_t segment_number                   = 0;
 	int amount_of_handles                     = 0;
 	int file_io_handle_iterator               = 0;
@@ -1441,7 +1440,6 @@ int libewf_handle_open_file_io_pool(
 		          internal_handle->offset_table,
 		          internal_handle->sessions,
 		          internal_handle->acquiry_errors,
-		          segment_file_size,
 		          &( internal_handle->abort ),
 		          error );
 
@@ -1480,7 +1478,6 @@ int libewf_handle_open_file_io_pool(
 			       internal_handle->offset_table,
 			       internal_handle->sessions,
 			       internal_handle->acquiry_errors,
-			       segment_file_size,
 			       &( internal_handle->abort ),
 			       error ) != 1 ) )
 			{

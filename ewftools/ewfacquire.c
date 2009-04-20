@@ -2728,6 +2728,7 @@ int main( int argc, char * const argv[] )
 			     &compression_level,
 			     &compression_flags,
 			     &libewf_format,
+			     &segment_file_size,
 			     &sectors_per_chunk,
 			     &sector_error_granularity,
 			     &error ) != 1 )
@@ -3042,14 +3043,18 @@ int main( int argc, char * const argv[] )
 			{
 				maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 			}
+			if( segment_file_size == 0 )
+			{
+				segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+			}
 			if( ewfinput_get_byte_size_variable(
 			     stdout,
 			     input_buffer,
 			     EWFACQUIRE_INPUT_BUFFER_SIZE,
 			     _SYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
-			     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE ),
-			     ( maximum_segment_file_size ),
-			     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE ),
+			     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
+			     maximum_segment_file_size,
+			     segment_file_size,
 			     &segment_file_size,
 			     &error ) == -1 )
 			{

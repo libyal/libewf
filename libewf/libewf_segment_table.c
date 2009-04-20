@@ -299,7 +299,6 @@ int libewf_segment_table_build(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
-     size64_t *segment_file_size,
      int *abort,
      liberror_error_t **error )
 {
@@ -351,7 +350,6 @@ int libewf_segment_table_build(
 		          offset_table,
 		          sessions,
 		          acquiry_errors,
-		          segment_file_size,
 		          error );
 
 		if( result == -1 )
