@@ -526,7 +526,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        void *chunk_buffer,
                        size_t chunk_buffer_size,
                        int8_t *is_compressed,
-                       uint8_t *crc_buffer,
+                       void *crc_buffer,
                        uint32_t *chunk_crc,
                        int8_t *read_crc,
                        libewf_error_t **error );
@@ -580,7 +580,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
                        size_t chunk_buffer_size,
                        size_t data_size,
                        int8_t is_compressed,
-                       uint8_t *crc_buffer,
+                       void *crc_buffer,
                        uint32_t chunk_crc,
                        int8_t write_crc,
                        libewf_error_t **error );
@@ -1165,12 +1165,14 @@ LIBEWF_EXTERN int libewf_get_header_value(
         libewf_get_header_value( handle, "notes", value, value_size )
 
 /* Retrieves the header value acquiry date
+ * The string is formatted according to the date format
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 #define libewf_get_header_value_acquiry_date( handle, value, value_size ) \
         libewf_get_header_value( handle, "acquiry_date", value, value_size )
 
 /* Retrieves the header value system date
+ * The string is formatted according to the date format
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 #define libewf_get_header_value_system_date( handle, value, value_size ) \
@@ -1740,6 +1742,22 @@ LIBEWF_EXTERN int libewf_handle_set_header_codepage(
                    int header_codepage,
                    libewf_error_t **error );
 
+/* Retrieves the header values date format
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_header_values_date_format(
+                   libewf_handle_t *handle,
+                   int *date_format,
+                   libewf_error_t **error );
+
+/* Sets the header values date format
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_set_header_values_date_format(
+                   libewf_handle_t *handle,
+                   int date_format,
+                   libewf_error_t **error );
+
 /* Retrieves the amount of header values
  * Returns 1 if successful, 0 if no header values are present or -1 on error
  */
@@ -1825,12 +1843,14 @@ LIBEWF_EXTERN int libewf_handle_get_header_value(
         libewf_handle_get_header_value( handle, (uint8_t *) "notes", 5, value, value_size, error )
 
 /* Retrieves the header value acquiry date
+ * The string is formatted according to the date format
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 #define libewf_handle_get_header_value_acquiry_date( handle, value, value_size, error ) \
         libewf_handle_get_header_value( handle, (uint8_t *) "acquiry_date", 12, value, value_size, error )
 
 /* Retrieves the header value system date
+ * The string is formatted according to the date format
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 #define libewf_handle_get_header_value_system_date( handle, value, value_size, error ) \

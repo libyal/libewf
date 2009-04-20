@@ -34,15 +34,19 @@
 /* The libewf file access
  * bit 1	set to 1 for read access
  * bit 2	set to 1 for write access
- * bit 3-8	not used
+ * bit 3-4	not used
+ * bit 5        set to 1 to resume write
+ * bit 6-8	not used
  */
 #define LIBEWF_FLAG_READ			(uint8_t) 0x01
 #define LIBEWF_FLAG_WRITE			(uint8_t) 0x02
+#define LIBEWF_FLAG_RESUME			(uint8_t) 0x10
 
 /* The libewf file access macros
  */
 #define LIBEWF_OPEN_READ			( LIBEWF_FLAG_READ )
 #define LIBEWF_OPEN_WRITE			( LIBEWF_FLAG_WRITE )
+#define LIBEWF_OPEN_WRITE_RESUME		( LIBEWF_FLAG_WRITE | LIBEWF_FLAG_RESUME )
 #define LIBEWF_OPEN_READ_WRITE			( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE )
 
 /* The file formats
@@ -108,8 +112,6 @@ enum LIBEWF_VOLUME_TYPES
 	LIBEWF_VOLUME_TYPE_PHYSICAL		= 0x01
 };
 
-#if @HAVE_V1_API@
-
 /* The date representation formats
  */
 enum LIBEWF_DATE_FORMATS
@@ -119,8 +121,6 @@ enum LIBEWF_DATE_FORMATS
 	LIBEWF_DATE_FORMAT_ISO8601		= 0x03,
 	LIBEWF_DATE_FORMAT_CTIME		= 0x04
 };
-
-#endif
 
 /* The compression types
  */

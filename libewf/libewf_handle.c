@@ -113,9 +113,7 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
-#if defined( HAVE_V1_API )
-		internal_handle->header_values_date_format = LIBEWF_DATE_FORMAT_CTIME;
-#endif
+		internal_handle->date_format = LIBEWF_DATE_FORMAT_CTIME;
 
 		/* The segment table is initially filled with a single entry
 		 */
@@ -1797,7 +1795,7 @@ ssize_t libewf_handle_read_chunk(
          void *chunk_buffer,
          size_t chunk_buffer_size,
          int8_t *is_compressed,
-         uint8_t *crc_buffer,
+         void *crc_buffer,
          uint32_t *chunk_crc,
          int8_t *read_crc,
          liberror_error_t **error )
@@ -1846,10 +1844,10 @@ ssize_t libewf_handle_read_chunk(
 	              internal_handle->io_handle,
 	              internal_handle->offset_table,
 	              internal_handle->io_handle->current_chunk,
-	              chunk_buffer,
+	              (uint8_t *) chunk_buffer,
 	              chunk_buffer_size,
 	              is_compressed,
-	              crc_buffer,
+	              (uint8_t *) crc_buffer,
 	              (ewf_crc_t *) chunk_crc,
 	              read_crc,
 	              error );
@@ -2230,7 +2228,7 @@ ssize_t libewf_handle_write_chunk(
          size_t chunk_buffer_size,
          size_t data_size,
          int8_t is_compressed,
-         uint8_t *crc_buffer,
+         void *crc_buffer,
          uint32_t chunk_crc,
          int8_t write_crc,
          liberror_error_t **error )
@@ -2372,11 +2370,11 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->delta_segment_table,
 		               internal_handle->header_sections,
 		               internal_handle->io_handle->current_chunk,
-		               chunk_buffer,
+		               (uint8_t *) chunk_buffer,
 		               chunk_buffer_size,
 		               data_size,
 		               is_compressed,
-		               crc_buffer,
+		               (uint8_t *) crc_buffer,
 		               (ewf_crc_t) chunk_crc,
 		               write_crc,
 		               error );
@@ -2396,11 +2394,11 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->sessions,
 		               internal_handle->acquiry_errors,
 		               internal_handle->io_handle->current_chunk,
-		               chunk_buffer,
+		               (uint8_t *) chunk_buffer,
 		               chunk_buffer_size,
 		               data_size,
 		               is_compressed,
-		               crc_buffer,
+		               (uint8_t *) crc_buffer,
 		               (ewf_crc_t) chunk_crc,
 		               write_crc,
 		               error );

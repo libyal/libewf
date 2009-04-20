@@ -250,6 +250,16 @@ LIBEWF_EXTERN int libewf_handle_set_header_codepage(
                    int header_codepage,
                    liberror_error_t **error );
 
+LIBEWF_EXTERN int libewf_handle_get_header_values_date_format(
+                   libewf_handle_t *handle,
+                   int *date_format,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_header_values_date_format(
+                   libewf_handle_t *handle,
+                   int date_format,
+                   liberror_error_t **error );
+
 LIBEWF_EXTERN int libewf_handle_get_amount_of_header_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values,

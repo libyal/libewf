@@ -1,4 +1,4 @@
-.Dd April 18, 2009
+.Dd April 19, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -125,7 +125,7 @@ File/Handle functions (APIv2)
 .Ft ssize_t
 .Fn libewf_handle_prepare_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t read_crc, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, int8_t *is_compressed, uint8_t *crc_buffer, uint32_t *chunk_crc, int8_t *read_crc, libewf_error_t **error"
+.Fn libewf_handle_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, int8_t *is_compressed, void *crc_buffer, uint32_t *chunk_crc, int8_t *read_crc, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_read_buffer "libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
@@ -133,7 +133,7 @@ File/Handle functions (APIv2)
 .Ft ssize_t
 .Fn libewf_handle_prepare_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, size_t data_size, int8_t is_compressed, uint8_t *crc_buffer, uint32_t chunk_crc, int8_t write_crc, libewf_error_t **error"
+.Fn libewf_handle_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, size_t data_size, int8_t is_compressed, void *crc_buffer, uint32_t chunk_crc, int8_t write_crc, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_buffer "libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
@@ -257,7 +257,7 @@ Meta data functions (APIv1)
 .Ft int
 .Fn libewf_add_session "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors"
 .Ft int
-.Fn libewf_get_header_codepage "libewf_handle_t *handle, int codepage"
+.Fn libewf_get_header_codepage "libewf_handle_t *handle, int *codepage"
 .Ft int
 .Fn libewf_set_header_codepage "libewf_handle_t *handle, int codepage"
 .Ft int
@@ -422,6 +422,16 @@ Meta data functions (APIv2)
 .Fn libewf_handle_get_session "libewf_handle_t *handle, uint32_t index, off64_t *first_sector, uint32_t *amount_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_add_session "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_header_codepage "libewf_handle_t *handle, int *codepage, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_set_header_codepage "libewf_handle_t *handle, int codepage, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_header_values_data_format "libewf_handle_t *handle, int date_format, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_set_header_values_data_format "libewf_handle_t *handle, int date_format, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_amount_of_header_values "libewf_handle_t *handle, uint32_t *amount_of_values, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_header_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
 .Ft int

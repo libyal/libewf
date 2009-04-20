@@ -1,4 +1,4 @@
-/*
+
  * File Object definition for libewf Python bindings
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
@@ -520,7 +520,6 @@ PyObject *pyewf_file_get_header_value(
 #if defined( HAVE_V2_API )
 	if( libewf_handle_parse_header_values(
 	     pyewf_file->handle,
-	     LIBEWF_DATE_FORMAT_CTIME,
 	     NULL ) == -1 )
 	{
 		return( PyErr_Format(
@@ -665,7 +664,6 @@ PyObject *pyewf_file_get_header_values(
 #if defined( HAVE_V2_API )
 	if( libewf_handle_parse_header_values(
 	     pyewf_file->handle,
-	     LIBEWF_DATE_FORMAT_CTIME,
 	     NULL ) == -1 )
 	{
 		return( PyErr_Format(

@@ -98,15 +98,13 @@ struct libewf_internal_handle
 	 */
 	libewf_hash_sections_t *hash_sections;
 
+	/* The date format for certain header values
+	 */
+	int date_format;
+
 	/* The header values
 	 */
 	libewf_values_table_t *header_values;
-
-#if defined( HAVE_V1_API )
-	/* The header values date format
-	 */
-	int header_values_date_format;
-#endif
 
 	/* The hash values
 	 */
@@ -185,7 +183,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        void *chunk_buffer,
                        size_t chunk_buffer_size,
                        int8_t *is_compressed,
-                       uint8_t *crc_buffer,
+                       void *crc_buffer,
                        uint32_t *chunk_crc,
                        int8_t *read_crc,
                        liberror_error_t **error );
@@ -220,7 +218,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
                        size_t chunk_buffer_size,
                        size_t data_size,
                        int8_t is_compressed,
-                       uint8_t *crc_buffer,
+                       void *crc_buffer,
                        uint32_t chunk_crc,
                        int8_t write_crc,
                        liberror_error_t **error );

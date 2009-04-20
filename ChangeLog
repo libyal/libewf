@@ -1,12 +1,13 @@
 Roadmap:
+* resume write i.e. system failure (check to which part of the EWF files is ok)
 * low level and high level api (part of v2 api)
   - to allow low level access to sections etc. (for recovery)
-* resume write i.e. system failure (check to which part of the EWF files is ok)
 * lvf support
   - add support for interaction with data in ltree section
   - use libpff like item approach?
 * xsignature section to sign xhash and/or hash
-* library/tools enhancements (getoptlong)
+* library/tools enhancements
+  - getoptlong
 * internationalisation
   - Unicode support (added)
   - locale support
@@ -26,13 +27,6 @@ Further analysis of the EWF format:
 
 Features
 * tools and library support read/write of EnCase 6.12 SHA1
-* what about header values parsing with preservation of timestamps?
-  - use ISO8601 as default, need to fix timezone for this
-  - libewf_header_values_date_string_copy_from_timestamp and 
-    libewf_date_time_values_copy_to_timestamp add timezone and
-    daylight savings support?
-  - change localtime to gmtime in libewf_date_time_values_copy_to_string
-  - allow arbitrary length of ewfx date values (CET or CEST)
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
@@ -98,12 +92,11 @@ API changes
   - libewf_add/remove_file for LVF
 * libbfio API extension
   - add means to set pools open handle limit in libewf (partial completed)
-  - add means to obtain libbio handle of media data in ewf
+  - add means to obtain libbfio handle of media data in ewf
   - add means to set narrow string codepage
   - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
 * file structure API extension (idea)
 * add wide character functions definitions by default?
-* change crc_buffer from uint8_t * to void *
 
 ewftools:
 * add getoptlong support
@@ -225,11 +218,13 @@ Next beta release:
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
 * fix ewfexport different input and output chunk sizes for low level functions
-* check if ->tm_gmtoff works in WINAPI
+* what about header values parsing with preservation of timestamps?
+  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
+  - force set header value to require string formatted in the date format
 
-* ewfx: add daylight savings correction to date/time strings
-  or determine UTC correction (localtime - gmtime)
-  - fix date_format in ewfinfo for APIv2
+Version: 20090419
+* worked on date and time strings
+* changed crc_buffer from uint8_t * to void *
 
 Version: 20090418
 * changes for local use of libewf in libsmio

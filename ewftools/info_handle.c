@@ -829,7 +829,6 @@ int info_handle_header_values_fprint(
 #if defined( HAVE_V2_API )
 	if( libewf_handle_parse_header_values(
 	     info_handle->input_handle,
-	     date_format,
 	     error ) != 1 )
 #else
 	if( libewf_parse_header_values(
@@ -847,6 +846,20 @@ int info_handle_header_values_fprint(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
+	if( libewf_handle_set_header_values_date_format(
+	     info_handle->input_handle,
+	     date_format,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header values date format.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_handle_get_amount_of_header_values(
 	     info_handle->input_handle,
 	     &amount_of_values,

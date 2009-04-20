@@ -47,8 +47,6 @@ int libewf_date_time_values_copy_from_timestamp(
      libewf_character_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t timestamp,
-     libewf_character_t *timezone_string,
-     size_t timezone_string_length,
      liberror_error_t **error );
 
 int libewf_date_time_values_copy_to_timestamp(
@@ -57,8 +55,6 @@ int libewf_date_time_values_copy_to_timestamp(
      time_t *timestamp,
      liberror_error_t **error );
 
-#if defined( HAVE_V1_API )
-
 int libewf_date_time_values_copy_to_string(
      libewf_character_t *date_time_values_string,
      size_t date_time_values_string_length,
@@ -66,8 +62,6 @@ int libewf_date_time_values_copy_to_string(
      libewf_character_t *string,
      size_t string_size,
      liberror_error_t **error );
-
-#endif
 
 #if defined( __cplusplus )
 }

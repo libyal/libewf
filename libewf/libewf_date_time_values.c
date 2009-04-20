@@ -42,15 +42,13 @@
 #include "libewf_definitions.h"
 
 /* Copies date and time values string from a timestamp
- * The string must be at least 20 characters + the lenght of the timezone string of size including the end of string character
+ * The string must be at least 20 characters + the length of the timezone string and/or timezone name of size including the end of string character
  * Returns 1 if successful or -1 on error
  */
 int libewf_date_time_values_copy_from_timestamp(
      libewf_character_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t timestamp,
-     libewf_character_t *timezone_string,
-     size_t timezone_string_length,
      liberror_error_t **error )
 {
 	struct tm *time_elements = NULL;
@@ -79,7 +77,7 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	if( date_time_values_string_size < ( 20 + timezone_string_length ) )
+	if( date_time_values_string_size < 20 )
 	{
 		liberror_error_set(
 		 error,
@@ -105,33 +103,17 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	if( timezone_string == NULL )
-	{
-		print_count = libewf_string_snprintf(
-			       date_time_values_string,
-			       date_time_values_string_size,
-			       "%04d %02d %02d %02d %02d %02d",
-			       time_elements->tm_year + 1900,
-			       time_elements->tm_mon + 1,
-			       time_elements->tm_mday,
-			       time_elements->tm_hour,
-			       time_elements->tm_min,
-			       time_elements->tm_sec );
-	}
-	else
-	{
-		print_count = libewf_string_snprintf(
-			       date_time_values_string,
-			       date_time_values_string_size,
-			       "%04d %02d %02d %02d %02d %02d %" PRIs_LIBEWF "",
-			       time_elements->tm_year + 1900,
-			       time_elements->tm_mon + 1,
-			       time_elements->tm_mday,
-			       time_elements->tm_hour,
-			       time_elements->tm_min,
-			       time_elements->tm_sec,
-			       timezone_string );
-	}
+	print_count = libewf_string_snprintf(
+		       date_time_values_string,
+		       date_time_values_string_size,
+		       "%04d %02d %02d %02d %02d %02d",
+		       time_elements->tm_year + 1900,
+		       time_elements->tm_mon + 1,
+		       time_elements->tm_mday,
+		       time_elements->tm_hour,
+		       time_elements->tm_min,
+		       time_elements->tm_sec );
+
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > date_time_values_string_size ) )
 	{
@@ -218,8 +200,7 @@ int libewf_date_time_values_copy_to_timestamp(
 
 		return( -1 );
 	}
-	if( ( amount_of_date_time_elements != 6 )
-	 && ( amount_of_date_time_elements != 7 ) )
+	if( amount_of_date_time_elements < 6 )
 	{
 		liberror_error_set(
 		 error,
@@ -305,8 +286,6 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	return( 1 );
 }
-
-#if defined( HAVE_V1_API )
 
 /* Copies a date time values string to a string in a specific date format
  * The string must be at least 32 characters of size this includes the end of string character
@@ -517,35 +496,17 @@ int libewf_date_time_values_copy_to_string(
 
 				return( -1 );
 		}
-		if( date_time_values_string_length <= 19 )
-		{
-			print_count = libewf_string_snprintf(
-				       string,
-				       string_size,
-				       "%s %s %2d %02d:%02d:%02d %04d",
-				       (char *) day_of_week,
-				       (char *) month,
-				       time_elements->tm_mday,
-				       time_elements->tm_hour,
-				       time_elements->tm_min,
-				       time_elements->tm_sec,
-				       time_elements->tm_year + 1900 );
-		}
-		else
-		{
-			print_count = libewf_string_snprintf(
-				       string,
-				       string_size,
-				       "%s %s %2d %02d:%02d:%02d %04d %" PRIs_LIBEWF "",
-				       (char *) day_of_week,
-				       (char *) month,
-				       time_elements->tm_mday,
-				       time_elements->tm_hour,
-				       time_elements->tm_min,
-				       time_elements->tm_sec,
-				       time_elements->tm_year + 1900,
-			               &( date_time_values_string[ 20 ] ) );
-		}
+		print_count = libewf_string_snprintf(
+			       string,
+			       string_size,
+			       "%s %s %2d %02d:%02d:%02d %04d",
+			       (char *) day_of_week,
+			       (char *) month,
+			       time_elements->tm_mday,
+			       time_elements->tm_hour,
+			       time_elements->tm_min,
+			       time_elements->tm_sec,
+			       time_elements->tm_year + 1900 );
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	{
@@ -553,7 +514,7 @@ int libewf_date_time_values_copy_to_string(
 			       string,
 			       string_size,
 			       "%02d/%02d/%04d %02d:%02d:%02d",
-			       ( time_elements->tm_mon + 1 ),
+			       time_elements->tm_mon + 1,
 			       time_elements->tm_mday,
 			       time_elements->tm_year + 1900,
 			       time_elements->tm_hour,
@@ -567,7 +528,7 @@ int libewf_date_time_values_copy_to_string(
 			       string_size,
 			       "%02d/%02d/%04d %02d:%02d:%02d",
 			       time_elements->tm_mday,
-			       ( time_elements->tm_mon + 1 ),
+			       time_elements->tm_mon + 1,
 			       time_elements->tm_year + 1900,
 			       time_elements->tm_hour,
 			       time_elements->tm_min,
@@ -580,7 +541,7 @@ int libewf_date_time_values_copy_to_string(
 			       string_size,
 			       "%04d-%02d-%02dT%02d:%02d:%02d",
 			       time_elements->tm_year + 1900,
-			       ( time_elements->tm_mon + 1 ),
+			       time_elements->tm_mon + 1,
 			       time_elements->tm_mday,
 			       time_elements->tm_hour,
 			       time_elements->tm_min,
@@ -601,11 +562,47 @@ int libewf_date_time_values_copy_to_string(
 
 		return( -1 );
 	}
+	if( date_time_values_string_length > 19 )
+	{
+		if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			if( ( date_time_values_string[ 20 ] == (libewf_character_t ) '+' )
+			 || ( date_time_values_string[ 20 ] == (libewf_character_t ) '-' ) )
+			{
+				print_count = libewf_string_snprintf(
+					       &( string[ 19 ] ),
+					       7,
+					       "%" PRIs_LIBEWF "",
+					       &( date_time_values_string[ 20 ] ) );
+			}
+		}
+		else
+		{
+			print_count = libewf_string_snprintf(
+				       &( string[ print_count ] ),
+				       string_size - print_count,
+				       "%" PRIs_LIBEWF "",
+				       &( date_time_values_string[ 19 ] ) );
+		}
+		if( ( print_count <= -1 )
+		 || ( (size_t) print_count > string_size ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set string.",
+			 function );
+
+			memory_free(
+			 time_elements );
+
+			return( -1 );
+		}
+	}
 	memory_free(
 	 time_elements );
 
 	return( 1 );
 }
-
-#endif
 

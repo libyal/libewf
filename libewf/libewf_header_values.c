@@ -507,7 +507,7 @@ int libewf_convert_date_header_value(
 
 		return( -1 );
 	}
-	*date_time_values_string_size = 64;
+	*date_time_values_string_size = 20;
 
 	*date_time_values_string = (libewf_character_t *) memory_allocate(
 	                                                   sizeof( libewf_character_t ) * *date_time_values_string_size );
@@ -529,8 +529,6 @@ int libewf_convert_date_header_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     timestamp,
-	     NULL,
-	     0,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -740,7 +738,7 @@ int libewf_convert_date_header2_value(
 	}
 	timestamp = (time_t) timestamp_value;
 
-	*date_time_values_string_size = 64;
+	*date_time_values_string_size = 20;
 
 	*date_time_values_string = (libewf_character_t *) memory_allocate(
 	                                                   sizeof( libewf_character_t ) * *date_time_values_string_size );
@@ -762,8 +760,6 @@ int libewf_convert_date_header2_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     timestamp,
-	     NULL,
-	     0,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -5475,6 +5471,8 @@ int libewf_convert_date_xheader_value(
 	static char *function                   = "libewf_convert_date_xheader_value";
 	time_t timestamp                        = 0;
 	size_t amount_of_date_time_elements     = 0;
+	size_t timezone_name_length             = 0;
+	size_t timezone_string_length           = 0;
 	int empty_date_element_correction       = 0;
 
 	if( header_value == NULL )
@@ -5538,9 +5536,7 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
-	if( ( amount_of_date_time_elements != 6 )
-	 && ( amount_of_date_time_elements != 7 )
-	 && ( amount_of_date_time_elements != 8 ) )
+	if( amount_of_date_time_elements < 6 )
 	{
 		liberror_error_set(
 		 error,
@@ -5568,85 +5564,85 @@ int libewf_convert_date_xheader_value(
 	time_elements.tm_year = (int) ( ( ( date_time_elements[ empty_date_element_correction + 4 ][ 0 ] - (libewf_character_t) '0' ) * 1000 )
 			      + ( ( date_time_elements[ empty_date_element_correction + 4 ][ 1 ] - (libewf_character_t) '0' ) * 100 )
 			      + ( ( date_time_elements[ empty_date_element_correction + 4 ][ 2 ] - (libewf_character_t) '0' ) * 10 )
-				      + ( date_time_elements[ empty_date_element_correction + 4 ][ 3 ] - (libewf_character_t) '0' )
-				      - 1900 );
+			      + ( date_time_elements[ empty_date_element_correction + 4 ][ 3 ] - (libewf_character_t) '0' )
+			      - 1900 );
 
-		/* Set the month
-		 */
-		if( libewf_string_compare(
-		     date_time_elements[ 1 ],
-		     _LIBEWF_STRING( "Jan" ),
-		     3 ) == 0 )
-		{
-			time_elements.tm_mon = 0;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Feb" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 1;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Mar" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 2;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Apr" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 3;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "May" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 4;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Jun" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 5;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Jul" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 6;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Aug" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 7;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Sep" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 8;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Oct" ),
-			  3 ) == 0 )
-		{
-			time_elements.tm_mon = 9;
-		}
-		else if( libewf_string_compare(
-			  date_time_elements[ 1 ],
-			  _LIBEWF_STRING( "Nov" ),
+	/* Set the month
+	 */
+	if( libewf_string_compare(
+	     date_time_elements[ 1 ],
+	     _LIBEWF_STRING( "Jan" ),
+	     3 ) == 0 )
+	{
+		time_elements.tm_mon = 0;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Feb" ),
 		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 1;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Mar" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 2;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Apr" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 3;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "May" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 4;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Jun" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 5;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Jul" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 6;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Aug" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 7;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Sep" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 8;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Oct" ),
+		  3 ) == 0 )
+	{
+		time_elements.tm_mon = 9;
+	}
+	else if( libewf_string_compare(
+		  date_time_elements[ 1 ],
+		  _LIBEWF_STRING( "Nov" ),
+	  3 ) == 0 )
 	{
 		time_elements.tm_mon = 10;
 	}
@@ -5708,8 +5704,22 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
-	*date_time_values_string_size = 64;
+	*date_time_values_string_size = 20;
 
+	if( ( amount_of_date_time_elements - empty_date_element_correction ) > 5 )
+	{
+		timezone_string_length = libewf_string_length(
+		                          date_time_elements[ empty_date_element_correction + 5 ] );
+
+		*date_time_values_string_size += 1 + timezone_string_length;
+	}
+	if( ( amount_of_date_time_elements - empty_date_element_correction ) > 6 )
+	{
+		timezone_name_length = libewf_string_length(
+		                        date_time_elements[ empty_date_element_correction + 6 ] );
+
+		*date_time_values_string_size += 1 + timezone_name_length;
+	}
 	*date_time_values_string = (libewf_character_t *) memory_allocate(
 	                                                   sizeof( libewf_character_t ) * *date_time_values_string_size );
 
@@ -5735,9 +5745,6 @@ int libewf_convert_date_xheader_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     timestamp,
-	     date_time_elements[ empty_date_element_correction + 5 ],
-	     libewf_string_length(
-	      date_time_elements[ empty_date_element_correction + 5 ] ),
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -5760,6 +5767,68 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
+	if( ( amount_of_date_time_elements - empty_date_element_correction ) > 5 )
+	{
+		( *date_time_values_string )[ 19 ] = (libewf_character_t) ' ';
+
+		if( libewf_string_copy(
+		     &( ( *date_time_values_string )[ 20 ] ),
+		     date_time_elements[ empty_date_element_correction + 5 ],
+		     timezone_string_length ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set timezone string in data time values string.",
+			 function );
+
+			libewf_string_split_values_free(
+			 date_time_elements,
+			 amount_of_date_time_elements,
+			 NULL );
+
+			memory_free(
+			 *date_time_values_string );
+
+			*date_time_values_string      = NULL;
+			*date_time_values_string_size = 0;
+
+			return( -1 );
+		}
+	}
+	if( ( amount_of_date_time_elements - empty_date_element_correction ) > 6 )
+	{
+		( *date_time_values_string )[ 20 + timezone_string_length ] = (libewf_character_t) ' ';
+
+		if( libewf_string_copy(
+		     &( ( *date_time_values_string )[ 21 + timezone_string_length ] ),
+		     date_time_elements[ empty_date_element_correction + 6 ],
+		     timezone_name_length ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set timezone name in data time values string.",
+			 function );
+
+			libewf_string_split_values_free(
+			 date_time_elements,
+			 amount_of_date_time_elements,
+			 NULL );
+
+			memory_free(
+			 *date_time_values_string );
+
+			*date_time_values_string      = NULL;
+			*date_time_values_string_size = 0;
+
+			return( -1 );
+		}
+	}
+	( *date_time_values_string )[ *date_time_values_string_size - 1 ] = 0;
+
 	if( libewf_string_split_values_free(
 	     date_time_elements,
 	     amount_of_date_time_elements,
@@ -5948,12 +6017,13 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
+#if defined( _BSD_SOURCE )
 	time_elements->tm_gmtoff /= 60;
 
 	print_count = libewf_string_snprintf(
 		       *date_time_values_string,
 		       *date_time_values_string_size,
-		       "%s %s %2d %02d:%02d:%02d %04d %s (%+ld:%02ld)",
+		       "%s %s %2d %02d:%02d:%02d %04d %+03ld:%02ld (%s)",
 		       (char *) day_of_week,
 		       (char *) month,
 		       time_elements->tm_mday,
@@ -5961,9 +6031,23 @@ int libewf_generate_date_xheader_value(
 		       time_elements->tm_min,
 		       time_elements->tm_sec,
 		       time_elements->tm_year + 1900,
-		       tzname[ 0 ],
 	               time_elements->tm_gmtoff / 60,
-	               time_elements->tm_gmtoff % 60 );
+	               time_elements->tm_gmtoff % 60,
+		       time_elements->tm_zone );
+#else
+	print_count = libewf_string_snprintf(
+		       *date_time_values_string,
+		       *date_time_values_string_size,
+		       "%s %s %2d %02d:%02d:%02d %04d %s",
+		       (char *) day_of_week,
+		       (char *) month,
+		       time_elements->tm_mday,
+		       time_elements->tm_hour,
+		       time_elements->tm_min,
+		       time_elements->tm_sec,
+		       time_elements->tm_year + 1900,
+		       tzname[ time_elements->tm_isdst ] );
+#endif
 
 	memory_free(
 	 time_elements );

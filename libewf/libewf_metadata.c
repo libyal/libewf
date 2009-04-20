@@ -27,6 +27,7 @@
 
 #include <liberror.h>
 
+#include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
 #include "libewf_handle.h"
 #include "libewf_hash_values.h"
@@ -2556,6 +2557,111 @@ int libewf_handle_set_header_codepage(
 	return( 1 );
 }
 
+/* Retrieves the header value date format
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_header_values_date_format(
+     libewf_handle_t *handle,
+     int *date_format,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_header_values_date_format";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->header_sections == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing header sections.",
+		 function );
+
+		return( -1 );
+	}
+	if( date_format == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid date format.",
+		 function );
+
+		return( -1 );
+	}
+	*date_format = internal_handle->date_format;
+
+	return( 1 );
+}
+
+/* Sets the header values date format
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_header_values_date_format(
+     libewf_handle_t *handle,
+     int date_format,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_set_header_values_date_format";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->header_sections == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing header sections.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
+	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
+	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
+	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported date format.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->date_format = date_format;
+
+	return( 1 );
+}
+
 /* Retrieves the amount of header values
  * Returns 1 if successful, 0 if no header values are present or -1 on error
  */
@@ -2777,8 +2883,11 @@ int libewf_handle_get_header_value(
      size_t value_size,
      liberror_error_t **error )
 {
+	libewf_character_t date_time_values_string[ 64 ];
+
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_header_value";
+	size_t date_time_values_string_size       = 64;
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -2820,24 +2929,77 @@ int libewf_handle_get_header_value(
 	{
 		return( 0 );
 	}
-	result = libewf_values_table_get_value(
-	          internal_handle->header_values,
-	          identifier,
-	          identifier_length,
-	          value,
-	          value_size,
-	          error );
-
-	if( result == -1 )
+	if( ( ( identifier_length == 11 )
+	  && ( libewf_string_compare(
+	        _LIBEWF_STRING( "system_date" ),
+	        identifier,
+	        11 ) == 0 ) )
+	 || ( ( identifier_length == 12 )
+	  && ( libewf_string_compare(
+	        _LIBEWF_STRING( "acquiry_date" ),
+	        identifier,
+	        12 ) == 0 ) ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value.",
-		 function );
+		result = libewf_values_table_get_value(
+			  internal_handle->header_values,
+			  identifier,
+			  identifier_length,
+			  date_time_values_string,
+			  date_time_values_string_size,
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve date header value.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( result == 1 )
+		 && ( libewf_date_time_values_copy_to_string(
+		       date_time_values_string,
+		       libewf_string_length(
+		        date_time_values_string ),
+		       internal_handle->date_format,
+		       value,
+		       value_size,
+		       error ) != 1 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to create date string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		result = libewf_values_table_get_value(
+			  internal_handle->header_values,
+			  identifier,
+			  identifier_length,
+			  value,
+			  value_size,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }
