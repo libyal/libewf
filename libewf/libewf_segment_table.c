@@ -33,6 +33,8 @@
 #include "libewf_segment_table.h"
 #include "libewf_system_string.h"
 
+#include "ewf_data.h"
+
 /* Initialize the hash sections
  * Returns 1 if successful or -1 on error
  */
@@ -166,8 +168,8 @@ int libewf_segment_table_free(
      libewf_segment_table_t **segment_table,
      liberror_error_t **error )
 {
-	static char *function = "libewf_segment_table_free";
-	uint16_t iterator     = 0;
+	static char *function           = "libewf_segment_table_free";
+	uint16_t segment_table_iterator = 0;
 
 	if( segment_table == NULL )
 	{
@@ -182,10 +184,10 @@ int libewf_segment_table_free(
 	}
 	if( *segment_table != NULL )
 	{
-		for( iterator = 0; iterator < ( *segment_table )->amount; iterator++ )
+		for( segment_table_iterator = 0; segment_table_iterator < ( *segment_table )->amount; segment_table_iterator++ )
 		{
 			if( libewf_segment_file_handle_free(
-			     &( ( *segment_table )->segment_file_handle[ iterator ] ),
+			     &( ( *segment_table )->segment_file_handle[ segment_table_iterator ] ),
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -194,7 +196,7 @@ int libewf_segment_table_free(
 				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free segment file handle: %" PRIu16 ".",
 				 function,
-				 iterator + 1 );
+				 segment_table_iterator + 1 );
 			}
 		}
 		memory_free(
@@ -993,17 +995,6 @@ int libewf_segment_table_create_segment_file(
 	int file_io_pool_entry              = 0;
 	int flags                           = 0;
 
-	if( io_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_table == NULL )
 	{
 		liberror_error_set(
@@ -1044,6 +1035,17 @@ int libewf_segment_table_create_segment_file(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
 		 "%s: invalid segment number value out of range.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -1230,6 +1232,81 @@ int libewf_segment_table_create_segment_file(
 	}
 	segment_table->segment_file_handle[ segment_number ]->write_open = 1;
 
+	return( 1 );
+}
+
+/* Corrects sections after streamed write
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_write_sections_corrections(
+     libewf_segment_table_t *segment_table,
+     libewf_io_handle_t *io_handle,
+     uint32_t last_segment_amount_of_chunks,
+     libewf_media_values_t *media_values,
+     libewf_values_table_t *hash_values,
+     libewf_hash_sections_t *hash_sections,
+     libewf_sector_table_t *sessions,
+     libewf_sector_table_t *acquiry_errors,
+     ewf_data_t **cached_data_section,
+     liberror_error_t **error )
+{
+	static char *function           = "libewf_segment_table_write_sections_corrections";
+	uint16_t segment_table_iterator = 0;
+	int last_segment_file           = 0;
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment table - missing segment file handles.",
+		 function );
+
+		return( -1 );
+	}
+	for( segment_table_iterator = 1; segment_table_iterator < segment_table->amount; segment_table_iterator++ )
+	{
+		if( segment_table_iterator == ( segment_table->amount - 1 ) )
+		{
+			last_segment_file = 1;
+		}
+		if( libewf_segment_file_write_sections_correction(
+		     segment_table->segment_file_handle[ segment_table_iterator ],
+		     io_handle,
+		     segment_table_iterator,
+		     last_segment_amount_of_chunks,
+		     last_segment_file,
+		     media_values,
+		     hash_values,
+		     hash_sections,
+		     sessions,
+		     acquiry_errors,
+		     cached_data_section,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write sections correction to segment file: %" PRIu16 ".",
+			 function,
+			 segment_table_iterator );
+
+			return( -1 );
+		}
+	}
 	return( 1 );
 }
 

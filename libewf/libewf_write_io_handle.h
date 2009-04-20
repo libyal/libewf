@@ -295,6 +295,21 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
          size_t data_size,
          liberror_error_t **error );
 
+ssize_t libewf_write_io_handle_finalize(
+         libewf_write_io_handle_t *write_io_handle,
+         libewf_io_handle_t *io_handle,
+         libewf_media_values_t *media_values,
+         libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
+         libewf_values_table_t **header_values,
+         libewf_values_table_t *hash_values,
+         libewf_header_sections_t *header_sections,
+         libewf_hash_sections_t *hash_sections,
+         libewf_sector_table_t *sessions,
+         libewf_sector_table_t *acquiry_errors,
+         libewf_chunk_cache_t *chunk_cache,
+         liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

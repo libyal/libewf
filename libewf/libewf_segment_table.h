@@ -37,6 +37,8 @@
 #include "libewf_segment_file_handle.h"
 #include "libewf_system_string.h"
 
+#include "ewf_data.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -130,6 +132,18 @@ int libewf_segment_table_create_segment_file(
      libewf_io_handle_t *io_handle,
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
+     liberror_error_t **error );
+
+int libewf_segment_table_write_sections_corrections(
+     libewf_segment_table_t *segment_table,
+     libewf_io_handle_t *io_handle,
+     uint32_t last_segment_amount_of_chunks,
+     libewf_media_values_t *media_values,
+     libewf_values_table_t *hash_values,
+     libewf_hash_sections_t *hash_sections,
+     libewf_sector_table_t *sessions,
+     libewf_sector_table_t *acquiry_errors,
+     ewf_data_t **cached_data_section,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

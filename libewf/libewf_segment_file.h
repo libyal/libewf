@@ -153,6 +153,20 @@ ssize_t libewf_segment_file_write_close(
          ewf_data_t **cached_data_section,
          liberror_error_t **error );
 
+int libewf_segment_file_write_sections_correction(
+     libewf_segment_file_handle_t *segment_file_handle,
+     libewf_io_handle_t *io_handle,
+     uint16_t segment_number,
+     uint32_t segment_amount_of_chunks,
+     int last_segment_file,
+     libewf_media_values_t *media_values,
+     libewf_values_table_t *hash_values,
+     libewf_hash_sections_t *hash_sections,
+     libewf_sector_table_t *sessions,
+     libewf_sector_table_t *acquiry_errors,
+     ewf_data_t **cached_data_section,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

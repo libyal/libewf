@@ -2039,3 +2039,331 @@ ssize_t libewf_segment_file_write_close(
 	return( total_write_count );
 }
 
+/* Corrects sections after streamed write
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_file_write_sections_correction(
+     libewf_segment_file_handle_t *segment_file_handle,
+     libewf_io_handle_t *io_handle,
+     uint16_t segment_number,
+     uint32_t segment_amount_of_chunks,
+     int last_segment_file,
+     libewf_media_values_t *media_values,
+     libewf_values_table_t *hash_values,
+     libewf_hash_sections_t *hash_sections,
+     libewf_sector_table_t *sessions,
+     libewf_sector_table_t *acquiry_errors,
+     ewf_data_t **cached_data_section,
+     liberror_error_t **error )
+{
+	libewf_list_element_t *section_list_element       = NULL;
+	libewf_section_list_values_t *section_list_values = NULL;
+	static char *function                             = "libewf_segment_file_write_sections_correction";
+	off64_t next_section_start_offset                 = 0;
+	ssize_t write_count                               = 0;
+	int correct_last_next_section                     = 0;
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_handle->section_list == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file: %" PRIu16 " - missing section list.",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	if( segment_file_handle->section_list->first == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file: %" PRIu16 " - invalid section list - missing entries.",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	section_list_element = segment_file_handle->section_list->first;
+
+	if( segment_file_handle->file_io_pool_entry == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool entry for segment file: %" PRIu16 ".",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_pool_open(
+	     io_handle->file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     LIBBFIO_OPEN_READ_WRITE,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open segment file: %" PRIu16 ".",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: correcting sections in segment file: %" PRIu16 ".\n",
+	 function,
+	 segment_number );
+#endif
+
+	while( section_list_element != NULL )
+	{
+		section_list_values = (libewf_section_list_values_t *) section_list_element->value;
+
+		if( section_list_values == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing section list values for segment file: %" PRIu16 ".",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+		if( memory_compare(
+		     section_list_values->type,
+		     "volume",
+		     6 ) == 0 )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libewf_notify_verbose_printf(
+			 "%s: correcting volume section.\n",
+			 function );
+#endif
+
+			if( libbfio_pool_seek_offset(
+			     io_handle->file_io_pool,
+			     segment_file_handle->file_io_pool_entry,
+			     section_list_values->start_offset,
+			     SEEK_SET,
+			     error ) == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to find offset to correct volume section.",
+				 function );
+
+				return( -1 );
+			}
+			if( io_handle->ewf_format == EWF_FORMAT_S01 )
+			{
+				/* Write volume (SMART) section
+				 */
+				write_count = libewf_section_volume_s01_write(
+					       io_handle->file_io_pool,
+					       segment_file_handle,
+					       media_values,
+					       io_handle->format,
+					       1,
+					       error );
+			}
+			else if( io_handle->ewf_format == EWF_FORMAT_E01 )
+			{
+				/* Write volume section
+				 */
+				write_count = libewf_section_volume_e01_write(
+					       io_handle->file_io_pool,
+					       segment_file_handle,
+					       media_values,
+					       io_handle->compression_level,
+					       io_handle->format,
+					       1,
+					       error );
+			}
+			else
+			{
+				write_count = -1;
+			}
+			if( write_count == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to correct volume section.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		else if( memory_compare(
+			  section_list_values->type,
+			  "data",
+			  4 ) == 0 )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libewf_notify_verbose_printf(
+			 "%s: correcting data section.\n",
+			 function );
+#endif
+
+			if( libbfio_pool_seek_offset(
+			     io_handle->file_io_pool,
+			     segment_file_handle->file_io_pool_entry,
+			     section_list_values->start_offset,
+			     SEEK_SET,
+			     error ) == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to find offset to data volume section.",
+				 function );
+
+				return( -1 );
+			}
+			/* Write data section
+			 */
+			write_count = libewf_section_data_write(
+				       io_handle->file_io_pool,
+				       segment_file_handle,
+				       media_values,
+				       io_handle->compression_level,
+				       io_handle->format,
+				       cached_data_section,
+				       1,
+				       error );
+
+			if( write_count == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to correct data section.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		/* The last segment file should be terminated with a done section and not with a next section
+		 */
+		else if( ( last_segment_file != 0 )
+		      && ( memory_compare(
+			    section_list_values->type,
+			    "next",
+			    4 ) == 0 ) )
+
+		{
+			correct_last_next_section = 1;
+			next_section_start_offset = section_list_values->start_offset;
+		}
+		section_list_element = section_list_element->next;
+	}
+	if( correct_last_next_section != 0 )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		libewf_notify_verbose_printf(
+		 "%s: correcting last next section.\n",
+		 function );
+#endif
+
+		if( libbfio_pool_seek_offset(
+		     io_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     next_section_start_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to find offset to last next section.",
+			 function );
+
+			return( -1 );
+		}
+		write_count = libewf_segment_file_write_close(
+			       segment_file_handle,
+			       io_handle,
+			       segment_number,
+			       segment_amount_of_chunks,
+			       1,
+			       hash_sections,
+			       hash_values,
+			       media_values,
+			       sessions,
+			       acquiry_errors,
+			       cached_data_section,
+			       error );
+
+		if( write_count == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to close last segment file: %" PRIu16 ".",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( libbfio_pool_close(
+		     io_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     error ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close segment file: %" PRIu16 ".",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
