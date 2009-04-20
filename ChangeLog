@@ -1,5 +1,4 @@
 Roadmap:
-* resume write i.e. system failure (check to which part of the EWF files is ok)
 * low level and high level api (part of v2 api)
   - to allow low level access to sections etc. (for recovery)
 * lvf support
@@ -37,9 +36,6 @@ Recovery and analysis:
   - like alternative segment file path in EnCase
     however EnCase seems to fully test if the segment file upfront by
     allocating the necessary disk space
-* resume write i.e. system failure (check to which part EWF files ok)
-  - requires (some form of) read and write mode
-  - error resistency
 * all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
 
@@ -119,7 +115,6 @@ ewftools:
   - warn if values exceed maximum segment count
   - read from pipe - what about input size?
   - adjust error granularity if error granularity < process buffer size
-  - add resume on error
   - move ewfacquire_read_buffer to device_handle, list read errors
 * device handle
   - add Windows support for accessing memory device
@@ -220,11 +215,18 @@ Next beta release:
 * fix ewfexport different input and output chunk sizes for low level functions
 * what about header values parsing with preservation of timestamps?
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
-  - force set header value to require string formatted in the date format
+  - force set header value to require string formatted in the date format ?
+
+* resume acquiry
+  - get segment file size
 
 Version: 20090419
 * worked on date and time strings
 * changed crc_buffer from uint8_t * to void *
+* libewf now tracks if pool was created inside library
+* worked on acquiry resume
+* updated libbfio
+* added get segment file size functions to API
 
 Version: 20090418
 * changes for local use of libewf in libsmio

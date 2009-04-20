@@ -1368,7 +1368,7 @@ dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
 dnl Set memwatch support
-ac_libewf_have_memwatch=no
+ac_libewf_have_memwatch=yes
 
 AS_IF(
 	[test "x$ac_libewf_have_memwatch" != xno ],

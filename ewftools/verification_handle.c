@@ -631,7 +631,7 @@ ssize_t verification_handle_prepare_read_buffer(
 		 */
 		if( verification_handle_add_read_error(
 		     verification_handle,
-		     verification_handle->input_offset,
+		     verification_handle->last_offset_read,
 		     process_count,
 		     error ) != 1 )
 		{
@@ -656,7 +656,7 @@ ssize_t verification_handle_prepare_read_buffer(
 #else
 	process_count = storage_media_buffer->raw_buffer_amount;
 #endif
-	verification_handle->input_offset += process_count;
+	verification_handle->last_offset_read += process_count;
 
 	return( process_count );
 }
@@ -1222,15 +1222,15 @@ int verification_handle_set_header_codepage(
 	return( 1 );
 }
 
-/* Sets the input values of the verification handle
+/* Sets the error handling values of the verification handle
  * Returns 1 if successful or -1 on error
  */
-int verification_handle_set_input_values(
+int verification_handle_set_error_handling_values(
      verification_handle_t *verification_handle,
      int wipe_chunk_on_error,
      liberror_error_t **error )
 {
-	static char *function = "verification_handle_set_input_values";
+	static char *function = "verification_handle_set_error_handling_values";
 
 	if( verification_handle == NULL )
 	{

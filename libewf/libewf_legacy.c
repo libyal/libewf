@@ -837,6 +837,38 @@ int libewf_set_segment_filename_wide(
 
 #endif
 
+/* Retrieves the segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_get_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t *segment_file_size )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "libewf_get_segment_file_size";
+
+	if( libewf_handle_get_segment_file_size(
+	     handle,
+	     segment_file_size,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment file size.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the segment file size
  * Returns 1 if successful or -1 on error
  */
@@ -855,7 +887,7 @@ int libewf_set_segment_file_size(
 		liberror_error_set(
 		 &error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment file size.",
 		 function );
 
@@ -1017,6 +1049,38 @@ int libewf_set_delta_segment_filename_wide(
 
 #endif
 
+/* Retrieves the delta segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_get_delta_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t *delta_segment_file_size )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "libewf_set_delta_segment_file_size";
+
+	if( libewf_handle_get_delta_segment_file_size(
+	     handle,
+	     delta_segment_file_size,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve delta segment file size.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the delta segment file size
  * Returns 1 if successful or -1 on error
  */
@@ -1035,7 +1099,7 @@ int libewf_set_delta_segment_file_size(
 		liberror_error_set(
 		 &error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set delta segment file size.",
 		 function );
 

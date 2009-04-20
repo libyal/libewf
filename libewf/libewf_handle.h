@@ -281,6 +281,11 @@ LIBEWF_EXTERN int libewf_handle_set_segment_filename_wide(
                    liberror_error_t **error );
 #endif
 
+LIBEWF_EXTERN int libewf_handle_get_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *segment_file_size,
+                   liberror_error_t **error );
+
 LIBEWF_EXTERN int libewf_handle_set_segment_file_size(
                    libewf_handle_t *handle,
                    size64_t segment_file_size,
@@ -321,6 +326,11 @@ LIBEWF_EXTERN int libewf_handle_set_delta_segment_filename_wide(
                    size_t filename_length,
                    liberror_error_t **error );
 #endif
+
+LIBEWF_EXTERN int libewf_handle_get_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *delta_segment_file_size,
+                   liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
                    libewf_handle_t *handle,
@@ -382,6 +392,10 @@ int libewf_internal_handle_set_format(
      liberror_error_t **error );
 
 int libewf_internal_handle_write_initialize(
+     libewf_internal_handle_t *internal_handle,
+     liberror_error_t **error );
+
+int libewf_internal_handle_resume_write_initialize(
      libewf_internal_handle_t *internal_handle,
      liberror_error_t **error );
 

@@ -677,7 +677,8 @@ int libewf_handle_open(
 
 		return( -1 );
 	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
 		for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
 		{
@@ -783,12 +784,6 @@ int libewf_handle_open(
 						first_delta_segment_filename = filenames[ filename_iterator ];
 					}
 				}
-#if defined( HAVE_VERBOSE_OUTPUT )
-				libewf_notify_verbose_printf(
-				 "%s: added segment file: %s.\n",
-				 function,
-				 filenames[ filename_iterator ] );
-#endif
 			}
 			else if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'd' )
 			      || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'D' ) )
@@ -798,33 +793,8 @@ int libewf_handle_open(
 				{
 					first_delta_segment_filename = filenames[ filename_iterator ];
 				}
-#if defined( HAVE_VERBOSE_OUTPUT )
-				libewf_notify_verbose_printf(
-				 "%s: added delta segment file: %s.\n",
-				 function,
-				 filenames[ filename_iterator ] );
-#endif
 			}
 		}
-	}
-	if( libewf_handle_open_file_io_pool(
-	     handle,
-	     file_io_pool,
-	     flags,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open handle using a file io pool.",
-		 function );
-
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
 	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
@@ -850,7 +820,7 @@ int libewf_handle_open(
 
 			return( -1 );
 		}
-		/* Get the basename of the first segment file
+		/* Get the basename of the first delta segment file
 		 */
 		filename_length = narrow_string_length(
 				   first_delta_segment_filename );
@@ -868,6 +838,31 @@ int libewf_handle_open(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set basename in delta segment table.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
+	{
+		/* Get the basename of the first segment file
+		 */
+		filename_length = narrow_string_length(
+				   first_segment_filename );
+
+		/* Set segment table basename
+		 */
+		if( libewf_segment_table_set_basename(
+		     internal_handle->segment_table,
+		     first_segment_filename,
+		     filename_length - 4 + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in segment table.",
 			 function );
 
 			return( -1 );
@@ -898,6 +893,27 @@ int libewf_handle_open(
 			return( -1 );
 		}
 	}
+	if( libewf_handle_open_file_io_pool(
+	     handle,
+	     file_io_pool,
+	     flags,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open handle using a file io pool.",
+		 function );
+
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+
+		return( -1 );
+	}
+	internal_handle->io_handle->pool_created_in_library = 1;
+
 	return( 1 );
 }
 
@@ -986,7 +1002,8 @@ int libewf_handle_open_wide(
 
 		return( -1 );
 	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
 		for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
 		{
@@ -1092,12 +1109,6 @@ int libewf_handle_open_wide(
 						first_delta_segment_filename = filenames[ filename_iterator ];
 					}
 				}
-#if defined( HAVE_VERBOSE_OUTPUT )
-				libewf_notify_verbose_printf(
-				 "%s: added segment file: %ls.\n",
-				 function,
-				 filenames[ filename_iterator ] );
-#endif
 			}
 			else if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'd' )
 			      || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'D' ) )
@@ -1107,33 +1118,8 @@ int libewf_handle_open_wide(
 				{
 					first_delta_segment_filename = filenames[ filename_iterator ];
 				}
-#if defined( HAVE_VERBOSE_OUTPUT )
-				libewf_notify_verbose_printf(
-				 "%s: added delta segment file: %ls.\n",
-				 function,
-				 filenames[ filename_iterator ] );
-#endif
 			}
 		}
-	}
-	if( libewf_handle_open_file_io_pool(
-	     handle,
-	     file_io_pool,
-	     flags,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open handle using a file io pool.",
-		 function );
-
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
 	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
@@ -1159,7 +1145,7 @@ int libewf_handle_open_wide(
 
 			return( -1 );
 		}
-		/* Get the basename of the first segment file
+		/* Get the basename of the first delta segment file
 		 */
 		filename_length = wide_string_length(
 				   first_delta_segment_filename );
@@ -1177,6 +1163,31 @@ int libewf_handle_open_wide(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set basename in delta segment table.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
+	{
+		/* Get the basename of the first segment file
+		 */
+		filename_length = wide_string_length(
+				   first_segment_filename );
+
+		/* Set segment table basename
+		 */
+		if( libewf_segment_table_set_basename_wide(
+		     internal_handle->segment_table,
+		     first_segment_filename,
+		     filename_length - 4 + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in segment table.",
 			 function );
 
 			return( -1 );
@@ -1207,6 +1218,27 @@ int libewf_handle_open_wide(
 			return( -1 );
 		}
 	}
+	if( libewf_handle_open_file_io_pool(
+	     handle,
+	     file_io_pool,
+	     flags,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open handle using a file io pool.",
+		 function );
+
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+
+		return( -1 );
+	}
+	internal_handle->io_handle->pool_created_in_library = 1;
+
 	return( 1 );
 }
 #endif
@@ -1280,7 +1312,8 @@ int libewf_handle_open_file_io_pool(
 		return( -1 );
 	}
 	if( ( ( flags & LIBEWF_FLAG_READ ) != LIBEWF_FLAG_READ )
-	 && ( ( flags & LIBEWF_FLAG_WRITE ) != LIBEWF_FLAG_WRITE ) )
+	 && ( ( flags & LIBEWF_FLAG_WRITE ) != LIBEWF_FLAG_WRITE )
+	 && ( ( flags & LIBEWF_FLAG_RESUME ) != LIBEWF_FLAG_RESUME ) )
 	{
 		liberror_error_set(
 		 error,
@@ -1292,36 +1325,43 @@ int libewf_handle_open_file_io_pool(
 		return( -1 );
 	}
 	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 && ( libewf_read_io_handle_initialize(
-	       &( internal_handle->read_io_handle ),
-	       error ) != 1 ) )
+	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create read io handle.",
-		 function );
+		if( libewf_read_io_handle_initialize(
+		     &( internal_handle->read_io_handle ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create read io handle.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	if( ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-	 && ( libewf_write_io_handle_initialize(
-	       &( internal_handle->write_io_handle ),
-	       error ) != 1 ) )
+	if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create write io handle.",
-		 function );
+		if( libewf_write_io_handle_initialize(
+		     &( internal_handle->write_io_handle ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create write io handle.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
+	internal_handle->io_handle->flags        = flags;
 	internal_handle->io_handle->file_io_pool = file_io_pool;
 
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
 		for( file_io_handle_iterator = 0; file_io_handle_iterator < amount_of_handles; file_io_handle_iterator++ )
 		{
@@ -1392,18 +1432,20 @@ int libewf_handle_open_file_io_pool(
 				return( -1 );
 			}
 		}
-		if( libewf_segment_table_build(
-		     internal_handle->segment_table,
-		     internal_handle->io_handle,
-		     internal_handle->header_sections,
-		     internal_handle->hash_sections,
-		     internal_handle->media_values,
-		     internal_handle->offset_table,
-		     internal_handle->sessions,
-		     internal_handle->acquiry_errors,
-		     segment_file_size,
-		     &( internal_handle->abort ),
-		     error ) != 1 )
+		result = libewf_segment_table_build(
+		          internal_handle->segment_table,
+		          internal_handle->io_handle,
+		          internal_handle->header_sections,
+		          internal_handle->hash_sections,
+		          internal_handle->media_values,
+		          internal_handle->offset_table,
+		          internal_handle->sessions,
+		          internal_handle->acquiry_errors,
+		          segment_file_size,
+		          &( internal_handle->abort ),
+		          error );
+
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1412,34 +1454,47 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to build segment table.",
 			 function );
 
-			internal_handle->io_handle->file_io_pool = NULL;
+			if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
+			{
+				libewf_notify_error_backtrace(
+				 *error );
+				liberror_error_free(
+				 error );
+			}
+			else
+			{
+				internal_handle->io_handle->file_io_pool = NULL;
 
-			return( -1 );
+				return( -1 );
+			}
 		}
-		if( ( internal_handle->delta_segment_table->amount > 1 )
-		 && ( libewf_segment_table_build(
-		       internal_handle->delta_segment_table,
-		       internal_handle->io_handle,
-		       internal_handle->header_sections,
-		       internal_handle->hash_sections,
-		       internal_handle->media_values,
-		       internal_handle->offset_table,
-		       internal_handle->sessions,
-		       internal_handle->acquiry_errors,
-		       segment_file_size,
-		       &( internal_handle->abort ),
-		       error ) != 1 ) )
+		if( ( flags & LIBEWF_FLAG_RESUME ) == 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to build delta segment table.",
-			 function );
+			if( ( internal_handle->delta_segment_table->amount > 1 )
+			 && ( libewf_segment_table_build(
+			       internal_handle->delta_segment_table,
+			       internal_handle->io_handle,
+			       internal_handle->header_sections,
+			       internal_handle->hash_sections,
+			       internal_handle->media_values,
+			       internal_handle->offset_table,
+			       internal_handle->sessions,
+			       internal_handle->acquiry_errors,
+			       segment_file_size,
+			       &( internal_handle->abort ),
+			       error ) != 1 ) )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to build delta segment table.",
+				 function );
 
-			internal_handle->io_handle->file_io_pool = NULL;
+				internal_handle->io_handle->file_io_pool = NULL;
 
-			return( -1 );
+				return( -1 );
+			}
 		}
 		/* Determine the EWF format
 		 */
@@ -1483,6 +1538,23 @@ int libewf_handle_open_file_io_pool(
 		internal_handle->io_handle->file_io_pool = NULL;
 
 		return( -1 );
+	}
+	if( ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+	 && ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
+	{
+		 if( libewf_internal_handle_resume_write_initialize(
+		      internal_handle,
+		      error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize handle for resume write.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }
@@ -2281,7 +2353,7 @@ ssize_t libewf_handle_write_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize write values.",
+		 "%s: unable to initialize handle to write.",
 		 function );
 
 		return( -1 );
@@ -2344,7 +2416,8 @@ ssize_t libewf_handle_write_chunk(
 	 data_size );
 #endif
 
-	if( internal_handle->read_io_handle != NULL )
+	if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
 	{
 		/* Check if chunk has already been created within a segment file
 		 */
@@ -2358,7 +2431,7 @@ ssize_t libewf_handle_write_chunk(
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: chunk: %d does not exist.",
 			 function,
-			 ( internal_handle->io_handle->current_chunk + 1 ) );
+			 internal_handle->io_handle->current_chunk + 1 );
 
 			return( -1 );
 		}
@@ -2469,7 +2542,7 @@ ssize_t libewf_handle_write_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize write values.",
+		 "%s: unable to initialize handle to write.",
 		 function );
 
 		return( -1 );
@@ -2561,7 +2634,8 @@ ssize_t libewf_handle_write_buffer(
 	}
 	while( size > 0 )
 	{
-		if( internal_handle->read_io_handle != NULL )
+		if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+		 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
 		{
 			/* Check if chunk has already been created within a segment file
 			 */
@@ -2802,7 +2876,8 @@ ssize_t libewf_handle_write_finalize(
 	}
 	/* No need for finalization in R or RW mode
 	 */
-	if( internal_handle->read_io_handle != NULL )
+	if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
 	{
 		return( 0 );
 	}
@@ -3720,6 +3795,57 @@ int libewf_handle_set_segment_filename_wide(
 
 #endif
 
+/* Retrieves the segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t *segment_file_size,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_segment_file_size";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: delta segment filename cannot be changed.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file size.",
+		 function );
+
+		return( -1 );
+	}
+	*segment_file_size = internal_handle->write_io_handle->segment_file_size;
+
+	return( 1 );
+}
+
 /* Sets the segment file size
  * Returns 1 if successful or -1 on error
  */
@@ -4154,6 +4280,57 @@ int libewf_handle_set_delta_segment_filename_wide(
 }
 
 #endif
+
+/* Retrieves the delta segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_delta_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t *delta_segment_file_size,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_delta_segment_file_size";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: delta segment filename cannot be changed.",
+		 function );
+
+		return( -1 );
+	}
+	if( delta_segment_file_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid delta segment file size.",
+		 function );
+
+		return( -1 );
+	}
+	*delta_segment_file_size = internal_handle->write_io_handle->delta_segment_file_size;
+
+	return( 1 );
+}
 
 /* Sets the delta segment file size
  * Returns 1 if successful or -1 on error
@@ -4749,7 +4926,7 @@ int libewf_internal_handle_add_segment_file(
 		}
 		internal_handle->delta_segment_table->segment_file_handle[ *segment_number ] = segment_file_handle;
 
-		/* Make sure to re-open the delta segment file with write access
+		/* Re-open the delta segment file with write access
 		 */
 		if( ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 		 && ( libbfio_pool_reopen(
@@ -4762,7 +4939,7 @@ int libewf_internal_handle_add_segment_file(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to reopen segment file: %" PRIu16 ".",
+			 "%s: unable to reopen delta segment file: %" PRIu16 ".",
 			 function,
 			 *segment_number );
 
@@ -5091,7 +5268,7 @@ int libewf_internal_handle_set_format(
 	return( 1 );
 }
 
-/* Initializes the write values
+/* Initializes the handle to write
  * Returns 1 if successful or -1 on error
  */
 int libewf_internal_handle_write_initialize(
@@ -5207,6 +5384,222 @@ int libewf_internal_handle_write_initialize(
 	 */
 	internal_handle->write_io_handle->values_initialized = 1;
 
+	return( 1 );
+}
+
+/* Initializes the handle to resume write
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_internal_handle_resume_write_initialize(
+     libewf_internal_handle_t *internal_handle,
+     liberror_error_t **error )
+{
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	libewf_section_list_values_t *last_section_values = NULL;
+	static char *function                             = "libewf_internal_handle_resume_write_initialize";
+	uint16_t segment_number                           = 0;
+	uint8_t resume_in_chunks_section                  = 0;
+
+	if( internal_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing offset table.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - invalid segment table - missing segment file handles.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_internal_handle_write_initialize(
+	     internal_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize handle to write.",
+		 function );
+
+		return( -1 );
+	}
+	segment_number = internal_handle->segment_table->amount - 1;
+
+	segment_file_handle = internal_handle->segment_table->segment_file_handle[ segment_number ];
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing segment file handle: %" PRIu16 ".",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	if( segment_file_handle->section_list == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing section list.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_handle->section_list->last == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing last section list element.",
+		 function );
+
+		return( -1 );
+	}
+	last_section_values = (libewf_section_list_values_t * ) segment_file_handle->section_list->last->value;
+
+	if( last_section_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing last section values.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_compare(
+	     (void *) last_section_values->type,
+	     (void *) "next",
+	     5 ) == 0 )
+	{
+	}
+	else if( memory_compare(
+	          (void *) last_section_values->type,
+	          (void *) "sectors",
+	          8 ) == 0 )
+	{
+		resume_in_chunks_section = 1;
+	}
+	else
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: resume from section: %s not supported.",
+		 function,
+		 (char *) last_section_values->type );
+
+		return( -1 );
+	}
+	/* Set offset into media data
+	 */
+	internal_handle->io_handle->current_chunk        = internal_handle->offset_table->last_chunk_offset_compared + 1;
+	internal_handle->io_handle->current_chunk_offset = 0;
+
+	fprintf( stderr, "O: %" PRIu32 "\n", internal_handle->io_handle->current_chunk );
+
+	/* Set write handle values
+	 */
+	internal_handle->write_io_handle->amount_of_chunks   = internal_handle->io_handle->current_chunk;
+	internal_handle->write_io_handle->input_write_count  = internal_handle->write_io_handle->amount_of_chunks
+	                                                     * internal_handle->media_values->chunk_size;
+
+	fprintf( stderr, "AC: %" PRIu32 "\n", internal_handle->write_io_handle->amount_of_chunks );
+	fprintf( stderr, "IWC: %" PRIu64 "\n", internal_handle->write_io_handle->input_write_count );
+
+	if( resume_in_chunks_section != 0 )
+	{
+		if( libbfio_pool_reopen(
+		     internal_handle->io_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     LIBBFIO_OPEN_READ_WRITE,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to reopen segment file: %" PRIu16 ".",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+		if( libbfio_pool_seek_offset(
+		     internal_handle->io_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     last_section_values->start_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to seek last section start offset: %" PRIu64 " in segment file: %" PRIu16 ".",
+			 function,
+			 last_section_values->start_offset,
+			 segment_number );
+
+			return( -1 );
+		}
+		segment_file_handle->write_open = 1;
+
+		internal_handle->write_io_handle->create_chunks_section = 1;
+	}
 	return( 1 );
 }
 

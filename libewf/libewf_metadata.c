@@ -3697,7 +3697,19 @@ int libewf_handle_set_hash_value(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle != NULL )
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
 	{
 		liberror_error_set(
 		 error,

@@ -82,9 +82,9 @@ struct verification_handle
 	 */
 	uint32_t bytes_per_sector;
 
-	/* The last offset of the input data
+	/* The last offset read
 	 */
-	off64_t input_offset;
+	off64_t last_offset_read;
 
 	/* Value to indicate if the chunk should be wiped on error
 	 */
@@ -156,7 +156,7 @@ int verification_handle_set_header_codepage(
      int header_codepage,
      liberror_error_t **error );
 
-int verification_handle_set_input_values(
+int verification_handle_set_error_handling_values(
      verification_handle_t *verification_handle,
      int wipe_chunk_on_error,
      liberror_error_t **error );

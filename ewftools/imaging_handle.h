@@ -94,11 +94,23 @@ int imaging_handle_signal_abort(
 int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
      const system_character_t *filename,
+     uint8_t resume,
      liberror_error_t **error );
 
 int imaging_handle_close(
      imaging_handle_t *imaging_handle,
      liberror_error_t **error );
+
+ssize_t imaging_handle_prepare_read_buffer(
+         imaging_handle_t *imaging_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         liberror_error_t **error );
+
+ssize_t imaging_handle_read_buffer(
+         imaging_handle_t *imaging_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         size_t read_size,
+         liberror_error_t **error );
 
 ssize_t imaging_handle_prepare_write_buffer(
          imaging_handle_t *imaging_handle,
@@ -110,6 +122,16 @@ ssize_t imaging_handle_write_buffer(
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
          liberror_error_t **error );
+
+off64_t imaging_handle_seek_offset(
+         imaging_handle_t *imaging_handle,
+         off64_t offset,
+         liberror_error_t **error );
+
+int imaging_handle_get_offset(
+     imaging_handle_t *imaging_handle,
+     off64_t *offset,
+     liberror_error_t **error );
 
 int imaging_handle_swap_byte_pairs(
      imaging_handle_t *imaging_handle,
@@ -128,16 +150,47 @@ int imaging_handle_get_chunk_size(
      size32_t *chunk_size,
      liberror_error_t **error );
 
+int imaging_handle_get_output_values(
+     imaging_handle_t *imaging_handle,
+     system_character_t *case_number,
+     size_t case_number_size,
+     system_character_t *description,
+     size_t description_size,
+     system_character_t *evidence_number,
+     size_t evidence_number_size,
+     system_character_t *examiner_name,
+     size_t examiner_name_size,
+     system_character_t *notes,
+     size_t notes_size,
+     uint32_t *bytes_per_sector,
+     size64_t *media_size,
+     uint8_t *media_type,
+     uint8_t *volume_type,
+     int8_t *compression_level,
+     uint8_t *compression_flags,
+     uint8_t *libewf_format,
+     uint32_t *sectors_per_chunk,
+     uint32_t *sector_error_granularity,
+     liberror_error_t **error );
+
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
      system_character_t *case_number,
+     size_t case_number_length,
      system_character_t *description,
+     size_t description_length,
      system_character_t *evidence_number,
+     size_t evidence_number_length,
      system_character_t *examiner_name,
+     size_t examiner_name_length,
      system_character_t *notes,
+     size_t notes_length,
      system_character_t *acquiry_operating_system,
+     size_t acquiry_operating_system_length,
      system_character_t *acquiry_software,
+     size_t acquiry_software_length,
      system_character_t *acquiry_software_version,
+     size_t acquiry_software_version_length,
      int header_codepage,
      uint32_t bytes_per_sector,
      size64_t media_size,
@@ -149,6 +202,14 @@ int imaging_handle_set_output_values(
      size64_t segment_file_size,
      uint32_t sectors_per_chunk,
      uint32_t sector_error_granularity,
+     liberror_error_t **error );
+
+int imaging_handle_get_header_value(
+     imaging_handle_t *imaging_handle,
+     char *header_value_identifier,
+     size_t header_value_identifier_length,
+     system_character_t *header_value,
+     size_t header_value_size,
      liberror_error_t **error );
 
 int imaging_handle_set_header_value(

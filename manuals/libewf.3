@@ -87,11 +87,15 @@ File/Handle functions (APIv1)
 .Ft int
 .Fn libewf_set_segment_filename "libewf_handle_t *handle, const char *filename, size_t filename_length"
 .Ft int
+.Fn libewf_get_segment_file_size "libewf_handle_t *handle, size64_t *segment_file_size"
+.Ft int
 .Fn libewf_set_segment_file_size "libewf_handle_t *handle, size64_t segment_file_size"
 .Ft int
 .Fn libewf_get_delta_segment_filename "libewf_handle_t *handle, char *filename, size_t filename_size"
 .Ft int
 .Fn libewf_set_delta_segment_filename "libewf_handle_t *handle, const char *filename, size_t filename_length"
+.Ft int
+.Fn libewf_get_delta_segment_file_size "libewf_handle_t *handle, size64_t *delta_segment_file_size"
 .Ft int
 .Fn libewf_set_delta_segment_file_size "libewf_handle_t *handle, size64_t delta_segment_file_size"
 .Pp
@@ -147,6 +151,8 @@ File/Handle functions (APIv2)
 .Ft int
 .Fn libewf_handle_set_segment_filename "libewf_handle_t *handle, const char *filename, size_t filename_length, libewf_error_t **error"
 .Ft int
+.Fn libewf_handle_get_segment_file_size "libewf_handle_t *handle, size64_t *segment_file_size, libewf_error_t **error"
+.Ft int
 .Fn libewf_handle_set_segment_file_size "libewf_handle_t *handle, size64_t segment_file_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_delta_segment_filename_size "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
@@ -154,6 +160,8 @@ File/Handle functions (APIv2)
 .Fn libewf_handle_get_delta_segment_filename "libewf_handle_t *handle, char *filename, size_t filename_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_delta_segment_filename "libewf_handle_t *handle, const char *filename, size_t filename_length, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_delta_segment_file_size "libewf_handle_t *handle, size64_t *delta_segment_file_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_delta_segment_file_size "libewf_handle_t *handle, size64_t delta_segment_file_size, libewf_error_t **error"
 .Ft int

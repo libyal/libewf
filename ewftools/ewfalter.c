@@ -161,8 +161,6 @@ ssize64_t ewfalter_alter_input(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	/* Make sure SMART chunks fit in the storage media buffer
-	 */
 	process_buffer_size = (size_t) chunk_size;
 #else
 	if( process_buffer_size == 0 )

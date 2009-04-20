@@ -184,7 +184,7 @@ ssize64_t ewfverify_read_input(
 
 		return( -1 );
 	}
-	if( verification_handle_set_input_values(
+	if( verification_handle_set_error_handling_values(
 	     verification_handle,
 	     wipe_chunk_on_error,
 	     error ) != 1 )
@@ -193,14 +193,12 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set verification handle input values.\n",
+		 "%s: unable to set verification handle error handling values.\n",
 		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	/* Make sure SMART chunks fit in the storage media buffer
-	 */
 	process_buffer_size = chunk_size;
 #else
 	if( process_buffer_size == 0 )

@@ -151,6 +151,10 @@ LIBEWF_EXTERN int libewf_set_segment_filename_wide(
                    size_t filename_length );
 #endif
 
+LIBEWF_EXTERN int libewf_get_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *segment_file_size );
+
 LIBEWF_EXTERN int libewf_set_segment_file_size(
                    libewf_handle_t *handle,
                    size64_t segment_file_size );
@@ -176,6 +180,10 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
                    const wchar_t *filename,
                    size_t filename_length );
 #endif
+
+LIBEWF_EXTERN int libewf_get_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *delta_segment_file_size );
 
 LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
                    libewf_handle_t *handle,

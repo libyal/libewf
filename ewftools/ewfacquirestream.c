@@ -949,8 +949,6 @@ ssize64_t ewfacquirestream_read_input(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	/* Make sure SMART chunks fit in the storage media buffer
-	 */
 	process_buffer_size = (size_t) chunk_size;
 #else
 	if( process_buffer_size == 0 )
@@ -1111,7 +1109,6 @@ ssize64_t ewfacquirestream_read_input(
 		 if( process_status_update_unknown_total(
 		      process_status,
 		      (size64_t) acquiry_count,
-		      write_size,
 		      error ) != 1 )
 		{
 			liberror_error_set(
@@ -1212,8 +1209,6 @@ int main( int argc, char * const argv[] )
 {
 	system_character_t acquiry_operating_system[ 32 ];
 
-	imaging_handle_t *imaging_handle                = NULL;
-
 	liberror_error_t *error                         = NULL;
 
 	process_status_t *process_status                = NULL;
@@ -1254,6 +1249,7 @@ int main( int argc, char * const argv[] )
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                = 1;
 	uint8_t read_error_retry                        = 2;
+	uint8_t resume_acquiry                          = 0;
 	uint8_t swap_byte_pairs                         = 0;
 	uint8_t verbose                                 = 0;
 	uint8_t volume_type                             = LIBEWF_VOLUME_TYPE_PHYSICAL;
@@ -1798,7 +1794,7 @@ int main( int argc, char * const argv[] )
 			error_abort = 1;
 		}
 		else if( imaging_handle_initialize(
-		          &imaging_handle,
+		          &ewfacquirestream_imaging_handle,
 		          calculate_md5,
 		          calculate_sha1,
 		          &error ) != 1 )
@@ -1810,8 +1806,9 @@ int main( int argc, char * const argv[] )
 			error_abort = 1;
 		}
 		else if( imaging_handle_open_output(
-		          imaging_handle,
+		          ewfacquirestream_imaging_handle,
 		          target_filename,
+		          resume_acquiry,
 		          &error ) != 1 )
 		{
 			fprintf(
@@ -1819,21 +1816,37 @@ int main( int argc, char * const argv[] )
 			 "Unable to open output file(s).\n" );
 
 			imaging_handle_free(
-			 &imaging_handle,
+			 &ewfacquirestream_imaging_handle,
 			 NULL );
 
 			error_abort = 1;
 		}
 		else if( imaging_handle_set_output_values(
-		          imaging_handle,
+		          ewfacquirestream_imaging_handle,
 			  case_number,
+			  system_string_length(
+			   case_number ),
 			  description,
+			  system_string_length(
+			   description ),
 			  evidence_number,
+			  system_string_length(
+			   evidence_number ),
 			  examiner_name,
+			  system_string_length(
+			   examiner_name ),
 			  notes,
+			  system_string_length(
+			   notes ),
 			  acquiry_operating_system,
+			  system_string_length(
+			   acquiry_operating_system ),
 			  program,
+			  system_string_length(
+			   program ),
 			  acquiry_software_version,
+			  system_string_length(
+			   acquiry_software_version ),
 		          header_codepage,
 		          bytes_per_sector,
 		          acquiry_size,
@@ -1852,10 +1865,10 @@ int main( int argc, char * const argv[] )
 			 "Unable to initialize output settings.\n" );
 
 			imaging_handle_close(
-			 imaging_handle,
+			 ewfacquirestream_imaging_handle,
 			 NULL );
 			imaging_handle_free(
-			 &imaging_handle,
+			 &ewfacquirestream_imaging_handle,
 			 NULL );
 
 			error_abort = 1;
@@ -1907,10 +1920,10 @@ int main( int argc, char * const argv[] )
 			 "Unable to create calculated MD5 hash string.\n" );
 
 			imaging_handle_close(
-			 imaging_handle,
+			 ewfacquirestream_imaging_handle,
 			 NULL );
 			imaging_handle_free(
-			 &imaging_handle,
+			 &ewfacquirestream_imaging_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -1931,10 +1944,10 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 
 			imaging_handle_close(
-			 imaging_handle,
+			 ewfacquirestream_imaging_handle,
 			 NULL );
 			imaging_handle_free(
-			 &imaging_handle,
+			 &ewfacquirestream_imaging_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -1971,10 +1984,10 @@ int main( int argc, char * const argv[] )
 				 calculated_md5_hash_string );
 			}
 			imaging_handle_close(
-			 imaging_handle,
+			 ewfacquirestream_imaging_handle,
 			 NULL );
 			imaging_handle_free(
-			 &imaging_handle,
+			 &ewfacquirestream_imaging_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -2007,10 +2020,10 @@ int main( int argc, char * const argv[] )
 				 calculated_md5_hash_string );
 			}
 			imaging_handle_close(
-			 imaging_handle,
+			 ewfacquirestream_imaging_handle,
 			 NULL );
 			imaging_handle_free(
-			 &imaging_handle,
+			 &ewfacquirestream_imaging_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -2018,7 +2031,7 @@ int main( int argc, char * const argv[] )
 		/* Start acquiring data
 		 */
 		write_count = ewfacquirestream_read_input(
-		               imaging_handle,
+		               ewfacquirestream_imaging_handle,
 		               0,
 		               acquiry_size,
 		               bytes_per_sector,
@@ -2081,10 +2094,10 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 		}
 		imaging_handle_close(
-		 imaging_handle,
+		 ewfacquirestream_imaging_handle,
 		 NULL );
 		imaging_handle_free(
-		 &imaging_handle,
+		 &ewfacquirestream_imaging_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -2113,10 +2126,10 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 		}
 		imaging_handle_close(
-		 imaging_handle,
+		 ewfacquirestream_imaging_handle,
 		 NULL );
 		imaging_handle_free(
-		 &imaging_handle,
+		 &ewfacquirestream_imaging_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -2138,7 +2151,7 @@ int main( int argc, char * const argv[] )
 			}
 		}
 		if( imaging_handle_acquiry_errors_fprint(
-		     imaging_handle,
+		     ewfacquirestream_imaging_handle,
 		     stdout,
 		     &error ) != 1 )
 		{
@@ -2153,7 +2166,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( ( log_file_stream != NULL )
 		 && ( imaging_handle_acquiry_errors_fprint(
-		       imaging_handle,
+		       ewfacquirestream_imaging_handle,
 		       log_file_stream,
 		       &error ) != 1 ) )
 		{
@@ -2168,7 +2181,7 @@ int main( int argc, char * const argv[] )
 		}
 	}
 	if( imaging_handle_close(
-	     imaging_handle,
+	     ewfacquirestream_imaging_handle,
 	     &error ) != 0 )
 	{
 		fprintf(
@@ -2196,13 +2209,13 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 		}
 		imaging_handle_free(
-		 &imaging_handle,
+		 &ewfacquirestream_imaging_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
 	}
 	if( imaging_handle_free(
-	     &imaging_handle,
+	     &ewfacquirestream_imaging_handle,
 	     &error ) != 1 )
 	{
 		fprintf(

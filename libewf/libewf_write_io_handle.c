@@ -1212,7 +1212,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: writing chunk with size: %" PRIzd "(data size: %" PRIzd ").\n",
+	 "%s: writing chunk with size: %" PRIzd " (data size: %" PRIzd ").\n",
 	 function,
 	 chunk_size,
 	 chunk_data_size );

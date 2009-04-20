@@ -116,9 +116,10 @@ int libewf_io_handle_free(
 	}
 	if( *io_handle != NULL )
 	{
-		if( libbfio_pool_free(
-		     &( ( *io_handle )->file_io_pool ),
-		     error ) != 1 )
+		if( ( ( *io_handle )->pool_created_in_library != 0 )
+		 && ( libbfio_pool_free(
+		       &( ( *io_handle )->file_io_pool ),
+		       error ) != 1 ) )
 		{
 			liberror_error_set(
 			 error,

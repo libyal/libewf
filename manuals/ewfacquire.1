@@ -1,4 +1,4 @@
-.Dd April 4, 2009
+.Dd April 19, 2009
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -27,7 +27,7 @@
 .Op Fl r Ar read_error_retries
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
-.Op Fl hqsuvVw
+.Op Fl hqRsuvVw
 .Ar source
 .Sh DESCRIPTION
 .Nm ewfacquire
@@ -101,6 +101,8 @@ the amount of bytes per sector (default is 512) (use this to override the automa
 quiet shows no status information
 .It Fl r Ar read_error_retries
 the amount of retries when a read error occurs (default is 2)
+.It Fl R
+resume acquiry at a safe point
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
@@ -169,7 +171,7 @@ Media type:                     removable
 Volume type:                    physical
 Compression used:               none
 EWF file format:                Encase 5
-Acquiry start offet:            0
+Acquiry start offset:           0
 Amount of bytes to acquire:     1.4 MiB (1474560 bytes)
 Evidence segment file size:     1.4 GiB (1572864000 bytes)
 Block size:                     64 sectors

@@ -311,7 +311,6 @@ int process_status_update(
 int process_status_update_unknown_total(
      process_status_t *process_status,
      size64_t bytes_read,
-     size64_t bytes_total,
      liberror_error_t **error )
 {
 	static char *function    = "process_status_update_unknown_total";

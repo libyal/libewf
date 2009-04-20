@@ -124,7 +124,7 @@ void usage_fprint(
 	                 "                  [ -m media_type ] [ -M volume_type ] [ -N notes ] [ -o offset ]\n"
 	                 "                  [ -p process_buffer_size ] [ -P bytes_per_sector ]\n"
 	                 "                  [ -r read_error_retries ] [ -S segment_file_size ]\n"
-	                 "                  [ -t target ] [ -hqsuvVw ] source\n\n" );
+	                 "                  [ -t target ] [ -hqRsuvVw ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
@@ -157,6 +157,7 @@ void usage_fprint(
 	                 "\t        (use this to override the automatic bytes per sector detection)\n" );
 	fprintf( stream, "\t-q:     quiet shows no status information\n" );
 	fprintf( stream, "\t-r:     specify the amount of retries when a read error occurs (default is 2)\n" );
+	fprintf( stream, "\t-R:     resume acquiry at a safe point\n" );
 	fprintf( stream, "\t-s:     swap byte pairs of the media data (from AB to BA)\n"
 	                 "\t        (use this for big to little endian conversion and vice versa)\n" );
 
@@ -195,6 +196,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         FILE *stream,
         system_character_t *input_buffer,
         size_t input_buffer_size,
+        uint8_t resume_acquiry,
         system_character_t *filename,
         system_character_t *case_number,
         system_character_t *description,
@@ -207,6 +209,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         uint8_t compression_flags,
         uint8_t libewf_format,
         off64_t acquiry_offset,
+        off64_t resume_acquiry_offset,
         size64_t acquiry_size,
         size64_t segment_file_size,
         uint32_t bytes_per_sector,
@@ -241,28 +244,35 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 
 	fprintf(
 	 stream,
-	 "Image path and filename:\t%" PRIs_SYSTEM ".",
+	 "Image path and filename:\t%" PRIs_SYSTEM "",
 	 filename );
 
-	if( libewf_format == LIBEWF_FORMAT_SMART )
+	if( resume_acquiry == 0 )
 	{
-		fprintf(
-		 stream,
-		 "s01\n" );
+		if( libewf_format == LIBEWF_FORMAT_SMART )
+		{
+			fprintf(
+			 stream,
+			 ".s01" );
+		}
+		else if( ( libewf_format == LIBEWF_FORMAT_EWF )
+		      || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
+		{
+			fprintf(
+			 stream,
+			 ".e01" );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 ".E01" );
+		}
 	}
-	else if( ( libewf_format == LIBEWF_FORMAT_EWF )
-	      || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
-	{
-		fprintf(
-		 stream,
-		 "e01\n" );
-	}
-	else
-	{
-		fprintf(
-		 stream,
-		 "E01\n" );
-	}
+	fprintf(
+	 stream,
+	 "\n" );
+
 	fprintf(
 	 stream,
 	 "Case number:\t\t\t" );
@@ -496,9 +506,15 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 		 "\n" );
 	}
 	fprintf(
-	 stream, "Acquiry start offet:\t\t%" PRIi64 "\n",
+	 stream, "Acquiry start offset:\t\t%" PRIi64 "\n",
 	 acquiry_offset );
 
+	if( resume_acquiry != 0 )
+	{
+		fprintf(
+		 stream, "Resuming acquiry at offset:\t%" PRIi64 "\n",
+		 resume_acquiry_offset );
+	}
 	result = byte_size_string_create(
 	          acquiry_size_string,
 	          16,
@@ -1101,6 +1117,7 @@ ssize64_t ewfacquire_read_input(
            size64_t media_size,
            size64_t acquiry_size,
            off64_t acquiry_offset,
+           off64_t resume_acquiry_offset,
            uint32_t bytes_per_sector,
            uint8_t swap_byte_pairs,
            uint32_t sector_error_granularity,
@@ -1117,7 +1134,7 @@ ssize64_t ewfacquire_read_input(
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	static char *function                        = "ewfacquire_read_input";
 	ssize64_t acquiry_count                      = 0;
-	size_t write_size                            = 0;
+	size_t read_size                             = 0;
 	ssize_t read_count                           = 0;
 	ssize_t process_count                        = 0;
 	ssize_t write_count                          = 0;
@@ -1183,24 +1200,14 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( acquiry_offset > 0 )
 	{
-		if( acquiry_offset >= (off64_t) acquiry_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid acquiry offset.",
-			 function );
-
-			return( -1 );
-		}
-		if( ( acquiry_size + acquiry_offset ) > media_size )
+		if( ( acquiry_offset >= (off64_t) media_size )
+		 || ( ( acquiry_size + acquiry_offset ) >= media_size ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: unable to acquire beyond size of media.\n",
+			 "%s: unable to acquire beyond media size.",
 			 function );
 
 			return( -1 );
@@ -1216,6 +1223,49 @@ ssize64_t ewfacquire_read_input(
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to find acquiry offset.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( resume_acquiry_offset > 0 )
+	{
+		if( ( acquiry_offset + resume_acquiry_offset ) >= (off64_t) media_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: unable to resume acquire beyond media size.",
+			 function );
+
+			return( -1 );
+		}
+		if( device_handle_seek_offset(
+		     device_handle,
+		     resume_acquiry_offset,
+		     SEEK_CUR,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to find acquiry offset.",
+			 function );
+
+			return( -1 );
+		}
+		if( imaging_handle_seek_offset(
+		     imaging_handle,
+		     0,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek imaging offset.",
 			 function );
 
 			return( -1 );
@@ -1249,8 +1299,6 @@ ssize64_t ewfacquire_read_input(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	/* Make sure SMART chunks fit in the storage media buffer
-	 */
 	process_buffer_size = (size_t) chunk_size;
 #else
 	if( process_buffer_size == 0 )
@@ -1275,83 +1323,167 @@ ssize64_t ewfacquire_read_input(
 	}
 	while( acquiry_count < (ssize64_t) acquiry_size )
 	{
-		write_size = process_buffer_size;
+		read_size = process_buffer_size;
 
-		if( ( acquiry_size - acquiry_count ) < write_size )
+		if( ( acquiry_size - acquiry_count ) < read_size )
 		{
-			write_size = (size_t) ( acquiry_size - acquiry_count );
+			read_size = (size_t) ( acquiry_size - acquiry_count );
 		}
-		read_count = ewfacquire_read_buffer(
-		              imaging_handle,
-		              device_handle,
-		              storage_media_buffer->raw_buffer,
-		              storage_media_buffer->raw_buffer_size,
-		              acquiry_count,
-		              write_size,
-		              read_error_retry,
-		              byte_error_granularity,
-		              wipe_block_on_read_error,
-		              error );
-
-		if( read_count < 0 )
+		if( acquiry_count >= resume_acquiry_offset )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: error reading data from input.",
-			 function );
+			read_count = ewfacquire_read_buffer(
+				      imaging_handle,
+				      device_handle,
+				      storage_media_buffer->raw_buffer,
+				      storage_media_buffer->raw_buffer_size,
+				      acquiry_offset + acquiry_count,
+				      read_size,
+				      read_error_retry,
+				      byte_error_granularity,
+				      wipe_block_on_read_error,
+				      error );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
+			if( read_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: error reading data from input.",
+				 function );
 
-			return( -1 );
-		}
-		if( read_count == 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unexpected end of input.",
-			 function );
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
+				return( -1 );
+			}
+			if( read_count == 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: unexpected end of input.",
+				 function );
 
-			return( -1 );
-		}
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
+				return( -1 );
+			}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		storage_media_buffer->data_in_compression_buffer = 0;
+			storage_media_buffer->data_in_compression_buffer = 0;
 #endif
-		storage_media_buffer->raw_buffer_amount = read_count;
+			storage_media_buffer->raw_buffer_amount = read_count;
 
-		/* Swap byte pairs
-		 */
-		if( ( swap_byte_pairs == 1 )
-		 && ( imaging_handle_swap_byte_pairs(
-		       imaging_handle,
-		       storage_media_buffer,
-		       read_count,
-		       error ) != 1 ) )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to swap byte pairs.",
-			 function );
+			/* Swap byte pairs
+			 * The digest hashes are calcultated after swap
+			 */
+			if( ( swap_byte_pairs == 1 )
+			 && ( imaging_handle_swap_byte_pairs(
+			       imaging_handle,
+			       storage_media_buffer,
+			       read_count,
+			       error ) != 1 ) )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to swap byte pairs.",
+				 function );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
 
-			return( -1 );
+				return( -1 );
+			}
 		}
-		/* Digest hashes are calcultated after swap
-		 */
+		else
+		{
+			read_count = imaging_handle_read_buffer(
+				      imaging_handle,
+				      storage_media_buffer,
+				      read_size,
+				      error );
+
+			if( read_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				"%s: unable to read data.\n",
+				 function );
+
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
+				return( -1 );
+			}
+			if( read_count == 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: unexpected end of data.\n",
+				 function );
+
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
+				return( -1 );
+			}
+			process_count = imaging_handle_prepare_read_buffer(
+					 imaging_handle,
+					 storage_media_buffer,
+					 error );
+
+			if( process_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				"%s: unable to prepare buffer after read.\n",
+				 function );
+
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
+				return( -1 );
+			}
+			if( process_count > (ssize_t) read_size )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: more bytes read than requested.\n",
+				 function );
+
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
+				return( -1 );
+			}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			/* Set the amount of chunk data in the buffer
+			 */
+			if( storage_media_buffer->data_in_compression_buffer == 1 )
+			{
+				storage_media_buffer->compression_buffer_amount = process_count;
+			}
+#endif
+		}
 		if( imaging_handle_update_integrity_hash(
 		     imaging_handle,
 		     storage_media_buffer,
@@ -1371,53 +1503,56 @@ ssize64_t ewfacquire_read_input(
 
 			return( -1 );
 		}
-		process_count = imaging_handle_prepare_write_buffer(
-		                 imaging_handle,
-		                 storage_media_buffer,
-		                 error );
-
-		if( process_count < 0 )
+		if( acquiry_count >= resume_acquiry_offset )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to prepare buffer before write.",
-			 function );
+			process_count = imaging_handle_prepare_write_buffer(
+					 imaging_handle,
+					 storage_media_buffer,
+					 error );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
+			if( process_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				"%s: unable to prepare buffer before write.",
+				 function );
 
-			return( -1 );
-		}
-		write_count = imaging_handle_write_buffer(
-		               imaging_handle,
-		               storage_media_buffer,
-		               process_count,
-		               error );
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
 
-		if( write_count < 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write data to file.",
-			 function );
+				return( -1 );
+			}
+			write_count = imaging_handle_write_buffer(
+				       imaging_handle,
+				       storage_media_buffer,
+				       process_count,
+				       error );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
+			if( write_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to write data to file.",
+				 function );
 
-			return( -1 );
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
+				return( -1 );
+			}
 		}
 		acquiry_count += read_count;
 
 		 if( process_status_update(
 		      process_status,
 		      (size64_t) acquiry_count,
-		      write_size,
+		      acquiry_size,
 		      error ) != 1 )
 		{
 			liberror_error_set(
@@ -1447,27 +1582,29 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	write_count = imaging_handle_finalize(
-	               imaging_handle,
-	               calculated_md5_hash_string,
-	               calculated_md5_hash_string_size,
-	               calculated_sha1_hash_string,
-	               calculated_sha1_hash_string_size,
-	               error );
-
-	if( write_count == -1 )
+	if( acquiry_count >= resume_acquiry_offset )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to finalize.\n",
-		 function );
+		write_count = imaging_handle_finalize(
+			       imaging_handle,
+			       calculated_md5_hash_string,
+			       calculated_md5_hash_string_size,
+			       calculated_sha1_hash_string,
+			       calculated_sha1_hash_string_size,
+			       error );
 
-		return( -1 );
+		if( write_count == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to finalize.\n",
+			 function );
+
+			return( -1 );
+		}
+		acquiry_count += write_count;
 	}
-	acquiry_count += write_count;
-
 	return( acquiry_count );
 }
 
@@ -1547,7 +1684,8 @@ int main( int argc, char * const argv[] )
 	FILE *log_file_stream                           = NULL;
 
 	system_integer_t option                         = 0;
-	ssize64_t write_count                           = 0;
+	off64_t resume_acquiry_offset                   = 0;
+	ssize64_t read_count                            = 0;
 	size_t string_length                            = 0;
 	uint64_t acquiry_offset                         = 0;
 	uint64_t acquiry_size                           = 0;
@@ -1566,6 +1704,7 @@ int main( int argc, char * const argv[] )
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                = 1;
 	uint8_t read_error_retry                        = 2;
+	uint8_t resume_acquiry                          = 0;
 	uint8_t swap_byte_pairs                         = 0;
 	uint8_t verbose                                 = 0;
 	uint8_t volume_type                             = LIBEWF_VOLUME_TYPE_LOGICAL;
@@ -1616,7 +1755,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:sS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1950,6 +2089,11 @@ int main( int argc, char * const argv[] )
 				read_error_retry = (uint8_t) input_size_variable;
 
 				argument_set_read_error_retry = 1;
+
+				break;
+
+			case (system_integer_t) 'R':
+				resume_acquiry = 1;
 
 				break;
 
@@ -2446,6 +2590,25 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
+	/* Set up the imaging handle
+	 */
+	if( imaging_handle_initialize(
+	     &ewfacquire_imaging_handle,
+	     calculate_md5,
+	     calculate_sha1,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create imaging handle.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		error_abort = 1;
+	}
 	if( error_abort != 0 )
 	{
 		if( case_number != NULL )
@@ -2498,7 +2661,20 @@ int main( int argc, char * const argv[] )
 
 		/* Target filename
 		 */
-		if( option_target_filename == NULL )
+		if( resume_acquiry != 0 )
+		{
+			while( ewfinput_get_string_variable(
+				stdout,
+				_SYSTEM_CHARACTER_T_STRING( "Image path and filename with extension" ),
+				target_filename,
+				1024 ) != 1 )
+			{
+				fprintf(
+				 stdout,
+				 "Filename is required, please try again or terminate using Ctrl^C.\n" );
+			}
+		}
+		else if( option_target_filename == NULL )
 		{
 			while( ewfinput_get_string_variable(
 				stdout,
@@ -2511,254 +2687,348 @@ int main( int argc, char * const argv[] )
 				 "Filename is required, please try again or terminate using Ctrl^C.\n" );
 			}
 		}
-		/* Case number
-		 */
-		if( ( option_case_number == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _SYSTEM_CHARACTER_T_STRING( "Case number" ),
-		       case_number,
-		       256 ) == -1 ) )
+		if( resume_acquiry != 0 )
 		{
-			fprintf(
-			 stdout,
-			 "Unable to set case number string.\n" );
-
-			case_number[ 0 ] = 0;
-		}
-		/* Description
-		 */
-		if( ( option_description == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _SYSTEM_CHARACTER_T_STRING( "Description" ),
-		       description,
-		       256 ) == -1 ) )
-		{
-			fprintf(
-			 stdout,
-			 "Unable to set description string.\n" );
-
-			description[ 0 ] = 0;
-		}
-		/* Evidence number
-		 */
-		if( ( option_evidence_number == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _SYSTEM_CHARACTER_T_STRING( "Evidence number" ),
-		       evidence_number,
-		       256 ) == -1 ) )
-		{
-			fprintf(
-			 stdout,
-			 "Unable to set evidence number string.\n" );
-
-			evidence_number[ 0 ] = 0;
-		}
-		/* Examiner name
-		 */
-		if( ( option_examiner_name == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _SYSTEM_CHARACTER_T_STRING( "Examiner name" ),
-		       examiner_name,
-		       256 ) == -1 ) )
-		{
-			fprintf(
-			 stdout,
-			 "Unable to set examiner name string.\n" );
-
-			examiner_name[ 0 ] = 0;
-		}
-		/* Notes
-		 */
-		if( ( option_notes == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _SYSTEM_CHARACTER_T_STRING( "Notes" ),
-		       notes,
-		       256 ) == -1 ) )
-		{
-			fprintf(
-			 stdout,
-			 "Unable to set notes string.\n" );
-
-			notes[ 0 ] = 0;
-		}
-		/* Media type
-		 */
-		if( argument_set_media_type == 0 )
-		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Media type" ),
-			     ewfinput_media_types,
-			     EWFINPUT_MEDIA_TYPES_AMOUNT,
-			     EWFINPUT_MEDIA_TYPES_DEFAULT,
-			     &fixed_string_variable ) == -1 )
+			if( imaging_handle_open_output(
+			     ewfacquire_imaging_handle,
+			     target_filename,
+			     resume_acquiry,
+			     &error ) != 1 )
 			{
 				fprintf(
 				 stdout,
-				 "Unable to determine media type defaulting to: fixed.\n" );
+				 "Unable to resume acquire.\n" );
 
-				media_type = LIBEWF_MEDIA_TYPE_FIXED;
-			}
-			else if( ewfinput_determine_media_type(
-				  fixed_string_variable,
-				  &media_type ) != 1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unsupported media type defaulting to: fixed.\n" );
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
-				media_type = LIBEWF_MEDIA_TYPE_FIXED;
+				resume_acquiry = 0;
 			}
 		}
-		/* Volume type
-		 */
-		if( argument_set_volume_type == 0 )
+		if( resume_acquiry != 0 )
 		{
-			default_volume_type = EWFINPUT_VOLUME_TYPES_DEFAULT;
-
-			if( ( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-			 || ( media_type == LIBEWF_MEDIA_TYPE_OPTICAL ) )
-			{
-				default_volume_type = 0;
-			}
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Volume type" ),
-			     ewfinput_volume_types,
-			     EWFINPUT_VOLUME_TYPES_AMOUNT,
-			     (uint8_t) default_volume_type,
-			     &fixed_string_variable ) == -1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unable to determine volume type defaulting to: physical.\n" );
-
-				volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
-			}
-			else if( ewfinput_determine_volume_type(
-				  fixed_string_variable,
-				  &volume_type ) != 1 )
+			if( imaging_handle_get_output_values(
+			     ewfacquire_imaging_handle,
+			     case_number,
+			     256,
+			     description,
+			     256,
+			     evidence_number,
+			     256,
+			     examiner_name,
+			     256,
+			     notes,
+			     256,
+			     &bytes_per_sector,
+			     &acquiry_size,
+			     &media_type,
+			     &volume_type,
+			     &compression_level,
+			     &compression_flags,
+			     &libewf_format,
+			     &sectors_per_chunk,
+			     &sector_error_granularity,
+			     &error ) != 1 )
 			{
 				fprintf(
 				 stdout,
-				 "Unsupported volume type defaulting to: physical.\n" );
+				 "Unable to resume acquire.\n" );
 
-				volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				imaging_handle_close(
+				 ewfacquire_imaging_handle,
+				 NULL );
+
+				resume_acquiry = 0;
 			}
 		}
-		/* Compression
-		 */
-		if( argument_set_compression == 0 )
+		if( resume_acquiry != 0 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Use compression" ),
-			     ewfinput_compression_levels,
-			     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
-			     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-			     &fixed_string_variable ) == -1 )
+			if( imaging_handle_get_offset(
+			     ewfacquire_imaging_handle,
+			     (off64_t *) &resume_acquiry_offset,
+			     &error ) != 1 )
 			{
 				fprintf(
 				 stdout,
-				 "Unable to determine compression type defaulting to: none.\n" );
+				 "Unable to resume acquire.\n" );
 
-				compression_level = LIBEWF_COMPRESSION_NONE;
-				compression_flags = 0;
-			}
-			else if( ewfinput_determine_compression_level(
-				  fixed_string_variable,
-				  &compression_level,
-				  &compression_flags ) != 1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unsupported compression type defaulting to: none.\n" );
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
-				compression_level = LIBEWF_COMPRESSION_NONE;
-				compression_flags = 0;
+				imaging_handle_close(
+				 ewfacquire_imaging_handle,
+				 NULL );
+
+				resume_acquiry = 0;
 			}
 		}
-		/* File format
-		 */
-		if( argument_set_format == 0 )
+		if( resume_acquiry == 0 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Use EWF file format" ),
-			     ewfinput_format_types,
-			     EWFINPUT_FORMAT_TYPES_AMOUNT,
-			     EWFINPUT_FORMAT_TYPES_DEFAULT,
-			     &fixed_string_variable ) == -1 )
+			/* Case number
+			 */
+			if( ( option_case_number == NULL )
+			 && ( ewfinput_get_string_variable(
+			       stdout,
+			       _SYSTEM_CHARACTER_T_STRING( "Case number" ),
+			       case_number,
+			       256 ) == -1 ) )
 			{
 				fprintf(
 				 stdout,
-				 "Unable to determine EWF file format type defaulting to: encase5.\n" );
+				 "Unable to set case number string.\n" );
 
-				libewf_format = LIBEWF_FORMAT_ENCASE5;
+				case_number[ 0 ] = 0;
 			}
-			else if( ewfinput_determine_libewf_format(
-				  fixed_string_variable,
-				  &libewf_format ) != 1 )
+			/* Description
+			 */
+			if( ( option_description == NULL )
+			 && ( ewfinput_get_string_variable(
+			       stdout,
+			       _SYSTEM_CHARACTER_T_STRING( "Description" ),
+			       description,
+			       256 ) == -1 ) )
 			{
 				fprintf(
 				 stdout,
-				 "Unsupported EWF file format type defaulting to: encase5.\n" );
+				 "Unable to set description string.\n" );
 
-				libewf_format = LIBEWF_FORMAT_ENCASE5;
+				description[ 0 ] = 0;
+			}
+			/* Evidence number
+			 */
+			if( ( option_evidence_number == NULL )
+			 && ( ewfinput_get_string_variable(
+			       stdout,
+			       _SYSTEM_CHARACTER_T_STRING( "Evidence number" ),
+			       evidence_number,
+			       256 ) == -1 ) )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to set evidence number string.\n" );
+
+				evidence_number[ 0 ] = 0;
+			}
+			/* Examiner name
+			 */
+			if( ( option_examiner_name == NULL )
+			 && ( ewfinput_get_string_variable(
+			       stdout,
+			       _SYSTEM_CHARACTER_T_STRING( "Examiner name" ),
+			       examiner_name,
+			       256 ) == -1 ) )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to set examiner name string.\n" );
+
+				examiner_name[ 0 ] = 0;
+			}
+			/* Notes
+			 */
+			if( ( option_notes == NULL )
+			 && ( ewfinput_get_string_variable(
+			       stdout,
+			       _SYSTEM_CHARACTER_T_STRING( "Notes" ),
+			       notes,
+			       256 ) == -1 ) )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to set notes string.\n" );
+
+				notes[ 0 ] = 0;
+			}
+			/* Media type
+			 */
+			if( argument_set_media_type == 0 )
+			{
+				if( ewfinput_get_fixed_string_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "Media type" ),
+				     ewfinput_media_types,
+				     EWFINPUT_MEDIA_TYPES_AMOUNT,
+				     EWFINPUT_MEDIA_TYPES_DEFAULT,
+				     &fixed_string_variable ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to determine media type defaulting to: fixed.\n" );
+
+					media_type = LIBEWF_MEDIA_TYPE_FIXED;
+				}
+				else if( ewfinput_determine_media_type(
+					  fixed_string_variable,
+					  &media_type ) != 1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unsupported media type defaulting to: fixed.\n" );
+
+					media_type = LIBEWF_MEDIA_TYPE_FIXED;
+				}
+			}
+			/* Volume type
+			 */
+			if( argument_set_volume_type == 0 )
+			{
+				default_volume_type = EWFINPUT_VOLUME_TYPES_DEFAULT;
+
+				if( ( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
+				 || ( media_type == LIBEWF_MEDIA_TYPE_OPTICAL ) )
+				{
+					default_volume_type = 0;
+				}
+				if( ewfinput_get_fixed_string_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "Volume type" ),
+				     ewfinput_volume_types,
+				     EWFINPUT_VOLUME_TYPES_AMOUNT,
+				     (uint8_t) default_volume_type,
+				     &fixed_string_variable ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to determine volume type defaulting to: physical.\n" );
+
+					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+				}
+				else if( ewfinput_determine_volume_type(
+					  fixed_string_variable,
+					  &volume_type ) != 1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unsupported volume type defaulting to: physical.\n" );
+
+					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+				}
+			}
+			/* Compression
+			 */
+			if( argument_set_compression == 0 )
+			{
+				if( ewfinput_get_fixed_string_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "Use compression" ),
+				     ewfinput_compression_levels,
+				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
+				     &fixed_string_variable ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to determine compression type defaulting to: none.\n" );
+
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
+				}
+				else if( ewfinput_determine_compression_level(
+					  fixed_string_variable,
+					  &compression_level,
+					  &compression_flags ) != 1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unsupported compression type defaulting to: none.\n" );
+
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
+				}
+			}
+			/* File format
+			 */
+			if( argument_set_format == 0 )
+			{
+				if( ewfinput_get_fixed_string_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "Use EWF file format" ),
+				     ewfinput_format_types,
+				     EWFINPUT_FORMAT_TYPES_AMOUNT,
+				     EWFINPUT_FORMAT_TYPES_DEFAULT,
+				     &fixed_string_variable ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to determine EWF file format type defaulting to: encase5.\n" );
+
+					libewf_format = LIBEWF_FORMAT_ENCASE5;
+				}
+				else if( ewfinput_determine_libewf_format(
+					  fixed_string_variable,
+					  &libewf_format ) != 1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unsupported EWF file format type defaulting to: encase5.\n" );
+
+					libewf_format = LIBEWF_FORMAT_ENCASE5;
+				}
 			}
 		}
-		/* Offset of data to acquire
-		 */
-		if( ( argument_set_offset == 0 )
-		 && ( ewfinput_get_size_variable(
-		       stdout,
-		       input_buffer,
-		       EWFACQUIRE_INPUT_BUFFER_SIZE,
-		       _SYSTEM_CHARACTER_T_STRING( "Start to acquire at offset" ),
-		       0,
-		       media_size,
-		       0,
-		       &acquiry_offset ) == -1 ) )
+		if( ( resume_acquiry == 0 )
+		 || ( acquiry_size != media_size ) )
 		{
-			acquiry_offset = 0;
+			/* Offset of data to acquire
+			 */
+			if( ( argument_set_offset == 0 )
+			 && ( ewfinput_get_size_variable(
+			       stdout,
+			       input_buffer,
+			       EWFACQUIRE_INPUT_BUFFER_SIZE,
+			       _SYSTEM_CHARACTER_T_STRING( "Start to acquire at offset" ),
+			       0,
+			       media_size,
+			       0,
+			       &acquiry_offset ) == -1 ) )
+			{
+				acquiry_offset = 0;
 
-			fprintf(
-			 stdout,
-			 "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
-			 acquiry_offset );
+				fprintf(
+				 stdout,
+				 "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
+				 acquiry_offset );
+			}
 		}
-		/* Size of data to acquire
-		 */
-		if( ( argument_set_size == 0 )
-		 && ( ewfinput_get_size_variable(
-		       stdout,
-		       input_buffer,
-		       EWFACQUIRE_INPUT_BUFFER_SIZE,
-		       _SYSTEM_CHARACTER_T_STRING( "The amount of bytes to acquire" ),
-		       0,
-		       ( media_size - acquiry_offset ),
-		       ( media_size - acquiry_offset ),
-		       &acquiry_size ) == -1 ) )
+		if( resume_acquiry == 0 )
 		{
-			acquiry_size = media_size - acquiry_offset;
+			/* Size of data to acquire
+			 */
+			if( ( argument_set_size == 0 )
+			 && ( ewfinput_get_size_variable(
+			       stdout,
+			       input_buffer,
+			       EWFACQUIRE_INPUT_BUFFER_SIZE,
+			       _SYSTEM_CHARACTER_T_STRING( "The amount of bytes to acquire" ),
+			       0,
+			       ( media_size - acquiry_offset ),
+			       ( media_size - acquiry_offset ),
+			       &acquiry_size ) == -1 ) )
+			{
+				acquiry_size = media_size - acquiry_offset;
 
-			fprintf(
-			 stdout,
-			 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
-			 acquiry_size );
+				fprintf(
+				 stdout,
+				 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
+				 acquiry_size );
+			}
 		}
 		/* Segment file size
 		 */
@@ -2802,82 +3072,85 @@ int main( int argc, char * const argv[] )
 				segment_file_size = maximum_segment_file_size;
 			}
 		}
-		/* Bytes per sector
-		 */
-		if( argument_set_bytes_per_sector == 0 )
+		if( resume_acquiry == 0 )
 		{
-			if( ewfinput_get_size_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "The amount of bytes per sector" ),
-			     0,
-			     UINT32_MAX,
-			     bytes_per_sector,
-			     &input_size_variable ) == -1 )
+			/* Bytes per sector
+			 */
+			if( argument_set_bytes_per_sector == 0 )
 			{
-				input_size_variable = 512;
+				if( ewfinput_get_size_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "The amount of bytes per sector" ),
+				     0,
+				     UINT32_MAX,
+				     bytes_per_sector,
+				     &input_size_variable ) == -1 )
+				{
+					input_size_variable = 512;
 
-				fprintf(
-				 stdout,
-				 "Unable to determine bytes per sector defaulting to: %" PRIu64 ".\n",
-				 input_size_variable );
+					fprintf(
+					 stdout,
+					 "Unable to determine bytes per sector defaulting to: %" PRIu64 ".\n",
+					 input_size_variable );
+				}
+				bytes_per_sector = (uint32_t) input_size_variable;
 			}
-			bytes_per_sector = (uint32_t) input_size_variable;
-		}
-		/* Chunk size (sectors per block)
-		 */
-		if( argument_set_sectors_per_chunk == 0 )
-		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "The amount of sectors to read at once" ),
-			     ewfinput_sector_per_block_sizes,
-			     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-			     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-			     &fixed_string_variable ) == -1 )
+			/* Chunk size (sectors per block)
+			 */
+			if( argument_set_sectors_per_chunk == 0 )
 			{
-				fprintf(
-				 stdout,
-				 "Unable to determine sectors per chunk defaulting to: 64.\n" );
+				if( ewfinput_get_fixed_string_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "The amount of sectors to read at once" ),
+				     ewfinput_sector_per_block_sizes,
+				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
+				     &fixed_string_variable ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to determine sectors per chunk defaulting to: 64.\n" );
 
-				sectors_per_chunk = 64;
+					sectors_per_chunk = 64;
+				}
+				else if( ewfinput_determine_sectors_per_chunk(
+					  fixed_string_variable,
+					  &sectors_per_chunk ) != 1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unsupported sectors per chunk defaulting to: 64.\n" );
+
+					sectors_per_chunk = 64;
+				}
 			}
-			else if( ewfinput_determine_sectors_per_chunk(
-				  fixed_string_variable,
-				  &sectors_per_chunk ) != 1 )
+			/* Error granularity
+			 */
+			if( argument_set_sector_error_granularity == 0 )
 			{
-				fprintf(
-				 stdout,
-				 "Unsupported sectors per chunk defaulting to: 64.\n" );
+				if( ewfinput_get_size_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "The amount of sectors to be used as error granularity" ),
+				     1,
+				     (uint64_t) sectors_per_chunk,
+				     64,
+				     &input_size_variable ) == -1 )
+				{
+					input_size_variable = 64;
 
-				sectors_per_chunk = 64;
+					fprintf(
+					 stdout,
+					 "Unable to determine sector error granularity defaulting to: %" PRIu64 ".\n",
+					 input_size_variable );
+				}
+				sector_error_granularity = (uint32_t) input_size_variable;
 			}
-		}
-		/* Error granularity
-		 */
-		if( argument_set_sector_error_granularity == 0 )
-		{
-			if( ewfinput_get_size_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "The amount of sectors to be used as error granularity" ),
-			     1,
-			     (uint64_t) sectors_per_chunk,
-			     64,
-			     &input_size_variable ) == -1 )
-			{
-				input_size_variable = 64;
-
-				fprintf(
-				 stdout,
-				 "Unable to determine sector error granularity defaulting to: %" PRIu64 ".\n",
-				 input_size_variable );
-			}
-			sector_error_granularity = (uint32_t) input_size_variable;
 		}
 		/* The amount of read error retry
 		 */
@@ -2943,6 +3216,7 @@ int main( int argc, char * const argv[] )
 		                                stdout,
 		                                input_buffer,
 		                                EWFACQUIRE_INPUT_BUFFER_SIZE,
+		                                resume_acquiry,
 		                                target_filename,
 		                                case_number,
 		                                description,
@@ -2955,6 +3229,7 @@ int main( int argc, char * const argv[] )
 		                                compression_flags,
 		                                libewf_format,
 		                                (off64_t) acquiry_offset,
+		                                resume_acquiry_offset,
 		                                (size64_t) acquiry_size,
 		                                (size64_t) segment_file_size,
 		                                bytes_per_sector,
@@ -2989,6 +3264,22 @@ int main( int argc, char * const argv[] )
 			argument_set_size                     = 0;
 			argument_set_volume_type              = 0;
 			argument_set_wipe_block_on_read_error = 0;
+
+			if( resume_acquiry != 0 )
+			{
+				if( imaging_handle_close(
+				     ewfacquire_imaging_handle,
+				     &error ) != 0 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to close output file(s).\n" );
+
+					ewfacquire_abort = 1;
+
+					break;
+				}
+			}
 		}
 	}
 	if( ewfsignal_attach(
@@ -2998,7 +3289,8 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 	}
-	if( ewfacquire_abort == 0 )
+	if( ( ewfacquire_abort == 0 )
+	 && ( resume_acquiry == 0 ) )
 	{
 		if( ewfcommon_determine_operating_system_string(
 		     acquiry_operating_system,
@@ -3018,24 +3310,11 @@ int main( int argc, char * const argv[] )
 		}
 		acquiry_software_version = _SYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
-		/* Set up the imaging handle
-		 */
-		if( imaging_handle_initialize(
-		     &ewfacquire_imaging_handle,
-		     calculate_md5,
-		     calculate_sha1,
+		if( imaging_handle_open_output(
+		     ewfacquire_imaging_handle,
+		     target_filename,
+		     resume_acquiry,
 		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create imaging handle.\n" );
-
-			error_abort = 1;
-		}
-		else if( imaging_handle_open_output(
-		          ewfacquire_imaging_handle,
-		          target_filename,
-		          &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -3050,13 +3329,29 @@ int main( int argc, char * const argv[] )
 		else if( imaging_handle_set_output_values(
 		          ewfacquire_imaging_handle,
 			  case_number,
+			  system_string_length(
+			   case_number ),
 			  description,
+			  system_string_length(
+			   description ),
 			  evidence_number,
+			  system_string_length(
+			   evidence_number ),
 			  examiner_name,
+			  system_string_length(
+			   examiner_name ),
 			  notes,
+			  system_string_length(
+			   notes ),
 			  acquiry_operating_system,
+			  system_string_length(
+			   acquiry_operating_system ),
 			  program,
+			  system_string_length(
+			   program ),
 			  acquiry_software_version,
+			  system_string_length(
+			   acquiry_software_version ),
 		          header_codepage,
 		          bytes_per_sector,
 		          acquiry_size,
@@ -3076,9 +3371,6 @@ int main( int argc, char * const argv[] )
 
 			imaging_handle_close(
 			 ewfacquire_imaging_handle,
-			 NULL );
-			imaging_handle_free(
-			 &ewfacquire_imaging_handle,
 			 NULL );
 
 			error_abort = 1;
@@ -3103,6 +3395,10 @@ int main( int argc, char * const argv[] )
 		 error );
 		liberror_error_free(
 		 &error );
+
+		imaging_handle_free(
+		 &ewfacquire_imaging_handle,
+		 NULL );
 
 		device_handle_close(
 		 device_handle,
@@ -3263,26 +3559,27 @@ int main( int argc, char * const argv[] )
 		}
 		/* Start acquiring data
 		 */
-		write_count = ewfacquire_read_input(
-		               ewfacquire_imaging_handle,
-			       device_handle,
-			       media_size,
-			       acquiry_size,
-			       acquiry_offset,
-			       bytes_per_sector,
-			       swap_byte_pairs,
-		               sector_error_granularity,
-		               read_error_retry,
-		               wipe_block_on_read_error,
-			       (size_t) process_buffer_size,
-			       calculated_md5_hash_string,
-			       DIGEST_HASH_STRING_SIZE_MD5,
-			       calculated_sha1_hash_string,
-			       DIGEST_HASH_STRING_SIZE_SHA1,
-			       process_status,
-			       &error );
+		read_count = ewfacquire_read_input(
+		              ewfacquire_imaging_handle,
+		              device_handle,
+		              media_size,
+		              (size64_t) acquiry_size,
+		              (off64_t) acquiry_offset,
+		              resume_acquiry_offset,
+		              bytes_per_sector,
+		              swap_byte_pairs,
+		              sector_error_granularity,
+		              read_error_retry,
+		              wipe_block_on_read_error,
+		              (size_t) process_buffer_size,
+		              calculated_md5_hash_string,
+		              DIGEST_HASH_STRING_SIZE_MD5,
+		              calculated_sha1_hash_string,
+		              DIGEST_HASH_STRING_SIZE_SHA1,
+		              process_status,
+		              &error );
 
-		if( write_count <= -1 )
+		if( read_count <= -1 )
 		{
 			notify_error_backtrace(
 			 error );
@@ -3384,7 +3681,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( process_status_stop(
 	     process_status,
-	     (size64_t) write_count,
+	     (size64_t) read_count,
 	     status,
 	     &error ) != 1 )
 	{

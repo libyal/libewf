@@ -53,6 +53,8 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
+#define IMAGING_HANDLE_VALUE_SIZE		512
+
 /* Initializes the imaging handle
  * Returns 1 if successful or -1 on error
  */
@@ -287,10 +289,15 @@ int imaging_handle_signal_abort(
 int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
      const system_character_t *filename,
+     uint8_t resume,
      liberror_error_t **error )
 {
-	system_character_t *filenames[ 1 ] = { NULL };
-	static char *function              = "imaging_handle_open_output";
+	system_character_t **libewf_filenames = NULL;
+	system_character_t *filenames[ 1 ]    = { NULL };
+	static char *function                 = "imaging_handle_open_output";
+	int amount_of_filenames               = 0;
+	int flags                             = 0;
+	int result                            = 1;
 
 	if( imaging_handle == NULL )
 	{
@@ -339,21 +346,82 @@ int imaging_handle_open_output(
 
 		return( -1 );
 	}
-	filenames[ 0 ] = (system_character_t *) filename;
+	filenames[ 0 ]      = (system_character_t *) filename;
+	amount_of_filenames = 1;
 
+	if( resume != 0 )
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( HAVE_V2_API )
+		if( libewf_glob_wide(
+		     filenames[ 0 ],
+		     system_string_length(
+		     filenames[ 0 ] ),
+		     LIBEWF_FORMAT_UNKNOWN,
+		     &libewf_filenames,
+		     &amount_of_filenames,
+		     error ) != 1 )
+#else
+		amount_of_filenames = libewf_glob_wide(
+		                       filenames[ 0 ],
+		                       system_string_length(
+		                        filenames[ 0 ] ),
+		                       LIBEWF_FORMAT_UNKNOWN,
+		                       &libewf_filenames );
+
+		if( amount_of_filenames <= 0 )
+#endif
+#else
+#if defined( HAVE_V2_API )
+		if( libewf_glob(
+		     filenames[ 0 ],
+		     system_string_length(
+		     filenames[ 0 ] ),
+		     LIBEWF_FORMAT_UNKNOWN,
+		     &libewf_filenames,
+		     &amount_of_filenames,
+		     error ) != 1 )
+#else
+		amount_of_filenames = libewf_glob(
+		                       filenames[ 0 ],
+		                       system_string_length(
+		                        filenames[ 0 ] ),
+		                       LIBEWF_FORMAT_UNKNOWN,
+		                       &libewf_filenames );
+
+		if( amount_of_filenames <= 0 )
+#endif
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to resolve filename(s).",
+			 function );
+
+			return( -1 );
+		}
+		flags = LIBEWF_OPEN_WRITE_RESUME;
+	}
+	else
+	{
+		libewf_filenames = filenames;
+		flags            = LIBEWF_OPEN_WRITE;
+	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     imaging_handle->output_handle,
-	     filenames,
-	     1,
-	     LIBEWF_OPEN_WRITE,
+	     libewf_filenames,
+	     amount_of_filenames,
+	     flags,
 	     error ) != 1 )
 #else
 	imaging_handle->output_handle = libewf_open_wide(
-	                                 filenames,
-	                                 1,
-	                                 LIBEWF_OPEN_WRITE );
+	                                 libewf_filenames,
+	                                 amount_of_filenames,
+	                                 flags );
 
 	if( imaging_handle->output_handle == NULL )
 #endif
@@ -361,15 +429,15 @@ int imaging_handle_open_output(
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open(
 	     imaging_handle->output_handle,
-	     filenames,
-	     1,
-	     LIBEWF_OPEN_WRITE,
+	     libewf_filenames,
+	     amount_of_filenames,
+	     flags,
 	     error ) != 1 )
 #else
 	imaging_handle->output_handle = libewf_open(
-	                                 filenames,
-	                                 1,
-	                                 LIBEWF_OPEN_WRITE );
+	                                 libewf_filenames,
+	                                 amount_of_filenames,
+	                                 flags );
 
 	if( imaging_handle->output_handle == NULL )
 #endif
@@ -382,9 +450,19 @@ int imaging_handle_open_output(
 		 "%s: unable to open file.",
 		 function );
 
-		return( 1 );
+		result = -1;
 	}
-	return( 1 );
+	if( libewf_filenames != filenames )
+	{
+		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		{
+			memory_free(
+			 libewf_filenames[ amount_of_filenames - 1 ] );
+		}
+		memory_free(
+		 libewf_filenames );
+	}
+	return( result );
 }
 
 /* Closes the imaging handle
@@ -440,6 +518,200 @@ int imaging_handle_close(
 	imaging_handle->output_handle = NULL;
 #endif
 	return( 0 );
+}
+
+/* Prepares a buffer after reading the input of the imaging handle
+ * Returns the resulting buffer size or -1 on error
+ */
+ssize_t imaging_handle_prepare_read_buffer(
+         imaging_handle_t *imaging_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         liberror_error_t **error )
+{
+	static char *function = "imaging_handle_prepare_read_buffer";
+	ssize_t process_count = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->output_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid imaging handle - missing output handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
+
+#if defined( HAVE_V2_API )
+	process_count = libewf_handle_prepare_read_chunk(
+	                 imaging_handle->output_handle,
+	                 storage_media_buffer->compression_buffer,
+	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->raw_buffer,
+	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 storage_media_buffer->is_compressed,
+	                 storage_media_buffer->crc,
+	                 storage_media_buffer->process_crc,
+	                 error );
+#else
+	process_count = libewf_raw_prepare_read_buffer(
+	                 imaging_handle->output_handle,
+	                 storage_media_buffer->compression_buffer,
+	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->raw_buffer,
+	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 storage_media_buffer->is_compressed,
+	                 storage_media_buffer->crc,
+	                 storage_media_buffer->process_crc );
+#endif
+
+	if( process_count == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer->is_compressed == 0 )
+	{
+		storage_media_buffer->data_in_compression_buffer = 1;
+	}
+	else
+	{
+		storage_media_buffer->data_in_compression_buffer = 0;
+	}
+#else
+	process_count = storage_media_buffer->raw_buffer_amount;
+#endif
+	return( process_count );
+}
+
+/* Reads a buffer from the input of the imaging handle
+ * Returns the amount of bytes written or -1 on error
+ */
+ssize_t imaging_handle_read_buffer(
+         imaging_handle_t *imaging_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         size_t read_size,
+         liberror_error_t **error )
+{
+	static char *function = "imaging_handle_read_buffer";
+	ssize_t read_count    = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->output_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid imaging handle - missing output handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+#if defined( HAVE_V2_API )
+	read_count = libewf_handle_read_chunk(
+                      imaging_handle->output_handle,
+                      storage_media_buffer->compression_buffer,
+                      storage_media_buffer->compression_buffer_size,
+	              &( storage_media_buffer->is_compressed ),
+	              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
+	              &( storage_media_buffer->crc ),
+	              &( storage_media_buffer->process_crc ),
+	              error );
+#else
+	read_count = libewf_raw_read_buffer(
+	              imaging_handle->output_handle,
+	              storage_media_buffer->compression_buffer,
+	              storage_media_buffer->compression_buffer_size,
+	              &( storage_media_buffer->is_compressed ),
+	              &( storage_media_buffer->crc ),
+	              &( storage_media_buffer->process_crc ) );
+#endif
+#else
+#if defined( HAVE_V2_API )
+	read_count = libewf_handle_read_buffer(
+                      imaging_handle->output_handle,
+                      storage_media_buffer->raw_buffer,
+                      read_size,
+	              error );
+#else
+	read_count = libewf_read_buffer(
+                      imaging_handle->output_handle,
+                      storage_media_buffer->raw_buffer,
+                      read_size );
+#endif
+#endif
+	if( read_count == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	storage_media_buffer->compression_buffer_amount = read_count;
+#else
+	storage_media_buffer->raw_buffer_amount         = read_count;
+#endif
+
+	return( read_count );
 }
 
 /* Prepares a buffer before writing the output of the imaging handle
@@ -650,13 +922,138 @@ ssize_t imaging_handle_write_buffer(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write storage media buffer.",
 		 function );
 
 		return( -1 );
 	}
 	return( write_count );
+}
+
+/* Seeks the offset in the input file
+ * Returns the new offset if successful or -1 on error
+ */
+off64_t imaging_handle_seek_offset(
+         imaging_handle_t *imaging_handle,
+         off64_t offset,
+         liberror_error_t **error )
+{
+	static char *function = "imaging_handle_seek_offset";
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->output_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid imaging handle - missing output handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	offset = libewf_handle_seek_offset(
+	          imaging_handle->output_handle,
+	          offset,
+	          SEEK_SET,
+	          error );
+#else
+	offset = libewf_seek_offset(
+	          imaging_handle->output_handle,
+	          offset );
+#endif
+
+	if( offset == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset in output handle.",
+		 function );
+
+		return( -1 );
+	}
+	return( offset );
+}
+
+/* Retrieves the offset size
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_get_offset(
+     imaging_handle_t *imaging_handle,
+     off64_t *offset,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_get_offset";
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->output_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid imaging handle - missing output handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( offset == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_offset(
+	     imaging_handle->output_handle,
+	     offset,
+	     error ) != 1 )
+#else
+	*offset = libewf_get_offset(
+	           imaging_handle->output_handle );
+
+	if( *offset == -1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve offset.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Swaps the byte order of byte pairs within a buffer of a certain size
@@ -914,19 +1311,356 @@ int imaging_handle_get_chunk_size(
 	return( 1 );
 }
 
+/* Retrieves the output values of the imaging handle
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_get_output_values(
+     imaging_handle_t *imaging_handle,
+     system_character_t *case_number,
+     size_t case_number_size,
+     system_character_t *description,
+     size_t description_size,
+     system_character_t *evidence_number,
+     size_t evidence_number_size,
+     system_character_t *examiner_name,
+     size_t examiner_name_size,
+     system_character_t *notes,
+     size_t notes_size,
+     uint32_t *bytes_per_sector,
+     size64_t *media_size,
+     uint8_t *media_type,
+     uint8_t *volume_type,
+     int8_t *compression_level,
+     uint8_t *compression_flags,
+     uint8_t *libewf_format,
+     uint32_t *sectors_per_chunk,
+     uint32_t *sector_error_granularity,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_get_output_values";
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->output_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid imaging handle - missing output handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_parse_header_values(
+	     imaging_handle->output_handle,
+	     error ) != 1 )
+#else
+	if( libewf_parse_header_values(
+	     imaging_handle->output_handle,
+	     LIBEWF_DATE_FORMAT_CTIME ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to parse header values.",
+		 function );
+
+		return( -1 );
+	}
+	/* Get case number
+	 */
+	if( imaging_handle_get_header_value(
+	     imaging_handle,
+	     "case_number",
+	     11,
+	     case_number,
+	     case_number_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: case number.",
+		 function );
+
+		return( -1 );
+	}
+	/* Get description
+	 */
+	if( imaging_handle_get_header_value(
+	     imaging_handle,
+	     "description",
+	     11,
+	     description,
+	     description_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve header value: description.",
+		 function );
+
+		return( -1 );
+	}
+	/* Get evidence number
+	 */
+	if( imaging_handle_get_header_value(
+	     imaging_handle,
+	     "evidence_number",
+	     15,
+	     evidence_number,
+	     evidence_number_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve header value: evidence number.",
+		 function );
+
+		return( -1 );
+	}
+	/* Get examiner name
+	 */
+	if( imaging_handle_get_header_value(
+	     imaging_handle,
+	     "examiner_name",
+	     13,
+	     examiner_name,
+	     examiner_name_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve header value: examiner name.",
+		 function );
+
+		return( -1 );
+	}
+	/* Get notes
+	 */
+	if( imaging_handle_get_header_value(
+	     imaging_handle,
+	     "notes",
+	     5,
+	     notes,
+	     notes_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve header value: notes.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_bytes_per_sector(
+	     imaging_handle->output_handle,
+	     bytes_per_sector,
+	     error ) != 1 )
+#else
+	if( libewf_get_bytes_per_sector(
+	     imaging_handle->output_handle,
+	     bytes_per_sector ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_media_size(
+	     imaging_handle->output_handle,
+	     media_size,
+	     error ) != 1 )
+#else
+	if( libewf_get_media_size(
+	     imaging_handle->output_handle,
+	     media_size ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve media size.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_media_type(
+	     imaging_handle->output_handle,
+	     media_type,
+	     error ) != 1 )
+#else
+	if( libewf_get_media_type(
+	     imaging_handle->output_handle,
+	     media_type ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve media type.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_volume_type(
+	     imaging_handle->output_handle,
+	     volume_type,
+	     error ) != 1 )
+#else
+	if( libewf_get_volume_type(
+	     imaging_handle->output_handle,
+	     volume_type ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve volume type.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_compression_values(
+	     imaging_handle->output_handle,
+	     compression_level,
+	     compression_flags,
+	     error ) != 1 )
+#else
+	if( libewf_get_compression_values(
+	     imaging_handle->output_handle,
+	     compression_level,
+	     compression_flags ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve compression values.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_format(
+	     imaging_handle->output_handle,
+	     libewf_format,
+	     error ) != 1 )
+#else
+	if( libewf_get_format(
+	     imaging_handle->output_handle,
+	     libewf_format ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve format.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_sectors_per_chunk(
+	     imaging_handle->output_handle,
+	     sectors_per_chunk,
+	     error ) != 1 )
+#else
+	if( libewf_get_sectors_per_chunk(
+	     imaging_handle->output_handle,
+	     sectors_per_chunk ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve sectors per chunk.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_error_granularity(
+	     imaging_handle->output_handle,
+	     sector_error_granularity,
+	     error ) != 1 )
+#else
+	if( libewf_get_error_granularity(
+	     imaging_handle->output_handle,
+	     sector_error_granularity ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to retrieve error granularity.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the output values of the imaging handle
  * Returns 1 if successful or -1 on error
  */
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
      system_character_t *case_number,
+     size_t case_number_length,
      system_character_t *description,
+     size_t description_length,
      system_character_t *evidence_number,
+     size_t evidence_number_length,
      system_character_t *examiner_name,
+     size_t examiner_name_length,
      system_character_t *notes,
+     size_t notes_length,
      system_character_t *acquiry_operating_system,
+     size_t acquiry_operating_system_length,
      system_character_t *acquiry_software,
+     size_t acquiry_software_length,
      system_character_t *acquiry_software_version,
+     size_t acquiry_software_version_length,
      int header_codepage,
      uint32_t bytes_per_sector,
      size64_t media_size,
@@ -975,8 +1709,7 @@ int imaging_handle_set_output_values(
 	     "case_number",
 	     11,
 	     case_number,
-	     system_string_length(
-	      case_number ),
+	     case_number_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -995,8 +1728,7 @@ int imaging_handle_set_output_values(
 	     "description",
 	     11,
 	     description,
-	     system_string_length(
-	      description ),
+	     description_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1015,8 +1747,7 @@ int imaging_handle_set_output_values(
 	     "evidence_number",
 	     15,
 	     evidence_number,
-	     system_string_length(
-	      evidence_number ),
+	     evidence_number_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1035,8 +1766,7 @@ int imaging_handle_set_output_values(
 	     "examiner_name",
 	     13,
 	     examiner_name,
-	     system_string_length(
-	      examiner_name ),
+	     examiner_name_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1055,8 +1785,7 @@ int imaging_handle_set_output_values(
 	     "notes",
 	     5,
 	     notes,
-	     system_string_length(
-	      notes ),
+	     notes_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1082,8 +1811,7 @@ int imaging_handle_set_output_values(
 	       "acquiry_operating_system",
 	       24,
 	       acquiry_operating_system,
-	       system_string_length(
-	        acquiry_operating_system ),
+	       acquiry_operating_system_length,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -1100,8 +1828,7 @@ int imaging_handle_set_output_values(
 	     "acquiry_software",
 	     16,
 	     acquiry_software,
-	     system_string_length(
-	      acquiry_software ),
+	     acquiry_software_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1118,8 +1845,7 @@ int imaging_handle_set_output_values(
 	     "acquiry_software_version",
 	     24,
 	     acquiry_software_version,
-	     system_string_length(
-	      acquiry_software_version ),
+	     acquiry_software_version_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1310,7 +2036,7 @@ int imaging_handle_set_output_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set sectors per chunk in output handle.",
+		 "%s: unable to set sectors per chunk.",
 		 function );
 
 		return( -1 );
@@ -1330,7 +2056,7 @@ int imaging_handle_set_output_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set error granularity in output handle.",
+		 "%s: unable to set error granularity.",
 		 function );
 
 		return( -1 );
@@ -1415,6 +2141,127 @@ int imaging_handle_set_output_values(
 	imaging_handle->bytes_per_sector = bytes_per_sector;
 
 	return( 1 );
+}
+
+/* Retrieves the header value from the output handle
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int imaging_handle_get_header_value(
+     imaging_handle_t *imaging_handle,
+     char *header_value_identifier,
+     size_t header_value_identifier_length,
+     system_character_t *header_value,
+     size_t header_value_size,
+     liberror_error_t **error )
+{
+	uint8_t utf8_header_value[ IMAGING_HANDLE_VALUE_SIZE ];
+
+	static char *function               = "imaging_handle_get_header_value";
+	size_t calculated_header_value_size = 0;
+	size_t utf8_header_value_size       = IMAGING_HANDLE_VALUE_SIZE;
+	int result                          = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->output_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid imaging handle - missing output handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	result = libewf_handle_get_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) header_value_identifier,
+	          header_value_identifier_length,
+	          utf8_header_value,
+	          utf8_header_value_size,
+	          error );
+#else
+	result = libewf_get_header_value(
+	          imaging_handle->output_handle,
+	          header_value_identifier,
+	          (char *) utf8_header_value,
+	          utf8_header_value_size );
+#endif
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: %s.",
+		 function,
+		 header_value_identifier );
+
+		return( -1 );
+	}
+	else if( result == 1 )
+	{
+		/* Determine the header value size
+		 */
+		utf8_header_value_size = 1 + narrow_string_length(
+		                              (char *) utf8_header_value );
+
+		if( system_string_size_from_utf8_string(
+		     utf8_header_value,
+		     utf8_header_value_size,
+		     &calculated_header_value_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to determine header value size.",
+			 function );
+
+			return( -1 );
+		}
+		if( header_value_size < calculated_header_value_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: header value too small.",
+			 function );
+
+			return( -1 );
+		}
+		if( system_string_copy_from_utf8_string(
+		     header_value,
+		     header_value_size,
+		     utf8_header_value,
+		     utf8_header_value_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to set header value.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( result );
 }
 
 /* Sets the header value in the output handle
