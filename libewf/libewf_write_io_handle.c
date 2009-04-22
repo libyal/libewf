@@ -105,9 +105,7 @@ int libewf_write_io_handle_initialize(
 			return( -1 );
 		}
 		( *write_io_handle )->maximum_segment_file_size        = INT32_MAX;
-		( *write_io_handle )->segment_file_size                = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 		( *write_io_handle )->remaining_segment_file_size      = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-		( *write_io_handle )->delta_segment_file_size          = INT64_MAX;
 		( *write_io_handle )->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
 	}
 	return( 1 );
@@ -160,6 +158,7 @@ int libewf_write_io_handle_initialize_values(
      libewf_write_io_handle_t *write_io_handle,
      libewf_io_handle_t *io_handle,
      libewf_media_values_t *media_values,
+     libewf_segment_table_t *segment_table,
      liberror_error_t **error )
 {
 	static char *function               = "libewf_write_io_handle_initialize_values";
@@ -198,6 +197,17 @@ int libewf_write_io_handle_initialize_values(
 
 		return( -1 );
 	}
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
 	if( write_io_handle->values_initialized != 0 )
 	{
 		liberror_error_set(
@@ -209,7 +219,7 @@ int libewf_write_io_handle_initialize_values(
 
 		return( -1 );
 	}
-	if( write_io_handle->segment_file_size == 0 )
+	if( segment_table->maximum_segment_size == 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -263,7 +273,7 @@ int libewf_write_io_handle_initialize_values(
 	{
 		/* Determine the required amount of segments allowed to write
 		 */
-		required_amount_of_segments = (int64_t) media_values->media_size / (int64_t) write_io_handle->segment_file_size;
+		required_amount_of_segments = (int64_t) media_values->media_size / (int64_t) segment_table->maximum_segment_size;
 
 		if( required_amount_of_segments > (int64_t) write_io_handle->maximum_amount_of_segments )
 		{
@@ -273,7 +283,7 @@ int libewf_write_io_handle_initialize_values(
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
 			 "%s: the maximum amount of allowed segment files will be exceeded with the segment file size: %" PRIu64 ".",
 			 function,
-			 write_io_handle->segment_file_size );
+			 segment_table->maximum_segment_size );
 
 			return( -1 );
 		}
@@ -676,7 +686,7 @@ int libewf_write_io_handle_initialize_resume(
 
 	if( reopen_segment_file != 0 )
 	{
-		if( write_io_handle->resume_segment_file_offset > (off64_t) write_io_handle->segment_file_size )
+		if( write_io_handle->resume_segment_file_offset > (off64_t) segment_table->maximum_segment_size )
 		{
 			liberror_error_set(
 			 error,
@@ -687,7 +697,7 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		write_io_handle->remaining_segment_file_size = write_io_handle->segment_file_size
+		write_io_handle->remaining_segment_file_size = segment_table->maximum_segment_size
 		                                             - write_io_handle->resume_segment_file_offset;
 		write_io_handle->segment_amount_of_chunks    = segment_file_handle->amount_of_chunks; 
 
@@ -1901,7 +1911,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			return( -1 );
 		}
-		write_io_handle->remaining_segment_file_size = write_io_handle->segment_file_size;
+		write_io_handle->remaining_segment_file_size = segment_table->maximum_segment_size;
 
 		/* Leave space for the done or next section
 		 */
@@ -2702,7 +2712,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 			/* Check if chunk fits in exisiting delta segment file
 			 */
-			if( segment_file_offset > (off64_t) write_io_handle->segment_file_size )
+			if( segment_file_offset > (off64_t) delta_segment_table->maximum_segment_size )
 			{
 				/* Make sure to write a next section in the the previous delta segment file
 				 * The segment file offset is updated by the function

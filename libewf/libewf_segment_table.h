@@ -62,11 +62,16 @@ struct libewf_segment_table
 	/* The basename size
 	 */
 	size_t basename_size;
+
+	/* The maximum segment size
+	 */
+	size64_t maximum_segment_size;
 };
 
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
      uint16_t amount,
+     size64_t maximum_segment_size,
      liberror_error_t **error );
 
 int libewf_segment_table_free(

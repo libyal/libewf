@@ -217,11 +217,12 @@ Work in progress:
 * resume acquiry
   - handle corrupt first (data) section in segment file > 1
   - handle EWF/SMART table sections
-  - move segment file size from write io handle to segment table or io handle ?
-    set segment file size on read
+  - automatic testing
 
 Version: 20090421
 * fixes for MSVSCPP build
+* moved segment file size from write io handle to segment table
+* segment file size is now set on read
 
 Version: 20090420
 * moved write finalize function to write io handle

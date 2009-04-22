@@ -71,17 +71,9 @@ struct libewf_write_io_handle
 	 */
 	size64_t maximum_segment_file_size;
 
-	/* The segment file size
-	 */
-	size64_t segment_file_size;
-
 	/* The remaining segment file size
 	 */
 	ssize64_t remaining_segment_file_size;
-
-	/* The delta segment file size
-	 */
-	size64_t delta_segment_file_size;
 
 	/* The maximum amount of segments
 	 */
@@ -157,6 +149,7 @@ int libewf_write_io_handle_initialize_values(
      libewf_write_io_handle_t *write_io_handle,
      libewf_io_handle_t *io_handle,
      libewf_media_values_t *media_values,
+     libewf_segment_table_t *segment_table,
      liberror_error_t **error );
 
 int libewf_write_io_handle_initialize_resume(

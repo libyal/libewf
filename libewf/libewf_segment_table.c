@@ -41,6 +41,7 @@
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
      uint16_t amount,
+     size64_t maximum_segment_size,
      liberror_error_t **error )
 {
 	static char *function     = "libewf_segment_table_initialize";
@@ -156,7 +157,8 @@ int libewf_segment_table_initialize(
 
 			return( -1 );
 		}
-		( *segment_table )->amount = amount;
+		( *segment_table )->amount               = amount;
+		( *segment_table )->maximum_segment_size = maximum_segment_size;
 	}
 	return( 1 );
 }
@@ -327,6 +329,32 @@ int libewf_segment_table_build(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid segment table - missing segment file handles.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_pool_get_size(
+	     io_handle->file_io_pool,
+	     segment_table->segment_file_handle[ 1 ]->file_io_pool_entry,
+	     &( segment_table->maximum_segment_size ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment file size.",
 		 function );
 
 		return( -1 );

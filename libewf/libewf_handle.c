@@ -119,6 +119,7 @@ int libewf_handle_initialize(
 		if( libewf_segment_table_initialize(
 		     &( internal_handle->segment_table ),
 		     1,
+		     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -138,6 +139,7 @@ int libewf_handle_initialize(
 		if( libewf_segment_table_initialize(
 		     &( internal_handle->delta_segment_table ),
 		     1,
+		     INT64_MAX,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1543,6 +1545,7 @@ int libewf_handle_open_file_io_pool(
 		       internal_handle->write_io_handle,
 		       internal_handle->io_handle,
 		       internal_handle->media_values,
+		       internal_handle->segment_table,
 		       error ) != 1 ) )
 		{
 			liberror_error_set(
@@ -2365,6 +2368,7 @@ ssize_t libewf_handle_write_chunk(
 	       internal_handle->write_io_handle,
 	       internal_handle->io_handle,
 	       internal_handle->media_values,
+	       internal_handle->segment_table,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -2556,6 +2560,7 @@ ssize_t libewf_handle_write_buffer(
 	       internal_handle->write_io_handle,
 	       internal_handle->io_handle,
 	       internal_handle->media_values,
+	       internal_handle->segment_table,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -3307,13 +3312,13 @@ int libewf_handle_get_segment_file_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->write_io_handle == NULL )
+	if( internal_handle->segment_table == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: delta segment filename cannot be changed.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.",
 		 function );
 
 		return( -1 );
@@ -3329,7 +3334,7 @@ int libewf_handle_get_segment_file_size(
 
 		return( -1 );
 	}
-	*segment_file_size = internal_handle->write_io_handle->segment_file_size;
+	*segment_file_size = internal_handle->segment_table->maximum_segment_size;
 
 	return( 1 );
 }
@@ -3358,6 +3363,17 @@ int libewf_handle_set_segment_file_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( internal_handle->read_io_handle != NULL )
 	 || ( internal_handle->write_io_handle == NULL )
 	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
@@ -3394,7 +3410,7 @@ int libewf_handle_set_segment_file_size(
 
 		return( -1 );
 	}
-	internal_handle->write_io_handle->segment_file_size = segment_file_size;
+	internal_handle->segment_table->maximum_segment_size = segment_file_size;
 
 	return( 1 );
 }
@@ -3793,13 +3809,13 @@ int libewf_handle_get_delta_segment_file_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->write_io_handle == NULL )
+	if( internal_handle->delta_segment_table == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: delta segment filename cannot be changed.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
 		return( -1 );
@@ -3815,7 +3831,7 @@ int libewf_handle_get_delta_segment_file_size(
 
 		return( -1 );
 	}
-	*delta_segment_file_size = internal_handle->write_io_handle->delta_segment_file_size;
+	*delta_segment_file_size = internal_handle->delta_segment_table->maximum_segment_size;
 
 	return( 1 );
 }
@@ -3844,6 +3860,17 @@ int libewf_handle_set_delta_segment_file_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing delta segment table.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( internal_handle->write_io_handle == NULL )
 	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
 	{
@@ -3878,7 +3905,7 @@ int libewf_handle_set_delta_segment_file_size(
 
 		return( -1 );
 	}
-	internal_handle->write_io_handle->delta_segment_file_size = delta_segment_file_size;
+	internal_handle->delta_segment_table->maximum_segment_size = delta_segment_file_size;
 
 	return( 1 );
 }
