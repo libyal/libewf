@@ -344,20 +344,29 @@ int libewf_segment_table_build(
 
 		return( -1 );
 	}
-	if( libbfio_pool_get_size(
-	     io_handle->file_io_pool,
-	     segment_table->segment_file_handle[ 1 ]->file_io_pool_entry,
-	     &( segment_table->maximum_segment_size ),
-	     error ) != 1 )
+	/* If there are more than one segment files use the size of the 
+	 * first as tehe maximum segment size
+	 */
+	if( segment_table->amount > 2 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment file size.",
-		 function );
+		if( libbfio_pool_get_size(
+		     io_handle->file_io_pool,
+		     segment_table->segment_file_handle[ 1 ]->file_io_pool_entry,
+		     &( segment_table->maximum_segment_size ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file size.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		/* Round size to nearest KiB
+		 */
+		segment_table->maximum_segment_size = ( segment_table->maximum_segment_size / 1024 ) * 1024;
 	}
 	/* Read the segment and offset table from the segment file(s)
 	 */

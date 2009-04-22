@@ -3030,55 +3030,52 @@ int main( int argc, char * const argv[] )
 				 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
 				 acquiry_size );
 			}
-		}
-		/* Segment file size
-		 */
-		if( argument_set_segment_file_size == 0 )
-		{
-			if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
-			{
-				maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-			}
-			else
-			{
-				maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
-			}
-			if( segment_file_size == 0 )
-			{
-				segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-			}
-			if( ewfinput_get_byte_size_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
-			     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-			     maximum_segment_file_size,
-			     segment_file_size,
-			     &segment_file_size,
-			     &error ) == -1 )
-			{
-				notify_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-				fprintf(
-				 stdout,
-				 "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
-				 segment_file_size );
-			}
-			/* Make sure the segment file size is smaller than or equal to the maximum
+			/* Segment file size
 			 */
-			if( segment_file_size > maximum_segment_file_size )
+			if( argument_set_segment_file_size == 0 )
 			{
-				segment_file_size = maximum_segment_file_size;
+				if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+				{
+					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+				}
+				else
+				{
+					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+				}
+				if( segment_file_size == 0 )
+				{
+					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+				}
+				if( ewfinput_get_byte_size_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _SYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
+				     maximum_segment_file_size,
+				     segment_file_size,
+				     &segment_file_size,
+				     &error ) == -1 )
+				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
+					fprintf(
+					 stdout,
+					 "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
+					 segment_file_size );
+				}
+				/* Make sure the segment file size is smaller than or equal to the maximum
+				 */
+				if( segment_file_size > maximum_segment_file_size )
+				{
+					segment_file_size = maximum_segment_file_size;
+				}
 			}
-		}
-		if( resume_acquiry == 0 )
-		{
 			/* Bytes per sector
 			 */
 			if( argument_set_bytes_per_sector == 0 )
@@ -3294,91 +3291,93 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 	}
-	if( ( ewfacquire_abort == 0 )
-	 && ( resume_acquiry == 0 ) )
+	if( ewfacquire_abort == 0 )
 	{
-		if( ewfcommon_determine_operating_system_string(
-		     acquiry_operating_system,
-		     32,
-		     &error ) != 1 )
+		if( resume_acquiry == 0 )
 		{
-			fprintf(
-			 stdout,
-			 "Unable to determine operating system string.\n" );
+			if( ewfcommon_determine_operating_system_string(
+			     acquiry_operating_system,
+			     32,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to determine operating system string.\n" );
 
-			notify_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
-			acquiry_operating_system[ 0 ] = 0;
-		}
-		acquiry_software_version = _SYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
+				acquiry_operating_system[ 0 ] = 0;
+			}
+			acquiry_software_version = _SYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
-		if( imaging_handle_open_output(
-		     ewfacquire_imaging_handle,
-		     target_filename,
-		     resume_acquiry,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to open output file(s).\n" );
+			if( imaging_handle_open_output(
+			     ewfacquire_imaging_handle,
+			     target_filename,
+			     resume_acquiry,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to open output file(s).\n" );
 
-			imaging_handle_free(
-			 &ewfacquire_imaging_handle,
-			 NULL );
+				imaging_handle_free(
+				 &ewfacquire_imaging_handle,
+				 NULL );
 
-			error_abort = 1;
-		}
-		else if( imaging_handle_set_output_values(
-		          ewfacquire_imaging_handle,
-			  case_number,
-			  system_string_length(
-			   case_number ),
-			  description,
-			  system_string_length(
-			   description ),
-			  evidence_number,
-			  system_string_length(
-			   evidence_number ),
-			  examiner_name,
-			  system_string_length(
-			   examiner_name ),
-			  notes,
-			  system_string_length(
-			   notes ),
-			  acquiry_operating_system,
-			  system_string_length(
-			   acquiry_operating_system ),
-			  program,
-			  system_string_length(
-			   program ),
-			  acquiry_software_version,
-			  system_string_length(
-			   acquiry_software_version ),
-		          header_codepage,
-		          bytes_per_sector,
-		          acquiry_size,
-		          media_type,
-		          volume_type,
-		          compression_level,
-		          compression_flags,
-		          libewf_format,
-		          segment_file_size,
-		          sectors_per_chunk,
-		          sector_error_granularity,
-		          &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to initialize output settings.\n" );
+				error_abort = 1;
+			}
+			else if( imaging_handle_set_output_values(
+				  ewfacquire_imaging_handle,
+				  case_number,
+				  system_string_length(
+				   case_number ),
+				  description,
+				  system_string_length(
+				   description ),
+				  evidence_number,
+				  system_string_length(
+				   evidence_number ),
+				  examiner_name,
+				  system_string_length(
+				   examiner_name ),
+				  notes,
+				  system_string_length(
+				   notes ),
+				  acquiry_operating_system,
+				  system_string_length(
+				   acquiry_operating_system ),
+				  program,
+				  system_string_length(
+				   program ),
+				  acquiry_software_version,
+				  system_string_length(
+				   acquiry_software_version ),
+				  header_codepage,
+				  bytes_per_sector,
+				  acquiry_size,
+				  media_type,
+				  volume_type,
+				  compression_level,
+				  compression_flags,
+				  libewf_format,
+			          segment_file_size,
+				  sectors_per_chunk,
+				  sector_error_granularity,
+				  &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to initialize output settings.\n" );
 
-			imaging_handle_close(
-			 ewfacquire_imaging_handle,
-			 NULL );
+				imaging_handle_close(
+				 ewfacquire_imaging_handle,
+				 NULL );
 
-			error_abort = 1;
+				error_abort = 1;
+			}
 		}
 	}
 	memory_free(

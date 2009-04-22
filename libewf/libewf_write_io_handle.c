@@ -175,6 +175,17 @@ int libewf_write_io_handle_initialize_values(
 
 		return( -1 );
 	}
+	if( write_io_handle->values_initialized != 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: write values were initialized and cannot be initialized anymore.",
+		 function );
+
+		return( -1 );
+	}
 	if( io_handle == NULL )
 	{
 		liberror_error_set(
@@ -204,17 +215,6 @@ int libewf_write_io_handle_initialize_values(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( write_io_handle->values_initialized != 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: write values were initialized and cannot be initialized anymore.",
 		 function );
 
 		return( -1 );
@@ -1985,9 +1985,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	 */
 	if( write_io_handle->resume_segment_file_offset > 0 )
 	{
-fprintf( stderr, "RO: %" PRIu64 "\n",
- write_io_handle->resume_segment_file_offset );
-
 		if( libbfio_pool_seek_offset(
 		     io_handle->file_io_pool,
 		     segment_table->segment_file_handle[ segment_number ]->file_io_pool_entry,
