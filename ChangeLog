@@ -215,7 +215,8 @@ Work in progress:
   - force set header value to require string formatted in the date format ?
 * check TODO
 * resume acquiry
-  - improve resume write initialize in library
+  - handle corrupt first (data) section in segment file > 1
+  - handle EWF/SMART table sections
   - move segment file size from write io handle to segment table or io handle ?
     set segment file size on read
 
@@ -224,6 +225,7 @@ Version: 20090420
 * refactored sections correction out of write finalize function into separate functions
 * removed \n from error strings in libewf and ewftools
 * moved write initialize and resume functions to write io handle
+* refactored chunk offset correction for last filled/compared offset
 
 Version: 20090419
 * worked on date and time strings

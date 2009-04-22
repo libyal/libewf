@@ -67,10 +67,6 @@ struct libewf_write_io_handle
 	 */
 	ssize64_t input_write_count;
 
-	/* The total amount of bytes written
-	 */
-	ssize64_t write_count;
-
 	/* The maximum segment file size
 	 */
 	size64_t maximum_segment_file_size;
@@ -139,6 +135,10 @@ struct libewf_write_io_handle
 	/* Value to indicate a new chunks section should be created
 	 */
 	uint8_t create_chunks_section;
+
+	/* The offset in the segment file from which to resume write
+	 */
+	off64_t resume_segment_file_offset;
 
 	/* Value to indicate if the write has been finalized
 	 */

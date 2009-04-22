@@ -296,11 +296,13 @@ int libewf_write_io_handle_initialize_resume(
      libewf_segment_table_t *segment_table,
      liberror_error_t **error )
 {
+	libewf_list_element_t *section_list_element       = NULL;
+	libewf_section_list_values_t *section_list_values = NULL;
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
-	libewf_section_list_values_t *last_section_values = NULL;
 	static char *function                             = "libewf_write_io_handle_initialize_resume";
 	uint16_t segment_number                           = 0;
-	uint8_t resume_in_chunks_section                  = 0;
+	uint8_t backtrace_to_last_chunks_sections         = 0;
+	uint8_t reopen_segment_file                       = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -406,7 +408,9 @@ int libewf_write_io_handle_initialize_resume(
 
 		return( -1 );
 	}
-	if( segment_file_handle->section_list->last == NULL )
+	section_list_element = segment_file_handle->section_list->last;
+
+	if( section_list_element == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -417,32 +421,235 @@ int libewf_write_io_handle_initialize_resume(
 
 		return( -1 );
 	}
-	last_section_values = (libewf_section_list_values_t * ) segment_file_handle->section_list->last->value;
+	section_list_values = (libewf_section_list_values_t *) section_list_element->value;
 
-	if( last_section_values == NULL )
+	if( section_list_values == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing last section values.",
+		 "%s: missing last section list values.",
 		 function );
 
 		return( -1 );
 	}
-	/* TODO improve */
-	if( memory_compare(
-	     (void *) last_section_values->type,
-	     (void *) "next",
-	     5 ) == 0 )
+	if( ( segment_number == 1 )
+	 && ( memory_compare(
+	       (void *) section_list_values->type,
+	       (void *) "data",
+	       5 ) == 0 ) )
 	{
+		backtrace_to_last_chunks_sections = 1;
 	}
 	else if( memory_compare(
-	          (void *) last_section_values->type,
+	          (void *) section_list_values->type,
+	          (void *) "session",
+	          8 ) == 0 )
+	{
+		backtrace_to_last_chunks_sections = 1;
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
+	          (void *) "error2",
+	          7 ) == 0 )
+	{
+		backtrace_to_last_chunks_sections = 1;
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
+	          (void *) "digest",
+	          7 ) == 0 )
+	{
+		backtrace_to_last_chunks_sections = 1;
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
+	          (void *) "hash",
+	          5 ) == 0 )
+	{
+		backtrace_to_last_chunks_sections = 1;
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
+	          (void *) "xhash",
+	          6 ) == 0 )
+	{
+		backtrace_to_last_chunks_sections = 1;
+	}
+	if( backtrace_to_last_chunks_sections != 0 )
+	{
+		while( section_list_element->previous != NULL )
+		{
+			section_list_element = section_list_element->previous;
+
+			if( section_list_element->value == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing section list values.",
+				 function );
+
+				return( -1 );
+			}
+			section_list_values = (libewf_section_list_values_t *) section_list_element->value;
+
+			if( memory_compare(
+			     (void *) section_list_values->type,
+			     (void *) "table",
+			     5 ) == 0 )
+			{
+				break;
+			}
+		}
+		if( section_list_element == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing last chunks section.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( memory_compare(
+	     (void *) section_list_values->type,
+	     (void *) "data",
+	     5 ) == 0 )
+	{
+		/* The sections containing the chunks and offsets were read entirely
+		 * in the previous segment file
+		 */
+		reopen_segment_file                         = 1;
+		write_io_handle->resume_segment_file_offset = section_list_values->end_offset;
+		write_io_handle->create_chunks_section      = 1;
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
 	          (void *) "sectors",
 	          8 ) == 0 )
 	{
-		resume_in_chunks_section = 1;
+		/* Uncertain if the sections containing the chunks was read entirely
+		 * the offsets to the chunks are missing so the chunks need to be rewritten anyway
+		 */
+		reopen_segment_file                         = 1;
+		write_io_handle->resume_segment_file_offset = section_list_values->start_offset;
+		write_io_handle->create_chunks_section      = 1;
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
+	          (void *) "table",
+	          6 ) == 0 )
+	{
+		/* Determine if the table section also contains chunks
+		 */
+		if( section_list_element->previous == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing previous section list element.",
+			 function );
+
+			return( -1 );
+		}
+		if( section_list_element->previous->value == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing previous section list values.",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_compare(
+		     (void *) ( (libewf_section_list_values_t *) section_list_element->previous->value )->type,
+		     (void *) "sectors",
+		     8 ) == 0 )
+		{
+			if( offset_table->last_chunk_offset_compared >= offset_table->last_chunk_offset_filled )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+				 "%s: last chunk offset compared cannot be greater than last chunk offset filled.",
+				 function );
+
+				return( -1 );
+			}
+			/* The sections containing the chunks and offsets were read partially
+			 */
+			section_list_element = section_list_element->previous;
+			section_list_values  = (libewf_section_list_values_t *) section_list_element->value;
+
+			/* Reset the chunk offsets in the offset table
+			 */
+			if( memory_set(
+			     &( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ] ),
+			     0,
+			     sizeof( libewf_chunk_offset_t ) * ( offset_table->last_chunk_offset_filled - offset_table->last_chunk_offset_compared ) ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear offsets table.",
+				 function );
+
+				return( -1 );
+			}
+			segment_file_handle->amount_of_chunks -= offset_table->last_chunk_offset_filled - offset_table->last_chunk_offset_compared;
+			offset_table->last_chunk_offset_filled = offset_table->last_chunk_offset_compared;
+		}
+		else
+		{
+			/* TODO handle ENCASE1/SMART table section */
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported previous section: %s.",
+			 function,
+			 ( (libewf_section_list_values_t *) section_list_element->previous->value )->type );
+
+			return( -1 );
+		}
+		reopen_segment_file                         = 1;
+		write_io_handle->resume_segment_file_offset = section_list_values->start_offset;
+		write_io_handle->create_chunks_section      = 1;
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
+	          (void *) "table2",
+	          7 ) == 0 )
+	{
+		/* The sections containing the chunks and offsets were read entirely
+		 */
+		reopen_segment_file                         = 1;
+		write_io_handle->resume_segment_file_offset = section_list_values->end_offset;
+
+		/* Write a new chunks section if necessary
+		 */
+		if( offset_table->last_chunk_offset_compared < offset_table->amount_of_chunk_offsets )
+		{
+			write_io_handle->create_chunks_section = 1;
+		}
+	}
+	else if( memory_compare(
+	          (void *) section_list_values->type,
+	          (void *) "next",
+	          5 ) == 0 )
+	{
+		/* The segment file was read entirely
+		 */
 	}
 	else
 	{
@@ -452,22 +659,43 @@ int libewf_write_io_handle_initialize_resume(
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: write resume from section: %s not supported.",
 		 function,
-		 (char *) last_section_values->type );
+		 (char *) section_list_values->type );
 
 		return( -1 );
 	}
 	/* Set offset into media data
 	 */
-	io_handle->current_chunk        = offset_table->last_chunk_offset_compared + 1;
+	io_handle->current_chunk        = offset_table->last_chunk_offset_compared;
 	io_handle->current_chunk_offset = 0;
 
-	/* Set write handle values
+	/* Set write io handle values
 	 */
-	write_io_handle->amount_of_chunks  = io_handle->current_chunk;
 	write_io_handle->input_write_count = write_io_handle->amount_of_chunks * media_values->chunk_size;
+	write_io_handle->amount_of_chunks  = offset_table->last_chunk_offset_compared;
+	write_io_handle->write_finalized   = 0;
 
-	if( resume_in_chunks_section != 0 )
+	if( reopen_segment_file != 0 )
 	{
+		if( write_io_handle->resume_segment_file_offset > (off64_t) write_io_handle->segment_file_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: resume segment file offset cannot be greater than segment file size.",
+			 function );
+
+			return( -1 );
+		}
+		write_io_handle->remaining_segment_file_size = write_io_handle->segment_file_size
+		                                             - write_io_handle->resume_segment_file_offset;
+		write_io_handle->chunks_section_number       = segment_file_handle->amount_of_chunks; 
+
+		/* TODO set the following write io handle values to the correct value
+		 * currently only required for ENCASE1/SMART
+		 */
+		write_io_handle->segment_amount_of_chunks    = 0; 
+
 		if( libbfio_pool_reopen(
 		     io_handle->file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
@@ -484,26 +712,7 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		if( libbfio_pool_seek_offset(
-		     io_handle->file_io_pool,
-		     segment_file_handle->file_io_pool_entry,
-		     last_section_values->start_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek last section start offset: %" PRIu64 " in segment file: %" PRIu16 ".",
-			 function,
-			 last_section_values->start_offset,
-			 segment_number );
-
-			return( -1 );
-		}
-		segment_file_handle->write_open        = 1;
-		write_io_handle->create_chunks_section = 1;
+		segment_file_handle->write_open = 1;
 	}
 	return( 1 );
 }
@@ -1723,7 +1932,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			return( -1 );
 		}
 		total_write_count                            += write_count;
-		write_io_handle->write_count                 += write_count;
 		write_io_handle->remaining_segment_file_size -= write_count;
 
 		/* Determine the amount of chunks per segment
@@ -1762,6 +1970,33 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			write_io_handle->chunks_per_segment = segment_table->segment_file_handle[ segment_number ]->amount_of_chunks;
 		}
+	}
+	/* Set segment file to the correct offset if write is resumed
+	 */
+	if( write_io_handle->resume_segment_file_offset > 0 )
+	{
+fprintf( stderr, "RO: %" PRIu64 "\n",
+ write_io_handle->resume_segment_file_offset );
+
+		if( libbfio_pool_seek_offset(
+		     io_handle->file_io_pool,
+		     segment_table->segment_file_handle[ segment_number ]->file_io_pool_entry,
+		     write_io_handle->resume_segment_file_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to seek resume segment file offset: %" PRIu64 " in segment file: %" PRIu16 ".",
+			 function,
+			 write_io_handle->resume_segment_file_offset,
+			 segment_number );
+
+			return( -1 );
+		}
+		write_io_handle->resume_segment_file_offset = 0;
 	}
 	/* Check if a chunk section should be created
 	 */
@@ -1918,7 +2153,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			return( -1 );
 		}
 		total_write_count                            += write_count;
-		write_io_handle->write_count                 += write_count;
 		write_io_handle->remaining_segment_file_size -= write_count;
 	}
 	/* Write the chunk data
@@ -1957,7 +2191,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	total_write_count                            += write_count;
 	write_io_handle->input_write_count           += chunk_data_size;
-	write_io_handle->write_count                 += write_count;
 	write_io_handle->chunks_section_write_count  += write_count;
 	write_io_handle->remaining_segment_file_size -= write_count;
 	write_io_handle->segment_amount_of_chunks    += 1;
@@ -2075,7 +2308,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			return( -1 );
 		}
 		total_write_count                      += write_count;
-		write_io_handle->write_count           += write_count;
 		write_io_handle->create_chunks_section  = 1;
 		write_io_handle->chunks_section_offset  = 0;
 
@@ -2144,8 +2376,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 					return( -1 );
 				}
-				total_write_count            += write_count;
-				write_io_handle->write_count += write_count;
+				total_write_count += write_count;
 			}
 		}
 	}
@@ -3467,6 +3698,30 @@ ssize_t libewf_write_io_handle_finalize(
 
 		return( -1 );
 	}
+	/* Set segment file to the correct offset if write is resumed
+	 */
+	if( write_io_handle->resume_segment_file_offset > 0 )
+	{
+		if( libbfio_pool_seek_offset(
+		     io_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     write_io_handle->resume_segment_file_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to seek resume segment file offset: %" PRIu64 " in segment file: %" PRIu16 ".",
+			 function,
+			 write_io_handle->resume_segment_file_offset,
+			 segment_number );
+
+			return( -1 );
+		}
+		write_io_handle->resume_segment_file_offset = 0;
+	}
 	/* Check if the last segment file is still open for writing
 	 */
 	if( segment_file_handle->write_open != 0 )
@@ -3526,8 +3781,7 @@ ssize_t libewf_write_io_handle_finalize(
 
 				return( -1 );
 			}
-			write_finalize_count         += write_count;
-			write_io_handle->write_count += write_count;
+			write_finalize_count += write_count;
 		}
 		/* Close the segment file
 		 */
@@ -3562,8 +3816,7 @@ ssize_t libewf_write_io_handle_finalize(
 
 			return( -1 );
 		}
-		write_finalize_count         += write_count;
-		write_io_handle->write_count += write_count;
+		write_finalize_count += write_count;
 	}
 	/* Correct the media values if streamed write was used
 	 */

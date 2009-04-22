@@ -1200,8 +1200,8 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( acquiry_offset > 0 )
 	{
-		if( ( acquiry_offset >= (off64_t) media_size )
-		 || ( ( acquiry_size + acquiry_offset ) >= media_size ) )
+		if( ( acquiry_offset > (off64_t) media_size )
+		 || ( ( acquiry_size + acquiry_offset ) > media_size ) )
 		{
 			liberror_error_set(
 			 error,
@@ -1230,7 +1230,7 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( resume_acquiry_offset > 0 )
 	{
-		if( ( acquiry_offset + resume_acquiry_offset ) >= (off64_t) media_size )
+		if( ( acquiry_offset + resume_acquiry_offset ) > (off64_t) media_size )
 		{
 			liberror_error_set(
 			 error,

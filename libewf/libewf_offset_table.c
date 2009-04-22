@@ -326,13 +326,6 @@ int libewf_offset_table_fill(
 
 		return( -1 );
 	}
-	/* Correct the last offset, to fill the table it should point to the first empty entry
-	 * the the last filled entry
-	 */
-	if( offset_table->last_chunk_offset_filled > 0 )
-	{
-		offset_table->last_chunk_offset_filled++;
-	}
 	/* Allocate additional entries in the offset table if needed
 	 * - a single reallocation saves processing time
 	 */
@@ -716,6 +709,8 @@ int libewf_offset_table_fill_last_offset(
 			{
 				chunk_offset->flags |= LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED;
 			}
+			offset_table->last_chunk_offset_filled++;
+
 			break;
 		}
 		list_element = list_element->next;
@@ -888,13 +883,6 @@ int libewf_offset_table_compare(
 		 function );
 
 		return( -1 );
-	}
-	/* Correct the last offset compared, to compare the table it should point to the first empty entry
-	 * the the last filled entry
-	 */
-	if( offset_table->last_chunk_offset_compared > 0 )
-	{
-		offset_table->last_chunk_offset_compared++;
 	}
 	/* Allocate additional entries in the offset table if needed
 	 * - a single reallocation saves processing time
@@ -1255,7 +1243,7 @@ int libewf_offset_table_compare_last_offset(
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
 	list_element = section_list->first;
-	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
+	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ] );
 	last_offset  = chunk_offset->file_offset;
 
 	while( list_element != NULL )
@@ -1361,6 +1349,8 @@ int libewf_offset_table_compare_last_offset(
 				chunk_offset->size   = (size_t) chunk_size;
 				chunk_offset->flags &= ~ ( LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED | LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED ) ;
 			}
+			offset_table->last_chunk_offset_compared++;
+
 			break;
 		}
 		list_element = list_element->next;
