@@ -2,6 +2,7 @@ include_HEADERS = \
 	libewf.h
 
 pkginclude_HEADERS = \
+	libewf/codepage.h \
 	libewf/definitions.h \
 	libewf/error.h \
 	libewf/extern.h \

@@ -29,6 +29,8 @@
 
 #include "libewf_error.h"
 
+#if !defined( HAVE_LOCAL_LIBEWF )
+
 /* Free an error and its elements
  */
 void libewf_error_free(
@@ -59,4 +61,6 @@ void libewf_error_backtrace_fprint(
 	 (liberror_error_t *) error,
 	 stream );
 }
+
+#endif
 

@@ -1,5 +1,5 @@
 /*
- * Error functions
+ * The internal type definitions
  *
  * Copyright (c) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,41 +20,22 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_INTERNAL_ERROR_H )
-#define _LIBEWF_INTERNAL_ERROR_H
+#if !defined( _LIBEWF_INTERNAL_TYPES_H )
+#define _LIBEWF_INTERNAL_TYPES_H
 
 #include <common.h>
 #include <types.h>
 
-#include <stdio.h>
+/* Define HAVE_LOCAL_LIBEWF for local use of libewf
+ * The definitions in <libewf/types.h> are copied here
+ * for local use of libewf
+ */
+#if defined( HAVE_LOCAL_LIBEWF )
 
-#if !defined( HAVE_LOCAL_LIBEWF )
-#include <libewf/error.h>
-#endif
+/* The following type definitions hide internal data structures
+ */
+typedef intptr_t libewf_handle_t;
 
-#include "libewf_extern.h"
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-#if !defined( HAVE_LOCAL_LIBEWF )
-
-LIBEWF_EXTERN void libewf_error_free(
-                    libewf_error_t **error );
-
-LIBEWF_EXTERN void libewf_error_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
-
-LIBEWF_EXTERN void libewf_error_backtrace_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
-
-#endif
-
-#if defined( __cplusplus )
-}
 #endif
 
 #endif

@@ -30,9 +30,8 @@
 
 #include <liberror.h>
 
-#include <libewf/handle.h>
-
 #include "libewf_extern.h"
+#include "libewf_types.h"
 
 #if defined( __cplusplus )
 extern "C" {

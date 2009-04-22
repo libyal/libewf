@@ -1,7 +1,7 @@
 /*
- * Definitions for libewf
+ * The internal definitions
  *
- * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -20,11 +20,22 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_DEFINITIONS_H )
-#define _LIBEWF_DEFINITIONS_H
+#if !defined( _LIBEWF_INTERNAL_DEFINITIONS_H )
+#define _LIBEWF_INTERNAL_DEFINITIONS_H
 
-#include <libewf/types.h>
+#include <common.h>
+#include <endian.h>
 
+#define LIBEWF_ENDIAN_BIG	_ENDIAN_BIG
+#define LIBEWF_ENDIAN_LITTLE	_ENDIAN_LITTLE
+
+/* Define HAVE_LOCAL_LIBEWF for local use of libewf
+ */
+#if !defined( HAVE_LOCAL_LIBEWF )
+#include <libewf/codepage.h>
+#include <libewf/definitions.h>
+
+#else
 #define LIBEWF_VERSION				@VERSION@
 
 /* The libewf version string
@@ -136,6 +147,24 @@ enum LIBEWF_SEGMENT_FILE_TYPES
 	LIBEWF_SEGMENT_FILE_TYPE_EWF		= (int) 'E',
 	LIBEWF_SEGMENT_FILE_TYPE_LWF		= (int) 'L'
 };
+
+/* The codepages
+ */
+enum LIBEWF_CODEPAGES
+{
+	LIBEWF_CODEPAGE_ASCII				= 0x41,
+	LIBEWF_CODEPAGE_WINDOWS_1250			= 1250,
+	LIBEWF_CODEPAGE_WINDOWS_1251			= 1251,
+	LIBEWF_CODEPAGE_WINDOWS_1252			= 1252,
+	LIBEWF_CODEPAGE_WINDOWS_1253			= 1253,
+	LIBEWF_CODEPAGE_WINDOWS_1254			= 1254,
+	LIBEWF_CODEPAGE_WINDOWS_1255			= 1255,
+	LIBEWF_CODEPAGE_WINDOWS_1256			= 1256,
+	LIBEWF_CODEPAGE_WINDOWS_1257			= 1257,
+	LIBEWF_CODEPAGE_WINDOWS_1258			= 1258
+};
+
+#endif
 
 #endif
 

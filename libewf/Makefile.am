@@ -52,6 +52,7 @@ libewf_la_SOURCES = \
 	libewf_string.c libewf_string.h \
 	libewf_support.c libewf_support.h \
 	libewf_system_string.h \
+	libewf_types.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h
 
@@ -62,6 +63,9 @@ libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
 else
 libewf_la_LDFLAGS = -no-undefined -version-info 1:4:0
 endif
+
+EXTRA_DIST = \
+	libewf_definitions.h.in
 
 distclean: clean
 	/bin/rm -f Makefile

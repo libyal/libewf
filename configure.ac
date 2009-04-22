@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090421],
+ [20090422],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090421])
+ [20090422])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -130,7 +130,7 @@ AC_CHECK_HEADERS([string.h])
 dnl Headers included in common/memory.h
 AC_CHECK_HEADERS([stdlib.h])
 
-dnl Headers included in and libbfio/libbfio_file.h
+dnl Headers included in libbfio/libbfio_file.h and ewftools/file_io.h
 AC_CHECK_HEADERS([sys/stat.h])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([unistd.h])
@@ -142,16 +142,23 @@ dnl Headers included in libewf/libewf_notify.h
 AC_CHECK_HEADERS([stdarg.h])
 AC_CHECK_HEADERS([varargs.h])
 
-dnl Headers included in and ewftools/glob.h
+dnl Headers included in ewftools/glob.h
 AC_CHECK_HEADERS([glob.h])
 
-dnl Headers included in and ewftools/ewfsignal.h
+dnl Headers included in ewftools/ewfsignal.h
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([sys/signal.h])
 
-dnl Headers included in and ewftools/system_string.h
+dnl Headers included in ewftools/system_string.h
 AC_CHECK_HEADERS([langinfo.h])
 AC_CHECK_HEADERS([locale.h])
+
+dnl Headers included in ewftools/device_handle.c
+AC_CHECK_HEADERS([cygwin/fs.h])
+AC_CHECK_HEADERS([linux/fs.h])
+AC_CHECK_HEADERS([sys/disk.h])
+AC_CHECK_HEADERS([sys/disklabel.h])
+AC_CHECK_HEADERS([sys/ioctl.h])
 
 dnl Other headers
 AC_CHECK_HEADERS([errno.h])
@@ -160,12 +167,6 @@ AC_CHECK_HEADERS([sys/utsname.h])
 
 AC_CHECK_HEADERS([openssl/opensslv.h])
 AC_CHECK_HEADERS([zlib.h])
-
-AC_CHECK_HEADERS([cygwin/fs.h])
-AC_CHECK_HEADERS([linux/fs.h])
-AC_CHECK_HEADERS([sys/disk.h])
-AC_CHECK_HEADERS([sys/disklabel.h])
-AC_CHECK_HEADERS([sys/ioctl.h])
 
 dnl Check for type definitions
 AC_STRUCT_TM
@@ -1405,6 +1406,7 @@ AC_CONFIG_FILES([include/libewf.h])
 AC_CONFIG_FILES([include/libewf/definitions.h])
 AC_CONFIG_FILES([include/libewf/features.h])
 AC_CONFIG_FILES([include/libewf/types.h])
+AC_CONFIG_FILES([libewf/libewf_definitions.h])
 dnl Have configure make distribution specific files
 AC_CONFIG_FILES([debian/changelog])
 AC_CONFIG_FILES([debian/shlibs.local.ex])

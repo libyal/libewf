@@ -133,6 +133,10 @@ typedef int64_t ssize64_t;
 typedef int64_t off64_t;
 #endif
 
+/* The following type definitions hide internal data structures
+ */
+typedef intptr_t libewf_handle_t;
+
 #ifdef __cplusplus
 }
 #endif

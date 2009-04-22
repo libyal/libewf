@@ -28,8 +28,6 @@
 
 #include <liberror.h>
 
-#include <libewf/handle.h>
-
 #include "libewf_chunk_cache.h"
 #include "libewf_extern.h"
 #include "libewf_hash_sections.h"
@@ -41,6 +39,7 @@
 #include "libewf_read_io_handle.h"
 #include "libewf_segment_table.h"
 #include "libewf_sector_table.h"
+#include "libewf_types.h"
 #include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
 

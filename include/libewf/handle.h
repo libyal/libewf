@@ -34,8 +34,6 @@ extern "C" {
  */
 #define LIBEWF_HANDLE libewf_handle_t
 
-typedef intptr_t libewf_handle_t;
-
 #ifdef __cplusplus
 }
 #endif

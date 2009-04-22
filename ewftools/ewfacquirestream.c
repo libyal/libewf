@@ -31,22 +31,6 @@
 
 #include <stdio.h>
 
-#if defined( HAVE_SYS_IOCTL_H )
-#include <sys/ioctl.h>
-#endif
-
-#if defined( HAVE_UNISTD_H )
-#include <unistd.h>
-#endif
-
-#if defined( HAVE_FCNTL_H )
-#include <fcntl.h>
-#endif
-
-#if defined( HAVE_IO_H )
-#include <io.h>
-#endif
-
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -66,6 +50,7 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
+#include "file_io.h"
 #include "file_stream_io.h"
 #include "imaging_handle.h"
 #include "notify.h"

@@ -81,6 +81,7 @@ API changes
      libewf_set_notify_values
      libewf_signal_abort
   - remove write_finalize?
+  - remove include/handle.h
 * low level API
   - add function to retrieve the segment file names and amount?
   - add function to retrieve EWFX xml header/hash directly
@@ -91,6 +92,7 @@ API changes
   - add means to obtain libbfio handle of media data in ewf
   - add means to set narrow string codepage
   - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
+  - refactor glob functions to use libbfio handle input and return libbfio pool?
 * file structure API extension (idea)
 * add wide character functions definitions by default?
 
@@ -218,6 +220,12 @@ Work in progress:
   - handle corrupt first (data) section in segment file > 1
   - handle EWF/SMART table sections
   - automatic testing
+
+Version: 20090422
+* updated configure.ac
+* worked on local use support
+* implement codepage header file like in libpff
+* moved typedef from handle.h to type.h include header file
 
 Version: 20090421
 * fixes for MSVSCPP build

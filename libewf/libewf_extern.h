@@ -25,6 +25,10 @@
 
 #include <common.h>
 
+/* Define HAVE_LOCAL_LIBEWF for local use of libewf
+ */
+#if !defined( HAVE_LOCAL_LIBEWF )
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
  * before including libewf/extern.h
  */
@@ -33,6 +37,12 @@
 #endif
 
 #include <libewf/extern.h>
+
+#else
+
+#define LIBEWF_EXTERN  extern
+
+#endif
 
 #endif
 

@@ -23,6 +23,7 @@
 #if !defined( _LIBEWF_H )
 #define _LIBEWF_H
 
+#include <libewf/codepage.h>
 #include <libewf/definitions.h>
 #include <libewf/error.h>
 #include <libewf/extern.h>

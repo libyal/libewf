@@ -35,6 +35,7 @@
 #include "libewf_metadata.h"
 #include "libewf_notify.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_types.h"
 
 #include "ewf_definitions.h"
 

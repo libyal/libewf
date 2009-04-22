@@ -28,9 +28,8 @@
 
 #include <stdio.h>
 
-#include <libewf/handle.h>
-
 #include "libewf_extern.h"
+#include "libewf_libbfio.h"
 
 #if defined( __cplusplus )
 extern "C" {

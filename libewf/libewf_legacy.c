@@ -32,6 +32,7 @@
 #include "libewf_handle.h"
 #include "libewf_metadata.h"
 #include "libewf_notify.h"
+#include "libewf_types.h"
 
 #if defined( HAVE_V1_API )
 

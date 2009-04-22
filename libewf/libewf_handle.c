@@ -35,6 +35,7 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_string.h"
+#include "libewf_types.h"
 #include "libewf_write_io_handle.h"
 
 #include "ewf_crc.h"

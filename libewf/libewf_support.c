@@ -30,7 +30,6 @@
 #include "libewf_definitions.h"
 #include "libewf_filename.h"
 #include "libewf_error.h"
-#include "libewf_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_notify.h"
 #include "libewf_segment_file.h"
