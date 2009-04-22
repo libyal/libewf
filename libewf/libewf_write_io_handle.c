@@ -670,7 +670,7 @@ int libewf_write_io_handle_initialize_resume(
 
 	/* Set write io handle values
 	 */
-	write_io_handle->input_write_count = write_io_handle->amount_of_chunks * media_values->chunk_size;
+	write_io_handle->input_write_count = offset_table->last_chunk_offset_compared * media_values->chunk_size;
 	write_io_handle->amount_of_chunks  = offset_table->last_chunk_offset_compared;
 	write_io_handle->write_finalized   = 0;
 
@@ -689,12 +689,12 @@ int libewf_write_io_handle_initialize_resume(
 		}
 		write_io_handle->remaining_segment_file_size = write_io_handle->segment_file_size
 		                                             - write_io_handle->resume_segment_file_offset;
-		write_io_handle->chunks_section_number       = segment_file_handle->amount_of_chunks; 
+		write_io_handle->segment_amount_of_chunks    = segment_file_handle->amount_of_chunks; 
 
 		/* TODO set the following write io handle values to the correct value
 		 * currently only required for ENCASE1/SMART
 		 */
-		write_io_handle->segment_amount_of_chunks    = 0; 
+		write_io_handle->chunks_section_number       = 0;
 
 		if( libbfio_pool_reopen(
 		     io_handle->file_io_pool,

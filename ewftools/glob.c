@@ -276,7 +276,7 @@ int glob_resolve(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_MISSING_VALUE,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing pattern value.",
 			 function );
 
@@ -319,7 +319,7 @@ int glob_resolve(
 					liberror_error_set(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_RESIZE_FAILED,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 					 "%s: unable to resize glob.",
 					 function );
 
@@ -435,7 +435,7 @@ int glob_resolve(
 		}
 #endif
 	}
-	return( globs_found );
+	return( 1 );
 }
 
 #endif

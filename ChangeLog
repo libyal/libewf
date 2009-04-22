@@ -220,6 +220,9 @@ Work in progress:
   - move segment file size from write io handle to segment table or io handle ?
     set segment file size on read
 
+Version: 20090421
+* fixes for MSVSCPP build
+
 Version: 20090420
 * moved write finalize function to write io handle
 * refactored sections correction out of write finalize function into separate functions
