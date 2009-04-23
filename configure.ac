@@ -156,6 +156,7 @@ AC_CHECK_HEADERS([locale.h])
 dnl Headers included in ewftools/device_handle.c
 AC_CHECK_HEADERS([cygwin/fs.h])
 AC_CHECK_HEADERS([linux/fs.h])
+AC_CHECK_HEADERS([linux/hdreg.h])
 AC_CHECK_HEADERS([sys/disk.h])
 AC_CHECK_HEADERS([sys/disklabel.h])
 AC_CHECK_HEADERS([sys/ioctl.h])

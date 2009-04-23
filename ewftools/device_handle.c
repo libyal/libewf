@@ -49,6 +49,10 @@ typedef size_t u64;
 #include <linux/fs.h>
 #endif
 
+#if defined( HAVE_LINUX_HDREG_H )
+#include <linux/hdreg.h>
+#endif
+
 #if defined( HAVE_SYS_DISK_H )
 #include <sys/disk.h>
 #endif
@@ -407,6 +411,21 @@ int device_handle_open_input(
 	 || S_ISCHR( file_stat.st_mode ) )
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_DEVICE;
+
+
+#if defined( HDIO_GET_IDENTITY )
+		struct hd_driveid drive_id;
+
+		if( ioctl(
+		     device_handle->file_descriptor,
+		     HDIO_GET_IDENTITY,
+		     &drive_id ) == -1 )
+		{
+			notify_dump_data(
+			 &drive_id,
+			 sizeof( struct hd_driveid ) );
+		}
+#endif
 	}
 	file_size = file_stat.st_size;
 #endif

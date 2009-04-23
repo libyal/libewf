@@ -53,6 +53,10 @@ void notify_printf(
 void notify_error_backtrace(
       liberror_error_t *error );
 
+void notify_dump_data(
+      void *data,
+      size_t size );
+
 #if defined( __cplusplus )
 }
 #endif

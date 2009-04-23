@@ -73,6 +73,7 @@ Error handling/tollerance
 
 Python bindings
 * rewrite pyewf to match libewf API
+* implement error backtrace support in v2 API version
 
 API changes
 * allow for chunk data and CRC alignment (possible performance enhancement)
@@ -193,11 +194,6 @@ Windows build
   - reduce string conversions, use as much as possible the system string type in the tools
 * ewftools check char/wchar in/output
 
-Next stable release:
-
-Python bindings
-* implement error backtrace support in v2 API version
-
 Deployment
 * debian package
   - implement non local libuna and libbfio support like in spec file
@@ -219,13 +215,13 @@ Work in progress:
 * resume acquiry
   - handle corrupt first (data) section in segment file > 1
   - handle EWF/SMART table sections
-  - automatic testing
 
 Version: 20090422
 * updated configure.ac
 * worked on local use support
 * implement codepage header file like in libpff
 * moved typedef from handle.h to type.h include header file
+* worked on automatic testing of write resume
 
 Version: 20090421
 * fixes for MSVSCPP build

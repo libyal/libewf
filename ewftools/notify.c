@@ -115,3 +115,105 @@ void notify_error_backtrace(
 	}
 }
 
+/* Prints a dump of data
+ */
+void notify_dump_data(
+      void *data,
+      size_t size )
+{
+	size_t byte_iterator = 0;
+	size_t size_iterator = 0;
+
+	if( notify_stream == NULL )
+	{
+		return;
+	}
+	while( size_iterator < size )
+	{
+		while( byte_iterator < size )
+		{
+			if( byte_iterator % 16 == 0 )
+			{
+				fprintf(
+				 notify_stream,
+				 "%.8" PRIzx ": ",
+				 byte_iterator );
+			}
+			fprintf(
+			 notify_stream,
+			 "%.2" PRIx8 " ",
+			 ( (unsigned char *) data )[ byte_iterator++ ] );
+
+			if( byte_iterator % 16 == 0 )
+			{
+				break;
+			}
+			else if( byte_iterator % 8 == 0 )
+			{
+				fprintf(
+				 notify_stream,
+				 " " );
+			}
+		}
+		while( byte_iterator % 16 != 0 )
+		{
+			byte_iterator++;
+
+			fprintf(
+			 notify_stream,
+			 "   " );
+
+			if( ( byte_iterator % 8 == 0 )
+			 && ( byte_iterator % 16 != 0 ) )
+			{
+				fprintf(
+				 notify_stream,
+				 " " );
+			}
+		}
+		fprintf(
+		 notify_stream,
+		 "  " );
+
+		byte_iterator = size_iterator;
+
+		while( byte_iterator < size )
+		{
+			if( ( ( (char *) data )[ byte_iterator ] >= 0x20 )
+			 && ( ( (char *) data )[ byte_iterator ] <= 0x7e ) )
+			{
+				fprintf(
+				 notify_stream,
+				 "%c",
+				 ( (char *) data )[ byte_iterator ] );
+			}
+			else
+			{
+				fprintf(
+				 notify_stream,
+				 "." );
+			}
+			byte_iterator++;
+
+			if( byte_iterator % 16 == 0 )
+			{
+				break;
+			}
+			else if( byte_iterator % 8 == 0 )
+			{
+				fprintf(
+				 notify_stream,
+				 " " );
+			}
+		}
+		fprintf(
+		 notify_stream,
+		 "\n" );
+
+		size_iterator = byte_iterator;
+	}
+	fprintf(
+	 notify_stream,
+	 "\n" );
+}
+
