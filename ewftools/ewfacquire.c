@@ -2281,6 +2281,28 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( device_handle_get_information_values(
+	     device_handle,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve information values.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		device_handle_close(
+		 device_handle,
+		 NULL );
+		device_handle_free(
+		 &device_handle,
+		 NULL );
+
+		return( EXIT_FAILURE );
+	}
 	if( ( acquiry_size == 0 )
 	 || ( acquiry_size > ( media_size - acquiry_offset ) ) )
 	{

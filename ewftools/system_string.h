@@ -192,6 +192,13 @@ int system_string_copy_from_utf8_string(
      size_t utf8_string_size,
      liberror_error_t **error );
 
+int system_string_trim_copy_from_byte_stream(
+     system_character_t *string,
+     size_t string_size,
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
+     liberror_error_t **error );
+
 int utf8_string_size_from_system_string(
      const system_character_t *string,
      size_t string_size,

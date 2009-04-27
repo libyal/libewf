@@ -49,6 +49,10 @@ typedef struct device_handle device_handle_t;
 
 struct device_handle
 {
+	/* The device handle type
+	 */
+	int type;
+
 #if defined( WINAPI )
 	/* File handle
 	 */
@@ -58,10 +62,6 @@ struct device_handle
 	 */
 	int file_descriptor;
 #endif
-
-	/* The type
-	 */
-	int type;
 
 	/* The amount of bytes per sector
 	 */
@@ -78,6 +78,14 @@ struct device_handle
 	/* Value to indicate the media size value was set
 	 */
 	uint8_t media_size_set;
+
+	/* The serial number string
+	 */
+	system_character_t serial_number[ 21 ];
+
+	/* The model string
+	 */
+	system_character_t model[ 41 ];
 
 	/* The amount of read error retries
 	 */
@@ -130,6 +138,10 @@ int device_handle_get_media_size(
 int device_handle_get_bytes_per_sector(
      device_handle_t *device_handle,
      uint32_t *bytes_per_sector,
+     liberror_error_t **error );
+
+int device_handle_get_information_values(
+     device_handle_t *device_handle,
      liberror_error_t **error );
 
 int device_handle_set_read_error_values(

@@ -412,21 +412,6 @@ int device_handle_open_input(
 	 || S_ISCHR( file_stat.st_mode ) )
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_DEVICE;
-
-
-#if defined( HDIO_GET_IDENTITY )
-		struct hd_driveid drive_id;
-
-		if( ioctl(
-		     device_handle->file_descriptor,
-		     HDIO_GET_IDENTITY,
-		     &drive_id ) == -1 )
-		{
-			notify_dump_data(
-			 &drive_id,
-			 sizeof( struct hd_driveid ) );
-		}
-#endif
 	}
 	file_size = file_stat.st_size;
 #endif
@@ -1138,6 +1123,165 @@ int device_handle_get_bytes_per_sector(
 
 	*bytes_per_sector = device_handle->bytes_per_sector;
 
+	return( 1 );
+}
+
+/* Retrieves the amount of bytes per sector
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_information_values(
+     device_handle_t *device_handle,
+     liberror_error_t **error )
+{
+#if defined( HDIO_GET_IDENTITY )
+	struct hd_driveid drive_information;
+#endif
+
+	static char *function = "device_handle_get_information_values";
+	int result            = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( WINAPI )
+	if( device_handle->file_handle == INVALID_HANDLE_VALUE )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid device handle - missing file handle.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( device_handle->file_descriptor == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid device handle - missing file descriptor.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+#if defined( HDIO_GET_IDENTITY )
+	if( ioctl(
+	     device_handle->file_descriptor,
+	     HDIO_GET_IDENTITY,
+	     &drive_information ) != -1 )
+	{
+		notify_dump_data(
+		 &drive_information,
+		 sizeof( struct hd_driveid ) );
+
+		result = system_string_trim_copy_from_byte_stream(
+			  device_handle->serial_number,
+			  21,
+			  drive_information.serial_no,
+			  20,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set serial number.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			device_handle->serial_number[ 0 ] = 0;
+		}
+		result = system_string_trim_copy_from_byte_stream(
+			  device_handle->model,
+			  41,
+			  drive_information.model,
+			  40,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set model.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			device_handle->model[ 0 ] = 0;
+		}
+
+		/* TODO debug info */
+		fprintf(
+		 stderr,
+		 "Serial:\t\t\t%" PRIs_SYSTEM "\n",
+		 device_handle->serial_number );
+		fprintf(
+		 stderr,
+		 "Model:\t\t\t%" PRIs_SYSTEM "\n",
+		 device_handle->model );
+		fprintf(
+		 stderr,
+		 "Removable:\t\t%d\n",
+		 ( drive_information.config & 0x0080 ) >> 7 );
+		fprintf(
+		 stderr,
+		 "Device type:\t\t%d\n",
+		 ( drive_information.config & 0x1f00 ) >> 8 );
+		fprintf(
+		 stderr,
+		 "\nFeature sets:\n" );
+		fprintf(
+		 stderr,
+		 "SMART:\t\t\t%d\n",
+		 ( drive_information.command_set_1 & 0x0001 ) );
+		fprintf(
+		 stderr,
+		 "Security Mode:\t\t%d (%d)\n",
+		 ( drive_information.command_set_1 & 0x0002 ) >> 1,
+		 ( drive_information.dlf & 0x0001 ) );
+		fprintf(
+		 stderr,
+		 "Security Mode enabled:\t%d\n",
+		 ( drive_information.dlf & 0x0002 ) >> 1 );
+		fprintf(
+		 stderr,
+		 "Removable Media:\t%d\n",
+		 ( drive_information.command_set_1 & 0x0004 ) >> 2 );
+		fprintf(
+		 stderr,
+		 "HPA:\t\t\t%d\n",
+		 ( drive_information.command_set_1 & 0x0400 ) >> 10 );
+		fprintf(
+		 stderr,
+		 "DCO:\t\t\t%d\n",
+		 ( drive_information.command_set_2 & 0x0800 ) >> 11 );
+		fprintf(
+		 stderr,
+		 "Media serial:\t\t%d\n",
+		 ( drive_information.cfsse & 0x0004 ) >> 2 );
+	}
+#endif
 	return( 1 );
 }
 
