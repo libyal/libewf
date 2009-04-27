@@ -21,6 +21,7 @@
  */
 
 #include <common.h>
+#include <endian.h>
 #include <memory.h>
 #include <narrow_string.h>
 #include <types.h>
@@ -42,7 +43,10 @@
 #include <sys/utsname.h>
 #endif
 
-#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
+#if defined( WINAPI )
+#include <rpcdce.h>
+
+#elif defined( HAVE_UUID_UUID_H )
 #include <uuid/uuid.h>
 #endif
 
@@ -180,6 +184,10 @@ int ewfcommon_determine_guid(
      uint8_t *guid,
      uint8_t libewf_format )
 {
+#if defined( WINAPI )
+	UUID uuid             = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+#endif
+
 	static char *function = "ewfcommon_determine_guid";
 
 	if( guid == NULL )
@@ -189,24 +197,58 @@ int ewfcommon_determine_guid(
 
 		return( -1 );
 	}
-#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
-#if defined( HAVE_UUID_GENERATE_RANDOM )
 	if( ( libewf_format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
 	{
+#if defined( WINAPI )
+		UuidCreate(
+		 &uuid );
+
+#elif defined( HAVE_UUID_GENERATE_RANDOM )
 		uuid_generate_random(
 		 guid );
-	}
 #endif
-#if defined( HAVE_UUID_GENERATE_TIME )
+	}
 	if( ( libewf_format == LIBEWF_FORMAT_LINEN5 )
 	 || ( libewf_format == LIBEWF_FORMAT_LINEN6 ) )
 	{
+#if defined( WINAPI )
+		UuidCreateSequential(
+		 &uuid );
+
+#elif defined( HAVE_UUID_GENERATE_TIME )
 		uuid_generate_time(
 		 guid );
-	}
 #endif
+	}
+#if defined( WINAPI )
+	endian_little_revert_32bit(
+	 guid,
+	 uuid.Data1 );
+
+	guid += 4;
+
+	endian_little_revert_16bit(
+	 guid,
+	 uuid.Data2 );
+
+	guid += 2;
+
+	endian_little_revert_16bit(
+	 guid,
+	 uuid.Data3 );
+
+	guid += 2;
+
+	guid[ 0 ] = uuid.Data4[ 0 ];
+	guid[ 1 ] = uuid.Data4[ 1 ];
+	guid[ 2 ] = uuid.Data4[ 2 ];
+	guid[ 3 ] = uuid.Data4[ 3 ];
+	guid[ 4 ] = uuid.Data4[ 4 ];
+	guid[ 5 ] = uuid.Data4[ 5 ];
+	guid[ 6 ] = uuid.Data4[ 6 ];
+	guid[ 7 ] = uuid.Data4[ 7 ];
 #endif
 	return( 1 );
 }

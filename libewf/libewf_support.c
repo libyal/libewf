@@ -123,7 +123,7 @@ int libewf_check_file_signature(
 	if( libbfio_file_set_name(
 	     file_io_handle,
 	     filename,
-	     filename_length + 1,
+	     filename_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -139,7 +139,7 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	result = libewf_check_file_signature_handle(
+	result = libewf_check_file_signature_file_io_handle(
 	          file_io_handle,
 	          error );
 
@@ -239,7 +239,7 @@ int libewf_check_file_signature(
 	if( libbfio_file_set_name(
 	     file_io_handle,
 	     filename,
-	     filename_length + 1,
+	     filename_length,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -260,7 +260,7 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	result = libewf_check_file_signature_handle(
+	result = libewf_check_file_signature_file_io_handle(
 	          file_io_handle,
 	          &error );
 
@@ -361,7 +361,7 @@ int libewf_check_file_signature_wide(
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,
-	     filename_length + 1,
+	     filename_length,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -377,7 +377,7 @@ int libewf_check_file_signature_wide(
 
 		return( -1 );
 	}
-	result = libewf_check_file_signature_handle(
+	result = libewf_check_file_signature_file_io_handle(
 	          file_io_handle,
 	          error );
 
@@ -477,7 +477,7 @@ int libewf_check_file_signature_wide(
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,
-	     filename_length + 1,
+	     filename_length,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -498,7 +498,7 @@ int libewf_check_file_signature_wide(
 
 		return( -1 );
 	}
-	result = libewf_check_file_signature_handle(
+	result = libewf_check_file_signature_file_io_handle(
 	          file_io_handle,
 	          &error );
 
@@ -549,13 +549,13 @@ int libewf_check_file_signature_wide(
 /* Determines if a file is an EWF file (check for the EWF file signature) using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
-int libewf_check_file_signature_handle(
+int libewf_check_file_signature_file_io_handle(
      libbfio_handle_t *bfio_handle,
      liberror_error_t **error )
 {
 	uint8_t signature[ 8 ];
 
-	static char *function = "libewf_check_file_signature_handle";
+	static char *function = "libewf_check_file_signature_file_io_handle";
 	ssize_t read_count    = 0;
 
 	if( bfio_handle == NULL )
@@ -657,13 +657,15 @@ int libewf_glob(
      int *amount_of_filenames,
      liberror_error_t **error )
 {
-	char *segment_filename    = NULL;
-	void *reallocation        = NULL;
-	static char *function     = "libewf_glob";
-	size_t additional_length  = 4;
-	int result                = 0;
-	uint8_t segment_file_type = 0;
-	uint8_t ewf_format        = 0;
+	libbfio_handle_t *file_io_handle = NULL;
+	char *segment_filename           = NULL;
+	void *reallocation               = NULL;
+	static char *function            = "libewf_glob";
+	size_t additional_length         = 4;
+	size_t segment_filename_length   = 0;
+	int result                       = 0;
+	uint8_t segment_file_type        = 0;
+	uint8_t ewf_format               = 0;
 
 	if( filename == NULL )
 	{
@@ -793,12 +795,27 @@ int libewf_glob(
 		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 		ewf_format        = EWF_FORMAT_E01;
 	}
+	if( libbfio_file_initialize(
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	*amount_of_filenames = 0;
 
 	while( *amount_of_filenames < (int) UINT16_MAX )
 	{
+		segment_filename_length = filename_length + additional_length;
+
 		segment_filename = (char * ) memory_allocate(
-			                      sizeof( char ) * ( filename_length + additional_length + 1 ) );
+			                      sizeof( char ) * ( segment_filename_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -808,6 +825,10 @@ int libewf_glob(
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create segment filename.",
 			 function );
+
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -825,6 +846,9 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -833,7 +857,7 @@ int libewf_glob(
 			segment_filename[ filename_length ] = (char) '.';
 		}
 		if( libewf_filename_set_extension(
-		     &( segment_filename[ filename_length + additional_length - 3 ] ),
+		     &( segment_filename[ segment_filename_length - 3 ] ),
 		     (uint16_t) ( *amount_of_filenames + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
@@ -850,13 +874,37 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
-		segment_filename[ filename_length + additional_length ] = 0;
+		segment_filename[ segment_filename_length ] = 0;
 
-		result = libbfio_file_exists(
-		          segment_filename,
+		if( libbfio_file_set_name(
+		     file_io_handle,
+		     segment_filename,
+		     segment_filename_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set name in file IO handle.",
+			 function );
+
+			memory_free(
+			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
+
+			return( -1 );
+		}
+		result = libbfio_handle_exists(
+		          file_io_handle,
 		          error );
 
 		if( result == -1 )
@@ -870,6 +918,9 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -897,12 +948,28 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
 		*filenames = (char **) reallocation;
 
 		( *filenames )[ *amount_of_filenames - 1 ] = segment_filename;
+	}
+	if( libbfio_handle_free(
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file IO handle.",
+		 function );
+
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -918,15 +985,17 @@ int libewf_glob(
      uint8_t format,
      char **filenames[] )
 {
-	liberror_error_t *error   = NULL;
-	char *segment_filename    = NULL;
-	void *reallocation        = NULL;
-	static char *function     = "libewf_glob";
-	size_t additional_length  = 4;
-	int amount_of_files       = 0;
-	int result                = 0;
-	uint8_t segment_file_type = 0;
-	uint8_t ewf_format        = 0;
+	libbfio_handle_t *file_io_handle = NULL;
+	liberror_error_t *error          = NULL;
+	char *segment_filename           = NULL;
+	void *reallocation               = NULL;
+	static char *function            = "libewf_glob";
+	size_t additional_length         = 4;
+	size_t segment_filename_length   = 0;
+	int amount_of_files              = 0;
+	int result                       = 0;
+	uint8_t segment_file_type        = 0;
+	uint8_t ewf_format               = 0;
 
 	if( filename == NULL )
 	{
@@ -1075,10 +1144,30 @@ int libewf_glob(
 		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 		ewf_format        = EWF_FORMAT_E01;
 	}
+	if( libbfio_file_initialize(
+	     &file_io_handle,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file IO handle.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	while( amount_of_files < (int) UINT16_MAX )
 	{
+		segment_filename_length = filename_length + additional_length;
+
 		segment_filename = (char * ) memory_allocate(
-			                      sizeof( char ) * ( filename_length + additional_length + 1 ) );
+			                      sizeof( char ) * ( segment_filename_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -1093,6 +1182,10 @@ int libewf_glob(
 			 error );
 			liberror_error_free(
 			 &error );
+
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1115,6 +1208,9 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1123,7 +1219,7 @@ int libewf_glob(
 			segment_filename[ filename_length ] = (char) '.';
 		}
 		if( libewf_filename_set_extension(
-		     &( segment_filename[ filename_length + additional_length - 3 ] ),
+		     &( segment_filename[ segment_filename_length - 3 ] ),
 		     (uint16_t) ( amount_of_files + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
@@ -1145,13 +1241,42 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
-		segment_filename[ filename_length + additional_length ] = 0;
+		segment_filename[ segment_filename_length ] = 0;
 
-		result = libbfio_file_exists(
-		          segment_filename,
+		if( libbfio_file_set_name(
+		     file_io_handle,
+		     segment_filename,
+		     segment_filename_length,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set name in file IO handle.",
+			 function );
+
+			libewf_notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			memory_free(
+			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
+
+			return( -1 );
+		}
+		result = libbfio_handle_exists(
+		          file_io_handle,
 		          &error );
 
 		if( result == -1 )
@@ -1170,6 +1295,9 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1202,6 +1330,9 @@ int libewf_glob(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1209,9 +1340,42 @@ int libewf_glob(
 
 		( *filenames )[ amount_of_files - 1 ] = segment_filename;
 	}
+	if( libbfio_handle_free(
+	     &file_io_handle,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file IO handle.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	return( amount_of_files );
 }
 #endif
+
+/* Globs the segment files according to the EWF naming schema
+ * if format is known the filename should contain the base of the filename
+ * otherwise the function will try to determine the format based on the extension
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_glob_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     uint8_t format,
+     libbfio_pool_t *file_io_pool,
+     liberror_error_t **error )
+{
+	/* TODO */
+	return( -1 );
+}
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
@@ -1229,13 +1393,15 @@ int libewf_glob_wide(
      int *amount_of_filenames,
      liberror_error_t **error )
 {
-	wchar_t *segment_filename = NULL;
-	void *reallocation        = NULL;
-	static char *function     = "libewf_glob_wide";
-	size_t additional_length  = 4;
-	int result                = 0;
-	uint8_t segment_file_type = 0;
-	uint8_t ewf_format        = 0;
+	libbfio_handle_t *file_io_handle = NULL;
+	wchar_t *segment_filename        = NULL;
+	void *reallocation               = NULL;
+	static char *function            = "libewf_glob_wide";
+	size_t additional_length         = 4;
+	size_t segment_filename_length   = 0;
+	int result                       = 0;
+	uint8_t segment_file_type        = 0;
+	uint8_t ewf_format               = 0;
 
 	if( filename == NULL )
 	{
@@ -1365,12 +1531,27 @@ int libewf_glob_wide(
 		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 		ewf_format        = EWF_FORMAT_E01;
 	}
+	if( libbfio_file_initialize(
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	*amount_of_filenames = 0;
 
 	while( *amount_of_filenames < (int) UINT16_MAX )
 	{
+		segment_filename_length = filename_length + additional_length;
+
 		segment_filename = memory_allocate(
-			            sizeof( wchar_t ) * ( filename_length + additional_length + 1 ) );
+			            sizeof( wchar_t ) * ( segment_filename_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -1380,6 +1561,10 @@ int libewf_glob_wide(
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create segment filename.",
 			 function );
+
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1397,6 +1582,9 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1405,7 +1593,7 @@ int libewf_glob_wide(
 			segment_filename[ filename_length ] = (wchar_t) '.';
 		}
 		if( libewf_filename_set_extension_wide(
-		     &( segment_filename[ filename_length + additional_length - 3 ] ),
+		     &( segment_filename[ segment_filename_length - 3 ] ),
 		     (uint16_t) ( *amount_of_filenames + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
@@ -1422,13 +1610,37 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
-		segment_filename[ filename_length + additional_length ] = 0;
+		segment_filename[ segment_filename_length ] = 0;
 
-		result = libbfio_file_exists_wide(
-		          segment_filename,
+		if( libbfio_file_set_name_wide(
+		     file_io_handle,
+		     segment_filename,
+		     segment_filename_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set name in file IO handle.",
+			 function );
+
+			memory_free(
+			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
+
+			return( -1 );
+		}
+		result = libbfio_handle_exists(
+		          file_io_handle,
 		          error );
 
 		if( result == -1 )
@@ -1442,6 +1654,9 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1469,12 +1684,28 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
 		*filenames = (wchar_t **) reallocation;
 
 		( *filenames )[ *amount_of_filenames - 1 ] = segment_filename;
+	}
+	if( libbfio_handle_free(
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file IO handle.",
+		 function );
+
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -1490,15 +1721,17 @@ int libewf_glob_wide(
      uint8_t format,
      wchar_t **filenames[] )
 {
-	liberror_error_t *error   = NULL;
-	wchar_t *segment_filename = NULL;
-	void *reallocation        = NULL;
-	static char *function     = "libewf_glob_wide";
-	size_t additional_length  = 4;
-	int amount_of_files       = 0;
-	int result                = 0;
-	uint8_t segment_file_type = 0;
-	uint8_t ewf_format        = 0;
+	libbfio_handle_t *file_io_handle = NULL;
+	liberror_error_t *error          = NULL;
+	wchar_t *segment_filename        = NULL;
+	void *reallocation               = NULL;
+	static char *function            = "libewf_glob_wide";
+	size_t additional_length         = 4;
+	size_t segment_filename_length   = 0;
+	int amount_of_files              = 0;
+	int result                       = 0;
+	uint8_t segment_file_type        = 0;
+	uint8_t ewf_format               = 0;
 
 	if( filename == NULL )
 	{
@@ -1647,10 +1880,30 @@ int libewf_glob_wide(
 		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 		ewf_format        = EWF_FORMAT_E01;
 	}
+	if( libbfio_file_initialize(
+	     &file_io_handle,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file IO handle.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	while( amount_of_files < (int) UINT16_MAX )
 	{
+		segment_filename_length = filename_length + additional_length;
+
 		segment_filename = memory_allocate(
-			            sizeof( wchar_t ) * ( filename_length + additional_length + 1 ) );
+			            sizeof( wchar_t ) * ( segment_filename_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -1665,6 +1918,10 @@ int libewf_glob_wide(
 			 error );
 			liberror_error_free(
 			 &error );
+
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1687,6 +1944,9 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1695,7 +1955,7 @@ int libewf_glob_wide(
 			segment_filename[ filename_length ] = (wchar_t) '.';
 		}
 		if( libewf_filename_set_extension_wide(
-		     &( segment_filename[ filename_length + additional_length - 3 ] ),
+		     &( segment_filename[ segment_filename_length - 3 ] ),
 		     (uint16_t) ( amount_of_files + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
@@ -1717,13 +1977,42 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
-		segment_filename[ filename_length + additional_length ] = 0;
+		segment_filename[ segment_filename_length ] = 0;
 
-		result = libbfio_file_exists_wide(
-		          segment_filename,
+		if( libbfio_file_set_name_wide(
+		     file_io_handle,
+		     segment_filename,
+		     segment_filename_length,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set name in file IO handle.",
+			 function );
+
+			libewf_notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			memory_free(
+			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
+
+			return( -1 );
+		}
+		result = libbfio_handle_exists(
+		          file_io_handle,
 		          &error );
 
 		if( result == -1 )
@@ -1742,6 +2031,9 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -1774,12 +2066,33 @@ int libewf_glob_wide(
 
 			memory_free(
 			 segment_filename );
+			libbfio_handle_free(
+			 &file_io_handle,
+			 NULL );
 
 			return( -1 );
 		}
 		*filenames = (wchar_t **) reallocation;
 
 		( *filenames )[ amount_of_files - 1 ] = segment_filename;
+	}
+	if( libbfio_handle_free(
+	     &file_io_handle,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file IO handle.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
 	}
 	return( amount_of_files );
 }

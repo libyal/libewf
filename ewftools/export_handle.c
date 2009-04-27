@@ -26,7 +26,10 @@
 
 #include <liberror.h>
 
-#if defined( HAVE_UUID_UUID_H )
+#if defined( WINAPI )
+#include <rpcdce.h>
+
+#elif defined( HAVE_UUID_UUID_H )
 #include <uuid/uuid.h>
 #endif
 
@@ -1712,7 +1715,7 @@ int export_handle_set_output_values(
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error )
 {
-#if defined( HAVE_UUID_UUID_H )
+#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
 	uint8_t guid[ 16 ];
 #endif
 
@@ -2046,7 +2049,7 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_UUID_UUID_H )
+#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
 		/* Add a system GUID if necessary
 		 */
 		if( ewfcommon_determine_guid(

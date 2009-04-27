@@ -26,7 +26,10 @@
 
 #include <liberror.h>
 
-#if defined( HAVE_UUID_UUID_H )
+#if defined( WINAPI )
+#include <rpcdce.h>
+
+#elif defined( HAVE_UUID_UUID_H )
 #include <uuid/uuid.h>
 #endif
 
@@ -421,7 +424,7 @@ int imaging_handle_open_output(
 	imaging_handle->output_handle = libewf_open_wide(
 	                                 libewf_filenames,
 	                                 amount_of_filenames,
-	                                 flags );
+	                                 (uint8_t) flags );
 
 	if( imaging_handle->output_handle == NULL )
 #endif
@@ -437,7 +440,7 @@ int imaging_handle_open_output(
 	imaging_handle->output_handle = libewf_open(
 	                                 libewf_filenames,
 	                                 amount_of_filenames,
-	                                 flags );
+	                                 (uint8_t) flags );
 
 	if( imaging_handle->output_handle == NULL )
 #endif
@@ -1695,7 +1698,7 @@ int imaging_handle_set_output_values(
      uint32_t sector_error_granularity,
      liberror_error_t **error )
 {
-#if defined( HAVE_UUID_UUID_H )
+#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
 	uint8_t guid[ 16 ];
 #endif
 
@@ -2082,7 +2085,7 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_UUID_UUID_H )
+#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
 	/* Add a system GUID if necessary
 	 */
 	if( ewfcommon_determine_guid(

@@ -29,6 +29,7 @@ Features
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
+* resume write support for ENCASE1/SMART table sections
 
 Recovery and analysis:
 * imaging: detect disk full and ask for new segment file location?
@@ -94,6 +95,7 @@ API changes
   - add means to set narrow string codepage
   - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
   - refactor glob functions to use libbfio handle input and return libbfio pool?
+  - think about libewf_glob_file_io_handle and abstration of file io handle get/set name
 * file structure API extension (idea)
 * add wide character functions definitions by default?
 
@@ -181,7 +183,6 @@ Testing
 * check read error handling (linux, mac)
 
 Windows build
-* GUID support
 * windows port
   - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
   - reduce _s function to pre MVC 2005 variants provides for wider support
@@ -212,9 +213,15 @@ Work in progress:
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
-* resume acquiry
-  - handle corrupt first (data) section in segment file > 1
-  - handle EWF/SMART table sections
+* windows acquiry of 40GB disk
+
+Version: 20090425
+* worked on libbfio exists handle function update
+* updated libbfio
+* worked on GUID support for windows build
+
+Version: 20090424
+* updated libbfio - exist handle function update
 
 Version: 20090422
 * updated configure.ac
