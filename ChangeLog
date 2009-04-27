@@ -181,6 +181,7 @@ Testing
 Windows build
 * windows port
   - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
+* add WIN32_LEAN_AND_MEAN or VC_EXTRALEAN to msvscpp
 
 * locale support
   - print output convert to system string
@@ -207,6 +208,10 @@ Work in progress:
 * check TODO
 * check windows acquiry of 40GB disk
 
+Version: 20090426
+* worked on device information
+* updated libbfio
+
 Version: 20090425
 * worked on libbfio exists handle function update
 * updated libbfio
@@ -214,6 +219,7 @@ Version: 20090425
 * extents header value is now formatted in more table like manner
 * fixed hash value identifier size issue in info and verification handle
 * rename libewf_format to ewf_format in ewftools
+* worked on device information
 
 Version: 20090424
 * updated libbfio - exist handle function update

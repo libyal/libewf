@@ -35,7 +35,7 @@
 #endif
 
 #if defined( WINAPI )
-#include <winbase.h>
+#include <windows.h>
 
 #elif defined( HAVE_CYGWIN_FS_H )
 #include <cygwin/fs.h>
@@ -54,6 +54,10 @@ typedef size_t u64;
 #include <linux/hdreg.h>
 #endif
 
+#if defined( HAVE_LINUX_USBDEVICE_FS_H )
+#include <linux/usbdevice_fs.h>
+#endif
+
 #else
 
 #if defined( HAVE_SYS_DISK_H )
@@ -68,6 +72,7 @@ typedef size_t u64;
 
 #include "device_handle.h"
 #include "notify.h"
+#include "scsi_io.h"
 #include "storage_media_buffer.h"
 #include "system_string.h"
 
@@ -778,7 +783,7 @@ int device_handle_get_media_size(
 #if defined( WINAPI )
 	GET_LENGTH_INFORMATION length_information;
 
-	DWORD result_count    = 0;
+	DWORD response_count  = 0;
 #else
 #if !defined( DIOCGMEDIASIZE ) && defined( DIOCGDINFO )
 	struct disklabel disk_label;
@@ -846,7 +851,7 @@ int device_handle_get_media_size(
 		     0,
 		     &length_information,
 		     sizeof( GET_LENGTH_INFORMATION ),
-		     &result_count,
+		     &response_count,
 		     NULL ) == 0 )
 		{
 				liberror_error_set(
@@ -992,7 +997,7 @@ int device_handle_get_bytes_per_sector(
 #if defined( WINAPI )
 	DISK_GEOMETRY_EX disk_geometry;
 
-	DWORD result_count    = 0;
+	DWORD response_count  = 0;
 #endif
 	static char *function = "device_handle_get_bytes_per_sector";
 
@@ -1053,7 +1058,7 @@ int device_handle_get_bytes_per_sector(
 		     0,
 		     &disk_geometry,
 		     sizeof( DISK_GEOMETRY_EX ),
-		     &result_count,
+		     &response_count,
 		     NULL ) == 0 )
 		{
 				liberror_error_set(
@@ -1133,12 +1138,29 @@ int device_handle_get_information_values(
      device_handle_t *device_handle,
      liberror_error_t **error )
 {
+#if defined( WINAPI )
+	STORAGE_PROPERTY_QUERY query;
+
+	uint8_t *response      = NULL;
+	size_t response_size   = 1024;
+	size_t string_length   = 0;
+	DWORD response_count   = 0;
+
+#else
 #if defined( HDIO_GET_IDENTITY )
 	struct hd_driveid drive_information;
 #endif
+#if defined( USBDEVFS_GETDRIVER )
+	struct usbdevfs_getdriver usb_information;
+#endif
+#if defined( HAVE_SCSI_IO )
+	uint8_t response[ 255 ];
+	ssize_t response_count = 0;
+#endif
+#endif
 
-	static char *function = "device_handle_get_information_values";
-	int result            = 0;
+	static char *function  = "device_handle_get_information_values";
+	int result             = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1176,112 +1198,523 @@ int device_handle_get_information_values(
 		return( -1 );
 	}
 #endif
-#if defined( HDIO_GET_IDENTITY )
-	if( ioctl(
-	     device_handle->file_descriptor,
-	     HDIO_GET_IDENTITY,
-	     &drive_information ) != -1 )
+#if defined( WINAPI )
+	if( device_handle->media_information_set == 0 )
 	{
-		notify_dump_data(
-		 &drive_information,
-		 sizeof( struct hd_driveid ) );
-
-		result = system_string_trim_copy_from_byte_stream(
-			  device_handle->serial_number,
-			  21,
-			  drive_information.serial_no,
-			  20,
-			  error );
-
-		if( result == -1 )
+		if( memset(
+		     &query,
+		     0,
+		     sizeof( STORAGE_PROPERTY_QUERY ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set serial number.",
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear storage property query.",
 			 function );
 
 			return( -1 );
 		}
-		else if( result == 0 )
-		{
-			device_handle->serial_number[ 0 ] = 0;
-		}
-		result = system_string_trim_copy_from_byte_stream(
-			  device_handle->model,
-			  41,
-			  drive_information.model,
-			  40,
-			  error );
+		query.PropertyId = StorageDeviceProperty;
+		query.QueryType  = PropertyStandardQuery;
 
-		if( result == -1 )
+		response         = (uint8_t *) memory_allocate(
+						response_size );
+
+		if( response == NULL )
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set model.",
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to response.",
 			 function );
 
 			return( -1 );
 		}
-		else if( result == 0 )
+		if( DeviceIoControl(
+		     device_handle->file_handle,
+		     IOCTL_STORAGE_QUERY_PROPERTY,
+		     &query,
+		     sizeof( STORAGE_PROPERTY_QUERY ),
+		     response,
+		     response_size,
+		     &response_count,
+		     NULL ) == 0 )
 		{
-			device_handle->model[ 0 ] = 0;
-		}
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: IOCTL_STORAGE_QUERY_PROPERTY.",
+			 function );
 
-		/* TODO debug info */
+			memory_free(
+			 response );
+
+			return( -1 );
+		}
+		if( (size_t) ( (STORAGE_DESCRIPTOR_HEADER *) response )->Size > response_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: response buffer too small.\n",
+			 function );
+
+			memory_free(
+			 response );
+
+			return( -1 );
+		}
+		if( (size_t) ( (STORAGE_DESCRIPTOR_HEADER *) response )->Size > sizeof( STORAGE_DEVICE_DESCRIPTOR ) )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			notify_dump_data(
+			 response,
+			 (size_t) response_count );
+#endif
+
+			if( ( (STORAGE_DEVICE_DESCRIPTOR *) response )->VendorIdOffset > 0 )
+			{
+				string_length = narrow_string_length(
+				                 (char *) &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->VendorIdOffset ] ) );
+
+				result = system_string_trim_copy_from_byte_stream(
+					  device_handle->vendor,
+					  255,
+					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->VendorIdOffset ] ),
+					  string_length,
+					  error );
+
+				if( result == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set vendor.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result == 0 )
+				{
+					device_handle->vendor[ 0 ] = 0;
+				}
+			}
+			if( ( (STORAGE_DEVICE_DESCRIPTOR *) response )->ProductIdOffset > 0 )
+			{
+				string_length = narrow_string_length(
+				                 (char *) &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->ProductIdOffset ] ) );
+
+				result = system_string_trim_copy_from_byte_stream(
+					  device_handle->model,
+					  255,
+					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->ProductIdOffset ] ),
+					  string_length,
+					  error );
+
+				if( result == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set model.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result == 0 )
+				{
+					device_handle->model[ 0 ] = 0;
+				}
+			}
+			if( ( (STORAGE_DEVICE_DESCRIPTOR *) response )->SerialNumberOffset > 0 )
+			{
+				string_length = narrow_string_length(
+				                 (char *) &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->SerialNumberOffset ] ) );
+
+				result = system_string_trim_copy_from_byte_stream(
+					  device_handle->serial_number,
+					  255,
+					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->SerialNumberOffset ] ),
+					  string_length,
+					  error );
+
+				if( result == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set serial number.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result == 0 )
+				{
+					device_handle->serial_number[ 0 ] = 0;
+				}
+			}
+			device_handle->removable             = ( (STORAGE_DEVICE_DESCRIPTOR *) response )->RemovableMedia;
+			device_handle->media_information_set = 1;
+
+			fprintf(
+			 stderr,
+			 "Bus type:\t\t" );
+
+			switch( ( ( STORAGE_DEVICE_DESCRIPTOR *) response )->BusType )
+			{
+				case BusTypeScsi:
+					fprintf(
+					 stderr,
+					 "SCSI" );
+					break;
+
+				case BusTypeAtapi:
+					fprintf(
+					 stderr,
+					 "ATAPI" );
+					break;
+
+				case BusTypeAta:
+					fprintf(
+					 stderr,
+					 "ATA" );
+					break;
+
+				case BusType1394:
+					fprintf(
+					 stderr,
+					 "FireWire (IEEE1394)" );
+					break;
+
+				case BusTypeSsa:
+					fprintf(
+					 stderr,
+					 "Serial Storage Architecture (SSA)" );
+					break;
+
+				case BusTypeFibre:
+					fprintf(
+					 stderr,
+					 "Fibre Channel" );
+					break;
+
+				case BusTypeUsb:
+					fprintf(
+					 stderr,
+					 "USB" );
+					break;
+
+				case BusTypeRAID:
+					fprintf(
+					 stderr,
+					 "RAID" );
+					break;
+
+				case BusTypeiScsi:
+					fprintf(
+					 stderr,
+					 "iSCSI" );
+					break;
+
+				case BusTypeSas:
+					fprintf(
+					 stderr,
+					 "SAS" );
+					break;
+
+				case BusTypeSata:
+					fprintf(
+					 stderr,
+					 "SATA" );
+					break;
+
+				case BusTypeSd:
+					fprintf(
+					 stderr,
+					 "Secure Digital (SD)" );
+					break;
+
+				case BusTypeMmc:
+					fprintf(
+					 stderr,
+					 "Multi Media Card (MMC)" );
+					break;
+
+				default:
+					fprintf(
+					 stderr,
+					 "%d",
+					 ( ( STORAGE_DEVICE_DESCRIPTOR *) response )->BusType );
+					break;
+			}
+			fprintf(
+			 stderr,
+			 "\n" );
+		}
+		memory_free(
+		 response );
+	}
+#else
+#if defined( HDIO_GET_IDENTITY )
+	if( device_handle->media_information_set == 0 )
+	{
+		if( ioctl(
+		     device_handle->file_descriptor,
+		     HDIO_GET_IDENTITY,
+		     &drive_information ) != -1 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			notify_dump_data(
+			 &drive_information,
+			 sizeof( struct hd_driveid ) );
+#endif
+
+			result = system_string_trim_copy_from_byte_stream(
+				  device_handle->serial_number,
+				  255,
+				  drive_information.serial_no,
+				  20,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set serial number.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result == 0 )
+			{
+				device_handle->serial_number[ 0 ] = 0;
+			}
+			result = system_string_trim_copy_from_byte_stream(
+				  device_handle->model,
+				  255,
+				  drive_information.model,
+				  40,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set model.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result == 0 )
+			{
+				device_handle->model[ 0 ] = 0;
+			}
+			device_handle->removable             = ( drive_information.config & 0x0080 ) >> 7;
+			device_handle->media_information_set = 1;
+
+			fprintf(
+			 stderr,
+			 "Device type:\t\t%d\n",
+			 ( drive_information.config & 0x1f00 ) >> 8 );
+			fprintf(
+			 stderr,
+			 "Feature sets:\n" );
+			fprintf(
+			 stderr,
+			 "SMART:\t\t\t%d\n",
+			 ( drive_information.command_set_1 & 0x0001 ) );
+			fprintf(
+			 stderr,
+			 "Security Mode:\t\t%d (%d)\n",
+			 ( drive_information.command_set_1 & 0x0002 ) >> 1,
+			 ( drive_information.dlf & 0x0001 ) );
+			fprintf(
+			 stderr,
+			 "Security Mode enabled:\t%d\n",
+			 ( drive_information.dlf & 0x0002 ) >> 1 );
+			fprintf(
+			 stderr,
+			 "Removable Media:\t%d\n",
+			 ( drive_information.command_set_1 & 0x0004 ) >> 2 );
+			fprintf(
+			 stderr,
+			 "HPA:\t\t\t%d\n",
+			 ( drive_information.command_set_1 & 0x0400 ) >> 10 );
+			fprintf(
+			 stderr,
+			 "DCO:\t\t\t%d\n",
+			 ( drive_information.command_set_2 & 0x0800 ) >> 11 );
+			fprintf(
+			 stderr,
+			 "Media serial:\t\t%d\n",
+			 ( drive_information.cfsse & 0x0004 ) >> 2 );
+			fprintf(
+			 stderr,
+			 "\n" );
+		}
+	}
+#endif
+#if defined( USBDEVFS_GETDRIVER )
+	if( device_handle->media_information_set == 0 )
+	{
+		if( ioctl(
+		     device_handle->file_descriptor,
+		     USBDEVFS_GETDRIVER,
+		     &usb_information ) != -1 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			notify_dump_data(
+			 &usb_information,
+			 sizeof( struct usbdevfs_getdriver ) );
+#endif
+		}
+	}
+#endif
+#if defined( HAVE_SCSI_IO )
+	if( device_handle->media_information_set == 0 )
+	{
+		response_count = scsi_io_inquiry(
+		                  device_handle->file_descriptor,
+		                  0x00,
+		                  0x00,
+		                  response,
+		                  255,
+		                  NULL );
+
+		if( response_count > 32 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			notify_dump_data(
+			 response,
+			 response_count );
+#endif
+			result = system_string_trim_copy_from_byte_stream(
+				  device_handle->vendor,
+				  255,
+				  &( response[ 8 ] ),
+				  15 - 8,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set vendor.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result == 0 )
+			{
+				device_handle->vendor[ 0 ] = 0;
+			}
+			result = system_string_trim_copy_from_byte_stream(
+				  device_handle->model,
+				  255,
+				  &( response[ 16 ] ),
+				  31 - 16,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set model.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result == 0 )
+			{
+				device_handle->model[ 0 ] = 0;
+			}
+			device_handle->removable             = ( response[ 1 ] & 0x80 ) >> 7;
+			device_handle->media_information_set = 1;
+		}
+	}
+	if( device_handle->serial_number[ 0 ] == 0 )
+	{
+		response_count = scsi_io_inquiry(
+		                  device_handle->file_descriptor,
+		                  0x01,
+		                  0x80,
+		                  response,
+		                  255,
+		                  NULL );
+
+		if( response_count > 4 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			notify_dump_data(
+			 response,
+			 response_count );
+#endif
+			result = system_string_trim_copy_from_byte_stream(
+				  device_handle->serial_number,
+				  255,
+				  &( response[ 4 ] ),
+				  response_count - 4,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set serial number.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result == 0 )
+			{
+				device_handle->serial_number[ 0 ] = 0;
+			}
+		}
+	}
+#endif
+#endif
+	if( device_handle->media_information_set != 0 )
+	{
 		fprintf(
 		 stderr,
-		 "Serial:\t\t\t%" PRIs_SYSTEM "\n",
-		 device_handle->serial_number );
+		 "Device information:\n" );
+		fprintf(
+		 stderr,
+		 "Vendor:\t\t\t%" PRIs_SYSTEM "\n",
+		 device_handle->vendor );
 		fprintf(
 		 stderr,
 		 "Model:\t\t\t%" PRIs_SYSTEM "\n",
 		 device_handle->model );
 		fprintf(
 		 stderr,
+		 "Serial:\t\t\t%" PRIs_SYSTEM "\n",
+		 device_handle->serial_number );
+		fprintf(
+		 stderr,
 		 "Removable:\t\t%d\n",
-		 ( drive_information.config & 0x0080 ) >> 7 );
+		 device_handle->removable );
 		fprintf(
 		 stderr,
-		 "Device type:\t\t%d\n",
-		 ( drive_information.config & 0x1f00 ) >> 8 );
-		fprintf(
-		 stderr,
-		 "\nFeature sets:\n" );
-		fprintf(
-		 stderr,
-		 "SMART:\t\t\t%d\n",
-		 ( drive_information.command_set_1 & 0x0001 ) );
-		fprintf(
-		 stderr,
-		 "Security Mode:\t\t%d (%d)\n",
-		 ( drive_information.command_set_1 & 0x0002 ) >> 1,
-		 ( drive_information.dlf & 0x0001 ) );
-		fprintf(
-		 stderr,
-		 "Security Mode enabled:\t%d\n",
-		 ( drive_information.dlf & 0x0002 ) >> 1 );
-		fprintf(
-		 stderr,
-		 "Removable Media:\t%d\n",
-		 ( drive_information.command_set_1 & 0x0004 ) >> 2 );
-		fprintf(
-		 stderr,
-		 "HPA:\t\t\t%d\n",
-		 ( drive_information.command_set_1 & 0x0400 ) >> 10 );
-		fprintf(
-		 stderr,
-		 "DCO:\t\t\t%d\n",
-		 ( drive_information.command_set_2 & 0x0800 ) >> 11 );
-		fprintf(
-		 stderr,
-		 "Media serial:\t\t%d\n",
-		 ( drive_information.cfsse & 0x0004 ) >> 2 );
+		 "\n" );
 	}
-#endif
 	return( 1 );
 }
 

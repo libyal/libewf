@@ -29,7 +29,7 @@
 #include <liberror.h>
 
 #if defined( WINAPI )
-#include <winbase.h>
+#include <windows.h>
 #endif
 
 #include "system_string.h"
@@ -43,6 +43,12 @@ enum DEVICE_HANDLE_TYPES
 {
 	DEVICE_HANDLE_TYPE_DEVICE	= (int) 'd',
 	DEVICE_HANDLE_TYPE_FILE		= (int) 'f'
+};
+
+enum DEVICE_TYPES
+{
+	DEVICE_TYPE_HARDDISK		= (int) 'h',
+	DEVICE_TYPE_OPTICAL_DISK	= (int) 'o'
 };
 
 typedef struct device_handle device_handle_t;
@@ -79,13 +85,29 @@ struct device_handle
 	 */
 	uint8_t media_size_set;
 
-	/* The serial number string
+	/* The device type
 	 */
-	system_character_t serial_number[ 21 ];
+	uint8_t device_type;
+
+	/* Value to indicate if the device is removable
+	 */
+	uint8_t removable;
+
+	/* The vendor string
+	 */
+	system_character_t vendor[ 255 ];
 
 	/* The model string
 	 */
-	system_character_t model[ 41 ];
+	system_character_t model[ 255 ];
+
+	/* The serial number string
+	 */
+	system_character_t serial_number[ 255 ];
+
+	/* Value to indicate the media information values were set
+	 */
+	uint8_t media_information_set;
 
 	/* The amount of read error retries
 	 */

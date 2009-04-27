@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090425],
+ [20090426],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090425])
+ [20090426])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -157,6 +157,10 @@ dnl Headers included in ewftools/device_handle.c
 AC_CHECK_HEADERS([cygwin/fs.h])
 AC_CHECK_HEADERS([linux/fs.h])
 AC_CHECK_HEADERS([linux/hdreg.h])
+AC_CHECK_HEADERS([linux/usbdevice_fs.h])
+AC_CHECK_HEADERS([scsi/scsi.h])
+AC_CHECK_HEADERS([scsi/scsi_ioctl.h])
+AC_CHECK_HEADERS([scsi/sg.h])
 AC_CHECK_HEADERS([sys/disk.h])
 AC_CHECK_HEADERS([sys/disklabel.h])
 AC_CHECK_HEADERS([sys/ioctl.h])

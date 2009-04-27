@@ -21,7 +21,9 @@ ewfacquire_SOURCES = \
 	imaging_handle.c imaging_handle.h \
 	md5.h \
 	notify.c notify.h \
+	platform.c platform.h \
 	process_status.c process_status.h \
+	scsi_io.c scsi_io.h \
 	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h \
 	system_string.c system_string.h
