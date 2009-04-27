@@ -1636,13 +1636,13 @@ int verification_handle_additional_hash_values_fprint(
 	char hash_identifier[ VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE ];
 	system_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
 
-	static char *function        = "verification_handle_additional_hash_values_fprint";
-	size_t hash_identifier_size  = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
-	size_t hash_value_size       = VERIFICATION_HANDLE_VALUE_SIZE;
-	uint32_t amount_of_values    = 0;
-	uint32_t hash_value_iterator = 0;
-	uint8_t print_header         = 1;
-	int result                   = 1;
+	static char *function             = "verification_handle_additional_hash_values_fprint";
+	size_t hash_value_identifier_size = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
+	size_t hash_value_size            = VERIFICATION_HANDLE_VALUE_SIZE;
+	uint32_t amount_of_values         = 0;
+	uint32_t hash_value_iterator      = 0;
+	uint8_t print_header              = 1;
+	int result                        = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -1721,14 +1721,28 @@ int verification_handle_additional_hash_values_fprint(
 		if( libewf_handle_get_hash_value_identifier_size(
 		     verification_handle->input_handle,
 		     hash_value_iterator,
-		     &hash_identifier_size,
+		     &hash_value_identifier_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash identifier size for index: %" PRIu32 ".",
+			 "%s: unable to retrieve the hash value identifier size for index: %" PRIu32 ".",
+			 function,
+			 hash_value_iterator );
+
+			result = -1;
+
+			continue;
+		}
+		if( hash_value_identifier_size > VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: hash value identifier size value out of range for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -1740,14 +1754,16 @@ int verification_handle_additional_hash_values_fprint(
 		     verification_handle->input_handle,
 		     hash_value_iterator,
 		     (uint8_t *) hash_identifier,
-		     hash_identifier_size,
+		     hash_value_identifier_size,
 		     error ) != 1 )
 #else
+		hash_value_identifier_size = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
+
 		if( libewf_get_hash_value_identifier(
 		     verification_handle->input_handle,
 		     hash_value_iterator,
 		     hash_identifier,
-		     hash_identifier_size ) != 1 )
+		     hash_value_identifier_size ) != 1 )
 #endif
 		{
 			liberror_error_set(
@@ -1781,7 +1797,7 @@ int verification_handle_additional_hash_values_fprint(
 		if( verification_handle_get_hash_value(
 		     verification_handle,
 		     hash_identifier,
-		     hash_identifier_size - 1,
+		     hash_value_identifier_size - 1,
 		     hash_value,
 		     hash_value_size,
 		     error ) != 1 )

@@ -53,22 +53,6 @@ int libewf_hash_values_initialize(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_identifier(
-	     hash_values,
-	     LIBEWF_HASH_VALUES_INDEX_MD5,
-	     _LIBEWF_STRING( "MD5" ),
-	     3,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set MD5 identifier.",
-		 function );
-
-		return( -1 );
-	}
 	return( 1 );
 }
 

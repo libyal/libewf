@@ -914,7 +914,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: case_number.",
+			 "%s: unable to retrieve header value: case_number.",
 			 function );
 
 			result = -1;
@@ -942,7 +942,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: description.",
+			 "%s: unable to retrieve header value: description.",
 			 function );
 
 			result = -1;
@@ -970,7 +970,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: examiner_name.",
+			 "%s: unable to retrieve header value: examiner_name.",
 			 function );
 
 			result = -1;
@@ -998,7 +998,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: evidence_number.",
+			 "%s: unable to retrieve header value: evidence_number.",
 			 function );
 
 			result = -1;
@@ -1026,7 +1026,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: notes.",
+			 "%s: unable to retrieve header value: notes.",
 			 function );
 
 			result = -1;
@@ -1054,7 +1054,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: acquiry_date.",
+			 "%s: unable to retrieve header value: acquiry_date.",
 			 function );
 
 			result = -1;
@@ -1082,7 +1082,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: system_date.",
+			 "%s: unable to retrieve header value: system_date.",
 			 function );
 
 			result = -1;
@@ -1110,7 +1110,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: acquiry_operating_system.",
+			 "%s: unable to retrieve header value: acquiry_operating_system.",
 			 function );
 
 			result = -1;
@@ -1138,7 +1138,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: acquiry_software_version.",
+			 "%s: unable to retrieve header value: acquiry_software_version.",
 			 function );
 
 			result = -1;
@@ -1172,7 +1172,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: password.",
+			 "%s: unable to retrieve header value: password.",
 			 function );
 
 			result = -1;
@@ -1233,7 +1233,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: compression_type.",
+			 "%s: unable to retrieve header value: compression_type.",
 			 function );
 
 			result = -1;
@@ -1261,7 +1261,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: model.",
+			 "%s: unable to retrieve header value: model.",
 			 function );
 
 			result = -1;
@@ -1289,7 +1289,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: serial_number.",
+			 "%s: unable to retrieve header value: serial_number.",
 			 function );
 
 			result = -1;
@@ -1317,7 +1317,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: process_identifier.",
+			 "%s: unable to retrieve header value: process_identifier.",
 			 function );
 
 			result = -1;
@@ -1346,13 +1346,12 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: unknown_dc.",
+			 "%s: unable to retrieve header value: unknown_dc.",
 			 function );
 
 			result = -1;
 		}
 		/* Extents
-		 * TODO parse the extents and print them nicely formatted
 		 */
 		header_value_result = info_handle_get_header_value(
 		                       info_handle,
@@ -1362,20 +1361,29 @@ int info_handle_header_values_fprint(
 		                       header_value_size,
 		                       error );
 
-		if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tExtents:\t\t%" PRIs_SYSTEM "\n",
-			 header_value );
-		}
-		else if( header_value_result == -1 )
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to header value: extents.",
+			 "%s: unable to retrieve header value: extents.",
+			 function );
+
+			result = -1;
+		}
+		else if( ( header_value_result == 1 )
+		      && ( info_handle_header_value_extents_fprint(
+		            header_value,
+		            header_value_size - 1,
+		            stream,
+		            error ) != 1 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print header value: extents.",
 			 function );
 
 			result = -1;
@@ -1391,6 +1399,38 @@ int info_handle_header_values_fprint(
 			for( header_value_iterator = 16; header_value_iterator < amount_of_values; header_value_iterator++ )
 			{
 #if defined( HAVE_V2_API )
+				if( libewf_handle_get_header_value_identifier_size(
+				     info_handle->input_handle,
+				     header_value_iterator,
+				     &header_value_identifier_size,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve the header identifier size for index: %" PRIu32 ".",
+					 function,
+					 header_value_iterator );
+
+					result = -1;
+
+					continue;
+				}
+				if( header_value_identifier_size > INFO_HANDLE_VALUE_IDENTIFIER_SIZE )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+					 "%s: header identifier size value out of range for index: %" PRIu32 ".",
+					 function,
+					 header_value_iterator );
+
+					result = -1;
+
+					continue;
+				}
 				if( libewf_handle_get_header_value_identifier(
 				     info_handle->input_handle,
 				     header_value_iterator,
@@ -1398,6 +1438,8 @@ int info_handle_header_values_fprint(
 				     header_value_identifier_size,
 				     error ) != 1 )
 #else
+				header_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
+
 				if( libewf_get_header_value_identifier(
 				     info_handle->input_handle,
 				     header_value_iterator,
@@ -1417,6 +1459,10 @@ int info_handle_header_values_fprint(
 
 					continue;
 				}
+#if !defined( HAVE_V2_API )
+				header_value_identifier_size = 1 + narrow_string_length(
+				                                    header_value_identifier );
+#endif
 				header_value_result = info_handle_get_header_value(
 				                       info_handle,
 				                       header_value_identifier,
@@ -1453,6 +1499,96 @@ int info_handle_header_values_fprint(
 	 "\n" );
 
 	return( result );
+}
+
+/* Print the extents header values to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_header_value_extents_fprint(
+     system_character_t *header_value,
+     size_t header_value_length,
+     FILE *stream,
+     liberror_error_t **error )
+{
+	system_character_t **extents_elements = NULL;
+	static char *function                 = "info_handle_header_value_extents_fprint";
+	size_t amount_of_extents_elements     = 0;
+	size_t extents_element_iterator       = 0;
+
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_split(
+	     header_value,
+	     header_value_length,
+	     (system_character_t) ' ',
+	     &extents_elements,
+	     &amount_of_extents_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split header value into elements.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( amount_of_extents_elements % 4 ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported amount of extents elements in header value.",
+		 function );
+
+		system_string_split_values_free(
+		 extents_elements,
+		 amount_of_extents_elements,
+		 NULL );
+
+		return( -1 );
+	}
+	fprintf(
+	 stream,
+	 "\tExtents:\t\t%" PRIs_SYSTEM "\n",
+	 extents_elements[ 0 ] );
+
+	for( extents_element_iterator = 1; extents_element_iterator < amount_of_extents_elements; extents_element_iterator += 4 )
+	{
+		fprintf(
+		 stream,
+		 "\t\t\t\t%" PRIs_SYSTEM " %" PRIs_SYSTEM " %" PRIs_SYSTEM " %" PRIs_SYSTEM "\n",
+		 extents_elements[ extents_element_iterator ],
+		 extents_elements[ extents_element_iterator + 1 ],
+		 extents_elements[ extents_element_iterator + 2 ],
+		 extents_elements[ extents_element_iterator + 3 ] );
+	}
+	if( system_string_split_values_free(
+	     extents_elements,
+	     amount_of_extents_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split date time elements.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Print the media information to a stream
@@ -1965,16 +2101,16 @@ int info_handle_hash_values_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	char hash_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
+	char hash_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
 	system_character_t hash_value[ INFO_HANDLE_VALUE_SIZE ];
 
-	static char *function         = "info_handle_hash_values_fprint";
-	size_t hash_identifier_size   = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
-	size_t hash_value_size        = INFO_HANDLE_VALUE_SIZE;
-	uint32_t amount_of_values     = 0;
-	uint32_t hash_value_iterator  = 0;
-	uint8_t print_header          = 1;
-	int result                    = 1;
+	static char *function             = "info_handle_hash_values_fprint";
+	size_t hash_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
+	size_t hash_value_size            = INFO_HANDLE_VALUE_SIZE;
+	uint32_t amount_of_values         = 0;
+	uint32_t hash_value_iterator      = 0;
+	uint8_t print_header              = 1;
+	int result                        = 1;
 
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
@@ -2136,14 +2272,28 @@ int info_handle_hash_values_fprint(
 		if( libewf_handle_get_hash_value_identifier_size(
 		     info_handle->input_handle,
 		     hash_value_iterator,
-		     &hash_identifier_size,
+		     &hash_value_identifier_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash identifier size for index: %" PRIu32 ".",
+			 "%s: unable to retrieve the hash value identifier size for index: %" PRIu32 ".",
+			 function,
+			 hash_value_iterator );
+
+			result = -1;
+
+			continue;
+		}
+		if( hash_value_identifier_size > INFO_HANDLE_VALUE_IDENTIFIER_SIZE )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: hash value identifier size value out of range for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -2154,22 +2304,24 @@ int info_handle_hash_values_fprint(
 		if( libewf_handle_get_hash_value_identifier(
 		     info_handle->input_handle,
 		     hash_value_iterator,
-		     (uint8_t *) hash_identifier,
-		     hash_identifier_size,
+		     (uint8_t *) hash_value_identifier,
+		     hash_value_identifier_size,
 		     error ) != 1 )
 #else
+		hash_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
+
 		if( libewf_get_hash_value_identifier(
 		     info_handle->input_handle,
 		     hash_value_iterator,
-		     hash_identifier,
-		     hash_identifier_size ) != 1 )
+		     hash_value_identifier,
+		     hash_value_identifier_size ) != 1 )
 #endif
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".",
+			 "%s: unable to retrieve the hash value identifier for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -2178,12 +2330,12 @@ int info_handle_hash_values_fprint(
 			continue;
 		}
 #if !defined( HAVE_V2_API )
-		hash_identifier_size = 1 + narrow_string_length(
-		                            hash_identifier );
+		hash_value_identifier_size = 1 + narrow_string_length(
+		                                  hash_value_identifier );
 #endif
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 		if( narrow_string_compare(
-		     hash_identifier,
+		     hash_value_identifier,
 		     "MD5",
 		     3 ) == 0 )
 		{
@@ -2192,8 +2344,8 @@ int info_handle_hash_values_fprint(
 #endif
 		if( info_handle_get_hash_value(
 		     info_handle,
-		     hash_identifier,
-		     hash_identifier_size - 1,
+		     hash_value_identifier,
+		     hash_value_identifier_size - 1,
 		     hash_value,
 		     hash_value_size,
 		     error ) != 1 )
@@ -2204,7 +2356,7 @@ int info_handle_hash_values_fprint(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the hash value for identifier: %s.",
 			 function,
-			 hash_identifier );
+			 hash_value_identifier );
 
 			result = -1;
 		}
@@ -2221,7 +2373,7 @@ int info_handle_hash_values_fprint(
 			fprintf(
 			 stream,
 			 "\t%s:\t\t\t%" PRIs_SYSTEM "\n",
-			 hash_identifier,
+			 hash_value_identifier,
 			 hash_value );
 		}
 	}

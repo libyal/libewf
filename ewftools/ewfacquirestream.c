@@ -190,7 +190,7 @@ int ewfacquirestream_acquiry_parameters_fprint(
      uint8_t volume_type,
      int8_t compression_level,
      uint8_t compression_flags,
-     uint8_t libewf_format,
+     uint8_t ewf_format,
      size64_t acquiry_size,
      size64_t segment_file_size,
      uint32_t bytes_per_sector,
@@ -226,14 +226,14 @@ int ewfacquirestream_acquiry_parameters_fprint(
 	 "Image path and filename:\t%" PRIs_SYSTEM ".",
 	 filename );
 
-	if( libewf_format == LIBEWF_FORMAT_SMART )
+	if( ewf_format == LIBEWF_FORMAT_SMART )
 	{
 		fprintf(
 		 stream,
 		 "s01\n" );
 	}
-	else if( ( libewf_format == LIBEWF_FORMAT_EWF )
-	      || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
+	else if( ( ewf_format == LIBEWF_FORMAT_EWF )
+	      || ( ewf_format == LIBEWF_FORMAT_EWFX ) )
 	{
 		fprintf(
 		 stream,
@@ -399,73 +399,73 @@ int ewfacquirestream_acquiry_parameters_fprint(
 	 stream,
 	 "EWF file format:\t\t" );
 
-	if( libewf_format == LIBEWF_FORMAT_EWF )
+	if( ewf_format == LIBEWF_FORMAT_EWF )
 	{
 		fprintf(
 		 stream,
 		 "original EWF\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_SMART )
+	else if( ewf_format == LIBEWF_FORMAT_SMART )
 	{
 		fprintf(
 		 stream,
 		 "SMART\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_FTK )
+	else if( ewf_format == LIBEWF_FORMAT_FTK )
 	{
 		fprintf(
 		 stream,
 		 "FTK Imager\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_ENCASE1 )
+	else if( ewf_format == LIBEWF_FORMAT_ENCASE1 )
 	{
 		fprintf(
 		 stream,
 		 "EnCase 1\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_ENCASE2 )
+	else if( ewf_format == LIBEWF_FORMAT_ENCASE2 )
 	{
 		fprintf(
 		 stream,
 		 "EnCase 2\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_ENCASE3 )
+	else if( ewf_format == LIBEWF_FORMAT_ENCASE3 )
 	{
 		fprintf(
 		 stream,
 		 "EnCase 3\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_ENCASE4 )
+	else if( ewf_format == LIBEWF_FORMAT_ENCASE4 )
 	{
 		fprintf(
 		 stream,
 		 "EnCase 4\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_ENCASE5 )
+	else if( ewf_format == LIBEWF_FORMAT_ENCASE5 )
 	{
 		fprintf(
 		 stream,
 		 "EnCase 5\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+	else if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
 	{
 		fprintf(
 		 stream,
 		 "EnCase 6\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_LINEN5 )
+	else if( ewf_format == LIBEWF_FORMAT_LINEN5 )
 	{
 		fprintf(
 		 stream,
 		 "linen 5\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_LINEN6 )
+	else if( ewf_format == LIBEWF_FORMAT_LINEN6 )
 	{
 		fprintf(
 		 stream,
 		 "linen 6\n" );
 	}
-	else if( libewf_format == LIBEWF_FORMAT_EWFX )
+	else if( ewf_format == LIBEWF_FORMAT_EWFX )
 	{
 		fprintf(
 		 stream,
@@ -1230,7 +1230,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                           = 1;
 	uint8_t calculate_sha1                          = 0;
 	uint8_t compression_flags                       = 0;
-	uint8_t libewf_format                           = LIBEWF_FORMAT_ENCASE5;
+	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE5;
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                = 1;
 	uint8_t read_error_retry                        = 2;
@@ -1380,17 +1380,17 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'f':
-				if( ( ewfinput_determine_libewf_format(
+				if( ( ewfinput_determine_ewf_format(
 				       optarg,
-				       &libewf_format ) != 1 )
-				 || ( libewf_format == LIBEWF_FORMAT_EWF )
-				 || ( libewf_format == LIBEWF_FORMAT_SMART ) )
+				       &ewf_format ) != 1 )
+				 || ( ewf_format == LIBEWF_FORMAT_EWF )
+				 || ( ewf_format == LIBEWF_FORMAT_SMART ) )
 				{
 					fprintf(
 					 stderr,
 					 "Unsupported EWF file format type defaulting to: encase5.\n" );
 
-					libewf_format = LIBEWF_FORMAT_ENCASE5;
+					ewf_format = LIBEWF_FORMAT_ENCASE5;
 				}
 				break;
 
@@ -1492,9 +1492,9 @@ int main( int argc, char * const argv[] )
 				}
 				if( ( result != 1 )
 				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+				 || ( ( ewf_format == LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
+				 || ( ( ewf_format != LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 				{
 					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
@@ -1762,7 +1762,7 @@ int main( int argc, char * const argv[] )
 		     volume_type,
 		     compression_level,
 		     compression_flags,
-		     libewf_format,
+		     ewf_format,
 		     (size64_t) acquiry_size,
 		     (size64_t) segment_file_size,
 		     bytes_per_sector,
@@ -1839,7 +1839,7 @@ int main( int argc, char * const argv[] )
 		          volume_type,
 		          compression_level,
 		          compression_flags,
-		          libewf_format,
+		          ewf_format,
 		          segment_file_size,
 		          sectors_per_chunk,
 		          sector_error_granularity,

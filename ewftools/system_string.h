@@ -205,6 +205,19 @@ int utf8_string_copy_from_system_string(
      size_t string_size,
      liberror_error_t **error );
 
+int system_string_split(
+     system_character_t *string,
+     size_t string_size,
+     system_character_t delimiter,
+     system_character_t ***split_values,
+     size_t *amount_of_split_values,
+     liberror_error_t **error );
+
+int system_string_split_values_free(
+     system_character_t **split_values,
+     size_t amount_of_split_values,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

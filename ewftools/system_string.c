@@ -857,3 +857,304 @@ int utf8_string_copy_from_system_string(
 	return( 1 );
 }
 
+/* Split a string into elements using a delimiter character
+ * Returns 1 if successful or -1 on error
+ */
+int system_string_split(
+     system_character_t *string,
+     size_t string_size,
+     system_character_t delimiter,
+     system_character_t ***split_values,
+     size_t *amount_of_split_values,
+     liberror_error_t **error )
+{
+	system_character_t *split_value_start = NULL;
+	system_character_t *split_value_end   = NULL;
+	system_character_t *string_end        = NULL;
+	static char *function                 = "system_string_split";
+	size_t remaining_string_size          = 0;
+	size_t split_value_iterator           = 0;
+	ssize_t split_value_size              = 0;
+
+	if( string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( split_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid split values.",
+		 function );
+
+		return( -1 );
+	}
+	if( *split_values != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: split values already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_split_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of split values.",
+		 function );
+
+		return( -1 );
+	}
+	/* Include the last character if not the end of string character
+	 */
+	if( string[ string_size - 1 ] != 0 )
+	{
+		string_size += 1;
+	}
+	/* Do not bother with empty strings
+	 */
+	if( ( string_size == 0 )
+	 || ( string[ 0 ] == 0 ) )
+	{
+		*split_values           = NULL;
+		*amount_of_split_values = 0;
+
+		return( 1 );
+	}
+	/* Determine the amount of split values
+	 */
+	remaining_string_size = string_size;
+	split_value_start     = string;
+	split_value_end       = string;
+	string_end            = &string[ string_size - 1 ];
+
+	do
+	{
+		split_value_end = system_string_search(
+		                   split_value_start,
+		                   delimiter,
+		                   remaining_string_size );
+
+		if( split_value_end > string_end )
+		{
+			break;
+		}
+		split_value_iterator++;
+
+		if( split_value_end == NULL )
+		{
+			break;
+		}
+		/* Include delimiter character
+		 */
+		remaining_string_size -= (size_t) ( split_value_end - split_value_start ) + 1;
+
+		if( split_value_end == split_value_start )
+		{
+			split_value_start += 1;
+		}
+		else if( split_value_end != string )
+		{
+			split_value_start = split_value_end + 1;
+		}
+	}
+	while( split_value_end != NULL );
+
+	*amount_of_split_values = split_value_iterator;
+
+	if( *amount_of_split_values == 0 )
+	{
+		*split_values = NULL;
+
+		return( 1 );
+	}
+	*split_values = (system_character_t **) memory_allocate(
+	                                         ( sizeof( system_character_t * ) * *amount_of_split_values ) );
+
+	if( *split_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: unable to create split values.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     *split_values,
+	     0,
+	     sizeof( system_character_t * ) * *amount_of_split_values ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: unable to clear split values.",
+		 function );
+
+		memory_free(
+		 *split_values );
+
+		*split_values = NULL;
+
+		return( -1 );
+	}
+	/* Determine the split values
+	 */
+	remaining_string_size = string_size;
+	split_value_start     = string;
+	split_value_end       = string;
+
+	/* Empty values are stored as strings only containing the end of character
+	 */
+	for( split_value_iterator = 0; split_value_iterator < *amount_of_split_values; split_value_iterator++ )
+	{
+		if( split_value_end != string )
+		{
+			split_value_start = split_value_end + 1;
+		}
+		split_value_end = system_string_search(
+		                   split_value_start,
+		                   delimiter,
+		                   remaining_string_size );
+
+		/* Check for last value
+		 */
+		if( split_value_end == NULL )
+		{
+			split_value_size = (ssize_t) ( string_end - split_value_start );
+		}
+		else
+		{
+			split_value_size = (ssize_t) ( split_value_end - split_value_start );
+		}
+		if( split_value_size >= 0 )
+		{
+			/* Add 1 additional byte required for the end of string character
+			 */
+			split_value_size += 1;
+
+			( *split_values )[ split_value_iterator ] = (system_character_t *) memory_allocate(
+										            sizeof( system_character_t ) * split_value_size );
+
+			if( ( *split_values )[ split_value_iterator ] == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: unable to create split value: %" PRIzd ".",
+				 function,
+				 split_value_iterator );
+
+				system_string_split_values_free(
+				 *split_values,
+				 ( split_value_iterator - 1 ),
+				 NULL );
+
+				*split_values = NULL;
+
+				return( -1 );
+			}
+			if( system_string_copy(
+			     ( *split_values )[ split_value_iterator ],
+			     split_value_start,
+			     split_value_size ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: unable to set split value: %" PRIzd ".",
+				 function,
+				 split_value_iterator );
+
+				system_string_split_values_free(
+				 *split_values,
+				 split_value_iterator,
+				 NULL );
+
+				*split_values = NULL;
+
+				return( -1 );
+			}
+			( *split_values )[ split_value_iterator ][ split_value_size - 1 ] = 0;
+		}
+		/* Include delimiter character
+		 */
+		remaining_string_size -= (size_t) ( split_value_end - split_value_start ) + 1;
+
+		/* Correct if first value is empty
+		 */
+		if( split_value_end == string )
+		{
+			split_value_start += 1;
+		}
+	}
+	return( 1 );
+}
+
+/* Clears a split values array
+ * Returns 1 if successful or -1 on error
+ */
+int system_string_split_values_free(
+     system_character_t **split_values,
+     size_t amount_of_split_values,
+     liberror_error_t **error )
+{
+	static char *function       = "system_string_split_values_free";
+	size_t split_value_iterator = 0;
+
+	if( split_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid split values array.",
+		 function );
+
+		return( -1 );
+	}
+	for( split_value_iterator = 0; split_value_iterator < amount_of_split_values; split_value_iterator++ )
+	{
+		if( split_values[ split_value_iterator ] != NULL )
+		{
+			memory_free(
+			 split_values[ split_value_iterator ] );
+		}
+	}
+	memory_free(
+	 split_values );
+
+	return( 1 );
+}
+

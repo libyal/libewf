@@ -99,11 +99,11 @@ system_character_t *ewfinput_yes_no[ 2 ] = \
 /* Determines the EWF format from an argument string
  * Returns 1 if successful or -1 on error
  */
-int ewfinput_determine_libewf_format(
+int ewfinput_determine_ewf_format(
      const system_character_t *argument,
-     uint8_t *libewf_format )
+     uint8_t *ewf_format )
 {
-	static char *function = "ewfinput_determine_libewf_format";
+	static char *function = "ewfinput_determine_ewf_format";
 	int result            = -1;
 
 	if( argument == NULL )
@@ -113,7 +113,7 @@ int ewfinput_determine_libewf_format(
 
 		return( -1 );
 	}
-	if( libewf_format == NULL )
+	if( ewf_format == NULL )
 	{
 		notify_warning_printf( "%s: invalid libewf format.\n",
 		 function );
@@ -125,7 +125,7 @@ int ewfinput_determine_libewf_format(
 	     _SYSTEM_CHARACTER_T_STRING( "smart" ),
 	     5 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_SMART;
+		*ewf_format = LIBEWF_FORMAT_SMART;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -133,7 +133,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "ftk" ),
 	          3 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_FTK;
+		*ewf_format = LIBEWF_FORMAT_FTK;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -141,7 +141,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "encase1" ),
 	          7 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE1;
+		*ewf_format = LIBEWF_FORMAT_ENCASE1;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -149,7 +149,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "encase2" ),
 	          7 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE2;
+		*ewf_format = LIBEWF_FORMAT_ENCASE2;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -157,7 +157,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "encase3" ),
 	          7 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE3;
+		*ewf_format = LIBEWF_FORMAT_ENCASE3;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -165,7 +165,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "encase4" ),
 	          7 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE4;
+		*ewf_format = LIBEWF_FORMAT_ENCASE4;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -173,7 +173,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "encase5" ),
 	          7 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE5;
+		*ewf_format = LIBEWF_FORMAT_ENCASE5;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -181,7 +181,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "encase6" ),
 	          7 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE6;
+		*ewf_format = LIBEWF_FORMAT_ENCASE6;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -189,7 +189,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "linen5" ),
 	          6 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_LINEN5;
+		*ewf_format = LIBEWF_FORMAT_LINEN5;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -197,7 +197,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "linen6" ),
 	          6 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_LINEN6;
+		*ewf_format = LIBEWF_FORMAT_LINEN6;
 		result         = 1;
 	}
 	/* This check must before the check for "ewf"
@@ -207,7 +207,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "ewfx" ),
 	          4 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_EWFX;
+		*ewf_format = LIBEWF_FORMAT_EWFX;
 		result         = 1;
 	}
 	else if( system_string_compare(
@@ -215,7 +215,7 @@ int ewfinput_determine_libewf_format(
 	          _SYSTEM_CHARACTER_T_STRING( "ewf" ),
 	          3 ) == 0 )
 	{
-		*libewf_format = LIBEWF_FORMAT_EWF;
+		*ewf_format = LIBEWF_FORMAT_EWF;
 		result         = 1;
 	}
 	return( result );

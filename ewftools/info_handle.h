@@ -103,6 +103,12 @@ int info_handle_header_values_fprint(
      FILE *stream,
      liberror_error_t **error );
 
+int info_handle_header_value_extents_fprint(
+     system_character_t *header_value,
+     size_t header_value_length,
+     FILE *stream,
+     liberror_error_t **error );
+
 int info_handle_media_information_fprint(
      info_handle_t *info_handle,
      FILE *stream,

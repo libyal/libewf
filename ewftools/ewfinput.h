@@ -56,9 +56,9 @@ extern system_character_t *ewfinput_volume_types[ 2 ];
 extern system_character_t *ewfinput_sector_per_block_sizes[ 10 ];
 extern system_character_t *ewfinput_yes_no[ 2 ];
 
-int ewfinput_determine_libewf_format(
+int ewfinput_determine_ewf_format(
      const system_character_t *argument,
-     uint8_t *libewf_format );
+     uint8_t *ewf_format );
 
 int ewfinput_determine_sectors_per_chunk(
      const system_character_t *argument,

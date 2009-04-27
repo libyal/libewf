@@ -647,7 +647,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1                          = 0;
 	uint8_t compression_flags                       = 0;
 	uint8_t export_handle_output_format             = 0;
-	uint8_t libewf_format                           = LIBEWF_FORMAT_ENCASE5;
+	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE5;
 	uint8_t print_status_information                = 1;
 	uint8_t swap_byte_pairs                         = 0;
 	uint8_t wipe_chunk_on_error                     = 0;
@@ -834,9 +834,9 @@ int main( int argc, char * const argv[] )
 					output_raw          = 1;
 					argument_set_format = 1;
 				}
-				else if( ewfinput_determine_libewf_format(
+				else if( ewfinput_determine_ewf_format(
 				          optarg,
-				          &libewf_format ) != 1 )
+				          &ewf_format ) != 1 )
 				{
 					fprintf(
 					 stderr,
@@ -942,9 +942,9 @@ int main( int argc, char * const argv[] )
 
 				if( ( result != 1 )
 				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+				 || ( ( ewf_format == LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
+				 || ( ( ewf_format != LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 				{
 					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
@@ -1295,9 +1295,9 @@ int main( int argc, char * const argv[] )
 			{
 				output_raw = 1;
 			}
-			else if( ewfinput_determine_libewf_format(
+			else if( ewfinput_determine_ewf_format(
 			          fixed_string_variable,
-			          &libewf_format ) != 1 )
+			          &ewf_format ) != 1 )
 			{
 				fprintf(
 				 stderr,
@@ -1365,7 +1365,7 @@ int main( int argc, char * const argv[] )
 			 */
 			if( argument_set_segment_file_size == 0 )
 			{
-				if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+				if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
 				{
 					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
 				}
@@ -1713,7 +1713,7 @@ int main( int argc, char * const argv[] )
 		     export_size,
 		     compression_level,
 		     compression_flags,
-		     libewf_format,
+		     ewf_format,
 		     segment_file_size,
 		     sectors_per_chunk,
 		     wipe_chunk_on_error,

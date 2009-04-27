@@ -28,7 +28,6 @@ Features
 * tools and library support read/write of EnCase 6.12 SHA1
 * implement low memory usage option
   - trade off IO versus memory use
-  - for write only offset table is not needed etc.
 * resume write support for ENCASE1/SMART table sections
 
 Recovery and analysis:
@@ -58,12 +57,10 @@ Possible performance improvements:
   - read/write block size seems to have little effect for dd on average
 * reduce alloc, realloc and free (this reduces breaks) use strace to analyze
   - pass values as parameters or use of handle
-* what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
+  - what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
 * optimize empty block test
 * optimize string functions
   - pass length/size as much as possible
-* reduce amount of write by aligining chunk data and CRC
-  - requires rewrite of some functions, CRC should be passed as buffer
 
 Error handling/tollerance
 * what about a function that translates error into an equivalent errno?
@@ -101,6 +98,7 @@ API changes
 
 ewftools:
 * add getoptlong support
+* implement CRC buffer alignment for chunk write functions
 * log handle
   - implement libpff log handle
 * liberror
@@ -142,7 +140,6 @@ ewftools:
   - handle different input and ouput chunk sizes in low level functions build
   - allow different input and output header codepages?
 * ewfinfo
-  - format extents header value in more table like manner
 * ewfverify
 * ewfdebug
   - create a tool to analyse a single segment file
@@ -150,7 +147,6 @@ ewftools:
 * ewfrecover
   - create a tool recover ewf files
 * ewfinput
-  - rename ewfinput_determine_libewf_format to ewfinput_determine_ewf_format
 * export handle
   - move input handle initialize to export_handle_open_input function ?
   - used storage_media_buffer_get_data in byte swap function
@@ -185,10 +181,6 @@ Testing
 Windows build
 * windows port
   - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
-  - reduce _s function to pre MVC 2005 variants provides for wider support
-    (no, alternative is to use native winapi functions instead of posix like functions)
-  - improve globbing support
-    (no. not necessary at the moment)
 
 * locale support
   - print output convert to system string
@@ -213,12 +205,15 @@ Work in progress:
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
-* windows acquiry of 40GB disk
+* check windows acquiry of 40GB disk
 
 Version: 20090425
 * worked on libbfio exists handle function update
 * updated libbfio
 * worked on GUID support for windows build
+* extents header value is now formatted in more table like manner
+* fixed hash value identifier size issue in info and verification handle
+* rename libewf_format to ewf_format in ewftools
 
 Version: 20090424
 * updated libbfio - exist handle function update
