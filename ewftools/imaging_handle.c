@@ -1332,7 +1332,7 @@ int imaging_handle_get_output_values(
      uint32_t *bytes_per_sector,
      size64_t *media_size,
      uint8_t *media_type,
-     uint8_t *volume_type,
+     uint8_t *media_flags,
      int8_t *compression_level,
      uint8_t *compression_flags,
      uint8_t *libewf_format,
@@ -1540,21 +1540,21 @@ int imaging_handle_get_output_values(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_handle_get_volume_type(
+	if( libewf_handle_get_media_flags(
 	     imaging_handle->output_handle,
-	     volume_type,
+	     media_flags,
 	     error ) != 1 )
 #else
-	if( libewf_get_volume_type(
+	if( libewf_get_media_flags(
 	     imaging_handle->output_handle,
-	     volume_type ) != 1 )
+	     media_flags ) != 1 )
 #endif
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve volume type.",
+		 "%s: unable to retrieve media flags.",
 		 function );
 
 		return( -1 );
@@ -1689,7 +1689,7 @@ int imaging_handle_set_output_values(
      uint32_t bytes_per_sector,
      size64_t media_size,
      uint8_t media_type,
-     uint8_t volume_type,
+     uint8_t media_flags,
      int8_t compression_level,
      uint8_t compression_flags,
      uint8_t libewf_format,
@@ -1962,21 +1962,21 @@ int imaging_handle_set_output_values(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_handle_set_volume_type(
+	if( libewf_handle_set_media_flags(
 	     imaging_handle->output_handle,
-	     volume_type,
+	     media_flags,
 	     error ) != 1 )
 #else
-	if( libewf_set_volume_type(
+	if( libewf_set_media_flags(
 	     imaging_handle->output_handle,
-	     volume_type ) != 1 )
+	     media_flags ) != 1 )
 #endif
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set volume type.",
+		 "%s: unable to set media flags.",
 		 function );
 
 		return( -1 );

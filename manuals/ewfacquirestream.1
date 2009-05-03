@@ -1,4 +1,4 @@
-.Dd April 4, 2009
+.Dd May 1, 2009
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -17,7 +17,7 @@
 .Op Fl f Ar format
 .Op Fl l Ar log_filename
 .Op Fl m Ar media_type
-.Op Fl M Ar volume_type
+.Op Fl M Ar media_flags
 .Op Fl N Ar notes
 .Op Fl p Ar process_buffer_size
 .Op Fl S Ar segment_file_size
@@ -70,8 +70,8 @@ shows this help
 logs acquiry errors and the digest (hash) to the log filename
 .It Fl m Ar media_type
 the media type, options: fixed (default), removable, optical, memory
-.It Fl M Ar volume_type
-the volume type, options: logical, physical (default)
+.It Fl M Ar media_flags
+the media flags, options: logical, physical (default)
 .It Fl N Ar notes
 the notes (default is notes)
 .It Fl p Ar process_buffer_size

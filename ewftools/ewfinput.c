@@ -76,7 +76,7 @@ system_character_t *ewfinput_media_types[ 4 ] = \
    _SYSTEM_CHARACTER_T_STRING( "optical" ),
    _SYSTEM_CHARACTER_T_STRING( "memory" ) };
 
-system_character_t *ewfinput_volume_types[ 2 ] = \
+system_character_t *ewfinput_media_flags[ 2 ] = \
  { _SYSTEM_CHARACTER_T_STRING( "logical" ),
    _SYSTEM_CHARACTER_T_STRING( "physical" ) };
 
@@ -467,14 +467,14 @@ int ewfinput_determine_media_type(
 	return( result );
 }
 
-/* Determines the volume type value from an argument string
+/* Determines the media flags value from an argument string
  * Returns 1 if successful or -1 on error
  */
-int ewfinput_determine_volume_type(
+int ewfinput_determine_media_flags(
      const system_character_t *argument,
-     uint8_t *volume_type )
+     uint8_t *media_flags )
 {
-	static char *function = "ewfinput_determine_volume_type";
+	static char *function = "ewfinput_determine_media_flags";
 	int result            = -1;
 
 	if( argument == NULL )
@@ -484,9 +484,9 @@ int ewfinput_determine_volume_type(
 
 		return( -1 );
 	}
-	if( volume_type == NULL )
+	if( media_flags == NULL )
 	{
-		notify_warning_printf( "%s: invalid volume type.\n",
+		notify_warning_printf( "%s: invalid media flags.\n",
 		 function );
 
 		return( -1 );
@@ -496,16 +496,32 @@ int ewfinput_determine_volume_type(
 	     _SYSTEM_CHARACTER_T_STRING( "logical" ),
 	     7 ) == 0 )
 	{
-		*volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
-		result       = 1;
+		*media_flags &= ~LIBEWF_MEDIA_FLAG_PHYSICAL;
+		result        = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "physical" ),
 	          8 ) == 0 )
 	{
-		*volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
-		result       = 1;
+		*media_flags |= LIBEWF_MEDIA_FLAG_PHYSICAL;
+		result        = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "fastbloc" ),
+	          8 ) == 0 )
+	{
+		*media_flags |= LIBEWF_MEDIA_FLAG_FASTBLOC;
+		result        = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "tableau" ),
+	          8 ) == 0 )
+	{
+		*media_flags |= LIBEWF_MEDIA_FLAG_TABLEAU;
+		result        = 1;
 	}
 	return( result );
 }

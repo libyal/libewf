@@ -1647,6 +1647,38 @@ int libewf_get_media_flags(
 	return( 1 );
 }
 
+/* Sets the media flags
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_media_flags(
+     libewf_handle_t *handle,
+     uint8_t media_flags )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "libewf_set_media_flags";
+
+	if( libewf_handle_set_media_flags(
+	     handle,
+	     media_flags,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to set the media flags.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the volume type value
  * Returns 1 if successful or -1 on error
  */

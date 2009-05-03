@@ -121,7 +121,7 @@ void usage_fprint(
 	                 "                  [ -c compression_type ] [ -C case_number ] [ -d digest_type ]\n"
 	                 "                  [ -D description ] [ -e examiner_name ] [ -E evidence_number ]\n"
 	                 "                  [ -f format ] [ -g amount_of_sectors ] [ -l log_filename ]\n"
-	                 "                  [ -m media_type ] [ -M volume_type ] [ -N notes ] [ -o offset ]\n"
+	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ] [ -o offset ]\n"
 	                 "                  [ -p process_buffer_size ] [ -P bytes_per_sector ]\n"
 	                 "                  [ -r read_error_retries ] [ -S segment_file_size ]\n"
 	                 "                  [ -t target ] [ -hqRsuvVw ] source\n\n" );
@@ -149,7 +149,7 @@ void usage_fprint(
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m:     specify the media type, options: fixed (default), removable, optical, memory\n" );
-	fprintf( stream, "\t-M:     specify the volume type, options: logical, physical (default)\n" );
+	fprintf( stream, "\t-M:     specify the media flags, options: logical, physical (default)\n" );
 	fprintf( stream, "\t-N:     specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-o:     specify the offset to start to acquire (default is 0)\n" );
 	fprintf( stream, "\t-p:     specify the process buffer size (default is the chunk size)\n" );
@@ -204,7 +204,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         system_character_t *examiner_name,
         system_character_t *notes,
         uint8_t media_type,
-        uint8_t volume_type,
+        uint8_t media_flags,
         int8_t compression_level,
         uint8_t compression_flags,
         uint8_t ewf_format,
@@ -378,19 +378,19 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	}
 	fprintf(
 	 stream,
-	 "Volume type:\t\t\t" );
+	 "Is physical:\t\t\t" );
 
-	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
+	if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) == LIBEWF_MEDIA_FLAG_PHYSICAL )
 	{
 		fprintf(
 		 stream,
-		 "logical\n" );
+		 "yes\n" );
 	}
-	else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
+	else
 	{
 		fprintf(
 		 stream,
-		 "physical\n" );
+		 "no\n" );
 	}
 	fprintf(
 	 stream,
@@ -1701,13 +1701,13 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1                          = 0;
 	uint8_t compression_flags                       = 0;
 	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE5;
+	uint8_t media_flags                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                = 1;
 	uint8_t read_error_retry                        = 2;
 	uint8_t resume_acquiry                          = 0;
 	uint8_t swap_byte_pairs                         = 0;
 	uint8_t verbose                                 = 0;
-	uint8_t volume_type                             = LIBEWF_VOLUME_TYPE_LOGICAL;
 	uint8_t wipe_block_on_read_error                = 0;
 	int8_t acquiry_parameters_confirmed             = 0;
 	int8_t compression_level                        = LIBEWF_COMPRESSION_NONE;
@@ -1721,9 +1721,9 @@ int main( int argc, char * const argv[] )
 	int argument_set_sectors_per_chunk              = 0;
 	int argument_set_segment_file_size              = 0;
 	int argument_set_size                           = 0;
-	int argument_set_volume_type                    = 0;
+	int argument_set_media_flags                    = 0;
 	int argument_set_wipe_block_on_read_error       = 0;
-	int default_volume_type                         = 0;
+	int default_media_flags                         = 0;
 	int error_abort                                 = 0;
 	int header_codepage                             = LIBEWF_CODEPAGE_ASCII;
 	int interactive_mode                            = 1;
@@ -1944,19 +1944,19 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'M':
-				if( ewfinput_determine_volume_type(
+				if( ewfinput_determine_media_flags(
 				     optarg,
-				     &volume_type ) != 1 )
+				     &media_flags ) != 1 )
 				{
 					fprintf(
 					 stderr,
-					 "Unsupported volume type defaulting to: physical.\n" );
+					 "Unsupported media flags defaulting to: physical.\n" );
 
-					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
 				else
 				{
-					argument_set_volume_type = 1;
+					argument_set_media_flags = 1;
 				}
 				break;
 
@@ -2769,7 +2769,7 @@ int main( int argc, char * const argv[] )
 			     &bytes_per_sector,
 			     &acquiry_size,
 			     &media_type,
-			     &volume_type,
+			     &media_flags,
 			     &compression_level,
 			     &compression_flags,
 			     &ewf_format,
@@ -2925,42 +2925,42 @@ int main( int argc, char * const argv[] )
 					media_type = LIBEWF_MEDIA_TYPE_FIXED;
 				}
 			}
-			/* Volume type
+			/* Media flags
 			 */
-			if( argument_set_volume_type == 0 )
+			if( argument_set_media_flags == 0 )
 			{
-				default_volume_type = EWFINPUT_VOLUME_TYPES_DEFAULT;
+				default_media_flags = EWFINPUT_MEDIA_FLAGS_DEFAULT;
 
 				if( ( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
 				 || ( media_type == LIBEWF_MEDIA_TYPE_OPTICAL ) )
 				{
-					default_volume_type = 0;
+					default_media_flags = 0;
 				}
 				if( ewfinput_get_fixed_string_variable(
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Volume type" ),
-				     ewfinput_volume_types,
-				     EWFINPUT_VOLUME_TYPES_AMOUNT,
-				     (uint8_t) default_volume_type,
+				     _SYSTEM_CHARACTER_T_STRING( "Media characteristics" ),
+				     ewfinput_media_flags,
+				     EWFINPUT_MEDIA_FLAGS_AMOUNT,
+				     (uint8_t) default_media_flags,
 				     &fixed_string_variable ) == -1 )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to determine volume type defaulting to: physical.\n" );
+					 "Unable to determine media flags defaulting to: physical.\n" );
 
-					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
-				else if( ewfinput_determine_volume_type(
+				else if( ewfinput_determine_media_flags(
 					  fixed_string_variable,
-					  &volume_type ) != 1 )
+					  &media_flags ) != 1 )
 				{
 					fprintf(
 					 stdout,
-					 "Unsupported volume type defaulting to: physical.\n" );
+					 "Unsupported media flags defaulting to: physical.\n" );
 
-					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
 			}
 			/* Compression
@@ -3271,7 +3271,7 @@ int main( int argc, char * const argv[] )
 		                                examiner_name,
 		                                notes,
 		                                media_type,
-		                                volume_type,
+		                                media_flags,
 		                                compression_level,
 		                                compression_flags,
 		                                ewf_format,
@@ -3309,7 +3309,7 @@ int main( int argc, char * const argv[] )
 			argument_set_sectors_per_chunk        = 0;
 			argument_set_segment_file_size        = 0;
 			argument_set_size                     = 0;
-			argument_set_volume_type              = 0;
+			argument_set_media_flags              = 0;
 			argument_set_wipe_block_on_read_error = 0;
 
 			if( resume_acquiry != 0 )
@@ -3404,7 +3404,7 @@ int main( int argc, char * const argv[] )
 				  bytes_per_sector,
 				  acquiry_size,
 				  media_type,
-				  volume_type,
+				  media_flags,
 				  compression_level,
 				  compression_flags,
 				  ewf_format,

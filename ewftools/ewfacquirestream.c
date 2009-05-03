@@ -119,7 +119,7 @@ void usage_fprint(
 	                 "                        [ -d digest_type ] [ -D description ]\n"
 	                 "                        [ -e examiner_name ] [ -E evidence_number ]\n"
 	                 "                        [ -f format ] [ -l log_filename ] [ -m media_type ]\n"
-	                 "                        [ -M volume_type ] [ -N notes ]\n"
+	                 "                        [ -M media_flags ] [ -N notes ]\n"
 	                 "                        [ -p process_buffer_size ] [ -S segment_file_size ]\n"
 	                 "                        [ -t target ] [ -hqsvVw ]\n\n" );
 
@@ -142,7 +142,7 @@ void usage_fprint(
 	fprintf( stream, "\t-h: shows this help\n" );
 	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable, optical, memory\n" );
-	fprintf( stream, "\t-M: specify the volume type, options: logical, physical (default)\n" );
+	fprintf( stream, "\t-M: specify the media flags, options: logical, physical (default)\n" );
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-p: specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q: quiet shows no status information\n" );
@@ -187,7 +187,7 @@ int ewfacquirestream_acquiry_parameters_fprint(
      system_character_t *examiner_name,
      system_character_t *notes,
      uint8_t media_type,
-     uint8_t volume_type,
+     uint8_t media_flags,
      int8_t compression_level,
      uint8_t compression_flags,
      uint8_t ewf_format,
@@ -350,19 +350,19 @@ int ewfacquirestream_acquiry_parameters_fprint(
 	}
 	fprintf(
 	 stream,
-	 "Volume type:\t\t\t" );
+	 "Is physical:\t\t\t" );
 
-	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
+	if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) == LIBEWF_MEDIA_FLAG_PHYSICAL )
 	{
 		fprintf(
 		 stream,
-		 "logical\n" );
+		 "yes\n" );
 	}
-	else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
+	else
 	{
 		fprintf(
 		 stream,
-		 "physical\n" );
+		 "no\n" );
 	}
 	fprintf(
 	 stream,
@@ -1231,13 +1231,13 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1                          = 0;
 	uint8_t compression_flags                       = 0;
 	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE5;
+	uint8_t media_flags                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                = 1;
 	uint8_t read_error_retry                        = 2;
 	uint8_t resume_acquiry                          = 0;
 	uint8_t swap_byte_pairs                         = 0;
 	uint8_t verbose                                 = 0;
-	uint8_t volume_type                             = LIBEWF_VOLUME_TYPE_PHYSICAL;
 	uint8_t wipe_block_on_read_error                = 0;
 	int error_abort                                 = 0;
 	int header_codepage                             = LIBEWF_CODEPAGE_ASCII;
@@ -1419,15 +1419,15 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'M':
-				if( ewfinput_determine_volume_type(
+				if( ewfinput_determine_media_flags(
 				     optarg,
-				     &volume_type ) != 1 )
+				     &media_flags ) != 1 )
 				{
 					fprintf(
 					 stderr,
-					 "Unsupported volume type defaulting to: physical.\n" );
+					 "Unsupported media flags defaulting to: physical.\n" );
 
-					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
 				break;
 
@@ -1759,7 +1759,7 @@ int main( int argc, char * const argv[] )
 		     examiner_name,
 		     notes,
 		     media_type,
-		     volume_type,
+		     media_flags,
 		     compression_level,
 		     compression_flags,
 		     ewf_format,
@@ -1836,7 +1836,7 @@ int main( int argc, char * const argv[] )
 		          bytes_per_sector,
 		          acquiry_size,
 		          media_type,
-		          volume_type,
+		          media_flags,
 		          compression_level,
 		          compression_flags,
 		          ewf_format,

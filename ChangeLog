@@ -18,8 +18,8 @@ Roadmap:
   - check for race conditions especially on change of data elements
 
 Further analysis of the EWF format:
-* unknowns in volume/disk section
 * password hash
+* unknowns in volume/disk section
 * 16 bytes in hash section (EWF-E01)
 * values in EnCase5/6 header2 (+/-)
 * values in ltree strings (EWF-L01 LVF)
@@ -163,7 +163,6 @@ ewftools:
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
   virtualisation could be part of the problem
-* The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
 * check chunk size for > 2 GiB table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
@@ -210,14 +209,14 @@ Work in progress:
   - force set header value to require string formatted in the date format ?
 * check TODO
 * check windows acquiry of 40 GB disk
-* remove volume type from ewftools
-  - update test scripts
 * limit ENCASE1/SMART format to max 2 TiB media size?
 * ewfacquire warn if media does not fit using chunk size or APIv1
   a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
 
 Version: 20090501
 * implemented 64-bit sector support for add crc and acquiry error and sessions in APIv2
+* worked on refactoring volume type into media flags in ewftools
+* added set media flags function to APIv1
 
 Version: 20090429
 * update for new findings regarding volume/data section

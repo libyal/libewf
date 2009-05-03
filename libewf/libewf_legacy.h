@@ -252,6 +252,10 @@ LIBEWF_EXTERN int libewf_get_media_flags(
                    libewf_handle_t *handle,
                    uint8_t *media_flags );
 
+LIBEWF_EXTERN int libewf_set_media_flags(
+                   libewf_handle_t *handle,
+                   uint8_t media_flags );
+
 LIBEWF_EXTERN int libewf_get_volume_type(
                    libewf_handle_t *handle,
                    uint8_t *volume_type );

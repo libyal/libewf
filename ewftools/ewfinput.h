@@ -43,8 +43,8 @@ extern "C" {
 #define EWFINPUT_MEDIA_TYPES_AMOUNT			4
 #define EWFINPUT_MEDIA_TYPES_DEFAULT			0
 
-#define EWFINPUT_VOLUME_TYPES_AMOUNT			2
-#define EWFINPUT_VOLUME_TYPES_DEFAULT			1
+#define EWFINPUT_MEDIA_FLAGS_AMOUNT			2
+#define EWFINPUT_MEDIA_FLAGS_DEFAULT			1
 
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		0
@@ -52,7 +52,7 @@ extern "C" {
 extern system_character_t *ewfinput_compression_levels[ 4 ];
 extern system_character_t *ewfinput_format_types[ 12 ];
 extern system_character_t *ewfinput_media_types[ 4 ];
-extern system_character_t *ewfinput_volume_types[ 2 ];
+extern system_character_t *ewfinput_media_flags[ 2 ];
 extern system_character_t *ewfinput_sector_per_block_sizes[ 10 ];
 extern system_character_t *ewfinput_yes_no[ 2 ];
 
@@ -73,9 +73,9 @@ int ewfinput_determine_media_type(
      const system_character_t *argument,
      uint8_t *media_type );
 
-int ewfinput_determine_volume_type(
+int ewfinput_determine_media_flags(
      const system_character_t *argument,
-     uint8_t *volume_type );
+     uint8_t *media_flags );
 
 int ewfinput_determine_header_codepage(
      const system_character_t *argument,

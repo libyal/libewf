@@ -57,6 +57,8 @@ i.e. CFLAGS=-DLIBEWF_DLL_IMPORT
 When the libewf DLL was build with Microsoft Visual Studio
 you'll need the zlib DLL. To run the executables on other platforms
 than the build platform, you'll need the Microsoft Visual Studio redistributable DLLs.
+If you want to create your own Microsoft Visual Studio project files note that libewf needs
+to be compiled with the paramete /MD, because stderr is passed from the executables.
 
 
 Mac OS X

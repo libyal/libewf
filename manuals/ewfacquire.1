@@ -1,4 +1,4 @@
-.Dd April 19, 2009
+.Dd May 1, 2009
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -19,7 +19,7 @@
 .Op Fl g Ar amount_of_sectors
 .Op Fl l Ar log_filename
 .Op Fl m Ar media_type
-.Op Fl M Ar volume_type
+.Op Fl M Ar media_flags
 .Op Fl N Ar notes
 .Op Fl o Ar offset
 .Op Fl p Ar process_buffer_size
@@ -87,8 +87,8 @@ shows this help
 logs acquiry errors and the digest (hash) to the log filename
 .It Fl m Ar media_type
 the media type, options: fixed (default), removable, optical, memory
-.It Fl M Ar volume_type
-the volume type, options: logical, physical (default)
+.It Fl M Ar media_flags
+the media flags, options: logical, physical (default)
 .It Fl N Ar notes
 the notes (default is notes)
 .It Fl o Ar offset
@@ -138,7 +138,7 @@ None
 will ask for the information it requires.
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20090229 (libewf 20090229, libuna 20090124, zlib 1.2.3, libcrypto 0.9.8g, libuuid)
+ewfacquire 20090501 (libewf 20090501, libuna 20090124, zlib 1.2.3, libcrypto 0.9.8g, libuuid)
 
 Information about acquiry required, please provide the necessary input
 Image path and filename without extension: floppy
@@ -148,7 +148,7 @@ Evidence number: 1.1
 Examiner name: John D.
 Notes: Just a floppy in my system
 Media type (fixed, removable, optical, memory) [fixed]: removable
-Volume type (logical, physical) [logical]:
+Media characteristics (logical, physical) [logical]:
 Use compression (none, empty-block, fast, best) [none]:
 Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [encase5]:
 Start to acquire at offset (0 >= value >= 1474560) [0]:
@@ -168,7 +168,7 @@ Evidence number:                1.1
 Examiner name:                  John D.
 Notes:                          Just a floppy in my system
 Media type:                     removable
-Volume type:                    physical
+Is physical:                    no
 Compression used:               none
 EWF file format:                Encase 5
 Acquiry start offset:           0
