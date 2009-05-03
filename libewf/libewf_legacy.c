@@ -1253,6 +1253,22 @@ int libewf_get_amount_of_sectors(
 	static char *function           = "libewf_get_amount_of_sectors";
 	uint64_t safe_amount_of_sectors = 0;
 
+	if( amount_of_sectors == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of sectors.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	if( libewf_handle_get_amount_of_sectors(
 	     handle,
 	     &safe_amount_of_sectors,
@@ -1272,7 +1288,7 @@ int libewf_get_amount_of_sectors(
 
 		return( -1 );
 	}
-	if( safe_amount_of_sectors > (uint64_t) INT32_MAX )
+	if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
 	{
 		liberror_error_set(
 		 &error,
@@ -2201,15 +2217,32 @@ int libewf_get_acquiry_error(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_get_acquiry_error";
-	int result              = 0;
+	liberror_error_t *error         = NULL;
+	static char *function           = "libewf_get_acquiry_error";
+	uint64_t safe_amount_of_sectors = 0;
+	int result                      = 0;
 
+	if( amount_of_sectors == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of sectors.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	result = libewf_handle_get_acquiry_error(
 	          handle,
 	          index,
-	          first_sector,
-	          amount_of_sectors,
+	          (uint64_t *) first_sector,
+	          &safe_amount_of_sectors,
 	          &error );
 
 	if( result == -1 )
@@ -2225,6 +2258,28 @@ int libewf_get_acquiry_error(
 		 error );
 		liberror_error_free(
 		 &error );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid amount of sectors value exceeds maximum.",
+			 function );
+
+			libewf_notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		*amount_of_sectors = (uint32_t) safe_amount_of_sectors;
 	}
 	return( result );
 }
@@ -2242,8 +2297,8 @@ int libewf_add_acquiry_error(
 
 	if( libewf_handle_add_acquiry_error(
 	     handle,
-	     first_sector,
-	     amount_of_sectors,
+	     (uint64_t) first_sector,
+	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -2304,15 +2359,32 @@ int libewf_get_crc_error(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_get_crc_error";
-	int result              = 0;
+	liberror_error_t *error         = NULL;
+	static char *function           = "libewf_get_crc_error";
+	uint64_t safe_amount_of_sectors = 0;
+	int result                      = 0;
 
+	if( amount_of_sectors == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of sectors.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	result = libewf_handle_get_crc_error(
 	          handle,
 	          index,
-	          first_sector,
-	          amount_of_sectors,
+	          (uint64_t *) first_sector,
+	          &safe_amount_of_sectors,
 	          &error );
 
 	if( result == -1 )
@@ -2328,6 +2400,28 @@ int libewf_get_crc_error(
 		 error );
 		liberror_error_free(
 		 &error );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid amount of sectors value exceeds maximum.",
+			 function );
+
+			libewf_notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		*amount_of_sectors = (uint32_t) safe_amount_of_sectors;
 	}
 	return( result );
 }
@@ -2345,8 +2439,8 @@ int libewf_add_crc_error(
 
 	if( libewf_handle_add_crc_error(
 	     handle,
-	     first_sector,
-	     amount_of_sectors,
+	     (uint64_t) first_sector,
+	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -2407,15 +2501,32 @@ int libewf_get_session(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_get_session";
-	int result              = 0;
+	liberror_error_t *error         = NULL;
+	static char *function           = "libewf_get_session";
+	uint64_t safe_amount_of_sectors = 0;
+	int result                      = 0;
 
+	if( amount_of_sectors == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of sectors.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	result = libewf_handle_get_session(
 	          handle,
 	          index,
-	          first_sector,
-	          amount_of_sectors,
+	          (uint64_t *) first_sector,
+	          &safe_amount_of_sectors,
 	          &error );
 
 	if( result == -1 )
@@ -2431,6 +2542,28 @@ int libewf_get_session(
 		 error );
 		liberror_error_free(
 		 &error );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid amount of sectors value exceeds maximum.",
+			 function );
+
+			libewf_notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		*amount_of_sectors = (uint32_t) safe_amount_of_sectors;
 	}
 	return( result );
 }
@@ -2448,8 +2581,8 @@ int libewf_add_session(
 
 	if( libewf_handle_add_session(
 	     handle,
-	     first_sector,
-	     amount_of_sectors,
+	     (uint64_t) first_sector,
+	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
 		liberror_error_set(

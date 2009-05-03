@@ -211,11 +211,13 @@ Work in progress:
 * check TODO
 * check windows acquiry of 40 GB disk
 * remove volume type from ewftools
+  - update test scripts
 * limit ENCASE1/SMART format to max 2 TiB media size?
-* implement 64-bit sector support for add crc and acquiry error and sessions
-  in APIv2
-* a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
-  ewfacquire warn if media does not fit using chunk size
+* ewfacquire warn if media does not fit using chunk size or APIv1
+  a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
+
+Version: 20090501
+* implemented 64-bit sector support for add crc and acquiry error and sessions in APIv2
 
 Version: 20090429
 * update for new findings regarding volume/data section

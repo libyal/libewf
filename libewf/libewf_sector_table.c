@@ -259,8 +259,8 @@ int libewf_sector_table_resize(
 int libewf_sector_table_get_sector(
      libewf_sector_table_t *sector_table,
      uint32_t index,
-     off64_t *first_sector,
-     uint32_t *amount_of_sectors,
+     uint64_t *first_sector,
+     uint64_t *amount_of_sectors,
      liberror_error_t **error )
 {
 	static char *function = "libewf_sector_table_get_sector";
@@ -335,15 +335,15 @@ int libewf_sector_table_get_sector(
  */
 int libewf_sector_table_add_sector(
      libewf_sector_table_t *sector_table,
-     off64_t first_sector,
-     uint32_t amount_of_sectors,
+     uint64_t first_sector,
+     uint64_t amount_of_sectors,
      int merge_continious_entries,
      liberror_error_t **error )
 {
-	static char *function     = "libewf_sector_table_add_sector";
-	off64_t last_sector       = 0;
-	off64_t last_range_sector = 0;
-	uint32_t iterator         = 0;
+	static char *function      = "libewf_sector_table_add_sector";
+	uint64_t last_sector       = 0;
+	uint64_t last_range_sector = 0;
+	uint32_t iterator          = 0;
 
 	if( sector_table == NULL )
 	{
@@ -352,17 +352,6 @@ int libewf_sector_table_add_sector(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.",
-		 function );
-
-		return( -1 );
-	}
-	if( first_sector < 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid first sector value is less than zero.",
 		 function );
 
 		return( -1 );
@@ -386,7 +375,7 @@ int libewf_sector_table_add_sector(
 
 				if( last_sector > last_range_sector )
 				{
-					sector_table->sector[ iterator ].amount_of_sectors += (uint32_t) ( last_sector - last_range_sector );
+					sector_table->sector[ iterator ].amount_of_sectors += last_sector - last_range_sector;
 				}
 				return( 1 );
 			}
