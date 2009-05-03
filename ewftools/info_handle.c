@@ -1606,13 +1606,12 @@ int info_handle_media_information_fprint(
 	char *format_string        = NULL;
 	static char *function      = "info_handle_media_information_fprint";
 	size64_t media_size        = 0;
+	uint64_t amount_of_sectors = 0;
 	uint32_t bytes_per_sector  = 0;
-	uint32_t amount_of_sectors = 0;
 	uint32_t error_granularity = 0;
 	uint8_t compression_flags  = 0;
 	uint8_t media_type         = 0;
 	uint8_t media_flags        = 0;
-	uint8_t volume_type        = 0;
 	uint8_t format             = 0;
 	int8_t compression_level   = 0;
 	int result                 = 1;
@@ -1970,14 +1969,18 @@ int info_handle_media_information_fprint(
 		 stream,
 		 "\n" );
 
-#if defined( HAVE_VERBOSE_OUTPUT )
-		if( ( media_flags & 0x08 ) == 0x08 )
+		if( ( media_flags & LIBEWF_MEDIA_FLAG_FASTBLOC ) == LIBEWF_MEDIA_FLAG_FASTBLOC )
+		{
+			fprintf(
+			 stream,
+			 "\tWrite blocked:\t\tFastbloc\n" );
+		}
+		if( ( media_flags & LIBEWF_MEDIA_FLAG_TABLEAU ) == LIBEWF_MEDIA_FLAG_TABLEAU )
 		{
 			fprintf(
 			 stream,
 			 "\tWrite blocked:\t\tTableau\n" );
 		}
-#endif
 	}
 #if defined( HAVE_V2_API )
 	if( libewf_handle_get_bytes_per_sector(
@@ -2014,12 +2017,12 @@ int info_handle_media_information_fprint(
 #else
 	if( libewf_get_amount_of_sectors(
 	     info_handle->input_handle,
-	     &amount_of_sectors ) == 1 )
+	     (uint32_t *) &amount_of_sectors ) == 1 )
 #endif
 	{
 		fprintf(
 		 stream,
-		 "\tAmount of sectors:\t%" PRIu32 "\n",
+		 "\tAmount of sectors:\t%" PRIu64 "\n",
 		 amount_of_sectors );
 	}
 	else

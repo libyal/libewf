@@ -4542,8 +4542,8 @@ int libewf_internal_handle_set_media_values(
 	static char *function            = "libewf_internal_handle_set_media_values";
 	size32_t chunk_size              = 0;
 	size64_t maximum_input_file_size = 0;
+	uint64_t amount_of_sectors       = 0;
 	int64_t amount_of_chunks         = 0;
-	int64_t amount_of_sectors        = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -4668,9 +4668,9 @@ int libewf_internal_handle_set_media_values(
 
 		/* Determine the amount of sectors to write
 		 */
-		amount_of_sectors = (int64_t) media_size / (int64_t) bytes_per_sector;
+		amount_of_sectors = (uint64_t) media_size / (uint64_t) bytes_per_sector;
 
-		if( amount_of_chunks > (int64_t) UINT32_MAX )
+		if( amount_of_sectors > (uint64_t) INT64_MAX )
 		{
 			liberror_error_set(
 			 error,
@@ -4681,7 +4681,7 @@ int libewf_internal_handle_set_media_values(
 
 			return( -1 );
 		}
-		internal_handle->media_values->amount_of_sectors = (uint32_t) amount_of_sectors;
+		internal_handle->media_values->amount_of_sectors = (uint64_t) amount_of_sectors;
 	}
 	return( 1 );
 }

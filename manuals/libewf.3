@@ -1,4 +1,4 @@
-.Dd April 27, 2009
+.Dd April 29, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -365,7 +365,7 @@ Meta data functions (APIv2)
 .Ft int
 .Fn libewf_handle_set_bytes_per_sector "libewf_handle_t *handle, uint32_t bytes_per_sector, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_amount_of_sectors "libewf_handle_t *handle, uint32_t *amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_amount_of_sectors "libewf_handle_t *handle, uint64_t *amount_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_chunk_size "libewf_handle_t *handle, size32_t *chunk_size, libewf_error_t **error, libewf_error_t **error"
 .Ft int

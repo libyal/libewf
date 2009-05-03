@@ -613,11 +613,11 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	uint8_t *crc_read_buffer   = NULL;
 	static char *function      = "libewf_read_io_handle_read_chunk_data";
 	ewf_crc_t chunk_crc        = 0;
-	off64_t sector             = 0;
 	size_t chunk_data_size     = 0;
 	size_t chunk_size          = 0;
 	size_t bytes_available     = 0;
 	ssize_t read_count         = 0;
+	int64_t sector             = 0;
 	uint32_t amount_of_sectors = 0;
 	int chunk_cache_data_used  = 0;
 	uint8_t crc_mismatch       = 0;
@@ -868,13 +868,15 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 			}
 			/* Add CRC error
 			 */
-			sector            = (off64_t) chunk * (off64_t) media_values->sectors_per_chunk;
+			sector            = (int64_t) chunk * (int64_t) media_values->sectors_per_chunk;
 			amount_of_sectors = media_values->sectors_per_chunk;
 
-			if( ( sector + amount_of_sectors ) > media_values->amount_of_sectors )
+			if( ( sector + amount_of_sectors ) > (int64_t) media_values->amount_of_sectors )
 			{
-				amount_of_sectors = (uint32_t) ( (off64_t) media_values->amount_of_sectors - sector );
+				amount_of_sectors = (uint32_t) ( (int64_t) media_values->amount_of_sectors - sector );
 			}
+			/* TODO how are sector values > 32-bit handled by EnCase
+			 */
 			if( libewf_sector_table_add_sector(
 			     read_io_handle->crc_errors,
 			     sector,

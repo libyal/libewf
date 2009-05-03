@@ -18,11 +18,14 @@ Roadmap:
   - check for race conditions especially on change of data elements
 
 Further analysis of the EWF format:
+* unknowns in volume/disk section
 * password hash
 * 16 bytes in hash section (EWF-E01)
 * values in EnCase5/6 header2 (+/-)
 * values in ltree strings (EWF-L01 LVF)
 * values in session section (+/-)
+* amount of sectors in volume/data section has changed to a 64-bit value
+  but what about error2/sessions ?
 
 Features
 * tools and library support read/write of EnCase 6.12 SHA1
@@ -206,11 +209,23 @@ Work in progress:
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
-* check windows acquiry of 40GB disk
+* check windows acquiry of 40 GB disk
+* remove volume type from ewftools
+* limit ENCASE1/SMART format to max 2 TiB media size?
+* implement 64-bit sector support for add crc and acquiry error and sessions
+  in APIv2
+* a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
+  ewfacquire warn if media does not fit using chunk size
+
+Version: 20090429
+* update for new findings regarding volume/data section
+* changed APIv2 function handle_get_amount_of_sectors to have a 64-bit parameter
+  instead of 32-bit
+* worked on EnCase Fastbloc write blocker support
 
 Version: 20090427
 * updated libuna
-* worked on EnCase 6.13 Tableau writeblocker support
+* worked on EnCase 6.13 Tableau write blocker support
 * remove volume type functions/definitions in APIv2 and changed it to media flags
 
 Version: 20090426

@@ -3832,8 +3832,8 @@ ssize_t libewf_write_io_handle_finalize(
 		/* Determine the media values
 		 */
 		media_values->amount_of_chunks  = write_io_handle->amount_of_chunks;
-		media_values->amount_of_sectors = (uint32_t) ( write_io_handle->input_write_count / media_values->bytes_per_sector );
-		media_values->media_size        = (size32_t) write_io_handle->input_write_count;
+		media_values->amount_of_sectors = (uint64_t) ( write_io_handle->input_write_count / media_values->bytes_per_sector );
+		media_values->media_size        = (size64_t) write_io_handle->input_write_count;
 
 		/* Flush the data section write cache
 		 */

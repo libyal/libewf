@@ -1500,7 +1500,7 @@ ssize_t libewf_section_volume_s01_write(
 	 media_values->sectors_per_chunk );
 
 	libewf_notify_verbose_printf(
-	 "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
 	 function,
 	 media_values->amount_of_sectors,
 	 media_values->bytes_per_sector );
@@ -1660,7 +1660,7 @@ ssize_t libewf_section_volume_e01_read(
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  volume,
-	                  ( sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ) ),
+	                  sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ),
 	                  1 );
 
 	endian_little_convert_32bit(
@@ -1684,27 +1684,57 @@ ssize_t libewf_section_volume_e01_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: unknown1.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown1,
 	 3 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown2.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown2,
-	 16 );
+	 3 );
+	libewf_notify_verbose_printf(
+	 "%s: PALM volume start sector.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 volume->palm_volume_start_sector,
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown3.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown3,
-	 3 );
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: SMART logs start sector.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 volume->smart_logs_start_sector,
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown4.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown4,
-	 12 );
+	 3 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown5.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown5,
-	 3 );
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown6.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown6,
-	 4 );
-	libewf_notify_verbose_dump_data(
-	 volume->unknown7,
 	 963 );
+	libewf_notify_verbose_printf(
+	 "%s: signature.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->signature,
 	 5 );
@@ -1722,7 +1752,7 @@ ssize_t libewf_section_volume_e01_read(
 	 media_values->bytes_per_sector,
 	 volume->bytes_per_sector );
 
-	endian_little_convert_32bit(
+	endian_little_convert_64bit(
 	 media_values->amount_of_sectors,
 	 volume->amount_of_sectors );
 
@@ -1868,7 +1898,7 @@ ssize_t libewf_section_volume_e01_write(
 	 volume->bytes_per_sector,
 	 media_values->bytes_per_sector );
 
-	endian_little_revert_32bit(
+	endian_little_revert_64bit(
 	 volume->amount_of_sectors,
 	 media_values->amount_of_sectors );
 
@@ -1919,7 +1949,7 @@ ssize_t libewf_section_volume_e01_write(
 	 media_values->sectors_per_chunk );
 
 	libewf_notify_verbose_printf(
-	 "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
 	 function,
 	 media_values->amount_of_sectors,
 	 media_values->bytes_per_sector );
@@ -2143,7 +2173,7 @@ ssize_t libewf_section_volume_read(
 	 media_values->sectors_per_chunk );
 
 	libewf_notify_verbose_printf(
-	 "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
 	 function,
 	 media_values->amount_of_sectors,
 	 media_values->bytes_per_sector );
@@ -3936,10 +3966,10 @@ ssize_t libewf_section_data_read(
 	ewf_crc_t calculated_crc   = 0;
 	ewf_crc_t stored_crc       = 0;
 	ssize_t read_count         = 0;
+	uint64_t amount_of_sectors = 0;
 	uint32_t amount_of_chunks  = 0;
 	uint32_t sectors_per_chunk = 0;
 	uint32_t bytes_per_sector  = 0;
-	uint32_t amount_of_sectors = 0;
 	uint32_t error_granularity = 0;
 
 	if( segment_file_handle == NULL )
@@ -4018,7 +4048,7 @@ ssize_t libewf_section_data_read(
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  data,
-	                  ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ),
+	                  sizeof( ewf_data_t ) - sizeof( ewf_crc_t ),
 	                  1 );
 
 	endian_little_convert_32bit(
@@ -4039,27 +4069,57 @@ ssize_t libewf_section_data_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: unknown1.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown1,
 	 3 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown2.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown2,
-	 16 );
+	 3 );
+	libewf_notify_verbose_printf(
+	 "%s: PALM volume start sector.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 data->palm_volume_start_sector,
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown3.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown3,
-	 3 );
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: SMART logs start sector.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 data->smart_logs_start_sector,
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown4.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown4,
-	 12 );
+	 3 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown5.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown5,
-	 3 );
+	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown6.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown6,
-	 4 );
-	libewf_notify_verbose_dump_data(
-	 data->unknown7,
 	 963 );
+	libewf_notify_verbose_printf(
+	 "%s: signature.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 data->signature,
 	 5 );
@@ -4134,7 +4194,7 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	endian_little_convert_32bit(
+	endian_little_convert_64bit(
 	 amount_of_sectors,
 	 data->amount_of_sectors );
 
@@ -4330,7 +4390,7 @@ ssize_t libewf_section_data_write(
 		 ( *cached_data_section )->bytes_per_sector,
 		 media_values->bytes_per_sector );
 
-		endian_little_revert_32bit(
+		endian_little_revert_64bit(
 		 ( *cached_data_section )->amount_of_sectors,
 		 media_values->amount_of_sectors );
 

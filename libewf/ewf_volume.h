@@ -36,10 +36,11 @@ struct ewf_volume
 {
 	/* The media type
 	 * consists of 1 byte
-	 * EnCase uses 0x00 for remobable media
-	 *             0x01 for fixed media
-	 *             0x0e for LVF
-	 * FTK Imager always uses 0x01
+	 * 0x00 => remobable disk
+	 * 0x01 => fixed disk
+	 * 0x03 => optical disk
+	 * 0x0e => LVF
+	 * 0x10 => memory (RAM/process)
 	 */
 	uint8_t media_type;
 
@@ -56,30 +57,32 @@ struct ewf_volume
 
 	/* The amount of sectors per chunks
 	 * consists of 4 bytes (32 bits)
-	 * value should be 64
 	 */
 	uint8_t sectors_per_chunk[ 4 ];
 
 	/* The amount of bytes per chunks
 	 * consists of 4 bytes (32 bits)
-	 * value should be 512
 	 */
 	uint8_t bytes_per_sector[ 4 ];
 
 	/* The amount of sectors
-	 * consists of 4 bytes (32 bits)
+	 * consists of 8 bytes (64 bits)
 	 */
-	uint8_t amount_of_sectors[ 4 ];
+	uint8_t amount_of_sectors[ 8 ];
 
-	/* Unknown
-	 * consists of 16 bytes
-	 * contains 0x00
+	/* C:H:S values
+	 * consists of 12 bytes, 4 bytes per value
 	 */
-	uint8_t unknown2[ 16 ];
+	uint8_t chs_cylinders[ 4 ];
+	uint8_t chs_heads[ 4 ];
+	uint8_t chs_sectors[ 4 ];
 
 	/* Media flags
 	 * consists of 1 byte
-	 * byte 2 is physical (1) or non physical (0)
+	 * 0x01 => image (1) or device (0) ?
+	 * 0x02 => physical (1)
+	 * 0x04 => Fastblock Tableau write blocker (1)
+	 * 0x08 => Tableau write blocker (1)
 	 */
 	uint8_t media_flags;
 
@@ -87,17 +90,30 @@ struct ewf_volume
 	 * consists of 3 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown3[ 3 ];
+	uint8_t unknown2[ 3 ];
+
+	/* PALM volume start sector
+	 * consists of 4 bytes
+	 */
+	uint8_t palm_volume_start_sector[ 4 ];
 
 	/* Unknown
-	 * consists of 12 bytes
+	 * consists of 4 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown4[ 12 ];
+	uint8_t unknown3[ 4 ];
 
-	/* Compression level (Encase 5 only)
+	/* SMART logs start sector
+	 * consists of 4 bytes
+	 * contains 0x00
+	 */
+	uint8_t smart_logs_start_sector[ 4 ];
+
+	/* Compression level (Encase 5 or later)
 	 * consists of 1 byte
-	 * value is 0x00 for no compression, 0x01 for fast/good compression, 0x02 for best compression
+	 * 0x00 => no compression,
+	 * 0x01 => fast/good compression
+	 * 0x02 => best compression
 	 */
 	uint8_t compression_level;
 
@@ -105,7 +121,7 @@ struct ewf_volume
 	 * consists of 3 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown5[ 3 ];
+	uint8_t unknown4[ 3 ];
 
 	/* The amount sectors to use for error granularity
 	 * consists of 4 bytes (32 bits)
@@ -116,9 +132,9 @@ struct ewf_volume
 	 * consists of 4 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown6[ 4 ];
+	uint8_t unknown5[ 4 ];
 
-	/* The GUID (Encase 5 only)
+	/* The GUID (Encase 5 or later)
 	 * consists of 16 bytes
 	 */
 	uint8_t guid[ 16 ];
@@ -127,7 +143,7 @@ struct ewf_volume
 	 * consists of 963 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown7[ 963 ];
+	uint8_t unknown6[ 963 ];
 
 	/* Reserved (signature)
 	 * consists of 5 bytes

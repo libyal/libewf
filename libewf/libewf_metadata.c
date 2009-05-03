@@ -301,7 +301,7 @@ int libewf_handle_set_bytes_per_sector(
  */
 int libewf_handle_get_amount_of_sectors(
      libewf_handle_t *handle,
-     uint32_t *amount_of_sectors,
+     uint64_t *amount_of_sectors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -342,7 +342,7 @@ int libewf_handle_get_amount_of_sectors(
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->amount_of_sectors > (uint32_t) INT32_MAX )
+	if( internal_handle->media_values->amount_of_sectors > (uint64_t) INT64_MAX )
 	{
 		liberror_error_set(
 		 error,

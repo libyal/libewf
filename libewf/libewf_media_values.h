@@ -61,7 +61,7 @@ struct libewf_media_values
 
         /* The amount of sectors
          */
-        uint32_t amount_of_sectors;
+        uint64_t amount_of_sectors;
 
         /* The amount of sectors to use as error granularity
          */

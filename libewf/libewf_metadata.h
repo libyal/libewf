@@ -59,7 +59,7 @@ LIBEWF_EXTERN int libewf_handle_set_bytes_per_sector(
 
 LIBEWF_EXTERN int libewf_handle_get_amount_of_sectors(
                    libewf_handle_t *handle,
-                   uint32_t *amount_of_sectors,
+                   uint64_t *amount_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_chunk_size(

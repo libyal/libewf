@@ -1249,12 +1249,13 @@ int libewf_get_amount_of_sectors(
      libewf_handle_t *handle,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_get_amount_of_sectors";
+	liberror_error_t *error         = NULL;
+	static char *function           = "libewf_get_amount_of_sectors";
+	uint64_t safe_amount_of_sectors = 0;
 
 	if( libewf_handle_get_amount_of_sectors(
 	     handle,
-	     amount_of_sectors,
+	     &safe_amount_of_sectors,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -1271,6 +1272,24 @@ int libewf_get_amount_of_sectors(
 
 		return( -1 );
 	}
+	if( safe_amount_of_sectors > (uint64_t) INT32_MAX )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid amount of sectors value exceeds maximum.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	*amount_of_sectors = (uint32_t) safe_amount_of_sectors;
+
 	return( 1 );
 }
 
