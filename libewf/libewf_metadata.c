@@ -976,73 +976,16 @@ int libewf_handle_get_media_flags(
 	return( 1 );
 }
 
-/* Retrieves the volume type value
+/* Sets the media flags
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_volume_type(
+int libewf_handle_set_media_flags(
      libewf_handle_t *handle,
-     uint8_t *volume_type,
+     uint8_t media_flags,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_volume_type";
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->media_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( volume_type == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid volume type.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->media_values->media_flags & 0x02 ) == 0 )
-	{
-		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL;
-	}
-	else
-	{
-		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL;
-	}
-	return( 1 );
-}
-
-/* Sets the volume type
- * Returns 1 if successful or -1 on error
- */
-int libewf_handle_set_volume_type(
-     libewf_handle_t *handle,
-     uint8_t volume_type,
-     liberror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_volume_type";
+	static char *function                     = "libewf_handle_set_media_flags";
 
 	if( handle == NULL )
 	{
@@ -1076,32 +1019,17 @@ int libewf_handle_set_volume_type(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: volume type cannot be changed.",
+		 "%s: media flags cannot be changed.",
 		 function );
 
 		return( -1 );
 	}
-	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
-	{
-		/* Uses 1-complement of EWF_MEDIA_FLAGS_IS_PHYSICAL
-		 */
-		internal_handle->media_values->media_flags &= ~EWF_MEDIA_FLAGS_IS_PHYSICAL;
-	}
-	else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
-	{
-		internal_handle->media_values->media_flags |= EWF_MEDIA_FLAGS_IS_PHYSICAL;
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported volume type.",
-		 function );
+	internal_handle->media_values->media_flags = media_flags;
 
-		return( -1 );
-	}
+	/* Make sure the lowest bit is always set
+	 */
+	internal_handle->media_values->media_flags |= 0x01;
+
 	return( 1 );
 }
 

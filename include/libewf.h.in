@@ -1565,20 +1565,12 @@ LIBEWF_EXTERN int libewf_handle_get_media_flags(
                    uint8_t *media_flags,
                    libewf_error_t **error );
 
-/* Retrieves the volume type value
+/* Sets the media flags
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_get_volume_type(
+LIBEWF_EXTERN int libewf_handle_set_media_flags(
                    libewf_handle_t *handle,
-                   uint8_t *volume_type,
-                   libewf_error_t **error );
-
-/* Sets the volume type
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_handle_set_volume_type(
-                   libewf_handle_t *handle,
-                   uint8_t volume_type,
+                   uint8_t media_flags,
                    libewf_error_t **error );
 
 /* Retrieves the format type value

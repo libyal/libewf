@@ -162,7 +162,7 @@ int device_handle_get_bytes_per_sector(
      uint32_t *bytes_per_sector,
      liberror_error_t **error );
 
-int device_handle_get_information_values(
+int device_handle_get_media_information(
      device_handle_t *device_handle,
      liberror_error_t **error );
 
@@ -171,6 +171,11 @@ int device_handle_set_read_error_values(
      int8_t read_error_retry,
      uint32_t byte_error_granularity,
      uint8_t wipe_block_on_read_error,
+     liberror_error_t **error );
+
+int device_handle_media_information_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

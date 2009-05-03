@@ -114,14 +114,9 @@ LIBEWF_EXTERN int libewf_handle_get_media_flags(
                    uint8_t *media_flags,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_volume_type(
+LIBEWF_EXTERN int libewf_handle_set_media_flags(
                    libewf_handle_t *handle,
-                   uint8_t *volume_type,
-                   liberror_error_t **error );
-
-LIBEWF_EXTERN int libewf_handle_set_volume_type(
-                   libewf_handle_t *handle,
-                   uint8_t volume_type,
+                   uint8_t media_flags,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_format(

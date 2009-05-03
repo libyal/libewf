@@ -1,4 +1,4 @@
-.Dd April 19, 2009
+.Dd April 27, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -387,9 +387,7 @@ Meta data functions (APIv2)
 .Ft int
 .Fn libewf_handle_get_media_flags "libewf_handle_t *handle, uint8_t *media_flags, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_volume_type "libewf_handle_t *handle, uint8_t *volume_type, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_set_volume_type "libewf_handle_t *handle, uint8_t volume_type, libewf_error_t **error"
+.Fn libewf_handle_set_media_flags "libewf_handle_t *handle, uint8_t media_flags, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_format "libewf_handle_t *handle, uint8_t* format, libewf_error_t **error"
 .Ft int

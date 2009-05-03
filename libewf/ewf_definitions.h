@@ -31,10 +31,6 @@
  */
 #define EWF_MINIMUM_CHUNK_SIZE			32768
 
-/* The EWF-E01 media flags definitions
- */
-#define EWF_MEDIA_FLAGS_IS_PHYSICAL		0x02
-
 /* The possible EWF file formats
  */
 #define EWF_FORMAT_UNKNOWN			(uint8_t) 'u'

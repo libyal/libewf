@@ -4637,6 +4637,9 @@ ssize_t libewf_section_error2_read(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
+		libewf_notify_verbose_printf(
+		 "%s: error2 sectors.\n",
+		 function );
 		libewf_notify_verbose_dump_data(
 		 error2_sectors,
 		 sectors_size );

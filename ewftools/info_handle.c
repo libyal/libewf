@@ -1652,7 +1652,7 @@ int info_handle_media_information_fprint(
 	}
 	fprintf(
 	 stream,
-	 "Media information\n" );
+	 "EWF information\n" );
 
 #if defined( HAVE_V2_API )
 	if( libewf_handle_get_format(
@@ -1674,7 +1674,6 @@ int info_handle_media_information_fprint(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
 	else
 	{
 		switch( format )
@@ -1735,236 +1734,8 @@ int info_handle_media_information_fprint(
 		}
 		fprintf(
 		 stdout,
-		 "\tEWF file format:\t%s\n",
+		 "\tFile format:\t\t%s\n",
 		 format_string );
-	}
-#endif
-	if( ( format != LIBEWF_FORMAT_EWF )
-	 && ( format != LIBEWF_FORMAT_SMART ) )
-	{
-#if defined( HAVE_V2_API )
-		if( libewf_handle_get_media_type(
-		     info_handle->input_handle,
-		     &media_type,
-		     error ) == 1 )
-#else
-		if( libewf_get_media_type(
-		     info_handle->input_handle,
-		     &media_type ) == 1 )
-#endif
-		{
-			if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tremovable disk\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tfixed disk\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\toptical disk (CD/DVD/BD)\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_MEMORY )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tmemory (RAM)\n" );
-			}
-			else
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n",
-				 media_type );
-			}
-		}
-		else
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media type.",
-			 function );
-
-			result = -1;
-		}
-#if defined( HAVE_VERBOSE_OUTPUT )
-#if defined( HAVE_V2_API )
-		if( libewf_handle_get_media_flags(
-		     info_handle->input_handle,
-		     &media_flags,
-		     error ) == 1 )
-#else
-		if( libewf_get_media_flags(
-		     info_handle->input_handle,
-		     &media_flags ) == 1 )
-#endif
-		{
-			fprintf(
-			 stream,
-			 "\tMedia flags:\t\t0x%02" PRIx8 "\n",
-			 media_flags );
-		}
-		else
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media flags.",
-			 function );
-
-			result = -1;
-		}
-#endif
-#if defined( HAVE_V2_API )
-		if( libewf_handle_get_volume_type(
-		     info_handle->input_handle,
-		     &volume_type,
-		     error ) == 1 )
-#else
-		if( libewf_get_volume_type(
-		     info_handle->input_handle,
-		     &volume_type ) == 1 )
-#endif
-		{
-			if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
-			{
-				fprintf(
-				 stream,
-				 "\tVolume type:\t\tlogical\n" );
-			}
-			else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
-			{
-				fprintf(
-				 stream,
-				 "\tVolume type:\t\tphysical\n" );
-			}
-			else
-			{
-				fprintf(
-				 stream, 
-				"\tVolume type:\t\tunknown (0x%02" PRIx8 ")\n",
-				 volume_type );
-			}
-		}
-		else
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve volume type.",
-			 function );
-
-			result = -1;
-		}
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_get_bytes_per_sector(
-	     info_handle->input_handle,
-	     &bytes_per_sector,
-	     error ) == 1 )
-#else
-	if( libewf_get_bytes_per_sector(
-	     info_handle->input_handle,
-	     &bytes_per_sector ) == 1 )
-#endif
-	{
-		fprintf(
-		 stream,
-		 "\tBytes per sector:\t%" PRIu32 "\n",
-		 bytes_per_sector );
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve bytes per sector.",
-		 function );
-
-		result = -1;
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_get_amount_of_sectors(
-	     info_handle->input_handle,
-	     &amount_of_sectors,
-	     error ) == 1 )
-#else
-	if( libewf_get_amount_of_sectors(
-	     info_handle->input_handle,
-	     &amount_of_sectors ) == 1 )
-#endif
-	{
-		fprintf(
-		 stream,
-		 "\tAmount of sectors:\t%" PRIu32 "\n",
-		 amount_of_sectors );
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of sectors.",
-		 function );
-
-		result = -1;
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_get_media_size(
-	     info_handle->input_handle,
-	     &media_size,
-	     error ) == 1 )
-#else
-	if( libewf_get_media_size(
-	     info_handle->input_handle,
-	     &media_size ) == 1 )
-#endif
-	{
-		result = byte_size_string_create(
-			  media_size_string,
-			  16,
-			  media_size,
-			  BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-			  NULL );
-
-		if( result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tMedia size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
-			 media_size_string, media_size );
-		}
-		else
-		{
-			fprintf(
-			 stream,
-			 "\tMedia size:\t\t%" PRIu64 " bytes\n",
-			 media_size );
-		}
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size.",
-		 function );
-
-		result = -1;
 	}
 	if( ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 )
@@ -2085,6 +1856,227 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
+	}
+	fprintf(
+	 stream,
+	 "\n" );
+	fprintf(
+	 stream,
+	 "Media information\n" );
+
+	if( ( format != LIBEWF_FORMAT_EWF )
+	 && ( format != LIBEWF_FORMAT_SMART ) )
+	{
+#if defined( HAVE_V2_API )
+		if( libewf_handle_get_media_type(
+		     info_handle->input_handle,
+		     &media_type,
+		     error ) == 1 )
+#else
+		if( libewf_get_media_type(
+		     info_handle->input_handle,
+		     &media_type ) == 1 )
+#endif
+		{
+			if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
+			{
+				fprintf(
+				 stream,
+				 "\tMedia type:\t\tremovable disk\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
+			{
+				fprintf(
+				 stream,
+				 "\tMedia type:\t\tfixed disk\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+			{
+				fprintf(
+				 stream,
+				 "\tMedia type:\t\toptical disk (CD/DVD/BD)\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_MEMORY )
+			{
+				fprintf(
+				 stream,
+				 "\tMedia type:\t\tmemory (RAM)\n" );
+			}
+			else
+			{
+				fprintf(
+				 stream,
+				 "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n",
+				 media_type );
+			}
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve media type.",
+			 function );
+
+			result = -1;
+		}
+#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_V2_API )
+		if( libewf_handle_get_media_flags(
+		     info_handle->input_handle,
+		     &media_flags,
+		     error ) == 1 )
+#else
+		if( libewf_get_media_flags(
+		     info_handle->input_handle,
+		     &media_flags ) == 1 )
+#endif
+		{
+			fprintf(
+			 stream,
+			 "\tMedia flags:\t\t0x%02" PRIx8 "\n",
+			 media_flags );
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve media flags.",
+			 function );
+
+			result = -1;
+		}
+#endif
+		fprintf(
+		 stream,
+		 "\tIs physical:\t\t" );
+
+		if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) == LIBEWF_MEDIA_FLAG_PHYSICAL )
+		{
+			fprintf(
+			 stream,
+			 "yes" );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "no" );
+		}
+		fprintf(
+		 stream,
+		 "\n" );
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( ( media_flags & 0x08 ) == 0x08 )
+		{
+			fprintf(
+			 stream,
+			 "\tWrite blocked:\t\tTableau\n" );
+		}
+#endif
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_bytes_per_sector(
+	     info_handle->input_handle,
+	     &bytes_per_sector,
+	     error ) == 1 )
+#else
+	if( libewf_get_bytes_per_sector(
+	     info_handle->input_handle,
+	     &bytes_per_sector ) == 1 )
+#endif
+	{
+		fprintf(
+		 stream,
+		 "\tBytes per sector:\t%" PRIu32 "\n",
+		 bytes_per_sector );
+	}
+	else
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_amount_of_sectors(
+	     info_handle->input_handle,
+	     &amount_of_sectors,
+	     error ) == 1 )
+#else
+	if( libewf_get_amount_of_sectors(
+	     info_handle->input_handle,
+	     &amount_of_sectors ) == 1 )
+#endif
+	{
+		fprintf(
+		 stream,
+		 "\tAmount of sectors:\t%" PRIu32 "\n",
+		 amount_of_sectors );
+	}
+	else
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve amount of sectors.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_media_size(
+	     info_handle->input_handle,
+	     &media_size,
+	     error ) == 1 )
+#else
+	if( libewf_get_media_size(
+	     info_handle->input_handle,
+	     &media_size ) == 1 )
+#endif
+	{
+		result = byte_size_string_create(
+			  media_size_string,
+			  16,
+			  media_size,
+			  BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+			  NULL );
+
+		if( result == 1 )
+		{
+			fprintf(
+			 stream,
+			 "\tMedia size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
+			 media_size_string,
+			 media_size );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "\tMedia size:\t\t%" PRIu64 " bytes\n",
+			 media_size );
+		}
+	}
+	else
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media size.",
+		 function );
+
+		result = -1;
 	}
 	fprintf(
 	 stream,

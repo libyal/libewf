@@ -208,6 +208,11 @@ Work in progress:
 * check TODO
 * check windows acquiry of 40GB disk
 
+Version: 20090427
+* updated libuna
+* worked on EnCase 6.13 Tableau writeblocker support
+* remove volume type functions/definitions in APIv2 and changed it to media flags
+
 Version: 20090426
 * worked on device information
 * updated libbfio

@@ -1619,19 +1619,17 @@ int libewf_get_volume_type(
      libewf_handle_t *handle,
      uint8_t *volume_type )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_get_volume_type";
+	liberror_error_t *error                   = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_volume_type";
 
-	if( libewf_handle_get_volume_type(
-	     handle,
-	     volume_type,
-	     &error ) != 1 )
+	if( handle == NULL )
 	{
 		liberror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the volume type.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_notify_error_backtrace(
@@ -1640,6 +1638,48 @@ int libewf_get_volume_type(
 		 &error );
 
 		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( volume_type == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume type.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( ( internal_handle->media_values->media_flags & 0x02 ) == 0 )
+	{
+		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL;
+	}
+	else
+	{
+		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL;
 	}
 	return( 1 );
 }
@@ -1651,19 +1691,79 @@ int libewf_set_volume_type(
      libewf_handle_t *handle,
      uint8_t volume_type )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_set_volume_type";
+	liberror_error_t *error                   = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_volume_type";
 
-	if( libewf_handle_set_volume_type(
-	     handle,
-	     volume_type,
-	     &error ) != 1 )
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->media_values == NULL )
 	{
 		liberror_error_set(
 		 &error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to set the volume type.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( ( internal_handle->read_io_handle != NULL )
+	 || ( internal_handle->write_io_handle == NULL )
+	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: volume type cannot be changed.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
+	{
+		/* Uses 1-complement of LIBEWF_MEDIA_FLAG_PHYSICAL
+		 */
+		internal_handle->media_values->media_flags &= ~LIBEWF_MEDIA_FLAG_PHYSICAL;
+	}
+	else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
+	{
+		internal_handle->media_values->media_flags |= LIBEWF_MEDIA_FLAG_PHYSICAL;
+	}
+	else
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported volume type.",
 		 function );
 
 		libewf_notify_error_backtrace(

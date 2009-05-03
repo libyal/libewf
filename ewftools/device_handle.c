@@ -70,6 +70,7 @@ typedef size_t u64;
 
 #endif
 
+#include "byte_size_string.h"
 #include "device_handle.h"
 #include "notify.h"
 #include "scsi_io.h"
@@ -1131,10 +1132,10 @@ int device_handle_get_bytes_per_sector(
 	return( 1 );
 }
 
-/* Retrieves the amount of bytes per sector
+/* Retrieves the media information
  * Returns 1 if successful or -1 on error
  */
-int device_handle_get_information_values(
+int device_handle_get_media_information(
      device_handle_t *device_handle,
      liberror_error_t **error )
 {
@@ -1159,7 +1160,7 @@ int device_handle_get_information_values(
 #endif
 #endif
 
-	static char *function  = "device_handle_get_information_values";
+	static char *function  = "device_handle_get_media_information";
 	int result             = 0;
 
 	if( device_handle == NULL )
@@ -1363,6 +1364,7 @@ int device_handle_get_information_values(
 			device_handle->removable             = ( (STORAGE_DEVICE_DESCRIPTOR *) response )->RemovableMedia;
 			device_handle->media_information_set = 1;
 
+#if defined( HAVE_DEBUG_OUTPUT )
 			fprintf(
 			 stderr,
 			 "Bus type:\t\t" );
@@ -1457,6 +1459,7 @@ int device_handle_get_information_values(
 			fprintf(
 			 stderr,
 			 "\n" );
+#endif
 		}
 		memory_free(
 		 response );
@@ -1523,6 +1526,7 @@ int device_handle_get_information_values(
 			device_handle->removable             = ( drive_information.config & 0x0080 ) >> 7;
 			device_handle->media_information_set = 1;
 
+#if defined( HAVE_DEBUG_OUTPUT )
 			fprintf(
 			 stderr,
 			 "Device type:\t\t%d\n",
@@ -1562,6 +1566,7 @@ int device_handle_get_information_values(
 			fprintf(
 			 stderr,
 			 "\n" );
+#endif
 		}
 	}
 #endif
@@ -1690,31 +1695,6 @@ int device_handle_get_information_values(
 	}
 #endif
 #endif
-	if( device_handle->media_information_set != 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Device information:\n" );
-		fprintf(
-		 stderr,
-		 "Vendor:\t\t\t%" PRIs_SYSTEM "\n",
-		 device_handle->vendor );
-		fprintf(
-		 stderr,
-		 "Model:\t\t\t%" PRIs_SYSTEM "\n",
-		 device_handle->model );
-		fprintf(
-		 stderr,
-		 "Serial:\t\t\t%" PRIs_SYSTEM "\n",
-		 device_handle->serial_number );
-		fprintf(
-		 stderr,
-		 "Removable:\t\t%d\n",
-		 device_handle->removable );
-		fprintf(
-		 stderr,
-		 "\n" );
-	}
 	return( 1 );
 }
 
@@ -1744,6 +1724,99 @@ int device_handle_set_read_error_values(
 	device_handle->read_error_retry         = read_error_retry;
 	device_handle->byte_error_granularity   = byte_error_granularity;
 	device_handle->wipe_block_on_read_error = wipe_block_on_read_error;
+
+	return( 1 );
+}
+
+/* Print the media information to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_media_information_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
+     liberror_error_t **error )
+{
+        system_character_t media_size_string[ 16 ];
+
+	static char *function = "device_handle_media_information_fprint";
+	int result            = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 stderr,
+	 "Media information:\n" );
+
+	if( device_handle->media_information_set != 0 )
+	{
+		fprintf(
+		 stream,
+		 "Vendor:\t\t\t%" PRIs_SYSTEM "\n",
+		 device_handle->vendor );
+		fprintf(
+		 stream,
+		 "Model:\t\t\t%" PRIs_SYSTEM "\n",
+		 device_handle->model );
+		fprintf(
+		 stream,
+		 "Serial:\t\t\t%" PRIs_SYSTEM "\n",
+		 device_handle->serial_number );
+
+		if( device_handle->removable != 0 )
+		{
+			fprintf(
+			 stream,
+			 "Removable:\t\tyes\n" );
+		}
+	}
+	if( device_handle->media_size_set != 0 )
+	{
+		result = byte_size_string_create(
+			  media_size_string,
+			  16,
+			  device_handle->media_size,
+			  BYTE_SIZE_STRING_UNIT_MEGABYTE,
+			  NULL );
+
+		if( result == 1 )
+		{
+			fprintf(
+			 stream,
+			 "Media size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
+			 media_size_string,
+			 device_handle->media_size );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "Media size:\t\t%" PRIu64 " bytes\n",
+			 device_handle->media_size );
+		}
+	}
+	fprintf(
+	 stream,
+	 "\n" );
 
 	return( 1 );
 }

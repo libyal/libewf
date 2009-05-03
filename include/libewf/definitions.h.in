@@ -104,6 +104,14 @@ enum LIBEWF_MEDIA_TYPES
 	LIBEWF_MEDIA_TYPE_MEMORY		= 0x10
 };
 
+/* The media flags definitions
+ */
+enum LIBEWF_MEDIA_FLAGS
+{
+	LIBEWF_MEDIA_FLAG_PHYSICAL		= 0x02
+};
+
+#if @HAVE_V1_API@
 /* The volume type definitions
  */
 enum LIBEWF_VOLUME_TYPES
@@ -111,6 +119,7 @@ enum LIBEWF_VOLUME_TYPES
 	LIBEWF_VOLUME_TYPE_LOGICAL		= 0x00,
 	LIBEWF_VOLUME_TYPE_PHYSICAL		= 0x01
 };
+#endif
 
 /* The date representation formats
  */
