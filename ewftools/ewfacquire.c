@@ -630,16 +630,36 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 		     ewfinput_yes_no,
 		     2,
 		     0,
-		     &fixed_string_variable ) == -1 )
+		     &fixed_string_variable,
+		     error ) == -1 )
 		{
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				notify_error_backtrace(
+				 *error );
+			}
+			liberror_error_free(
+			 error );
+
 			fprintf(
 			 stream,
 			 "Unable to determine answer.\n" );
 		}
 		else if( ewfinput_determine_yes_no(
 		          fixed_string_variable,
-		          (uint8_t *) &input_confirmed ) != 1 )
+		          (uint8_t *) &input_confirmed,
+		          error ) != 1 )
 		{
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				notify_error_backtrace(
+				 *error );
+			}
+			liberror_error_free(
+			 error );
+
 			fprintf(
 			 stream,
 			 "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
@@ -1785,8 +1805,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
-				     &header_codepage ) != 1 )
+				     &header_codepage,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported header codepage defaulting to: ascii.\n" );
@@ -1798,8 +1824,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
-				     &sector_error_granularity ) != 1 )
+				     &sector_error_granularity,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported amount of sector error granularity defaulting to: 64.\n" );
@@ -1841,8 +1873,14 @@ int main( int argc, char * const argv[] )
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
-				     &compression_flags ) != 1 )
+				     &compression_flags,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
@@ -1895,8 +1933,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'f':
 				if( ewfinput_determine_ewf_format(
 				     optarg,
-				     &ewf_format ) != 1 )
+				     &ewf_format,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported EWF file format type defaulting to: encase6.\n" );
@@ -1912,8 +1956,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'g':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
-				     &sectors_per_chunk ) != 1 )
+				     &sectors_per_chunk,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
@@ -1940,8 +1990,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'm':
 				if( ewfinput_determine_media_type(
 				     optarg,
-				     &media_type ) != 1 )
+				     &media_type,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported media type defaulting to: fixed.\n" );
@@ -1957,8 +2013,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'M':
 				if( ewfinput_determine_media_flags(
 				     optarg,
-				     &media_flags ) != 1 )
+				     &media_flags,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported media flags defaulting to: physical.\n" );
@@ -2725,8 +2787,14 @@ int main( int argc, char * const argv[] )
 				stdout,
 				_SYSTEM_CHARACTER_T_STRING( "Image path and filename with extension" ),
 				target_filename,
-				1024 ) != 1 )
+				1024,
+			        &error ) != 1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Filename is required, please try again or terminate using Ctrl^C.\n" );
@@ -2738,8 +2806,14 @@ int main( int argc, char * const argv[] )
 				stdout,
 				_SYSTEM_CHARACTER_T_STRING( "Image path and filename without extension" ),
 				target_filename,
-				1024 ) != 1 )
+				1024,
+			        &error ) != 1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Filename is required, please try again or terminate using Ctrl^C.\n" );
@@ -2839,8 +2913,14 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       _SYSTEM_CHARACTER_T_STRING( "Case number" ),
 			       case_number,
-			       256 ) == -1 ) )
+			       256,
+			       &error ) == -1 ) )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Unable to set case number string.\n" );
@@ -2854,8 +2934,14 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       _SYSTEM_CHARACTER_T_STRING( "Description" ),
 			       description,
-			       256 ) == -1 ) )
+			       256,
+			       &error ) == -1 ) )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Unable to set description string.\n" );
@@ -2869,8 +2955,14 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       _SYSTEM_CHARACTER_T_STRING( "Evidence number" ),
 			       evidence_number,
-			       256 ) == -1 ) )
+			       256,
+			       &error ) == -1 ) )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Unable to set evidence number string.\n" );
@@ -2884,8 +2976,14 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       _SYSTEM_CHARACTER_T_STRING( "Examiner name" ),
 			       examiner_name,
-			       256 ) == -1 ) )
+			       256,
+			       &error ) == -1 ) )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Unable to set examiner name string.\n" );
@@ -2899,8 +2997,14 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       _SYSTEM_CHARACTER_T_STRING( "Notes" ),
 			       notes,
-			       256 ) == -1 ) )
+			       256,
+			       &error ) == -1 ) )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Unable to set notes string.\n" );
@@ -2919,8 +3023,14 @@ int main( int argc, char * const argv[] )
 				     ewfinput_media_types,
 				     EWFINPUT_MEDIA_TYPES_AMOUNT,
 				     EWFINPUT_MEDIA_TYPES_DEFAULT,
-				     &fixed_string_variable ) == -1 )
+				     &fixed_string_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unable to determine media type defaulting to: fixed.\n" );
@@ -2929,8 +3039,14 @@ int main( int argc, char * const argv[] )
 				}
 				else if( ewfinput_determine_media_type(
 					  fixed_string_variable,
-					  &media_type ) != 1 )
+					  &media_type,
+				          &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unsupported media type defaulting to: fixed.\n" );
@@ -2957,8 +3073,14 @@ int main( int argc, char * const argv[] )
 				     ewfinput_media_flags,
 				     EWFINPUT_MEDIA_FLAGS_AMOUNT,
 				     (uint8_t) default_media_flags,
-				     &fixed_string_variable ) == -1 )
+				     &fixed_string_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unable to determine media flags defaulting to: physical.\n" );
@@ -2967,8 +3089,14 @@ int main( int argc, char * const argv[] )
 				}
 				else if( ewfinput_determine_media_flags(
 					  fixed_string_variable,
-					  &media_flags ) != 1 )
+					  &media_flags,
+				          &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unsupported media flags defaulting to: physical.\n" );
@@ -2988,8 +3116,14 @@ int main( int argc, char * const argv[] )
 				     ewfinput_compression_levels,
 				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-				     &fixed_string_variable ) == -1 )
+				     &fixed_string_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unable to determine compression type defaulting to: none.\n" );
@@ -3000,8 +3134,14 @@ int main( int argc, char * const argv[] )
 				else if( ewfinput_determine_compression_level(
 					  fixed_string_variable,
 					  &compression_level,
-					  &compression_flags ) != 1 )
+					  &compression_flags,
+				          &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unsupported compression type defaulting to: none.\n" );
@@ -3022,8 +3162,14 @@ int main( int argc, char * const argv[] )
 				     ewfinput_format_types,
 				     EWFINPUT_FORMAT_TYPES_AMOUNT,
 				     EWFINPUT_FORMAT_TYPES_DEFAULT,
-				     &fixed_string_variable ) == -1 )
+				     &fixed_string_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unable to determine EWF file format type defaulting to: encase6.\n" );
@@ -3032,8 +3178,14 @@ int main( int argc, char * const argv[] )
 				}
 				else if( ewfinput_determine_ewf_format(
 					  fixed_string_variable,
-					  &ewf_format ) != 1 )
+					  &ewf_format,
+				          &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unsupported EWF file format type defaulting to: encase6.\n" );
@@ -3056,8 +3208,14 @@ int main( int argc, char * const argv[] )
 			       0,
 			       media_size,
 			       0,
-			       &acquiry_offset ) == -1 ) )
+			       &acquiry_offset,
+			       &error ) == -1 ) )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				acquiry_offset = 0;
 
 				fprintf(
@@ -3079,8 +3237,14 @@ int main( int argc, char * const argv[] )
 			       0,
 			       ( media_size - acquiry_offset ),
 			       ( media_size - acquiry_offset ),
-			       &acquiry_size ) == -1 ) )
+			       &acquiry_size,
+			       &error ) == -1 ) )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				acquiry_size = media_size - acquiry_offset;
 
 				fprintf(
@@ -3146,8 +3310,14 @@ int main( int argc, char * const argv[] )
 				     0,
 				     UINT32_MAX,
 				     bytes_per_sector,
-				     &input_size_variable ) == -1 )
+				     &input_size_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					input_size_variable = 512;
 
 					fprintf(
@@ -3169,8 +3339,14 @@ int main( int argc, char * const argv[] )
 				     ewfinput_sector_per_block_sizes,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-				     &fixed_string_variable ) == -1 )
+				     &fixed_string_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unable to determine sectors per chunk defaulting to: 64.\n" );
@@ -3179,8 +3355,14 @@ int main( int argc, char * const argv[] )
 				}
 				else if( ewfinput_determine_sectors_per_chunk(
 					  fixed_string_variable,
-					  &sectors_per_chunk ) != 1 )
+					  &sectors_per_chunk,
+				          &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stdout,
 					 "Unsupported sectors per chunk defaulting to: 64.\n" );
@@ -3200,8 +3382,14 @@ int main( int argc, char * const argv[] )
 				     1,
 				     (uint64_t) sectors_per_chunk,
 				     64,
-				     &input_size_variable ) == -1 )
+				     &input_size_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					input_size_variable = 64;
 
 					fprintf(
@@ -3224,8 +3412,14 @@ int main( int argc, char * const argv[] )
 			     0,
 			     255,
 			     2,
-			     &input_size_variable ) == -1 )
+			     &input_size_variable,
+			     &error ) == -1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				input_size_variable = 2;
 
 				fprintf(
@@ -3247,8 +3441,14 @@ int main( int argc, char * const argv[] )
 			     ewfinput_yes_no,
 			     2,
 			     1,
-			     &fixed_string_variable ) == -1 )
+			     &fixed_string_variable,
+			     &error ) == -1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Unable to determine wipe chunk on error defaulting to: no.\n" );
@@ -3257,8 +3457,14 @@ int main( int argc, char * const argv[] )
 			}
 			else if( ewfinput_determine_yes_no(
 				  fixed_string_variable,
-				  &wipe_block_on_read_error ) != 1 )
+				  &wipe_block_on_read_error,
+			          &error ) != 1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stdout,
 				 "Unsupported wipe chunk on error defaulting to: no.\n" );

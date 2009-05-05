@@ -28,6 +28,8 @@
 #include <types.h>
 #include <wide_string.h>
 
+#include <liberror.h>
+
 #if defined( HAVE_IO_H )
 #include <io.h>
 #endif
@@ -70,25 +72,28 @@ extern "C" {
 
 #if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
 int file_io_exists(
-     const char *filename );
+     const char *filename,
+     liberror_error_t **error );
 #endif
 
 #if defined( HAVE_WOPEN ) && defined( HAVE_CLOSE )
 int file_io_wexists(
-     const wchar_t *filename );
+     const wchar_t *filename,
+     liberror_error_t **error );
 #endif
 
 #if defined( HAVE_OPEN )
 int file_io_open(
      const char *filename,
-     int flags );
+     int flags,
+     liberror_error_t **error );
 #endif
 
 #if defined( HAVE_WOPEN )
 int file_io_wopen(
      const wchar_t *filename,
-     int flags );
-
+     int flags,
+     liberror_error_t **error );
 #endif
 
 #if defined( WINAPI )

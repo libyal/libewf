@@ -25,8 +25,9 @@
 #include <wide_string.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "file_io.h"
-#include "notify.h"
 
 #if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
 
@@ -34,14 +35,19 @@
  * Return 1 if file exists, 0 if not or -1 on error
  */
 int file_io_exists(
-     const char *filename )
+     const char *filename,
+     liberror_error_t **error )
 {
 	static char *function = "file_io_exists";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		notify_warning_printf( "%s: invalid filename.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -77,14 +83,19 @@ int file_io_exists(
  * Return 1 if file exists, 0 if not or -1 on error
  */
 int file_io_wexists(
-     const wchar_t *filename )
+     const wchar_t *filename,
+     liberror_error_t **error )
 {
 	static char *function = "file_io_wexists";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		notify_warning_printf( "%s: invalid filename.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -113,14 +124,19 @@ int file_io_wexists(
  */
 int file_io_open(
      const char *filename,
-     int flags )
+     int flags,
+     liberror_error_t **error )
 {
 	static char *function = "file_io_open";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		notify_warning_printf( "%s: invalid filename.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -141,11 +157,13 @@ int file_io_open(
 	if( file_descriptor == -1 )
 #endif
 	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		notify_warning_printf( "%s: error opening file: %s.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: error opening file: %s.\n",
 		 function,
 		 filename );
-#endif
 
 		return( -1 );
 	}
@@ -159,14 +177,19 @@ int file_io_open(
  */
 int file_io_wopen(
      const wchar_t *filename,
-     int flags )
+     int flags,
+     liberror_error_t **error )
 {
 	static char *function = "file_io_wopen";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		notify_warning_printf( "%s: invalid filename.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -179,11 +202,13 @@ int file_io_wopen(
 	     _SH_DENYRW,
 	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		notify_warning_printf( "%s: error opening file: %s.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: error opening file: %ls.\n",
 		 function,
 		 filename );
-#endif
 
 		return( -1 );
 	}

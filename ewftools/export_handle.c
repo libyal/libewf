@@ -639,7 +639,8 @@ int export_handle_open_output(
 		{
 			export_handle->raw_output_file_descriptor = system_string_open(
 			                                             filename,
-			                                             FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC );
+			                                             FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC,
+			                                             error );
 
 			if( export_handle->raw_output_file_descriptor == -1 )
 			{

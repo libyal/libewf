@@ -45,7 +45,6 @@
 
 #include "byte_size_string.h"
 #include "ewfinput.h"
-#include "notify.h"
 #include "system_string.h"
 
 /* Input selection defintions
@@ -101,21 +100,30 @@ system_character_t *ewfinput_yes_no[ 2 ] = \
  */
 int ewfinput_determine_ewf_format(
      const system_character_t *argument,
-     uint8_t *ewf_format )
+     uint8_t *ewf_format,
+     liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_ewf_format";
 	int result            = -1;
 
 	if( argument == NULL )
 	{
-		notify_warning_printf( "%s: invalid argument string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid argument string.",
 		 function );
 
 		return( -1 );
 	}
 	if( ewf_format == NULL )
 	{
-		notify_warning_printf( "%s: invalid libewf format.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid libewf format.",
 		 function );
 
 		return( -1 );
@@ -226,21 +234,30 @@ int ewfinput_determine_ewf_format(
  */
 int ewfinput_determine_sectors_per_chunk(
      const system_character_t *argument,
-     uint32_t *sectors_per_chunk )
+     uint32_t *sectors_per_chunk,
+     liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk";
 	int result            = -1;
 
 	if( argument == NULL )
 	{
-		notify_warning_printf( "%s: invalid argument string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid argument string.",
 		 function );
 
 		return( -1 );
 	}
 	if( sectors_per_chunk == NULL )
 	{
-		notify_warning_printf( "%s: invalid sectors per chunk.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid sectors per chunk.",
 		 function );
 
 		return( -1 );
@@ -334,28 +351,41 @@ int ewfinput_determine_sectors_per_chunk(
 int ewfinput_determine_compression_level(
      const system_character_t *argument,
      int8_t *compression_level,
-     uint8_t *compression_flags )
+     uint8_t *compression_flags,
+     liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_compression_level";
 	int result            = 1;
 
 	if( argument == NULL )
 	{
-		notify_warning_printf( "%s: invalid argument string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid argument string.",
 		 function );
 
 		return( -1 );
 	}
 	if( compression_level == NULL )
 	{
-		notify_warning_printf( "%s: invalid compression level.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compression level.",
 		 function );
 
 		return( -1 );
 	}
 	if( compression_flags == NULL )
 	{
-		notify_warning_printf( "%s: invalid compression flags.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compression flags.",
 		 function );
 
 		return( -1 );
@@ -413,21 +443,30 @@ int ewfinput_determine_compression_level(
  */
 int ewfinput_determine_media_type(
      const system_character_t *argument,
-     uint8_t *media_type )
+     uint8_t *media_type,
+     liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_media_type";
 	int result            = -1;
 
 	if( argument == NULL )
 	{
-		notify_warning_printf( "%s: invalid argument string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid argument string.",
 		 function );
 
 		return( -1 );
 	}
 	if( media_type == NULL )
 	{
-		notify_warning_printf( "%s: invalid media type.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media type.",
 		 function );
 
 		return( -1 );
@@ -472,21 +511,30 @@ int ewfinput_determine_media_type(
  */
 int ewfinput_determine_media_flags(
      const system_character_t *argument,
-     uint8_t *media_flags )
+     uint8_t *media_flags,
+     liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_media_flags";
 	int result            = -1;
 
 	if( argument == NULL )
 	{
-		notify_warning_printf( "%s: invalid argument string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid argument string.",
 		 function );
 
 		return( -1 );
 	}
 	if( media_flags == NULL )
 	{
-		notify_warning_printf( "%s: invalid media flags.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media flags.",
 		 function );
 
 		return( -1 );
@@ -531,21 +579,30 @@ int ewfinput_determine_media_flags(
  */
 int ewfinput_determine_header_codepage(
      const system_character_t *argument,
-     int *header_codepage )
+     int *header_codepage,
+     liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_header_codepage";
 	int result            = -1;
 
 	if( argument == NULL )
 	{
-		notify_warning_printf( "%s: invalid argument string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid argument string.",
 		 function );
 
 		return( -1 );
 	}
 	if( header_codepage == NULL )
 	{
-		notify_warning_printf( "%s: invalid byte stream codepage.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte stream codepage.",
 		 function );
 
 		return( -1 );
@@ -710,21 +767,30 @@ int ewfinput_determine_header_codepage(
  */
 int ewfinput_determine_yes_no(
      const system_character_t *argument,
-     uint8_t *yes_no_value )
+     uint8_t *yes_no_value,
+     liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_yes_no";
 	int result            = -1;
 
 	if( argument == NULL )
 	{
-		notify_warning_printf( "%s: invalid argument string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid argument string.",
 		 function );
 
 		return( -1 );
 	}
 	if( yes_no_value == NULL )
 	{
-		notify_warning_printf( "%s: invalid yes no value.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid yes no value.",
 		 function );
 
 		return( -1 );
@@ -755,7 +821,8 @@ int ewfinput_get_string_variable(
      FILE *stream,
      system_character_t *request_string,
      system_character_t *string_variable,
-     size_t string_variable_size )
+     size_t string_variable_size,
+     liberror_error_t **error )
 {
 	system_character_t *end_of_input  = NULL;
 	system_character_t *result_string = NULL;
@@ -764,28 +831,44 @@ int ewfinput_get_string_variable(
 
 	if( stream == NULL )
 	{
-		notify_warning_printf( "%s: invalid output stream.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid output stream.",
 		 function );
 
 		return( -1 );
 	}
 	if( request_string == NULL )
 	{
-		notify_warning_printf( "%s: invalid request string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid request string.",
 		 function );
 
 		return( -1 );
 	}
 	if( string_variable == NULL )
 	{
-		notify_warning_printf( "%s: invalid string variable.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string variable.",
 		 function );
 
 		return( -1 );
 	}
 	if( string_variable_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid string variable size value exceeds maximum.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string variable size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -871,7 +954,8 @@ int ewfinput_get_size_variable(
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
-     uint64_t *size_variable )
+     uint64_t *size_variable,
+     liberror_error_t **error )
 {
 	system_character_t *end_of_input  = NULL;
 	system_character_t *result_string = NULL;
@@ -880,35 +964,55 @@ int ewfinput_get_size_variable(
 
 	if( stream == NULL )
 	{
-		notify_warning_printf( "%s: invalid output stream.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid output stream.",
 		 function );
 
 		return( -1 );
 	}
 	if( input_buffer == NULL )
 	{
-		notify_warning_printf( "%s: invalid input buffer.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid input buffer.",
 		 function );
 
 		return( -1 );
 	}
 	if( input_buffer_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid input buffer size value exceeds maximum.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid input buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
 	if( request_string == NULL )
 	{
-		notify_warning_printf( "%s: invalid request string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid request string.",
 		 function );
 
 		return( -1 );
 	}
 	if( size_variable == NULL )
 	{
-		notify_warning_printf( "%s: invalid size variable.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid size variable.",
 		 function );
 
 		return( -1 );
@@ -1051,7 +1155,11 @@ int ewfinput_get_byte_size_variable(
 	}
 	if( input_buffer_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid input buffer size value exceeds maximum.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid input buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1228,7 +1336,8 @@ int ewfinput_get_fixed_string_variable(
      system_character_t **values,
      uint8_t amount_of_values,
      uint8_t default_value,
-     system_character_t **fixed_string_variable )
+     system_character_t **fixed_string_variable,
+     liberror_error_t **error )
 {
 
 	system_character_t *end_of_input  = NULL;
@@ -1240,42 +1349,66 @@ int ewfinput_get_fixed_string_variable(
 
 	if( stream == NULL )
 	{
-		notify_warning_printf( "%s: invalid output stream.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid output stream.",
 		 function );
 
 		return( -1 );
 	}
 	if( input_buffer == NULL )
 	{
-		notify_warning_printf( "%s: invalid input buffer.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid input buffer.",
 		 function );
 
 		return( -1 );
 	}
 	if( input_buffer_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid input buffer size value exceeds maximum.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid input buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
 	if( request_string == NULL )
 	{
-		notify_warning_printf( "%s: invalid request string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid request string.",
 		 function );
 
 		return( -1 );
 	}
 	if( default_value >= amount_of_values )
 	{
-		notify_warning_printf( "%s: default value exceeds amount.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: default value exceeds amount.",
 		 function );
 
 		return( -1 );
 	}
 	if( fixed_string_variable == NULL )
 	{
-		notify_warning_printf( "%s: invalid fixed string variable.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid fixed string variable.",
 		 function );
 
 		return( -1 );
