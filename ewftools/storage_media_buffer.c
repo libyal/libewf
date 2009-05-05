@@ -97,8 +97,15 @@ int storage_media_buffer_initialize(
 		}
 		if( size > 0 )
 		{
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			/* Add 4 bytes to allow for write CRC buffer alignment
+			 */
+			( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
+			                                       sizeof( uint8_t ) * ( size + 4 ) );
+#else
 			( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
 			                                       sizeof( uint8_t ) * size );
+#endif
 			
 			if( ( *buffer )->raw_buffer == NULL )
 			{
@@ -119,6 +126,8 @@ int storage_media_buffer_initialize(
 			( *buffer )->raw_buffer_size = size;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			( *buffer )->crc_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
+
 			( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
 			                                               sizeof( uint8_t ) * ( size * 2 ) );
 			
@@ -255,7 +264,7 @@ int storage_media_buffer_resize(
  */
 int storage_media_buffer_get_data(
      storage_media_buffer_t *buffer,
-     void **data,
+     uint8_t **data,
      size_t *size,
      liberror_error_t **error )
 {
@@ -297,7 +306,7 @@ int storage_media_buffer_get_data(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( buffer->data_in_compression_buffer == 0 )
 	{
-		*data = (void *) buffer->raw_buffer;
+		*data = buffer->raw_buffer;
 		*size = (size_t) buffer->raw_buffer_amount;
 	}
 	else

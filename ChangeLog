@@ -30,6 +30,7 @@ Further analysis of the EWF format:
 * values in session section (+/-)
 * amount of sectors in volume/data section has changed to a 64-bit value
   but what about error2/sessions ?
+* linen6 sha1 support?
 
 Features
 * tools and library support read/write of EnCase 6.12 SHA1
@@ -62,6 +63,7 @@ Possible performance improvements:
   - add offsets of other segment files when needed
 * tune read and write buffer sizes
   - read/write block size seems to have little effect for dd on average
+  - buffered bfio ?
 * reduce alloc, realloc and free (this reduces breaks) use strace to analyze
   - pass values as parameters or use of handle
   - what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
@@ -98,7 +100,6 @@ API changes
 
 ewftools:
 * add getoptlong support
-* implement CRC buffer alignment for chunk write functions
 * log handle
   - implement libpff log handle
 * liberror
@@ -115,7 +116,6 @@ ewftools:
   - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
     no, although not set in EWF file, the granualarity is still used in handling read errors
   - warn if values exceed maximum segment count
-  - read from pipe - what about input size?
   - adjust error granularity if error granularity < process buffer size
   - move ewfacquire_read_buffer to device_handle, list read errors
   - warn if media does not fit using chunk size or APIv1
@@ -130,9 +130,6 @@ ewftools:
   - improve error detection and output (refactor error string like libbfio)
   - detect bus type
   - determine USB serial number
-* imaging handle
-  - move output handle initialize to imaging_handle_open_output function ?
-  - used storage_media_buffer_get_data in byte swap function
 * ewfacquirestream
   - implement -B as write size upper boundary
   - implement -o as skip of an amount of bytes ?
@@ -147,19 +144,37 @@ ewftools:
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
   - allow different input and output header codepages?
-* export handle
-  - move input handle initialize to export_handle_open_input function ?
-  - used storage_media_buffer_get_data in byte swap function
-* ewfinfo
-* info handle
-  - move input handle initialize to info_handle_open_input function ?
-  - implement use of libewf_handle_get_header_value_identifier_size for V2 API support
-* ewfverify
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
 * ewfrecover
   - create a tool recover ewf files
+
+Windows build
+* windows port
+  - some of the Windows functions are MVC 2005 or later specific
+  - figure out a way to warn about the compiler used
+* add WIN32_LEAN_AND_MEAN or VC_EXTRALEAN to msvscpp
+* locale support
+  - print output convert to system string
+  - reduce string conversions, use as much as possible the system string type in the tools
+* ewftools check char/wchar in/output
+
+Testing
+* add export unattended to automated tests
+* add encase 6.12 sha1 support to test
+
+Deployment
+* debian package
+  - implement non local libuna and libbfio support like in spec file
+* configure
+  - remove enable-v1-api after testing?
+
+Code clean up
+* rewrite glob marcros to function macros (including arguments) ?
+* rename length into size, make sure string size contains end of string character
+  - length is used when the value does not contain the EOS
+  - size is used when the value contains the EOS or otherwise
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -169,33 +184,6 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
-
-Code clean up
-* rewrite glob marcros to function macros (including arguments) ?
-* rename length into size, make sure string size contains end of string character
-  - length is used when the value does not contain the EOS
-  - size is used when the value contains the EOS or otherwise
-
-Testing
-* add export unattended to automated tests
-* add encase 6.12 sha1 support to test
-
-Windows build
-* windows port
-  - some of the Windows functions are MVC 2005 or later specific
-  - figure out a way to warn about the compiler used
-* add WIN32_LEAN_AND_MEAN or VC_EXTRALEAN to msvscpp
-
-* locale support
-  - print output convert to system string
-  - reduce string conversions, use as much as possible the system string type in the tools
-* ewftools check char/wchar in/output
-
-Deployment
-* debian package
-  - implement non local libuna and libbfio support like in spec file
-* configure
-  - remove enable-v1-api after testing?
 
 Work in progress:
 * check sprintf use

@@ -4850,6 +4850,8 @@ ssize_t libewf_section_error2_write(
 	 error2.crc,
 	 calculated_crc );
 
+	/* TODO EnCase compatible way to handle > 32-bit sector values
+	 */
 	error2_sectors = (ewf_error2_sector_t *) memory_allocate(
 	                                          sectors_size );
 

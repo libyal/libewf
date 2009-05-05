@@ -808,10 +808,6 @@ ssize_t imaging_handle_write_buffer(
          size_t write_size,
          liberror_error_t **error )
 {
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS ) && defined( HAVE_V2_API )
-	uint8_t crc_buffer[ 4 ];
-#endif
-
 	static char *function        = "imaging_handle_write_buffer";
 	ssize_t write_count          = 0;
 
@@ -886,7 +882,7 @@ ssize_t imaging_handle_write_buffer(
 	               raw_write_buffer_size,
 	               storage_media_buffer->raw_buffer_amount,
 	               storage_media_buffer->is_compressed,
-	               crc_buffer,
+	               storage_media_buffer->crc_buffer,
 	               storage_media_buffer->crc,
 	               storage_media_buffer->process_crc,
 	               error );
@@ -1062,7 +1058,9 @@ int imaging_handle_swap_byte_pairs(
      size_t read_size,
      liberror_error_t **error )
 {
+	uint8_t *data         = NULL;
 	static char *function = "imaging_handle_swap_byte_pairs";
+	size_t data_size      = 0;
 	size_t iterator       = 0;
 	uint8_t byte          = 0;
 
@@ -1113,22 +1111,37 @@ int imaging_handle_swap_byte_pairs(
 
 		return( -1 );
 	}
-	if( read_size != (size_t) storage_media_buffer->raw_buffer_amount )
+	if( storage_media_buffer_get_data(
+	     storage_media_buffer,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve storage media buffer data.",
+		 function );
+
+		return( -1 );
+	}
+	if( read_size != data_size )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: mismatch in read size and buffer data amount.",
+		 "%s: mismatch in read size and data size.",
 		 function );
 
 		return( -1 );
 	}
 	for( iterator = 0; iterator < read_size; iterator += 2 )
 	{
-		byte                                             = storage_media_buffer->raw_buffer[ iterator ];
-		storage_media_buffer->raw_buffer[ iterator ]     = storage_media_buffer->raw_buffer[ iterator + 1 ];
-		storage_media_buffer->raw_buffer[ iterator + 1 ] = byte;
+		byte                 = data[ iterator ];
+		data[ iterator ]     = data[ iterator + 1 ];
+		data[ iterator + 1 ] = byte;
 	}
 	return( 1 );
 }
@@ -1142,8 +1155,8 @@ int imaging_handle_update_integrity_hash(
      size_t read_size,
      liberror_error_t **error )
 {
+	uint8_t *data         = NULL;
 	static char *function = "imaging_handle_update_integrity_hash";
-	void *data            = NULL;
 	size_t data_size      = 0;
 
 	if( imaging_handle == NULL )

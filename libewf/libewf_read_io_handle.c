@@ -875,8 +875,6 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 			{
 				amount_of_sectors = (uint32_t) ( (int64_t) media_values->amount_of_sectors - sector );
 			}
-			/* TODO how are sector values > 32-bit handled by EnCase
-			 */
 			if( libewf_sector_table_add_sector(
 			     read_io_handle->crc_errors,
 			     sector,

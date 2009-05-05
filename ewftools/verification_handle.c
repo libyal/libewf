@@ -762,8 +762,8 @@ int verification_handle_update_integrity_hash(
      size_t read_size,
      liberror_error_t **error )
 {
+	uint8_t *data         = NULL;
 	static char *function = "verification_handle_update_integrity_hash";
-	void *data            = NULL;
 	size_t data_size      = 0;
 
 	if( verification_handle == NULL )

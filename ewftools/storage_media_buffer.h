@@ -70,6 +70,10 @@ struct storage_media_buffer
 	 */
 	ssize_t compression_buffer_amount;
 
+	/* The CRC buffer
+	 */
+	uint8_t *crc_buffer;
+
 	/* Value to indicate if the crc should be processed
 	 * read or written
 	 */
@@ -97,7 +101,7 @@ int storage_media_buffer_resize(
 
 int storage_media_buffer_get_data(
      storage_media_buffer_t *buffer,
-     void **data,
+     uint8_t **data,
      size_t *size,
      liberror_error_t **error );
 
