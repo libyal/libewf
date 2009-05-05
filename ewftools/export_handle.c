@@ -2342,8 +2342,8 @@ int export_handle_add_read_error(
       liberror_error_t **error )
 {
 	static char *function      = "export_handle_add_read_error";
-	off64_t start_sector       = 0;
-	uint32_t amount_of_sectors = 0;
+	uint64_t start_sector      = 0;
+	uint64_t amount_of_sectors = 0;
 
 	if( export_handle == NULL )
 	{
@@ -2381,7 +2381,7 @@ int export_handle_add_read_error(
 		return( -1 );
 	}
 	start_sector      = start_offset / export_handle->bytes_per_sector;
-	amount_of_sectors = (uint32_t) ( amount_of_bytes / export_handle->bytes_per_sector );
+	amount_of_sectors = amount_of_bytes / export_handle->bytes_per_sector;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 #if defined( HAVE_V2_API )
@@ -2393,8 +2393,8 @@ int export_handle_add_read_error(
 #else
 	if( libewf_add_crc_error(
 	     export_handle->input_handle,
-	     start_sector,
-	     amount_of_sectors ) != 1 )
+	     (off64_t) start_sector,
+	     (uint32_t) amount_of_sectors ) != 1 )
 #endif
 	{
 		liberror_error_set(
@@ -2430,8 +2430,8 @@ int export_handle_add_read_error(
 #else
 		if( libewf_add_acquiry_error(
 		     export_handle->ewf_output_handle,
-		     start_sector,
-		     amount_of_sectors ) != 1 )
+		     (off64_t) start_sector,
+		     (uint32_t) amount_of_sectors ) != 1 )
 #endif
 		{
 			liberror_error_set(
@@ -2636,9 +2636,13 @@ int export_handle_crc_errors_fprint(
      liberror_error_t **error )
 {
 	static char *function             = "export_handle_crc_errors_fprint";
-	uint64_t amount_of_sectors        = 0;
-	uint64_t first_sector             = 0;
+	uint64_t start_sector             = 0;
 	uint64_t last_sector              = 0;
+#if defined( HAVE_V2_API )
+	uint64_t amount_of_sectors        = 0;
+#else
+	uint32_t amount_of_sectors        = 0;
+#endif
 	uint32_t amount_of_errors         = 0;
 	uint32_t error_iterator           = 0;
 	int result                        = 1;
@@ -2719,15 +2723,15 @@ int export_handle_crc_errors_fprint(
 			if( libewf_handle_get_crc_error(
 			     export_handle->input_handle,
 			     error_iterator,
-			     &first_sector,
+			     &start_sector,
 			     &amount_of_sectors,
 			     error ) != 1 )
 #else
 			if( libewf_get_crc_error(
 			     export_handle->input_handle,
 			     error_iterator,
-			     (off64_t *) &first_sector,
-			     (uint32_t *) &amount_of_sectors ) != 1 )
+			     (off64_t *) &start_sector,
+			     &amount_of_sectors ) != 1 )
 #endif
 			{
 				liberror_error_set(
@@ -2738,33 +2742,42 @@ int export_handle_crc_errors_fprint(
 				 function,
 				 error_iterator );
 
-				first_sector      = 0;
+				start_sector      = 0;
 				amount_of_sectors = 0;
 
 				result = -1;
 			}
-			last_sector = first_sector + amount_of_sectors;
+			last_sector = start_sector + amount_of_sectors;
 
+#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu64 ")",
-			 first_sector,
+			 start_sector,
 			 last_sector,
 			 amount_of_sectors );
+#else
+			fprintf(
+			 stream,
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu32 ")",
+			 start_sector,
+			 last_sector,
+			 amount_of_sectors );
+#endif
 
 #if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 " in segment file(s):" );
 
-			first_sector *= export_handle->bytes_per_sector;
+			start_sector *= export_handle->bytes_per_sector;
 			last_sector  *= export_handle->bytes_per_sector;
 
-			while( first_sector < last_sector )
+			while( start_sector < last_sector )
 			{
 				if( libewf_handle_seek_offset(
 				     export_handle->input_handle,
-				     first_sector,
+				     (off64_t) start_sector,
 				     SEEK_SET,
 				     error ) == -1 )
 				{
@@ -2774,7 +2787,7 @@ int export_handle_crc_errors_fprint(
 					 LIBERROR_IO_ERROR_SEEK_FAILED,
 					 "%s: unable to seek offset: %" PRIu64 ".",
 					 function,
-					 first_sector );
+					 start_sector );
 
 					if( last_filename != NULL )
 					{
@@ -2887,7 +2900,7 @@ int export_handle_crc_errors_fprint(
 					last_filename      = filename;
 					last_filename_size = filename_size;
 				}
-				first_sector += export_handle->chunk_size;
+				start_sector += export_handle->chunk_size;
 			}
 			memory_free(
 			 last_filename );

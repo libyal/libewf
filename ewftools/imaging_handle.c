@@ -2579,8 +2579,8 @@ int imaging_handle_add_read_error(
       liberror_error_t **error )
 {
 	static char *function      = "imaging_handle_add_read_error";
-	off64_t start_sector       = 0;
-	uint32_t amount_of_sectors = 0;
+	uint64_t amount_of_sectors = 0;
+	uint64_t start_sector      = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -2616,7 +2616,7 @@ int imaging_handle_add_read_error(
 		return( -1 );
 	}
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
-	amount_of_sectors = (uint32_t) ( amount_of_bytes / imaging_handle->bytes_per_sector );
+	amount_of_sectors = amount_of_bytes / imaging_handle->bytes_per_sector;
 
 #if defined( HAVE_V2_API )
 	if( libewf_handle_add_acquiry_error(
@@ -2627,8 +2627,8 @@ int imaging_handle_add_read_error(
 #else
 	if( libewf_add_acquiry_error(
 	     imaging_handle->output_handle,
-	     start_sector,
-	     amount_of_sectors ) != 1 )
+	     (off64_t) start_sector,
+	     (uint32_t) amount_of_sectors ) != 1 )
 #endif
 	{
 		liberror_error_set(
@@ -2826,8 +2826,12 @@ int imaging_handle_acquiry_errors_fprint(
      liberror_error_t **error )
 {
 	static char *function      = "imaging_handle_acquiry_errors_fprint";
+	uint64_t start_sector      = 0;
+#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors = 0;
-	uint64_t first_sector      = 0;
+#else
+	uint32_t amount_of_sectors = 0;
+#endif
 	uint32_t amount_of_errors  = 0;
 	uint32_t error_iterator    = 0;
 	int result                 = 1;
@@ -2901,15 +2905,15 @@ int imaging_handle_acquiry_errors_fprint(
 			if( libewf_handle_get_acquiry_error(
 			     imaging_handle->output_handle,
 			     error_iterator,
-			     &first_sector,
+			     &start_sector,
 			     &amount_of_sectors,
 			     error ) != 1 )
 #else
 			if( libewf_get_acquiry_error(
 			     imaging_handle->output_handle,
 			     error_iterator,
-			     (off64_t *) &first_sector,
-			     (uint32_t *) &amount_of_sectors ) != 1 )
+			     (off64_t *) &start_sector,
+			     &amount_of_sectors ) != 1 )
 #endif
 			{
 				liberror_error_set(
@@ -2920,17 +2924,26 @@ int imaging_handle_acquiry_errors_fprint(
 				 function,
 				 error_iterator );
 
-				first_sector      = 0;
+				start_sector      = 0;
 				amount_of_sectors = 0;
 
 				result = -1;
 			}
+#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
-			 first_sector,
-			 first_sector + amount_of_sectors,
+			 start_sector,
+			 start_sector + amount_of_sectors,
 			 amount_of_sectors );
+#else
+			fprintf(
+			 stream,
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 start_sector,
+			 start_sector + amount_of_sectors,
+			 amount_of_sectors );
+#endif
 		}
 		fprintf(
 		 stream,
