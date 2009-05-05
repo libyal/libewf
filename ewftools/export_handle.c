@@ -1715,7 +1715,7 @@ int export_handle_set_output_values(
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error )
 {
-#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
 	uint8_t guid[ 16 ];
 #endif
 
@@ -2048,12 +2048,13 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
 		/* Add a system GUID if necessary
 		 */
 		if( ewfcommon_determine_guid(
 		     guid,
-		     libewf_format ) != 1 )
+		     libewf_format,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,

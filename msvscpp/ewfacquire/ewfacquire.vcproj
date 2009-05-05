@@ -164,6 +164,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\io_ata.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\io_optical_disk.c"
 				>
 			</File>
@@ -255,6 +259,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\imaging_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\io_ata.h"
 				>
 			</File>
 			<File

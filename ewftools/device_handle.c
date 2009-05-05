@@ -50,10 +50,6 @@ typedef size_t u64;
 
 #include <linux/fs.h>
 
-#if defined( HAVE_LINUX_HDREG_H )
-#include <linux/hdreg.h>
-#endif
-
 #else
 
 #if defined( HAVE_SYS_DISK_H )
@@ -68,6 +64,7 @@ typedef size_t u64;
 
 #include "byte_size_string.h"
 #include "device_handle.h"
+#include "io_ata.h"
 #include "io_bus.h"
 #include "io_optical_disk.h"
 #include "io_scsi.h"
@@ -1147,12 +1144,12 @@ int device_handle_get_media_information(
 	DWORD response_count   = 0;
 
 #else
-#if defined( HDIO_GET_IDENTITY )
-	struct hd_driveid drive_information;
-#endif
 #if defined( HAVE_IO_SCSI )
 	uint8_t response[ 255 ];
 	ssize_t response_count = 0;
+#endif
+#if defined( HAVE_IO_ATA )
+	struct hd_driveid device_configuration;
 #endif
 #endif
 
@@ -1640,26 +1637,31 @@ int device_handle_get_media_information(
 		}
 	}
 #endif
-#if defined( HDIO_GET_IDENTITY )
+#if defined( HAVE_IO_ATA )
 	if( device_handle->bus_type == IO_BUS_TYPE_ATA )
 	{
-		if( ioctl(
+		if( io_ata_get_device_configuration(
 		     device_handle->file_descriptor,
-		     HDIO_GET_IDENTITY,
-		     &drive_information ) != -1 )
+		     &device_configuration,
+		     error ) == -1 )
 		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			notify_dump_data(
-			 &drive_information,
-			 sizeof( struct hd_driveid ) );
-#endif
-
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				notify_error_backtrace(
+				 *error );
+			}
+			liberror_error_free(
+			 error );
+		}
+		else
+		{
 			if( device_handle->serial_number[ 0 ] == 0 )
 			{
 				result = system_string_trim_copy_from_byte_stream(
 					  device_handle->serial_number,
 					  255,
-					  drive_information.serial_no,
+					  device_configuration.serial_no,
 					  20,
 					  error );
 
@@ -1684,7 +1686,7 @@ int device_handle_get_media_information(
 				result = system_string_trim_copy_from_byte_stream(
 					  device_handle->model,
 					  255,
-					  drive_information.model,
+					  device_configuration.model,
 					  40,
 					  error );
 
@@ -1706,47 +1708,10 @@ int device_handle_get_media_information(
 			}
 			if( device_handle->media_information_set == 0 )
 			{
-				device_handle->removable             = ( drive_information.config & 0x0080 ) >> 7;
-				device_handle->device_type           = ( drive_information.config & 0x1f00 ) >> 8;
+				device_handle->removable             = ( device_configuration.config & 0x0080 ) >> 7;
+				device_handle->device_type           = ( device_configuration.config & 0x1f00 ) >> 8;
 				device_handle->media_information_set = 1;
 			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			fprintf(
-			 stderr,
-			 "Feature sets:\n" );
-			fprintf(
-			 stderr,
-			 "SMART:\t\t\t%d\n",
-			 ( drive_information.command_set_1 & 0x0001 ) );
-			fprintf(
-			 stderr,
-			 "Security Mode:\t\t%d (%d)\n",
-			 ( drive_information.command_set_1 & 0x0002 ) >> 1,
-			 ( drive_information.dlf & 0x0001 ) );
-			fprintf(
-			 stderr,
-			 "Security Mode enabled:\t%d\n",
-			 ( drive_information.dlf & 0x0002 ) >> 1 );
-			fprintf(
-			 stderr,
-			 "Removable Media:\t%d\n",
-			 ( drive_information.command_set_1 & 0x0004 ) >> 2 );
-			fprintf(
-			 stderr,
-			 "HPA:\t\t\t%d\n",
-			 ( drive_information.command_set_1 & 0x0400 ) >> 10 );
-			fprintf(
-			 stderr,
-			 "DCO:\t\t\t%d\n",
-			 ( drive_information.command_set_2 & 0x0800 ) >> 11 );
-			fprintf(
-			 stderr,
-			 "Media serial:\t\t%d\n",
-			 ( drive_information.cfsse & 0x0004 ) >> 2 );
-			fprintf(
-			 stderr,
-			 "\n" );
-#endif
 		}
 	}
 #endif
@@ -1757,14 +1722,14 @@ int device_handle_get_media_information(
 		     device_handle->file_descriptor,
 		     error ) != 1 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to test optical disk.",
-			 function );
-
-			return( -1 );
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				notify_error_backtrace(
+				 *error );
+			}
+			liberror_error_free(
+			 error );
 		}
 	}
 #endif

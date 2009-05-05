@@ -88,7 +88,6 @@ int libewf_media_values_initialize(
 		( *media_values )->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
 		( *media_values )->sectors_per_chunk = 64;
 		( *media_values )->bytes_per_sector  = 512;
-		( *media_values )->media_type        = 0;
 		( *media_values )->media_flags       = 0x01;
 	}
 	return( 1 );

@@ -217,17 +217,18 @@ Work in progress:
 * ewfacquire warn if media does not fit using chunk size or APIv1
   a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
 * if available add model and serial to header values
-* fix offset drift for MacOS-X read error handling
+
+Version: 20090504
+* fixed error in device read error handling
+* added Darwin uuid/uuid.h support
 
 Version: 20090503
 * worked on usb disk support
 * limited EWF/ENCASE1/SMART format to max 2 TiB acquire size
 * encase6 format is now default
 * library and tools pass automated tests
-* fixed error in device handle seek offset not correctly returning the current
-  offset
-* fixed read error correction in ewfacquire
-* tested device read error handling on MacOS-X
+* fixed error in device handle seek offset not correctly returning the current offset
+* fixed error in device read error handling
 
 Version: 20090502
 * worked on bus type support

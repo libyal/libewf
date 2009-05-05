@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090503],
+ [20090504],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090503])
+ [20090504])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -1120,35 +1120,61 @@ AS_IF(
 	 [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support.])
 	])
 
-dnl Check for enabling libuuid support
+dnl Check for enabling guid support
 AC_CHECK_HEADERS(
  [uuid/uuid.h],
  [],
- [ac_libewf_have_libuuid=no])
+ [ac_libewf_have_guid_support=no])
 
 AS_IF(
-	[test "x$ac_libewf_have_libuuid" != xno],
-	[ac_libewf_have_libuuid=yes
+	[test "x$ac_libewf_have_guid_support" != xno],
+	[ac_libewf_have_guid_support=libuuid
 	AC_CHECK_LIB(
-	 uuid,
-	 uuid_generate,
+	 [uuid],
+	 [uuid_generate],
 	 [],
-	 [ac_libewf_have_libuuid=no])
-	AC_CHECK_LIB(
-	 uuid,
-	 uuid_generate_random,
+	 [ac_libewf_have_guid_support=native])
+	AC_DEFINE(
+	 [HAVE_GUID_SUPPORT],
+	 [1],
+	 [Define to 1 if GUID support is available.])
+	])
+
+AS_IF(
+	[test "x$ac_libewf_have_guid_support" = xlibuuid],
+	[AC_CHECK_LIB(
+	 [uuid],
+	 [uuid_generate_random],
 	 [AC_DEFINE(
 	  [HAVE_UUID_GENERATE_RANDOM],
 	  [1],
 	  [Defines if uuid_generate_random funtion is present in libuuid.])
 	 ])
 	AC_CHECK_LIB(
-	 uuid,
-	 uuid_generate_time,
+	 [uuid],
+	 [uuid_generate_time],
 	 [AC_DEFINE(
 	  [HAVE_UUID_GENERATE_TIME],
 	  [1],
 	  [Defines if uuid_generate_time funtion is present in libuuid.])
+	 ])
+	])
+
+AS_IF(
+	[test "x$ac_libewf_have_guid_support" = xnative],
+	[AC_CHECK_FUNC(
+	 [uuid_generate_random],
+	 [AC_DEFINE(
+	  [HAVE_UUID_GENERATE_RANDOM],
+	  [1],
+	  [Defines if uuid_generate_random funtion is present.])
+	 ])
+	AC_CHECK_FUNC(
+	 [uuid_generate_time],
+	 [AC_DEFINE(
+	  [HAVE_UUID_GENERATE_TIME],
+	  [1],
+	  [Defines if uuid_generate_time funtion is present.])
 	 ])
 	])
 
@@ -1433,7 +1459,7 @@ Building:
    libcrypto EVP support:                           $ac_libewf_have_libcrypto_evp
    libcrypto MD5 support:                           $ac_libewf_have_libcrypto_md5
    libcrypto SHA1 support:                          $ac_libewf_have_libcrypto_sha1
-   libuuid support:                                 $ac_libewf_have_libuuid
+   guid support:                                    $ac_libewf_have_guid_support
 
 Features:
    Wide character type support:                     $ac_cv_libewf_enable_wide_character_type

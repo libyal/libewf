@@ -1606,7 +1606,11 @@ int info_handle_media_information_fprint(
 	char *format_string        = NULL;
 	static char *function      = "info_handle_media_information_fprint";
 	size64_t media_size        = 0;
+#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors = 0;
+#else
+	uint32_t amount_of_sectors = 0;
+#endif
 	uint32_t bytes_per_sector  = 0;
 	uint32_t error_granularity = 0;
 	uint8_t compression_flags  = 0;
@@ -2014,17 +2018,23 @@ int info_handle_media_information_fprint(
 	     info_handle->input_handle,
 	     &amount_of_sectors,
 	     error ) == 1 )
-#else
-	if( libewf_get_amount_of_sectors(
-	     info_handle->input_handle,
-	     (uint32_t *) &amount_of_sectors ) == 1 )
-#endif
 	{
 		fprintf(
 		 stream,
 		 "\tAmount of sectors:\t%" PRIu64 "\n",
 		 amount_of_sectors );
 	}
+#else
+	if( libewf_get_amount_of_sectors(
+	     info_handle->input_handle,
+	     &amount_of_sectors ) == 1 )
+	{
+		fprintf(
+		 stream,
+		 "\tAmount of sectors:\t%" PRIu32 "\n",
+		 amount_of_sectors );
+	}
+#endif
 	else
 	{
 		liberror_error_set(

@@ -182,7 +182,8 @@ int ewfcommon_determine_operating_system_string(
  */
 int ewfcommon_determine_guid(
      uint8_t *guid,
-     uint8_t libewf_format )
+     uint8_t libewf_format,
+     liberror_error_t **error )
 {
 #if defined( WINAPI )
 	UUID uuid             = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
@@ -192,7 +193,11 @@ int ewfcommon_determine_guid(
 
 	if( guid == NULL )
 	{
-		notify_warning_printf( "%s: invalid GUID.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid GUID.",
 		 function );
 
 		return( -1 );

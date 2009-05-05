@@ -1685,6 +1685,10 @@ int imaging_handle_set_output_values(
      size_t acquiry_software_length,
      system_character_t *acquiry_software_version,
      size_t acquiry_software_version_length,
+     system_character_t *model,
+     size_t model_length,
+     system_character_t *serial_number,
+     size_t serial_number_length,
      int header_codepage,
      uint32_t bytes_per_sector,
      size64_t media_size,
@@ -1698,7 +1702,7 @@ int imaging_handle_set_output_values(
      uint32_t sector_error_granularity,
      liberror_error_t **error )
 {
-#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
 	uint8_t guid[ 16 ];
 #endif
 
@@ -1877,6 +1881,42 @@ int imaging_handle_set_output_values(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header value: acquiry software version.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( model != NULL )
+	 && ( imaging_handle_set_header_value(
+	       imaging_handle,
+	       "model",
+	       5,
+	       model,
+	       model_length,
+	       error ) != 1 ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header value: model.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( serial_number != NULL )
+	 && ( imaging_handle_set_header_value(
+	       imaging_handle,
+	       "serial_number",
+	       13,
+	       serial_number,
+	       serial_number_length,
+	       error ) != 1 ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header value: serial number.",
 		 function );
 
 		return( -1 );
@@ -2085,12 +2125,13 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_UUID_UUID_H ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
 	/* Add a system GUID if necessary
 	 */
 	if( ewfcommon_determine_guid(
 	     guid,
-	     libewf_format ) != 1 )
+	     libewf_format,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,

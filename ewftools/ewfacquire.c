@@ -867,10 +867,10 @@ ssize_t ewfacquire_read_buffer(
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf(
-				 "%s: correcting offset drift current: %" PRIjd ", calculated: %" PRIjd ".\n",
+				 "%s: correcting offset drift calculated: %" PRIjd ", current: %" PRIjd ".\n",
 				 function,
-				 current_read_offset,
-				 current_calculated_offset );
+				 current_calculated_offset,
+				 current_read_offset );
 #endif
 
 				if( current_read_offset < current_calculated_offset )
@@ -934,13 +934,13 @@ ssize_t ewfacquire_read_buffer(
 		{
 			/* Check if last chunk is smaller than the chunk size and take corrective measures
 			 */
-			if( ( current_offset + (off64_t) remaining_read_size ) > (off64_t) total_input_size )
+			if( ( current_offset + (off64_t) read_size ) > (off64_t) total_input_size )
 			{
 				read_remaining_bytes = (size_t) ( total_input_size - current_offset );
 			}
 			else
 			{
-				read_remaining_bytes = remaining_read_size;
+				read_remaining_bytes = read_size;
 			}
 			if( read_remaining_bytes > (size_t) SSIZE_MAX )
 			{
@@ -989,9 +989,10 @@ ssize_t ewfacquire_read_buffer(
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf(
-				 "%s: wiping remainder of chunk at offset %" PRIu32 ".\n",
+				 "%s: wiping remainder of block: %" PRIu32 " at offset %" PRIzd ".\n",
 				 function,
-				 read_error_offset );
+				 error_skip_bytes,
+				 read_error_buffer_offset );
 #endif
 
 				if( memory_set(
@@ -3425,6 +3426,10 @@ int main( int argc, char * const argv[] )
 				  acquiry_software_version,
 				  system_string_length(
 				   acquiry_software_version ),
+			          NULL,
+			          0,
+			          NULL,
+			          0,
 				  header_codepage,
 				  bytes_per_sector,
 				  acquiry_size,

@@ -65,7 +65,8 @@ int ewfcommon_determine_operating_system_string(
 
 int ewfcommon_determine_guid(
      uint8_t *guid,
-     uint8_t libewf_format );
+     uint8_t libewf_format,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

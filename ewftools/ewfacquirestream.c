@@ -1832,6 +1832,10 @@ int main( int argc, char * const argv[] )
 			  acquiry_software_version,
 			  system_string_length(
 			   acquiry_software_version ),
+		          NULL,
+		          0,
+		          NULL,
+		          0,
 		          header_codepage,
 		          bytes_per_sector,
 		          acquiry_size,
