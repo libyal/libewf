@@ -33,13 +33,13 @@
 #if !defined( HAVE_CTIME_R )
 
 /* Sets ctime in the string
- * The string must be at least 32 characters of length
+ * The string must be at least 32 characters of size
  * Returns the pointer to the string if successful or NULL on error
  */
 char *_date_time_ctime(
        const time_t *timestamp,
        char *string,
-       size_t length )
+       size_t size )
 {
 	char *ctime_string    = NULL;
 	static char *function = "_date_time_ctime";
@@ -58,14 +58,14 @@ char *_date_time_ctime(
 
 		return( NULL );
 	}
-	if( length > (size_t) SSIZE_MAX )
+	if( size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid length.\n",
+		notify_warning_printf( "%s: invalid size.\n",
 		 function );
 
 		return( NULL );
 	}
-	if( length < 32 )
+	if( size < 32 )
 	{
 		notify_warning_printf( "%s: string too small.\n",
 		 function );

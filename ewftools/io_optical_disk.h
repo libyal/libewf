@@ -32,7 +32,9 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_LINUX_CDROM_H )
+#if defined( WINAPI )
+
+#elif defined( HAVE_LINUX_CDROM_H )
 #define HAVE_IO_OPTICAL_DISK
 #endif
 

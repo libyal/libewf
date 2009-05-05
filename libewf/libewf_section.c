@@ -99,7 +99,6 @@ int libewf_section_test_zero(
 ssize_t libewf_section_start_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         off64_t section_start_offset,
          ewf_section_t *section,
          uint64_t *section_size,
          uint64_t *section_next,
@@ -6906,7 +6905,6 @@ int libewf_section_read(
 	if( libewf_section_start_read(
 	     file_io_pool,
 	     segment_file_handle,
-	     *section_start_offset,
 	     section,
 	     &section_size,
 	     &section_next,

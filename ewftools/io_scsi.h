@@ -32,7 +32,9 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_SCSI_SG_H )
+#if defined( WINAPI )
+
+#elif defined( HAVE_SCSI_SG_H )
 #define HAVE_IO_SCSI
 #endif
 

@@ -282,11 +282,5 @@
 #define USE_NATIVE_WINAPI_FUNCTIONS	1
  */
 
-#if defined( LIBEWF_OPERATING_SYSTEM )
-#undef LIBEWF_OPERATING_SYSTEM
-#endif
-
-#define LIBEWF_OPERATING_SYSTEM		"Windows"
-
 #endif
 

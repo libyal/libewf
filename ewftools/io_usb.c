@@ -24,7 +24,6 @@
 #include <endian.h>
 #include <memory.h>
 #include <narrow_string.h>
-#include <notify.h>
 #include <types.h>
 
 #include <liberror.h>
@@ -33,12 +32,18 @@
 #include <sys/ioctl.h>
 #endif
 
+#if defined( WINAPI )
+
+#else
+
 #if defined( HAVE_LINUX_USBDEVICE_FS_H )
 #include <linux/usbdevice_fs.h>
 #endif
 
 #if defined( HAVE_LINUX_USB_CH9_H )
 #include <linux/usb/ch9.h>
+#endif
+
 #endif
 
 #include <errno.h>

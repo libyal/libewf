@@ -128,10 +128,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfcommon.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfgetopt.c"
 				>
 			</File>
@@ -152,6 +148,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\guid.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\glob.c"
 				>
 			</File>
@@ -161,6 +161,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\notify.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\platform.c"
 				>
 			</File>
 			<File
@@ -230,6 +234,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\guid.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\glob.h"
 				>
 			</File>
@@ -243,6 +251,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\notify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\platform.h"
 				>
 			</File>
 			<File

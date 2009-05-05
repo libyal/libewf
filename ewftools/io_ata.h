@@ -32,7 +32,9 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_LINUX_HDREG_H )
+#if defined( WINAPI )
+
+#elif defined( HAVE_LINUX_HDREG_H )
 #include <linux/hdreg.h>
 
 #define HAVE_IO_ATA

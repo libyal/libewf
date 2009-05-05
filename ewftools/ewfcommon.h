@@ -33,7 +33,6 @@
 #include <libewf/definitions.h>
 
 #include "error_string.h"
-#include "system_string.h"
 
 #define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
 #define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1024 * 1024 )
@@ -53,20 +52,6 @@ extern "C" {
         error_string_strerror( error_number )
 
 #endif
-
-int ewfcommon_swap_byte_pairs(
-     uint8_t *buffer,
-     size_t size );
-
-int ewfcommon_determine_operating_system_string(
-     system_character_t *operating_system_string,
-     size_t operating_system_string_size,
-     liberror_error_t **error );
-
-int ewfcommon_determine_guid(
-     uint8_t *guid,
-     uint8_t libewf_format,
-     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

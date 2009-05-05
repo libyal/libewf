@@ -23,7 +23,6 @@
 #include <common.h>
 #include <endian.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
 #include <liberror.h>
@@ -32,8 +31,14 @@
 #include <sys/ioctl.h>
 #endif
 
+#if defined( WINAPI )
+
+#else
+
 #if defined( HAVE_LINUX_CDROM_H )
 #include <linux/cdrom.h>
+#endif
+
 #endif
 
 #include "io_optical_disk.h"

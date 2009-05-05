@@ -45,7 +45,7 @@ int platform_get_operating_system(
      size_t operating_system_string_size,
      liberror_error_t **error )
 {
-#if defined( HAVE_UNAME )
+#if defined( HAVE_UNAME ) && !defined( WINAPI )
 	struct utsname utsname_buffer;
 #endif
 
@@ -64,7 +64,10 @@ int platform_get_operating_system(
 
 		return( -1 );
 	}
-#if defined( HAVE_UNAME )
+#if defined( WINAPI )
+	operating_system = "Windows";
+
+#elif defined( HAVE_UNAME )
 	/* Determine the operating system
 	 */
 	if( uname(
@@ -77,8 +80,11 @@ int platform_get_operating_system(
 		operating_system = "Undetermined";
 	}
 #else
+	/* Have configure determine the operating system
+	 */
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
+
 	operating_system_length = narrow_string_length(
 	                           operating_system );
 

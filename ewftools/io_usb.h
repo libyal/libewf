@@ -32,7 +32,9 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_LINUX_USB_CH9_H )
+#if defined( WINAPI )
+
+#elif defined( HAVE_LINUX_USB_CH9_H )
 #define HAVE_IO_USB
 #endif
 

@@ -24,7 +24,6 @@
 #include <endian.h>
 #include <memory.h>
 #include <narrow_string.h>
-#include <notify.h>
 #include <types.h>
 
 #include <liberror.h>
@@ -33,8 +32,14 @@
 #include <sys/ioctl.h>
 #endif
 
+#if defined( WINAPI )
+
+#else
+
 #if defined( HAVE_LINUX_HDREG_H )
 #include <linux/hdreg.h>
+#endif
+
 #endif
 
 #include <errno.h>

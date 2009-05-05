@@ -84,7 +84,7 @@ extern "C" {
 char *_date_time_ctime(
        const time_t *timestamp,
        char *string,
-       size_t length );
+       size_t size );
 
 #define date_time_ctime( timestamp, string, size ) \
 	_date_time_ctime( timestamp, string, size )

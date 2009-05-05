@@ -53,6 +53,7 @@
 #include "glob.h"
 #include "md5.h"
 #include "notify.h"
+#include "platform.h"
 #include "process_status.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
@@ -743,8 +744,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
-				     &header_codepage ) != 1 )
+				     &header_codepage,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported header codepage defaulting to: ascii.\n" );
@@ -756,8 +763,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
-				     &sectors_per_chunk ) != 1 )
+				     &sectors_per_chunk,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported amount of sectors per chunk defaulting to: 64.\n" );
@@ -794,8 +807,14 @@ int main( int argc, char * const argv[] )
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
-				     &compression_flags ) != 1 )
+				     &compression_flags,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
@@ -836,7 +855,8 @@ int main( int argc, char * const argv[] )
 				}
 				else if( ewfinput_determine_ewf_format(
 				          optarg,
-				          &ewf_format ) != 1 )
+				          &ewf_format,
+				          &error ) != 1 )
 				{
 					fprintf(
 					 stderr,
@@ -1280,8 +1300,14 @@ int main( int argc, char * const argv[] )
 			     ewfexport_format_types,
 			     13,
 			     0,
-			     &fixed_string_variable ) == -1 )
+			     &fixed_string_variable,
+			     &error ) == -1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stderr,
 				 "Unable to determine file format defaulting to: raw.\n" );
@@ -1297,8 +1323,14 @@ int main( int argc, char * const argv[] )
 			}
 			else if( ewfinput_determine_ewf_format(
 			          fixed_string_variable,
-			          &ewf_format ) != 1 )
+			          &ewf_format,
+			          &error ) != 1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				fprintf(
 				 stderr,
 				 "Unsupported file format defaulting to: raw.\n" );
@@ -1320,8 +1352,14 @@ int main( int argc, char * const argv[] )
 					stderr,
 					_SYSTEM_CHARACTER_T_STRING( "Target path and filename without extension" ),
 				        target_filename,
-				        1024 ) != 1 )
+				        1024,
+				        &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
@@ -1339,8 +1377,14 @@ int main( int argc, char * const argv[] )
 				     ewfinput_compression_levels,
 				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-				     &fixed_string_variable ) == -1 )
+				     &fixed_string_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unable to determine compression type defaulting to: none.\n" );
@@ -1351,8 +1395,14 @@ int main( int argc, char * const argv[] )
 				else if( ewfinput_determine_compression_level(
 				          fixed_string_variable,
 				          &compression_level,
-				          &compression_flags ) != 1 )
+				          &compression_flags,
+				          &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
@@ -1382,8 +1432,13 @@ int main( int argc, char * const argv[] )
 				     maximum_segment_file_size,
 				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 				     &segment_file_size,
-				     NULL ) == -1 )
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
 					fprintf(
@@ -1410,8 +1465,14 @@ int main( int argc, char * const argv[] )
 				     ewfinput_sector_per_block_sizes,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-				     &fixed_string_variable ) == -1 )
+				     &fixed_string_variable,
+				     &error ) == -1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unable to determine sectors per chunk on error defaulting to: 64.\n" );
@@ -1420,8 +1481,14 @@ int main( int argc, char * const argv[] )
 				}
 				else if( ewfinput_determine_sectors_per_chunk(
 				          fixed_string_variable,
-				          &sectors_per_chunk ) != 1 )
+				          &sectors_per_chunk,
+				          &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported sectors per chunk on error defaulting to: 64.\n" );
@@ -1440,8 +1507,14 @@ int main( int argc, char * const argv[] )
 					stderr,
 					_SYSTEM_CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ),
 					target_filename,
-					1024 ) != 1 )
+					1024,
+					&error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
@@ -1459,8 +1532,14 @@ int main( int argc, char * const argv[] )
 		       0,
 		       media_size,
 		       export_offset,
-		       &export_offset ) == -1 ) )
+		       &export_offset,
+		       &error ) == -1 ) )
 		{
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
 			export_offset = 0;
 
 			fprintf(
@@ -1479,8 +1558,14 @@ int main( int argc, char * const argv[] )
 		       0,
 		       ( media_size - export_offset ),
 		       export_size,
-		       &export_size ) == -1 ) )
+		       &export_size,
+		       &error ) == -1 ) )
 		{
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
 			export_size = media_size - export_offset;
 
 			fprintf(
@@ -1686,14 +1771,14 @@ int main( int argc, char * const argv[] )
 		memory_free(
 		 target_filename );
 
-		if( ewfcommon_determine_operating_system_string(
+		if( platform_get_operating_system(
 		     acquiry_operating_system,
 		     32,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to determine operating system string.\n" );
+			 "Unable to determine operating system.\n" );
 
 			notify_error_backtrace(
 			 error );

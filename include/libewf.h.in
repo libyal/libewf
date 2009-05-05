@@ -28,8 +28,11 @@
 #include <libewf/error.h>
 #include <libewf/extern.h>
 #include <libewf/features.h>
-#include <libewf/handle.h>
 #include <libewf/types.h>
+
+#if @HAVE_V1_API@
+#include <libewf/handle.h>
+#endif
 
 #include <stdio.h>
 

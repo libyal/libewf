@@ -11,13 +11,14 @@ ewfacquire_SOURCES = \
 	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfacquire.c \
-	ewfcommon.c ewfcommon.h \
+	ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
+	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	io_ata.c io_ata.h \
 	io_bus.h \
@@ -41,16 +42,18 @@ ewfacquirestream_SOURCES = \
 	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfacquirestream.c \
-	ewfcommon.c ewfcommon.h \
+	ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
+	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	md5.h \
 	notify.c notify.h \
+	platform.c platform.h \
 	process_status.c process_status.h \
 	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h \
@@ -95,7 +98,7 @@ ewfexport_SOURCES = \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
-	ewfcommon.c ewfcommon.h \
+	ewfcommon.h \
 	ewfexport.c \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
@@ -104,8 +107,10 @@ ewfexport_SOURCES = \
 	export_handle.c export_handle.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
+	guid.c guid.h \
 	md5.h \
 	notify.c notify.h \
+	platform.c platform.h \
 	process_status.c process_status.h \
 	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h \

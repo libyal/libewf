@@ -562,8 +562,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
-				     &header_codepage ) != 1 )
+				     &header_codepage,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported header codepage defaulting to: ascii.\n" );
@@ -884,8 +890,14 @@ int main( int argc, char * const argv[] )
 		       0,
 		       media_size,
 		       0,
-		       &alter_offset ) == -1 ) )
+		       &alter_offset,
+		       &error ) == -1 ) )
 		{
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
 			alter_offset = 0;
 
 			fprintf(
@@ -900,10 +912,16 @@ int main( int argc, char * const argv[] )
 		       EWFALTER_INPUT_BUFFER_SIZE,
 		       _SYSTEM_CHARACTER_T_STRING( "Amount of bytes to alter" ),
 		       0,
-		       ( media_size - alter_offset ),
-		       ( media_size - alter_offset ),
-		       &alter_size ) == -1 ) )
+		       media_size - alter_offset,
+		       media_size - alter_offset,
+		       &alter_size,
+		       &error ) == -1 ) )
 		{
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
 			alter_size = media_size - alter_offset;
 
 			fprintf(
@@ -921,8 +939,14 @@ int main( int argc, char * const argv[] )
 			     1,
 			     SSIZE_MAX,
 			     ( 64 * 512 ),
-			     &process_buffer_size ) == -1 )
+			     &process_buffer_size,
+			     &error ) == -1 )
 			{
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
 				process_buffer_size = 64 * 512;
 
 				fprintf(

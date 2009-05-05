@@ -55,6 +55,7 @@
 #include "file_stream_io.h"
 #include "imaging_handle.h"
 #include "notify.h"
+#include "platform.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
 #include "system_string.h"
@@ -3572,14 +3573,14 @@ int main( int argc, char * const argv[] )
 	{
 		if( resume_acquiry == 0 )
 		{
-			if( ewfcommon_determine_operating_system_string(
+			if( platform_get_operating_system(
 			     acquiry_operating_system,
 			     32,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stdout,
-				 "Unable to determine operating system string.\n" );
+				 "Unable to determine operating system.\n" );
 
 				notify_error_backtrace(
 				 error );

@@ -1601,7 +1601,7 @@ int info_handle_media_information_fprint(
 {
         system_character_t media_size_string[ 16 ];
         system_character_t guid_string[ GUID_STRING_SIZE ];
-        uint8_t guid[ 16 ];
+        uint8_t guid[ GUID_SIZE ];
 
 	char *format_string        = NULL;
 	static char *function      = "info_handle_media_information_fprint";
@@ -1826,29 +1826,14 @@ int info_handle_media_information_fprint(
 		if( libewf_handle_get_guid(
 		     info_handle->input_handle,
 		     guid,
-		     16,
+		     GUID_SIZE,
 		     error ) == 1 )
 #else
 		if( libewf_get_guid(
 		     info_handle->input_handle,
 		     guid,
-		     16 ) == 1 )
+		     GUID_SIZE ) == 1 )
 #endif
-		{
-			if( guid_to_string(
-			     (guid_t *) guid,
-			     _ENDIAN_LITTLE,
-			     guid_string,
-			     GUID_STRING_SIZE,
-			     NULL ) == 1 )
-			{
-				fprintf(
-				 stream,
-				 "\tGUID:\t\t\t%" PRIs_SYSTEM "\n",
-				 guid_string );
-			}
-		}
-		else
 		{
 			liberror_error_set(
 			 error,
@@ -1858,6 +1843,30 @@ int info_handle_media_information_fprint(
 			 function );
 
 			result = -1;
+		}
+		else if( guid_to_string(
+		          guid,
+		          GUID_SIZE,
+		          _ENDIAN_LITTLE,
+		          guid_string,
+		          GUID_STRING_SIZE,
+		          NULL ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to create GUID string.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "\tGUID:\t\t\t%" PRIs_SYSTEM "\n",
+			 guid_string );
 		}
 	}
 	fprintf(

@@ -1,5 +1,6 @@
 Roadmap:
-* low level and high level api (part of v2 api)
+* libbfio API extensions
+* low and high level API
   - to allow low level access to sections etc. (for recovery)
 * lvf support
   - add support for interaction with data in ltree section
@@ -42,11 +43,11 @@ Recovery and analysis:
   - like alternative segment file path in EnCase
     however EnCase seems to fully test if the segment file upfront by
     allocating the necessary disk space
-* all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
+* recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
 
 Additional (integrity) checks:
-* check if successive headers match first header ?
+* read: check if successive headers match first header
 * read: add check for next and done segment
   - really the last segment in the file
   - offset pointing at themselves
@@ -80,18 +81,7 @@ Python bindings
 * implement error backtrace support in v2 API version
 
 API changes
-* allow for chunk data and CRC alignment (possible performance enhancement)
-* APIv2
-  - add error parameter (largely completed)
-     libewf_set_notify_values
-     libewf_signal_abort
-  - remove write_finalize?
-  - remove include/handle.h
-* low level API
-  - add function to retrieve the segment file names and amount?
-  - add function to retrieve EWFX xml header/hash directly
-* LVF
-  - libewf_add/remove_file for LVF
+* add wide character functions definitions by default?
 * libbfio API extension
   - add means to set pools open handle limit in libewf (partial completed)
   - add means to obtain libbfio handle of media data in ewf
@@ -99,8 +89,12 @@ API changes
   - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
   - refactor glob functions to use libbfio handle input and return libbfio pool?
   - think about libewf_glob_file_io_handle and abstration of file io handle get/set name
+* low level API
+  - add function to retrieve the segment file names and amount?
+  - add function to retrieve EWFX xml header/hash directly
+* LVF
+  - libewf_add/remove_file for LVF
 * file structure API extension (idea)
-* add wide character functions definitions by default?
 
 ewftools:
 * add getoptlong support
@@ -109,10 +103,8 @@ ewftools:
   - implement libpff log handle
 * liberror
   - implement use of liberror
-  - date_time.[ch]
-  - ewfcommon.[ch]
-  - ewfinput.[ch]
-  - ewfoutput.[ch]
+  - date_time.[ch] (no, wraps date time functions)
+  - ewfoutput.[ch] (not necessary)
   - ewfsignal.[ch] ?
 * make compilation resilient for missing crypto library
   - compile on system without libcrypto
@@ -121,19 +113,26 @@ ewftools:
 * fix ewfcommon_signal_handler per tool
 * ewfacquire
   - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
+    no, although not set in EWF file, the granualarity is still used in handling read errors
   - warn if values exceed maximum segment count
   - read from pipe - what about input size?
   - adjust error granularity if error granularity < process buffer size
   - move ewfacquire_read_buffer to device_handle, list read errors
+  - warn if media does not fit using chunk size or APIv1
+    a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
 * device handle
   - add Windows support for accessing memory device
   - detect removable disk
   - detect optical disk
+  - determine optical disk sessions
+  - detect floppy
   - move fstat to file_io ?
   - improve error detection and output (refactor error string like libbfio)
   - detect bus type
   - determine USB serial number
-  - determine optical disk sessions
+* imaging handle
+  - move output handle initialize to imaging_handle_open_output function ?
+  - used storage_media_buffer_get_data in byte swap function
 * ewfacquirestream
   - implement -B as write size upper boundary
   - implement -o as skip of an amount of bytes ?
@@ -148,23 +147,19 @@ ewftools:
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
   - allow different input and output header codepages?
+* export handle
+  - move input handle initialize to export_handle_open_input function ?
+  - used storage_media_buffer_get_data in byte swap function
 * ewfinfo
+* info handle
+  - move input handle initialize to info_handle_open_input function ?
+  - implement use of libewf_handle_get_header_value_identifier_size for V2 API support
 * ewfverify
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
 * ewfrecover
   - create a tool recover ewf files
-* ewfinput
-* export handle
-  - move input handle initialize to export_handle_open_input function ?
-  - used storage_media_buffer_get_data in byte swap function
-* info handle
-  - move input handle initialize to info_handle_open_input function ?
-  - implement use of libewf_handle_get_header_value_identifier_size for V2 API support
-* imaging handle
-  - move output handle initialize to imaging_handle_open_output function ?
-  - used storage_media_buffer_get_data in byte swap function
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -187,7 +182,8 @@ Testing
 
 Windows build
 * windows port
-  - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
+  - some of the Windows functions are MVC 2005 or later specific
+  - figure out a way to warn about the compiler used
 * add WIN32_LEAN_AND_MEAN or VC_EXTRALEAN to msvscpp
 
 * locale support
@@ -201,29 +197,27 @@ Deployment
 * configure
   - remove enable-v1-api after testing?
 
-Next beta release:
+Work in progress:
 * check sprintf use
    - liberror -> liberror_error_vsnprintf
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
-* fix ewfexport different input and output chunk sizes for low level functions
-
-Work in progress:
 * what about header values parsing with preservation of timestamps?
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
 * check windows acquiry of 40 GB disk
-* ewfacquire warn if media does not fit using chunk size or APIv1
-  a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
-* if available add model and serial to header values
-* implement error for ewfinput functions in ewftools
+* ewftools: if available add model and serial to header values
+* ewfexport: fix different input and output chunk sizes for low level functions
 
 Version: 20090504
 * fixed error in device read error handling
 * added Darwin uuid/uuid.h support
 * removed check for caseless string compare from configure
 * added error to file_io updated system string accordingly
+* added 32-bit amount of sectors for MacOS-X
+* refactored guid generate from ewfcommon to guid
+* fixes for winapi
 
 Version: 20090503
 * worked on usb disk support

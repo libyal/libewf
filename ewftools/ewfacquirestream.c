@@ -54,6 +54,7 @@
 #include "file_stream_io.h"
 #include "imaging_handle.h"
 #include "notify.h"
+#include "platform.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
 #include "system_string.h"
@@ -1305,8 +1306,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
-				     &header_codepage ) != 1 )
+				     &header_codepage,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported header codepage defaulting to: ascii.\n" );
@@ -1318,8 +1325,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
-				     &sectors_per_chunk ) != 1 )
+				     &sectors_per_chunk,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
@@ -1332,8 +1345,14 @@ int main( int argc, char * const argv[] )
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
-				     &compression_flags ) != 1 )
+				     &compression_flags,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
@@ -1380,11 +1399,24 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'f':
-				if( ( ewfinput_determine_ewf_format(
-				       optarg,
-				       &ewf_format ) != 1 )
-				 || ( ewf_format == LIBEWF_FORMAT_EWF )
-				 || ( ewf_format == LIBEWF_FORMAT_SMART ) )
+				if( ewfinput_determine_ewf_format(
+				     optarg,
+				     &ewf_format,
+				     &error ) != 1 )
+				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					fprintf(
+					 stderr,
+					 "Unsupported EWF file format type defaulting to: encase6.\n" );
+
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
+				}
+				else if( ( ewf_format == LIBEWF_FORMAT_EWF )
+				      || ( ewf_format == LIBEWF_FORMAT_SMART ) )
 				{
 					fprintf(
 					 stderr,
@@ -1408,8 +1440,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'm':
 				if( ewfinput_determine_media_type(
 				     optarg,
-				     &media_type ) != 1 )
+				     &media_type,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported media type defaulting to: fixed.\n" );
@@ -1421,8 +1459,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'M':
 				if( ewfinput_determine_media_flags(
 				     optarg,
-				     &media_flags ) != 1 )
+				     &media_flags,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsupported media flags defaulting to: physical.\n" );
@@ -1732,14 +1776,14 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfacquirestream_abort == 0 )
 	{
-		if( ewfcommon_determine_operating_system_string(
+		if( platform_get_operating_system(
 		     acquiry_operating_system,
 		     32,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stdout,
-			 "Unable to determine operating system string.\n" );
+			 "Unable to determine operating system.\n" );
 
 			notify_error_backtrace(
 			 error );

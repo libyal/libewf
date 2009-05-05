@@ -46,6 +46,7 @@
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "export_handle.h"
+#include "guid.h"
 #include "md5.h"
 #include "sha1.h"
 #include "system_string.h"
@@ -1717,7 +1718,9 @@ int export_handle_set_output_values(
      liberror_error_t **error )
 {
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
-	uint8_t guid[ 16 ];
+	uint8_t guid[ GUID_SIZE ];
+
+	uint8_t guid_type     = 0;
 #endif
 
 	static char *function = "export_handle_set_output_values";
@@ -2050,45 +2053,60 @@ int export_handle_set_output_values(
 			return( -1 );
 		}
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
-		/* Add a system GUID if necessary
-		 */
-		if( ewfcommon_determine_guid(
-		     guid,
-		     libewf_format,
-		     error ) != 1 )
+		if( ( libewf_format == LIBEWF_FORMAT_ENCASE5 )
+		 || ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to create GUID.",
-			 function );
-
-			return( -1 );
+			guid_type = GUID_TYPE_RANDOM;
 		}
+		else if( ( libewf_format == LIBEWF_FORMAT_LINEN5 )
+		      || ( libewf_format == LIBEWF_FORMAT_LINEN6 ) )
+		{
+			guid_type = GUID_TYPE_TIME;
+		}
+		if( guid_type != 0 )
+		{
+			/* Add a GUID if necessary
+			 */
+			if( guid_generate(
+			     guid,
+			     GUID_SIZE,
+			     guid_type,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to generate GUID.",
+				 function );
+
+				return( -1 );
+			}
 #if defined( HAVE_V2_API )
-		if( libewf_handle_set_guid(
-		     export_handle->ewf_output_handle,
-		     guid,
-		     16,
-		     error ) != 1 )
+			if( libewf_handle_set_guid(
+			     export_handle->ewf_output_handle,
+			     guid,
+			     16,
+			     error ) != 1 )
 #else
-		if( libewf_set_guid(
-		     export_handle->ewf_output_handle,
-		     guid,
-		     16 ) != 1 )
+			if( libewf_set_guid(
+			     export_handle->ewf_output_handle,
+			     guid,
+			     16 ) != 1 )
 #endif
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set GUID.",
-			 function );
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set GUID.",
+				 function );
 
-			return( -1 );
-		}
+				return( -1 );
+			}
 #endif
+		}
 	}
 	return( 1 );
 }

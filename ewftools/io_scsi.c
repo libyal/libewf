@@ -23,7 +23,6 @@
 #include <common.h>
 #include <memory.h>
 #include <narrow_string.h>
-#include <notify.h>
 #include <types.h>
 
 #include <liberror.h>
@@ -31,6 +30,10 @@
 #if defined( HAVE_SYS_IOCTL_H )
 #include <sys/ioctl.h>
 #endif
+
+#if defined( WINAPI )
+
+#else
 
 #if defined( HAVE_SCSI_SCSI_H )
 #include <scsi/scsi.h>
@@ -42,6 +45,8 @@
 
 #if defined( HAVE_SCSI_SG_H )
 #include <scsi/sg.h>
+#endif
+
 #endif
 
 #include "io_bus.h"

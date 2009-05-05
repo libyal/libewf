@@ -491,8 +491,14 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
-				     &header_codepage ) != 1 )
+				     &header_codepage,
+				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					fprintf(
 					 stderr,
 					 "Unsuported header codepage defaulting to: ascii.\n" );
