@@ -218,6 +218,9 @@ Version: 20090504
 * added 32-bit amount of sectors for MacOS-X
 * refactored guid generate from ewfcommon to guid
 * fixes for winapi
+* added Cygwin uuid/uuid.h support
+* changed ewftools dll import for Cygwin
+* added libewf_is_dll to libewf.c, this function is not exported
 
 Version: 20090503
 * worked on usb disk support

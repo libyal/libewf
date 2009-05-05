@@ -33,7 +33,7 @@
 #define LIBEWF_EXTERN __declspec(dllexport)
 
 #elif defined( LIBEWF_DLL_IMPORT )
-#define LIBEWF_EXTERN __declspec(dllimport)
+#define LIBEWF_EXTERN extern __declspec(dllimport)
 
 #else
 #define LIBEWF_EXTERN extern

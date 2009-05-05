@@ -154,15 +154,20 @@ AC_CHECK_HEADERS([langinfo.h])
 AC_CHECK_HEADERS([locale.h])
 
 dnl Headers included in ewftools/device_handle.c
+dnl and ewftools/io_*.[ch]
 AC_CHECK_HEADERS([cygwin/fs.h])
+AC_CHECK_HEADERS([cygwin/hdreg.h])
+
 AC_CHECK_HEADERS([linux/cdrom.h])
 AC_CHECK_HEADERS([linux/fs.h])
 AC_CHECK_HEADERS([linux/hdreg.h])
 AC_CHECK_HEADERS([linux/usbdevice_fs.h])
 AC_CHECK_HEADERS([linux/usb/ch9.h])
+
 AC_CHECK_HEADERS([scsi/scsi.h])
 AC_CHECK_HEADERS([scsi/scsi_ioctl.h])
 AC_CHECK_HEADERS([scsi/sg.h])
+
 AC_CHECK_HEADERS([sys/disk.h])
 AC_CHECK_HEADERS([sys/disklabel.h])
 AC_CHECK_HEADERS([sys/ioctl.h])
@@ -1118,13 +1123,22 @@ AC_CHECK_HEADERS(
 
 AS_IF(
 	[test "x$ac_libewf_have_guid_support" != xno],
-	[ac_libewf_have_guid_support=libuuid
-	AC_CHECK_LIB(
-	 [uuid],
+	[ac_libewf_have_guid_support=native
+	AC_CHECK_FUNC(
 	 [uuid_generate],
 	 [],
-	 [ac_libewf_have_guid_support=native])
-	AC_DEFINE(
+	 [ac_libewf_have_guid_support=libuuid
+	  AC_CHECK_LIB(
+	  [uuid],
+	  [uuid_generate],
+	  [],
+	  [ac_libewf_have_guid_support=no])
+	 ])
+	])
+
+AS_IF(
+	[test "x$ac_libewf_have_guid_support" != xno],
+	[AC_DEFINE(
 	 [HAVE_GUID_SUPPORT],
 	 [1],
 	 [Define to 1 if GUID support is available.])
@@ -1399,6 +1413,18 @@ AM_CONDITIONAL(
 
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";
+
+dnl Check if DLL support is needed in ewftools
+AS_IF(
+	[test x"$enable_shared" = xyes],
+	[AS_CASE(
+		[$host],
+		[*cygwin* | *mingw*],
+		[AC_SUBST(
+		 [LIBEWF_DLL_IMPORT],
+		 ["-DLIBEWF_DLL_IMPORT"])
+		])
+	])
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])

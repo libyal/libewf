@@ -23,8 +23,12 @@
 #include <common.h>
 
 #if defined( WINAPI )
-
 #include <windows.h>
+#endif
+
+#include "libewf_extern.h"
+
+#if defined( WINAPI )
 
 #if defined( _MANAGED )
 #pragma managed( push, off )
@@ -56,5 +60,19 @@ BOOL WINAPI DllMain(
 	return( TRUE );
 }
 
+#else
+
+#endif
+
+#if defined( LIBEWF_DLL_EXPORT )
+
+/* Function that indicates the library is a DLL
+ * Returns 1
+ */
+char libewf_is_dll(
+      void )
+{
+	return( 1 );
+}
 #endif
 

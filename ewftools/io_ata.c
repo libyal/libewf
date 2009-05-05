@@ -36,6 +36,10 @@
 
 #else
 
+#if defined( HAVE_CYGWIN_HDREG_H )
+#include <cygwin/hdreg.h>
+#endif
+
 #if defined( HAVE_LINUX_HDREG_H )
 #include <linux/hdreg.h>
 #endif
