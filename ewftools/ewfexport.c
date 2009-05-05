@@ -647,7 +647,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1                          = 0;
 	uint8_t compression_flags                       = 0;
 	uint8_t export_handle_output_format             = 0;
-	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE5;
+	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE6;
 	uint8_t print_status_information                = 1;
 	uint8_t swap_byte_pairs                         = 0;
 	uint8_t wipe_chunk_on_error                     = 0;

@@ -1841,10 +1841,10 @@ int verification_handle_crc_errors_fprint(
      liberror_error_t **error )
 {
 	static char *function             = "verification_handle_crc_errors_fprint";
-	off64_t first_sector              = 0;
-	off64_t last_sector               = 0;
+	uint64_t amount_of_sectors        = 0;
+	uint64_t first_sector             = 0;
+	uint64_t last_sector              = 0;
 	uint32_t amount_of_errors         = 0;
-	uint32_t amount_of_sectors        = 0;
 	uint32_t error_iterator           = 0;
 	int result                        = 1;
 
@@ -1931,8 +1931,8 @@ int verification_handle_crc_errors_fprint(
 			if( libewf_get_crc_error(
 			     verification_handle->input_handle,
 			     error_iterator,
-			     &first_sector,
-			     &amount_of_sectors ) != 1 )
+			     (off64_t *) &first_sector,
+			     (uint32_t *) &amount_of_sectors ) != 1 )
 #endif
 			{
 				liberror_error_set(
@@ -1954,7 +1954,7 @@ int verification_handle_crc_errors_fprint(
 
 			fprintf(
 			 stream,
-			 "\tat sector(s): %" PRId64 " - %" PRId64 " (amount: %" PRIu32 ")",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu64 ")",
 			 first_sector,
 			 last_sector,
 			 amount_of_sectors );

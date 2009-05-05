@@ -2390,9 +2390,9 @@ int info_handle_acquiry_errors_fprint(
      liberror_error_t **error )
 {
 	static char *function      = "info_handle_acquiry_errors_fprint";
-	off64_t first_sector       = 0;
+	uint64_t amount_of_sectors = 0;
+	uint64_t first_sector      = 0;
 	uint32_t amount_of_errors  = 0;
-	uint32_t amount_of_sectors = 0;
 	uint32_t error_iterator    = 0;
 	int result                 = 1;
 
@@ -2472,8 +2472,8 @@ int info_handle_acquiry_errors_fprint(
 			if( libewf_get_acquiry_error(
 			     info_handle->input_handle,
 			     error_iterator,
-			     &first_sector,
-			     &amount_of_sectors ) != 1 )
+			     (off64_t *) &first_sector,
+			     (uint32_t *) &amount_of_sectors ) != 1 )
 #endif
 			{
 				liberror_error_set(
@@ -2491,9 +2491,9 @@ int info_handle_acquiry_errors_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) first_sector,
-			 (uint64_t) ( first_sector + amount_of_sectors ),
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
+			 first_sector,
+			 first_sector + amount_of_sectors,
 			 amount_of_sectors );
 		}
 		fprintf(
@@ -2512,9 +2512,9 @@ int info_handle_sessions_fprint(
      liberror_error_t **error )
 {
 	static char *function       = "info_handle_sessions_fprint";
-	off64_t first_sector        = 0;
+	uint64_t amount_of_sectors  = 0;
+	uint64_t first_sector       = 0;
 	uint32_t amount_of_sessions = 0;
-	uint32_t amount_of_sectors  = 0;
 	uint32_t session_iterator   = 0;
 	int result                  = 1;
 
@@ -2594,8 +2594,8 @@ int info_handle_sessions_fprint(
 			if( libewf_get_session(
 			     info_handle->input_handle,
 			     session_iterator,
-			     &first_sector,
-			     &amount_of_sectors ) != 1 )
+			     (off64_t *) &first_sector,
+			     (uint32_t *) &amount_of_sectors ) != 1 )
 #endif
 			{
 				liberror_error_set(
@@ -2613,9 +2613,9 @@ int info_handle_sessions_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) first_sector,
-			 (uint64_t) ( first_sector + amount_of_sectors ),
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
+			 first_sector,
+			 first_sector + amount_of_sectors,
 			 amount_of_sectors );
 		}
 		fprintf(

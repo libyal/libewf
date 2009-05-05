@@ -126,7 +126,7 @@ int ewfinput_determine_ewf_format(
 	     5 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_SMART;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -134,7 +134,7 @@ int ewfinput_determine_ewf_format(
 	          3 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_FTK;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -142,7 +142,7 @@ int ewfinput_determine_ewf_format(
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE1;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -150,7 +150,7 @@ int ewfinput_determine_ewf_format(
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE2;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -158,7 +158,7 @@ int ewfinput_determine_ewf_format(
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE3;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -166,7 +166,7 @@ int ewfinput_determine_ewf_format(
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE4;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -174,7 +174,7 @@ int ewfinput_determine_ewf_format(
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE5;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -182,7 +182,7 @@ int ewfinput_determine_ewf_format(
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE6;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -190,7 +190,7 @@ int ewfinput_determine_ewf_format(
 	          6 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_LINEN5;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -198,7 +198,7 @@ int ewfinput_determine_ewf_format(
 	          6 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_LINEN6;
-		result         = 1;
+		result      = 1;
 	}
 	/* This check must before the check for "ewf"
 	 */
@@ -208,7 +208,7 @@ int ewfinput_determine_ewf_format(
 	          4 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_EWFX;
-		result         = 1;
+		result      = 1;
 	}
 	else if( system_string_compare(
 	          argument,
@@ -216,7 +216,7 @@ int ewfinput_determine_ewf_format(
 	          3 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_EWF;
-		result         = 1;
+		result      = 1;
 	}
 	return( result );
 }

@@ -54,10 +54,6 @@ typedef size_t u64;
 #include <linux/hdreg.h>
 #endif
 
-#if defined( HAVE_LINUX_USBDEVICE_FS_H )
-#include <linux/usbdevice_fs.h>
-#endif
-
 #else
 
 #if defined( HAVE_SYS_DISK_H )
@@ -72,8 +68,11 @@ typedef size_t u64;
 
 #include "byte_size_string.h"
 #include "device_handle.h"
+#include "io_bus.h"
+#include "io_optical_disk.h"
+#include "io_scsi.h"
+#include "io_usb.h"
 #include "notify.h"
-#include "scsi_io.h"
 #include "storage_media_buffer.h"
 #include "system_string.h"
 
@@ -753,10 +752,10 @@ off64_t device_handle_seek_offset(
 		return( -1 );
 	}
 #else
-	lseek(
-	 device_handle->file_descriptor,
-	 offset,
-	 whence );
+	offset = lseek(
+	          device_handle->file_descriptor,
+	          offset,
+	          whence );
 
 	if( offset < 0 )
 	{
@@ -1133,7 +1132,7 @@ int device_handle_get_bytes_per_sector(
 }
 
 /* Retrieves the media information
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no media information available or -1 on error
  */
 int device_handle_get_media_information(
      device_handle_t *device_handle,
@@ -1151,10 +1150,7 @@ int device_handle_get_media_information(
 #if defined( HDIO_GET_IDENTITY )
 	struct hd_driveid drive_information;
 #endif
-#if defined( USBDEVFS_GETDRIVER )
-	struct usbdevfs_getdriver usb_information;
-#endif
-#if defined( HAVE_SCSI_IO )
+#if defined( HAVE_IO_SCSI )
 	uint8_t response[ 255 ];
 	ssize_t response_count = 0;
 #endif
@@ -1173,6 +1169,10 @@ int device_handle_get_media_information(
 		 function );
 
 		return( -1 );
+	}
+	if( device_handle->type != DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		return( 0 );
 	}
 #if defined( WINAPI )
 	if( device_handle->file_handle == INVALID_HANDLE_VALUE )
@@ -1364,6 +1364,25 @@ int device_handle_get_media_information(
 			device_handle->removable             = ( (STORAGE_DEVICE_DESCRIPTOR *) response )->RemovableMedia;
 			device_handle->media_information_set = 1;
 
+			switch( ( ( STORAGE_DEVICE_DESCRIPTOR *) response )->BusType )
+			{
+				case BusTypeScsi:
+					device_handle->bus_type = IO_BUS_TYPE_SCSI;
+					break;
+
+				case BusTypeAtapi:
+				case BusTypeAta:
+					device_handle->bus_type = IO_BUS_TYPE_ATA;
+					break;
+
+				case BusType1394:
+					device_handle->bus_type = IO_BUS_TYPE_FIREWIRE;
+					break;
+
+				case BusTypeUsb:
+					device_handle->bus_type = IO_BUS_TYPE_USB;
+					break;
+			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			fprintf(
 			 stderr,
@@ -1452,7 +1471,7 @@ int device_handle_get_media_information(
 				default:
 					fprintf(
 					 stderr,
-					 "%d",
+					 "Unknown: %d",
 					 ( ( STORAGE_DEVICE_DESCRIPTOR *) response )->BusType );
 					break;
 			}
@@ -1465,131 +1484,57 @@ int device_handle_get_media_information(
 		 response );
 	}
 #else
-#if defined( HDIO_GET_IDENTITY )
-	if( device_handle->media_information_set == 0 )
+#if defined( HAVE_IO_SCSI )
+	/* Use the Linux sg (generic SCSI) driver to determine device information
+	 */
+	if( io_scsi_get_bus_type(
+	     device_handle->file_descriptor,
+	     &( device_handle->bus_type ),
+	     error ) != 1 )
 	{
-		if( ioctl(
-		     device_handle->file_descriptor,
-		     HDIO_GET_IDENTITY,
-		     &drive_information ) != -1 )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			notify_dump_data(
-			 &drive_information,
-			 sizeof( struct hd_driveid ) );
-#endif
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine bus type.",
+		 function );
 
-			result = system_string_trim_copy_from_byte_stream(
-				  device_handle->serial_number,
-				  255,
-				  drive_information.serial_no,
-				  20,
-				  error );
-
-			if( result == -1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set serial number.",
-				 function );
-
-				return( -1 );
-			}
-			else if( result == 0 )
-			{
-				device_handle->serial_number[ 0 ] = 0;
-			}
-			result = system_string_trim_copy_from_byte_stream(
-				  device_handle->model,
-				  255,
-				  drive_information.model,
-				  40,
-				  error );
-
-			if( result == -1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set model.",
-				 function );
-
-				return( -1 );
-			}
-			else if( result == 0 )
-			{
-				device_handle->model[ 0 ] = 0;
-			}
-			device_handle->removable             = ( drive_information.config & 0x0080 ) >> 7;
-			device_handle->media_information_set = 1;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			fprintf(
-			 stderr,
-			 "Device type:\t\t%d\n",
-			 ( drive_information.config & 0x1f00 ) >> 8 );
-			fprintf(
-			 stderr,
-			 "Feature sets:\n" );
-			fprintf(
-			 stderr,
-			 "SMART:\t\t\t%d\n",
-			 ( drive_information.command_set_1 & 0x0001 ) );
-			fprintf(
-			 stderr,
-			 "Security Mode:\t\t%d (%d)\n",
-			 ( drive_information.command_set_1 & 0x0002 ) >> 1,
-			 ( drive_information.dlf & 0x0001 ) );
-			fprintf(
-			 stderr,
-			 "Security Mode enabled:\t%d\n",
-			 ( drive_information.dlf & 0x0002 ) >> 1 );
-			fprintf(
-			 stderr,
-			 "Removable Media:\t%d\n",
-			 ( drive_information.command_set_1 & 0x0004 ) >> 2 );
-			fprintf(
-			 stderr,
-			 "HPA:\t\t\t%d\n",
-			 ( drive_information.command_set_1 & 0x0400 ) >> 10 );
-			fprintf(
-			 stderr,
-			 "DCO:\t\t\t%d\n",
-			 ( drive_information.command_set_2 & 0x0800 ) >> 11 );
-			fprintf(
-			 stderr,
-			 "Media serial:\t\t%d\n",
-			 ( drive_information.cfsse & 0x0004 ) >> 2 );
-			fprintf(
-			 stderr,
-			 "\n" );
-#endif
-		}
+		return( -1 );
 	}
-#endif
-#if defined( USBDEVFS_GETDRIVER )
-	if( device_handle->media_information_set == 0 )
+	if( io_scsi_get_identiier(
+	     device_handle->file_descriptor,
+	     error ) != 1 )
 	{
-		if( ioctl(
-		     device_handle->file_descriptor,
-		     USBDEVFS_GETDRIVER,
-		     &usb_information ) != -1 )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			notify_dump_data(
-			 &usb_information,
-			 sizeof( struct usbdevfs_getdriver ) );
-#endif
-		}
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine SCSI identifier.",
+		 function );
+
+		return( -1 );
 	}
-#endif
-#if defined( HAVE_SCSI_IO )
+	uint8_t pci_bus_address[ 64 ];
+	size_t pci_bus_address_size = 64;
+
+	if( io_scsi_get_pci_bus_address(
+	     device_handle->file_descriptor,
+	     pci_bus_address,
+	     pci_bus_address_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine PCI bus address.",
+		 function );
+
+		return( -1 );
+	}
 	if( device_handle->media_information_set == 0 )
 	{
-		response_count = scsi_io_inquiry(
+		response_count = io_scsi_inquiry(
 		                  device_handle->file_descriptor,
 		                  0x00,
 		                  0x00,
@@ -1649,12 +1594,13 @@ int device_handle_get_media_information(
 				device_handle->model[ 0 ] = 0;
 			}
 			device_handle->removable             = ( response[ 1 ] & 0x80 ) >> 7;
+			device_handle->device_type           = ( response[ 0 ] & 0x1f );
 			device_handle->media_information_set = 1;
 		}
 	}
 	if( device_handle->serial_number[ 0 ] == 0 )
 	{
-		response_count = scsi_io_inquiry(
+		response_count = io_scsi_inquiry(
 		                  device_handle->file_descriptor,
 		                  0x01,
 		                  0x80,
@@ -1694,6 +1640,154 @@ int device_handle_get_media_information(
 		}
 	}
 #endif
+#if defined( HDIO_GET_IDENTITY )
+	if( device_handle->bus_type == IO_BUS_TYPE_ATA )
+	{
+		if( ioctl(
+		     device_handle->file_descriptor,
+		     HDIO_GET_IDENTITY,
+		     &drive_information ) != -1 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			notify_dump_data(
+			 &drive_information,
+			 sizeof( struct hd_driveid ) );
+#endif
+
+			if( device_handle->serial_number[ 0 ] == 0 )
+			{
+				result = system_string_trim_copy_from_byte_stream(
+					  device_handle->serial_number,
+					  255,
+					  drive_information.serial_no,
+					  20,
+					  error );
+
+				if( result == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set serial number.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result == 0 )
+				{
+					device_handle->serial_number[ 0 ] = 0;
+				}
+			}
+			if( device_handle->model[ 0 ] == 0 )
+			{
+				result = system_string_trim_copy_from_byte_stream(
+					  device_handle->model,
+					  255,
+					  drive_information.model,
+					  40,
+					  error );
+
+				if( result == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set model.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result == 0 )
+				{
+					device_handle->model[ 0 ] = 0;
+				}
+			}
+			if( device_handle->media_information_set == 0 )
+			{
+				device_handle->removable             = ( drive_information.config & 0x0080 ) >> 7;
+				device_handle->device_type           = ( drive_information.config & 0x1f00 ) >> 8;
+				device_handle->media_information_set = 1;
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			fprintf(
+			 stderr,
+			 "Feature sets:\n" );
+			fprintf(
+			 stderr,
+			 "SMART:\t\t\t%d\n",
+			 ( drive_information.command_set_1 & 0x0001 ) );
+			fprintf(
+			 stderr,
+			 "Security Mode:\t\t%d (%d)\n",
+			 ( drive_information.command_set_1 & 0x0002 ) >> 1,
+			 ( drive_information.dlf & 0x0001 ) );
+			fprintf(
+			 stderr,
+			 "Security Mode enabled:\t%d\n",
+			 ( drive_information.dlf & 0x0002 ) >> 1 );
+			fprintf(
+			 stderr,
+			 "Removable Media:\t%d\n",
+			 ( drive_information.command_set_1 & 0x0004 ) >> 2 );
+			fprintf(
+			 stderr,
+			 "HPA:\t\t\t%d\n",
+			 ( drive_information.command_set_1 & 0x0400 ) >> 10 );
+			fprintf(
+			 stderr,
+			 "DCO:\t\t\t%d\n",
+			 ( drive_information.command_set_2 & 0x0800 ) >> 11 );
+			fprintf(
+			 stderr,
+			 "Media serial:\t\t%d\n",
+			 ( drive_information.cfsse & 0x0004 ) >> 2 );
+			fprintf(
+			 stderr,
+			 "\n" );
+#endif
+		}
+	}
+#endif
+#if defined( HAVE_IO_OPTICAL_DISK )
+	if( device_handle->device_type == 0x05 )
+	{
+		if( io_optical_disk_get_table_of_contents(
+		     device_handle->file_descriptor,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to test optical disk.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#endif
+/* Disabled for now
+#if defined( HAVE_IO_USB )
+	if( device_handle->bus_type == IO_BUS_TYPE_USB )
+	{
+		if( io_usb_test(
+		     device_handle->file_descriptor,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to test USB.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#endif
+*/
 #endif
 	return( 1 );
 }
@@ -1770,6 +1864,194 @@ int device_handle_media_information_fprint(
 	if( device_handle->media_information_set != 0 )
 	{
 		fprintf(
+		 stderr,
+		 "Device type:\t\t" );
+
+		switch( device_handle->device_type )
+		{
+			case 0x00:
+				fprintf(
+				 stderr,
+				 "Direct access" );
+				break;
+
+			case 0x01:
+				fprintf(
+				 stderr,
+				 "Sequential access" );
+				break;
+
+			case 0x02:
+				fprintf(
+				 stderr,
+				 "Printer" );
+				break;
+
+			case 0x03:
+				fprintf(
+				 stderr,
+				 "Processor" );
+				break;
+
+			case 0x04:
+				fprintf(
+				 stderr,
+				 "Write-once" );
+				break;
+
+			case 0x05:
+				fprintf(
+				 stderr,
+				 "Optical disk (CD/DVD/BD)" );
+				break;
+
+			case 0x06:
+				fprintf(
+				 stderr,
+				 "Scanner" );
+				break;
+
+			case 0x07:
+				fprintf(
+				 stderr,
+				 "Optical memory" );
+				break;
+
+			case 0x08:
+				fprintf(
+				 stderr,
+				 "Medium changer" );
+				break;
+
+			case 0x09:
+				fprintf(
+				 stderr,
+				 "Communications" );
+				break;
+
+			case 0x0a:
+			case 0x0b:
+				fprintf(
+				 stderr,
+				 "Graphic arts pre-press" );
+				break;
+
+			case 0x0c:
+				fprintf(
+				 stderr,
+				 "Storage array controller" );
+				break;
+
+			case 0x0d:
+				fprintf(
+				 stderr,
+				 "Enclosure services" );
+				break;
+
+			case 0x0e:
+				fprintf(
+				 stderr,
+				 "Simplified direct-access" );
+				break;
+
+			case 0x0f:
+				fprintf(
+				 stderr,
+				 "Optical card reader/writer" );
+				break;
+
+			case 0x10:
+				fprintf(
+				 stderr,
+				 "Bridging expander" );
+				break;
+
+			case 0x11:
+				fprintf(
+				 stderr,
+				 "Object-based Storage" );
+				break;
+
+			case 0x12:
+				fprintf(
+				 stderr,
+				 "Automation/Drive Interface" );
+				break;
+
+			case 0x13:
+			case 0x14:
+			case 0x15:
+			case 0x16:
+			case 0x17:
+			case 0x18:
+			case 0x1a:
+			case 0x1b:
+			case 0x1c:
+			case 0x1d:
+				fprintf(
+				 stderr,
+				 "Reserved: %d",
+				 device_handle->device_type );
+				break;
+
+			case 0x1e:
+				fprintf(
+				 stderr,
+				 "Well known logical unit" );
+				break;
+
+			default:
+				fprintf(
+				 stderr,
+				 "Unknown: %d",
+				 device_handle->device_type );
+				break;
+		}
+		fprintf(
+		 stderr,
+		 "\n" );
+
+		fprintf(
+		 stderr,
+		 "Bus type:\t\t" );
+
+		switch( device_handle->bus_type )
+		{
+			case IO_BUS_TYPE_ATA:
+				fprintf(
+				 stderr,
+				 "ATA/ATAPI" );
+				break;
+
+			case IO_BUS_TYPE_FIREWIRE:
+				fprintf(
+				 stderr,
+				 "FireWire (IEEE1394)" );
+				break;
+
+			case IO_BUS_TYPE_SCSI:
+				fprintf(
+				 stderr,
+				 "SCSI" );
+				break;
+
+			case IO_BUS_TYPE_USB:
+				fprintf(
+				 stderr,
+				 "USB" );
+				break;
+		}
+		fprintf(
+		 stderr,
+		 "\n" );
+
+		if( device_handle->removable != 0 )
+		{
+			fprintf(
+			 stream,
+			 "Removable:\t\tyes\n" );
+		}
+		fprintf(
 		 stream,
 		 "Vendor:\t\t\t%" PRIs_SYSTEM "\n",
 		 device_handle->vendor );
@@ -1781,13 +2063,6 @@ int device_handle_media_information_fprint(
 		 stream,
 		 "Serial:\t\t\t%" PRIs_SYSTEM "\n",
 		 device_handle->serial_number );
-
-		if( device_handle->removable != 0 )
-		{
-			fprintf(
-			 stream,
-			 "Removable:\t\tyes\n" );
-		}
 	}
 	if( device_handle->media_size_set != 0 )
 	{

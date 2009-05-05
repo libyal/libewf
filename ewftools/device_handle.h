@@ -85,6 +85,10 @@ struct device_handle
 	 */
 	uint8_t media_size_set;
 
+	/* The bus type
+	 */
+	uint8_t bus_type;
+
 	/* The device type
 	 */
 	uint8_t device_type;

@@ -59,6 +59,7 @@
 #include "storage_media_buffer.h"
 #include "system_string.h"
 
+#define EWFACQUIRE_2_TIB		2199023255552LL
 #define EWFACQUIRE_INPUT_BUFFER_SIZE	64
 
 imaging_handle_t *ewfacquire_imaging_handle = NULL;
@@ -144,7 +145,7 @@ void usage_fprint(
 	fprintf( stream, "\t-g      specify the amount of sectors to be used as error granularity, options:\n"
 	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart, ftk,\n"
-	                 "\t        encase2, encase3, encase4, encase5 (default), encase6, linen5, linen6,\n"
+	                 "\t        encase2, encase3, encase4, encase5, encase6 (default), linen5, linen6,\n"
 	                 "\t        ewfx\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
@@ -845,6 +846,15 @@ ssize_t ewfacquire_read_buffer(
 
 				return( -1 );
 			}
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				notify_error_backtrace(
+				 *error );
+			}
+			liberror_error_free(
+			 error );
+
 			current_calculated_offset = current_offset + (off64_t) read_error_buffer_offset;
 
 			current_read_offset = device_handle_seek_offset(
@@ -924,13 +934,13 @@ ssize_t ewfacquire_read_buffer(
 		{
 			/* Check if last chunk is smaller than the chunk size and take corrective measures
 			 */
-			if( ( current_offset + (off64_t) read_size ) > (off64_t) total_input_size )
+			if( ( current_offset + (off64_t) remaining_read_size ) > (off64_t) total_input_size )
 			{
 				read_remaining_bytes = (size_t) ( total_input_size - current_offset );
 			}
 			else
 			{
-				read_remaining_bytes = read_size;
+				read_remaining_bytes = remaining_read_size;
 			}
 			if( read_remaining_bytes > (size_t) SSIZE_MAX )
 			{
@@ -1337,7 +1347,7 @@ ssize64_t ewfacquire_read_input(
 				      storage_media_buffer->raw_buffer,
 				      storage_media_buffer->raw_buffer_size,
 				      acquiry_offset + acquiry_count,
-				      read_size,
+				      acquiry_size,
 				      read_error_retry,
 				      byte_error_granularity,
 				      wipe_block_on_read_error,
@@ -1700,7 +1710,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                           = 1;
 	uint8_t calculate_sha1                          = 0;
 	uint8_t compression_flags                       = 0;
-	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE5;
+	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE6;
 	uint8_t media_flags                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                = 1;
@@ -1888,9 +1898,9 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unsupported EWF file format type defaulting to: encase5.\n" );
+					 "Unsupported EWF file format type defaulting to: encase6.\n" );
 
-					ewf_format = LIBEWF_FORMAT_ENCASE5;
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
 				}
 				else
 				{
@@ -2281,9 +2291,11 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( device_handle_get_media_information(
-	     device_handle,
-	     &error ) != 1 )
+	result = device_handle_get_media_information(
+	          device_handle,
+	          &error );
+
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -3013,9 +3025,9 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to determine EWF file format type defaulting to: encase5.\n" );
+					 "Unable to determine EWF file format type defaulting to: encase6.\n" );
 
-					ewf_format = LIBEWF_FORMAT_ENCASE5;
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
 				}
 				else if( ewfinput_determine_ewf_format(
 					  fixed_string_variable,
@@ -3023,9 +3035,9 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unsupported EWF file format type defaulting to: encase5.\n" );
+					 "Unsupported EWF file format type defaulting to: encase6.\n" );
 
-					ewf_format = LIBEWF_FORMAT_ENCASE5;
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
 				}
 			}
 		}
@@ -3326,6 +3338,19 @@ int main( int argc, char * const argv[] )
 
 					break;
 				}
+			}
+		}
+		else if( acquiry_size > EWFACQUIRE_2_TIB )
+		{
+			if( ( ewf_format != LIBEWF_FORMAT_ENCASE6 )
+			 && ( ewf_format != LIBEWF_FORMAT_LINEN6 )
+			 && ( ewf_format != LIBEWF_FORMAT_EWFX ) )
+			{
+				fprintf(
+				 stdout,
+				 "Cannot acquire more than 2 TiB in selected ewf format.\n" );
+
+				acquiry_parameters_confirmed = 0;
 			}
 		}
 	}

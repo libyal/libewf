@@ -1,0 +1,17 @@
+
+Tableau support (USB):
+usb 1-9: New USB device found, idVendor=13d7, idProduct=0001
+usb 1-9: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+usb 1-9: Product: T35es Forensic SATA/IDE Bridge
+usb 1-9: Manufacturer: Tableau
+usb 1-9: SerialNumber: x
+
+Tableau support (FireWire):
+Device type:		Bridging expander
+Bus type:		FireWire (IEEE1394)
+Vendor:			tpm
+
+USB support:
+* find a way to determine to what usb device /dev/sdx maps
+  to access descriptor data open device: /dev/bus/usb/<bus>/<id> in RW
+

@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _SCSI_IO_H )
-#define _SCSI_IO_H
+#if !defined( _IO_SCSI_H )
+#define _IO_SCSI_H
 
 #include <common.h>
 #include <types.h>
@@ -33,14 +33,14 @@ extern "C" {
 #endif
 
 #if defined( HAVE_SCSI_SG_H )
-#define HAVE_SCSI_IO
+#define HAVE_IO_SCSI
 #endif
 
-#if defined( HAVE_SCSI_IO )
+#if defined( HAVE_IO_SCSI )
 
-enum SCSI_IO_OPERATION_CODES
+enum IO_SCSI_OPERATION_CODES
 {
-	SCSI_IO_OPERATION_CODE_INQUIRY	= 0x12
+	IO_SCSI_OPERATION_CODE_INQUIRY	= 0x12
 };
 
 /* SCSI device types:
@@ -69,9 +69,9 @@ enum SCSI_IO_OPERATION_CODES
 
 /* The SCSI command descriptor block (CDB)
  */
-typedef struct scsi_io_command_descriptor scsi_io_command_descriptor_t;
+typedef struct io_scsi_command_descriptor io_scsi_command_descriptor_t;
 
-struct scsi_io_command_descriptor
+struct io_scsi_command_descriptor
 {
 	/* The operation code
 	 */
@@ -101,10 +101,28 @@ struct scsi_io_command_descriptor
 	uint8_t control;
 };
 
-#define SCSI_IO_RESPONSE_SIZE_INQUIRY	96
-#define SCSI_IO_SENSE_SIZE		32
+/* The SCSI ioctrl header
+ */
+typedef struct io_scsi_ioctrl_header io_scsi_ioctrl_header_t;
 
-int scsi_io_command(
+struct io_scsi_ioctrl_header
+{
+	/* The size of the request (input data)
+	 */
+	unsigned int request_size;
+
+	/* The size out the response (output data)
+	 */
+	unsigned int response_size;
+
+	/* The request/response data
+	 */
+};
+
+#define IO_SCSI_RESPONSE_SIZE_INQUIRY	96
+#define IO_SCSI_SENSE_SIZE		32
+
+int io_scsi_command(
      int file_descriptor,
      uint8_t *command,
      size_t command_size,
@@ -114,13 +132,34 @@ int scsi_io_command(
      size_t sense_size,
      liberror_error_t **error );
 
-ssize_t scsi_io_inquiry(
+int io_scsi_ioctrl(
+     int file_descriptor,
+     void *request_data,
+     size_t request_data_size,
+     liberror_error_t **error );
+
+ssize_t io_scsi_inquiry(
          int file_descriptor,
          uint8_t inquiry_vital_product_data,
          uint8_t code_page,
          uint8_t *response,
          size_t response_size,
          liberror_error_t **error );
+
+int io_scsi_get_identiier(
+     int file_descriptor,
+     liberror_error_t **error );
+
+int io_scsi_get_bus_type(
+     int file_descriptor,
+     uint8_t *bus_type,
+     liberror_error_t **error );
+
+int io_scsi_get_pci_bus_address(
+     int file_descriptor,
+     uint8_t *pci_bus_address,
+     size_t pci_bus_address_size,
+     liberror_error_t **error );
 
 #endif
 

@@ -19,8 +19,11 @@ Roadmap:
 
 Further analysis of the EWF format:
 * password hash
-* unknowns in volume/disk section
-* 16 bytes in hash section (EWF-E01)
+* volume/disk section (EWF-E01)
+   - do EnCase 5 or earlier versions support 64-bit amount of sectors?
+   - unknowns
+* hash section (EWF-E01)
+  - 16 byte unknown
 * values in EnCase5/6 header2 (+/-)
 * values in ltree strings (EWF-L01 LVF)
 * values in session section (+/-)
@@ -128,6 +131,9 @@ ewftools:
   - detect optical disk
   - move fstat to file_io ?
   - improve error detection and output (refactor error string like libbfio)
+  - detect bus type
+  - determine USB serial number
+  - determine optical disk sessions
 * ewfacquirestream
   - implement -B as write size upper boundary
   - implement -o as skip of an amount of bytes ?
@@ -178,7 +184,6 @@ Code clean up
 Testing
 * add export unattended to automated tests
 * add encase 6.12 sha1 support to test
-* check read error handling (linux, mac)
 
 Windows build
 * windows port
@@ -209,9 +214,26 @@ Work in progress:
   - force set header value to require string formatted in the date format ?
 * check TODO
 * check windows acquiry of 40 GB disk
-* limit ENCASE1/SMART format to max 2 TiB media size?
 * ewfacquire warn if media does not fit using chunk size or APIv1
   a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
+* if available add model and serial to header values
+* fix offset drift for MacOS-X read error handling
+
+Version: 20090503
+* worked on usb disk support
+* limited EWF/ENCASE1/SMART format to max 2 TiB acquire size
+* encase6 format is now default
+* library and tools pass automated tests
+* fixed error in device handle seek offset not correctly returning the current
+  offset
+* fixed read error correction in ewfacquire
+* tested device read error handling on MacOS-X
+
+Version: 20090502
+* worked on bus type support
+* worked on optical disk support
+* worked on usb disk support
+* worked on Tableau support
 
 Version: 20090501
 * implemented 64-bit sector support for add crc and acquiry error and sessions in APIv2

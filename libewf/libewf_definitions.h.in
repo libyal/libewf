@@ -29,6 +29,8 @@
 #define LIBEWF_ENDIAN_BIG	_ENDIAN_BIG
 #define LIBEWF_ENDIAN_LITTLE	_ENDIAN_LITTLE
 
+#define LIBEWF_2_TIB		2199023255552LL
+
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */
 #if !defined( HAVE_LOCAL_LIBEWF )

@@ -19,11 +19,14 @@ ewfacquire_SOURCES = \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	imaging_handle.c imaging_handle.h \
+	io_bus.h \
+	io_optical_disk.c io_optical_disk.h \
+	io_scsi.c io_scsi.h \
+	io_usb.c io_usb.h \
 	md5.h \
 	notify.c notify.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	scsi_io.c scsi_io.h \
 	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h \
 	system_string.c system_string.h

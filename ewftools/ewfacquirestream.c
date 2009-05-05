@@ -1230,7 +1230,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                           = 1;
 	uint8_t calculate_sha1                          = 0;
 	uint8_t compression_flags                       = 0;
-	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE5;
+	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE6;
 	uint8_t media_flags                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                = 1;
@@ -1388,9 +1388,9 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unsupported EWF file format type defaulting to: encase5.\n" );
+					 "Unsupported EWF file format type defaulting to: encase6.\n" );
 
-					ewf_format = LIBEWF_FORMAT_ENCASE5;
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
 				}
 				break;
 

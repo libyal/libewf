@@ -267,9 +267,7 @@ int libewf_write_io_handle_initialize_values(
 			return( -1 );
 		}
 	}
-	/* If an input write size was provided
-	 */
-	else if( media_values->media_size > 0 )
+	else
 	{
 		/* Determine the required amount of segments allowed to write
 		 */
@@ -288,6 +286,23 @@ int libewf_write_io_handle_initialize_values(
 			return( -1 );
 		}
 	}
+	if( media_values->media_size > LIBEWF_2_TIB )
+	{
+		if( ( io_handle->format != LIBEWF_FORMAT_ENCASE6 )
+		 && ( io_handle->format != LIBEWF_FORMAT_LINEN6 )
+		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: EWF file format does not allow for a media size greater than 2 TiB.",
+			 function );
+
+			return( -1 );
+		}
+	}
+
 	/* Flag that the write values were initialized
 	 */
 	write_io_handle->values_initialized = 1;
