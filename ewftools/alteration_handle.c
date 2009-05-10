@@ -504,7 +504,7 @@ ssize_t alteration_handle_prepare_read_buffer(
 	                 storage_media_buffer->process_crc,
 	                 error );
 #else
-	process_count = libewf_raw_prepare_read_buffer(
+	process_count = libewf_raw_read_prepare_buffer(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
 	                 storage_media_buffer->compression_buffer_amount,
@@ -678,7 +678,7 @@ ssize_t alteration_handle_prepare_write_buffer(
 	                 &( storage_media_buffer->process_crc ),
 	                 error );
 #else
-	process_count = libewf_raw_prepare_write_buffer(
+	process_count = libewf_raw_write_prepare_buffer(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->raw_buffer,
 	                 storage_media_buffer->raw_buffer_amount,

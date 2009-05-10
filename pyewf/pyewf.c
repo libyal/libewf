@@ -71,7 +71,7 @@ PyMethodDef pyewf_object_methods[] = {
 	  "Retrieve all header values" },
 
 	/* Sentinel */
-	{ NULL }
+	{ NULL, NULL, 0, NULL }
 };
 
 PyTypeObject pyewf_type_object = {
@@ -152,6 +152,22 @@ PyTypeObject pyewf_type_object = {
 	/* tp_alloc */
 	0,
 	/* tp_new */
+	0,
+	/* tp_free */
+	0,
+	/* tp_is_gc */
+	0,
+	/* tp_bases */
+	NULL,
+	/* tp_mro */
+	NULL,
+	/* tp_cache */
+	NULL,
+	/* tp_subclasses */
+	NULL,
+	/* tp_weaklist */
+	NULL,
+	/* tp_del */
 	0
 };
 

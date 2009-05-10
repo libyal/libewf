@@ -1,4 +1,4 @@
-
+/*
  * File Object definition for libewf Python bindings
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
@@ -335,7 +335,7 @@ PyObject* pyewf_file_read(
 	/* Adjust the read size if the size not given or is larger than the size of the media data
 	 */
 	if( ( read_size < 0 )
-	 || ( pyewf_file->read_offset + read_size ) > pyewf_file->media_size )
+	 || ( pyewf_file->read_offset + (off64_t) read_size ) > (off64_t) pyewf_file->media_size )
 	{
 		read_size = pyewf_file->media_size - pyewf_file->read_offset;
 	}

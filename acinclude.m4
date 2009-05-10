@@ -234,9 +234,9 @@ AC_DEFUN([LIBEWF_CHECK_PYTHON_DEVEL],
 	AC_MSG_CHECKING(
 	 [for Python library path])
 
-	PYTHON_LDFLAGS=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() "`;
+	python_path=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() "`;
 	AC_MSG_RESULT(
-	 [$PYTHON_LDFLAGS])
+	 [$python_path])
 
 	AC_SUBST(
 	 [PYTHON_LDFLAGS],

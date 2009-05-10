@@ -568,7 +568,7 @@ ssize_t verification_handle_prepare_read_buffer(
 	                 storage_media_buffer->process_crc,
 	                 error );
 #else
-	process_count = libewf_raw_prepare_read_buffer(
+	process_count = libewf_raw_read_prepare_buffer(
 	                 verification_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
 	                 storage_media_buffer->compression_buffer_amount,
