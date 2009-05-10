@@ -285,14 +285,16 @@ PyObject* pyewf_file_close(
 {
 #if defined( HAVE_V2_API )
 	if( libewf_handle_close(
-	     pyewf_file->handle ) != 0 )
+	     pyewf_file->handle,
+	     NULL ) != 0 )
 	{
 		return( PyErr_Format(
 		         PyExc_IOError,
 		         "libewf_handle_close failed to close file(s)" ) );
 	}
 	if( libewf_handle_free(
-	     &( pyewf_file->handle ) ) != 1 )
+	     &( pyewf_file->handle ),
+	     NULL ) != 1 )
 	{
 		return( PyErr_Format(
 		         PyExc_IOError,
@@ -437,7 +439,9 @@ PyObject* pyewf_file_seek_offset(
 #if defined( HAVE_V2_API )
 	if( libewf_handle_seek_offset(
 	     pyewf_file->handle,
-	     pyewf_file->read_offset ) < 0 )
+	     offset,
+	     whence,
+	     NULL ) < 0 )
 	{
 		return( PyErr_Format(
 		         PyExc_IOError,
@@ -542,7 +546,7 @@ PyObject *pyewf_file_get_header_value(
 
 	result = libewf_handle_get_header_value_size(
 	          pyewf_file->handle,
-	          header_value_identifier,
+	          (uint8_t *) header_value_identifier,
 	          header_value_identifier_length,
 	          &header_value_size,
 	          NULL );
@@ -588,9 +592,9 @@ PyObject *pyewf_file_get_header_value(
 #if defined( HAVE_V2_API )
 	result = libewf_handle_get_header_value(
 	          pyewf_file->handle,
-	          header_value_identifier,
+	          (uint8_t *) header_value_identifier,
 	          header_value_identifier_length,
-	          header_value,
+	          (uint8_t *) header_value,
 	          header_value_size,
 	          NULL );
 
@@ -683,7 +687,8 @@ PyObject *pyewf_file_get_header_values(
 #if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_header_values(
 	     pyewf_file->handle,
-	     &amount_of_header_values ) != 1 )
+	     &amount_of_header_values,
+	     NULL ) != 1 )
 	{
 		return( PyErr_Format(
 		         PyExc_IOError,
@@ -742,7 +747,7 @@ PyObject *pyewf_file_get_header_values(
 		if( libewf_handle_get_header_value_identifier(
 		     pyewf_file->handle,
 		     header_value_iterator,
-		     header_value_identifier,
+		     (uint8_t *) header_value_identifier,
 		     header_value_identifier_size,
 		     NULL ) != 1 )
 		{
@@ -776,7 +781,7 @@ PyObject *pyewf_file_get_header_values(
 
 		if( libewf_handle_get_header_value_size(
 		     pyewf_file->handle,
-		     header_value_identifier,
+		     (uint8_t *) header_value_identifier,
 		     header_value_identifier_length,
 		     &header_value_size,
 		     NULL ) != 1 )
@@ -823,10 +828,11 @@ PyObject *pyewf_file_get_header_values(
 #if defined( HAVE_V2_API )
 		if( libewf_handle_get_header_value(
 		     pyewf_file->handle,
-		     header_value_identifier,
+		     (uint8_t *) header_value_identifier,
 		     header_value_identifier_length,
-		     header_value,
-		     header_value_size ) == 1 )
+		     (uint8_t *) header_value,
+		     header_value_size,
+		     NULL ) == 1 )
 #else
 		if( libewf_get_header_value(
 		     pyewf_file->handle,

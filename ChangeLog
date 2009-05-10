@@ -32,13 +32,13 @@ Further analysis of the EWF format:
 * values in session section (+/-)
 * amount of sectors in volume/data section has changed to a 64-bit value
   but what about error2/sessions ?
-* linen6 sha1 support?
+* does newer linen6 has sha1 support?
 
 Features
+* resume write support for ENCASE1/SMART table sections ?
 * support missing segment files (chunks)
 * implement low memory usage option
   - trade off IO versus memory use
-* resume write support for ENCASE1/SMART table sections
 
 Recovery and analysis:
 * imaging: detect disk full and ask for new segment file location?
@@ -200,6 +200,8 @@ Work in progress:
   - variating buffer sizes
 * test: read/write of EnCase 6.12 SHA1
 * test: windows acquiry of 40 GB disk
+* add support functions for new flags
+* fix small memory leak in verification handle memory allocated at line 2026
 
 Version: 20090509
 * worked on support for missing segment files (chunks)
@@ -213,6 +215,9 @@ Version: 20090509
 * ewfacquirestream implemented -o as skip of an amount of bytes
 * ewfacquire: added support for acquiry resume offset alignment, for non block boundary offsets
 * fixed crc buffer alignment error in write
+* removed get version and flags for local usage of libewf
+* fixed pyewf API v2 support
+* fixed small memory leak in ewfinfo
 
 Version: 20090506
 * fixed unsupported codepage 0 on NetBSD, system string too strict

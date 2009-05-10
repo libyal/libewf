@@ -2059,14 +2059,12 @@ int info_handle_media_information_fprint(
 	     &media_size ) == 1 )
 #endif
 	{
-		result = byte_size_string_create(
-			  media_size_string,
-			  16,
-			  media_size,
-			  BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-			  NULL );
-
-		if( result == 1 )
+		if( byte_size_string_create(
+		     media_size_string,
+		     16,
+		     media_size,
+		     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+		     NULL ) == 1 )
 		{
 			fprintf(
 			 stream,

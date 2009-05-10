@@ -37,6 +37,8 @@
 
 #include "ewf_definitions.h"
 
+#if !defined( HAVE_LOCAL_LIBEWF )
+
 /* Returns the library version as a string
  */
 const char *libewf_get_version(
@@ -68,6 +70,8 @@ uint8_t libewf_get_flags_write(
 {
 	return( (uint8_t) LIBEWF_FLAG_WRITE );
 }
+
+#endif
 
 /* Determines if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error

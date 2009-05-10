@@ -51,7 +51,7 @@ struct pyewf_file
 
 	/* The libewf handle
 	 */
-	LIBEWF_HANDLE *handle;
+	libewf_handle_t *handle;
 
 	/* The read offset
 	 */

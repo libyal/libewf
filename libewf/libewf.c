@@ -26,7 +26,9 @@
 #include <windows.h>
 #endif
 
-#include "libewf_extern.h"
+/* Define HAVE_LOCAL_LIBEWF for local use of libewf
+ */
+#if !defined( HAVE_LOCAL_LIBEWF )
 
 #if defined( WINAPI )
 
@@ -60,8 +62,6 @@ BOOL WINAPI DllMain(
 	return( TRUE );
 }
 
-#else
-
 #endif
 
 #if defined( LIBEWF_DLL_EXPORT )
@@ -74,5 +74,7 @@ char libewf_is_dll(
 {
 	return( 1 );
 }
+#endif
+
 #endif
 

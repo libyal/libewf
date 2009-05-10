@@ -35,6 +35,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBEWF )
+
 LIBEWF_EXTERN const char *libewf_get_version(
                            void );
 
@@ -46,6 +48,8 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
 
 LIBEWF_EXTERN uint8_t libewf_get_flags_write(
                        void );
+
+#endif
 
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_check_file_signature(
