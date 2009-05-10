@@ -50,6 +50,7 @@
 #include <libuna.h>
 #endif
 
+#include "notify.h"
 #include "system_string.h"
 
 #if !defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
@@ -134,19 +135,18 @@ int system_string_initialize(
 	charset_length = locale_length - (size_t) ( charset - locale );
 #endif
 
+#if defined( HAVE_DEBUG_OUTPUT )
+	notify_verbose_printf(
+	 "%s: charset: %s\n",
+	 function,
+	 charset );
+#endif
+
 	/* Determine codepage
 	 */
-	if( charset_length == 8 )
-	{
-		if( narrow_string_compare(
-		     "US-ASCII",
-		     charset,
-		     8 ) == 0 )
-		{
-			system_string_ascii_codepage = LIBUNA_CODEPAGE_ASCII;
-		}
-	}
-	else if( charset_length == 5 )
+	system_string_ascii_codepage = LIBUNA_CODEPAGE_ASCII;
+
+	if( charset_length == 5 )
 	{
 		if( narrow_string_compare(
 		     "UTF-8",
@@ -227,18 +227,6 @@ int system_string_initialize(
 		          4 ) == 0 )
 		{
 			system_string_is_unicode = 1;
-		}
-		else
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported character set: %s.",
-			 function,
-			 charset );
-
-			return( -1 );
 		}
 	}
 #endif

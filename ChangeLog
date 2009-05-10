@@ -197,6 +197,10 @@ Work in progress:
 * check windows acquiry of 40 GB disk
 * ewftools: if available add model and serial to header values
 * ewfexport: fix different input and output chunk sizes for low level functions
+* system string: codepage debug
+
+Version: 20090506
+* fixed unsupported codepage 0 on NetBSD, system string too strict
 
 Version: 20090504
 * fixed error in device read error handling
