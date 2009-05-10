@@ -1360,9 +1360,9 @@ ssize64_t ewfacquire_read_input(
 	{
 		read_size = process_buffer_size;
 
-		if( ( acquiry_size - acquiry_count ) < read_size )
+		if( ( (ssize64_t) acquiry_size - acquiry_count ) < (ssize64_t) read_size )
 		{
-			read_size = (size_t) ( acquiry_size - acquiry_count );
+			read_size = (size_t) ( (ssize64_t) acquiry_size - acquiry_count );
 		}
 		if( acquiry_count >= resume_acquiry_offset )
 		{
@@ -1439,6 +1439,12 @@ ssize64_t ewfacquire_read_input(
 		}
 		else
 		{
+			/* Align with resume acquiry offset if necessary
+			 */
+			if( ( resume_acquiry_offset - (off64_t) acquiry_count ) < (off64_t) read_size )
+			{
+				read_size = (size_t) ( resume_acquiry_offset - acquiry_count );
+			}
 			read_count = imaging_handle_read_buffer(
 				      imaging_handle,
 				      storage_media_buffer,
@@ -1819,11 +1825,11 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					header_codepage = LIBEWF_CODEPAGE_ASCII;
+
 					fprintf(
 					 stderr,
 					 "Unsuported header codepage defaulting to: ascii.\n" );
-
-					header_codepage = LIBEWF_CODEPAGE_ASCII;
 				}
 				break;
 
@@ -1838,11 +1844,11 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					sector_error_granularity = 64;
+
 					fprintf(
 					 stderr,
 					 "Unsuported amount of sector error granularity defaulting to: 64.\n" );
-
-					sector_error_granularity = 64;
 				}
 				else
 				{
@@ -1860,16 +1866,16 @@ int main( int argc, char * const argv[] )
 				     &acquiry_size,
 				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					acquiry_size = 0;
 
 					fprintf(
 					 stderr,
 					 "Unsupported acquiry size defaulting to: all bytes.\n" );
-
-					notify_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
 				}
 				argument_set_size = 1;
 
@@ -1887,12 +1893,12 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
+
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
-
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
 				}
 				else
 				{
@@ -1947,11 +1953,11 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
+
 					fprintf(
 					 stderr,
 					 "Unsupported EWF file format type defaulting to: encase6.\n" );
-
-					ewf_format = LIBEWF_FORMAT_ENCASE6;
 				}
 				else
 				{
@@ -1970,11 +1976,11 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					sectors_per_chunk = 64;
+
 					fprintf(
 					 stderr,
 					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
-
-					sectors_per_chunk = 64;
 				}
 				else
 				{
@@ -2004,11 +2010,11 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					media_type = LIBEWF_MEDIA_TYPE_FIXED;
+
 					fprintf(
 					 stderr,
 					 "Unsupported media type defaulting to: fixed.\n" );
-
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
 				}
 				else
 				{
@@ -2027,11 +2033,11 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
+
 					fprintf(
 					 stderr,
 					 "Unsupported media flags defaulting to: physical.\n" );
-
-					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
 				else
 				{
@@ -2054,17 +2060,17 @@ int main( int argc, char * const argv[] )
 				     &acquiry_offset,
 				     &error ) != 1 )
 				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
 					acquiry_offset = 0;
 
 					fprintf(
 					 stderr,
 					 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
 					 acquiry_offset );
-
-					notify_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
 				}
 				argument_set_offset = 1;
 

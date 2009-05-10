@@ -134,8 +134,6 @@ ewftools:
   - warn if media does not fit using chunk size or APIv1
     a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
 * ewfacquirestream
-  - implement -B as write size upper boundary
-  - implement -o as skip of an amount of bytes ?
   - what about wipe on error - does this do anything? (remove if not used)
   - add parameter to set sector size?
   - allow user to set bytes per sector for raw file conversion
@@ -197,11 +195,9 @@ Work in progress:
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
-* ewfacquire: if available add model and serial to header values
 * ewfexport: fix different input and output chunk sizes for low level functions
 * fix automated tests:
-  - check low level functions compilation test
-  - python compilation (v1 and v2 API)
+  - variating buffer sizes
 * test: read/write of EnCase 6.12 SHA1
 * test: windows acquiry of 40 GB disk
 
@@ -212,6 +208,11 @@ Version: 20090509
 * corrected pyewf compiler warnings
 * worked on detecting device removal, write finalize no longer closes segment
   files if the media size was known and not entirely written
+* ewfacquire now adds model and serial to header values
+* ewfacquirestream implemented -B as write size upper boundary
+* ewfacquirestream implemented -o as skip of an amount of bytes
+* ewfacquire: added support for acquiry resume offset alignment, for non block boundary offsets
+* fixed crc buffer alignment error in write
 
 Version: 20090506
 * fixed unsupported codepage 0 on NetBSD, system string too strict

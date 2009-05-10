@@ -90,7 +90,7 @@ int io_ata_get_device_configuration(
 	if( ioctl(
 	     file_descriptor,
 	     HDIO_GET_IDENTITY,
-	     &device_configuration ) == -1 )
+	     device_configuration ) == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -105,7 +105,7 @@ int io_ata_get_device_configuration(
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	notify_verbose_dump_data(
-	 &device_configuration,
+	 device_configuration,
 	 sizeof( struct hd_driveid ) );
 
 	notify_verbose_printf(

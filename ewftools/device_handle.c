@@ -1820,9 +1820,9 @@ int device_handle_get_media_information_value(
 	            media_information_value_identifier,
 	            media_information_value_identifier_length ) == 0 ) )
 	{
-		utf8_media_information_value = (uint8_t *) device_handle->serial_number;
+		utf8_media_information_value = (uint8_t *) device_handle->vendor;
 	}
-	else if( ( media_information_value_identifier_length == 5 )
+	else if( ( media_information_value_identifier_length == 13 )
 	      && ( narrow_string_compare(
 	            "serial_number",
 	            media_information_value_identifier,

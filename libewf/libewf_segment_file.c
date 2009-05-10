@@ -1502,14 +1502,33 @@ ssize_t libewf_segment_file_write_chunk(
 
 	write_size = chunk_size;
 
-	/* Check if the chunk and crc buffers are aligned
-	 * if so write the chunk and crc at the same time
+	/* Write the CRC if necessary
 	 */
-	if( ( is_compressed == 0 )
-	 && ( write_crc != 0 )
-	 && ( &( chunk_buffer[ chunk_size ] ) == crc_buffer ) )
+	if( write_crc != 0 )
 	{
-		write_size += sizeof( ewf_crc_t );
+		if( crc_buffer == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid CRC buffer.",
+			 function );
+
+			return( -1 );
+		}
+		endian_little_revert_32bit(
+		 crc_buffer,
+		 *chunk_crc );
+
+		/* Check if the chunk and crc buffers are aligned
+		 * if so write the chunk and crc at the same time
+		 */
+		if( ( is_compressed == 0 )
+		 && ( &( chunk_buffer[ chunk_size ] ) == crc_buffer ) )
+		{
+			write_size += sizeof( ewf_crc_t );
+		}
 	}
 	/* Write the chunk data to the segment file
 	 */
@@ -1533,50 +1552,31 @@ ssize_t libewf_segment_file_write_chunk(
 	}
 	total_write_count += write_count;
 
-	/* Write the CRC if necessary
+	/* Check if the chunk and crc buffers are aligned
+	 * if not the chunk and crc need to be written separately
 	 */
-	if( write_crc != 0 )
+	if( ( write_crc != 0 )
+	 && ( &( chunk_buffer[ chunk_size ] ) != crc_buffer ) )
 	{
-		/* Check if the chunk and crc buffers are aligned
-		 * if not the chunk and crc need to be written separately
-		 */
-		if( &( chunk_buffer[ chunk_size ] ) != crc_buffer )
+		write_count = libbfio_pool_write(
+			       io_handle->file_io_pool,
+			       segment_file_handle->file_io_pool_entry,
+			       crc_buffer,
+			       sizeof( ewf_crc_t ),
+			       error );
+
+		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
-			if( crc_buffer == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: invalid CRC buffer.",
-				 function );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write CRC.",
+			 function );
 
-				return( -1 );
-			}
-			endian_little_revert_32bit(
-			 crc_buffer,
-			 *chunk_crc );
-
-			write_count = libbfio_pool_write(
-				       io_handle->file_io_pool,
-				       segment_file_handle->file_io_pool_entry,
-				       crc_buffer,
-				       sizeof( ewf_crc_t ),
-				       error );
-
-			if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write CRC.",
-				 function );
-
-				return( -1 );
-			}
-			total_write_count += write_count;
+			return( -1 );
 		}
+		total_write_count += write_count;
 	}
 	return( total_write_count );
 }

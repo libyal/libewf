@@ -1,4 +1,4 @@
-.Dd May 3, 2009
+.Dd May 9, 2009
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -8,6 +8,7 @@
 .Nm ewfacquirestream
 .Op Fl A Ar codepage
 .Op Fl b Ar amount_of_sectors
+.Op Fl B Ar amount_of_bytes
 .Op Fl c Ar compression_type
 .Op Fl C Ar case_number
 .Op Fl d Ar digest_type
@@ -19,6 +20,7 @@
 .Op Fl m Ar media_type
 .Op Fl M Ar media_flags
 .Op Fl N Ar notes
+.Op Fl o Ar offset
 .Op Fl p Ar process_buffer_size
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
@@ -48,6 +50,8 @@ The options are as follows:
 the codepage of header section, options: ascii (default), windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
 .It Fl b Ar amount_of_sectors
 the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+.It Fl B Ar amount_of_bytes
+the amount of bytes to acquire
 .It Fl c Ar compression_type
 the compression type, options: none (default), empty-block, fast, best
 .It Fl C Ar case_number
@@ -74,6 +78,8 @@ the media type, options: fixed (default), removable, optical, memory
 the media flags, options: logical, physical (default)
 .It Fl N Ar notes
 the notes (default is notes)
+.It Fl o Ar offset
+the offset to start to acquire (default is 0)
 .It Fl p Ar process_buffer_size
 the process buffer size (default is the chunk size)
 .It Fl q

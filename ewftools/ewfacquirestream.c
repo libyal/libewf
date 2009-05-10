@@ -109,13 +109,13 @@ void usage_fprint(
 	                 "(Expert Witness Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfacquirestream [ -A codepage ] [ -b amount_of_sectors ]\n"
-	                 "                        [ -c compression_type ] [ -C case_number ]\n"
-	                 "                        [ -d digest_type ] [ -D description ]\n"
-	                 "                        [ -e examiner_name ] [ -E evidence_number ]\n"
-	                 "                        [ -f format ] [ -l log_filename ] [ -m media_type ]\n"
-	                 "                        [ -M media_flags ] [ -N notes ]\n"
-	                 "                        [ -p process_buffer_size ] [ -S segment_file_size ]\n"
-	                 "                        [ -t target ] [ -hqsvVw ]\n\n" );
+	                 "                        [ -B amount_of_bytes ] [ -c compression_type ]\n"
+	                 "                        [ -C case_number ] [ -d digest_type ]\n"
+	                 "                        [ -D description ] [ -e examiner_name ]\n"
+	                 "                        [ -E evidence_number ] [ -f format ] [ -l log_filename ]\n"
+	                 "                        [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
+	                 "                        [ -o offset ] [ -p process_buffer_size ]\n"
+	                 "                        [ -S segment_file_size ] [ -t target ] [ -hqsvVw ]\n\n" );
 
 	fprintf( stream, "\tReads data from stdin\n\n" );
 
@@ -124,6 +124,7 @@ void usage_fprint(
 	                 "\t    windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options:\n"
 	                 "\t    64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stream, "\t-B: specify the amount of bytes to acquire (default is all bytes)\n" );
 	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast\n"
 	                 "\t    or best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
@@ -138,6 +139,7 @@ void usage_fprint(
 	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable, optical, memory\n" );
 	fprintf( stream, "\t-M: specify the media flags, options: logical, physical (default)\n" );
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
+	fprintf( stream, "\t-o: specify the offset to start to acquire (default is 0)\n" );
 	fprintf( stream, "\t-p: specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q: quiet shows no status information\n" );
 	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n"
@@ -185,6 +187,7 @@ int ewfacquirestream_acquiry_parameters_fprint(
      int8_t compression_level,
      uint8_t compression_flags,
      uint8_t ewf_format,
+     off64_t acquiry_offset,
      size64_t acquiry_size,
      size64_t segment_file_size,
      uint32_t bytes_per_sector,
@@ -471,6 +474,10 @@ int ewfacquirestream_acquiry_parameters_fprint(
 		 stream,
 		 "\n" );
 	}
+	fprintf(
+	 stream, "Acquiry start offset:\t\t%" PRIi64 "\n",
+	 acquiry_offset );
+
 	result = byte_size_string_create(
 	          acquiry_size_string,
 	          16,
@@ -836,7 +843,8 @@ ssize_t ewfacquirestream_read_chunk(
 ssize64_t ewfacquirestream_read_input(
            imaging_handle_t *imaging_handle,
            int input_file_descriptor,
-           size64_t write_size,
+           size64_t acquiry_size,
+           off64_t acquiry_offset,
            uint32_t bytes_per_sector,
            uint8_t swap_byte_pairs,
            uint8_t read_error_retry,
@@ -853,10 +861,10 @@ ssize64_t ewfacquirestream_read_input(
 	static char *function                        = "ewfacquirestream_read_input";
 	ssize64_t acquiry_count                      = 0;
 	size32_t chunk_size                          = 0;
+	size_t read_size                             = 0;
 	ssize_t read_count                           = 0;
 	ssize_t process_count                        = 0;
 	ssize_t write_count                          = 0;
-	uint32_t amount_of_chunks                    = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -951,8 +959,24 @@ ssize64_t ewfacquirestream_read_input(
 		return( -1 );
 	}
 
-	while( write_size == 0 )
+	while( ( acquiry_size == 0 )
+	    || ( acquiry_count < (ssize64_t) acquiry_size ) )
 	{
+		read_size = process_buffer_size;
+
+		/* Align with acquiry offset if necessary
+		 */
+		if( ( acquiry_offset != 0 )
+		 && ( acquiry_offset < (off64_t) read_size ) )
+		{
+			read_size = (size_t) acquiry_offset;
+		}
+		else if( ( acquiry_size != 0 )
+		      && ( ( (ssize64_t) acquiry_size - acquiry_count ) < (ssize64_t) read_size ) )
+		{
+			read_size = (size_t) ( (ssize64_t) acquiry_size - acquiry_count );
+		}
+
 		/* Read a chunk from the file descriptor
 		 */
 		read_count = ewfacquirestream_read_chunk(
@@ -960,18 +984,10 @@ ssize64_t ewfacquirestream_read_input(
 		              input_file_descriptor,
 		              storage_media_buffer->raw_buffer,
 		              storage_media_buffer->raw_buffer_size,
-		              process_buffer_size,
+		              read_size,
 		              acquiry_count,
 		              read_error_retry,
 		              error );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		notify_verbose_printf(
-		 "%s: read chunk: %" PRIi32 " with size: %" PRIzd ".\n",
-		 function,
-		 amount_of_chunks + 1,
-		 read_count );
-#endif
 
 		if( read_count < 0 )
 		{
@@ -992,13 +1008,19 @@ ssize64_t ewfacquirestream_read_input(
 		{
 			break;
 		}
-		amount_of_chunks++;
-
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		storage_media_buffer->data_in_compression_buffer = 0;
 #endif
 		storage_media_buffer->raw_buffer_amount = read_count;
 
+		/* Skip a certain amount of bytes if necessary
+		 */
+		if( acquiry_offset > (off64_t) acquiry_count )
+		{
+			acquiry_offset -= read_count;
+
+			continue;
+		}
 		/* Swap byte pairs
 		 */
 		if( ( swap_byte_pairs == 1 )
@@ -1214,6 +1236,7 @@ int main( int argc, char * const argv[] )
 	system_integer_t option                         = 0;
 	size_t string_length                            = 0;
 	int64_t write_count                             = 0;
+	uint64_t acquiry_offset                         = 0;
 	uint64_t acquiry_size                           = 0;
 	uint64_t process_buffer_size                    = 0;
 	uint64_t segment_file_size                      = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
@@ -1280,7 +1303,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "A:b:c:C:d:D:e:E:f:hl:m:M:N:p:qsS:t:vVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:qsS:t:vVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1326,11 +1349,34 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					sectors_per_chunk = 64;
+
 					fprintf(
 					 stderr,
 					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
+				}
+				break;
 
-					sectors_per_chunk = 64;
+			case (system_integer_t) 'B':
+				string_length = system_string_length(
+				                 optarg );
+
+				if( system_string_to_uint64(
+				     optarg,
+				     string_length + 1,
+				     &acquiry_size,
+				     &error ) != 1 )
+				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					acquiry_size = 0;
+
+					fprintf(
+					 stderr,
+					 "Unsupported acquiry size defaulting to: all bytes.\n" );
 				}
 				break;
 
@@ -1346,12 +1392,12 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
+
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
-
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
 				}
 				break;
 
@@ -1402,20 +1448,20 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
+
 					fprintf(
 					 stderr,
 					 "Unsupported EWF file format type defaulting to: encase6.\n" );
-
-					ewf_format = LIBEWF_FORMAT_ENCASE6;
 				}
 				else if( ( ewf_format == LIBEWF_FORMAT_EWF )
 				      || ( ewf_format == LIBEWF_FORMAT_SMART ) )
 				{
+					ewf_format = LIBEWF_FORMAT_ENCASE6;
+
 					fprintf(
 					 stderr,
 					 "Unsupported EWF file format type defaulting to: encase6.\n" );
-
-					ewf_format = LIBEWF_FORMAT_ENCASE6;
 				}
 				break;
 
@@ -1441,11 +1487,11 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					media_type = LIBEWF_MEDIA_TYPE_FIXED;
+
 					fprintf(
 					 stderr,
 					 "Unsupported media type defaulting to: fixed.\n" );
-
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
 				}
 				break;
 
@@ -1460,17 +1506,41 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
+					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
+
 					fprintf(
 					 stderr,
 					 "Unsupported media flags defaulting to: physical.\n" );
-
-					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
 				break;
 
 			case (system_integer_t) 'N':
 				option_notes = optarg;
 
+				break;
+
+			case (system_integer_t) 'o':
+				string_length = system_string_length(
+				                 optarg );
+
+				if( system_string_to_uint64(
+				     optarg,
+				     string_length + 1,
+				     &acquiry_offset,
+				     &error ) != 1 )
+				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					acquiry_offset = 0;
+
+					fprintf(
+					 stderr,
+					 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
+					 acquiry_offset );
+				}
 				break;
 
 			case (system_integer_t) 'p':
@@ -1800,6 +1870,7 @@ int main( int argc, char * const argv[] )
 		     compression_level,
 		     compression_flags,
 		     ewf_format,
+		     (off64_t) acquiry_offset,
 		     (size64_t) acquiry_size,
 		     (size64_t) segment_file_size,
 		     bytes_per_sector,
@@ -2060,6 +2131,7 @@ int main( int argc, char * const argv[] )
 		               ewfacquirestream_imaging_handle,
 		               0,
 		               acquiry_size,
+		               acquiry_offset,
 		               bytes_per_sector,
 		               swap_byte_pairs,
 		               read_error_retry,
