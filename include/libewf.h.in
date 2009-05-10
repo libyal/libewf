@@ -64,6 +64,11 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
 LIBEWF_EXTERN uint8_t libewf_get_flags_write(
                        void );
 
+/* Returns the flags for resume writing
+ */
+LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
+                       void );
+
 /* Determines if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */

@@ -200,8 +200,11 @@ Work in progress:
   - variating buffer sizes
 * test: read/write of EnCase 6.12 SHA1
 * test: windows acquiry of 40 GB disk
-* add support functions for new flags
-* fix small memory leak in verification handle memory allocated at line 2026
+
+Version: 20090510
+* updated libbfio
+* added libewf_get_flags_write_resume
+* fixed small memory leak in verification and export handles
 
 Version: 20090509
 * worked on support for missing segment files (chunks)

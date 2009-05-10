@@ -2100,6 +2100,11 @@ int verification_handle_crc_errors_fprint(
 					last_filename      = filename;
 					last_filename_size = filename_size;
 				}
+				else
+				{
+					memory_free(
+					 filename );
+				}
 				start_sector += verification_handle->chunk_size;
 			}
 			memory_free(

@@ -49,6 +49,9 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
 LIBEWF_EXTERN uint8_t libewf_get_flags_write(
                        void );
 
+LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
+                       void );
+
 #endif
 
 #if defined( HAVE_V2_API )

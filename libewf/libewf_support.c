@@ -71,6 +71,14 @@ uint8_t libewf_get_flags_write(
 	return( (uint8_t) LIBEWF_FLAG_WRITE );
 }
 
+/* Returns the flags for resume writing
+ */
+uint8_t libewf_get_flags_write_resume(
+         void )
+{
+	return( (uint8_t) LIBEWF_FLAG_WRITE | LIBEWF_FLAG_RESUME );
+}
+
 #endif
 
 /* Determines if a file is an EWF file (check for the EWF file signature)
