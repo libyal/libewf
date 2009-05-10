@@ -1128,10 +1128,10 @@ int device_handle_get_bytes_per_sector(
 	return( 1 );
 }
 
-/* Retrieves the media information
+/* Determines the media information
  * Returns 1 if successful, 0 if no media information available or -1 on error
  */
-int device_handle_get_media_information(
+int device_handle_determine_media_information(
      device_handle_t *device_handle,
      liberror_error_t **error )
 {
@@ -1153,7 +1153,7 @@ int device_handle_get_media_information(
 #endif
 #endif
 
-	static char *function  = "device_handle_get_media_information";
+	static char *function  = "device_handle_determine_media_information";
 	int result             = 0;
 
 	if( device_handle == NULL )
@@ -1269,7 +1269,7 @@ int device_handle_get_media_information(
 		if( (size_t) ( (STORAGE_DESCRIPTOR_HEADER *) response )->Size > sizeof( STORAGE_DEVICE_DESCRIPTOR ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_dump_data(
+			notify_verbose_dump_data(
 			 response,
 			 (size_t) response_count );
 #endif
@@ -1281,7 +1281,7 @@ int device_handle_get_media_information(
 
 				result = system_string_trim_copy_from_byte_stream(
 					  device_handle->vendor,
-					  255,
+					  64,
 					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->VendorIdOffset ] ),
 					  string_length,
 					  error );
@@ -1309,7 +1309,7 @@ int device_handle_get_media_information(
 
 				result = system_string_trim_copy_from_byte_stream(
 					  device_handle->model,
-					  255,
+					  64,
 					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->ProductIdOffset ] ),
 					  string_length,
 					  error );
@@ -1337,7 +1337,7 @@ int device_handle_get_media_information(
 
 				result = system_string_trim_copy_from_byte_stream(
 					  device_handle->serial_number,
-					  255,
+					  64,
 					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->SerialNumberOffset ] ),
 					  string_length,
 					  error );
@@ -1542,13 +1542,13 @@ int device_handle_get_media_information(
 		if( response_count > 32 )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_dump_data(
+			notify_verbose_dump_data(
 			 response,
 			 response_count );
 #endif
 			result = system_string_trim_copy_from_byte_stream(
 				  device_handle->vendor,
-				  255,
+				  64,
 				  &( response[ 8 ] ),
 				  15 - 8,
 				  error );
@@ -1570,7 +1570,7 @@ int device_handle_get_media_information(
 			}
 			result = system_string_trim_copy_from_byte_stream(
 				  device_handle->model,
-				  255,
+				  64,
 				  &( response[ 16 ] ),
 				  31 - 16,
 				  error );
@@ -1608,13 +1608,13 @@ int device_handle_get_media_information(
 		if( response_count > 4 )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_dump_data(
+			notify_verbose_dump_data(
 			 response,
 			 response_count );
 #endif
 			result = system_string_trim_copy_from_byte_stream(
 				  device_handle->serial_number,
-				  255,
+				  64,
 				  &( response[ 4 ] ),
 				  response_count - 4,
 				  error );
@@ -1660,7 +1660,7 @@ int device_handle_get_media_information(
 			{
 				result = system_string_trim_copy_from_byte_stream(
 					  device_handle->serial_number,
-					  255,
+					  64,
 					  device_configuration.serial_no,
 					  20,
 					  error );
@@ -1685,7 +1685,7 @@ int device_handle_get_media_information(
 			{
 				result = system_string_trim_copy_from_byte_stream(
 					  device_handle->model,
-					  255,
+					  64,
 					  device_configuration.model,
 					  40,
 					  error );
@@ -1757,6 +1757,140 @@ int device_handle_get_media_information(
 	return( 1 );
 }
 
+/* Retrieves the media information value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int device_handle_get_media_information_value(
+     device_handle_t *device_handle,
+     char *media_information_value_identifier,
+     size_t media_information_value_identifier_length,
+     system_character_t *media_information_value,
+     size_t media_information_value_size,
+     liberror_error_t **error )
+{
+	uint8_t *utf8_media_information_value          = NULL;
+	static char *function                          = "device_handle_get_media_information_value";
+	size_t calculated_media_information_value_size = 0;
+	size_t utf8_media_information_value_size       = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_information_value_identifier == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media information value identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_information_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media information value.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( media_information_value_identifier_length == 5 )
+	 && ( narrow_string_compare(
+	       "model",
+	       media_information_value_identifier,
+	       media_information_value_identifier_length ) == 0 ) )
+	{
+		utf8_media_information_value = (uint8_t *) device_handle->model;
+	}
+	else if( ( media_information_value_identifier_length == 6 )
+	      && ( narrow_string_compare(
+	            "vendor",
+	            media_information_value_identifier,
+	            media_information_value_identifier_length ) == 0 ) )
+	{
+		utf8_media_information_value = (uint8_t *) device_handle->serial_number;
+	}
+	else if( ( media_information_value_identifier_length == 5 )
+	      && ( narrow_string_compare(
+	            "serial_number",
+	            media_information_value_identifier,
+	            media_information_value_identifier_length ) == 0 ) )
+	{
+		utf8_media_information_value = (uint8_t *) device_handle->serial_number;
+	}
+	else
+	{
+		return( 0 );
+	}
+	if( utf8_media_information_value != NULL )
+	{
+		if( utf8_media_information_value[ 0 ] == 0 )
+		{
+			return( 0 );
+		}
+		/* Determine the header value size
+		 */
+		utf8_media_information_value_size = 1 + narrow_string_length(
+		                                         (char *) utf8_media_information_value );
+
+		if( system_string_size_from_utf8_string(
+		     utf8_media_information_value,
+		     utf8_media_information_value_size,
+		     &calculated_media_information_value_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to determine media information value size.",
+			 function );
+
+			return( -1 );
+		}
+		if( media_information_value_size < calculated_media_information_value_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: media information value too small.",
+			 function );
+
+			return( -1 );
+		}
+		if( system_string_copy_from_utf8_string(
+		     media_information_value,
+		     media_information_value_size,
+		     utf8_media_information_value,
+		     utf8_media_information_value_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to set media information value.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
 /* Set the read error values in the device handle
  * Returns 1 if successful or -1 on error
  */
@@ -1823,123 +1957,123 @@ int device_handle_media_information_fprint(
 		return( -1 );
 	}
 	fprintf(
-	 stderr,
+	 stream,
 	 "Media information:\n" );
 
 	if( device_handle->media_information_set != 0 )
 	{
 		fprintf(
-		 stderr,
+		 stream,
 		 "Device type:\t\t" );
 
 		switch( device_handle->device_type )
 		{
 			case 0x00:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Direct access" );
 				break;
 
 			case 0x01:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Sequential access" );
 				break;
 
 			case 0x02:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Printer" );
 				break;
 
 			case 0x03:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Processor" );
 				break;
 
 			case 0x04:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Write-once" );
 				break;
 
 			case 0x05:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Optical disk (CD/DVD/BD)" );
 				break;
 
 			case 0x06:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Scanner" );
 				break;
 
 			case 0x07:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Optical memory" );
 				break;
 
 			case 0x08:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Medium changer" );
 				break;
 
 			case 0x09:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Communications" );
 				break;
 
 			case 0x0a:
 			case 0x0b:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Graphic arts pre-press" );
 				break;
 
 			case 0x0c:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Storage array controller" );
 				break;
 
 			case 0x0d:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Enclosure services" );
 				break;
 
 			case 0x0e:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Simplified direct-access" );
 				break;
 
 			case 0x0f:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Optical card reader/writer" );
 				break;
 
 			case 0x10:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Bridging expander" );
 				break;
 
 			case 0x11:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Object-based Storage" );
 				break;
 
 			case 0x12:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Automation/Drive Interface" );
 				break;
 
@@ -1954,60 +2088,60 @@ int device_handle_media_information_fprint(
 			case 0x1c:
 			case 0x1d:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Reserved: %d",
 				 device_handle->device_type );
 				break;
 
 			case 0x1e:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Well known logical unit" );
 				break;
 
 			default:
 				fprintf(
-				 stderr,
+				 stream,
 				 "Unknown: %d",
 				 device_handle->device_type );
 				break;
 		}
 		fprintf(
-		 stderr,
+		 stream,
 		 "\n" );
 
 		fprintf(
-		 stderr,
+		 stream,
 		 "Bus type:\t\t" );
 
 		switch( device_handle->bus_type )
 		{
 			case IO_BUS_TYPE_ATA:
 				fprintf(
-				 stderr,
+				 stream,
 				 "ATA/ATAPI" );
 				break;
 
 			case IO_BUS_TYPE_FIREWIRE:
 				fprintf(
-				 stderr,
+				 stream,
 				 "FireWire (IEEE1394)" );
 				break;
 
 			case IO_BUS_TYPE_SCSI:
 				fprintf(
-				 stderr,
+				 stream,
 				 "SCSI" );
 				break;
 
 			case IO_BUS_TYPE_USB:
 				fprintf(
-				 stderr,
+				 stream,
 				 "USB" );
 				break;
 		}
 		fprintf(
-		 stderr,
+		 stream,
 		 "\n" );
 
 		if( device_handle->removable != 0 )

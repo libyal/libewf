@@ -99,15 +99,15 @@ struct device_handle
 
 	/* The vendor string
 	 */
-	system_character_t vendor[ 255 ];
+	system_character_t vendor[ 64 ];
 
 	/* The model string
 	 */
-	system_character_t model[ 255 ];
+	system_character_t model[ 64 ];
 
 	/* The serial number string
 	 */
-	system_character_t serial_number[ 255 ];
+	system_character_t serial_number[ 64 ];
 
 	/* Value to indicate the media information values were set
 	 */
@@ -166,8 +166,16 @@ int device_handle_get_bytes_per_sector(
      uint32_t *bytes_per_sector,
      liberror_error_t **error );
 
-int device_handle_get_media_information(
+int device_handle_determine_media_information(
      device_handle_t *device_handle,
+     liberror_error_t **error );
+
+int device_handle_get_media_information_value(
+     device_handle_t *device_handle,
+     char *media_information_value_identifier,
+     size_t media_information_value_identifier_length,
+     system_character_t *media_information_value,
+     size_t media_information_value_size,
      liberror_error_t **error );
 
 int device_handle_set_read_error_values(

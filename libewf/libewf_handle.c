@@ -1604,8 +1604,19 @@ int libewf_handle_close(
 
 	if( ( internal_handle->write_io_handle != NULL )
 	 && ( internal_handle->write_io_handle->write_finalized == 0 )
-	 && ( libewf_handle_write_finalize(
-	       handle,
+	 && ( libewf_write_io_handle_finalize(
+	       internal_handle->write_io_handle,
+	       internal_handle->io_handle,
+	       internal_handle->media_values,
+	       internal_handle->offset_table,
+	       internal_handle->segment_table,
+	       &( internal_handle->header_values ),
+	       internal_handle->hash_values,
+	       internal_handle->header_sections,
+	       internal_handle->hash_sections,
+	       internal_handle->sessions,
+	       internal_handle->acquiry_errors,
+	       internal_handle->chunk_cache,
 	       error ) == -1 ) )
 	{
 		liberror_error_set(

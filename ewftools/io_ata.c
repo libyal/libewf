@@ -104,44 +104,35 @@ int io_ata_get_device_configuration(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	notify_verbose_dump_data(
 	 &device_configuration,
 	 sizeof( struct hd_driveid ) );
 
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "Feature sets:\n" );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "SMART:\t\t\t%d\n",
 	 ( device_configuration->command_set_1 & 0x0001 ) );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "Security Mode:\t\t%d (%d)\n",
 	 ( device_configuration->command_set_1 & 0x0002 ) >> 1,
 	 ( device_configuration->dlf & 0x0001 ) );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "Security Mode enabled:\t%d\n",
 	 ( device_configuration->dlf & 0x0002 ) >> 1 );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "Removable Media:\t%d\n",
 	 ( device_configuration->command_set_1 & 0x0004 ) >> 2 );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "HPA:\t\t\t%d\n",
 	 ( device_configuration->command_set_1 & 0x0400 ) >> 10 );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "DCO:\t\t\t%d\n",
 	 ( device_configuration->command_set_2 & 0x0800 ) >> 11 );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "Media serial:\t\t%d\n",
 	 ( device_configuration->cfsse & 0x0004 ) >> 2 );
-	fprintf(
-	 stderr,
+	notify_verbose_printf(
 	 "\n" );
 #endif
 #endif

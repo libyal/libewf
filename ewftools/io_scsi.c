@@ -468,7 +468,7 @@ int io_scsi_get_identiier(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	notify_verbose_dump_data(
 	 &identifier,
 	 sizeof( identifier ) );
 #endif
@@ -554,6 +554,14 @@ int io_scsi_get_bus_type(
 	       sg_probe_host.buffer,
 	       "ahci",
 	       4 ) == 0 ) )
+	{
+		*bus_type = IO_BUS_TYPE_ATA;
+	}
+	else if( ( sg_probe_host_length == 7 )
+	      && ( narrow_string_compare(
+	            sg_probe_host.buffer,
+	            "sata_nv",
+	            7 ) == 0 ) )
 	{
 		*bus_type = IO_BUS_TYPE_ATA;
 	}

@@ -36,7 +36,6 @@ Further analysis of the EWF format:
 
 Features
 * support missing segment files (chunks)
-* tools and library support read/write of EnCase 6.12 SHA1
 * implement low memory usage option
   - trade off IO versus memory use
 * resume write support for ENCASE1/SMART table sections
@@ -198,18 +197,21 @@ Work in progress:
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
-* check windows acquiry of 40 GB disk
-* ewftools: if available add model and serial to header values
+* ewfacquire: if available add model and serial to header values
 * ewfexport: fix different input and output chunk sizes for low level functions
-* automated tests:
+* fix automated tests:
   - check low level functions compilation test
   - python compilation (v1 and v2 API)
+* test: read/write of EnCase 6.12 SHA1
+* test: windows acquiry of 40 GB disk
 
 Version: 20090509
 * worked on support for missing segment files (chunks)
 * applied patch by aozsyn for compilation errors of API v1 with low level functions and
   python bindings
 * corrected pyewf compiler warnings
+* worked on detecting device removal, write finalize no longer closes segment
+  files if the media size was known and not entirely written
 
 Version: 20090506
 * fixed unsupported codepage 0 on NetBSD, system string too strict

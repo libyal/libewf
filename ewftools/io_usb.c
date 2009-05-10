@@ -188,7 +188,7 @@ int io_usb_control_command(
 	}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	notify_verbose_dump_data(
 	 buffer,
 	 buffer_size );
 #endif
@@ -237,7 +237,7 @@ int io_usb_test(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	notify_verbose_dump_data(
 	 &connection_information,
 	 sizeof( struct usbdevfs_connectinfo ) );
 #endif

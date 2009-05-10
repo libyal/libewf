@@ -57,6 +57,9 @@ void notify_dump_data(
       void *data,
       size_t size );
 
+#define notify_verbose_dump_data \
+        if( notify_verbose != 0 ) notify_dump_data
+
 #if defined( __cplusplus )
 }
 #endif

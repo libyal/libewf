@@ -3641,12 +3641,6 @@ ssize_t libewf_write_io_handle_finalize(
 	{
 		return( 0 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	libewf_notify_verbose_printf(
-	 "%s: finalizing write.\n",
-	 function );
-#endif
-
 	/* Write data remaining in the chunk cache to file
 	 */
 	if( ( io_handle->current_chunk_offset != 0 )
@@ -3696,6 +3690,13 @@ ssize_t libewf_write_io_handle_finalize(
 		}
 		write_finalize_count += write_count;
 	}
+	/* Check if all the media data has been written
+	 */
+	if( ( media_values->media_size != 0 )
+	 && ( write_io_handle->input_write_count < (ssize64_t) media_values->media_size ) )
+	{
+		return( write_finalize_count );
+	}
 	/* Check last segment file
 	 */
 	segment_number = segment_table->amount - 1;
@@ -3704,7 +3705,7 @@ ssize_t libewf_write_io_handle_finalize(
 	 */
 	if( segment_number == 0 )
 	{
-		return( 0 );
+		return( write_finalize_count );
 	}
 	segment_file_handle = segment_table->segment_file_handle[ segment_number ];
 

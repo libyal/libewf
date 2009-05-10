@@ -860,6 +860,16 @@ ssize_t ewfacquire_read_buffer(
 
 				return( -1 );
 			}
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: error reading data: %" PRIs_SYSTEM ".",
+			 function,
+			 system_string_strerror(
+			  errno ) );
+
+				return( -1 );
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
@@ -1680,6 +1690,8 @@ int main( int argc, char * const argv[] )
 {
 	system_character_t acquiry_operating_system[ 32 ];
 	system_character_t input_buffer[ EWFACQUIRE_INPUT_BUFFER_SIZE ];
+	system_character_t media_information_model[ 64 ];
+	system_character_t media_information_serial_number[ 64 ];
 
 	device_handle_t *device_handle                  = NULL;
 
@@ -2348,7 +2360,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	result = device_handle_get_media_information(
+	result = device_handle_determine_media_information(
 	          device_handle,
 	          &error );
 
@@ -2356,7 +2368,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to retrieve media information.\n" );
+		 "Unable to determine media information.\n" );
 
 		notify_error_backtrace(
 		 error );
@@ -2767,7 +2779,7 @@ int main( int argc, char * const argv[] )
 	/* Request the necessary case data
 	 */
 	while( ( interactive_mode == 1 )
-	 && ( acquiry_parameters_confirmed == 0 ) )
+	    && ( acquiry_parameters_confirmed == 0 ) )
 	{
 		fprintf(
 		 stdout,
@@ -2861,7 +2873,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stdout,
-				 "Unable to resume acquire.\n" );
+				 "Unable to determine previous acquiry parameters.\n" );
 
 				notify_error_backtrace(
 				 error );
@@ -2884,7 +2896,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stdout,
-				 "Unable to resume acquire.\n" );
+				 "Unable to determine resume acquiry offset.\n" );
 
 				notify_error_backtrace(
 				 error );
@@ -2897,6 +2909,13 @@ int main( int argc, char * const argv[] )
 
 				resume_acquiry = 0;
 			}
+		}
+		if( resume_acquiry != 0 )
+		{
+			fprintf(
+			 stdout,
+			 "Resuming acquire at offset: %" PRIu64 ".\n",
+			 resume_acquiry_offset );
 		}
 		if( resume_acquiry == 0 )
 		{
@@ -3584,6 +3603,44 @@ int main( int argc, char * const argv[] )
 			}
 			acquiry_software_version = _SYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
+			if( device_handle_get_media_information_value(
+			     device_handle,
+			     "model",
+			     5,
+			     media_information_model,
+			     64,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to retrieve model.\n" );
+
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				media_information_model[ 0 ] = 0;
+			}
+			if( device_handle_get_media_information_value(
+			     device_handle,
+			     "serial_number",
+			     13,
+			     media_information_serial_number,
+			     64,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to retrieve serial number.\n" );
+
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				media_information_serial_number[ 0 ] = 0;
+			}
 			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
 			     target_filename,
@@ -3626,10 +3683,12 @@ int main( int argc, char * const argv[] )
 				  acquiry_software_version,
 				  system_string_length(
 				   acquiry_software_version ),
-			          NULL,
-			          0,
-			          NULL,
-			          0,
+			          media_information_model,
+				  system_string_length(
+				   media_information_model ),
+			          media_information_serial_number,
+				  system_string_length(
+				   media_information_serial_number ),
 				  header_codepage,
 				  bytes_per_sector,
 				  acquiry_size,
