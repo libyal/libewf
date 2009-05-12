@@ -869,7 +869,6 @@ ssize_t ewfacquire_read_buffer(
 			 system_string_strerror(
 			  errno ) );
 
-				return( -1 );
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{

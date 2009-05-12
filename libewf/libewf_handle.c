@@ -802,72 +802,81 @@ int libewf_handle_open(
 	{
 		/* Get the basename of the first segment file
 		 */
-		filename_length = narrow_string_length(
-				   first_segment_filename );
-
-		/* Set segment table basename
-		 */
-		if( libewf_segment_table_set_basename(
-		     internal_handle->segment_table,
-		     first_segment_filename,
-		     filename_length - 4 + 1,
-		     error ) != 1 )
+		if( first_segment_filename != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.",
-			 function );
+			filename_length = narrow_string_length(
+					   first_segment_filename );
 
-			return( -1 );
+			/* Set segment table basename
+			 */
+			if( libewf_segment_table_set_basename(
+			     internal_handle->segment_table,
+			     first_segment_filename,
+			     filename_length - 4 + 1,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set basename in segment table.",
+				 function );
+
+				return( -1 );
+			}
 		}
 		/* Get the basename of the first delta segment file
 		 */
-		filename_length = narrow_string_length(
-				   first_delta_segment_filename );
-
-		/* Set delta segment table basename
-		 */
-		if( libewf_segment_table_set_basename(
-		     internal_handle->delta_segment_table,
-		     first_delta_segment_filename,
-		     filename_length - 4 + 1,
-		     error ) != 1 )
+		if( first_delta_segment_filename != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in delta segment table.",
-			 function );
+			filename_length = narrow_string_length(
+					   first_delta_segment_filename );
 
-			return( -1 );
+			/* Set delta segment table basename
+			 */
+			if( libewf_segment_table_set_basename(
+			     internal_handle->delta_segment_table,
+			     first_delta_segment_filename,
+			     filename_length - 4 + 1,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set basename in delta segment table.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	else if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
 	{
 		/* Get the basename of the first segment file
 		 */
-		filename_length = narrow_string_length(
-				   first_segment_filename );
-
-		/* Set segment table basename
-		 */
-		if( libewf_segment_table_set_basename(
-		     internal_handle->segment_table,
-		     first_segment_filename,
-		     filename_length - 4 + 1,
-		     error ) != 1 )
+		if( first_segment_filename != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.",
-			 function );
+			filename_length = narrow_string_length(
+					   first_segment_filename );
 
-			return( -1 );
+			/* Set segment table basename
+			 */
+			if( libewf_segment_table_set_basename(
+			     internal_handle->segment_table,
+			     first_segment_filename,
+			     filename_length - 4 + 1,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set basename in segment table.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
@@ -1127,72 +1136,81 @@ int libewf_handle_open_wide(
 	{
 		/* Get the basename of the first segment file
 		 */
-		filename_length = wide_string_length(
-				   first_segment_filename );
-
-		/* Set segment table basename
-		 */
-		if( libewf_segment_table_set_basename_wide(
-		     internal_handle->segment_table,
-		     first_segment_filename,
-		     filename_length - 4 + 1,
-		     error ) != 1 )
+		if( first_segment_filename != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.",
-			 function );
+			filename_length = wide_string_length(
+					   first_segment_filename );
 
-			return( -1 );
+			/* Set segment table basename
+			 */
+			if( libewf_segment_table_set_basename_wide(
+			     internal_handle->segment_table,
+			     first_segment_filename,
+			     filename_length - 4 + 1,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set basename in segment table.",
+				 function );
+
+				return( -1 );
+			}
 		}
 		/* Get the basename of the first delta segment file
 		 */
-		filename_length = wide_string_length(
-				   first_delta_segment_filename );
-
-		/* Set delta segment table basename
-		 */
-		if( libewf_segment_table_set_basename_wide(
-		     internal_handle->delta_segment_table,
-		     first_delta_segment_filename,
-		     filename_length - 4 + 1,
-		     error ) != 1 )
+		if( first_delta_segment_filename != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in delta segment table.",
-			 function );
+			filename_length = wide_string_length(
+					   first_delta_segment_filename );
 
-			return( -1 );
+			/* Set delta segment table basename
+			 */
+			if( libewf_segment_table_set_basename_wide(
+			     internal_handle->delta_segment_table,
+			     first_delta_segment_filename,
+			     filename_length - 4 + 1,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set basename in delta segment table.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	else if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
 	{
 		/* Get the basename of the first segment file
 		 */
-		filename_length = wide_string_length(
-				   first_segment_filename );
-
-		/* Set segment table basename
-		 */
-		if( libewf_segment_table_set_basename_wide(
-		     internal_handle->segment_table,
-		     first_segment_filename,
-		     filename_length - 4 + 1,
-		     error ) != 1 )
+		if( first_segment_filename != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.",
-			 function );
+			filename_length = wide_string_length(
+					   first_segment_filename );
 
-			return( -1 );
+			/* Set segment table basename
+			 */
+			if( libewf_segment_table_set_basename_wide(
+			     internal_handle->segment_table,
+			     first_segment_filename,
+			     filename_length - 4 + 1,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set basename in segment table.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )

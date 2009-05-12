@@ -201,6 +201,11 @@ Work in progress:
 * test: read/write of EnCase 6.12 SHA1
 * test: windows acquiry of 40 GB disk
 
+Version: 20090511
+* bug fix in ewfacquire error handling code
+* commented out some unused code
+* bug fix in libewf handle open regarding base name
+
 Version: 20090510
 * updated libbfio
 * added libewf_get_flags_write_resume

@@ -1379,15 +1379,16 @@ int libewf_glob(
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
+/* TODO
 int libewf_glob_file_io_handle(
      libbfio_handle_t *file_io_handle,
      uint8_t format,
      libbfio_pool_t *file_io_pool,
      liberror_error_t **error )
 {
-	/* TODO */
 	return( -1 );
 }
+*/
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 

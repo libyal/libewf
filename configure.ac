@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090510],
+ [20090511],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090510])
+ [20090511])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -1396,7 +1396,7 @@ dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
 dnl Set memwatch support
-ac_libewf_have_memwatch=yes
+ac_libewf_have_memwatch=no
 
 AS_IF(
 	[test "x$ac_libewf_have_memwatch" != xno ],
