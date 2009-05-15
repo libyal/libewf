@@ -1507,7 +1507,8 @@ ssize64_t ewfacquire_read_input(
 				 LIBERROR_ERROR_DOMAIN_IO,
 				 LIBERROR_IO_ERROR_READ_FAILED,
 				 "%s: more bytes read than requested.",
-				 function );
+				 function,
+				 process_count, read_size );
 
 				storage_media_buffer_free(
 				 &storage_media_buffer,
@@ -1515,6 +1516,8 @@ ssize64_t ewfacquire_read_input(
 
 				return( -1 );
 			}
+			read_count = process_count;
+
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 			/* Set the amount of chunk data in the buffer
 			 */
@@ -1589,11 +1592,11 @@ ssize64_t ewfacquire_read_input(
 		}
 		acquiry_count += read_count;
 
-		 if( process_status_update(
-		      process_status,
-		      (size64_t) acquiry_count,
-		      acquiry_size,
-		      error ) != 1 )
+		if( process_status_update(
+		     process_status,
+		     (size64_t) acquiry_count,
+		     acquiry_size,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,

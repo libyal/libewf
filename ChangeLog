@@ -203,6 +203,10 @@ Work in progress:
 
 Version: 20090512
 * updated liberror, libuna and libbfio
+* worked fix for ewfexport for different input and output chunk sizes for low level functions
+* checked use of uninitialized ->chunk_size ini ewftools handles
+* fixed error in ewfacquire for write resume with low level functions
+* fixed error in prepare write chunk for resume write
 
 Version: 20090511
 * bug fix in ewfacquire error handling code

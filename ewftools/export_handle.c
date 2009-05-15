@@ -489,6 +489,26 @@ int export_handle_open_input(
 		memory_free(
 		 libewf_filenames );
 	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_chunk_size(
+	     export_handle->input_handle,
+	     &( export_handle->input_chunk_size ),
+	     error ) != 1 )
+#else
+	if( libewf_get_chunk_size(
+	     export_handle->input_handle,
+	     &( export_handle->input_chunk_size ) ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk size.",
+		 function );
+
+		return( -1 );
+	}
 	return( result );
 }
 
@@ -858,7 +878,7 @@ ssize_t export_handle_prepare_read_buffer(
 				return( -1 );
 			}
 		}
-		process_count = export_handle->chunk_size;
+		process_count = export_handle->input_chunk_size;
 
 		/* Add a read error
 		 */
@@ -1025,29 +1045,6 @@ ssize_t export_handle_prepare_write_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	/* if the data is in compression buffer move data to raw buffer
-	 */
-	if( storage_media_buffer->data_in_compression_buffer == 1 )
-	{
-		if( memory_copy(
-		     storage_media_buffer->raw_buffer,
-		     storage_media_buffer->compression_buffer,
-		     storage_media_buffer->compression_buffer_amount ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to data from compression buffer to raw buffer.",
-			 function );
-
-			return( -1 );
-		}
-		storage_media_buffer->data_in_compression_buffer = 0;
-		storage_media_buffer->raw_buffer_amount          = storage_media_buffer->compression_buffer_amount;
-	}
-#endif
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
 		if( export_handle->ewf_output_handle == NULL )
@@ -1584,7 +1581,7 @@ int export_handle_get_input_media_size(
 	return( 1 );
 }
 
-/* Retrieves the chunk size
+/* Retrieves the input chunk size
  * Returns 1 if successful or -1 on error
  */
 int export_handle_get_input_chunk_size(
@@ -1627,25 +1624,80 @@ int export_handle_get_input_chunk_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_get_chunk_size(
-	     export_handle->input_handle,
-	     chunk_size,
-	     error ) != 1 )
-#else
-	if( libewf_get_chunk_size(
-	     export_handle->input_handle,
-	     chunk_size ) != 1 )
-#endif
+	*chunk_size = export_handle->input_chunk_size;
+
+	return( 1 );
+}
+
+/* Retrieves the chunk size
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_get_output_chunk_size(
+     export_handle_t *export_handle,
+     size32_t *chunk_size,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_get_output_chunk_size";
+
+	if( export_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunk size.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
 		 function );
 
 		return( -1 );
+	}
+	if( chunk_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+	{
+		if( export_handle->ewf_output_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing ewf output handle.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( HAVE_V2_API )
+		if( libewf_handle_get_chunk_size(
+		     export_handle->ewf_output_handle,
+		     chunk_size,
+		     error ) != 1 )
+#else
+		if( libewf_get_chunk_size(
+		     export_handle->ewf_output_handle,
+		     chunk_size ) != 1 )
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve chunk size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+	{
+		*chunk_size = export_handle->input_chunk_size;
 	}
 	return( 1 );
 }
@@ -2930,7 +2982,7 @@ int export_handle_crc_errors_fprint(
 					memory_free(
 					 filename );
 				}
-				start_sector += export_handle->chunk_size;
+				start_sector += export_handle->input_chunk_size;
 			}
 			memory_free(
 			 last_filename );

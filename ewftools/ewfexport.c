@@ -187,14 +187,19 @@ ssize64_t ewfexport_read_input(
            process_status_t *process_status,
 	   liberror_error_t **error )
 {
-	storage_media_buffer_t *storage_media_buffer = NULL;
-	static char *function                        = "ewfexport_read_input";
-	ssize64_t export_count                       = 0;
-	size32_t input_chunk_size                    = 0;
-	size_t read_size                             = 0;
-	ssize_t process_count                        = 0;
-	ssize_t read_count                           = 0;
-	ssize_t write_count                          = 0;
+	storage_media_buffer_t *storage_media_buffer        = NULL;
+	static char *function                               = "ewfexport_read_input";
+	ssize64_t export_count                              = 0;
+	size32_t input_chunk_size                           = 0;
+	size_t read_size                                    = 0;
+	ssize_t process_count                               = 0;
+	ssize_t read_count                                  = 0;
+	ssize_t write_count                                 = 0;
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	storage_media_buffer_t *output_storage_media_buffer = NULL;
+	size32_t output_chunk_size                          = 0;
+#endif
 
 	if( export_handle == NULL )
 	{
@@ -329,6 +334,59 @@ ssize64_t ewfexport_read_input(
 
 		return( -1 );
 	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( export_handle_get_output_chunk_size(
+	     export_handle,
+	     &output_chunk_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine the output chunk size.",
+		 function );
+
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+
+		return( -1 );
+	}
+	if( output_chunk_size == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid output chunk size.",
+		 function );
+
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+
+		return( -1 );
+	}
+	if( storage_media_buffer_initialize(
+	     &output_storage_media_buffer,
+	     output_chunk_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create output storage media buffer.",
+		 function );
+
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+
+		return( -1 );
+	}
+#endif
 	while( export_count < (int64_t) export_size )
 	{
 		read_size = process_buffer_size;
@@ -355,6 +413,11 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
@@ -370,6 +433,11 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
@@ -390,6 +458,11 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
@@ -405,6 +478,11 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
@@ -435,6 +513,11 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
@@ -456,15 +539,51 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
 		export_count += process_count;
 
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* TODO implement use of output storage media buffer
+		 */
+
+		/* if the data is in compression buffer move data to raw buffer
+		 */
+		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		{
+			if( memory_copy(
+			     storage_media_buffer->raw_buffer,
+			     storage_media_buffer->compression_buffer,
+			     storage_media_buffer->compression_buffer_amount ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to data from compression buffer to raw buffer.",
+				 function );
+
+				return( -1 );
+			}
+			storage_media_buffer->data_in_compression_buffer = 0;
+			storage_media_buffer->raw_buffer_amount          = storage_media_buffer->compression_buffer_amount;
+		}
 		process_count = export_handle_prepare_write_buffer(
 		                 export_handle,
 		                 storage_media_buffer,
 		                 error );
+#else
+		process_count = export_handle_prepare_write_buffer(
+		                 export_handle,
+		                 storage_media_buffer,
+		                 error );
+#endif
 
 		if( process_count < 0 )
 		{
@@ -478,14 +597,29 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* TODO implement use of output storage media buffer
+		 */
 		write_count = export_handle_write_buffer(
 		               export_handle,
 		               storage_media_buffer,
 		               process_count,
 		               error );
+#else
+		write_count = export_handle_write_buffer(
+		               export_handle,
+		               storage_media_buffer,
+		               process_count,
+		               error );
+#endif
 
 		if( write_count < 0 )
 		{
@@ -499,6 +633,11 @@ ssize64_t ewfexport_read_input(
 			storage_media_buffer_free(
 			 &storage_media_buffer,
 			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
@@ -514,6 +653,15 @@ ssize64_t ewfexport_read_input(
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update process status.",
 			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer_free(
+			 &output_storage_media_buffer,
+			 NULL );
+#endif
 
 			return( -1 );
 		}
@@ -533,8 +681,29 @@ ssize64_t ewfexport_read_input(
 		 "%s: unable to free storage media buffer.",
 		 function );
 
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		storage_media_buffer_free(
+		 &output_storage_media_buffer,
+		 NULL );
+#endif
+
 		return( -1 );
 	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( storage_media_buffer_free(
+	     &output_storage_media_buffer,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free output storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	write_count = export_handle_finalize(
 	               export_handle,
 	               calculated_md5_hash_string,

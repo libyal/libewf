@@ -2294,17 +2294,24 @@ ssize_t libewf_handle_prepare_write_chunk(
 		 || ( internal_handle->offset_table->chunk_offset == NULL )
 		 || ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle == NULL ) )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: chunk: %d does not exist.",
-			 function,
-			 ( internal_handle->io_handle->current_chunk + 1 ) );
+			if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+			 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: chunk: %d does not exist.",
+				 function,
+				 ( internal_handle->io_handle->current_chunk + 1 ) );
 
-			return( -1 );
+				return( -1 );
+			}
 		}
-		chunk_exists = 1;
+		else
+		{
+			chunk_exists = 1;
+		}
 	}
 	chunk_data_size = libewf_write_io_handle_process_chunk(
 	                   internal_handle->chunk_cache,

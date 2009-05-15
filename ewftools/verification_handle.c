@@ -451,6 +451,26 @@ int verification_handle_open_input(
 		memory_free(
 		 libewf_filenames );
 	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_chunk_size(
+	     verification_handle->input_handle,
+	     &( verification_handle->chunk_size ),
+	     error ) != 1 )
+#else
+	if( libewf_get_chunk_size(
+	     verification_handle->input_handle,
+	     &( verification_handle->chunk_size ) ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk size.",
+		 function );
+
+		return( -1 );
+	}
 	return( result );
 }
 
@@ -943,26 +963,6 @@ int verification_handle_get_values(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_get_chunk_size(
-	     verification_handle->input_handle,
-	     &( verification_handle->chunk_size ),
-	     error ) != 1 )
-#else
-	if( libewf_get_chunk_size(
-	     verification_handle->input_handle,
-	     &( verification_handle->chunk_size ) ) != 1 )
-#endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunk size.",
 		 function );
 
 		return( -1 );

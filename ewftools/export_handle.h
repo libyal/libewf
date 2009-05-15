@@ -83,9 +83,9 @@ struct export_handle
 	 */
 	libewf_handle_t *ewf_output_handle;
 
-	/* The chunk size
+	/* The input chunk size
 	 */
-	size32_t chunk_size;
+	size32_t input_chunk_size;
 
 	/* The amount of bytes per sector
 	 */
@@ -181,6 +181,11 @@ int export_handle_get_input_media_size(
      liberror_error_t **error );
 
 int export_handle_get_input_chunk_size(
+     export_handle_t *export_handle,
+     size32_t *chunk_size,
+     liberror_error_t **error );
+
+int export_handle_get_output_chunk_size(
      export_handle_t *export_handle,
      size32_t *chunk_size,
      liberror_error_t **error );
