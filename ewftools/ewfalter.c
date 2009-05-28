@@ -37,6 +37,7 @@
 
 #include "alteration_handle.h"
 #include "byte_size_string.h"
+#include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
@@ -496,7 +497,7 @@ int main( int argc, char * const argv[] )
 	size_t string_length                       = 0;
 	uint64_t alter_offset                      = 0;
 	uint64_t alter_size                        = 0;
-	uint64_t process_buffer_size               = 0;
+	uint64_t process_buffer_size               = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint8_t verbose                            = 0;
 	int alteration_run                         = 0;
 	int alteration_runs                        = 1;

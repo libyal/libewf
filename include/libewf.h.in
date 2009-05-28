@@ -1183,7 +1183,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value case number
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#define libewf_get_header_value_case_number( handle, value, size ) \
+#define libewf_get_header_value_case_number( handle, value, value_size ) \
         libewf_get_header_value( handle, "case_number", value, value_size )
 
 /* Retrieves the header value description

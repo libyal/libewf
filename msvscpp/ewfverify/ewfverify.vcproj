@@ -198,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfcommon.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfgetopt.h"
 				>
 			</File>

@@ -67,6 +67,7 @@ ewfalter_SOURCES = \
 	date_time.c date_time.h \
 	error_string.c error_string.h \
 	ewfalter.c \
+	ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
@@ -142,6 +143,7 @@ ewfverify_SOURCES = \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
+	ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \

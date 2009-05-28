@@ -1737,7 +1737,7 @@ int main( int argc, char * const argv[] )
 	uint64_t input_size_variable                    = 0;
 	uint64_t maximum_segment_file_size              = 0;
 	uint64_t media_size                             = 0;
-	uint64_t process_buffer_size                    = 0;
+	uint64_t process_buffer_size                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint64_t segment_file_size                      = 0;
 	uint32_t bytes_per_sector                       = 512;
 	uint32_t sector_error_granularity               = 0;

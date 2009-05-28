@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090512],
+ [20090528],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090512])
+ [20090528])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -1447,6 +1447,7 @@ AC_CONFIG_FILES([include/libewf/features.h])
 AC_CONFIG_FILES([include/libewf/types.h])
 AC_CONFIG_FILES([libewf/libewf_definitions.h])
 dnl Have configure make distribution specific files
+AC_CONFIG_FILES([common/types.h])
 AC_CONFIG_FILES([debian/changelog])
 AC_CONFIG_FILES([debian/shlibs.local.ex])
 AC_CONFIG_FILES([macosx/Introduction.rtf])

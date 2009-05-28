@@ -37,6 +37,7 @@
 
 #include "byte_size_string.h"
 #include "digest_context.h"
+#include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
@@ -424,7 +425,7 @@ int main( int argc, char * const argv[] )
 	system_integer_t option                         = 0;
 	ssize64_t verify_count                          = 0;
 	size_t string_length                            = 0;
-	uint64_t process_buffer_size                    = 0;
+	uint64_t process_buffer_size                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint32_t amount_of_crc_errors                   = 0;
 	uint8_t calculate_md5                           = 1;
 	uint8_t calculate_sha1                          = 0;

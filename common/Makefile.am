@@ -8,6 +8,7 @@ EXTRA_DIST = \
 	memory.h \
 	narrow_string.h \
 	types.h \
+	types.h.in \
 	wide_string.h
 
 if HAVE_MEMWATCH

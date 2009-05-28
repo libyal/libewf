@@ -1238,7 +1238,7 @@ int main( int argc, char * const argv[] )
 	int64_t write_count                             = 0;
 	uint64_t acquiry_offset                         = 0;
 	uint64_t acquiry_size                           = 0;
-	uint64_t process_buffer_size                    = 0;
+	uint64_t process_buffer_size                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint64_t segment_file_size                      = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	uint32_t bytes_per_sector                       = 512;
 	uint32_t sectors_per_chunk                      = 64;

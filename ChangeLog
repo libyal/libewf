@@ -201,6 +201,17 @@ Work in progress:
 * test: read/write of EnCase 6.12 SHA1
 * test: windows acquiry of 40 GB disk
 
+Next stable release:
+* full test
+* remove/disable --enable-v1-api from configure
+* remove/disable chunk size option in ewfexport
+* remove/disable ewfdebug
+
+Version: 20090528
+* fixed error in marco libewf_get_header_value_case_number (thanks to Guy)
+* updated libbfio, implemented support for track changes function
+* implemented generation of common/types.h by autoconf
+
 Version: 20090512
 * updated liberror, libuna and libbfio
 * worked fix for ewfexport for different input and output chunk sizes for low level functions

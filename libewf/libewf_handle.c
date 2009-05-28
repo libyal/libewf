@@ -724,6 +724,22 @@ int libewf_handle_open(
 
 				return( -1 );
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libbfio_handle_set_track_offsets_read(
+			     file_io_handle,
+			     1,
+			     error ) != 1 )
+			{
+		                liberror_error_set(
+		                 error,
+		                 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		                 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		                 "%s: unable to set track offsets read in file io handle.",
+		                 function );
+
+		                return( -1 );
+			}
+#endif
 			if( libbfio_file_set_name(
 			     file_io_handle,
 			     filenames[ filename_iterator ],
@@ -1058,6 +1074,22 @@ int libewf_handle_open_wide(
 
 				return( -1 );
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libbfio_handle_set_track_offsets_read(
+			     file_io_handle,
+			     1,
+			     error ) != 1 )
+			{
+		                liberror_error_set(
+		                 error,
+		                 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		                 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		                 "%s: unable to set track offsets read in file io handle.",
+		                 function );
+
+		                return( -1 );
+			}
+#endif
 			if( libbfio_file_set_name_wide(
 			     file_io_handle,
 			     filenames[ filename_iterator ],

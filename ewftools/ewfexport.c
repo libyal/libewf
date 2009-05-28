@@ -803,7 +803,7 @@ int main( int argc, char * const argv[] )
 	uint64_t export_offset                          = 0;
 	uint64_t export_size                            = 0;
 	uint64_t maximum_segment_file_size              = 0;
-	uint64_t process_buffer_size                    = 0;
+	uint64_t process_buffer_size                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint64_t segment_file_size                      = 0;
 	uint32_t sectors_per_chunk                      = 64;
 	uint8_t calculate_md5                           = 1;

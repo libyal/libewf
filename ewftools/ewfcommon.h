@@ -39,6 +39,12 @@
 #define EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT	INT32_MAX
 #define EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT	INT64_MAX
 
+/* This definition is intended for automated testing of variable process buffer sizes
+ */
+#if !defined( EWFCOMMON_PROCESS_BUFFER_SIZE )
+#define EWFCOMMON_PROCESS_BUFFER_SIZE			0
+#endif
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
