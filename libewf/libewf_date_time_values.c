@@ -364,7 +364,7 @@ int libewf_date_time_values_copy_to_string(
 
 		return( -1 );
 	}
-	if( string_size < 32 )
+	if( string_size < 20 )
 	{
 		liberror_error_set(
 		 error,
@@ -407,6 +407,17 @@ int libewf_date_time_values_copy_to_string(
 	}
 	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
+		if( string_size < 25 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: string too small.",
+			 function );
+
+			return( -1 );
+		}
 		switch( time_elements->tm_wday )
 		{
 			case 0:

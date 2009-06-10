@@ -1820,12 +1820,12 @@ int info_handle_media_information_fprint(
 		     info_handle->input_handle,
 		     guid,
 		     GUID_SIZE,
-		     error ) == 1 )
+		     error ) != 1 )
 #else
 		if( libewf_get_guid(
 		     info_handle->input_handle,
 		     guid,
-		     GUID_SIZE ) == 1 )
+		     GUID_SIZE ) != 1 )
 #endif
 		{
 			liberror_error_set(

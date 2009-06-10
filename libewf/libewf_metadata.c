@@ -2748,8 +2748,13 @@ int libewf_handle_get_header_value_size(
      size_t *value_size,
      liberror_error_t **error )
 {
+	libewf_character_t date_time_values_string[ 64 ];
+	uint8_t date_time_string[ 64 ];
+
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_header_value_size";
+	size_t date_time_string_size              = 64;
+	size_t date_time_values_string_size       = 64;
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -2780,21 +2785,76 @@ int libewf_handle_get_header_value_size(
 	{
 		return( 0 );
 	}
-	result = libewf_values_table_get_value_size(
-	          internal_handle->header_values,
-	          identifier,
-	          identifier_length,
-	          value_size,
-	          error );
-
-	if( result == -1 )
+	if( ( ( identifier_length == 11 )
+	  && ( libewf_string_compare(
+	        _LIBEWF_STRING( "system_date" ),
+	        identifier,
+	        11 ) == 0 ) )
+	 || ( ( identifier_length == 12 )
+	  && ( libewf_string_compare(
+	        _LIBEWF_STRING( "acquiry_date" ),
+	        identifier,
+	        12 ) == 0 ) ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value size.",
-		 function );
+		result = libewf_values_table_get_value(
+			  internal_handle->header_values,
+			  identifier,
+			  identifier_length,
+			  date_time_values_string,
+			  date_time_values_string_size,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve date header value.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( result == 1 )
+		 && ( libewf_date_time_values_copy_to_string(
+		       date_time_values_string,
+		       libewf_string_length(
+		        date_time_values_string ),
+		       internal_handle->date_format,
+		       date_time_string,
+		       date_time_string_size,
+		       error ) != 1 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to create date string.",
+			 function );
+
+			return( -1 );
+		}
+		*value_size = 1 + narrow_string_length(
+		                   (char *) date_time_string );
+	}
+	else
+	{
+		result = libewf_values_table_get_value_size(
+			  internal_handle->header_values,
+			  identifier,
+			  identifier_length,
+			  value_size,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value size.",
+			 function );
+		}
 	}
 	return( result );
 }

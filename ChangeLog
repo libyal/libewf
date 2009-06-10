@@ -82,7 +82,12 @@ Error handling/tollerance
 
 Python bindings
 * rewrite pyewf to match libewf API
+  - library module functions
+  - handle object
+  - keep file object for legacy support ?
 * implement error backtrace support in v2 API version
+* keep certain Python function names as alias
+* use Unicode strings
 
 API changes
 * add wide character functions definitions by default?
@@ -207,8 +212,16 @@ Next stable release:
 * remove/disable chunk size option in ewfexport
 * remove/disable ewfdebug
 
+Version: 20090606
+* fixed missing code for correctly handling acquiry and system date header
+  values (Thanks to David Loveall)
+* started working on improved version of pyewf
+* fixed error in info_handle
+* fixed issue regarding date time string must required to be at least 32 bytes
+  should be at least 20 or 25
+
 Version: 20090528
-* fixed error in marco libewf_get_header_value_case_number (thanks to Guy)
+* fixed error in marco libewf_get_header_value_case_number (thanks to Guy Voncken)
 * updated libbfio, implemented support for track changes function
 * implemented generation of common/types.h by autoconf
 
