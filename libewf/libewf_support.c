@@ -1374,6 +1374,53 @@ int libewf_glob(
 }
 #endif
 
+#if defined( HAVE_V2_API )
+/* Frees the globbed filenames
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_glob_free(
+     char *filenames[],
+     int amount_of_filenames,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_glob_free";
+	int filename_iterator = 0;
+
+	if( filenames == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_filenames < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 "%s: invalid amount of filenames value less than zero.",
+		 function );
+
+		return( -1 );
+	}
+	for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+	{
+		memory_free(
+		 filename[ filename_iterator ] );
+
+	}
+	memory_free(
+	 filenames );
+
+	return( 1 );
+}
+#endif
+
 /* Globs the segment files according to the EWF naming schema
  * if format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
@@ -2111,5 +2158,51 @@ int libewf_glob_wide(
 }
 #endif
 
+#if defined( HAVE_V2_API )
+/* Frees the globbed wide filenames
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_glob_free_wide(
+     wchar_t *filenames[],
+     int amount_of_filenames,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_glob_free_wide";
+	int filename_iterator = 0;
+
+	if( filenames == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_filenames < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 "%s: invalid amount of filenames value less than zero.",
+		 function );
+
+		return( -1 );
+	}
+	for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+	{
+		memory_free(
+		 filename[ filename_iterator ] );
+
+	}
+	memory_free(
+	 filenames );
+
+	return( 1 );
+}
+#endif
 #endif
 

@@ -110,19 +110,28 @@ void usage_fprint(
 	fprintf( stream, "Use ewfexport to export data from the EWF format (Expert Witness Compression\n"
 	                 "Format) to raw data or another EWF format.\n\n" );
 
+#ifdef DISABLED
 	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -b amount_of_sectors ] [ -B amount_of_bytes ]\n"
 	                 "                 [ -c compression_type ] [ -d digest_type ] [ -f format ]\n"
 	                 "                 [ -l log_filename ] [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
+#else
+	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -B amount_of_bytes ] [ -c compression_type ]\n"
+	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
+	                 "                 [ -o offset ] [ -p process_buffer_size ] [ -S segment_file_size ]\n"
+	                 "                 [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
+#endif
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
 	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-1250,\n"
 	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
+#ifdef DISABLED
 	fprintf( stream, "\t-b:        specify the amount of sectors to read at once (per chunk), options:\n"
 	                 "\t           64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n"
 	                 "\t           (not used for raw format)\n" );
+#endif
 	fprintf( stream, "\t-B:        specify the amount of bytes to export (default is all bytes)\n" );
 	fprintf( stream, "\t-c:        specify the compression type, options: none (default), empty-block,\n"
 	                 "\t           fast or best (not used for raw format)\n" );
@@ -884,10 +893,17 @@ int main( int argc, char * const argv[] )
 	}
 #endif
 
+#ifdef DISABLED
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_CHARACTER_T_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+#else
+	while( ( option = ewfgetopt(
+	                   argc,
+	                   argv,
+	                   _SYSTEM_CHARACTER_T_STRING( "A:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+#endif
 	{
 		switch( option )
 		{
@@ -922,6 +938,7 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
+#ifdef DISABLED
 			case (system_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
@@ -944,6 +961,7 @@ int main( int argc, char * const argv[] )
 					argument_set_sectors_per_chunk = 1;
 				}
 				break;
+#endif
 
 			case (system_integer_t) 'B':
 				string_length = system_string_length(

@@ -206,11 +206,18 @@ Work in progress:
 * test: read/write of EnCase 6.12 SHA1
 * test: windows acquiry of 40 GB disk
 
+Beta after next stable release
+* remove DISABLED in ewfexport
+* move manuals/ewfexport.1.backup to manuals/ewfexport.1
+
 Next stable release:
 * full test
 * remove/disable --enable-v1-api from configure
-* remove/disable chunk size option in ewfexport
 * remove/disable ewfdebug
+
+Version: 20090609
+* added libewf_glob_free to v2 API
+* disabled chunk size option in ewfexport
 
 Version: 20090606
 * fixed missing code for correctly handling acquiry and system date header

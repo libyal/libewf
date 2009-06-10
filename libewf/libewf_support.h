@@ -94,6 +94,13 @@ LIBEWF_EXTERN int libewf_glob(
                    char **filenames[] );
 #endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_glob_free(
+                   char *filenames[],
+                   int amount_of_filenames,
+                   liberror_error_t **error );
+#endif
+
 LIBEWF_EXTERN int libewf_glob_file_io_handle(
                    libbfio_handle_t *file_io_handle,
                    uint8_t format,
@@ -115,6 +122,13 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    size_t length,
                    uint8_t format,
                    wchar_t **filenames[] );
+#endif
+
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_glob_free_wide(
+                   wchar_t *filenames[],
+                   int amount_of_filenames,
+                   liberror_error_t **error );
 #endif
 #endif
 

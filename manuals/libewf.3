@@ -1,4 +1,4 @@
-.Dd May 10, 2009
+.Dd June 9, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -35,13 +35,17 @@ Support functions (APIv2)
 .Ft int
 .Fn libewf_check_file_signature "const char *filename, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob "const char *filename, size_t filename_length, uint8_t format, char ** filenames[], int *amount_of_filenames, libewf_error_t **error"
+.Fn libewf_glob "const char *filename, size_t filename_length, uint8_t format, char **filenames[], int *amount_of_filenames, libewf_error_t **error"
+.Ft int
+.Fn libewf_glob_free "char *filenames[], int amount_of_filenames, liberror_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
 .Fn libewf_check_file_signature_wide "const wchar_t *filename, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t ** filenames[], int *amount_of_filenames, libewf_error_t **error"
+.Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t **filenames[], int *amount_of_filenames, libewf_error_t **error"
+.Ft int
+.Fn libewf_glob_free_wide "wchar_t *filenames[], int amount_of_filenames, liberror_error_t **error"
 .Pp
 Notify functions
 .Ft void

@@ -121,6 +121,16 @@ LIBEWF_EXTERN int libewf_glob(
                    char **filenames[] );
 #endif
 
+#if @HAVE_V2_API@
+/* Frees the globbed filenames
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_glob_free(
+                   char *filenames[],
+                   int amount_of_filenames,
+                   liberror_error_t **error );
+#endif
+
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 /* Globs the segment files according to the EWF naming schema
  * if the format is known the filename should contain the base of the filename
@@ -146,6 +156,16 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    size_t filename_length,
                    uint8_t format,
                    wchar_t **filenames[] );
+#endif
+
+#if @HAVE_V2_API@
+/* Frees the globbed filenames
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_glob_free(
+                   char *filenames[],
+                   int amount_of_filenames,
+                   liberror_error_t **error );
 #endif
 #endif
 
