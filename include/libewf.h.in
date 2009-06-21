@@ -128,7 +128,7 @@ LIBEWF_EXTERN int libewf_glob(
 LIBEWF_EXTERN int libewf_glob_free(
                    char *filenames[],
                    int amount_of_filenames,
-                   liberror_error_t **error );
+                   libewf_error_t **error );
 #endif
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
@@ -165,7 +165,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
 LIBEWF_EXTERN int libewf_glob_free(
                    char *filenames[],
                    int amount_of_filenames,
-                   liberror_error_t **error );
+                   libewf_error_t **error );
 #endif
 #endif
 
