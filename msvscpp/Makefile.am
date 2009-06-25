@@ -8,6 +8,7 @@ EXTRA_DIST = \
 	libbfio/libbfio.vcproj \
 	liberror/liberror.vcproj \
 	libewf_dll/libewf_dll.vcproj \
+	libnotify/libnotify.vcproj \
 	libuna/libuna.vcproj \
 	libewf.sln
 

@@ -242,7 +242,7 @@ int device_handle_open_input(
 	device_handle->file_handle = CreateFile(
 	                              (LPCTSTR) filename,
 	                              GENERIC_READ,
-	                              0,
+	                              FILE_SHARE_READ,
 	                              NULL,
 	                              OPEN_EXISTING,
 	                              FILE_ATTRIBUTE_NORMAL,
@@ -1128,6 +1128,116 @@ int device_handle_get_bytes_per_sector(
 	return( 1 );
 }
 
+/* Copies and trims the string from the byte stream
+ * Returns 1 if successful, 0 if the string is empty or -1 on error
+ */
+int device_handle_trim_copy_from_byte_stream(
+     uint8_t *string,
+     size_t string_size,
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
+     liberror_error_t **error )
+{
+	static char *function   = "device_handle_trim_copy_from_byte_stream";
+        ssize_t first_character = 0;
+        ssize_t last_character  = 0;
+
+	if( string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( byte_stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( byte_stream_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid byte stream size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	for( first_character = 0; first_character < (ssize_t) byte_stream_size; first_character++ )
+	{
+		if( ( byte_stream[ first_character ] >= (uint8_t) 0x21 )
+		 && ( byte_stream[ first_character ] <= (uint8_t) 0x7e ) )
+		{
+			break;
+		}
+	}
+	for( last_character = (ssize_t) byte_stream_size; last_character >= 0; last_character-- )
+	{
+		if( ( byte_stream[ last_character ] >= (uint8_t) 0x21 )
+		 && ( byte_stream[ last_character ] <= (uint8_t) 0x7e ) )
+		{
+			break;
+		}
+	}
+	if( last_character <= first_character )
+	{
+		return( 0 );
+	}
+	last_character  -= first_character;
+	byte_stream_size = (size_t) ( last_character + 1 );
+	byte_stream      = &( byte_stream[ first_character ] );
+
+	if( string_size < byte_stream_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: string too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     string,
+	     byte_stream,
+	     byte_stream_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Determines the media information
  * Returns 1 if successful, 0 if no media information available or -1 on error
  */
@@ -1279,7 +1389,7 @@ int device_handle_determine_media_information(
 				string_length = narrow_string_length(
 				                 (char *) &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->VendorIdOffset ] ) );
 
-				result = system_string_trim_copy_from_byte_stream(
+				result = device_handle_trim_copy_from_byte_stream(
 					  device_handle->vendor,
 					  64,
 					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->VendorIdOffset ] ),
@@ -1307,7 +1417,7 @@ int device_handle_determine_media_information(
 				string_length = narrow_string_length(
 				                 (char *) &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->ProductIdOffset ] ) );
 
-				result = system_string_trim_copy_from_byte_stream(
+				result = device_handle_trim_copy_from_byte_stream(
 					  device_handle->model,
 					  64,
 					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->ProductIdOffset ] ),
@@ -1335,7 +1445,7 @@ int device_handle_determine_media_information(
 				string_length = narrow_string_length(
 				                 (char *) &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->SerialNumberOffset ] ) );
 
-				result = system_string_trim_copy_from_byte_stream(
+				result = device_handle_trim_copy_from_byte_stream(
 					  device_handle->serial_number,
 					  64,
 					  &( response[ ( (STORAGE_DEVICE_DESCRIPTOR *) response )->SerialNumberOffset ] ),
@@ -1546,7 +1656,7 @@ int device_handle_determine_media_information(
 			 response,
 			 response_count );
 #endif
-			result = system_string_trim_copy_from_byte_stream(
+			result = device_handle_trim_copy_from_byte_stream(
 				  device_handle->vendor,
 				  64,
 				  &( response[ 8 ] ),
@@ -1568,7 +1678,7 @@ int device_handle_determine_media_information(
 			{
 				device_handle->vendor[ 0 ] = 0;
 			}
-			result = system_string_trim_copy_from_byte_stream(
+			result = device_handle_trim_copy_from_byte_stream(
 				  device_handle->model,
 				  64,
 				  &( response[ 16 ] ),
@@ -1612,7 +1722,7 @@ int device_handle_determine_media_information(
 			 response,
 			 response_count );
 #endif
-			result = system_string_trim_copy_from_byte_stream(
+			result = device_handle_trim_copy_from_byte_stream(
 				  device_handle->serial_number,
 				  64,
 				  &( response[ 4 ] ),
@@ -1658,7 +1768,7 @@ int device_handle_determine_media_information(
 		{
 			if( device_handle->serial_number[ 0 ] == 0 )
 			{
-				result = system_string_trim_copy_from_byte_stream(
+				result = device_handle_trim_copy_from_byte_stream(
 					  device_handle->serial_number,
 					  64,
 					  device_configuration.serial_no,
@@ -1683,7 +1793,7 @@ int device_handle_determine_media_information(
 			}
 			if( device_handle->model[ 0 ] == 0 )
 			{
-				result = system_string_trim_copy_from_byte_stream(
+				result = device_handle_trim_copy_from_byte_stream(
 					  device_handle->model,
 					  64,
 					  device_configuration.model,
@@ -2152,16 +2262,16 @@ int device_handle_media_information_fprint(
 		}
 		fprintf(
 		 stream,
-		 "Vendor:\t\t\t%" PRIs_SYSTEM "\n",
-		 device_handle->vendor );
+		 "Vendor:\t\t\t%s\n",
+		 (char *) device_handle->vendor );
 		fprintf(
 		 stream,
-		 "Model:\t\t\t%" PRIs_SYSTEM "\n",
-		 device_handle->model );
+		 "Model:\t\t\t%s\n",
+		 (char *) device_handle->model );
 		fprintf(
 		 stream,
-		 "Serial:\t\t\t%" PRIs_SYSTEM "\n",
-		 device_handle->serial_number );
+		 "Serial:\t\t\t%s\n",
+		 (char *) device_handle->serial_number );
 	}
 	if( device_handle->media_size_set != 0 )
 	{

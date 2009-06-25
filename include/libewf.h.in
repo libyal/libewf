@@ -179,6 +179,36 @@ LIBEWF_EXTERN void libewf_set_notify_values(
                     FILE *stream,
                     uint8_t verbose );
 
+#if @HAVE_V2_API@
+
+/* Set the verbose notification
+ */
+LIBEWF_EXTERN void libewf_notify_set_verbose(
+                    int verbose );
+
+/* Set the notification stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_notify_set_stream(
+                   FILE *stream,
+                   libewf_error_t **error );
+
+/* Opens the notification stream using a filename
+ * The stream is opened in append mode
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_notify_stream_open(
+                   const char *filename,
+                   libewf_error_t **error );
+
+/* Closes the notification stream if opened using a filename
+ * Returns 0 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_notify_stream_close(
+                   libewf_error_t **error );
+
+#endif
+
 /* -------------------------------------------------------------------------
  * Error functions (APIv2)
  * ------------------------------------------------------------------------- */

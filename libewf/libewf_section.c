@@ -210,6 +210,9 @@ ssize_t libewf_section_start_read(
 	}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: padding:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 section->padding,
 	 40 );
@@ -1323,12 +1326,21 @@ ssize_t libewf_section_volume_s01_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: unknown1:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown1,
 	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown2:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown2,
 	 20 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown3:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown3,
 	 45 );
@@ -1684,13 +1696,13 @@ ssize_t libewf_section_volume_e01_read(
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: unknown1.\n",
+	 "%s: unknown1:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown1,
 	 3 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown2.\n",
+	 "%s: unknown2:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown2,
@@ -1702,7 +1714,7 @@ ssize_t libewf_section_volume_e01_read(
 	 volume->palm_volume_start_sector,
 	 4 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown3.\n",
+	 "%s: unknown3:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown3,
@@ -1714,25 +1726,25 @@ ssize_t libewf_section_volume_e01_read(
 	 volume->smart_logs_start_sector,
 	 4 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown4.\n",
+	 "%s: unknown4:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown4,
 	 3 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown5.\n",
+	 "%s: unknown5:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown5,
 	 4 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown6.\n",
+	 "%s: unknown6:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->unknown6,
 	 963 );
 	libewf_notify_verbose_printf(
-	 "%s: signature.\n",
+	 "%s: signature:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 volume->signature,
@@ -2314,9 +2326,15 @@ ssize_t libewf_section_table_read(
 	 table.base_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: padding1:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 table.padding1,
 	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: padding2:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 table.padding2,
 	 4 );
@@ -2661,9 +2679,15 @@ ssize_t libewf_section_table2_read(
 	 table.base_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: padding1:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 table.padding1,
 	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: padding2:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 table.padding2,
 	 4 );
@@ -3354,18 +3378,33 @@ ssize_t libewf_section_ltree_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: unknown1:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 ltree->unknown1,
 	 16 );
+	libewf_notify_verbose_printf(
+	 "%s: tree size:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 ltree->tree_size,
 	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown2:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 ltree->unknown2,
 	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown3:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 ltree->unknown3,
 	 4 );
+	libewf_notify_verbose_printf(
+	 "%s: unknown4:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 ltree->unknown4,
 	 20 );
@@ -3558,6 +3597,9 @@ ssize_t libewf_section_session_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: unknown1:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 ewf_session.unknown1,
 	 28 );
@@ -3566,6 +3608,13 @@ ssize_t libewf_section_session_read(
 	endian_little_convert_32bit(
 	 amount_of_ewf_sessions,
 	 ewf_session.amount_of_sessions );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: amount of sessions: %" PRIu32 "\n",
+	 function,
+	 amount_of_ewf_sessions );
+#endif
 
 	if( amount_of_ewf_sessions > 0 )
 	{
@@ -3654,6 +3703,9 @@ ssize_t libewf_section_session_read(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
+		libewf_notify_verbose_printf(
+		 "%s: sessions data:\n",
+		 function );
 		libewf_notify_verbose_dump_data(
 		 ewf_sessions,
 		 ewf_sessions_size );
@@ -3696,6 +3748,13 @@ ssize_t libewf_section_session_read(
 			 first_sector,
 			 ewf_sessions[ iterator ].first_sector );
 
+#if defined( HAVE_DEBUG_OUTPUT )
+			libewf_notify_verbose_printf(
+			 "%s: session: %" PRIu32 " first sector: %" PRIu32 "\n",
+			 function,
+			 iterator,
+			 first_sector );
+#endif
 			sessions->sector[ iterator ].first_sector = (uint64_t) first_sector;
 
 			if( iterator > 0 )
@@ -3704,7 +3763,14 @@ ssize_t libewf_section_session_read(
 			}
 			last_first_sector = first_sector;
 		}
-		sessions->sector[ iterator - 1 ].amount_of_sectors = media_values->amount_of_sectors - last_first_sector;
+		if( media_values->amount_of_sectors > last_first_sector )
+		{
+			sessions->sector[ iterator - 1 ].amount_of_sectors = media_values->amount_of_sectors - last_first_sector;
+		}
+		else
+		{
+			sessions->sector[ iterator - 1 ].amount_of_sectors = 0;
+		}
 
 		memory_free(
 		 ewf_sessions );
@@ -4069,13 +4135,13 @@ ssize_t libewf_section_data_read(
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: unknown1.\n",
+	 "%s: unknown1:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown1,
 	 3 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown2.\n",
+	 "%s: unknown2:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown2,
@@ -4087,7 +4153,7 @@ ssize_t libewf_section_data_read(
 	 data->palm_volume_start_sector,
 	 4 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown3.\n",
+	 "%s: unknown3:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown3,
@@ -4099,25 +4165,25 @@ ssize_t libewf_section_data_read(
 	 data->smart_logs_start_sector,
 	 4 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown4.\n",
+	 "%s: unknown4:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown4,
 	 3 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown5.\n",
+	 "%s: unknown5:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown5,
 	 4 );
 	libewf_notify_verbose_printf(
-	 "%s: unknown6.\n",
+	 "%s: unknown6:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 data->unknown6,
 	 963 );
 	libewf_notify_verbose_printf(
-	 "%s: signature.\n",
+	 "%s: signature:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 data->signature,
@@ -4601,6 +4667,9 @@ ssize_t libewf_section_error2_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: unknown:\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 error2.unknown,
 	 200 );
@@ -4697,7 +4766,7 @@ ssize_t libewf_section_error2_read(
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		libewf_notify_verbose_printf(
-		 "%s: error2 sectors.\n",
+		 "%s: error2 sectors:\n",
 		 function );
 		libewf_notify_verbose_dump_data(
 		 error2_sectors,
@@ -5088,19 +5157,19 @@ ssize_t libewf_section_digest_read(
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: MD5 hash.\n",
+	 "%s: MD5 hash:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 digest.md5_hash,
 	 16 );
 	libewf_notify_verbose_printf(
-	 "%s: SHA1 hash.\n",
+	 "%s: SHA1 hash:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 digest.sha1_hash,
 	 20 );
 	libewf_notify_verbose_printf(
-	 "%s: padding.\n",
+	 "%s: padding:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 digest.padding1,
@@ -5250,13 +5319,13 @@ ssize_t libewf_section_digest_write(
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: MD5 hash.\n",
+	 "%s: MD5 hash:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 digest.md5_hash,
 	 16 );
 	libewf_notify_verbose_printf(
-	 "%s: SHA1 hash.\n",
+	 "%s: SHA1 hash:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 digest.sha1_hash,
@@ -5414,13 +5483,13 @@ ssize_t libewf_section_hash_read(
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: MD5 hash.\n",
+	 "%s: MD5 hash:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 hash.md5_hash,
 	 16 );
 	libewf_notify_verbose_printf(
-	 "%s: padding.\n",
+	 "%s: unknown1:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 hash.unknown1,
@@ -5530,7 +5599,7 @@ ssize_t libewf_section_hash_write(
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: MD5 hash.\n",
+	 "%s: MD5 hash:\n",
 	 function );
 	libewf_notify_verbose_dump_data(
 	 hash.md5_hash,

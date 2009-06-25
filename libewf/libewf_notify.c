@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -215,5 +216,88 @@ void libewf_notify_dump_data(
 	fprintf(
 	 libewf_notify_stream,
 	 "\n" );
+}
+
+/* Set the verbose notification
+ */
+void libewf_notify_set_verbose(
+      int verbose )
+{
+	libnotify_set_verbose(
+	 verbose );
+}
+
+/* Set the notification stream
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_notify_set_stream(
+     FILE *stream,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_notify_set_stream";
+
+	if( libnotify_set_stream(
+	     stream,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set stream.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Opens the notification stream using a filename
+ * The stream is opened in append mode
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_notify_stream_open(
+     const char *filename,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_notify_stream_open";
+
+	if( libnotify_stream_open(
+	     filename,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open stream.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Closes the notification stream if opened using a filename
+ * Returns 0 if successful or -1 on error
+ */
+int libewf_notify_stream_close(
+     liberror_error_t **error )
+{
+	static char *function = "libewf_notify_stream_close";
+
+	if( libnotify_stream_close(
+	     error ) != 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open stream.",
+		 function );
+
+		return( -1 );
+	}
+	return( 0 );
 }
 

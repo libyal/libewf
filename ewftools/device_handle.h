@@ -32,7 +32,6 @@
 #include <windows.h>
 #endif
 
-#include "system_string.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -99,15 +98,15 @@ struct device_handle
 
 	/* The vendor string
 	 */
-	system_character_t vendor[ 64 ];
+	uint8_t vendor[ 64 ];
 
 	/* The model string
 	 */
-	system_character_t model[ 64 ];
+	uint8_t model[ 64 ];
 
 	/* The serial number string
 	 */
-	system_character_t serial_number[ 64 ];
+	uint8_t serial_number[ 64 ];
 
 	/* Value to indicate the media information values were set
 	 */
@@ -164,6 +163,13 @@ int device_handle_get_media_size(
 int device_handle_get_bytes_per_sector(
      device_handle_t *device_handle,
      uint32_t *bytes_per_sector,
+     liberror_error_t **error );
+
+int device_handle_trim_copy_from_byte_stream(
+     uint8_t *string,
+     size_t string_size,
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
      liberror_error_t **error );
 
 int device_handle_determine_media_information(
