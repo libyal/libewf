@@ -36,6 +36,7 @@ Further analysis of the EWF format:
 
 Features
 * resume write support for ENCASE1/SMART table sections ?
+* improve resume to support available table but missing table2
 * support missing segment files (chunks)
 * implement low memory usage option
   - trade off IO versus memory use
@@ -201,14 +202,12 @@ Work in progress:
   - force set header value to require string formatted in the date format ?
 * check TODO
 * ewfexport: fix different input and output chunk sizes for low level functions
-* fix automated tests:
-  - variating buffer sizes
-* test: read/write of EnCase 6.12 SHA1
-* test: windows acquiry of 40 GB disk
 
 Beta after next stable release
 * remove DISABLED in ewfexport
 * move manuals/ewfexport.1.backup to manuals/ewfexport.1
+* implement libnotify
+* update liberror
 
 Next stable release:
 * full test
@@ -216,6 +215,8 @@ Next stable release:
 * remove/disable ewfdebug
 * check into resume write error for 32-bit compile
 * ewfacquire resume does not allow break when input requested
+* test: read/write of EnCase 6.12 SHA1
+* test: windows acquiry of 40 GB disk
 
 Version: 20090614
 * small fix in libewf_glob_free
