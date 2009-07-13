@@ -293,8 +293,8 @@ int imaging_handle_open_output(
 	system_character_t *filenames[ 1 ]    = { NULL };
 	static char *function                 = "imaging_handle_open_output";
 	int amount_of_filenames               = 0;
-	int flags                             = 0;
 	int result                            = 1;
+	uint8_t flags                         = 0;
 
 	if( imaging_handle == NULL )
 	{

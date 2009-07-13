@@ -682,7 +682,9 @@ int libewf_handle_open(
 	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
-		for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+		for( filename_iterator = 0;
+		     filename_iterator < amount_of_filenames;
+		     filename_iterator++ )
 		{
 			filename_length = narrow_string_length(
 					   filenames[ filename_iterator ] );
@@ -785,6 +787,14 @@ int libewf_handle_open(
 
 				return( -1 );
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libewf_notify_verbose_printf(
+			 "%s: added pool entry: %d with filename: %s.\n",
+			 function,
+			 file_io_pool_entry,
+			 filenames[ filename_iterator ] );
+#endif
+
 			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'E' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'l' )
@@ -1135,6 +1145,14 @@ int libewf_handle_open_wide(
 
 				return( -1 );
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libewf_notify_verbose_printf(
+			 "%s: added pool entry: %d with filename: %ls.\n",
+			 function,
+			 file_io_pool_entry,
+			 filenames[ filename_iterator ] );
+#endif
+
 			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'E' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'l' )
@@ -1414,7 +1432,9 @@ int libewf_handle_open_file_io_pool(
 	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
-		for( file_io_handle_iterator = 0; file_io_handle_iterator < amount_of_handles; file_io_handle_iterator++ )
+		for( file_io_handle_iterator = 0;
+		     file_io_handle_iterator < amount_of_handles;
+		     file_io_handle_iterator++ )
 		{
 			file_io_handle = NULL;
 
@@ -1435,6 +1455,13 @@ int libewf_handle_open_file_io_pool(
 
 				return( -1 );
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libewf_notify_verbose_printf(
+			 "%s: processing pool entry: %d.\n",
+			 function,
+			 file_io_handle_iterator );
+#endif
+
 			result = libewf_internal_handle_add_segment_file(
 			          internal_handle,
 			          file_io_handle_iterator,

@@ -4,6 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libewf_dll", "libewf_dll\libewf_dll.vcproj", "{B5225323-AC67-411D-8FBA-199E9467FAB5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BC27FF34-C859-4A1A-95D6-FC89952E1910} = {BC27FF34-C859-4A1A-95D6-FC89952E1910}
+		{9381BD88-C1D2-4573-9567-5A9D705AE74E} = {9381BD88-C1D2-4573-9567-5A9D705AE74E}
 		{41CFAFBF-A1C8-4704-AFEF-31979E6452B9} = {41CFAFBF-A1C8-4704-AFEF-31979E6452B9}
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
 	EndProjectSection
@@ -51,6 +52,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libuna", "libuna\libuna.vcp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liberror", "liberror\liberror.vcproj", "{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libnotify", "libnotify\libnotify.vcproj", "{9381BD88-C1D2-4573-9567-5A9D705AE74E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Win32 = Release|Win32
@@ -76,6 +82,8 @@ Global
 		{BC27FF34-C859-4A1A-95D6-FC89952E1910}.Release|Win32.Build.0 = Release|Win32
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.ActiveCfg = Release|Win32
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.Build.0 = Release|Win32
+		{9381BD88-C1D2-4573-9567-5A9D705AE74E}.Release|Win32.ActiveCfg = Release|Win32
+		{9381BD88-C1D2-4573-9567-5A9D705AE74E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
