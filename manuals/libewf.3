@@ -1,4 +1,4 @@
-.Dd June 9, 2009
+.Dd June 28, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -64,10 +64,14 @@ Notify functions (APIv2)
 Error functions (APIv2)
 .Ft void
 .Fn libewf_error_free "libewf_error_t **error"
-.Ft void
+.Ft int
 .Fn libewf_error_fprint "libewf_error_t *error, FILE *stream"
-.Ft void
+.Ft int
+.Fn libewf_error_sprint "libewf_error_t *error, char *string, size_t size"
+.Ft int
 .Fn libewf_error_backtrace_fprint "libewf_error_t *error, FILE *stream"
+.Ft int
+.Fn libewf_error_backtrace_sprint "libewf_error_t *error, char *string, size_t size"
 .Pp
 File/Handle functions (APIv1)
 .Ft int

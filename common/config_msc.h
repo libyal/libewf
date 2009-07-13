@@ -1,5 +1,5 @@
 /*
- * Configuration file for Windows native compilation
+ * Configuration file for Microsoft Visual Studio C++ Compiler (MSC)
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,40 +20,35 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _CONFIG_WINDOWS_H )
-#define _CONFIG_WINDOWS_H
+#if !defined( _CONFIG_MSC_H )
+#define _CONFIG_MSC_H
 
 #include "config.h"
 
-/* Windows does not have other platform specific headers
- */
-#undef HAVE_CYGWIN_FS_H
-#undef HAVE_LINUX_FS_H
-#undef HAVE_SYS_DISKLABEL_H
-#undef HAVE_SYS_DISK_H
-
-/* Windows does not have <inttypes.h> or <stdint.h>
+/* MSC does not have <inttypes.h> or <stdint.h>
  */
 #undef HAVE_INTTYPES_H
 #undef HAVE_STDINT_H
 
+/* MSC does not have the safe size and offset definitions
+ */
 #define HAVE_SIZE32_T   0
 #define HAVE_SSIZE32_T  0
 #define HAVE_SIZE64_T   0
 #define HAVE_SSIZE64_T  0
 #define HAVE_OFF64_T    0
 
-/* Windows does not have %jd and %zd printf conversion specifiers
+/* MSC does not have %jd and %zd printf conversion specifiers
  */
 #undef HAVE_PRINTF_JD
 #undef HAVE_PRINTF_ZD
 
-/* Windows does not have <sys/time.h>
+/* MSC does not have <sys/time.h>
  */
 #undef TIME_WITH_SYS_TIME
 #undef HAVE_SYS_TIME_H
 
-/* Windows does not have <unistd.h> but uses <io.h> and <share.h> instead
+/* MSC does not have <unistd.h> but uses <io.h> and <share.h> instead
  */
 #undef HAVE_UNISTD_H
 #define HAVE_IO_H	1
@@ -63,35 +58,35 @@
 #define HAVE_FCNTL_H    1
 #endif
 
-/* Windows does not have <sys/ioctl.h> and <sys/utsname.h>
+/* MSC does not have <sys/ioctl.h> and <sys/utsname.h>
  */
 #undef HAVE_SYS_IOCTL_H
 #undef HAVE_SYS_UTSNAME_H
 
-/* Use Windows crypto API instead of libcrypto or equivalent
+/* Use MSC crypto API instead of libcrypto or equivalent
  */
 #undef HAVE_OPENSSL_MD5_H
 #undef HAVE_OPENSSL_OPENSSLV_H
 #undef HAVE_LIBCRYPTO
 #define HAVE_WINCPRYPT_H	1
 
-/* Use Windows GUID (UUID) calculation algorithms instead of libuuid
+/* Use MSC GUID (UUID) calculation algorithms instead of libuuid
  */
 #undef HAVE_UUID_UUID_H
 #undef HAVE_LIBUUID
 #undef HAVE_UUID_GENERATE_RANDOM
 #undef HAVE_UUID_GENERATE_TIME
 
-/* Windows does not have getopt or <glob.h>
+/* MSC does not have getopt or <glob.h>
  */
 #undef HAVE_GETOPT
 #undef HAVE_GLOB_H
 
-/* Windows does not have <signal.h>
+/* MSC does not have <signal.h>
  */
 #undef HAVE_SIGNAL_H
 
-/* Windows does not have <langinfo.h>
+/* MSC does not have <langinfo.h>
  */
 #undef HAVE_LANGINFO_H
 #undef HAVE_LANGINFO_CODESET

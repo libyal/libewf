@@ -221,16 +221,34 @@ LIBEWF_EXTERN void libewf_error_free(
                     libewf_error_t **error );
 
 /* Prints a descriptive string of the error to the stream
+ * Returns the amount of printed characters if successful or -1 on error
  */
-LIBEWF_EXTERN void libewf_error_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
+LIBEWF_EXTERN int libewf_error_fprint(
+                   libewf_error_t *error,
+                   FILE *stream );
+
+/* Prints a descriptive string of the error to the string
+ * Returns the amount of printed characters if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_error_sprint(
+                   libewf_error_t *error,
+                   char *string,
+                   size_t size );
 
 /* Prints a backtrace of the error to the stream
+ * Returns the amount of printed characters if successful or -1 on error
  */
-LIBEWF_EXTERN void libewf_error_backtrace_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
+LIBEWF_EXTERN int libewf_error_backtrace_fprint(
+                   libewf_error_t *error,
+                   FILE *stream );
+
+/* Prints a backtrace of the error to the string
+ * Returns the amount of printed characters if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_error_backtrace_sprint(
+                   libewf_error_t *error,
+                   char *string,
+                   size_t size );
 
 #endif
 

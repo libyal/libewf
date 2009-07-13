@@ -1,5 +1,6 @@
 /*
- * Common include file
+ * Configuration file for Borland/CodeGear C++ Builder compiler
+ *
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,29 +21,13 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _COMMON_H )
-#define _COMMON_H
+#if !defined( _CONFIG_BORLANDC_H )
+#define _CONFIG_BORLANDC_H
 
-#if defined( HAVE_CONFIG_H )
-#include <config.h>
-#endif
+#include "config.h"
 
-/* Check to see if we're dealing with the Microsoft Visual Studio C++ compiler
- */
-#if defined( _MSC_VER )
-#include <config_msc.h>
-#endif
-
-/* Check to see if we're dealing with the Borland/CodeGear C++ Builder compiler
- */
-#if defined( __BORLANDC__ )
-#include <config_borlandc.h>
-#endif
-
-/* Make sure WINAPI is defined
- */
-#if defined( _MSC_VER ) || defined( __BORLANDC__ )
-#include <windows.h>
+#if !defined( HAVE_STDINT_H )
+#define HAVE_STDINT_H
 #endif
 
 #endif

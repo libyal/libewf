@@ -1,0 +1,23 @@
+USEUNIT("..\..\libuna\libuna_codepage_windows_1251.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1252.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1253.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1254.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1255.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1256.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1257.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1258.c");
+USEUNIT("..\..\libuna\libuna_compare.c");
+USEUNIT("..\..\libuna\libuna_support.c");
+USEUNIT("..\..\libuna\libuna_unicode_character.c");
+USEUNIT("..\..\libuna\libuna_utf8_stream.c");
+USEUNIT("..\..\libuna\libuna_utf8_string.c");
+USEUNIT("..\..\libuna\libuna_utf16_stream.c");
+USEUNIT("..\..\libuna\libuna_utf16_string.c");
+USEUNIT("..\..\libuna\libuna_utf32_stream.c");
+USEUNIT("..\..\libuna\libuna_utf32_string.c");
+USEUNIT("..\..\libuna\libuna_byte_stream.c");
+USEUNIT("..\..\libuna\libuna_codepage_windows_1250.c");
+//---------------------------------------------------------------------------
+#define Library
+
+ 

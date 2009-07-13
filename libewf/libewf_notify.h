@@ -59,18 +59,18 @@ void libewf_notify_dump_data(
 #define libewf_notify_verbose_dump_data \
 	if( libewf_notify_verbose != 0 ) libewf_notify_dump_data
 
-LIBPFF_EXTERN void libewf_notify_set_verbose(
+LIBEWF_EXTERN void libewf_notify_set_verbose(
                     int verbose );
 
-LIBPFF_EXTERN int libewf_notify_set_stream(
+LIBEWF_EXTERN int libewf_notify_set_stream(
                    FILE *stream,
                    liberror_error_t **error );
 
-LIBPFF_EXTERN int libewf_notify_stream_open(
+LIBEWF_EXTERN int libewf_notify_stream_open(
                    const char *filename,
                    liberror_error_t **error );
 
-LIBPFF_EXTERN int libewf_notify_stream_close(
+LIBEWF_EXTERN int libewf_notify_stream_close(
                    liberror_error_t **error );
 
 #if defined( __cplusplus )

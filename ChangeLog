@@ -217,6 +217,14 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * ewfacquire resume does not allow break when input requested
 
+Version: 20090628
+* updated libbfio
+* updated liberror
+* updated libnotify
+* fixed Windows 64-bit ssize_t definition issue (pointerd out by Xavier Roche)
+* worked on implementing Borland compiler patches by Peter Van Hove of IsoBuster
+  - added liberror sprint functions
+
 Version: 20090624
 * updated libbfio
 * added allow shared read to device handle CreateFile

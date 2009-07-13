@@ -52,7 +52,7 @@ int file_io_exists(
 
 		return( -1 );
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && !defined( __BORLANDC__ )
 	if( _sopen_s(
 	     &file_descriptor,
 	     filename,
@@ -100,7 +100,7 @@ int file_io_wexists(
 
 		return( -1 );
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && !defined( __BORLANDC__ )
 	if( _wsopen_s(
 	     &file_descriptor,
 	     filename,
@@ -141,7 +141,7 @@ int file_io_open(
 
 		return( -1 );
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && !defined( __BORLANDC__ )
 	if( _sopen_s(
 	     &file_descriptor,
 	     filename,
@@ -194,7 +194,7 @@ int file_io_wopen(
 
 		return( -1 );
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && !defined( __BORLANDC__ )
 	if( _wsopen_s(
 	     &file_descriptor,
 	     filename,

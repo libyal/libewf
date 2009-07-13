@@ -1,0 +1,10 @@
+USEUNIT("..\..\libbfio\libbfio_support.c");
+USEUNIT("..\..\libbfio\libbfio_error_string.c");
+USEUNIT("..\..\libbfio\libbfio_file.c");
+USEUNIT("..\..\libbfio\libbfio_handle.c");
+USEUNIT("..\..\libbfio\libbfio_list_type.c");
+USEUNIT("..\..\libbfio\libbfio_offset_list.c");
+USEUNIT("..\..\libbfio\libbfio_pool.c");
+//---------------------------------------------------------------------------
+#define Library
+ 

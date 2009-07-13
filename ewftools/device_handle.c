@@ -37,6 +37,14 @@
 #if defined( WINAPI )
 #include <windows.h>
 
+/* Platform specific macros
+ */
+#if defined( __BORLANDC__ )
+#define DEVICE_HANDLE_LARGE_INTEGER_ZERO	{ 0 }
+#else
+#define DEVICE_HANDLE_LARGE_INTEGER_ZERO	{ 0, 0 }
+#endif
+
 #elif defined( HAVE_CYGWIN_FS_H )
 #include <cygwin/fs.h>
 
@@ -184,7 +192,7 @@ int device_handle_open_input(
 
 #if defined( WINAPI )
 	PVOID error_string               = NULL;
-	LARGE_INTEGER large_integer_size = { 0, 0 };
+	LARGE_INTEGER large_integer_size = DEVICE_HANDLE_LARGE_INTEGER_ZERO;
 	DWORD error_code                 = 0;
 	DWORD file_type                  = 0;
 #else
@@ -649,7 +657,7 @@ off64_t device_handle_seek_offset(
 	static char *function              = "device_handle_seek_offset";
 
 #if defined( WINAPI )
-	LARGE_INTEGER large_integer_offset = { 0, 0 };
+	LARGE_INTEGER large_integer_offset = DEVICE_HANDLE_LARGE_INTEGER_ZERO;
 	DWORD move_method                  = 0;
 #endif
 

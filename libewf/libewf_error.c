@@ -41,25 +41,55 @@ void libewf_error_free(
 }
 
 /* Prints a descriptive string of the error to the stream
+ * Returns the amount of printed characters if successful or -1 on error
  */
-void libewf_error_fprint(
-      libewf_error_t *error,
-      FILE *stream )
+int libewf_error_fprint(
+     libewf_error_t *error,
+     FILE *stream )
 {
-	liberror_error_fprint(
-	 (liberror_error_t *) error,
-	 stream );
+	return( liberror_error_fprint(
+	         (liberror_error_t *) error,
+	         stream ) );
+}
+
+/* Prints a descriptive string of the error to the string
+ * Returns the amount of printed characters if successful or -1 on error
+ */
+int libewf_error_sprint(
+     libewf_error_t *error,
+     char *string,
+     size_t size )
+{
+	return( liberror_error_sprint(
+	         (liberror_error_t *) error,
+	         string,
+	         size ) );
 }
 
 /* Prints a backtrace of the error to the stream
+ * Returns the amount of printed characters if successful or -1 on error
  */
-void libewf_error_backtrace_fprint(
-      libewf_error_t *error,
+int libewf_error_backtrace_fprint(
+     libewf_error_t *error,
       FILE *stream )
 {
-	liberror_error_backtrace_fprint(
-	 (liberror_error_t *) error,
-	 stream );
+	return( liberror_error_backtrace_fprint(
+	         (liberror_error_t *) error,
+	         stream ) );
+}
+
+/* Prints a backtrace of the error to the string
+ * Returns the amount of printed characters if successful or -1 on error
+ */
+int libewf_error_backtrace_sprint(
+     libewf_error_t *error,
+     char *string,
+     size_t size )
+{
+	return( liberror_error_backtrace_sprint(
+	         (liberror_error_t *) error,
+	         string,
+	         size ) );
 }
 
 #endif

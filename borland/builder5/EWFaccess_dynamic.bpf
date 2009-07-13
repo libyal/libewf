@@ -1,0 +1,6 @@
+USEUNIT("..\..\cppclass\EWFaccess.cpp");
+USELIB("..\..\builds\Builder\libewf_static.lib");
+//---------------------------------------------------------------------------
+This file is used by the project manager only and should be treated like the project file
+
+DllMain
