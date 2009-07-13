@@ -216,6 +216,7 @@ Next stable release:
 * remove/disable ewfdebug
 * check into resume write error for 32-bit compile
 * ewfacquire resume does not allow break when input requested
+* check make distclean
 
 Version: 20090629
 * worked on implementing Borland compiler patches
