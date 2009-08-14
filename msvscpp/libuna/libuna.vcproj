@@ -89,6 +89,58 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_3.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_4.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_5.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_6.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_7.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_8.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_9.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_10.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_13.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_14.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_15.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_16.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libuna\libuna_codepage_windows_1250.c"
 				>
 			</File>
@@ -172,6 +224,66 @@
 			</File>
 			<File
 				RelativePath="..\..\libuna\libuna_codepage_ascii.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_1.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_3.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_4.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_5.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_6.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_7.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_8.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_9.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_10.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_11.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_13.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_14.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_15.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_iso_8859_16.h"
 				>
 			</File>
 			<File

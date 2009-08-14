@@ -28,7 +28,6 @@
 
 #include "libewf_filename.h"
 #include "libewf_list_type.h"
-#include "libewf_notify.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_file_handle.h"
 
@@ -158,7 +157,7 @@ int libewf_segment_file_handle_free(
 		if( ( *segment_file_handle )->section_list != NULL )
 		{
 			if( libewf_list_free(
-			     ( *segment_file_handle )->section_list,
+			     &( ( *segment_file_handle )->section_list ),
 			     &libewf_section_list_values_free,
 			     error ) != 1 )
 			{

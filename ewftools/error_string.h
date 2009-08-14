@@ -24,40 +24,35 @@
 #define _ERROR_STRING_H
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_WCSERROR_R )
-#if defined( WINAPI )
+#if defined( _MSC_VER )
 #define error_string_wcserror_r( error_number, string, size ) \
 	_wcserror_s( string, size, error_number )
 
 #define ERROR_STRING_WCSTRERROR_R_RETURN_ERROR	0
 #endif
-#endif
 
-#if defined( HAVE_STRERROR_R )
-#if defined( WINAPI )
+#if defined( _MSC_VER )
 #define error_string_strerror_r( error_number, string, size ) \
 	strerror_s( string, size, error_number )
 
-#define ERROR_STRING_STRERROR_R_RETURN_ERROR	0
-
-#else
+#elif defined( HAVE_STRERROR_R )
 #define error_string_strerror_r( error_number, string, size ) \
 	strerror_r( error_number, string, size )
+#endif
 
 #if defined( STRERROR_R_CHAR_P )
 #define ERROR_STRING_STRERROR_R_RETURN_ERROR	NULL
 
 #else
 #define ERROR_STRING_STRERROR_R_RETURN_ERROR	0
-#endif
-
-#endif
 #endif
 
 #if defined( error_string_strerror_r ) || defined( HAVE_STRERROR )

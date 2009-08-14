@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090629],
+ [20090811],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,9 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090629])
+ [20090811])
+
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -364,6 +366,13 @@ AC_CHECK_FUNCS(
   [AC_MSG_FAILURE(
    [Missing functions: strtoull and atoll],
    [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [vsnprintf],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: vsnprintf],
+  [1]) ])
 
 dnl File input/output functions used in libbdio/libbfio_file.h
 AC_CHECK_FUNCS(

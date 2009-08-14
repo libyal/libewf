@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include <stdio.h>
 
@@ -31,7 +32,6 @@
 #include "libewf_filename.h"
 #include "libewf_error.h"
 #include "libewf_libbfio.h"
-#include "libewf_notify.h"
 #include "libewf_segment_file.h"
 #include "libewf_support.h"
 
@@ -204,7 +204,7 @@ int libewf_check_file_signature(
 		 "%s: invalid filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -223,7 +223,7 @@ int libewf_check_file_signature(
 		 "%s: invalid filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -241,7 +241,7 @@ int libewf_check_file_signature(
 		 "%s: unable to create file io handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -261,7 +261,7 @@ int libewf_check_file_signature(
 		 "%s: unable to set filename in file io handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -285,7 +285,7 @@ int libewf_check_file_signature(
 		 "%s: unable to check file signature using a file handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -307,7 +307,7 @@ int libewf_check_file_signature(
 		 "%s: unable to free file io handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -442,7 +442,7 @@ int libewf_check_file_signature_wide(
 		 "%s: invalid filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -461,7 +461,7 @@ int libewf_check_file_signature_wide(
 		 "%s: invalid filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -479,7 +479,7 @@ int libewf_check_file_signature_wide(
 		 "%s: unable to create file io handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -499,7 +499,7 @@ int libewf_check_file_signature_wide(
 		 "%s: unable to set filename in file io handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -523,7 +523,7 @@ int libewf_check_file_signature_wide(
 		 "%s: unable to check file signature using a file handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -545,7 +545,7 @@ int libewf_check_file_signature_wide(
 		 "%s: unable to free file io handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1018,7 +1018,7 @@ int libewf_glob(
 		 "%s: invalid filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1035,7 +1035,7 @@ int libewf_glob(
 		 "%s: invalid filename length.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1064,7 +1064,7 @@ int libewf_glob(
 		 "%s: unsupported format.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1080,7 +1080,7 @@ int libewf_glob(
 		 "%s: invalid filenames.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1098,7 +1098,7 @@ int libewf_glob(
 			 "%s: invalid filename - missing extension.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1133,7 +1133,7 @@ int libewf_glob(
 			 function,
 			 &( filename[ filename_length - 4 ] ) );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1167,7 +1167,7 @@ int libewf_glob(
 		 "%s: unable to create file IO handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1190,7 +1190,7 @@ int libewf_glob(
 			 "%s: unable to create segment filename.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1213,7 +1213,7 @@ int libewf_glob(
 			 "%s: unable to copy filename.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1246,7 +1246,7 @@ int libewf_glob(
 			 "%s: unable to set extension.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1274,7 +1274,7 @@ int libewf_glob(
 			 "%s: unable to set name in file IO handle.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1300,7 +1300,7 @@ int libewf_glob(
 			 "%s: unable to test if file exists.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1335,7 +1335,7 @@ int libewf_glob(
 			 "%s: unable to resize filenames.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1363,7 +1363,7 @@ int libewf_glob(
 		 "%s: unable to free file IO handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1802,7 +1802,7 @@ int libewf_glob_wide(
 		 "%s: invalid filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1819,7 +1819,7 @@ int libewf_glob_wide(
 		 "%s: invalid filename length.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1848,7 +1848,7 @@ int libewf_glob_wide(
 		 "%s: unsupported format.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1864,7 +1864,7 @@ int libewf_glob_wide(
 		 "%s: invalid filenames.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1882,7 +1882,7 @@ int libewf_glob_wide(
 			 "%s: invalid filename - missing extension.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1917,7 +1917,7 @@ int libewf_glob_wide(
 			 function,
 			 &( filename[ filename_length - 4 ] ) );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1951,7 +1951,7 @@ int libewf_glob_wide(
 		 "%s: unable to create file IO handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1974,7 +1974,7 @@ int libewf_glob_wide(
 			 "%s: unable to create segment filename.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1997,7 +1997,7 @@ int libewf_glob_wide(
 			 "%s: unable to copy filename.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2030,7 +2030,7 @@ int libewf_glob_wide(
 			 "%s: unable to set extension.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2058,7 +2058,7 @@ int libewf_glob_wide(
 			 "%s: unable to set name in file IO handle.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2084,7 +2084,7 @@ int libewf_glob_wide(
 			 "%s: unable to test if file exists.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2119,7 +2119,7 @@ int libewf_glob_wide(
 			 "%s: unable to resize filenames.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2147,7 +2147,7 @@ int libewf_glob_wide(
 		 "%s: unable to free file IO handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );

@@ -9,6 +9,7 @@ ewfacquire_SOURCES = \
 	device_handle.c device_handle.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
+	directory_io.h \
 	error_string.c error_string.h \
 	ewfacquire.c \
 	ewfcommon.h \
@@ -40,6 +41,7 @@ ewfacquirestream_SOURCES = \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
+	directory_io.h \
 	error_string.c error_string.h \
 	ewfacquirestream.c \
 	ewfcommon.h \
@@ -65,6 +67,7 @@ ewfalter_SOURCES = \
 	alteration_handle.c alteration_handle.h \
 	byte_size_string.c byte_size_string.h \
 	date_time.c date_time.h \
+	directory_io.h \
 	error_string.c error_string.h \
 	ewfalter.c \
 	ewfcommon.h \
@@ -98,6 +101,7 @@ ewfexport_SOURCES = \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
+	directory_io.h \
 	error_string.c error_string.h \
 	ewfcommon.h \
 	ewfexport.c \
@@ -123,6 +127,7 @@ ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	date_time.c date_time.h \
 	digest_hash.c digest_hash.h \
+	directory_io.h \
 	error_string.c error_string.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinfo.c \
@@ -142,6 +147,7 @@ ewfverify_SOURCES = \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
+	directory_io.h \
 	error_string.c error_string.h \
 	ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \

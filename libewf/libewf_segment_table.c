@@ -24,11 +24,13 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+#include <libnotify.h>
+
 #include "libewf_definitions.h"
 #include "libewf_filename.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
-#include "libewf_notify.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_system_string.h"
@@ -373,7 +375,7 @@ int libewf_segment_table_build(
 	for( segment_number = 1; segment_number < segment_table->amount; segment_number++ )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libewf_notify_verbose_printf(
+		libnotify_verbose_printf(
 		 "%s: reading section list for segment number: %" PRIu16 ".\n",
 		 function,
 		 segment_number );
@@ -1154,7 +1156,7 @@ int libewf_segment_table_create_segment_file(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libewf_notify_verbose_printf(
+	libnotify_verbose_printf(
 	 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBEWF_SYSTEM ".\n",
 	 function,
 	 segment_number,

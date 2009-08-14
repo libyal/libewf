@@ -21,5 +21,6 @@ endif
 
 distclean: clean
 	/bin/rm -f config.h
+	/bin/rm -f types.h
 	/bin/rm -f Makefile
 

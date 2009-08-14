@@ -29,7 +29,7 @@
 
 #include <errno.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
@@ -53,7 +53,7 @@
 #include "storage_media_buffer.h"
 #include "system_string.h"
 
-#define EWFACQUIRE_2_TIB		2199023255552LL
+#define EWFACQUIRE_2_TIB		0x20000000000ULL
 #define EWFACQUIRE_INPUT_BUFFER_SIZE	64
 
 imaging_handle_t *ewfacquire_imaging_handle = NULL;
@@ -2266,9 +2266,17 @@ int main( int argc, char * const argv[] )
 	notify_set_values(
 	 stderr,
 	 verbose );
+#if defined( HAVE_V2_API )
+	libewf_notify_set_verbose(
+	 verbose );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#else
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
+#endif
 
 	/* Check if to read from stdin
 	 */

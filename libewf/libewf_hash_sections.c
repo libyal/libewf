@@ -24,7 +24,6 @@
 #include <memory.h>
 
 #include "libewf_hash_sections.h"
-#include "libewf_notify.h"
 
 /* Initialize the hash sections
  * Returns 1 if successful or -1 on error

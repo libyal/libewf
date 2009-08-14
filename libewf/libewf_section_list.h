@@ -57,7 +57,8 @@ struct libewf_section_list_values
 };
 
 int libewf_section_list_values_free(
-     intptr_t *value );
+     intptr_t *value,
+     liberror_error_t **error );
 
 int libewf_section_list_append(
      libewf_list_t *section_list,

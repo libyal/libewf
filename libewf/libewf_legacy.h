@@ -39,6 +39,10 @@ extern "C" {
 
 #if defined( HAVE_V1_API )
 
+LIBEWF_EXTERN void libewf_set_notify_values(
+                    FILE *stream,
+                    int verbose );
+
 LIBEWF_EXTERN int libewf_signal_abort(
                    libewf_handle_t *handle );
 

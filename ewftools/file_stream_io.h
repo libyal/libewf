@@ -32,13 +32,13 @@ extern "C" {
 #endif
 
 #if defined( WINAPI )
-#define FILE_STREAM_IO_OPEN_APPEND	"ab"
-#define FILE_STREAM_IO_OPEN_READ	"rb"
-#define FILE_STREAM_IO_OPEN_WRITE	"wb"
+#define FILE_STREAM_IO_BINARY_OPEN_APPEND	"ab"
+#define FILE_STREAM_IO_BINARY_OPEN_READ		"rb"
+#define FILE_STREAM_IO_BINARY_OPEN_WRITE	"wb"
 #else
-#define FILE_STREAM_IO_OPEN_APPEND	"a"
-#define FILE_STREAM_IO_OPEN_READ	"r"
-#define FILE_STREAM_IO_OPEN_WRITE	"w"
+#define FILE_STREAM_IO_BINARY_OPEN_APPEND	"a"
+#define FILE_STREAM_IO_BINARY_OPEN_READ		"r"
+#define FILE_STREAM_IO_BINARY_OPEN_WRITE	"w"
 #endif
 
 #if defined( HAVE_FOPEN ) || defined( WINAPI )

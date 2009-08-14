@@ -1,7 +1,6 @@
 /*
  * Configuration file for Borland/CodeGear C++ Builder compiler
  *
- *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
@@ -24,11 +23,43 @@
 #if !defined( _CONFIG_BORLANDC_H )
 #define _CONFIG_BORLANDC_H
 
-#include "config.h"
+/* Define to the address where bug reports for this package should be sent.
+ */
+#define PACKAGE_BUGREPORT "forensics@hoffmannbv.nl"
 
-#if !defined( HAVE_STDINT_H )
-#define HAVE_STDINT_H
+/* Use the safe size and offset types
+ */
+#define HAVE_SIZE32_T   0
+#define HAVE_SSIZE32_T  0
+#define HAVE_SIZE64_T   0
+#define HAVE_SSIZE64_T  0
+#define HAVE_OFF64_T    0
+
+/* Define the wide character type
+ */
+#if !defined( HAVE_WCHAR_H )
+#define HAVE_WCHAR_H		1
 #endif
+
+#if defined( SIZEOF_WCHAR_T )
+#undef SIZEOF_WCHAR_T
+#endif
+
+#define SIZEOF_WCHAR_T		2
+
+/* Use the native WINAPI functions instead of the POSIX like functions
+#define USE_NATIVE_WINAPI_FUNCTIONS	1
+ */
+
+/* Enable verbose output
+#define HAVE_VERBOSE_OUTPUT     1
+ */
+
+/* Enable debug output
+#define HAVE_DEBUG_OUTPUT       1
+ */
+
+#define HAVE_V1_API		1
 
 #endif
 

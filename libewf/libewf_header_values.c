@@ -25,6 +25,7 @@
 #include <memory.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #if defined( TIME_WITH_SYS_TIME )
 #include <sys/time.h>
@@ -40,7 +41,6 @@
 #include "libewf_definitions.h"
 #include "libewf_header_values.h"
 #include "libewf_libuna.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
@@ -974,7 +974,7 @@ int libewf_header_values_copy(
 		 || ( source_header_values->identifier_length[ values_table_index ] == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: missing identifier for index: %d.\n",
 			 function,
 			 values_table_index );
@@ -988,7 +988,7 @@ int libewf_header_values_copy(
 		 || ( source_header_values->value_length[ values_table_index ] == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: missing value for index: %d.\n",
 			 function,
 			 values_table_index );
@@ -1168,7 +1168,7 @@ int libewf_header_values_parse_header_string(
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( amount_of_types != amount_of_values )
 		{
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: mismatch in amount of types and values.\n",
 			 function );
 		}
@@ -1800,7 +1800,7 @@ int libewf_header_values_parse_header_string(
 #if defined( HAVE_VERBOSE_OUTPUT )
 			else
 			{
-				libewf_notify_verbose_printf(
+				libnotify_verbose_printf(
 				 "%s: unsupported type: %s with value: %s.\n",
 				 function,
 				 (char *) types[ iterator ],
@@ -2491,7 +2491,7 @@ int libewf_header_values_generate_header_string_type1(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -2528,7 +2528,7 @@ int libewf_header_values_generate_header_string_type1(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -2866,7 +2866,7 @@ int libewf_header_values_generate_header_string_type2(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -2903,7 +2903,7 @@ int libewf_header_values_generate_header_string_type2(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3242,7 +3242,7 @@ int libewf_header_values_generate_header_string_type3(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3279,7 +3279,7 @@ int libewf_header_values_generate_header_string_type3(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3593,7 +3593,7 @@ int libewf_header_values_generate_header_string_type4(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3630,7 +3630,7 @@ int libewf_header_values_generate_header_string_type4(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3947,7 +3947,7 @@ int libewf_header_values_generate_header_string_type5(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3984,7 +3984,7 @@ int libewf_header_values_generate_header_string_type5(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -4313,7 +4313,7 @@ int libewf_header_values_generate_header_string_type6(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -4350,7 +4350,7 @@ int libewf_header_values_generate_header_string_type6(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -4692,7 +4692,7 @@ int libewf_header_values_generate_header_string_type7(
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -4729,7 +4729,7 @@ int libewf_header_values_generate_header_string_type7(
 			 "%s: unable to generate system date header value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );

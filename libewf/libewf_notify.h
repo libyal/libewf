@@ -27,6 +27,7 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include <stdio.h>
 
@@ -35,29 +36,6 @@
 #if defined( __cplusplus )
 extern "C" {
 #endif
-
-extern int libewf_notify_verbose;
-
-LIBEWF_EXTERN void libewf_set_notify_values(
-                    FILE *stream,
-                    int verbose );
-
-void libewf_notify_printf(
-      char *format,
-      ... );
-
-#define libewf_notify_verbose_printf \
-	if( libewf_notify_verbose != 0 ) libewf_notify_printf
-
-void libewf_notify_error_backtrace(
-      liberror_error_t *error );
-
-void libewf_notify_dump_data(
-      void *data,
-      size_t size );
-
-#define libewf_notify_verbose_dump_data \
-	if( libewf_notify_verbose != 0 ) libewf_notify_dump_data
 
 LIBEWF_EXTERN void libewf_notify_set_verbose(
                     int verbose );

@@ -26,11 +26,11 @@
 
 #include <liberror.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#if defined( HAVE_STRING_H )
+#if defined( HAVE_STRING_H ) || defined( WINAPI )
 #include <string.h>
 #endif
 

@@ -27,7 +27,7 @@
 
 /* Define HAVE_LOCAL_LIBBFIO for local use of libbfio
  */
-#if( HAVE_LOCAL_LIBBFIO )
+#if defined( HAVE_LOCAL_LIBBFIO )
 
 #include <libbfio_definitions.h>
 #include <libbfio_file.h>

@@ -25,13 +25,13 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_definitions.h"
 #include "libewf_compression.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_libbfio.h"
 #include "libewf_media_values.h"
-#include "libewf_notify.h"
 #include "libewf_offset_table.h"
 #include "libewf_read_io_handle.h"
 #include "libewf_sector_table.h"
@@ -239,7 +239,7 @@ ssize_t libewf_read_io_handle_process_chunk(
 		if( chunk_crc != calculated_crc )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 			 function,
 			 chunk_crc,
@@ -501,7 +501,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	{
 		chunk_type = "compressed";
 	}
-	libewf_notify_verbose_printf(
+	libnotify_verbose_printf(
 	 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIu64 " with size: %" PRIzd ".\n",
 	 function,
 	 chunk_type,
@@ -717,7 +717,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		if( chunk_size > chunk_cache->allocated_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: reallocating chunk size: %" PRIzu ".\n",
 			 function,
 			 chunk_size );

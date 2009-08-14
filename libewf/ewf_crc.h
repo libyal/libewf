@@ -26,7 +26,7 @@
 #include <common.h>
 #include <types.h>
 
-#if defined( HAVE_ZLIB_H ) && defined( HAVE_LIBZ )
+#if defined( HAVE_ZLIB_H )
 #include <zlib.h>
 #endif
 

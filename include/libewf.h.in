@@ -170,14 +170,22 @@ LIBEWF_EXTERN int libewf_glob_free(
 #endif
 
 /* -------------------------------------------------------------------------
- * Notify functions
+ * Notify functions (APIv1)
  * ------------------------------------------------------------------------- */
+
+#if @HAVE_V1_API@
 
 /* Set the notify values
  */
 LIBEWF_EXTERN void libewf_set_notify_values(
                     FILE *stream,
                     uint8_t verbose );
+
+#endif
+
+/* -------------------------------------------------------------------------
+ * Notify functions (APIv2)
+ * ------------------------------------------------------------------------- */
 
 #if @HAVE_V2_API@
 

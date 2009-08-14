@@ -31,7 +31,7 @@
 
 #include <stdio.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
@@ -1638,9 +1638,17 @@ int main( int argc, char * const argv[] )
 	notify_set_values(
 	 stderr,
 	 verbose );
+#if defined( HAVE_V2_API )
+	libewf_notify_set_verbose(
+	 verbose );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#else
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
+#endif
 
 	if( option_case_number != NULL )
 	{

@@ -26,6 +26,7 @@
 #include <wide_string.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
@@ -33,7 +34,6 @@
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_metadata.h"
-#include "libewf_notify.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_types.h"
 
@@ -3254,7 +3254,7 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse xheader.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 *error );
 		liberror_error_free(
 		 error );
@@ -3274,7 +3274,7 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse header2.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 *error );
 		liberror_error_free(
 		 error );
@@ -3295,7 +3295,7 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse header.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 *error );
 		liberror_error_free(
 		 error );
@@ -3887,7 +3887,7 @@ int libewf_handle_parse_hash_values(
 		 "%s: unable to parse xhash for values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 *error );
 		liberror_error_free(
 		 error );
@@ -3909,7 +3909,7 @@ int libewf_handle_parse_hash_values(
 			 "%s: unable to parse MD5 hash for its value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3928,7 +3928,7 @@ int libewf_handle_parse_hash_values(
 			 "%s: unable to parse SHA1 hash for its value.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 *error );
 			liberror_error_free(
 			 error );
@@ -3948,7 +3948,7 @@ int libewf_handle_parse_hash_values(
 		 "%s: unable to parse MD5 hash for its value.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 *error );
 		liberror_error_free(
 		 error );

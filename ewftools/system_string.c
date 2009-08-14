@@ -26,6 +26,8 @@
 #include <wide_string.h>
 #include <types.h>
 
+#include <errno.h>
+
 #if defined( HAVE_LOCALE_H )
 #include <locale.h>
 #endif
@@ -293,12 +295,14 @@ int system_string_to_int64(
 	}
 	end_of_string = (system_character_t *) &( string[ string_size - 1 ] );
 
+	errno = 0;
+
 	*value = system_string_to_signed_long_long(
 	          string,
 	          &end_of_string,
 	          0 );
 
-	if( *value == (int64_t) LONG_MAX )
+	if( errno != 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -373,12 +377,14 @@ int system_string_to_uint64(
 	}
 	end_of_string = (system_character_t *) &( string[ string_size - 1 ] );
 
+	errno = 0;
+
 	*value = system_string_to_unsigned_long_long(
 	          string,
 	          &end_of_string,
 	          0 );
 
-	if( *value == (uint64_t) LONG_MAX )
+	if( errno != 0 )
 	{
 		liberror_error_set(
 		 error,

@@ -28,11 +28,11 @@
 
 #include <errno.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#if defined( HAVE_STRING_H )
+#if defined( HAVE_STRING_H ) || defined( WINAPI )
 #include <string.h>
 #endif
 
@@ -40,7 +40,7 @@
 #include <sys/utsname.h>
 #endif
 
-#if defined( HAVE_STDARG_H )
+#if defined( HAVE_STDARG_H ) || defined( WINAPI )
 #include <stdarg.h>
 #elif defined( HAVE_VARARGS_H )
 #include <varargs.h>
@@ -170,7 +170,7 @@ void ewfoutput_copyright_fprint(
 	 PACKAGE_BUGREPORT );
 }
 
-#if defined( HAVE_STDARG_H )
+#if defined( HAVE_STDARG_H ) || defined( WINAPI )
 #define VARIABLE_ARGUMENTS_FUNCTION( function, type, argument ) \
         function( FILE *stream, type argument, ... )
 #define VARIABLE_ARGUMENTS_START( argument_list, type, name ) \

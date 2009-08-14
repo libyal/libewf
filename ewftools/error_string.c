@@ -20,21 +20,24 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "memory.h"
-#include "notify.h"
+#include <common.h>
+#include <memory.h>
+#include <narrow_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #include <errno.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#if defined( HAVE_STRING_H )
+#if defined( HAVE_STRING_H ) || defined( WINAPI )
 #include <string.h>
 #endif
 
 #include "error_string.h"
+#include "notify.h"
 
 #if defined( error_string_strerror_r ) || defined( HAVE_STRERROR )
 

@@ -26,7 +26,6 @@
 #include <liberror.h>
 
 #include "libewf_media_values.h"
-#include "libewf_notify.h"
 
 #include "ewf_definitions.h"
 

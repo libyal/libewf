@@ -27,7 +27,7 @@
 
 /* Define HAVE_LOCAL_LIBUNA for local use of libuna
  */
-#if( HAVE_LOCAL_LIBUNA )
+#if defined( HAVE_LOCAL_LIBUNA )
 
 #include <libuna_byte_stream.h>
 #include <libuna_compare.h>

@@ -30,6 +30,7 @@
 
 #include <liberror.h>
 
+#include "directory_io.h"
 #include "error_string.h"
 #include "file_io.h"
 #include "file_stream_io.h"
@@ -88,17 +89,23 @@ typedef wint_t system_integer_t;
 #define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	wide_string_to_unsigned_long_long( string, end_of_string, base )
 
-#define system_string_get_from_stream( string, size, stream ) \
-	file_stream_io_get_wide_string( string, size, stream )
+#define system_string_open( filename, mode ) \
+        file_io_wopen( filename, mode )
+
+#define system_string_file_exists( filename ) \
+        file_io_wexists( filename )
 
 #define system_string_fopen( filename, mode ) \
         file_stream_io_wfopen( filename, mode )
 
-#define system_string_open( filename, mode, error ) \
-        file_io_wopen( filename, mode, error )
+#define system_string_get_from_stream( string, size, stream ) \
+        file_stream_io_get_wide_string( string, size, stream )
 
-#define system_string_file_exists( filename, error ) \
-        file_io_wexists( filename, error )
+#define system_string_chdir( pathname ) \
+        directory_io_wchdir( pathname )
+
+#define system_string_mkdir( pathname ) \
+        directory_io_wmkdir( pathname )
 
 #define system_string_strerror( error_number ) \
         error_string_wcserror( error_number )
@@ -143,17 +150,23 @@ typedef int system_integer_t;
 #define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	narrow_string_to_unsigned_long_long( string, end_of_string, base )
 
-#define system_string_get_from_stream( string, size, stream ) \
-	file_stream_io_get_narrow_string( string, size, stream )
+#define system_string_open( filename, mode ) \
+        file_io_open( filename, mode )
+
+#define system_string_file_exists( filename ) \
+        file_io_exists( filename )
 
 #define system_string_fopen( filename, mode ) \
         file_stream_io_fopen( filename, mode )
 
-#define system_string_open( filename, mode, error ) \
-        file_io_open( filename, mode, error )
+#define system_string_get_from_stream( string, size, stream ) \
+        file_stream_io_get_narrow_string( string, size, stream )
 
-#define system_string_file_exists( filename, error ) \
-        file_io_exists( filename, error )
+#define system_string_chdir( pathname ) \
+        directory_io_chdir( pathname )
+
+#define system_string_mkdir( pathname ) \
+        directory_io_mkdir( pathname )
 
 #define system_string_strerror( error_number ) \
         error_string_strerror( error_number )

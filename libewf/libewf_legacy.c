@@ -27,6 +27,7 @@
 #include <wide_string.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_definitions.h"
 #include "libewf_handle.h"
@@ -35,6 +36,35 @@
 #include "libewf_types.h"
 
 #if defined( HAVE_V1_API )
+
+/* Set the notify values
+ */
+void libewf_set_notify_values(
+      FILE *stream,
+      int verbose )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "libewf_set_notify_values";
+
+	if( libewf_notify_set_stream(
+	     stream,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to set notify stream.",
+		 function );
+
+		libnotify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	libewf_notify_set_verbose(
+	 verbose );
+}
 
 /* Signals the libewf handle to abort its current activity
  * Returns 1 if successful or -1 on error
@@ -56,7 +86,7 @@ int libewf_signal_abort(
 		 "%s: unable to signal abort.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -91,7 +121,7 @@ libewf_handle_t *libewf_open(
 		 "%s: unable to create handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -112,7 +142,7 @@ libewf_handle_t *libewf_open(
 		 "%s: unable to create handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -153,7 +183,7 @@ libewf_handle_t *libewf_open_wide(
 		 "%s: unable to create handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -174,7 +204,7 @@ libewf_handle_t *libewf_open_wide(
 		 "%s: unable to create handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -205,7 +235,7 @@ int libewf_close(
 		 "%s: unable to close handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -223,7 +253,7 @@ int libewf_close(
 		 "%s: unable to free handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -259,7 +289,7 @@ off64_t libewf_seek_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -291,7 +321,7 @@ off64_t libewf_get_offset(
 		 "%s: unable to retrieve offset.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -340,7 +370,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 "%s: unable to raw read prepare buffer.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -388,7 +418,7 @@ ssize_t libewf_raw_read_buffer(
 		 "%s: unable to raw read buffer.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -425,7 +455,7 @@ ssize_t libewf_read_buffer(
 		 "%s: unable to read buffer.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -464,7 +494,7 @@ ssize_t libewf_read_random(
 		 "%s: unable to read random.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -514,7 +544,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		 "%s: unable to raw write prepare buffer.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -566,7 +596,7 @@ ssize_t libewf_raw_write_buffer(
 		 "%s: unable to raw write buffer.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -605,7 +635,7 @@ ssize_t libewf_write_buffer(
 		 "%s: unable to write buffer.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -646,7 +676,7 @@ ssize_t libewf_write_random(
 		 "%s: unable to write random.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -680,7 +710,7 @@ ssize_t libewf_write_finalize(
 		 "%s: unable to finalize write.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -718,7 +748,7 @@ int libewf_get_segment_filename(
 		 "%s: unable to retrieve segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -752,7 +782,7 @@ int libewf_set_segment_filename(
 		 "%s: unable to set segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -792,7 +822,7 @@ int libewf_get_segment_filename_wide(
 		 "%s: unable to retrieve wide segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -826,7 +856,7 @@ int libewf_set_segment_filename_wide(
 		 "%s: unable to set wide segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -860,7 +890,7 @@ int libewf_get_segment_file_size(
 		 "%s: unable to retrieve segment file size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -892,7 +922,7 @@ int libewf_set_segment_file_size(
 		 "%s: unable to set segment file size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -930,7 +960,7 @@ int libewf_get_delta_segment_filename(
 		 "%s: unable to retrieve delta segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -964,7 +994,7 @@ int libewf_set_delta_segment_filename(
 		 "%s: unable to set delta segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1004,7 +1034,7 @@ int libewf_get_delta_segment_filename_wide(
 		 "%s: unable to retrieve wide delta segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1038,7 +1068,7 @@ int libewf_set_delta_segment_filename_wide(
 		 "%s: unable to set wide delta segment filename.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1072,7 +1102,7 @@ int libewf_get_delta_segment_file_size(
 		 "%s: unable to retrieve delta segment file size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1104,7 +1134,7 @@ int libewf_set_delta_segment_file_size(
 		 "%s: unable to set delta segment file size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1136,7 +1166,7 @@ int libewf_get_sectors_per_chunk(
 		 "%s: unable to retrieve the amount of sectors per chunk.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1168,7 +1198,7 @@ int libewf_set_sectors_per_chunk(
 		 "%s: unable to set the amount of sectors per chunk.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1200,7 +1230,7 @@ int libewf_get_bytes_per_sector(
 		 "%s: unable to retrieve the amount of bytes per sector.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1232,7 +1262,7 @@ int libewf_set_bytes_per_sector(
 		 "%s: unable to set the amount of bytes per sector.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1262,7 +1292,7 @@ int libewf_get_amount_of_sectors(
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1281,7 +1311,7 @@ int libewf_get_amount_of_sectors(
 		 "%s: unable to retrieve the amount of sectors.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1297,7 +1327,7 @@ int libewf_get_amount_of_sectors(
 		 "%s: invalid amount of sectors value exceeds maximum.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1331,7 +1361,7 @@ int libewf_get_chunk_size(
 		 "%s: unable to retrieve the chunk size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1363,7 +1393,7 @@ int libewf_get_error_granularity(
 		 "%s: unable to retrieve the error granularity.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1395,7 +1425,7 @@ int libewf_set_error_granularity(
 		 "%s: unable to set the error granularity.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1430,7 +1460,7 @@ int libewf_get_compression_values(
 		 "%s: unable to retrieve the compression values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1477,7 +1507,7 @@ int libewf_set_compression_values(
 		 "%s: unable to set the compression values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1509,7 +1539,7 @@ int libewf_get_media_size(
 		 "%s: unable to retrieve the media size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1541,7 +1571,7 @@ int libewf_set_media_size(
 		 "%s: unable to set the media size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1573,7 +1603,7 @@ int libewf_get_media_type(
 		 "%s: unable to retrieve the media type.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1605,7 +1635,7 @@ int libewf_set_media_type(
 		 "%s: unable to set the media type.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1637,7 +1667,7 @@ int libewf_get_media_flags(
 		 "%s: unable to retrieve the media flags.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1669,7 +1699,7 @@ int libewf_set_media_flags(
 		 "%s: unable to set the media flags.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1699,7 +1729,7 @@ int libewf_get_volume_type(
 		 "%s: invalid handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1717,7 +1747,7 @@ int libewf_get_volume_type(
 		 "%s: invalid handle - missing media values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1733,7 +1763,7 @@ int libewf_get_volume_type(
 		 "%s: invalid volume type.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1771,7 +1801,7 @@ int libewf_set_volume_type(
 		 "%s: invalid handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1789,7 +1819,7 @@ int libewf_set_volume_type(
 		 "%s: invalid handle - missing media values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1807,7 +1837,7 @@ int libewf_set_volume_type(
 		 "%s: volume type cannot be changed.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1833,7 +1863,7 @@ int libewf_set_volume_type(
 		 "%s: unsupported volume type.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1865,7 +1895,7 @@ int libewf_get_format(
 		 "%s: unable to retrieve the format.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1897,7 +1927,7 @@ int libewf_set_format(
 		 "%s: unable to set the format.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1931,7 +1961,7 @@ int libewf_get_guid(
 		 "%s: unable to retrieve the GUID.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1965,7 +1995,7 @@ int libewf_set_guid(
 		 "%s: unable to set the GUID.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1999,7 +2029,7 @@ int libewf_get_md5_hash(
 		 "%s: unable to retrieve the MD5 hash.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2033,7 +2063,7 @@ int libewf_set_md5_hash(
 		 "%s: unable to set the MD5 hash.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2067,7 +2097,7 @@ int libewf_get_sha1_hash(
 		 "%s: unable to retrieve the SHA1 hash.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2101,7 +2131,7 @@ int libewf_set_sha1_hash(
 		 "%s: unable to set the SHA1 hash.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2133,7 +2163,7 @@ int libewf_get_write_amount_of_chunks(
 		 "%s: unable to retrieve amount of chunks written.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2166,7 +2196,7 @@ int libewf_set_read_wipe_chunk_on_error(
 		 "%s: unable to set wipe chunk on error during read.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2198,7 +2228,7 @@ int libewf_copy_media_values(
 		 "%s: unable to copy media values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2230,7 +2260,7 @@ int libewf_get_amount_of_acquiry_errors(
 		 "%s: unable to retrieve the amount of acquiry errors.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2263,7 +2293,7 @@ int libewf_get_acquiry_error(
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2286,7 +2316,7 @@ int libewf_get_acquiry_error(
 		 "%s: unable to retrieve acquiry error.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2304,7 +2334,7 @@ int libewf_get_acquiry_error(
 			 "%s: invalid amount of sectors value exceeds maximum.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2340,7 +2370,7 @@ int libewf_add_acquiry_error(
 		 "%s: unable to add acquiry error.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error);
 		liberror_error_free(
 		 &error );
@@ -2372,7 +2402,7 @@ int libewf_get_amount_of_crc_errors(
 		 "%s: unable to retrieve the amount of CRC errors.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2405,7 +2435,7 @@ int libewf_get_crc_error(
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2428,7 +2458,7 @@ int libewf_get_crc_error(
 		 "%s: unable to retrieve CRC error.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2446,7 +2476,7 @@ int libewf_get_crc_error(
 			 "%s: invalid amount of sectors value exceeds maximum.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2482,7 +2512,7 @@ int libewf_add_crc_error(
 		 "%s: unable to add CRC error.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error);
 		liberror_error_free(
 		 &error );
@@ -2514,7 +2544,7 @@ int libewf_get_amount_of_sessions(
 		 "%s: unable to retrieve the amount of sessions.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2547,7 +2577,7 @@ int libewf_get_session(
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2570,7 +2600,7 @@ int libewf_get_session(
 		 "%s: unable to retrieve session.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2588,7 +2618,7 @@ int libewf_get_session(
 			 "%s: invalid amount of sectors value exceeds maximum.",
 			 function );
 
-			libewf_notify_error_backtrace(
+			libnotify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2624,7 +2654,7 @@ int libewf_add_session(
 		 "%s: unable to add session.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error);
 		liberror_error_free(
 		 &error );
@@ -2656,7 +2686,7 @@ int libewf_get_header_codepage(
 		 "%s: unable to retrieve the header codepage.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2688,7 +2718,7 @@ int libewf_set_header_codepage(
 		 "%s: unable to set header codepage.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2720,7 +2750,7 @@ int libewf_get_amount_of_header_values(
 		 "%s: unable to retrieve the amount of header values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2758,7 +2788,7 @@ int libewf_get_header_value_identifier_size(
 		 "%s: unable to retrieve header value identifier size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2797,7 +2827,7 @@ int libewf_get_header_value_identifier(
 		 "%s: unable to retrieve header value identifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2828,7 +2858,7 @@ int libewf_get_header_value_size(
 		 "%s: invalid indentifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2855,7 +2885,7 @@ int libewf_get_header_value_size(
 		 function,
 		 identifier );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2888,7 +2918,7 @@ int libewf_get_header_value(
 		 "%s: invalid indentifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2916,7 +2946,7 @@ int libewf_get_header_value(
 		 function,
 		 identifier );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2949,7 +2979,7 @@ int libewf_set_header_value(
 		 "%s: invalid identifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2975,7 +3005,7 @@ int libewf_set_header_value(
 		 function,
 		 identifier );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3007,7 +3037,7 @@ int libewf_copy_header_values(
 		 "%s: unable to copy header values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3039,7 +3069,7 @@ int libewf_parse_header_values(
 		 "%s: invalid handle.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3060,7 +3090,7 @@ int libewf_parse_header_values(
 		 "%s: unsupported date format.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3082,7 +3112,7 @@ int libewf_parse_header_values(
 		 "%s: unable to parse header values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3112,7 +3142,7 @@ int libewf_get_amount_of_hash_values(
 		 "%s: unable to retrieve the amount of hash values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3150,7 +3180,7 @@ int libewf_get_hash_value_identifier_size(
 		 "%s: unable to retrieve hash value identifier size.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3190,7 +3220,7 @@ int libewf_get_hash_value_identifier(
 		 "%s: unable to retrieve hash value identifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3223,7 +3253,7 @@ int libewf_get_hash_value(
 		 "%s: invalid indentifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3251,7 +3281,7 @@ int libewf_get_hash_value(
 		 function,
 		 identifier );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3282,7 +3312,7 @@ int libewf_get_hash_value_size(
 		 "%s: invalid indentifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3309,7 +3339,7 @@ int libewf_get_hash_value_size(
 		 function,
 		 identifier );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3340,7 +3370,7 @@ int libewf_set_hash_value(
 		 "%s: invalid identifier.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3366,7 +3396,7 @@ int libewf_set_hash_value(
 		 function,
 		 identifier );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3399,7 +3429,7 @@ int libewf_parse_hash_values(
 		 "%s: unable to parse hash values.",
 		 function );
 
-		libewf_notify_error_backtrace(
+		libnotify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );

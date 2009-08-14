@@ -25,13 +25,13 @@
 
 #include <liberror.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
 
-#if defined( HAVE_STDARG_H )
+#if defined( HAVE_STDARG_H ) || defined( WINAPI )
 #include <stdarg.h>
 #elif defined( HAVE_VARARGS_H )
 #include <varargs.h>
@@ -54,7 +54,7 @@ void notify_set_values(
 	notify_verbose = verbose;
 }
 
-#if defined( HAVE_STDARG_H )
+#if defined( HAVE_STDARG_H ) || defined( WINAPI )
 #define VARARGS( function, type, argument ) \
 	function( type argument, ... )
 #define VASTART( argument_list, type, name ) \

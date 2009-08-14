@@ -41,15 +41,16 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_MKTIME )
 #if defined( WINAPI )
 #define libewf_date_time_mktime( time_elements ) \
 	mktime( time_elements )
 
-#else
+#elif defined( HAVE_MKTIME )
 #define libewf_date_time_mktime( time_elements ) \
 	mktime( time_elements )
-#endif
+
+#else
+#error Missing mktime function
 #endif
 
 struct tm *libewf_date_time_localtime(

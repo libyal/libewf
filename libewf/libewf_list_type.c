@@ -27,15 +27,73 @@
 #include <liberror.h>
 
 #include "libewf_list_type.h"
-#include "libewf_notify.h"
+
+/* Creates a list
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_list_initialize(
+     libewf_list_t **list,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_list_initialize";
+
+	if( list == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid list.",
+		 function );
+
+		return( -1 );
+	}
+	if( *list == NULL )
+	{
+		*list = (libewf_list_t *) memory_allocate(
+		                           sizeof( libewf_list_t ) );
+
+		if( *list == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create list.",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *list,
+		     0,
+		     sizeof( libewf_list_t ) ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear list.",
+			 function );
+
+			memory_free(
+			 *list );
+
+			*list = NULL;
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
 
 /* Frees a list including the elements
  * Uses the value_free_function to free the element value
  * Returns 1 if successful or -1 on error
  */
 int libewf_list_free(
-     libewf_list_t *list,
-     int (*value_free_function)( intptr_t *value ),
+     libewf_list_t **list,
+     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
      liberror_error_t **error )
 {
 	static char *function = "libewf_list_free";
@@ -52,23 +110,27 @@ int libewf_list_free(
 
 		return( -1 );
 	}
-	result = libewf_list_empty(
-	          list,
-	          value_free_function,
-	          error );
-
-	if( result != 1 )
+	if( *list != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty list.",
-		 function );
-	}
-	memory_free(
-	 list );
+		result = libewf_list_empty(
+		          *list,
+		          value_free_function,
+		          error );
 
+		if( result != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to empty list.",
+			 function );
+		}
+		memory_free(
+		 *list );
+
+		*list = NULL;
+	}
 	return( result );
 }
 
@@ -78,7 +140,7 @@ int libewf_list_free(
  */
 int libewf_list_empty(
      libewf_list_t *list,
-     int (*value_free_function)( intptr_t *value ),
+     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
@@ -134,7 +196,8 @@ int libewf_list_empty(
 
 			if( ( value_free_function != NULL )
 			 && ( value_free_function(
-			       list_element->value ) != 1 ) )
+			       list_element->value,
+			       error ) != 1 ) )
 			{
 				liberror_error_set(
 				 error,
@@ -151,6 +214,147 @@ int libewf_list_empty(
 		}
 	}
 	return( result );
+}
+
+/* Clones the existing list and its elements
+ * This function can return a partially cloned list on error
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_list_clone(
+     libewf_list_t **destination,
+     libewf_list_t *source,
+     int (*value_clone_function)( intptr_t **destination, intptr_t *source, liberror_error_t **error ),
+     liberror_error_t **error )
+{
+	libewf_list_element_t *source_list_element = NULL;
+	intptr_t *destination_value                = NULL;
+	static char *function                      = "libewf_list_clone";
+	int iterator                               = 0;
+
+	if( destination == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination list.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination list already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_clone_function == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value clone function.",
+		 function );
+
+		return( -1 );
+	}
+	if( source == NULL )
+	{
+		*destination = NULL;
+	}
+	else
+	{
+		*destination = (libewf_list_t *) memory_allocate(
+		                                  sizeof( libewf_list_t ) );
+
+		if( *destination == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create list.",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *destination,
+		     0,
+		     sizeof( libewf_list_t ) ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear list.",
+			 function );
+
+			memory_free(
+			 *destination );
+
+			*destination = NULL;
+
+			return( -1 );
+		}
+		source_list_element = source->first;
+
+		for( iterator = 0; iterator < source->amount_of_elements; iterator++ )
+		{
+			if( source_list_element == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: corruption detected in source list element: %d.",
+				 function,
+				 iterator + 1 );
+
+				return( -1 );
+			}
+			destination_value = NULL;
+
+			if( value_clone_function(
+			     &destination_value,
+			     source_list_element->value,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to clone value of list element: %d.",
+				 function,
+				 iterator + 1 );
+
+				return( -1 );
+			}
+			if( libewf_list_append_value(
+			     *destination,
+			     destination_value,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append value of list element: %d.",
+				 function,
+				 iterator + 1 );
+
+				return( -1 );
+			}
+			source_list_element = source_list_element->next;
+		}
+	}
+	return( 1 );
 }
 
 /* Prepend an element to the list
@@ -406,7 +610,7 @@ int libewf_list_append_value(
 int libewf_list_insert_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value ),
+     int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, liberror_error_t **error ),
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
@@ -516,13 +720,26 @@ int libewf_list_insert_element(
 		{
 			result = value_compare_function(
 			          element->value,
-			          list_element->value );
+			          list_element->value,
+			          error );
 
-			if( result == 0 )
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to compare list element: %d.",
+				 function,
+				 iterator + 1 );
+
+				return( -1 );
+			}
+			else if( result == LIBEWF_LIST_COMPARE_EQUAL )
 			{
 				return( 0 );
 			}
-			else if( result <= -1 )
+			else if( result == LIBEWF_LIST_COMPARE_LESS )
 			{
 				element->previous = list_element->previous;
 				element->next     = list_element;
@@ -573,11 +790,12 @@ int libewf_list_insert_element(
 int libewf_list_insert_value(
      libewf_list_t *list,
      intptr_t *value,
-     int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value ),
+     int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, liberror_error_t **error ),
      liberror_error_t **error )
 {
 	libewf_list_element_t *element = NULL;
 	static char *function          = "libewf_list_insert_value";
+	int result                     = 0;
 
 	if( value == NULL )
 	{
@@ -623,11 +841,18 @@ int libewf_list_insert_value(
 	}
 	element->value = value;
 
-	if( libewf_list_insert_element(
-	     list,
-	     element,
-	     value_compare_function,
-	     error ) != 1 )
+	result = libewf_list_insert_element(
+	          list,
+	          element,
+	          value_compare_function,
+	          error );
+
+	if( result != 1 )
+	{
+		memory_free(
+		 element );
+	}
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -636,12 +861,9 @@ int libewf_list_insert_value(
 		 "%s: unable to insert element to list.",
 		 function );
 
-		memory_free(
-		 element );
-
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Removes an element from the list

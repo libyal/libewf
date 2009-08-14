@@ -27,7 +27,6 @@
 #include <liberror.h>
 
 #include "libewf_chunk_cache.h"
-#include "libewf_notify.h"
 
 /* Initialize the chunk cache
  * Returns 1 if successful or -1 on error

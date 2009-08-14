@@ -32,6 +32,13 @@
 extern "C" {
 #endif
 
+enum LIBEWF_LIST_COMPARE_DEFINITIONS
+{
+	LIBEWF_LIST_COMPARE_LESS,
+	LIBEWF_LIST_COMPARE_EQUAL,
+	LIBEWF_LIST_COMPARE_GREATER
+};
+
 typedef struct libewf_list_element libewf_list_element_t;
 
 struct libewf_list_element
@@ -66,14 +73,24 @@ struct libewf_list
 	libewf_list_element_t *last;
 };
 
+int libewf_list_initialize(
+     libewf_list_t **list,
+     liberror_error_t **error );
+
 int libewf_list_free(
-     libewf_list_t *list,
-     int (*value_free_function)( intptr_t *value ),
+     libewf_list_t **list,
+     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_empty(
      libewf_list_t *list,
-     int (*value_free_function)( intptr_t *value ),
+     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
+     liberror_error_t **error );
+
+int libewf_list_clone(
+     libewf_list_t **destination,
+     libewf_list_t *source,
+     int (*value_clone_function)( intptr_t **destination, intptr_t *source, liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_prepend_element(
@@ -99,13 +116,13 @@ int libewf_list_append_value(
 int libewf_list_insert_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     int (*value_compare_function)( intptr_t *first, intptr_t *second ),
+     int (*value_compare_function)( intptr_t *first, intptr_t *second, liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_insert_value(
      libewf_list_t *list,
      intptr_t *value,
-     int (*value_compare_function)( intptr_t *first, intptr_t *second ),
+     int (*value_compare_function)( intptr_t *first, intptr_t *second, liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_remove_element(

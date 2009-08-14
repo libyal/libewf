@@ -25,8 +25,8 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 /* Split a string into elements using a delimiter character
@@ -326,7 +326,7 @@ int libewf_string_split_values_free(
 #if defined( HAVE_VERBOSE_OUTPUT )
 		else
 		{
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: empty split value: %" PRIzd " out of: %" PRIzd ".\n",
 			 function,
 			 split_value_iterator,

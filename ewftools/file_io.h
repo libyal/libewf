@@ -28,25 +28,19 @@
 #include <types.h>
 #include <wide_string.h>
 
-#include <liberror.h>
-
-#if defined( HAVE_IO_H )
-#include <io.h>
-#endif
-
-#if defined( HAVE_SHARE_H )
-#include <share.h>
-#endif
-
-#if defined( HAVE_SYS_STAT_H )
+#if defined( HAVE_SYS_STAT_H ) || defined( WINAPI )
 #include <sys/stat.h>
 #endif
 
-#if defined( HAVE_FCNTL_H )
+#if defined( HAVE_FCNTL_H ) || defined( WINAPI )
 #include <fcntl.h>
 #endif
 
-#if defined( HAVE_UNISTD_H )
+#if defined( WINAPI )
+#include <io.h>
+#include <share.h>
+
+#elif defined( HAVE_UNISTD_H )
 #include <unistd.h>
 #endif
 
@@ -70,30 +64,26 @@ extern "C" {
 
 #endif
 
-#if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
+#if ( defined( HAVE_OPEN ) && defined( HAVE_CLOSE ) ) || defined( WINAPI )
 int file_io_exists(
-     const char *filename,
-     liberror_error_t **error );
+     const char *filename );
 #endif
 
-#if defined( HAVE_WOPEN ) && defined( HAVE_CLOSE )
+#if defined( WINAPI )
 int file_io_wexists(
-     const wchar_t *filename,
-     liberror_error_t **error );
+     const wchar_t *filename );
 #endif
 
-#if defined( HAVE_OPEN )
+#if defined( HAVE_OPEN ) || defined( WINAPI )
 int file_io_open(
      const char *filename,
-     int flags,
-     liberror_error_t **error );
+     int flags );
 #endif
 
-#if defined( HAVE_WOPEN )
+#if defined( WINAPI )
 int file_io_wopen(
      const wchar_t *filename,
-     int flags,
-     liberror_error_t **error );
+     int flags );
 #endif
 
 #if defined( WINAPI )

@@ -26,12 +26,12 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_definitions.h"
 #include "libewf_hash_values.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
-#include "libewf_notify.h"
 #include "libewf_section.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
@@ -1165,7 +1165,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	/* Seek the start of the data chunks
 	*/
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libewf_notify_verbose_printf(
+	libnotify_verbose_printf(
 	 "%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
 	 function,
 	 chunks_section_offset );
@@ -1191,7 +1191,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libewf_notify_verbose_printf(
+		libnotify_verbose_printf(
 		 "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
 		 function,
 		 chunks_section_size,
@@ -1230,7 +1230,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libewf_notify_verbose_printf(
+		libnotify_verbose_printf(
 		 "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
 		 function,
 		 chunks_section_size,
@@ -1261,7 +1261,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	/* Seek the end of the chunks section
 	 */
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libewf_notify_verbose_printf(
+	libnotify_verbose_printf(
 	 "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
 	 function,
 	 last_segment_file_offset );
@@ -1490,7 +1490,7 @@ ssize_t libewf_segment_file_write_chunk(
 	{
 		chunk_type = "compressed";
 	}
-	libewf_notify_verbose_printf(
+	libnotify_verbose_printf(
 	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
 	 chunk_type,
@@ -1667,7 +1667,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	segment_file_offset += sizeof( ewfx_delta_chunk_header_t ) + sizeof( ewf_section_t );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libewf_notify_verbose_printf(
+	libnotify_verbose_printf(
 	 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
 	 ( chunk + 1 ),
@@ -1948,7 +1948,7 @@ ssize_t libewf_segment_file_write_close(
 			if( hash_sections->xhash != NULL )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libewf_notify_verbose_printf(
+				libnotify_verbose_printf(
 				 "%s: xhash already set - cleaning previous defintion.\n",
 				 function );
 #endif
@@ -2140,7 +2140,7 @@ int libewf_segment_file_write_sections_correction(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libewf_notify_verbose_printf(
+	libnotify_verbose_printf(
 	 "%s: correcting sections in segment file: %" PRIu16 ".\n",
 	 function,
 	 segment_number );
@@ -2168,7 +2168,7 @@ int libewf_segment_file_write_sections_correction(
 		     6 ) == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: correcting volume section.\n",
 			 function );
 #endif
@@ -2236,7 +2236,7 @@ int libewf_segment_file_write_sections_correction(
 			  4 ) == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libewf_notify_verbose_printf(
+			libnotify_verbose_printf(
 			 "%s: correcting data section.\n",
 			 function );
 #endif
@@ -2298,7 +2298,7 @@ int libewf_segment_file_write_sections_correction(
 	if( correct_last_next_section != 0 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libewf_notify_verbose_printf(
+		libnotify_verbose_printf(
 		 "%s: correcting last next section.\n",
 		 function );
 #endif

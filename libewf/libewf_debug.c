@@ -26,9 +26,9 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_debug.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_crc.h"
@@ -91,15 +91,15 @@ int libewf_debug_dump_data(
 	 stored_crc,
 	 crc_data );
 
-	libewf_notify_printf(
+	libnotify_printf(
 	 "%" PRIs_LIBEWF ":\n",
 	 header );
 
-	libewf_notify_dump_data(
+	libnotify_verbose_print_data(
 	 data,
 	 data_size );
 
-	libewf_notify_printf(
+	libnotify_printf(
 	 "%s: possible CRC (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 	 function,	
 	 stored_crc,	
@@ -149,7 +149,7 @@ int libewf_debug_section_print(
 	 section_size,
 	 section->size );
 
-	libewf_notify_printf(
+	libnotify_printf(
 	 "Section:\n"
 	 "type:\t%s\n"
 	 "next:\t%" PRIu64 "\n"
@@ -250,7 +250,7 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	libewf_notify_printf(
+	libnotify_printf(
 	 "%" PRIs_LIBEWF ":\n"
 	 "%" PRIs_LIBEWF "",
 	 header,
@@ -345,7 +345,7 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	libewf_notify_printf(
+	libnotify_printf(
 	 "%" PRIs_LIBEWF ":\n"
 	 "%" PRIs_LIBEWF "",
 	 header,
@@ -442,7 +442,7 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	libewf_notify_printf(
+	libnotify_printf(
 	 "%" PRIs_LIBEWF ":\n"
 	 "%" PRIs_LIBEWF "",
 	 header,

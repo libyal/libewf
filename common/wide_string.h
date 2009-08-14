@@ -37,14 +37,14 @@ extern "C" {
 
 /* String length
  */
-#if defined( HAVE_WCSLEN )
+#if defined( HAVE_WCSLEN ) || defined( WINAPI )
 #define wide_string_length( string ) \
 	wcslen( string )
 #endif
 
 /* String compare
  */
-#if defined( HAVE_WCSNCMP )
+#if defined( HAVE_WCSNCMP ) || defined( WINAPI )
 #define wide_string_compare( string1, string2, size ) \
 	wcsncmp( string1, string2, size )
 
@@ -59,9 +59,13 @@ extern "C" {
 
 /* Caseless string compare
  */
-#if defined( WINAPI )
+#if defined( _MSC_VER )
 #define wide_string_compare_no_case( string1, string2, size ) \
 	_wcsnicmp( string1, string2, size )
+
+#elif defined( WINAPI )
+#define wide_string_compare_no_case( string1, string2, size ) \
+	wcsnicmp( string1, string2, size )
 
 #elif defined( HAVE_WCSNCASECMP )
 #define wide_string_compare_no_case( string1, string2, size ) \
@@ -74,7 +78,7 @@ extern "C" {
 
 /* String copy
  */
-#if defined( HAVE_WCSNCPY )
+#if defined( HAVE_WCSNCPY ) || defined( WINAPI )
 #define wide_string_copy( destination, source, size ) \
 	wcsncpy( destination, source, size )
 
@@ -89,7 +93,7 @@ extern "C" {
 
 /* String search
  */
-#if defined( HAVE_WCSCHR )
+#if defined( HAVE_WCSCHR ) || defined( WINAPI )
 #define wide_string_search( string, character, size ) \
 	wcschr( string, (wchar_t) character )
 
@@ -100,7 +104,7 @@ extern "C" {
 
 /* String reverse search
  */
-#if defined( HAVE_WCSRCHR )
+#if defined( HAVE_WCSRCHR ) || defined( WINAPI )
 #define wide_string_search_reverse( string, character, size ) \
 	wcsrchr( string, (wchar_t) character )
 
@@ -111,18 +115,22 @@ extern "C" {
 
 /* String formatted print (snprinf)
  */
-#if defined( WINAPI )
+#if defined( _MSC_VER )
 #define wide_string_snprintf( target, size, format, ... ) \
 	swprintf_s( target, size, format, __VA_ARGS__ )
 
-#elif defined( HAVE_SWPRINTF )
+#elif defined( __BORLANDC__ )
+#define wide_string_snprintf( target, size, format, ... ) \
+	swprintf( target, format, __VA_ARGS__ )
+
+#elif defined( HAVE_SWPRINTF ) || defined( WINAPI )
 #define wide_string_snprintf( target, size, format, ... ) \
 	swprintf( target, size, format, __VA_ARGS__ )
 #endif
 
 /* String retrieve from stream (fgets)
  */
-#if defined( HAVE_FGETWS )
+#if defined( HAVE_FGETWS ) || defined( WINAPI )
 #define wide_string_get_from_stream( string, size, stream ) \
 	fgetws( string, size, stream )
 #endif

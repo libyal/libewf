@@ -23,42 +23,43 @@
 #include <common.h>
 #include <narrow_string.h>
 #include <wide_string.h>
-#include <types.h>
-
-#include <liberror.h>
 
 #include "file_io.h"
+#include "notify.h"
 
-#if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
+#if ( defined( HAVE_OPEN ) && defined( HAVE_CLOSE ) ) || defined( WINAPI )
 
 /* Function to determine if a file exists
  * Return 1 if file exists, 0 if not or -1 on error
  */
 int file_io_exists(
-     const char *filename,
-     liberror_error_t **error )
+     const char *filename )
 {
 	static char *function = "file_io_exists";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
+		notify_warning_printf(
+		 "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( WINAPI ) && !defined( __BORLANDC__ )
+#if defined( _MSC_VER )
 	if( _sopen_s(
 	     &file_descriptor,
 	     filename,
-	     ( _O_RDONLY | _O_BINARY ),
-	     _SH_DENYRW,
-	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+	     _O_RDONLY | _O_BINARY,
+	     _SH_DENYWR,
+	     _S_IREAD | _S_IWRITE ) != 0 )
+#elif defined( WINAPI )
+	file_descriptor = _sopen(
+	                   filename,
+	                   _O_RDONLY | _O_BINARY,
+	                   _S_IREAD | _S_IWRITE );
+
+	if( file_descriptor == -1 )
 #else
 	file_descriptor = open(
 	                   filename,
@@ -77,36 +78,40 @@ int file_io_exists(
 }
 #endif
 
-#if defined( HAVE_WOPEN ) && defined( HAVE_CLOSE )
+#if defined( WINAPI )
 
 /* Function to determine if a file exists
  * Return 1 if file exists, 0 if not or -1 on error
  */
 int file_io_wexists(
-     const wchar_t *filename,
-     liberror_error_t **error )
+	 const wchar_t *filename )
 {
 	static char *function = "file_io_wexists";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
+		notify_warning_printf(
+		 "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( WINAPI ) && !defined( __BORLANDC__ )
+#if defined( _MSC_VER )
 	if( _wsopen_s(
-	     &file_descriptor,
-	     filename,
-	     ( _O_RDONLY | _O_BINARY ),
-	     _SH_DENYRW,
-	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+		 &file_descriptor,
+		 filename,
+		 _O_RDONLY | _O_BINARY,
+		 _SH_DENYWR,
+		 _S_IREAD | _S_IWRITE ) != 0 )
+#else
+	file_descriptor = _wsopen(
+	                   filename,
+	                   _O_RDONLY | _O_BINARY,
+	                   _S_IREAD | _S_IWRITE );
+
+	if( file_descriptor == -1 )
+#endif
 	{
 		return( 0 );
 	}
@@ -114,40 +119,42 @@ int file_io_wexists(
 	 file_descriptor );
 
 	return( 1 );
-#endif
 }
 #endif
 
-#if defined( HAVE_OPEN )
+#if defined( HAVE_OPEN ) || defined( WINAPI )
 
 /* Function to wrap open()
  */
 int file_io_open(
      const char *filename,
-     int flags,
-     liberror_error_t **error )
+     int flags )
 {
 	static char *function = "file_io_open";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
+		notify_warning_printf(
+		 "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( WINAPI ) && !defined( __BORLANDC__ )
+#if defined( _MSC_VER )
 	if( _sopen_s(
 	     &file_descriptor,
 	     filename,
 	     ( flags | _O_BINARY ),
-	     _SH_DENYRW,
+	     _SH_DENYWR,
 	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+#elif defined( WINAPI )
+	file_descriptor = _sopen(
+	                   filename,
+	                   _O_RDONLY | _O_BINARY,
+	                   _S_IREAD | _S_IWRITE );
+
+	if( file_descriptor == -1 )
 #else
 	file_descriptor = open(
 	                   filename,
@@ -157,13 +164,12 @@ int file_io_open(
 	if( file_descriptor == -1 )
 #endif
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+#if defined( HAVE_DEBUG_OUTPUT )
+		notify_warning_printf(
 		 "%s: error opening file: %s.\n",
 		 function,
 		 filename );
+#endif
 
 		return( -1 );
 	}
@@ -171,49 +177,51 @@ int file_io_open(
 }
 #endif
 
-#if defined( HAVE_WOPEN )
+#if defined( WINAPI )
 
 /* Function to wrap wopen() which is the wide character equivalent of open()
  */
 int file_io_wopen(
      const wchar_t *filename,
-     int flags,
-     liberror_error_t **error )
+     int flags )
 {
 	static char *function = "file_io_wopen";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
+		notify_warning_printf(
+		 "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( WINAPI ) && !defined( __BORLANDC__ )
+#if defined( _MSC_VER )
 	if( _wsopen_s(
 	     &file_descriptor,
 	     filename,
-	     ( flags | _O_BINARY ),
-	     _SH_DENYRW,
-	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+	     flags | _O_BINARY,
+	     _SH_DENYWR,
+	     _S_IREAD | _S_IWRITE ) != 0 )
+#else
+	file_descriptor = _wsopen(
+	                   filename,
+	                   _O_RDONLY | _O_BINARY,
+	                   _S_IREAD | _S_IWRITE );
+
+	if( file_descriptor == -1 )
+#endif
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: error opening file: %ls.\n",
+#if defined( HAVE_DEBUG_OUTPUT )
+		notify_warning_printf(
+		 "%s: error opening file: %s.\n",
 		 function,
 		 filename );
+#endif
 
 		return( -1 );
 	}
 	return( file_descriptor );
-#endif
 }
 #endif
 

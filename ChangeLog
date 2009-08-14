@@ -165,6 +165,7 @@ Windows build
   - print output convert to system string
   - reduce string conversions, use as much as possible the system string type in the tools
 * ewftools check char/wchar in/output
+* add directory_io.h to msvscpp project files
 
 Testing
 * add export unattended to automated tests
@@ -217,6 +218,20 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * ewfacquire resume does not allow break when input requested
 * check make distclean
+
+CodeGear project files
+* zlib ?
+* libewf
+* ewftools
+
+Version: 20090811
+* worked on Borland C++ Builder compiler support
+* updated libbfio, liberror and libuna
+* added m4 directory support to autoconf/make files for libtool
+* updated list type
+* fixed define error in libewf_libuna.h and libewf_libbfio.h
+* updated libewf_notify
+* updated ewftools: date_time, file_io, file_stream_io, glob
 
 Version: 20090629
 * worked on implementing Borland compiler patches

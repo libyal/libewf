@@ -25,7 +25,6 @@
 
 #include <liberror.h>
 
-#include "libewf_notify.h"
 #include "libewf_sector_table.h"
 
 /* Initialize the sector table
