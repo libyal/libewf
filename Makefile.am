@@ -8,6 +8,7 @@ SUBDIRS = \
 	libuna \
 	libbfio \
 	libewf \
+	libsystem \
 	ewftools \
 	pyewf \
 	documents \

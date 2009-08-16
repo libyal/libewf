@@ -27,20 +27,17 @@
 
 #include <liberror.h>
 
-#include <stdio.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <libewf.h>
 
-#include "ewfgetopt.h"
+#include <libsystem.h>
+
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "glob.h"
-#include "notify.h"
 
 libewf_handle_t *ewfdebug_input_handle = NULL;
 int ewfdebug_abort                     = 0;
@@ -89,12 +86,12 @@ void ewfdebug_signal_handler(
 	       ewfdebug_input_handle ) != 1 ) )
 #endif
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to signal input handle to abort.\n",
 		 function );
 
 #if defined( HAVE_V2_API )
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -104,10 +101,10 @@ void ewfdebug_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( file_io_close(
+	if( libsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -115,41 +112,44 @@ void ewfdebug_signal_handler(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-#if !defined( HAVE_GLOB_H )
-	glob_t *glob                               = NULL;
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	libsystem_glob_t *glob                        = NULL;
 #endif
 
-	liberror_error_t *error                    = NULL;
+	liberror_error_t *error                       = NULL;
 
-	system_character_t * const *argv_filenames = NULL;
-	system_character_t **ewf_filenames         = NULL;
+	libsystem_character_t * const *argv_filenames = NULL;
+	libsystem_character_t **ewf_filenames         = NULL;
 
-	system_character_t *program                = _SYSTEM_CHARACTER_T_STRING( "ewfdebug" );
+	libsystem_character_t *program                = _LIBSYSTEM_CHARACTER_T_STRING( "ewfdebug" );
 
-	system_integer_t option                    = 0;
-	uint8_t verbose                            = 0;
-	int amount_of_filenames                    = 0;
-	int header_codepage                        = LIBEWF_CODEPAGE_ASCII;
-	int result                                 = 0;
+	libsystem_integer_t option                    = 0;
+	size_t first_filename_length                  = 0;
+	uint8_t verbose                               = 0;
+	int amount_of_filenames                       = 0;
+	int header_codepage                           = LIBEWF_CODEPAGE_ASCII;
+	int result                                    = 0;
 
-	notify_set_values(
+	libsystem_notify_set_stream(
 	 stderr,
+	 NULL );
+	libsystem_notify_set_verbose(
 	 1 );
 
-	if( system_string_initialize(
+	if( libsystem_initialize(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system string.\n" );
+		 "Unable to initialize system values.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -160,18 +160,18 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = ewfgetopt(
+	while( ( option = libsystem_getopt(
 			   argc,
 			   argv,
-			   _SYSTEM_CHARACTER_T_STRING( "A:hqvV" ) ) ) != (system_integer_t) -1 )
+			   _LIBSYSTEM_CHARACTER_T_STRING( "A:hqvV" ) ) ) != (libsystem_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (system_integer_t) '?':
+			case (libsystem_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_LIBSYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -179,13 +179,13 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (system_integer_t) 'A':
+			case (libsystem_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -198,21 +198,21 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'h':
+			case (libsystem_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'q':
+			case (libsystem_integer_t) 'q':
 				break;
 
-			case (system_integer_t) 'v':
+			case (libsystem_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (system_integer_t) 'V':
+			case (libsystem_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -230,8 +230,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	notify_set_values(
-	 stderr,
+	libsystem_notify_set_verbose(
 	 verbose );
 #if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
@@ -252,8 +251,8 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 	}
-#if !defined( HAVE_GLOB_H )
-	if( glob_initialize(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_initialize(
 	     &glob
 	     &error ) != 1 )
 	{
@@ -261,14 +260,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
 	}
-	if( glob_resolve(
+	if( libsystem_glob_resolve(
 	     glob,
 	     &argv[ optind ],
 	     argc - optind,
@@ -278,12 +277,12 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to resolve glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-		glob_free(
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 
@@ -298,12 +297,14 @@ int main( int argc, char * const argv[] )
 
 	if( amount_of_filenames == 1 )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		first_filename_length = libsystem_string_length(
+		                         argv_filenames[ 0 ] );
+
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     argv_filenames[ 0 ],
-		     system_string_length(
-		     argv_filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &ewf_filenames,
 		     &amount_of_filenames,
@@ -311,8 +312,7 @@ int main( int argc, char * const argv[] )
 #else
 		amount_of_filenames = libewf_glob_wide(
 		                       argv_filenames[ 0 ],
-		                       system_string_length(
-		                        argv_filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &ewf_filenames );
 
@@ -322,8 +322,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     argv_filenames[ 0 ],
-		     system_string_length(
-		     argv_filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &ewf_filenames,
 		     &amount_of_filenames,
@@ -331,8 +330,7 @@ int main( int argc, char * const argv[] )
 #else
 		amount_of_filenames = libewf_glob(
 		                       argv_filenames[ 0 ],
-		                       system_string_length(
-		                        argv_filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &ewf_filenames );
 
@@ -345,21 +343,21 @@ int main( int argc, char * const argv[] )
 			 "Unable to resolve ewf file(s).\n" );
 
 #if defined( HAVE_V2_API )
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
 #endif
 
-#if !defined( HAVE_GLOB_H )
-			glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+			libsystem_glob_free(
 			 &glob,
 			 NULL );
 #endif
 
 			return( EXIT_FAILURE );
 		}
-		argv_filenames = (system_character_t * const *) ewf_filenames;
+		argv_filenames = (libsystem_character_t * const *) ewf_filenames;
 	}
 #if defined( HAVE_V2_API )
 	if( libewf_handle_initialize(
@@ -370,13 +368,13 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize input handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-#if !defined( HAVE_GLOB_H )
-		glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 #endif
@@ -390,8 +388,8 @@ int main( int argc, char * const argv[] )
 	          LIBEWF_OPEN_READ_WRITE,
 	          &error );
 
-#if !defined( HAVE_GLOB_H )
-	if( glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -399,7 +397,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -420,7 +418,7 @@ int main( int argc, char * const argv[] )
 	if( ( ewfdebug_abort == 0 )
 	 && ( result != 1 ) )
 	{
-		ewfoutput_error_fprint(
+		fprintf(
 		 stderr,
 		 "Unable to open EWF file(s)" );
 

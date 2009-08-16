@@ -35,14 +35,16 @@
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "digest_context.h"
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "export_handle.h"
+#include "file_io.h"
 #include "guid.h"
 #include "md5.h"
 #include "sha1.h"
-#include "system_string.h"
 
 #if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
@@ -315,13 +317,14 @@ int export_handle_signal_abort(
  */
 int export_handle_open_input(
      export_handle_t *export_handle,
-     system_character_t * const * filenames,
+     libsystem_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error )
 {
-	system_character_t **libewf_filenames = NULL;
-	static char *function                 = "export_handle_open_input";
-	int result                            = 1;
+	libsystem_character_t **libewf_filenames = NULL;
+	static char *function                    = "export_handle_open_input";
+	size_t first_filename_length             = 0;
+	int result                               = 1;
 
 	if( export_handle == NULL )
 	{
@@ -383,12 +386,14 @@ int export_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		first_filename_length = libsystem_string_length(
+		                         filenames[ 0 ] );
+
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
-		     system_string_length(
-		     filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
 		     &amount_of_filenames,
@@ -396,8 +401,7 @@ int export_handle_open_input(
 #else
 		amount_of_filenames = libewf_glob_wide(
 		                       filenames[ 0 ],
-		                       system_string_length(
-		                        filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &libewf_filenames );
 
@@ -407,8 +411,7 @@ int export_handle_open_input(
 #if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     filenames[ 0 ],
-		     system_string_length(
-		     filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
 		     &amount_of_filenames,
@@ -416,8 +419,7 @@ int export_handle_open_input(
 #else
 		amount_of_filenames = libewf_glob(
 		                       filenames[ 0 ],
-		                       system_string_length(
-		                        filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &libewf_filenames );
 
@@ -434,9 +436,9 @@ int export_handle_open_input(
 
 			return( -1 );
 		}
-		filenames = (system_character_t * const *) libewf_filenames;
+		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     export_handle->input_handle,
@@ -518,12 +520,12 @@ int export_handle_open_input(
 int export_handle_open_output(
      export_handle_t *export_handle,
      uint8_t output_format,
-     const system_character_t *filename,
+     const libsystem_character_t *filename,
      liberror_error_t **error )
 {
-	system_character_t *filenames[ 1 ] = { NULL };
-	static char *function              = "export_handle_open_output";
-	size_t filename_length             = 0;
+	libsystem_character_t *filenames[ 1 ] = { NULL };
+	static char *function                 = "export_handle_open_output";
+	size_t filename_length                = 0;
 
 	if( export_handle == NULL )
 	{
@@ -589,9 +591,9 @@ int export_handle_open_output(
 			return( -1 );
 		}
 #endif
-		filenames[ 0 ] = (system_character_t *) filename;
+		filenames[ 0 ] = (libsystem_character_t *) filename;
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 		if( libewf_handle_open_wide(
 		     export_handle->ewf_output_handle,
@@ -629,7 +631,7 @@ int export_handle_open_output(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open file: %" PRIs_SYSTEM ".",
+			 "%s: unable to open file: %" PRIs_LIBSYSTEM ".",
 			 function,
 			 filename );
 
@@ -638,22 +640,28 @@ int export_handle_open_output(
 	}
 	else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	{
-		filename_length = system_string_length(
+		filename_length = libsystem_string_length(
 		                   filename );
 
 		if( ( filename_length == 1 )
-		 && ( system_string_compare(
+		 && ( libsystem_string_compare(
 		       filename,
-		       _SYSTEM_CHARACTER_T_STRING( "-" ),
+		       _LIBSYSTEM_CHARACTER_T_STRING( "-" ),
 		       1 ) == 0 ) )
 		{
 			export_handle->raw_output_file_descriptor = 1;
 		}
 		else
 		{
-			export_handle->raw_output_file_descriptor = system_string_open(
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER_TYPE )
+			export_handle->raw_output_file_descriptor = file_io_wopen(
 			                                             filename,
 			                                             FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC );
+#else
+			export_handle->raw_output_file_descriptor = file_io_open(
+			                                             filename,
+			                                             FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC );
+#endif
 
 			if( export_handle->raw_output_file_descriptor == -1 )
 			{
@@ -661,7 +669,7 @@ int export_handle_open_output(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_IO,
 				 LIBERROR_IO_ERROR_OPEN_FAILED,
-				 "%s: unable to open file: %" PRIs_SYSTEM ".",
+				 "%s: unable to open file: %" PRIs_LIBSYSTEM ".",
 				 function,
 				 filename );
 
@@ -1761,9 +1769,9 @@ int export_handle_set_header_codepage(
  */
 int export_handle_set_output_values(
      export_handle_t *export_handle,
-     system_character_t *acquiry_operating_system,
-     system_character_t *acquiry_software,
-     system_character_t *acquiry_software_version,
+     libsystem_character_t *acquiry_operating_system,
+     libsystem_character_t *acquiry_software,
+     libsystem_character_t *acquiry_software_version,
      int header_codepage,
      size64_t media_size,
      int8_t compression_level,
@@ -1906,7 +1914,7 @@ int export_handle_set_output_values(
 		       "acquiry_operating_system",
 		       24,
 		       acquiry_operating_system,
-		       system_string_length(
+		       libsystem_string_length(
 			acquiry_operating_system ),
 		       error ) != 1 ) )
 		{
@@ -1924,7 +1932,7 @@ int export_handle_set_output_values(
 		     "acquiry_software",
 		     16,
 		     acquiry_software,
-		     system_string_length(
+		     libsystem_string_length(
 		      acquiry_software ),
 		     error ) != 1 )
 		{
@@ -1942,7 +1950,7 @@ int export_handle_set_output_values(
 		     "acquiry_software_version",
 		     24,
 		     acquiry_software_version,
-		     system_string_length(
+		     libsystem_string_length(
 		      acquiry_software_version ),
 		     error ) != 1 )
 		{
@@ -2175,7 +2183,7 @@ int export_handle_set_header_value(
      export_handle_t *export_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     system_character_t *header_value,
+     libsystem_character_t *header_value,
      size_t header_value_length,
      liberror_error_t **error )
 {
@@ -2205,7 +2213,7 @@ int export_handle_set_header_value(
 
 		return( -1 );
 	}
-	if( utf8_string_size_from_system_string(
+	if( libsystem_string_size_to_utf8_string(
 	     header_value,
 	     header_value_length + 1,
 	     &utf8_header_value_size,
@@ -2234,11 +2242,11 @@ int export_handle_set_header_value(
 
 		return( -1 );
 	}
-	if( utf8_string_copy_from_system_string(
-	     utf8_header_value,
-	     utf8_header_value_size,
+	if( libsystem_string_copy_to_utf8_string(
 	     header_value,
 	     header_value_length + 1,
+	     utf8_header_value,
+	     utf8_header_value_size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2295,7 +2303,7 @@ int export_handle_set_hash_value(
      export_handle_t *export_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     libsystem_character_t *hash_value,
      size_t hash_value_length,
      liberror_error_t **error )
 {
@@ -2325,7 +2333,7 @@ int export_handle_set_hash_value(
 
 		return( -1 );
 	}
-	if( utf8_string_size_from_system_string(
+	if( libsystem_string_size_to_utf8_string(
 	     hash_value,
 	     hash_value_length + 1,
 	     &utf8_hash_value_size,
@@ -2354,11 +2362,11 @@ int export_handle_set_hash_value(
 
 		return( -1 );
 	}
-	if( utf8_string_copy_from_system_string(
-	     utf8_hash_value,
-	     utf8_hash_value_size,
+	if( libsystem_string_copy_to_utf8_string(
 	     hash_value,
 	     hash_value_length + 1,
+	     utf8_hash_value,
+	     utf8_hash_value_size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2528,9 +2536,9 @@ int export_handle_add_read_error(
  */
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
-         system_character_t *calculated_md5_hash_string,
+         libsystem_character_t *calculated_md5_hash_string,
          size_t calculated_md5_hash_string_size,
-         system_character_t *calculated_sha1_hash_string,
+         libsystem_character_t *calculated_sha1_hash_string,
          size_t calculated_sha1_hash_string_size,
          liberror_error_t **error )
 {
@@ -2711,23 +2719,23 @@ int export_handle_crc_errors_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	static char *function             = "export_handle_crc_errors_fprint";
-	uint64_t start_sector             = 0;
-	uint64_t last_sector              = 0;
+	static char *function                = "export_handle_crc_errors_fprint";
+	uint64_t start_sector                = 0;
+	uint64_t last_sector                 = 0;
 #if defined( HAVE_V2_API )
-	uint64_t amount_of_sectors        = 0;
+	uint64_t amount_of_sectors           = 0;
 #else
-	uint32_t amount_of_sectors        = 0;
+	uint32_t amount_of_sectors           = 0;
 #endif
-	uint32_t amount_of_errors         = 0;
-	uint32_t error_iterator           = 0;
-	int result                        = 1;
+	uint32_t amount_of_errors            = 0;
+	uint32_t error_iterator              = 0;
+	int result                           = 1;
 
 #if defined( HAVE_V2_API )
-	system_character_t *filename      = NULL;
-	system_character_t *last_filename = NULL;
-	size_t filename_size              = 0;
-	size_t last_filename_size         = 0;
+	libsystem_character_t *filename      = NULL;
+	libsystem_character_t *last_filename = NULL;
+	size_t filename_size                 = 0;
+	size_t last_filename_size            = 0;
 #endif
 
 	if( export_handle == NULL )
@@ -2872,7 +2880,7 @@ int export_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 				if( libewf_handle_get_filename_size_wide(
 				     export_handle->input_handle,
 				     &filename_size,
@@ -2898,8 +2906,8 @@ int export_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-				filename = (system_character_t *) memory_allocate(
-				                                   sizeof( system_character_t ) * filename_size ); 
+				filename = (libsystem_character_t *) memory_allocate(
+				                                      sizeof( libsystem_character_t ) * filename_size ); 
 
 
 				if( filename == NULL )
@@ -2918,7 +2926,7 @@ int export_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 				if( libewf_handle_get_filename_wide(
 				     export_handle->input_handle,
 				     filename,

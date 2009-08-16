@@ -26,21 +26,19 @@
 
 #include <liberror.h>
 
-#include <stdio.h>
+#include <libsystem.h>
 
 #include "byte_size_string.h"
-#include "date_time.h"
 #include "process_status.h"
-#include "system_string.h"
 
 /* Initializes the process status information
  * Returns 1 if successful or -1 on error
  */
 int process_status_initialize(
      process_status_t **process_status,
-     const system_character_t *status_process_string,
-     const system_character_t *status_update_string,
-     const system_character_t *status_summary_string,
+     const libsystem_character_t *status_process_string,
+     const libsystem_character_t *status_update_string,
+     const libsystem_character_t *status_summary_string,
      FILE *output_stream,
      uint8_t print_status_information,
      liberror_error_t **error )
@@ -139,7 +137,7 @@ int process_status_start(
      process_status_t *process_status,
      liberror_error_t **error )
 {
-	system_character_t time_string[ 32 ];
+	libsystem_character_t time_string[ 32 ];
 
 	static char *function = "process_status_start";
 
@@ -155,37 +153,31 @@ int process_status_start(
 		return( -1 );
 	}
 	process_status->last_percentage = -1;
-	process_status->start_timestamp = date_time_time(
+	process_status->start_timestamp = libsystem_date_time_time(
 	                                   NULL );
 
 	if( ( process_status->output_stream != NULL )
 	 && ( process_status->print_status_information != 0 )
 	 && ( process_status->status_process_string != NULL ) )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-		if( date_time_wctime(
+		if( libsystem_date_time_get_ctime_string(
 		     &( process_status->start_timestamp ),
 		     time_string,
-		     32 ) == NULL )
-#else
-		if( date_time_ctime(
-		     &( process_status->start_timestamp ),
-		     time_string,
-		     32 ) == NULL )
-#endif
+		     32,
+		     NULL ) == 1 )
 		{
 			fprintf(
 			 stderr,
-			 "%" PRIs_SYSTEM " started.\n",
-			 process_status->status_process_string );
+			 "%" PRIs_LIBSYSTEM " started at: %" PRIs_LIBSYSTEM "\n",
+			 process_status->status_process_string,
+			 time_string );
 		}
 		else
 		{
 			fprintf(
 			 stderr,
-			 "%" PRIs_SYSTEM " started at: %" PRIs_SYSTEM "\n",
-			 process_status->status_process_string,
-			 time_string );
+			 "%" PRIs_LIBSYSTEM " started.\n",
+			 process_status->status_process_string );
 		}
 		fprintf(
 		 stderr,
@@ -246,7 +238,7 @@ int process_status_update(
 
 			fprintf(
 			 process_status->output_stream,
-			 "        %" PRIs_SYSTEM "",
+			 "        %" PRIs_LIBSYSTEM "",
 			 process_status->status_update_string );
 
 			process_status_bytes_fprint(
@@ -350,7 +342,7 @@ int process_status_update_unknown_total(
 
 				fprintf(
 				 process_status->output_stream,
-				 "Status: %" PRIs_SYSTEM "",
+				 "Status: %" PRIs_LIBSYSTEM "",
 				 process_status->status_update_string );
 
 				process_status_bytes_fprint(
@@ -394,11 +386,11 @@ int process_status_stop(
      int status,
      liberror_error_t **error )
 {
-	system_character_t time_string[ 32 ];
+	libsystem_character_t time_string[ 32 ];
 
-	static char *function                   = "process_status_start";
-	const system_character_t *status_string = NULL;
-	time_t seconds_total                    = 0;
+	static char *function                      = "process_status_start";
+	const libsystem_character_t *status_string = NULL;
+	time_t seconds_total                       = 0;
 
 	if( process_status == NULL )
 	{
@@ -424,7 +416,7 @@ int process_status_stop(
 
 		return( -1 );
 	}
-	process_status->last_timestamp = date_time_time(
+	process_status->last_timestamp = libsystem_date_time_time(
 	                                  NULL );
 
 	if( ( process_status->output_stream != NULL )
@@ -433,37 +425,31 @@ int process_status_stop(
 	{
 		if( status == PROCESS_STATUS_ABORTED )
 		{
-			status_string = _SYSTEM_CHARACTER_T_STRING( "aborted" );
+			status_string = _LIBSYSTEM_CHARACTER_T_STRING( "aborted" );
 		}
 		else if( status == PROCESS_STATUS_COMPLETED )
 		{
-			status_string = _SYSTEM_CHARACTER_T_STRING( "completed" );
+			status_string = _LIBSYSTEM_CHARACTER_T_STRING( "completed" );
 		}
 		else if( status == PROCESS_STATUS_FAILED )
 		{
-			status_string = _SYSTEM_CHARACTER_T_STRING( "failed" );
+			status_string = _LIBSYSTEM_CHARACTER_T_STRING( "failed" );
 		}
 		fprintf(
 		 process_status->output_stream,
-		 "%" PRIs_SYSTEM " %" PRIs_SYSTEM "",
+		 "%" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM "",
 		 process_status->status_process_string,
 		 status_string );
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-		if( date_time_wctime(
+		if( libsystem_date_time_get_ctime_string(
 		     &( process_status->last_timestamp ),
 		     time_string,
-		     32 ) == NULL )
-#else
-		if( date_time_ctime(
-		     &( process_status->last_timestamp ),
-		     time_string,
-		     32 ) == NULL )
-#endif
+		     32,
+		     NULL ) == 1 )
 		{
 			fprintf(
 			 process_status->output_stream,
-			 " at: %" PRIs_SYSTEM "\n",
+			 " at: %" PRIs_LIBSYSTEM "\n",
 			 time_string );
 		}
 		else
@@ -479,7 +465,7 @@ int process_status_stop(
 
 			fprintf(
 			process_status->output_stream,
-			"%" PRIs_SYSTEM ":",
+			"%" PRIs_LIBSYSTEM ":",
 			process_status->status_summary_string );
 
 			process_status_bytes_fprint(
@@ -509,55 +495,54 @@ void process_status_timestamp_fprint(
       FILE *stream,
       time_t timestamp )
 {
-	struct tm *time_elements = NULL;
+	struct tm time_elements;
 
 	if( stream == NULL )
 	{
 		return;
 	}
-	time_elements = date_time_gmtime(
-	                 &timestamp );
-
-	if( time_elements != NULL )
+	if( libsystem_date_time_get_time_elements_in_utc(
+	     &timestamp,
+	     &time_elements,
+	     NULL ) == 1 )
 	{
-		fprintf( stream, " in" );
+		fprintf(
+		 stream,
+		 " in" );
 
-		if( time_elements->tm_isdst != 0 )
+		if( time_elements.tm_isdst != 0 )
 		{
-			time_elements->tm_hour -= 1;
-			time_elements->tm_isdst = 0;	
+			time_elements.tm_hour -= 1;
+			time_elements.tm_isdst = 0;	
 		}
-		if( time_elements->tm_yday > 0 )
+		if( time_elements.tm_yday > 0 )
 		{
 			fprintf(
 			 stream,
 			 " %i day(s), %i hour(s), %i minute(s) and",
-			 time_elements->tm_yday,
-			 time_elements->tm_hour,
-			 time_elements->tm_min );
+			 time_elements.tm_yday,
+			 time_elements.tm_hour,
+			 time_elements.tm_min );
 		}
-		else if( time_elements->tm_hour > 0 )
+		else if( time_elements.tm_hour > 0 )
 		{
 			fprintf(
 			 stream,
 			 " %i hour(s), %i minute(s) and",
-			 time_elements->tm_hour,
-			 time_elements->tm_min );
+			 time_elements.tm_hour,
+			 time_elements.tm_min );
 		}
-		else if( time_elements->tm_min > 0 )
+		else if( time_elements.tm_min > 0 )
 		{
 			fprintf(
 			 stream,
 			 " %i minute(s) and",
-			 time_elements->tm_min );
+			 time_elements.tm_min );
 		}
 		fprintf(
 		 stream,
 		 " %i second(s)",
-		 time_elements->tm_sec );
-
-		memory_free(
-		 time_elements );
+		 time_elements.tm_sec );
 	}
 }
 
@@ -568,7 +553,7 @@ void process_status_bytes_per_second_fprint(
       size64_t bytes,
       time_t seconds )
 {
-	system_character_t bytes_per_second_string[ 16 ];
+	libsystem_character_t bytes_per_second_string[ 16 ];
 
 	size64_t bytes_per_second = 0;
 	int result                = 0;
@@ -598,7 +583,7 @@ void process_status_bytes_per_second_fprint(
 		{
 			fprintf(
 			 stream,
-			 " %" PRIs_SYSTEM "/s (%" PRIu64 " bytes/second)",
+			 " %" PRIs_LIBSYSTEM "/s (%" PRIu64 " bytes/second)",
 			 bytes_per_second_string,
 			 bytes_per_second );
 		}
@@ -619,7 +604,7 @@ void process_status_bytes_fprint(
       FILE *stream,
       size64_t bytes )
 {
-	system_character_t bytes_string[ 16 ];
+	libsystem_character_t bytes_string[ 16 ];
 
 	int result = 0;
 
@@ -640,7 +625,7 @@ void process_status_bytes_fprint(
 	{
 		fprintf(
 		 stream,
-		 " %" PRIs_SYSTEM " (%" PRIi64 " bytes)",
+		 " %" PRIs_LIBSYSTEM " (%" PRIi64 " bytes)",
 		 bytes_string,
 		 bytes );
 	}

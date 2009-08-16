@@ -28,6 +28,8 @@
 
 #include <liberror.h>
 
+#include <libsystem.h>
+
 #if defined( WINAPI )
 #include <windows.h>
 #endif
@@ -136,7 +138,7 @@ int device_handle_free(
 
 int device_handle_open_input(
      device_handle_t *device_handle,
-     const system_character_t *filename,
+     const libsystem_character_t *filename,
      liberror_error_t **error );
 
 int device_handle_close(
@@ -180,7 +182,7 @@ int device_handle_get_media_information_value(
      device_handle_t *device_handle,
      char *media_information_value_identifier,
      size_t media_information_value_identifier_length,
-     system_character_t *media_information_value,
+     libsystem_character_t *media_information_value,
      size_t media_information_value_size,
      liberror_error_t **error );
 

@@ -28,9 +28,10 @@
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "alteration_handle.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 /* Initializes the alteration handle
  * Returns 1 if successful or -1 on error
@@ -212,13 +213,14 @@ int alteration_handle_signal_abort(
  */
 int alteration_handle_open_input(
      alteration_handle_t *alteration_handle,
-     system_character_t * const * filenames,
+     libsystem_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error )
 {
-	system_character_t **libewf_filenames = NULL;
-	static char *function                 = "alteration_handle_open_input";
-	int result                            = 1;
+	libsystem_character_t **libewf_filenames = NULL;
+	static char *function                    = "alteration_handle_open_input";
+	size_t first_filename_length             = 0;
+	int result                               = 1;
 
 	if( alteration_handle == NULL )
 	{
@@ -280,12 +282,14 @@ int alteration_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		first_filename_length = libsystem_string_length(
+		                         filenames[ 0 ]);
+
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
-		     system_string_length(
-		     filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
 		     &amount_of_filenames,
@@ -293,8 +297,7 @@ int alteration_handle_open_input(
 #else
 		amount_of_filenames = libewf_glob_wide(
 		                       filenames[ 0 ],
-		                       system_string_length(
-		                        filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &libewf_filenames );
 
@@ -304,8 +307,7 @@ int alteration_handle_open_input(
 #if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     filenames[ 0 ],
-		     system_string_length(
-		     filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
 		     &amount_of_filenames,
@@ -313,8 +315,7 @@ int alteration_handle_open_input(
 #else
 		amount_of_filenames = libewf_glob(
 		                       filenames[ 0 ],
-		                       system_string_length(
-		                        filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &libewf_filenames );
 
@@ -331,9 +332,9 @@ int alteration_handle_open_input(
 
 			return( -1 );
 		}
-		filenames = (system_character_t * const *) libewf_filenames;
+		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     alteration_handle->input_handle,
@@ -1082,7 +1083,7 @@ int alteration_handle_set_header_codepage(
  */
 int alteration_handle_set_output_values(
      alteration_handle_t *alteration_handle,
-     system_character_t *delta_segment_filename,
+     libsystem_character_t *delta_segment_filename,
      size_t delta_segment_filename_length,
      liberror_error_t **error )
 {
@@ -1110,7 +1111,7 @@ int alteration_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_set_delta_segment_filename_wide(
 	     alteration_handle->input_handle,

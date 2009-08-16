@@ -28,24 +28,27 @@
 
 #include <liberror.h>
 
-#include "system_string.h"
+#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define BYTE_SIZE_STRING_UNIT_MEGABYTE		1000
-#define BYTE_SIZE_STRING_UNIT_MEBIBYTE		1024
+enum BYTE_SIZE_STRING_UNITS
+{
+	BYTE_SIZE_STRING_UNIT_MEGABYTE	= 1000,
+	BYTE_SIZE_STRING_UNIT_MEBIBYTE	= 1024
+};
 
 int byte_size_string_create(
-     system_character_t *byte_size_string,
+     libsystem_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
      int units,
      liberror_error_t **error );
 
 int byte_size_string_convert(
-     const system_character_t *byte_size_string,
+     const libsystem_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size,
      liberror_error_t **error );

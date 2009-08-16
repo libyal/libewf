@@ -26,8 +26,18 @@
 
 #include <liberror.h>
 
+#include <libsystem.h>
+
 #if defined( HAVE_SYS_IOCTL_H )
 #include <sys/ioctl.h>
+#endif
+
+#if defined( HAVE_SYS_STAT_H ) || defined( WINAPI )
+#include <sys/stat.h>
+#endif
+
+#if defined( HAVE_FCNTL_H ) || defined( WINAPI )
+#include <fcntl.h>
 #endif
 
 #if defined( HAVE_UNISTD_H )
@@ -77,9 +87,7 @@ typedef size_t u64;
 #include "io_optical_disk.h"
 #include "io_scsi.h"
 #include "io_usb.h"
-#include "notify.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 /* Initializes the device handle
  * Returns 1 if successful or -1 on error
@@ -180,7 +188,7 @@ int device_handle_free(
  */
 int device_handle_open_input(
      device_handle_t *device_handle,
-     const system_character_t *filename,
+     const libsystem_character_t *filename,
      liberror_error_t **error )
 {
 #if defined( WINAPI )
@@ -275,7 +283,7 @@ int device_handle_open_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open file or device: %" PRIs_SYSTEM " with error: %" PRIs_SYSTEM "",
+			 "%s: unable to open file or device: %" PRIs_LIBSYSTEM " with error: %" PRIs_LIBSYSTEM "",
 			 function,
 			 filename,
 			 error_string );
@@ -289,7 +297,7 @@ int device_handle_open_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open file or device: %" PRIs_SYSTEM ".",
+			 "%s: unable to open file or device: %" PRIs_LIBSYSTEM ".",
 			 function,
 			 filename );
 		}
@@ -386,7 +394,7 @@ int device_handle_open_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file or device: %" PRIs_SYSTEM ".",
+		 "%s: unable to open file or device: %" PRIs_LIBSYSTEM ".",
 		 function,
 		 filename );
 
@@ -960,7 +968,7 @@ int device_handle_get_media_size(
 		device_handle->media_size_set = 1;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_verbose_printf(
+		libsystem_notify_verbose_printf(
 		 "%s: block size: %" PRIu32 " block count: %" PRIu64 " ",
 		 function,
 		 device_handle->bytes_per_sector,
@@ -980,7 +988,7 @@ int device_handle_get_media_size(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "%s: device size: %" PRIu64 "\n",
 	 function,
 	 device_handle->media_size );
@@ -1125,7 +1133,7 @@ int device_handle_get_bytes_per_sector(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "%s: sector size: %" PRIu32 "\n",
 	 function,
 	 device_handle->bytes_per_sector );
@@ -1387,7 +1395,7 @@ int device_handle_determine_media_information(
 		if( (size_t) ( (STORAGE_DESCRIPTOR_HEADER *) response )->Size > sizeof( STORAGE_DEVICE_DESCRIPTOR ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_verbose_dump_data(
+			libsystem_notify_verbose_print_data(
 			 response,
 			 (size_t) response_count );
 #endif
@@ -1616,7 +1624,7 @@ int device_handle_determine_media_information(
 
 		return( -1 );
 	}
-	if( io_scsi_get_identiier(
+	if( io_scsi_get_identier(
 	     device_handle->file_descriptor,
 	     error ) != 1 )
 	{
@@ -1660,7 +1668,7 @@ int device_handle_determine_media_information(
 		if( response_count > 32 )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_verbose_dump_data(
+			libsystem_notify_verbose_print_data(
 			 response,
 			 response_count );
 #endif
@@ -1726,7 +1734,7 @@ int device_handle_determine_media_information(
 		if( response_count > 4 )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_verbose_dump_data(
+			libsystem_notify_verbose_print_data(
 			 response,
 			 response_count );
 #endif
@@ -1766,7 +1774,7 @@ int device_handle_determine_media_information(
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 *error );
 			}
 			liberror_error_free(
@@ -1843,7 +1851,7 @@ int device_handle_determine_media_information(
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 *error );
 			}
 			liberror_error_free(
@@ -1882,7 +1890,7 @@ int device_handle_get_media_information_value(
      device_handle_t *device_handle,
      char *media_information_value_identifier,
      size_t media_information_value_identifier_length,
-     system_character_t *media_information_value,
+     libsystem_character_t *media_information_value,
      size_t media_information_value_size,
      liberror_error_t **error )
 {
@@ -1963,7 +1971,7 @@ int device_handle_get_media_information_value(
 		utf8_media_information_value_size = 1 + narrow_string_length(
 		                                         (char *) utf8_media_information_value );
 
-		if( system_string_size_from_utf8_string(
+		if( libsystem_string_size_from_utf8_string(
 		     utf8_media_information_value,
 		     utf8_media_information_value_size,
 		     &calculated_media_information_value_size,
@@ -1989,7 +1997,7 @@ int device_handle_get_media_information_value(
 
 			return( -1 );
 		}
-		if( system_string_copy_from_utf8_string(
+		if( libsystem_string_copy_from_utf8_string(
 		     media_information_value,
 		     media_information_value_size,
 		     utf8_media_information_value,
@@ -2047,7 +2055,7 @@ int device_handle_media_information_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-        system_character_t media_size_string[ 16 ];
+        libsystem_character_t media_size_string[ 16 ];
 
 	static char *function = "device_handle_media_information_fprint";
 	int result            = 0;
@@ -2294,7 +2302,7 @@ int device_handle_media_information_fprint(
 		{
 			fprintf(
 			 stream,
-			 "Media size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
+			 "Media size:\t\t%" PRIs_LIBSYSTEM " (%" PRIu64 " bytes)\n",
 			 media_size_string,
 			 device_handle->media_size );
 		}

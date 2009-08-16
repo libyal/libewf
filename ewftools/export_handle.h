@@ -30,12 +30,13 @@
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "digest_context.h"
 #include "digest_hash.h"
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -122,14 +123,14 @@ int export_handle_signal_abort(
 
 int export_handle_open_input(
      export_handle_t *export_handle,
-     system_character_t * const * filenames,
+     libsystem_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
 int export_handle_open_output(
      export_handle_t *export_handle,
      uint8_t output_format,
-     const system_character_t *filename,
+     const libsystem_character_t *filename,
      liberror_error_t **error );
 
 int export_handle_close(
@@ -197,9 +198,9 @@ int export_handle_set_header_codepage(
 
 int export_handle_set_output_values(
      export_handle_t *export_handle,
-     system_character_t *acquiry_operating_system,
-     system_character_t *acquiry_software,
-     system_character_t *acquiry_software_version,
+     libsystem_character_t *acquiry_operating_system,
+     libsystem_character_t *acquiry_software,
+     libsystem_character_t *acquiry_software_version,
      int header_codepage,
      size64_t media_size,
      int8_t compression_level,
@@ -214,7 +215,7 @@ int export_handle_set_header_value(
      export_handle_t *export_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     system_character_t *header_value,
+     libsystem_character_t *header_value,
      size_t header_value_length,
      liberror_error_t **error );
 
@@ -222,7 +223,7 @@ int export_handle_set_hash_value(
      export_handle_t *export_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     libsystem_character_t *hash_value,
      size_t hash_value_length,
      liberror_error_t **error );
 
@@ -236,9 +237,9 @@ int export_handle_add_read_error(
 
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
-         system_character_t *calculated_md5_hash_string,
+         libsystem_character_t *calculated_md5_hash_string,
          size_t calculated_md5_hash_string_size,
-         system_character_t *calculated_sha1_hash_string,
+         libsystem_character_t *calculated_sha1_hash_string,
          size_t calculated_sha1_hash_string_size,
          liberror_error_t **error );
 

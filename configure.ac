@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090811],
+ [20090815],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090811])
+ [20090815])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -132,28 +132,29 @@ AC_CHECK_HEADERS([string.h])
 dnl Headers included in common/memory.h
 AC_CHECK_HEADERS([stdlib.h])
 
-dnl Headers included in libbfio/libbfio_file.h and ewftools/file_io.h
+dnl Headers included in libbfio/libbfio_file.h and libsystem/libsystem_file_io.h
 AC_CHECK_HEADERS([sys/stat.h])
+AC_CHECK_HEADERS([errno.h])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([unistd.h])
+
+dnl Headers included in libnotify/libnotify.c
+AC_CHECK_HEADERS([stdarg.h])
+AC_CHECK_HEADERS([varargs.h])
 
 dnl Headers included in libewf/libewf_date_time.h
 AC_HEADER_TIME
 
-dnl Headers included in libewf/libewf_notify.h
-AC_CHECK_HEADERS([stdarg.h])
-AC_CHECK_HEADERS([varargs.h])
-
-dnl Headers included in ewftools/glob.h
+dnl Headers included in libsystem/libsystem_glob.h
 AC_CHECK_HEADERS([glob.h])
+
+dnl Headers included in libsytem/libsystem_support.c
+AC_CHECK_HEADERS([langinfo.h])
+AC_CHECK_HEADERS([locale.h])
 
 dnl Headers included in ewftools/ewfsignal.h
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([sys/signal.h])
-
-dnl Headers included in ewftools/system_string.h
-AC_CHECK_HEADERS([langinfo.h])
-AC_CHECK_HEADERS([locale.h])
 
 dnl Headers included in ewftools/device_handle.c
 dnl and ewftools/io_*.[ch]
@@ -175,8 +176,6 @@ AC_CHECK_HEADERS([sys/disklabel.h])
 AC_CHECK_HEADERS([sys/ioctl.h])
 
 dnl Other headers
-AC_CHECK_HEADERS([errno.h])
-
 AC_CHECK_HEADERS([sys/utsname.h])
 
 AC_CHECK_HEADERS([openssl/opensslv.h])
@@ -374,6 +373,14 @@ AC_CHECK_FUNCS(
   [Missing function: vsnprintf],
   [1]) ])
 
+dnl File input/output functions used in libnotify/libnotify.h
+AC_CHECK_FUNCS(
+ [vfprintf],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: vfprintf],
+  [1]) ])
+
 dnl File input/output functions used in libbdio/libbfio_file.h
 AC_CHECK_FUNCS(
  [close],
@@ -435,15 +442,7 @@ AC_CHECK_FUNCS(
   [Missing function: mktime],
   [1]) ])
 
-dnl File input/output functions used in libewf/libewf_notify.h
-AC_CHECK_FUNCS(
- [vfprintf],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: vfprintf],
-  [1]) ])
-
-dnl Date and time functions used in ewftools/date_time.h
+dnl Date and time functions used in libsystem/libsystem_date_time.h
 LIBEWF_CHECK_FUNC_CTIME
 
 AC_CHECK_FUNCS(
@@ -463,7 +462,7 @@ AC_CHECK_FUNCS(
   [Missing function: time],
   [1]) ])
 
-dnl Check for error string functions used in ewftools/error_string.h
+dnl Check for error string functions used in libsystem/libsystem_error.c
 AC_FUNC_STRERROR_R(
  [],
  [AC_CHECK_FUNCS(
@@ -473,10 +472,7 @@ AC_FUNC_STRERROR_R(
    [Missing functions: strerror_r and strerror],
    [1]) ]) ])
 
-dnl Check for error string functions used in ewftools/ewfgetopt.h
-AC_CHECK_FUNCS([getopt])
-
-dnl File input/output functions used in ewftools/file_stream_io.h
+dnl File input/output functions used in libsystem/libsystem_file_stream_io.h
 AC_CHECK_FUNCS(
  [fclose],
  [],
@@ -519,7 +515,10 @@ AC_CHECK_FUNCS(
   [Missing function: fwrite],
   [1]) ])
 
-dnl Check for locale functions
+dnl Commandline argument/option parsing functions in libsystem/libsystem_getopt.h
+AC_CHECK_FUNCS([getopt])
+
+dnl Check for locale functions in libsystem/libsystem_string.h
 AC_CHECK_FUNCS(
  [setlocale],
  [],
@@ -535,13 +534,6 @@ AC_CHECK_FUNCS(
  [],
  [AC_MSG_FAILURE(
   [Missing function: fstat],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [setlocale],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: setlocale],
   [1]) ])
 
 AC_CHECK_FUNCS([uname])
@@ -1444,6 +1436,7 @@ AC_CONFIG_FILES([libnotify/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
+AC_CONFIG_FILES([libsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([pyewf/Makefile])
 AC_CONFIG_FILES([documents/Makefile])

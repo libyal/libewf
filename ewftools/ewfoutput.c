@@ -76,22 +76,21 @@
 
 #include <libewf.h>
 
-#include "error_string.h"
+#include <libsystem.h>
+
 #include "ewfoutput.h"
-#include "notify.h"
-#include "system_string.h"
 
 /* Print the version information to a stream
  */
 void ewfoutput_version_fprint(
       FILE *stream,
-      const system_character_t *program )
+      const libsystem_character_t *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
 	if( stream == NULL )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: invalid stream.\n",
 		 function );
 
@@ -99,7 +98,7 @@ void ewfoutput_version_fprint(
 	}
 	if( program == NULL )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: invalid program name.\n",
 		 function );
 
@@ -107,7 +106,7 @@ void ewfoutput_version_fprint(
 	}
 	fprintf(
 	 stream,
-	 "%" PRIs_SYSTEM " %s (libewf %s",
+	 "%" PRIs_LIBSYSTEM " %s (libewf %s",
 	 program,
 	 LIBEWF_VERSION_STRING,
 	 LIBEWF_VERSION_STRING );
@@ -156,7 +155,7 @@ void ewfoutput_copyright_fprint(
 
 	if( stream == NULL )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: invalid stream.\n",
 		 function );
 
@@ -164,86 +163,9 @@ void ewfoutput_copyright_fprint(
 	}
 	fprintf(
 	 stream,
-	 "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n"
+	 "Copyright (c) 2006-2009, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n"
 	 "This is free software; see the source for copying conditions. There is NO\n"
 	 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	 PACKAGE_BUGREPORT );
 }
-
-#if defined( HAVE_STDARG_H ) || defined( WINAPI )
-#define VARIABLE_ARGUMENTS_FUNCTION( function, type, argument ) \
-        function( FILE *stream, type argument, ... )
-#define VARIABLE_ARGUMENTS_START( argument_list, type, name ) \
-        va_start( argument_list, name )
-#define VARIABLE_ARGUMENTS_END( argument_list ) \
-        va_end( argument_list )
-
-#elif defined( HAVE_VARARGS_H )
-#define VARIABLE_ARGUMENTS_FUNCTION( function, type, argument ) \
-        function( FILE *stream, va_alist ) va_dcl
-#define VARIABLE_ARGUMENTS_START( argument_list, type, name ) \
-        { type name; va_start( argument_list ); name = va_arg( argument_list, type )
-#define VARIABLE_ARGUMENTS_END( argument_list ) \
-        va_end( argument_list ); }
-
-#endif
-
-void VARIABLE_ARGUMENTS_FUNCTION(
-      ewfoutput_error_fprint,
-      char *,
-      format )
-{
-	va_list argument_list;
-
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        system_character_t *error_string = NULL;
-#endif
-
-	if( stream == NULL )
-	{
-		return;
-	}
-	VARIABLE_ARGUMENTS_START(
-	 argument_list,
-	 char *,
-       	 format );
-
-	vfprintf(
-       	 stream,
-	 format,
-       	 argument_list );
-
-	VARIABLE_ARGUMENTS_END(
-       	 argument_list );
-
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-	if( errno != 0 )
-	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-		error_string = error_string_wcserror(
-		                errno );
-#else
-		error_string = error_string_strerror(
-		                errno );
-#endif
-
-		if( error_string != NULL )
-		{
-			fprintf(
-			 stream, " with error: %" PRIs_SYSTEM "",
-			 error_string );
-
-			memory_free(
-			 error_string );
-		}
-	}
-#endif
-	fprintf(
-	 stream,
-	 ".\n" );
-}
-
-#undef VARIABLE_ARGUMENTS_FUNCTION
-#undef VARIABLE_ARGUMENTS_START
-#undef VARIABLE_ARGUMENTS_END
 

@@ -41,8 +41,9 @@
 
 #endif
 
+#include <libsystem.h>
+
 #include "io_optical_disk.h"
-#include "notify.h"
 
 #if defined( HAVE_IO_OPTICAL_DISK )
 
@@ -90,9 +91,9 @@ int io_optical_disk_get_table_of_contents(
 	last_entry  = toc_header.cdth_trk1;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "Table of contents (TOC):\n" );
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "\tAmount of entries:\t%d\n",
 	 last_entry );
 #endif
@@ -130,14 +131,14 @@ int io_optical_disk_get_table_of_contents(
 
 			return( -1 );
 		}
-		notify_verbose_printf(
+		libsystem_notify_verbose_printf(
 		 "\tTrack: %" PRIu16 "",
 		 entry_iterator );
 
 		if( toc_entry.cdte_format == CDROM_MSF )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_verbose_printf(
+			libsystem_notify_verbose_printf(
 			 " start:\t\t%02" PRIu8 ":%02" PRIu8 ".%" PRIu8 "",
 			 toc_entry.cdte_addr.msf.minute,
 			 toc_entry.cdte_addr.msf.second,
@@ -147,12 +148,12 @@ int io_optical_disk_get_table_of_contents(
 		else if( toc_entry.cdte_format == CDROM_LBA )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			notify_verbose_printf(
+			libsystem_notify_verbose_printf(
 			 " start:\t\t%" PRIu32 "",
 			 toc_entry.cdte_addr.lba );
 #endif
 		}
-		notify_verbose_printf(
+		libsystem_notify_verbose_printf(
 		 "\n" );
 
 		if( ( toc_entry.cdte_ctrl & CDROM_DATA_TRACK ) == CDROM_DATA_TRACK )
@@ -191,13 +192,13 @@ int io_optical_disk_get_table_of_contents(
 
 		return( -1 );
 	}
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "\tLead out" );
 
 	if( toc_entry.cdte_format == CDROM_MSF )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_verbose_printf(
+		libsystem_notify_verbose_printf(
 		 " start:\t\t%02" PRIu8 ":%02" PRIu8 ".%" PRIu8 "",
 		 toc_entry.cdte_addr.msf.minute,
 		 toc_entry.cdte_addr.msf.second,
@@ -207,12 +208,12 @@ int io_optical_disk_get_table_of_contents(
 	else if( toc_entry.cdte_format == CDROM_LBA )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_verbose_printf(
+		libsystem_notify_verbose_printf(
 		 " start:\t\t%" PRIu32 "",
 		 toc_entry.cdte_addr.lba );
 #endif
 	}
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "\n\n" );
 
 	return( 1 );

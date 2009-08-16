@@ -28,12 +28,11 @@
 
 #include <liberror.h>
 
-#include <stdio.h>
-
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -62,7 +61,7 @@ int alteration_handle_signal_abort(
 
 int alteration_handle_open_input(
      alteration_handle_t *alteration_handle,
-     system_character_t * const * filenames,
+     libsystem_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
@@ -116,7 +115,7 @@ int alteration_handle_set_header_codepage(
 
 int alteration_handle_set_output_values(
      alteration_handle_t *alteration_handle,
-     system_character_t *delta_segment_filename,
+     libsystem_character_t *delta_segment_filename,
      size_t delta_segment_filename_length,
      liberror_error_t **error );
 

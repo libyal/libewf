@@ -221,8 +221,15 @@ Next stable release:
 
 CodeGear project files
 * zlib ?
+* libsystem
 * libewf
 * ewftools
+
+Version: 20090815
+* worked on common system library for ewftools
+* rewrote ewftools date and time functions
+* rewrote ewftools error string functions
+* refactored ewftools to work with libsystem
 
 Version: 20090811
 * worked on Borland C++ Builder compiler support

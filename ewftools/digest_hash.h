@@ -28,7 +28,7 @@
 
 #include <liberror.h>
 
-#include "system_string.h"
+#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -45,7 +45,7 @@ typedef uint8_t digest_hash_t;
 int digest_hash_copy_to_string(
      digest_hash_t *digest_hash,
      size_t digest_hash_size,
-     system_character_t *string,
+     libsystem_character_t *string,
      size_t string_size,
      liberror_error_t **error );
 

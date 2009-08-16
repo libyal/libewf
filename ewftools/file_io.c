@@ -24,8 +24,9 @@
 #include <narrow_string.h>
 #include <wide_string.h>
 
+#include <libsystem.h>
+
 #include "file_io.h"
-#include "notify.h"
 
 #if ( defined( HAVE_OPEN ) && defined( HAVE_CLOSE ) ) || defined( WINAPI )
 
@@ -40,7 +41,7 @@ int file_io_exists(
 
 	if( filename == NULL )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: invalid filename.\n",
 		 function );
 
@@ -91,7 +92,7 @@ int file_io_wexists(
 
 	if( filename == NULL )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: invalid filename.\n",
 		 function );
 
@@ -135,7 +136,7 @@ int file_io_open(
 
 	if( filename == NULL )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: invalid filename.\n",
 		 function );
 
@@ -165,7 +166,7 @@ int file_io_open(
 #endif
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: error opening file: %s.\n",
 		 function,
 		 filename );
@@ -190,7 +191,7 @@ int file_io_wopen(
 
 	if( filename == NULL )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: invalid filename.\n",
 		 function );
 
@@ -213,7 +214,7 @@ int file_io_wopen(
 #endif
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: error opening file: %s.\n",
 		 function,
 		 filename );

@@ -30,9 +30,7 @@
 
 #include <libewf.h>
 
-#include <stdio.h>
-
-#include "system_string.h"
+#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -61,7 +59,7 @@ int info_handle_signal_abort(
 
 int info_handle_open_input(
      info_handle_t *info_handle,
-     system_character_t * const * filenames,
+     libsystem_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
@@ -73,7 +71,7 @@ int info_handle_get_header_value(
      info_handle_t *info_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     system_character_t *header_value,
+     libsystem_character_t *header_value,
      size_t header_value_size,
      liberror_error_t **error );
 
@@ -81,7 +79,7 @@ int info_handle_get_hash_value(
      info_handle_t *info_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     libsystem_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error );
 
@@ -97,7 +95,7 @@ int info_handle_header_values_fprint(
      liberror_error_t **error );
 
 int info_handle_header_value_extents_fprint(
-     system_character_t *header_value,
+     libsystem_character_t *header_value,
      size_t header_value_length,
      FILE *stream,
      liberror_error_t **error );

@@ -27,23 +27,20 @@
 
 #include <liberror.h>
 
-#include <stdio.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "alteration_handle.h"
 #include "byte_size_string.h"
 #include "ewfcommon.h"
-#include "ewfgetopt.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "glob.h"
-#include "notify.h"
 
 #define EWFALTER_INPUT_BUFFER_SIZE	64
 
@@ -446,11 +443,11 @@ void ewfalter_signal_handler(
 	       ewfalter_alteration_handle,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to signal alteration handle to abort.\n",
 		 function );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -459,10 +456,10 @@ void ewfalter_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( file_io_close(
+	if( libsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -470,55 +467,57 @@ void ewfalter_signal_handler(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	system_character_t input_buffer[ EWFALTER_INPUT_BUFFER_SIZE ];
+	libsystem_character_t input_buffer[ EWFALTER_INPUT_BUFFER_SIZE ];
 
-	alteration_handle_t *alteration_handle     = NULL;
+	alteration_handle_t *alteration_handle        = NULL;
 
-#if !defined( HAVE_GLOB_H )
-	glob_t *glob                               = NULL;
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	libsystem_glob_t *glob                        = NULL;
 #endif
 
-	liberror_error_t *error                    = NULL;
+	liberror_error_t *error                       = NULL;
 
-	system_character_t * const *argv_filenames = NULL;
+	libsystem_character_t * const *argv_filenames = NULL;
 
-	system_character_t *program                = _SYSTEM_CHARACTER_T_STRING( "ewfalter" );
-	system_character_t *target_filename        = NULL;
+	libsystem_character_t *program                = _LIBSYSTEM_CHARACTER_T_STRING( "ewfalter" );
+	libsystem_character_t *target_filename        = NULL;
 
-	system_integer_t option                    = 0;
-	size64_t media_size                        = 0;
-	ssize64_t alter_count                      = 0;
-	size_t string_length                       = 0;
-	uint64_t alter_offset                      = 0;
-	uint64_t alter_size                        = 0;
-	uint64_t process_buffer_size               = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint8_t verbose                            = 0;
-	int alteration_run                         = 0;
-	int alteration_runs                        = 1;
-	int amount_of_filenames                    = 0;
-	int argument_set_offset                    = 0;
-	int argument_set_size                      = 0;
-	int header_codepage                        = LIBEWF_CODEPAGE_ASCII;
-	int result                                 = 0;
+	libsystem_integer_t option                    = 0;
+	size64_t media_size                           = 0;
+	ssize64_t alter_count                         = 0;
+	size_t string_length                          = 0;
+	uint64_t alter_offset                         = 0;
+	uint64_t alter_size                           = 0;
+	uint64_t process_buffer_size                  = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint8_t verbose                               = 0;
+	int alteration_run                            = 0;
+	int alteration_runs                           = 1;
+	int amount_of_filenames                       = 0;
+	int argument_set_offset                       = 0;
+	int argument_set_size                         = 0;
+	int header_codepage                           = LIBEWF_CODEPAGE_ASCII;
+	int result                                    = 0;
 
-	notify_set_values(
+	libsystem_notify_set_stream(
 	 stderr,
+	 NULL );
+	libsystem_notify_set_verbose(
 	 1 );
 
-	if( system_string_initialize(
+	if( libsystem_initialize(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system string.\n" );
+		 "Unable to initialize system values.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -531,21 +530,21 @@ int main( int argc, char * const argv[] )
 
 	fprintf(
 	 stdout,
-	 "%" PRIs_SYSTEM " is for testing purposes only.\n",
+	 "%" PRIs_LIBSYSTEM " is for testing purposes only.\n",
 	 program );
 
-	while( ( option = ewfgetopt(
+	while( ( option = libsystem_getopt(
 			   argc,
 			   argv,
-			   _SYSTEM_CHARACTER_T_STRING( "A:B:ho:p:qt:vV" ) ) ) != (system_integer_t) -1 )
+			   _LIBSYSTEM_CHARACTER_T_STRING( "A:B:ho:p:qt:vV" ) ) ) != (libsystem_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (system_integer_t) '?':
+			case (libsystem_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_LIBSYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -553,13 +552,13 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (system_integer_t) 'A':
+			case (libsystem_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -572,11 +571,11 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'B':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'B':
+				string_length = libsystem_string_length(
 				                 optarg );
 
-				if( system_string_to_uint64(
+				if( libsystem_string_to_uint64(
 				     optarg,
 				     string_length + 1,
 				     &alter_size,
@@ -588,7 +587,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unsupported alter size defaulting to: all bytes.\n" );
 
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -597,17 +596,17 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'h':
+			case (libsystem_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'o':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'o':
+				string_length = libsystem_string_length(
 				                 optarg );
 
-				if( system_string_to_uint64(
+				if( libsystem_string_to_uint64(
 				     optarg,
 				     string_length + 1,
 				     &alter_offset,
@@ -620,7 +619,7 @@ int main( int argc, char * const argv[] )
 					 "Unsupported alter offset defaulting to: %" PRIu64 ".\n",
 					 alter_offset );
 
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -629,8 +628,8 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'p':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'p':
+				string_length = libsystem_string_length(
 						 optarg );
 
 				result = byte_size_string_convert(
@@ -641,7 +640,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -657,20 +656,20 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'q':
+			case (libsystem_integer_t) 'q':
 				break;
 
-			case (system_integer_t) 't':
+			case (libsystem_integer_t) 't':
 				target_filename = optarg;
 
 				break;
 
-			case (system_integer_t) 'v':
+			case (libsystem_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (system_integer_t) 'V':
+			case (libsystem_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -688,8 +687,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	notify_set_values(
-	 stderr,
+	libsystem_notify_set_verbose(
 	 verbose );
 #if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
@@ -710,8 +708,8 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 	}
-#if !defined( HAVE_GLOB_H )
-	if( glob_initialize(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -719,14 +717,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
 	}
-	if( glob_resolve(
+	if( libsystem_glob_resolve(
 	     glob,
 	     &argv[ optind ],
 	     argc - optind,
@@ -736,12 +734,12 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to resolve glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-		glob_free(
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 
@@ -762,13 +760,13 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create alteration handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-#if !defined( HAVE_GLOB_H )
-		glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 #endif
@@ -785,7 +783,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to set header codepage in alteration handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -794,8 +792,8 @@ int main( int argc, char * const argv[] )
 		 &alteration_handle,
 		 NULL );
 
-#if !defined( HAVE_GLOB_H )
-		glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 #endif
@@ -809,8 +807,8 @@ int main( int argc, char * const argv[] )
 	          amount_of_filenames,
 	          &error );
 
-#if !defined( HAVE_GLOB_H )
-	if( glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -818,7 +816,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -834,7 +832,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to open EWF image file(s).\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -855,7 +853,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to determine media size.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -888,14 +886,14 @@ int main( int argc, char * const argv[] )
 		       stdout,
 		       input_buffer,
 		       EWFALTER_INPUT_BUFFER_SIZE,
-		       _SYSTEM_CHARACTER_T_STRING( "Start altering at offset" ),
+		       _LIBSYSTEM_CHARACTER_T_STRING( "Start altering at offset" ),
 		       0,
 		       media_size,
 		       0,
 		       &alter_offset,
 		       &error ) == -1 ) )
 		{
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -912,14 +910,14 @@ int main( int argc, char * const argv[] )
 		       stdout,
 		       input_buffer,
 		       EWFALTER_INPUT_BUFFER_SIZE,
-		       _SYSTEM_CHARACTER_T_STRING( "Amount of bytes to alter" ),
+		       _LIBSYSTEM_CHARACTER_T_STRING( "Amount of bytes to alter" ),
 		       0,
 		       media_size - alter_offset,
 		       media_size - alter_offset,
 		       &alter_size,
 		       &error ) == -1 ) )
 		{
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -937,14 +935,14 @@ int main( int argc, char * const argv[] )
 			     stdout,
 			     input_buffer,
 			     EWFALTER_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Alteration buffer size" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "Alteration buffer size" ),
 			     1,
 			     SSIZE_MAX,
 			     ( 64 * 512 ),
 			     &process_buffer_size,
 			     &error ) == -1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -971,7 +969,7 @@ int main( int argc, char * const argv[] )
 			if( alteration_handle_set_output_values(
 			     alteration_handle,
 			     target_filename,
-			     system_string_length(
+			     libsystem_string_length(
 			      target_filename ),
 			     &error ) != 1 )
 			{
@@ -979,7 +977,7 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to set delta segment filename in handle.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -1028,7 +1026,7 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Alteration failed.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -1056,7 +1054,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close EWF file(s).\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1075,7 +1073,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free alteration handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );

@@ -49,9 +49,10 @@
 
 #endif
 
+#include <libsystem.h>
+
 #include "io_bus.h"
 #include "io_scsi.h"
-#include "notify.h"
 
 #if defined( HAVE_IO_SCSI )
 
@@ -427,7 +428,7 @@ ssize_t io_scsi_inquiry(
 /* Retrieves the SCSI identifier
  * Returns 1 if successful or -1 on error
  */
-int io_scsi_get_identiier(
+int io_scsi_get_identier(
      int file_descriptor,
      liberror_error_t **error )
 {
@@ -468,8 +469,8 @@ int io_scsi_get_identiier(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_dump_data(
-	 &identifier,
+	libsystem_notify_verbose_print_data(
+	 (uint8_t *) &identifier,
 	 sizeof( identifier ) );
 #endif
 #endif
@@ -543,7 +544,7 @@ int io_scsi_get_bus_type(
 	                        sg_probe_host.buffer );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "SCSI_IOCTL_PROBE_HOST (%d): %s\n",
 	 sg_probe_host_length,
 	 sg_probe_host.buffer );
@@ -664,7 +665,7 @@ int io_scsi_get_pci_bus_address(
 	pci_bus_address[ pci_bus_address_size - 1 ] = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_printf(
+	libsystem_notify_verbose_printf(
 	 "SCSI_IOCTL_GET_PCI: %s\n",
 	 pci_bus_address );
 #endif

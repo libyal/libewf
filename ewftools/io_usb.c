@@ -46,12 +46,10 @@
 
 #endif
 
-#include <errno.h>
+#include <libsystem.h>
 
 #include "io_usb.h"
 #include "io_scsi.h"
-#include "notify.h"
-#include "system_string.h"
 
 #define IO_USB_CONTROL_COMMAND_TIMEOUT	5000
 
@@ -67,6 +65,8 @@ int io_usb_ioctl(
      void *request_data,
      liberror_error_t **error )
 {
+	libsystem_character_t error_string[ 128 ];
+
 #if defined( USBDEVFS_IOCTL )
 	struct usbdevfs_ioctl ioctl_request;
 #endif
@@ -94,15 +94,29 @@ int io_usb_ioctl(
 	     USBDEVFS_IOCTL,
 	     &ioctl_request ) == -1 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_IOCTL_FAILED,
-		 "%s: unable to query device for: USBDEVFS_IOCTL with error: %" PRIs_SYSTEM ".",
-		 function,
-		 system_string_strerror(
-		  errno ) );
-
+		if( libsystem_error_copy_to_string(
+		     errno,
+		     error_string,
+		     128,
+		     error ) == 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: USBDEVFS_IOCTL with error: %" PRIs_LIBSYSTEM ".",
+			 function,
+			 error_string );
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: USBDEVFS_IOCTL.",
+			 function );
+		}
 		return( -1 );
 	}
 #endif
@@ -122,6 +136,8 @@ int io_usb_control_command(
      size_t buffer_size,
      liberror_error_t **error )
 {
+	libsystem_character_t error_string[ 128 ];
+
 #if defined( USBDEVFS_CONTROL )
 	struct usbdevfs_ctrltransfer control_request;
 #endif
@@ -175,20 +191,34 @@ int io_usb_control_command(
 	     USBDEVFS_CONTROL,
 	     (void *) &control_request ) == -1 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_IOCTL_FAILED,
-		 "%s: unable to query device for: USBDEVFS_CONTROL with error: %" PRIs_SYSTEM ".",
-		 function,
-		 system_string_strerror(
-		  errno ) );
-
+		if( libsystem_error_copy_to_string(
+		     errno,
+		     error_string,
+		     128,
+		     error ) == 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: USBDEVFS_CONTROL with error: %" PRIs_LIBSYSTEM ".",
+			 function,
+			 error_string );
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: USBDEVFS_CONTROL.",
+			 function );
+		}
 		return( -1 );
 	}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_dump_data(
+	libsystem_notify_verbose_print_data(
 	 buffer,
 	 buffer_size );
 #endif
@@ -202,6 +232,8 @@ int io_usb_test(
      int file_descriptor,
      liberror_error_t **error )
 {
+	libsystem_character_t error_string[ 128 ];
+
 #if defined( USBDEVFS_CONNECTINFO )
 	struct usbdevfs_connectinfo connection_information;
 #endif
@@ -225,20 +257,34 @@ int io_usb_test(
 	     USBDEVFS_CONNECTINFO,
 	     &connection_information ) == -1 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_IOCTL_FAILED,
-		 "%s: unable to query device for: USBDEVFS_CONNECTINFO with error: %" PRIs_SYSTEM ".",
-		 function,
-		 system_string_strerror(
-		  errno ) );
-
+		if( libsystem_error_copy_to_string(
+		     errno,
+		     error_string,
+		     128,
+		     error ) == 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: USBDEVFS_CONNECTINFO with error: %" PRIs_LIBSYSTEM ".",
+			 function,
+			 error_string );
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: USBDEVFS_CONNECTINFO.",
+			 function );
+		}
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_verbose_dump_data(
-	 &connection_information,
+	libsystem_notify_verbose_print_data(
+	 (uint8_t *) &connection_information,
 	 sizeof( struct usbdevfs_connectinfo ) );
 #endif
 #endif

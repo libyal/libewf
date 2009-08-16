@@ -30,12 +30,13 @@
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "digest_context.h"
 #include "digest_hash.h"
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -86,7 +87,7 @@ int imaging_handle_signal_abort(
 
 int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
-     const system_character_t *filename,
+     const libsystem_character_t *filename,
      uint8_t resume,
      liberror_error_t **error );
 
@@ -145,15 +146,15 @@ int imaging_handle_get_chunk_size(
 
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     system_character_t *case_number,
+     libsystem_character_t *case_number,
      size_t case_number_size,
-     system_character_t *description,
+     libsystem_character_t *description,
      size_t description_size,
-     system_character_t *evidence_number,
+     libsystem_character_t *evidence_number,
      size_t evidence_number_size,
-     system_character_t *examiner_name,
+     libsystem_character_t *examiner_name,
      size_t examiner_name_size,
-     system_character_t *notes,
+     libsystem_character_t *notes,
      size_t notes_size,
      uint32_t *bytes_per_sector,
      size64_t *media_size,
@@ -169,25 +170,25 @@ int imaging_handle_get_output_values(
 
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
-     system_character_t *case_number,
+     libsystem_character_t *case_number,
      size_t case_number_length,
-     system_character_t *description,
+     libsystem_character_t *description,
      size_t description_length,
-     system_character_t *evidence_number,
+     libsystem_character_t *evidence_number,
      size_t evidence_number_length,
-     system_character_t *examiner_name,
+     libsystem_character_t *examiner_name,
      size_t examiner_name_length,
-     system_character_t *notes,
+     libsystem_character_t *notes,
      size_t notes_length,
-     system_character_t *acquiry_operating_system,
+     libsystem_character_t *acquiry_operating_system,
      size_t acquiry_operating_system_length,
-     system_character_t *acquiry_software,
+     libsystem_character_t *acquiry_software,
      size_t acquiry_software_length,
-     system_character_t *acquiry_software_version,
+     libsystem_character_t *acquiry_software_version,
      size_t acquiry_software_version_length,
-     system_character_t *model,
+     libsystem_character_t *model,
      size_t model_length,
-     system_character_t *serial_number,
+     libsystem_character_t *serial_number,
      size_t serial_number_length,
      int header_codepage,
      uint32_t bytes_per_sector,
@@ -206,7 +207,7 @@ int imaging_handle_get_header_value(
      imaging_handle_t *imaging_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     system_character_t *header_value,
+     libsystem_character_t *header_value,
      size_t header_value_size,
      liberror_error_t **error );
 
@@ -214,7 +215,7 @@ int imaging_handle_set_header_value(
      imaging_handle_t *imaging_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     system_character_t *header_value,
+     libsystem_character_t *header_value,
      size_t header_value_length,
      liberror_error_t **error );
 
@@ -222,7 +223,7 @@ int imaging_handle_set_hash_value(
      imaging_handle_t *imaging_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     libsystem_character_t *hash_value,
      size_t hash_value_length,
      liberror_error_t **error );
 
@@ -234,9 +235,9 @@ int imaging_handle_add_read_error(
 
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
-         system_character_t *calculated_md5_hash_string,
+         libsystem_character_t *calculated_md5_hash_string,
          size_t calculated_md5_hash_string_size,
-         system_character_t *calculated_sha1_hash_string,
+         libsystem_character_t *calculated_sha1_hash_string,
          size_t calculated_sha1_hash_string_size,
          liberror_error_t **error );
 

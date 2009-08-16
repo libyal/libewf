@@ -28,7 +28,7 @@
 
 #include <liberror.h>
 
-#include "system_string.h"
+#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -49,61 +49,61 @@ extern "C" {
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		0
 
-extern system_character_t *ewfinput_compression_levels[ 4 ];
-extern system_character_t *ewfinput_format_types[ 12 ];
-extern system_character_t *ewfinput_media_types[ 4 ];
-extern system_character_t *ewfinput_media_flags[ 2 ];
-extern system_character_t *ewfinput_sector_per_block_sizes[ 10 ];
-extern system_character_t *ewfinput_yes_no[ 2 ];
+extern libsystem_character_t *ewfinput_compression_levels[ 4 ];
+extern libsystem_character_t *ewfinput_format_types[ 12 ];
+extern libsystem_character_t *ewfinput_media_types[ 4 ];
+extern libsystem_character_t *ewfinput_media_flags[ 2 ];
+extern libsystem_character_t *ewfinput_sector_per_block_sizes[ 10 ];
+extern libsystem_character_t *ewfinput_yes_no[ 2 ];
 
 int ewfinput_determine_ewf_format(
-     const system_character_t *argument,
+     const libsystem_character_t *argument,
      uint8_t *ewf_format,
      liberror_error_t **error );
 
 int ewfinput_determine_sectors_per_chunk(
-     const system_character_t *argument,
+     const libsystem_character_t *argument,
      uint32_t *sectors_per_chunk,
      liberror_error_t **error );
 
 int ewfinput_determine_compression_level(
-     const system_character_t *argument,
+     const libsystem_character_t *argument,
      int8_t *compression_level,
      uint8_t *compression_flags,
      liberror_error_t **error );
 
 int ewfinput_determine_media_type(
-     const system_character_t *argument,
+     const libsystem_character_t *argument,
      uint8_t *media_type,
      liberror_error_t **error );
 
 int ewfinput_determine_media_flags(
-     const system_character_t *argument,
+     const libsystem_character_t *argument,
      uint8_t *media_flags,
      liberror_error_t **error );
 
 int ewfinput_determine_header_codepage(
-     const system_character_t *argument,
+     const libsystem_character_t *argument,
      int *header_codepage,
      liberror_error_t **error );
 
 int ewfinput_determine_yes_no(
-     const system_character_t *argument,
+     const libsystem_character_t *argument,
      uint8_t *yes_no_value,
      liberror_error_t **error );
 
 int ewfinput_get_string_variable(
      FILE *stream,
-     system_character_t *request_string,
-     system_character_t *string_variable,
+     libsystem_character_t *request_string,
+     libsystem_character_t *string_variable,
      size_t string_variable_size,
      liberror_error_t **error );
 
 int ewfinput_get_size_variable(
      FILE *stream,
-     system_character_t *input_buffer,
+     libsystem_character_t *input_buffer,
      size_t input_buffer_size,
-     system_character_t *request_string,
+     libsystem_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
@@ -112,9 +112,9 @@ int ewfinput_get_size_variable(
 
 int ewfinput_get_byte_size_variable(
      FILE *stream,
-     system_character_t *input_buffer,
+     libsystem_character_t *input_buffer,
      size_t input_buffer_size,
-     system_character_t *request_string,
+     libsystem_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
@@ -123,13 +123,13 @@ int ewfinput_get_byte_size_variable(
 
 int ewfinput_get_fixed_string_variable(
      FILE *stream,
-     system_character_t *input_buffer,
+     libsystem_character_t *input_buffer,
      size_t input_buffer_size,
-     system_character_t *request_string,
-     system_character_t **values,
+     libsystem_character_t *request_string,
+     libsystem_character_t **values,
      uint8_t amount_of_values,
      uint8_t default_value,
-     system_character_t **fixed_string_variable,
+     libsystem_character_t **fixed_string_variable,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

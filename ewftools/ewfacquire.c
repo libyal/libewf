@@ -27,31 +27,24 @@
 
 #include <liberror.h>
 
-#include <errno.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
 #include <libewf.h>
+
+#include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "device_handle.h"
 #include "ewfcommon.h"
-#include "ewfgetopt.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "file_io.h"
-#include "file_stream_io.h"
 #include "imaging_handle.h"
-#include "notify.h"
 #include "platform.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 #define EWFACQUIRE_2_TIB		0x20000000000ULL
 #define EWFACQUIRE_INPUT_BUFFER_SIZE	64
@@ -64,10 +57,10 @@ int ewfacquire_abort                        = 0;
 void usage_fprint(
       FILE *stream )
 {
-	system_character_t default_segment_file_size_string[ 16 ];
-	system_character_t minimum_segment_file_size_string[ 16 ];
-	system_character_t maximum_32bit_segment_file_size_string[ 16 ];
-	system_character_t maximum_64bit_segment_file_size_string[ 16 ];
+	libsystem_character_t default_segment_file_size_string[ 16 ];
+	libsystem_character_t minimum_segment_file_size_string[ 16 ];
+	libsystem_character_t maximum_32bit_segment_file_size_string[ 16 ];
+	libsystem_character_t maximum_64bit_segment_file_size_string[ 16 ];
 
 	int result = 0;
 
@@ -158,9 +151,9 @@ void usage_fprint(
 
 	if( result == 1 )
 	{
-		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIs_SYSTEM ")\n"
-		                 "\t        (minimum is %" PRIs_SYSTEM ", maximum is %" PRIs_SYSTEM " for encase6 format\n"
-		                 "\t        and %" PRIs_SYSTEM " for other formats)\n",
+		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIs_LIBSYSTEM ")\n"
+		                 "\t        (minimum is %" PRIs_LIBSYSTEM ", maximum is %" PRIs_LIBSYSTEM " for encase6 format\n"
+		                 "\t        and %" PRIs_LIBSYSTEM " for other formats)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -189,15 +182,15 @@ void usage_fprint(
  */
 int8_t ewfacquire_confirm_acquiry_parameters(
         FILE *stream,
-        system_character_t *input_buffer,
+        libsystem_character_t *input_buffer,
         size_t input_buffer_size,
         uint8_t resume_acquiry,
-        system_character_t *filename,
-        system_character_t *case_number,
-        system_character_t *description,
-        system_character_t *evidence_number,
-        system_character_t *examiner_name,
-        system_character_t *notes,
+        libsystem_character_t *filename,
+        libsystem_character_t *case_number,
+        libsystem_character_t *description,
+        libsystem_character_t *evidence_number,
+        libsystem_character_t *examiner_name,
+        libsystem_character_t *notes,
         uint8_t media_type,
         uint8_t media_flags,
         int8_t compression_level,
@@ -214,13 +207,13 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         uint8_t wipe_block_on_read_error,
         liberror_error_t **error )
 {
-	system_character_t acquiry_size_string[ 16 ];
-	system_character_t segment_file_size_string[ 16 ];
+	libsystem_character_t acquiry_size_string[ 16 ];
+	libsystem_character_t segment_file_size_string[ 16 ];
 
-	system_character_t *fixed_string_variable = NULL;
-	static char *function                     = "ewfacquire_confirm_acquiry_parameters";
-	int8_t input_confirmed                    = -1;
-	int result                                = 0;
+	libsystem_character_t *fixed_string_variable = NULL;
+	static char *function                        = "ewfacquire_confirm_acquiry_parameters";
+	int8_t input_confirmed                       = -1;
+	int result                                   = 0;
 
 	if( stream == NULL )
 	{
@@ -239,7 +232,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 
 	fprintf(
 	 stream,
-	 "Image path and filename:\t%" PRIs_SYSTEM "",
+	 "Image path and filename:\t%" PRIs_LIBSYSTEM "",
 	 filename );
 
 	if( resume_acquiry == 0 )
@@ -276,7 +269,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_SYSTEM "",
+		 "%" PRIs_LIBSYSTEM "",
 		 case_number );
 	}
 	fprintf(
@@ -291,7 +284,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_SYSTEM "",
+		 "%" PRIs_LIBSYSTEM "",
 		 description );
 	}
 	fprintf(
@@ -306,7 +299,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_SYSTEM "",
+		 "%" PRIs_LIBSYSTEM "",
 		 evidence_number );
 	}
 	fprintf(
@@ -321,7 +314,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_SYSTEM "",
+		 "%" PRIs_LIBSYSTEM "",
 		 examiner_name );
 	}
 	fprintf(
@@ -336,7 +329,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_SYSTEM "",
+		 "%" PRIs_LIBSYSTEM "",
 		 notes );
 	}
 	fprintf(
@@ -532,7 +525,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_SYSTEM " (%" PRIu64 " bytes)",
+		 "%" PRIs_LIBSYSTEM " (%" PRIu64 " bytes)",
 		 acquiry_size_string, acquiry_size );
 	}
 	else
@@ -560,7 +553,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	if( result == 1 )
 	{
 		fprintf(
-		 stream, "%" PRIs_SYSTEM " (%" PRIu64 " bytes)",
+		 stream, "%" PRIs_LIBSYSTEM " (%" PRIu64 " bytes)",
 		 segment_file_size_string,
 		 segment_file_size );
 	}
@@ -620,7 +613,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 		     stream,
 		     input_buffer,
 		     input_buffer_size,
-		     _SYSTEM_CHARACTER_T_STRING( "Continue acquiry with these values" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "Continue acquiry with these values" ),
 		     ewfinput_yes_no,
 		     2,
 		     0,
@@ -630,7 +623,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 *error );
 			}
 			liberror_error_free(
@@ -648,7 +641,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 *error );
 			}
 			liberror_error_free(
@@ -683,22 +676,21 @@ ssize_t ewfacquire_read_buffer(
          uint8_t wipe_block_on_read_error,
          liberror_error_t **error )
 {
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-	system_character_t *error_string  = NULL;
-#endif
-	static char *function             = "ewfacquire_read_buffer";
-	off64_t current_read_offset       = 0;
-	off64_t current_calculated_offset = 0;
-	off64_t read_error_offset         = 0;
-	ssize_t read_count                = 0;
-	ssize_t read_error_buffer_offset  = 0;
-	size_t remaining_read_size        = 0;
-	size_t read_remaining_bytes       = 0;
-	size_t error_remaining_bytes      = 0;
-	size_t read_error_amount_of_bytes = 0;
-	uint32_t error_skip_bytes         = 0;
-	uint32_t error_granularity_offset = 0;
-	int16_t read_amount_of_errors     = 0;
+	libsystem_character_t error_string[ 128 ];
+
+	static char *function               = "ewfacquire_read_buffer";
+	off64_t current_read_offset         = 0;
+	off64_t current_calculated_offset   = 0;
+	off64_t read_error_offset           = 0;
+	ssize_t read_count                  = 0;
+	ssize_t read_error_buffer_offset    = 0;
+	size_t remaining_read_size          = 0;
+	size_t read_remaining_bytes         = 0;
+	size_t error_remaining_bytes        = 0;
+	size_t read_error_amount_of_bytes   = 0;
+	uint32_t error_skip_bytes           = 0;
+	uint32_t error_granularity_offset   = 0;
+	int16_t read_amount_of_errors       = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -781,7 +773,7 @@ ssize_t ewfacquire_read_buffer(
 			      error );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
+		libsystem_notify_verbose_printf(
 		 "%s: read buffer at offset: %" PRIu64 " of size: %" PRIzd ".\n",
 		 function,
 		 current_offset + (off64_t) read_error_buffer_offset,
@@ -790,89 +782,92 @@ ssize_t ewfacquire_read_buffer(
 
 		if( read_count < 0 )
 		{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 			if( ( errno == ESPIPE )
 			 || ( errno == EPERM )
 			 || ( errno == ENXIO )
 			 || ( errno == ENODEV ) )
 			{
-				error_string = ewfcommon_strerror(
-						errno );
-
-				if( error_string != NULL )
+				if( libsystem_error_copy_to_string(
+				     errno,
+				     error_string,
+				     128,
+				     error ) == 1 )
 				{
 					liberror_error_set(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_IO,
 					 LIBERROR_IO_ERROR_READ_FAILED,
-					 "%s: error reading data: " PRIs_SYSTEM ".",
+					 "%s: error reading data: " PRIs_LIBSYSTEM ".",
 					 function,
 					 error_string );
-
-					memory_free(
-					 error_string );
-
-					return( -1 );
 				}
+				else if( errno == ESPIPE )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_READ_FAILED,
+					 "%s: error reading data: invalid seek.",
+					 function );
+				}
+				else if( errno == EPERM )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_READ_FAILED,
+					 "%s: error reading data: operation not permitted.",
+					 function );
+				}
+				else if( errno == ENXIO )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_READ_FAILED,
+					 "%s: error reading data: no such device or address.",
+					 function );
+				}
+				else if( errno == ENODEV )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_READ_FAILED,
+					 "%s: error reading data: no such device.",
+					 function );
+				}
+				return( -1 );
+			}
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( libsystem_error_copy_to_string(
+			     errno,
+			     error_string,
+			     128,
+			     error ) == 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: error reading data: %" PRIs_LIBSYSTEM ".",
+				 function,
+				 error_string );
+			}
+			else
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: error reading data.",
+				 function );
 			}
 #endif
-			if( errno == ESPIPE )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: error reading data: invalid seek.",
-				 function );
-
-				return( -1 );
-			}
-			else if( errno == EPERM )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: error reading data: operation not permitted.",
-				 function );
-
-				return( -1 );
-			}
-			else if( errno == ENXIO )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: error reading data: no such device or address.",
-				 function );
-
-				return( -1 );
-			}
-			else if( errno == ENODEV )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: error reading data: no such device.",
-				 function );
-
-				return( -1 );
-			}
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: error reading data: %" PRIs_SYSTEM ".",
-			 function,
-			 system_string_strerror(
-			  errno ) );
-
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 *error );
 			}
 			liberror_error_free(
@@ -889,7 +884,7 @@ ssize_t ewfacquire_read_buffer(
 			if( current_read_offset != current_calculated_offset )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libsystem_notify_verbose_printf(
 				 "%s: correcting offset drift calculated: %" PRIjd ", current: %" PRIjd ".\n",
 				 function,
 				 current_calculated_offset,
@@ -898,7 +893,7 @@ ssize_t ewfacquire_read_buffer(
 
 				if( current_read_offset < current_calculated_offset )
 				{
-					notify_warning_printf(
+					libsystem_notify_printf(
 					 "%s: unable to correct offset drift.\n",
 					 function );
 
@@ -946,7 +941,7 @@ ssize_t ewfacquire_read_buffer(
 		read_amount_of_errors++;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
+		libsystem_notify_verbose_printf(
 		 "%s: read error: %" PRIi16 " at offset %" PRIjd ".\n",
 		 function,
 		 read_amount_of_errors,
@@ -984,7 +979,7 @@ ssize_t ewfacquire_read_buffer(
 			if( wipe_block_on_read_error == 1 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libsystem_notify_verbose_printf(
 				 "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
 				 function,
 				 byte_error_granularity,
@@ -1011,7 +1006,7 @@ ssize_t ewfacquire_read_buffer(
 			else
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libsystem_notify_verbose_printf(
 				 "%s: wiping remainder of block: %" PRIu32 " at offset %" PRIzd ".\n",
 				 function,
 				 error_skip_bytes,
@@ -1036,7 +1031,7 @@ ssize_t ewfacquire_read_buffer(
 				read_error_amount_of_bytes = error_skip_bytes;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libsystem_notify_verbose_printf(
 			 "%s: adding read error at offset: %" PRIu64 ", amount of bytes: %" PRIu32 ".\n",
 			 function,
 			 read_error_offset,
@@ -1063,7 +1058,7 @@ ssize_t ewfacquire_read_buffer(
 			if( ( current_offset + (off64_t) read_remaining_bytes ) >= (off64_t) total_input_size )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libsystem_notify_verbose_printf(
 				 "%s: at end of input no remaining bytes to read from chunk.\n",
 				 function );
 #endif
@@ -1073,7 +1068,7 @@ ssize_t ewfacquire_read_buffer(
 				break;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libsystem_notify_verbose_printf(
 			 "%s: skipping %" PRIu32 " bytes.\n",
 			 function,
 			 error_skip_bytes );
@@ -1085,29 +1080,25 @@ ssize_t ewfacquire_read_buffer(
 			     SEEK_CUR,
 			     error ) == -1 )
 			{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-				error_string = ewfcommon_strerror(
-						errno );
-
-				if( error_string != NULL )
+				if( libsystem_error_copy_to_string(
+				     errno,
+				     error_string,
+				     128,
+				     error ) == 1 )
 				{
-					notify_warning_printf(
-					 "%s: unable skip %" PRIu32 " bytes after sector with error - %s.\n",
+					libsystem_notify_printf(
+					 "%s: unable skip %" PRIu32 " bytes after sector with error: %" PRIs_LIBSYSTEM ".",
 					 function,
 					 error_skip_bytes,
 					 error_string );
-
-					memory_free(
-					 error_string );
-
-					return( -1 );
 				}
-#endif
-				notify_warning_printf(
-				 "%s: unable to skip %" PRIu32 " bytes after sector with error.\n",
-				 function,
-				 error_skip_bytes );
-
+				else
+				{
+					libsystem_notify_printf(
+					 "%s: unable to skip %" PRIu32 " bytes after sector.",
+					 function,
+					 error_skip_bytes );
+				}
 				return( -1 );
 			}
 			/* If error granularity skip is still within the chunk
@@ -1119,7 +1110,7 @@ ssize_t ewfacquire_read_buffer(
 				read_amount_of_errors     = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libsystem_notify_verbose_printf(
 				 "%s: %" PRIzd " bytes remaining to read from chunk.\n",
 				 function,
 				 remaining_read_size );
@@ -1130,7 +1121,7 @@ ssize_t ewfacquire_read_buffer(
 				read_count = (ssize_t) read_remaining_bytes;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libsystem_notify_verbose_printf(
 				 "%s: no bytes remaining to read from chunk.\n",
 				 function );
 #endif
@@ -1158,9 +1149,9 @@ ssize64_t ewfacquire_read_input(
            uint8_t read_error_retry,
            uint8_t wipe_block_on_read_error,
            size_t process_buffer_size,
-           system_character_t *calculated_md5_hash_string,
+           libsystem_character_t *calculated_md5_hash_string,
            size_t calculated_md5_hash_string_size,
-           system_character_t *calculated_sha1_hash_string,
+           libsystem_character_t *calculated_sha1_hash_string,
            size_t calculated_sha1_hash_string_size,
            process_status_t *process_status,
            liberror_error_t **error )
@@ -1666,11 +1657,11 @@ void ewfacquire_signal_handler(
 	       ewfacquire_imaging_handle,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to signal imaging handle to abort.\n",
 		 function );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1679,10 +1670,10 @@ void ewfacquire_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( file_io_close(
+	if( libsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -1690,103 +1681,105 @@ void ewfacquire_signal_handler(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	system_character_t acquiry_operating_system[ 32 ];
-	system_character_t input_buffer[ EWFACQUIRE_INPUT_BUFFER_SIZE ];
-	system_character_t media_information_model[ 64 ];
-	system_character_t media_information_serial_number[ 64 ];
+	libsystem_character_t acquiry_operating_system[ 32 ];
+	libsystem_character_t input_buffer[ EWFACQUIRE_INPUT_BUFFER_SIZE ];
+	libsystem_character_t media_information_model[ 64 ];
+	libsystem_character_t media_information_serial_number[ 64 ];
 
-	device_handle_t *device_handle                  = NULL;
+	device_handle_t *device_handle                     = NULL;
 
-	liberror_error_t *error                         = NULL;
+	liberror_error_t *error                            = NULL;
 
-	process_status_t *process_status                = NULL;
+	process_status_t *process_status                   = NULL;
 
-	system_character_t *acquiry_software_version    = NULL;
-	system_character_t *calculated_md5_hash_string  = NULL;
-	system_character_t *calculated_sha1_hash_string = NULL;
-	system_character_t *case_number                 = NULL;
-	system_character_t *description                 = NULL;
-	system_character_t *evidence_number             = NULL;
-	system_character_t *examiner_name               = NULL;
-	system_character_t *fixed_string_variable       = NULL;
-	system_character_t *log_filename                = NULL;
-	system_character_t *notes                       = NULL;
-	system_character_t *option_case_number          = NULL;
-	system_character_t *option_description          = NULL;
-	system_character_t *option_examiner_name        = NULL;
-	system_character_t *option_evidence_number      = NULL;
-	system_character_t *option_notes                = NULL;
-	system_character_t *option_target_filename      = NULL;
-	system_character_t *program                     = _SYSTEM_CHARACTER_T_STRING( "ewfacquire" );
-	system_character_t *target_filename             = NULL;
+	libsystem_character_t *acquiry_software_version    = NULL;
+	libsystem_character_t *calculated_md5_hash_string  = NULL;
+	libsystem_character_t *calculated_sha1_hash_string = NULL;
+	libsystem_character_t *case_number                 = NULL;
+	libsystem_character_t *description                 = NULL;
+	libsystem_character_t *evidence_number             = NULL;
+	libsystem_character_t *examiner_name               = NULL;
+	libsystem_character_t *fixed_string_variable       = NULL;
+	libsystem_character_t *log_filename                = NULL;
+	libsystem_character_t *notes                       = NULL;
+	libsystem_character_t *option_case_number          = NULL;
+	libsystem_character_t *option_description          = NULL;
+	libsystem_character_t *option_examiner_name        = NULL;
+	libsystem_character_t *option_evidence_number      = NULL;
+	libsystem_character_t *option_notes                = NULL;
+	libsystem_character_t *option_target_filename      = NULL;
+	libsystem_character_t *program                     = _LIBSYSTEM_CHARACTER_T_STRING( "ewfacquire" );
+	libsystem_character_t *target_filename             = NULL;
 
-	FILE *log_file_stream                           = NULL;
+	FILE *log_file_stream                              = NULL;
 
-	system_integer_t option                         = 0;
-	off64_t resume_acquiry_offset                   = 0;
-	ssize64_t read_count                            = 0;
-	size_t string_length                            = 0;
-	uint64_t acquiry_offset                         = 0;
-	uint64_t acquiry_size                           = 0;
-	uint64_t input_size_variable                    = 0;
-	uint64_t maximum_segment_file_size              = 0;
-	uint64_t media_size                             = 0;
-	uint64_t process_buffer_size                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint64_t segment_file_size                      = 0;
-	uint32_t bytes_per_sector                       = 512;
-	uint32_t sector_error_granularity               = 0;
-	uint32_t sectors_per_chunk                      = 0;
-	uint8_t calculate_md5                           = 1;
-	uint8_t calculate_sha1                          = 0;
-	uint8_t compression_flags                       = 0;
-	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE6;
-	uint8_t media_flags                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
-	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
-	uint8_t print_status_information                = 1;
-	uint8_t read_error_retry                        = 2;
-	uint8_t resume_acquiry                          = 0;
-	uint8_t swap_byte_pairs                         = 0;
-	uint8_t verbose                                 = 0;
-	uint8_t wipe_block_on_read_error                = 0;
-	int8_t acquiry_parameters_confirmed             = 0;
-	int8_t compression_level                        = LIBEWF_COMPRESSION_NONE;
-	int argument_set_compression                    = 0;
-	int argument_set_bytes_per_sector               = 0;
-	int argument_set_format                         = 0;
-	int argument_set_media_type                     = 0;
-	int argument_set_offset                         = 0;
-	int argument_set_read_error_retry               = 0;
-	int argument_set_sector_error_granularity       = 0;
-	int argument_set_sectors_per_chunk              = 0;
-	int argument_set_segment_file_size              = 0;
-	int argument_set_size                           = 0;
-	int argument_set_media_flags                    = 0;
-	int argument_set_wipe_block_on_read_error       = 0;
-	int default_media_flags                         = 0;
-	int error_abort                                 = 0;
-	int header_codepage                             = LIBEWF_CODEPAGE_ASCII;
-	int interactive_mode                            = 1;
-	int result                                      = 0;
-	int status                                      = 0;
+	libsystem_integer_t option                         = 0;
+	off64_t resume_acquiry_offset                      = 0;
+	ssize64_t read_count                               = 0;
+	size_t string_length                               = 0;
+	uint64_t acquiry_offset                            = 0;
+	uint64_t acquiry_size                              = 0;
+	uint64_t input_size_variable                       = 0;
+	uint64_t maximum_segment_file_size                 = 0;
+	uint64_t media_size                                = 0;
+	uint64_t process_buffer_size                       = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint64_t segment_file_size                         = 0;
+	uint32_t bytes_per_sector                          = 512;
+	uint32_t sector_error_granularity                  = 0;
+	uint32_t sectors_per_chunk                         = 0;
+	uint8_t calculate_md5                              = 1;
+	uint8_t calculate_sha1                             = 0;
+	uint8_t compression_flags                          = 0;
+	uint8_t ewf_format                                 = LIBEWF_FORMAT_ENCASE6;
+	uint8_t media_flags                                = LIBEWF_MEDIA_FLAG_PHYSICAL;
+	uint8_t media_type                                 = LIBEWF_MEDIA_TYPE_FIXED;
+	uint8_t print_status_information                   = 1;
+	uint8_t read_error_retry                           = 2;
+	uint8_t resume_acquiry                             = 0;
+	uint8_t swap_byte_pairs                            = 0;
+	uint8_t verbose                                    = 0;
+	uint8_t wipe_block_on_read_error                   = 0;
+	int8_t acquiry_parameters_confirmed                = 0;
+	int8_t compression_level                           = LIBEWF_COMPRESSION_NONE;
+	int argument_set_compression                       = 0;
+	int argument_set_bytes_per_sector                  = 0;
+	int argument_set_format                            = 0;
+	int argument_set_media_type                        = 0;
+	int argument_set_offset                            = 0;
+	int argument_set_read_error_retry                  = 0;
+	int argument_set_sector_error_granularity          = 0;
+	int argument_set_sectors_per_chunk                 = 0;
+	int argument_set_segment_file_size                 = 0;
+	int argument_set_size                              = 0;
+	int argument_set_media_flags                       = 0;
+	int argument_set_wipe_block_on_read_error          = 0;
+	int default_media_flags                            = 0;
+	int error_abort                                    = 0;
+	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
+	int interactive_mode                               = 1;
+	int result                                         = 0;
+	int status                                         = 0;
 
-	notify_set_values(
+	libsystem_notify_set_stream(
 	 stderr,
+	 NULL );
+	libsystem_notify_set_verbose(
 	 1 );
 
-	if( system_string_initialize(
+	if( libsystem_initialize(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system string.\n" );
+		 "Unable to initialize system values.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1797,18 +1790,18 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = ewfgetopt(
+	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:uvVw" ) ) ) != (libsystem_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (system_integer_t) '?':
+			case (libsystem_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_SYSTEM "\n",
+				 "Invalid argument: %" PRIs_LIBSYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -1816,13 +1809,13 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (system_integer_t) 'A':
+			case (libsystem_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1835,13 +1828,13 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'b':
+			case (libsystem_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
 				     &sector_error_granularity,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1858,17 +1851,17 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'B':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'B':
+				string_length = libsystem_string_length(
 				                 optarg );
 
-				if( system_string_to_uint64(
+				if( libsystem_string_to_uint64(
 				     optarg,
 				     string_length + 1,
 				     &acquiry_size,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1883,14 +1876,14 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'c':
+			case (libsystem_integer_t) 'c':
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
 				     &compression_flags,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1908,15 +1901,15 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'C':
+			case (libsystem_integer_t) 'C':
 				option_case_number = optarg;
 
 				break;
 
-			case (system_integer_t) 'd':
-				if( system_string_compare(
+			case (libsystem_integer_t) 'd':
+				if( libsystem_string_compare(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "sha1" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "sha1" ),
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
@@ -1929,28 +1922,28 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'D':
+			case (libsystem_integer_t) 'D':
 				option_description = optarg;
 
 				break;
 
-			case (system_integer_t) 'e':
+			case (libsystem_integer_t) 'e':
 				option_examiner_name = optarg;
 
 				break;
 
-			case (system_integer_t) 'E':
+			case (libsystem_integer_t) 'E':
 				option_evidence_number = optarg;
 
 				break;
 
-			case (system_integer_t) 'f':
+			case (libsystem_integer_t) 'f':
 				if( ewfinput_determine_ewf_format(
 				     optarg,
 				     &ewf_format,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1967,13 +1960,13 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'g':
+			case (libsystem_integer_t) 'g':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
 				     &sectors_per_chunk,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1990,24 +1983,24 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'h':
+			case (libsystem_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'l':
+			case (libsystem_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (system_integer_t) 'm':
+			case (libsystem_integer_t) 'm':
 				if( ewfinput_determine_media_type(
 				     optarg,
 				     &media_type,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -2024,13 +2017,13 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'M':
+			case (libsystem_integer_t) 'M':
 				if( ewfinput_determine_media_flags(
 				     optarg,
 				     &media_flags,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -2047,22 +2040,22 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'N':
+			case (libsystem_integer_t) 'N':
 				option_notes = optarg;
 
 				break;
 
-			case (system_integer_t) 'o':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'o':
+				string_length = libsystem_string_length(
 				                 optarg );
 
-				if( system_string_to_uint64(
+				if( libsystem_string_to_uint64(
 				     optarg,
 				     string_length + 1,
 				     &acquiry_offset,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -2078,8 +2071,8 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'p':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'p':
+				string_length = libsystem_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -2090,7 +2083,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -2106,8 +2099,8 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'P':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'P':
+				string_length = libsystem_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -2118,7 +2111,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -2141,16 +2134,16 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'q':
+			case (libsystem_integer_t) 'q':
 				print_status_information = 0;
 
 				break;
 
-			case (system_integer_t) 'r':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'r':
+				string_length = libsystem_string_length(
 				                 optarg );
 
-				result = system_string_to_uint64(
+				result = libsystem_string_to_uint64(
 				          optarg,
 				          string_length + 1,
 				          &input_size_variable,
@@ -2158,7 +2151,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -2179,18 +2172,18 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'R':
+			case (libsystem_integer_t) 'R':
 				resume_acquiry = 1;
 
 				break;
 
-			case (system_integer_t) 's':
+			case (libsystem_integer_t) 's':
 				swap_byte_pairs = 1;
 
 				break;
 
-			case (system_integer_t) 'S':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'S':
+				string_length = libsystem_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -2201,7 +2194,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -2224,28 +2217,28 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 't':
+			case (libsystem_integer_t) 't':
 				option_target_filename = optarg;
 
 				break;
 
-			case (system_integer_t) 'u':
+			case (libsystem_integer_t) 'u':
 				interactive_mode = 0;
 
 				break;
 
-			case (system_integer_t) 'v':
+			case (libsystem_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (system_integer_t) 'V':
+			case (libsystem_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'w':
+			case (libsystem_integer_t) 'w':
 				wipe_block_on_read_error              = 1;
 				argument_set_wipe_block_on_read_error = 1;
 
@@ -2263,8 +2256,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	notify_set_values(
-	 stderr,
+	libsystem_notify_set_verbose(
 	 verbose );
 #if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
@@ -2280,9 +2272,9 @@ int main( int argc, char * const argv[] )
 
 	/* Check if to read from stdin
 	 */
-	if( system_string_compare(
+	if( libsystem_string_compare(
 	     argv[ optind ],
-	     _SYSTEM_CHARACTER_T_STRING( "-" ),
+	     _LIBSYSTEM_CHARACTER_T_STRING( "-" ),
 	     1 ) == 0 )
 	{
 		fprintf(
@@ -2299,7 +2291,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create device handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2315,10 +2307,10 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open file or device: %" PRIs_SYSTEM ".\n",
+		 "Unable to open file or device: %" PRIs_LIBSYSTEM ".\n",
 		 argv[ optind ] );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2338,7 +2330,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve media size.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2362,7 +2354,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve bytes per sector.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2386,7 +2378,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to determine media information.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2409,7 +2401,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to print media information.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2432,13 +2424,13 @@ int main( int argc, char * const argv[] )
 	 */
 	if( option_target_filename != NULL )
 	{
-		string_length = system_string_length(
+		string_length = libsystem_string_length(
 				 option_target_filename );
 
 		if( string_length > 0 )
 		{
-			target_filename = (system_character_t *) memory_allocate(
-			                                          sizeof( system_character_t ) * ( string_length + 1 ) );
+			target_filename = (libsystem_character_t *) memory_allocate(
+			                                             sizeof( libsystem_character_t ) * ( string_length + 1 ) );
 
 			if( target_filename == NULL )
 			{
@@ -2463,8 +2455,8 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		target_filename = (system_character_t *) memory_allocate(
-		                                          sizeof( system_character_t ) * 1024 );
+		target_filename = (libsystem_character_t *) memory_allocate(
+		                                             sizeof( libsystem_character_t ) * 1024 );
 
 		if( target_filename == NULL )
 		{
@@ -2480,7 +2472,7 @@ int main( int argc, char * const argv[] )
 		{
 			if( memory_copy(
 			     target_filename,
-			     _SYSTEM_CHARACTER_T_STRING( "acquiry" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "acquiry" ),
 			     7 ) == NULL )
 			{
 				fprintf(
@@ -2496,13 +2488,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( option_case_number != NULL )
 		{
-			string_length = system_string_length(
+			string_length = libsystem_string_length(
 					 option_case_number );
 
 			if( string_length > 0 )
 			{
-				case_number = (system_character_t *) memory_allocate(
-				                                      sizeof( system_character_t ) * ( string_length + 1 ) );
+				case_number = (libsystem_character_t *) memory_allocate(
+				                                         sizeof( libsystem_character_t ) * ( string_length + 1 ) );
 
 				if( case_number == NULL )
 				{
@@ -2527,8 +2519,8 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			case_number = (system_character_t *) memory_allocate(
-			                                      sizeof( system_character_t ) * 256 );
+			case_number = (libsystem_character_t *) memory_allocate(
+			                                         sizeof( libsystem_character_t ) * 256 );
 
 			if( case_number == NULL )
 			{
@@ -2544,13 +2536,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( option_description != NULL )
 		{
-			string_length = system_string_length(
+			string_length = libsystem_string_length(
 					 option_description );
 
 			if( string_length > 0 )
 			{
-				description = (system_character_t *) memory_allocate(
-				                                      sizeof( system_character_t ) * ( string_length + 1 ) );
+				description = (libsystem_character_t *) memory_allocate(
+				                                         sizeof( libsystem_character_t ) * ( string_length + 1 ) );
 
 				if( description == NULL )
 				{
@@ -2575,8 +2567,8 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			description = (system_character_t *) memory_allocate(
-			                                      sizeof( system_character_t ) * 256 );
+			description = (libsystem_character_t *) memory_allocate(
+			                                         sizeof( libsystem_character_t ) * 256 );
 
 			if( description == NULL )
 			{
@@ -2592,13 +2584,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( option_examiner_name != NULL )
 		{
-			string_length = system_string_length(
+			string_length = libsystem_string_length(
 					 option_examiner_name );
 
 			if( string_length > 0 )
 			{
-				examiner_name = (system_character_t *) memory_allocate(
-				                                        sizeof( system_character_t ) * ( string_length + 1 ) );
+				examiner_name = (libsystem_character_t *) memory_allocate(
+				                                           sizeof( libsystem_character_t ) * ( string_length + 1 ) );
 
 				if( examiner_name == NULL )
 				{
@@ -2623,8 +2615,8 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			evidence_number = (system_character_t *) memory_allocate(
-			                                          sizeof( system_character_t ) * 256 );
+			evidence_number = (libsystem_character_t *) memory_allocate(
+			                                             sizeof( libsystem_character_t ) * 256 );
 
 			if( evidence_number == NULL )
 			{
@@ -2640,13 +2632,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( option_evidence_number != NULL )
 		{
-			string_length = system_string_length(
+			string_length = libsystem_string_length(
 					 option_evidence_number );
 
 			if( string_length > 0 )
 			{
-				evidence_number = (system_character_t *) memory_allocate(
-				                                          sizeof( system_character_t ) * ( string_length + 1 ) );
+				evidence_number = (libsystem_character_t *) memory_allocate(
+				                                             sizeof( libsystem_character_t ) * ( string_length + 1 ) );
 
 				if( evidence_number == NULL )
 				{
@@ -2671,8 +2663,8 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			examiner_name = (system_character_t *) memory_allocate(
-			                                        sizeof( system_character_t ) * 256 );
+			examiner_name = (libsystem_character_t *) memory_allocate(
+			                                           sizeof( libsystem_character_t ) * 256 );
 
 			if( examiner_name == NULL )
 			{
@@ -2688,13 +2680,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( option_notes != NULL )
 		{
-			string_length = system_string_length(
+			string_length = libsystem_string_length(
 					 option_notes );
 
 			if( string_length > 0 )
 			{
-				notes = (system_character_t *) memory_allocate(
-				                                sizeof( system_character_t ) * ( string_length + 1 ) );
+				notes = (libsystem_character_t *) memory_allocate(
+				                                   sizeof( libsystem_character_t ) * ( string_length + 1 ) );
 
 				if( notes == NULL )
 				{
@@ -2719,8 +2711,8 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			notes = (system_character_t *) memory_allocate(
-			                                sizeof( system_character_t ) * 256 );
+			notes = (libsystem_character_t *) memory_allocate(
+			                                   sizeof( libsystem_character_t ) * 256 );
 
 			if( notes == NULL )
 			{
@@ -2744,7 +2736,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create imaging handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2807,12 +2799,12 @@ int main( int argc, char * const argv[] )
 		{
 			while( ewfinput_get_string_variable(
 				stdout,
-				_SYSTEM_CHARACTER_T_STRING( "Image path and filename with extension" ),
+				_LIBSYSTEM_CHARACTER_T_STRING( "Image path and filename with extension" ),
 				target_filename,
 				1024,
 			        &error ) != 1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -2826,12 +2818,12 @@ int main( int argc, char * const argv[] )
 		{
 			while( ewfinput_get_string_variable(
 				stdout,
-				_SYSTEM_CHARACTER_T_STRING( "Image path and filename without extension" ),
+				_LIBSYSTEM_CHARACTER_T_STRING( "Image path and filename without extension" ),
 				target_filename,
 				1024,
 			        &error ) != 1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -2853,7 +2845,7 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to resume acquire.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -2891,7 +2883,7 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to determine previous acquiry parameters.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -2914,7 +2906,7 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to determine resume acquiry offset.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -2940,12 +2932,12 @@ int main( int argc, char * const argv[] )
 			if( ( option_case_number == NULL )
 			 && ( ewfinput_get_string_variable(
 			       stdout,
-			       _SYSTEM_CHARACTER_T_STRING( "Case number" ),
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Case number" ),
 			       case_number,
 			       256,
 			       &error ) == -1 ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -2961,12 +2953,12 @@ int main( int argc, char * const argv[] )
 			if( ( option_description == NULL )
 			 && ( ewfinput_get_string_variable(
 			       stdout,
-			       _SYSTEM_CHARACTER_T_STRING( "Description" ),
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Description" ),
 			       description,
 			       256,
 			       &error ) == -1 ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -2982,12 +2974,12 @@ int main( int argc, char * const argv[] )
 			if( ( option_evidence_number == NULL )
 			 && ( ewfinput_get_string_variable(
 			       stdout,
-			       _SYSTEM_CHARACTER_T_STRING( "Evidence number" ),
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Evidence number" ),
 			       evidence_number,
 			       256,
 			       &error ) == -1 ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3003,12 +2995,12 @@ int main( int argc, char * const argv[] )
 			if( ( option_examiner_name == NULL )
 			 && ( ewfinput_get_string_variable(
 			       stdout,
-			       _SYSTEM_CHARACTER_T_STRING( "Examiner name" ),
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Examiner name" ),
 			       examiner_name,
 			       256,
 			       &error ) == -1 ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3024,12 +3016,12 @@ int main( int argc, char * const argv[] )
 			if( ( option_notes == NULL )
 			 && ( ewfinput_get_string_variable(
 			       stdout,
-			       _SYSTEM_CHARACTER_T_STRING( "Notes" ),
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Notes" ),
 			       notes,
 			       256,
 			       &error ) == -1 ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3048,14 +3040,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Media type" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Media type" ),
 				     ewfinput_media_types,
 				     EWFINPUT_MEDIA_TYPES_AMOUNT,
 				     EWFINPUT_MEDIA_TYPES_DEFAULT,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3071,7 +3063,7 @@ int main( int argc, char * const argv[] )
 					  &media_type,
 				          &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3098,14 +3090,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Media characteristics" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Media characteristics" ),
 				     ewfinput_media_flags,
 				     EWFINPUT_MEDIA_FLAGS_AMOUNT,
 				     (uint8_t) default_media_flags,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3121,7 +3113,7 @@ int main( int argc, char * const argv[] )
 					  &media_flags,
 				          &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3141,14 +3133,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Use compression" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Use compression" ),
 				     ewfinput_compression_levels,
 				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3166,7 +3158,7 @@ int main( int argc, char * const argv[] )
 					  &compression_flags,
 				          &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3187,14 +3179,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Use EWF file format" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Use EWF file format" ),
 				     ewfinput_format_types,
 				     EWFINPUT_FORMAT_TYPES_AMOUNT,
 				     EWFINPUT_FORMAT_TYPES_DEFAULT,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3210,7 +3202,7 @@ int main( int argc, char * const argv[] )
 					  &ewf_format,
 				          &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3233,14 +3225,14 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       input_buffer,
 			       EWFACQUIRE_INPUT_BUFFER_SIZE,
-			       _SYSTEM_CHARACTER_T_STRING( "Start to acquire at offset" ),
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Start to acquire at offset" ),
 			       0,
 			       media_size,
 			       0,
 			       &acquiry_offset,
 			       &error ) == -1 ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3262,14 +3254,14 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       input_buffer,
 			       EWFACQUIRE_INPUT_BUFFER_SIZE,
-			       _SYSTEM_CHARACTER_T_STRING( "The amount of bytes to acquire" ),
+			       _LIBSYSTEM_CHARACTER_T_STRING( "The amount of bytes to acquire" ),
 			       0,
 			       ( media_size - acquiry_offset ),
 			       ( media_size - acquiry_offset ),
 			       &acquiry_size,
 			       &error ) == -1 ) )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3301,14 +3293,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
 				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 				     maximum_segment_file_size,
 				     segment_file_size,
 				     &segment_file_size,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3335,14 +3327,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "The amount of bytes per sector" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "The amount of bytes per sector" ),
 				     0,
 				     UINT32_MAX,
 				     bytes_per_sector,
 				     &input_size_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3364,14 +3356,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "The amount of sectors to read at once" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "The amount of sectors to read at once" ),
 				     ewfinput_sector_per_block_sizes,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3387,7 +3379,7 @@ int main( int argc, char * const argv[] )
 					  &sectors_per_chunk,
 				          &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3407,14 +3399,14 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "The amount of sectors to be used as error granularity" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "The amount of sectors to be used as error granularity" ),
 				     1,
 				     (uint64_t) sectors_per_chunk,
 				     64,
 				     &input_size_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -3437,14 +3429,14 @@ int main( int argc, char * const argv[] )
 			     stdout,
 			     input_buffer,
 			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "The amount of retries when a read error occurs" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "The amount of retries when a read error occurs" ),
 			     0,
 			     255,
 			     2,
 			     &input_size_variable,
 			     &error ) == -1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3466,14 +3458,14 @@ int main( int argc, char * const argv[] )
 			     stdout,
 			     input_buffer,
 			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Wipe sectors on read error (mimic EnCase like behavior)" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "Wipe sectors on read error (mimic EnCase like behavior)" ),
 			     ewfinput_yes_no,
 			     2,
 			     1,
 			     &fixed_string_variable,
 			     &error ) == -1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3489,7 +3481,7 @@ int main( int argc, char * const argv[] )
 				  &wipe_block_on_read_error,
 			          &error ) != 1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3610,14 +3602,14 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to determine operating system.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
 
 				acquiry_operating_system[ 0 ] = 0;
 			}
-			acquiry_software_version = _SYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
+			acquiry_software_version = _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
 			if( device_handle_get_media_information_value(
 			     device_handle,
@@ -3631,7 +3623,7 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to retrieve model.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3650,7 +3642,7 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to retrieve serial number.\n" );
 
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -3676,34 +3668,34 @@ int main( int argc, char * const argv[] )
 			else if( imaging_handle_set_output_values(
 				  ewfacquire_imaging_handle,
 				  case_number,
-				  system_string_length(
+				  libsystem_string_length(
 				   case_number ),
 				  description,
-				  system_string_length(
+				  libsystem_string_length(
 				   description ),
 				  evidence_number,
-				  system_string_length(
+				  libsystem_string_length(
 				   evidence_number ),
 				  examiner_name,
-				  system_string_length(
+				  libsystem_string_length(
 				   examiner_name ),
 				  notes,
-				  system_string_length(
+				  libsystem_string_length(
 				   notes ),
 				  acquiry_operating_system,
-				  system_string_length(
+				  libsystem_string_length(
 				   acquiry_operating_system ),
 				  program,
-				  system_string_length(
+				  libsystem_string_length(
 				   program ),
 				  acquiry_software_version,
-				  system_string_length(
+				  libsystem_string_length(
 				   acquiry_software_version ),
 			          media_information_model,
-				  system_string_length(
+				  libsystem_string_length(
 				   media_information_model ),
 			          media_information_serial_number,
-				  system_string_length(
+				  libsystem_string_length(
 				   media_information_serial_number ),
 				  header_codepage,
 				  bytes_per_sector,
@@ -3745,7 +3737,7 @@ int main( int argc, char * const argv[] )
 
 	if( error_abort != 0 )
 	{
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3765,8 +3757,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		calculated_md5_hash_string = (system_character_t *) memory_allocate(
-		                                                     sizeof( system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
+		calculated_md5_hash_string = (libsystem_character_t *) memory_allocate(
+		                                                        sizeof( libsystem_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
 		{
@@ -3793,8 +3785,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		calculated_sha1_hash_string = (system_character_t *) memory_allocate(
-		                                                      sizeof( system_character_t ) * DIGEST_HASH_STRING_SIZE_SHA1 );
+		calculated_sha1_hash_string = (libsystem_character_t *) memory_allocate(
+		                                                         sizeof( libsystem_character_t ) * DIGEST_HASH_STRING_SIZE_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )
 		{
@@ -3826,9 +3818,9 @@ int main( int argc, char * const argv[] )
 	{
 		if( process_status_initialize(
 		     &process_status,
-		     _SYSTEM_CHARACTER_T_STRING( "Acquiry" ),
-		     _SYSTEM_CHARACTER_T_STRING( "acquired" ),
-		     _SYSTEM_CHARACTER_T_STRING( "Written" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "Acquiry" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "acquired" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "Written" ),
 		     stdout,
 		     print_status_information,
 		     &error ) != 1 )
@@ -3837,7 +3829,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to initialize process status.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -3876,7 +3868,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to start process status.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -3935,7 +3927,7 @@ int main( int argc, char * const argv[] )
 
 		if( read_count <= -1 )
 		{
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -3957,7 +3949,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close input file or device.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -3997,7 +3989,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free device handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -4043,7 +4035,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to stop process status.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -4079,7 +4071,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free process status.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -4107,9 +4099,9 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_filename != NULL )
 		{
-			log_file_stream = system_string_fopen(
+			log_file_stream = libsystem_string_fopen(
 					   log_filename,
-					   _SYSTEM_CHARACTER_T_STRING( "a" ) );
+					   _LIBSYSTEM_CHARACTER_T_STRING( "a" ) );
 
 			if( log_file_stream == NULL )
 			{
@@ -4128,7 +4120,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to print acquiry errors.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -4143,7 +4135,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to write acquiry errors in log file.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -4157,14 +4149,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close output file(s).\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -4191,14 +4183,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free imaging handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -4223,7 +4215,7 @@ int main( int argc, char * const argv[] )
         {
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -4242,14 +4234,14 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 		 calculated_md5_hash_string );
 
 		if( log_file_stream != NULL )
 		{
 			fprintf(
 			 log_file_stream,
-			 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_md5_hash_string );
 		}
 		memory_free(
@@ -4259,14 +4251,14 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 		 calculated_sha1_hash_string );
 
 		if( log_file_stream != NULL )
 		{
 			fprintf(
 			 log_file_stream,
-			 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_sha1_hash_string );
 		}
 		memory_free(
@@ -4274,7 +4266,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( file_stream_io_fclose(
+		if( libsystem_file_stream_io_fclose(
 		     log_file_stream ) != 0 )
 		{
 			fprintf(

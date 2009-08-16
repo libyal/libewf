@@ -23,8 +23,9 @@
 #include <common.h>
 #include <types.h>
 
+#include <libsystem.h>
+
 #include "ewfsignal.h"
-#include "notify.h"
 
 #if defined( WINAPI )
 #include <winnt.h>
@@ -95,7 +96,7 @@ int ewfsignal_attach(
 
 	if( signal_handler == NULL )
 	{
-		notify_warning_printf( "%s: invalid signal handler.\n",
+		libsystem_notify_printf( "%s: invalid signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -106,7 +107,7 @@ int ewfsignal_attach(
 	     ewfsignal_handler,
 	     TRUE ) == 0 )
 	{
-		notify_warning_printf( "%s: unable to attach signal handler.\n",
+		libsystem_notify_printf( "%s: unable to attach signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -115,7 +116,7 @@ int ewfsignal_attach(
 	     NULL,
 	     FALSE ) == 0 )
 	{
-		notify_warning_printf( "%s: unable to attach break signal.\n",
+		libsystem_notify_printf( "%s: unable to attach break signal.\n",
 		 function );
 
 		return( -1 );
@@ -162,7 +163,7 @@ int ewfsignal_detach(
 	     ewfsignal_handler,
 	     FALSE ) == 0 )
 	{
-		notify_warning_printf( "%s: unable to detach signal handler.\n",
+		libsystem_notify_printf( "%s: unable to detach signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -184,7 +185,7 @@ int ewfsignal_attach(
 
 	if( signal_handler == NULL )
 	{
-		notify_warning_printf( "%s: invalid signal handler.\n",
+		libsystem_notify_printf( "%s: invalid signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -193,7 +194,7 @@ int ewfsignal_attach(
 	     SIGINT,
 	     signal_handler ) == SIG_ERR )
 	{
-		notify_warning_printf( "%s: unable to attach signal handler.\n",
+		libsystem_notify_printf( "%s: unable to attach signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -213,7 +214,7 @@ int ewfsignal_detach(
 	     SIGINT,
 	     SIG_DFL ) == SIG_ERR )
 	{
-		notify_warning_printf( "%s: unable to detach signal handler.\n",
+		libsystem_notify_printf( "%s: unable to detach signal handler.\n",
 		 function );
 
 		return( -1 );

@@ -28,13 +28,13 @@
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "digest_context.h"
 #include "digest_hash.h"
-#include "file_io.h"
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 #include "verification_handle.h"
 
 #define VERIFICATION_HANDLE_VALUE_SIZE			64
@@ -277,13 +277,14 @@ int verification_handle_signal_abort(
  */
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     system_character_t * const * filenames,
+     libsystem_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error )
 {
-	system_character_t **libewf_filenames = NULL;
-	static char *function                 = "verification_handle_open_input";
-	int result                            = 1;
+	libsystem_character_t **libewf_filenames = NULL;
+	static char *function                    = "verification_handle_open_input";
+	size_t first_filename_length             = 0;
+	int result                               = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -345,12 +346,14 @@ int verification_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		first_filename_length = libsystem_string_length(
+		                         filenames[ 0 ] );
+
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
-		     system_string_length(
-		     filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
 		     &amount_of_filenames,
@@ -358,8 +361,7 @@ int verification_handle_open_input(
 #else
 		amount_of_filenames = libewf_glob_wide(
 		                       filenames[ 0 ],
-		                       system_string_length(
-		                        filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &libewf_filenames );
 
@@ -369,8 +371,7 @@ int verification_handle_open_input(
 #if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     filenames[ 0 ],
-		     system_string_length(
-		     filenames[ 0 ] ),
+		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
 		     &amount_of_filenames,
@@ -378,8 +379,7 @@ int verification_handle_open_input(
 #else
 		amount_of_filenames = libewf_glob(
 		                       filenames[ 0 ],
-		                       system_string_length(
-		                        filenames[ 0 ] ),
+		                       first_filename_length,
 		                       LIBEWF_FORMAT_UNKNOWN,
 		                       &libewf_filenames );
 
@@ -396,9 +396,9 @@ int verification_handle_open_input(
 
 			return( -1 );
 		}
-		filenames = (system_character_t * const *) libewf_filenames;
+		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     verification_handle->input_handle,
@@ -1046,7 +1046,7 @@ int verification_handle_get_hash_value(
      verification_handle_t *verification_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     libsystem_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error )
 {
@@ -1114,7 +1114,7 @@ int verification_handle_get_hash_value(
 		utf8_hash_value_size = 1 + narrow_string_length(
 		                            (char *) utf8_hash_value );
 
-		if( system_string_size_from_utf8_string(
+		if( libsystem_string_size_from_utf8_string(
 		     utf8_hash_value,
 		     utf8_hash_value_size,
 		     &calculated_hash_value_size,
@@ -1140,7 +1140,7 @@ int verification_handle_get_hash_value(
 
 			return( -1 );
 		}
-		if( system_string_copy_from_utf8_string(
+		if( libsystem_string_copy_from_utf8_string(
 		     hash_value,
 		     hash_value_size,
 		     utf8_hash_value,
@@ -1354,14 +1354,14 @@ int verification_handle_add_read_error(
  */
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
-     system_character_t *calculated_md5_hash_string,
+     libsystem_character_t *calculated_md5_hash_string,
      size_t calculated_md5_hash_string_size,
-     system_character_t *stored_md5_hash_string,
+     libsystem_character_t *stored_md5_hash_string,
      size_t stored_md5_hash_string_size,
      int *stored_md5_hash_available,
-     system_character_t *calculated_sha1_hash_string,
+     libsystem_character_t *calculated_sha1_hash_string,
      size_t calculated_sha1_hash_string_size,
-     system_character_t *stored_sha1_hash_string,
+     libsystem_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,
      liberror_error_t **error )
@@ -1627,7 +1627,7 @@ int verification_handle_additional_hash_values_fprint(
      liberror_error_t **error )
 {
 	char hash_identifier[ VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE ];
-	system_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
+	libsystem_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
 
 	static char *function             = "verification_handle_additional_hash_values_fprint";
 	size_t hash_value_identifier_size = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
@@ -1817,7 +1817,7 @@ int verification_handle_additional_hash_values_fprint(
 			}
 			fprintf(
 			 stream,
-			 "%s:\t%" PRIs_SYSTEM "\n",
+			 "%s:\t%" PRIs_LIBSYSTEM "\n",
 			 hash_identifier,
 			 hash_value );
 		}
@@ -1833,23 +1833,23 @@ int verification_handle_crc_errors_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	static char *function             = "verification_handle_crc_errors_fprint";
-	uint64_t start_sector             = 0;
-	uint64_t last_sector              = 0;
+	static char *function                = "verification_handle_crc_errors_fprint";
+	uint64_t start_sector                = 0;
+	uint64_t last_sector                 = 0;
 #if defined( HAVE_V2_API )
-	uint64_t amount_of_sectors        = 0;
+	uint64_t amount_of_sectors           = 0;
 #else
-	uint32_t amount_of_sectors        = 0;
+	uint32_t amount_of_sectors           = 0;
 #endif
-	uint32_t amount_of_errors         = 0;
-	uint32_t error_iterator           = 0;
-	int result                        = 1;
+	uint32_t amount_of_errors            = 0;
+	uint32_t error_iterator              = 0;
+	int result                           = 1;
 
 #if defined( HAVE_V2_API )
-	system_character_t *filename      = NULL;
-	system_character_t *last_filename = NULL;
-	size_t filename_size              = 0;
-	size_t last_filename_size         = 0;
+	libsystem_character_t *filename      = NULL;
+	libsystem_character_t *last_filename = NULL;
+	size_t filename_size                 = 0;
+	size_t last_filename_size            = 0;
 #endif
 
 	if( verification_handle == NULL )
@@ -1996,7 +1996,7 @@ int verification_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 				if( libewf_handle_get_filename_size_wide(
 				     verification_handle->input_handle,
 				     &filename_size,
@@ -2022,8 +2022,8 @@ int verification_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-				filename = (system_character_t *) memory_allocate(
-				                                   sizeof( system_character_t ) * filename_size ); 
+				filename = (libsystem_character_t *) memory_allocate(
+				                                      sizeof( libsystem_character_t ) * filename_size ); 
 
 
 				if( filename == NULL )
@@ -2042,7 +2042,7 @@ int verification_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 				if( libewf_handle_get_filename_wide(
 				     verification_handle->input_handle,
 				     filename,

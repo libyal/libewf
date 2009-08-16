@@ -26,13 +26,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
-#include <stdio.h>
-
 #include <libewf/definitions.h>
-
-#include "error_string.h"
 
 #define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
 #define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1024 * 1024 )
@@ -43,24 +37,6 @@
  */
 #if !defined( EWFCOMMON_PROCESS_BUFFER_SIZE )
 #define EWFCOMMON_PROCESS_BUFFER_SIZE			0
-#endif
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define ewfcommon_strerror( error_number ) \
-        error_string_wcserror( error_number )
-
-#else
-#define ewfcommon_strerror( error_number ) \
-        error_string_strerror( error_number )
-
-#endif
-
-#if defined( __cplusplus )
-}
 #endif
 
 #endif

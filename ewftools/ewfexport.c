@@ -27,30 +27,26 @@
 
 #include <liberror.h>
 
-#include <stdio.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "byte_size_string.h"
 #include "digest_context.h"
 #include "ewfcommon.h"
-#include "ewfgetopt.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "export_handle.h"
-#include "glob.h"
 #include "md5.h"
-#include "notify.h"
 #include "platform.h"
 #include "process_status.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 #define EWFEXPORT_INPUT_BUFFER_SIZE	64
 
@@ -62,10 +58,10 @@ int ewfexport_abort                      = 0;
 void usage_fprint(
       FILE *stream )
 {
-	system_character_t default_segment_file_size_string[ 16 ];
-	system_character_t minimum_segment_file_size_string[ 16 ];
-	system_character_t maximum_32bit_segment_file_size_string[ 16 ];
-	system_character_t maximum_64bit_segment_file_size_string[ 16 ];
+	libsystem_character_t default_segment_file_size_string[ 16 ];
+	libsystem_character_t minimum_segment_file_size_string[ 16 ];
+	libsystem_character_t maximum_32bit_segment_file_size_string[ 16 ];
+	libsystem_character_t maximum_64bit_segment_file_size_string[ 16 ];
 
 	int result = 0;
 
@@ -150,9 +146,9 @@ void usage_fprint(
 
 	if( result == 1 )
 	{
-		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_SYSTEM ")\n"
-		                 "\t           (minimum is %" PRIs_SYSTEM ", maximum is %" PRIs_SYSTEM " for encase6 format\n"
-		                 "\t           and %" PRIs_SYSTEM " for other formats)\n"
+		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBSYSTEM ")\n"
+		                 "\t           (minimum is %" PRIs_LIBSYSTEM ", maximum is %" PRIs_LIBSYSTEM " for encase6 format\n"
+		                 "\t           and %" PRIs_LIBSYSTEM " for other formats)\n"
 		                 "\t           (not used for raw format)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
@@ -187,9 +183,9 @@ ssize64_t ewfexport_read_input(
            size64_t media_size,
            size64_t export_size,
            off64_t read_offset,
-           system_character_t *calculated_md5_hash_string,
+           libsystem_character_t *calculated_md5_hash_string,
            size_t calculated_md5_hash_string_size,
-           system_character_t *calculated_sha1_hash_string,
+           libsystem_character_t *calculated_sha1_hash_string,
            size_t calculated_sha1_hash_string_size,
            uint8_t swap_byte_pairs,
            size_t process_buffer_size,
@@ -750,11 +746,11 @@ void ewfexport_signal_handler(
 	       ewfexport_export_handle,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to signal export handle to abort.\n",
 		 function );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -763,10 +759,10 @@ void ewfexport_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( file_io_close(
+	if( libsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -774,98 +770,100 @@ void ewfexport_signal_handler(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	system_character_t acquiry_operating_system[ 32 ];
-	system_character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
+	libsystem_character_t acquiry_operating_system[ 32 ];
+	libsystem_character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
-	system_character_t * const *argv_filenames      = NULL;
+	libsystem_character_t * const *argv_filenames      = NULL;
 
-	export_handle_t *export_handle                  = NULL;
+	export_handle_t *export_handle                     = NULL;
 
-#if !defined( HAVE_GLOB_H )
-	glob_t *glob                                    = NULL;
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	libsystem_glob_t *glob                             = NULL;
 #endif
-	liberror_error_t *error                         = NULL;
+	liberror_error_t *error                            = NULL;
 
-	process_status_t *process_status                = NULL;
+	process_status_t *process_status                   = NULL;
 
-	system_character_t *acquiry_software_version    = NULL;
-	system_character_t *calculated_md5_hash_string  = NULL;
-	system_character_t *calculated_sha1_hash_string = NULL;
-	system_character_t *fixed_string_variable       = NULL;
-	system_character_t *log_filename                = NULL;
-	system_character_t *option_target_filename      = NULL;
-	system_character_t *program                     = _SYSTEM_CHARACTER_T_STRING( "ewfexport" );
-	system_character_t *target_filename             = NULL;
+	libsystem_character_t *acquiry_software_version    = NULL;
+	libsystem_character_t *calculated_md5_hash_string  = NULL;
+	libsystem_character_t *calculated_sha1_hash_string = NULL;
+	libsystem_character_t *fixed_string_variable       = NULL;
+	libsystem_character_t *log_filename                = NULL;
+	libsystem_character_t *option_target_filename      = NULL;
+	libsystem_character_t *program                     = _LIBSYSTEM_CHARACTER_T_STRING( "ewfexport" );
+	libsystem_character_t *target_filename             = NULL;
 
-	FILE *log_file_stream                           = NULL;
+	FILE *log_file_stream                              = NULL;
 
-	system_integer_t option                         = 0;
-	size64_t media_size                             = 0;
-	ssize64_t export_count                          = 0;
-	size_t string_length                            = 0;
-	uint64_t export_offset                          = 0;
-	uint64_t export_size                            = 0;
-	uint64_t maximum_segment_file_size              = 0;
-	uint64_t process_buffer_size                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint64_t segment_file_size                      = 0;
-	uint32_t sectors_per_chunk                      = 64;
-	uint8_t calculate_md5                           = 1;
-	uint8_t calculate_sha1                          = 0;
-	uint8_t compression_flags                       = 0;
-	uint8_t export_handle_output_format             = 0;
-	uint8_t ewf_format                              = LIBEWF_FORMAT_ENCASE6;
-	uint8_t print_status_information                = 1;
-	uint8_t swap_byte_pairs                         = 0;
-	uint8_t wipe_chunk_on_error                     = 0;
-	uint8_t verbose                                 = 0;
-	int8_t compression_level                        = LIBEWF_COMPRESSION_NONE;
-	int amount_of_filenames                         = 0;
-	int argument_set_compression                    = 0;
-	int argument_set_format                         = 0;
-	int argument_set_offset                         = 0;
-	int argument_set_sectors_per_chunk              = 0;
-	int argument_set_segment_file_size              = 0;
-	int argument_set_size                           = 0;
-	int error_abort                                 = 0;
-	int header_codepage                             = LIBEWF_CODEPAGE_ASCII;
-	int interactive_mode                            = 1;
-	int output_raw                                  = 1;
-	int result                                      = 1;
-	int status                                      = 0;
+	libsystem_integer_t option                         = 0;
+	size64_t media_size                                = 0;
+	ssize64_t export_count                             = 0;
+	size_t string_length                               = 0;
+	uint64_t export_offset                             = 0;
+	uint64_t export_size                               = 0;
+	uint64_t maximum_segment_file_size                 = 0;
+	uint64_t process_buffer_size                       = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint64_t segment_file_size                         = 0;
+	uint32_t sectors_per_chunk                         = 64;
+	uint8_t calculate_md5                              = 1;
+	uint8_t calculate_sha1                             = 0;
+	uint8_t compression_flags                          = 0;
+	uint8_t export_handle_output_format                = 0;
+	uint8_t ewf_format                                 = LIBEWF_FORMAT_ENCASE6;
+	uint8_t print_status_information                   = 1;
+	uint8_t swap_byte_pairs                            = 0;
+	uint8_t wipe_chunk_on_error                        = 0;
+	uint8_t verbose                                    = 0;
+	int8_t compression_level                           = LIBEWF_COMPRESSION_NONE;
+	int amount_of_filenames                            = 0;
+	int argument_set_compression                       = 0;
+	int argument_set_format                            = 0;
+	int argument_set_offset                            = 0;
+	int argument_set_sectors_per_chunk                 = 0;
+	int argument_set_segment_file_size                 = 0;
+	int argument_set_size                              = 0;
+	int error_abort                                    = 0;
+	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
+	int interactive_mode                               = 1;
+	int output_raw                                     = 1;
+	int result                                         = 1;
+	int status                                         = 0;
 
-	system_character_t *ewfexport_format_types[ 13 ] = \
-	 { _SYSTEM_CHARACTER_T_STRING( "raw" ),
-	   _SYSTEM_CHARACTER_T_STRING( "ewf" ),
-	   _SYSTEM_CHARACTER_T_STRING( "smart" ),
-	   _SYSTEM_CHARACTER_T_STRING( "ftk" ),
-	   _SYSTEM_CHARACTER_T_STRING( "encase1" ),
-	   _SYSTEM_CHARACTER_T_STRING( "encase2" ),
-	   _SYSTEM_CHARACTER_T_STRING( "encase3" ),
-	   _SYSTEM_CHARACTER_T_STRING( "encase4" ),
-	   _SYSTEM_CHARACTER_T_STRING( "encase5" ),
-	   _SYSTEM_CHARACTER_T_STRING( "encase6" ),
-	   _SYSTEM_CHARACTER_T_STRING( "linen5" ),
-	   _SYSTEM_CHARACTER_T_STRING( "linen6" ),
-	   _SYSTEM_CHARACTER_T_STRING( "ewfx" ) };
+	libsystem_character_t *ewfexport_format_types[ 13 ] = \
+	 { _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "ewf" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "smart" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "ftk" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "encase1" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "encase2" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "encase3" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "encase4" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "encase5" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "encase6" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "linen5" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "linen6" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "ewfx" ) };
 
-	notify_set_values(
+	libsystem_notify_set_stream(
 	 stderr,
+	 NULL );
+	libsystem_notify_set_verbose(
 	 1 );
 
-	if( system_string_initialize(
+	if( libsystem_initialize(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system string.\n" );
+		 "Unable to initialize system values.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -894,24 +892,24 @@ int main( int argc, char * const argv[] )
 #endif
 
 #ifdef DISABLED
-	while( ( option = ewfgetopt(
+	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libsystem_integer_t) -1 )
 #else
-	while( ( option = ewfgetopt(
+	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "A:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libsystem_integer_t) -1 )
 #endif
 	{
 		switch( option )
 		{
-			case (system_integer_t) '?':
+			case (libsystem_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_LIBSYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -919,13 +917,13 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (system_integer_t) 'A':
+			case (libsystem_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -939,13 +937,13 @@ int main( int argc, char * const argv[] )
 				break;
 
 #ifdef DISABLED
-			case (system_integer_t) 'b':
+			case (libsystem_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
 				     &sectors_per_chunk,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -963,11 +961,11 @@ int main( int argc, char * const argv[] )
 				break;
 #endif
 
-			case (system_integer_t) 'B':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'B':
+				string_length = libsystem_string_length(
 				                 optarg );
 
-				if( system_string_to_uint64(
+				if( libsystem_string_to_uint64(
 				     optarg,
 				     string_length + 1,
 				     &export_size,
@@ -983,14 +981,14 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'c':
+			case (libsystem_integer_t) 'c':
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
 				     &compression_flags,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1008,10 +1006,10 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'd':
-				if( system_string_compare(
+			case (libsystem_integer_t) 'd':
+				if( libsystem_string_compare(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "sha1" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "sha1" ),
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
@@ -1024,10 +1022,10 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'f':
-				if( system_string_compare(
+			case (libsystem_integer_t) 'f':
+				if( libsystem_string_compare(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "raw" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
 				     3 ) == 0 )
 				{
 					output_raw          = 1;
@@ -1051,22 +1049,22 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'h':
+			case (libsystem_integer_t) 'h':
 				usage_fprint(
 				 stderr );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'l':
+			case (libsystem_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (system_integer_t) 'o':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'o':
+				string_length = libsystem_string_length(
 				                 optarg );
 
-				if( system_string_to_uint64(
+				if( libsystem_string_to_uint64(
 				     optarg,
 				     string_length + 1,
 				     &export_offset,
@@ -1083,8 +1081,8 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'p':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'p':
+				string_length = libsystem_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -1095,7 +1093,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1111,18 +1109,18 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'q':
+			case (libsystem_integer_t) 'q':
 				print_status_information = 0;
 
 				break;
 
-			case (system_integer_t) 's':
+			case (libsystem_integer_t) 's':
 				swap_byte_pairs = 1;
 
 				break;
 
-			case (system_integer_t) 'S':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'S':
+				string_length = libsystem_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -1133,7 +1131,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1156,28 +1154,28 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 't':
+			case (libsystem_integer_t) 't':
 				option_target_filename = optarg;
 
 				break;
 
-			case (system_integer_t) 'u':
+			case (libsystem_integer_t) 'u':
 				interactive_mode = 0;
 
 				break;
 
-			case (system_integer_t) 'v':
+			case (libsystem_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (system_integer_t) 'V':
+			case (libsystem_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stderr );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'w':
+			case (libsystem_integer_t) 'w':
 				wipe_chunk_on_error = 1;
 
 				break;
@@ -1194,8 +1192,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	notify_set_values(
-	 stderr,
+	libsystem_notify_set_verbose(
 	 verbose );
 #if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
@@ -1216,8 +1213,8 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 	}
-#if !defined( HAVE_GLOB_H )
-	if( glob_initialize(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -1225,14 +1222,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
 	}
-	if( glob_resolve(
+	if( libsystem_glob_resolve(
 	     glob,
 	     &argv[ optind ],
 	     argc - optind,
@@ -1242,12 +1239,12 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to resolve glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-		glob_free(
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 
@@ -1270,13 +1267,13 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create export handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-#if !defined( HAVE_GLOB_H )
-		glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 #endif
@@ -1293,7 +1290,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to set header codepage in export handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1302,8 +1299,8 @@ int main( int argc, char * const argv[] )
 		 &export_handle,
 		 NULL );
 
-#if !defined( HAVE_GLOB_H )
-		glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 #endif
@@ -1317,8 +1314,8 @@ int main( int argc, char * const argv[] )
 	          amount_of_filenames,
 	          &error );
 
-#if !defined( HAVE_GLOB_H )
-	if( glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -1326,7 +1323,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1338,11 +1335,11 @@ int main( int argc, char * const argv[] )
 	if( ( ewfexport_abort == 0 )
 	 && ( result != 1 ) )
 	{
-		ewfoutput_error_fprint(
+		fprintf(
 		 stderr,
 		 "Unable to open EWF file(s)" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1359,11 +1356,11 @@ int main( int argc, char * const argv[] )
 	       &media_size,
 	       &error ) != 1 ) )
 	{
-		ewfoutput_error_fprint(
+		fprintf(
 		 stderr,
 		 "Unable to determine input media size.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -1386,13 +1383,13 @@ int main( int argc, char * const argv[] )
 	 */
 	if( option_target_filename != NULL )
 	{
-		string_length = system_string_length(
+		string_length = libsystem_string_length(
 				 option_target_filename );
 
 		if( string_length > 0 )
 		{
-			target_filename = (system_character_t *) memory_allocate(
-			                                          sizeof( system_character_t ) * ( string_length + 1 ) );
+			target_filename = (libsystem_character_t *) memory_allocate(
+			                                             sizeof( libsystem_character_t ) * ( string_length + 1 ) );
 
 			if( target_filename == NULL )
 			{
@@ -1402,7 +1399,7 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( system_string_copy(
+			else if( libsystem_string_copy(
 				  target_filename,
 				  option_target_filename,
 				  string_length ) == NULL )
@@ -1418,8 +1415,8 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		target_filename = (system_character_t *) memory_allocate(
-		                                          sizeof( system_character_t ) * 1024 );
+		target_filename = (libsystem_character_t *) memory_allocate(
+		                                             sizeof( libsystem_character_t ) * 1024 );
 
 		if( target_filename == NULL )
 		{
@@ -1433,9 +1430,9 @@ int main( int argc, char * const argv[] )
 		 */
 		else if( interactive_mode == 0 )
 		{
-			if( system_string_copy(
+			if( libsystem_string_copy(
 			     target_filename,
-			     _SYSTEM_CHARACTER_T_STRING( "export" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "export" ),
 			     7 ) == NULL )
 			{
 				fprintf(
@@ -1484,14 +1481,14 @@ int main( int argc, char * const argv[] )
 			     stderr,
 			     input_buffer,
 			     EWFEXPORT_INPUT_BUFFER_SIZE,
-			     _SYSTEM_CHARACTER_T_STRING( "Export to file format" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "Export to file format" ),
 			     ewfexport_format_types,
 			     13,
 			     0,
 			     &fixed_string_variable,
 			     &error ) == -1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -1502,9 +1499,9 @@ int main( int argc, char * const argv[] )
 
 				output_raw = 1;
 			}
-			else if( system_string_compare(
+			else if( libsystem_string_compare(
 			          fixed_string_variable,
-			          _SYSTEM_CHARACTER_T_STRING( "raw" ),
+			          _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
 			          3 ) == 0 )
 			{
 				output_raw = 1;
@@ -1514,7 +1511,7 @@ int main( int argc, char * const argv[] )
 			          &ewf_format,
 			          &error ) != 1 )
 			{
-				notify_error_backtrace(
+				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
@@ -1538,12 +1535,12 @@ int main( int argc, char * const argv[] )
 			{
 				while( ewfinput_get_string_variable(
 					stderr,
-					_SYSTEM_CHARACTER_T_STRING( "Target path and filename without extension" ),
+					_LIBSYSTEM_CHARACTER_T_STRING( "Target path and filename without extension" ),
 				        target_filename,
 				        1024,
 				        &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1561,14 +1558,14 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Use compression" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Use compression" ),
 				     ewfinput_compression_levels,
 				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1586,7 +1583,7 @@ int main( int argc, char * const argv[] )
 				          &compression_flags,
 				          &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1615,14 +1612,14 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
 				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 				     maximum_segment_file_size,
 				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 				     &segment_file_size,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1649,14 +1646,14 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _SYSTEM_CHARACTER_T_STRING( "The amount of sectors to read at once" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "The amount of sectors to read at once" ),
 				     ewfinput_sector_per_block_sizes,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1672,7 +1669,7 @@ int main( int argc, char * const argv[] )
 				          &sectors_per_chunk,
 				          &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1693,12 +1690,12 @@ int main( int argc, char * const argv[] )
 			{
 				while( ewfinput_get_string_variable(
 					stderr,
-					_SYSTEM_CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ),
+					_LIBSYSTEM_CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ),
 					target_filename,
 					1024,
 					&error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -1716,14 +1713,14 @@ int main( int argc, char * const argv[] )
 		       stderr,
 		       input_buffer,
 		       EWFEXPORT_INPUT_BUFFER_SIZE,
-		       _SYSTEM_CHARACTER_T_STRING( "Start export at offset" ),
+		       _LIBSYSTEM_CHARACTER_T_STRING( "Start export at offset" ),
 		       0,
 		       media_size,
 		       export_offset,
 		       &export_offset,
 		       &error ) == -1 ) )
 		{
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1742,14 +1739,14 @@ int main( int argc, char * const argv[] )
 		       stderr,
 		       input_buffer,
 		       EWFEXPORT_INPUT_BUFFER_SIZE,
-		       _SYSTEM_CHARACTER_T_STRING( "Amount of bytes to export" ),
+		       _LIBSYSTEM_CHARACTER_T_STRING( "Amount of bytes to export" ),
 		       0,
 		       ( media_size - export_offset ),
 		       export_size,
 		       &export_size,
 		       &error ) == -1 ) )
 		{
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1771,8 +1768,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		calculated_md5_hash_string = (system_character_t *) memory_allocate(
-		                                                     sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
+		calculated_md5_hash_string = (libsystem_character_t *) memory_allocate(
+		                                                        sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
 		{
@@ -1795,8 +1792,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		calculated_sha1_hash_string = (system_character_t *) memory_allocate(
-		                                                      sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+		calculated_sha1_hash_string = (libsystem_character_t *) memory_allocate(
+		                                                         sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )
 		{
@@ -1830,9 +1827,9 @@ int main( int argc, char * const argv[] )
 
 		if( process_status_initialize(
 		     &process_status,
-		     _SYSTEM_CHARACTER_T_STRING( "Export" ),
-		     _SYSTEM_CHARACTER_T_STRING( "exported" ),
-		     _SYSTEM_CHARACTER_T_STRING( "Written" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "Export" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "exported" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "Written" ),
 		     stderr,
 		     print_status_information,
 		     &error ) != 1 )
@@ -1841,7 +1838,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to initialize process status.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1876,7 +1873,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to start process status.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1925,7 +1922,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to open output.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1968,14 +1965,14 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to determine operating system.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
 
 			acquiry_operating_system[ 0 ] = 0;
 		}
-		acquiry_software_version = _SYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
+		acquiry_software_version = _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
 		if( export_handle_set_output_values(
 		     export_handle,
@@ -1996,7 +1993,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set output values.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2042,7 +2039,7 @@ int main( int argc, char * const argv[] )
 
 		if( export_count <= -1 )
 		{
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2068,7 +2065,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to stop process status.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2104,7 +2101,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free process status.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -2132,9 +2129,9 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_filename != NULL )
 		{
-			log_file_stream = system_string_fopen(
+			log_file_stream = libsystem_string_fopen(
 					   log_filename,
-					   _SYSTEM_CHARACTER_T_STRING( "a" ) );
+					   _LIBSYSTEM_CHARACTER_T_STRING( "a" ) );
 
 			if( log_file_stream == NULL )
 			{
@@ -2153,7 +2150,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to print export errors.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2168,7 +2165,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to write export errors in log file.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -2182,14 +2179,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close EWF file(s).\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -2216,14 +2213,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free export handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -2248,7 +2245,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -2267,14 +2264,14 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 		 calculated_md5_hash_string );
 
 		if( log_file_stream != NULL )
 		{
 			fprintf(
 			 log_file_stream,
-			 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_md5_hash_string );
 		}
 		memory_free(
@@ -2284,14 +2281,14 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 		 calculated_sha1_hash_string );
 
 		if( log_file_stream != NULL )
 		{
 			fprintf(
 			 log_file_stream,
-			 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_sha1_hash_string );
 		}
 		memory_free(
@@ -2299,7 +2296,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( file_stream_io_fclose(
+		if( libsystem_file_stream_io_fclose(
 		     log_file_stream ) != 0 )
 		{
 			fprintf(

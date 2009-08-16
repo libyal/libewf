@@ -148,7 +148,7 @@ ssize_t io_scsi_inquiry(
          size_t response_size,
          liberror_error_t **error );
 
-int io_scsi_get_identiier(
+int io_scsi_get_identier(
      int file_descriptor,
      liberror_error_t **error );
 

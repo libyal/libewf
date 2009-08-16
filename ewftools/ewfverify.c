@@ -27,29 +27,24 @@
 
 #include <liberror.h>
 
-#include <stdio.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <libewf.h>
 
+#include <libsystem.h>
+
 #include "byte_size_string.h"
 #include "digest_context.h"
 #include "ewfcommon.h"
-#include "ewfgetopt.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "file_stream_io.h"
-#include "glob.h"
 #include "md5.h"
-#include "notify.h"
 #include "process_status.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 #include "verification_handle.h"
 
 verification_handle_t *ewfverify_verification_handle = NULL;
@@ -371,11 +366,11 @@ void ewfverify_signal_handler(
 	       ewfverify_verification_handle,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to signal verification handle to abort.\n",
 		 function );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -384,10 +379,10 @@ void ewfverify_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( file_io_close(
+	if( libsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		notify_warning_printf(
+		libsystem_notify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -395,64 +390,66 @@ void ewfverify_signal_handler(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error                         = NULL;
+	liberror_error_t *error                            = NULL;
 
-	system_character_t * const *argv_filenames      = NULL;
+	libsystem_character_t * const *argv_filenames      = NULL;
 
-#if !defined( HAVE_GLOB_H )
-	glob_t *glob                                    = NULL;
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	libsystem_glob_t *glob                             = NULL;
 #endif
 
-	process_status_t *process_status                = NULL;
+	process_status_t *process_status                   = NULL;
 
-	system_character_t *calculated_md5_hash_string  = NULL;
-	system_character_t *calculated_sha1_hash_string = NULL;
-	system_character_t *log_filename                = NULL;
-	system_character_t *program                     = _SYSTEM_CHARACTER_T_STRING( "ewfverify" );
-	system_character_t *stored_md5_hash_string      = NULL;
-	system_character_t *stored_sha1_hash_string     = NULL;
+	libsystem_character_t *calculated_md5_hash_string  = NULL;
+	libsystem_character_t *calculated_sha1_hash_string = NULL;
+	libsystem_character_t *log_filename                = NULL;
+	libsystem_character_t *program                     = _LIBSYSTEM_CHARACTER_T_STRING( "ewfverify" );
+	libsystem_character_t *stored_md5_hash_string      = NULL;
+	libsystem_character_t *stored_sha1_hash_string     = NULL;
 
-	verification_handle_t *verification_handle      = NULL;
+	verification_handle_t *verification_handle         = NULL;
 
-	FILE *log_file_stream                           = NULL;
+	FILE *log_file_stream                              = NULL;
 
-	system_integer_t option                         = 0;
-	ssize64_t verify_count                          = 0;
-	size_t string_length                            = 0;
-	uint64_t process_buffer_size                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint32_t amount_of_crc_errors                   = 0;
-	uint8_t calculate_md5                           = 1;
-	uint8_t calculate_sha1                          = 0;
-	uint8_t print_status_information                = 1;
-	uint8_t wipe_chunk_on_error                     = 0;
-	uint8_t verbose                                 = 0;
-	int amount_of_filenames                         = 0;
-	int header_codepage                             = LIBEWF_CODEPAGE_ASCII;
-	int match_md5_hash                              = 0;
-	int match_sha1_hash                             = 0;
-	int result                                      = 0;
-	int status                                      = 0;
-	int stored_md5_hash_available                   = 0;
-	int stored_sha1_hash_available                  = 0;
+	libsystem_integer_t option                         = 0;
+	ssize64_t verify_count                             = 0;
+	size_t string_length                               = 0;
+	uint64_t process_buffer_size                       = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint32_t amount_of_crc_errors                      = 0;
+	uint8_t calculate_md5                              = 1;
+	uint8_t calculate_sha1                             = 0;
+	uint8_t print_status_information                   = 1;
+	uint8_t wipe_chunk_on_error                        = 0;
+	uint8_t verbose                                    = 0;
+	int amount_of_filenames                            = 0;
+	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
+	int match_md5_hash                                 = 0;
+	int match_sha1_hash                                = 0;
+	int result                                         = 0;
+	int status                                         = 0;
+	int stored_md5_hash_available                      = 0;
+	int stored_sha1_hash_available                     = 0;
 
-	notify_set_values(
+	libsystem_notify_set_stream(
 	 stderr,
+	 NULL );
+	libsystem_notify_set_verbose(
 	 1 );
 
-	if( system_string_initialize(
+	if( libsystem_initialize(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system string.\n" );
+		 "Unable to initialize system values.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -463,18 +460,18 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = ewfgetopt(
+	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "A:d:hl:p:qvVw" ) ) ) != (system_integer_t) -1 )
+	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:d:hl:p:qvVw" ) ) ) != (libsystem_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (system_integer_t) '?':
+			case (libsystem_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_SYSTEM "\n",
+				 "Invalid argument: %" PRIs_LIBSYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -482,13 +479,13 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (system_integer_t) 'A':
+			case (libsystem_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
 				     &error ) != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -501,10 +498,10 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'd':
-				if( system_string_compare(
+			case (libsystem_integer_t) 'd':
+				if( libsystem_string_compare(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "sha1" ),
+				     _LIBSYSTEM_CHARACTER_T_STRING( "sha1" ),
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
@@ -517,19 +514,19 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'h':
+			case (libsystem_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'l':
+			case (libsystem_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (system_integer_t) 'p':
-				string_length = system_string_length(
+			case (libsystem_integer_t) 'p':
+				string_length = libsystem_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -540,7 +537,7 @@ int main( int argc, char * const argv[] )
 
 				if( result != 1 )
 				{
-					notify_error_backtrace(
+					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
@@ -556,23 +553,23 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'q':
+			case (libsystem_integer_t) 'q':
 				print_status_information = 0;
 
 				break;
 
-			case (system_integer_t) 'v':
+			case (libsystem_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (system_integer_t) 'V':
+			case (libsystem_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (system_integer_t) 'w':
+			case (libsystem_integer_t) 'w':
 				wipe_chunk_on_error = 1;
 
 				break;
@@ -589,8 +586,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	notify_set_values(
-	 stderr,
+	libsystem_notify_set_verbose(
 	 verbose );
 #if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
@@ -611,8 +607,8 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 	}
-#if !defined( HAVE_GLOB_H )
-	if( glob_initialize(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -620,14 +616,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
 	}
-	if( glob_resolve(
+	if( libsystem_glob_resolve(
 	     glob,
 	     &argv[ optind ],
 	     argc - optind,
@@ -637,12 +633,12 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to resolve glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-		glob_free(
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 
@@ -665,13 +661,13 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create verification handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
-#if !defined( HAVE_GLOB_H )
-		glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 #endif
@@ -688,7 +684,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to set header codepage in verification handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -697,8 +693,8 @@ int main( int argc, char * const argv[] )
 		 &verification_handle,
 		 NULL );
 
-#if !defined( HAVE_GLOB_H )
-		glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+		libsystem_glob_free(
 		 &glob,
 		 NULL );
 #endif
@@ -712,8 +708,8 @@ int main( int argc, char * const argv[] )
 	          amount_of_filenames,
 	          &error );
 
-#if !defined( HAVE_GLOB_H )
-	if( glob_free(
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -721,7 +717,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free glob.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -737,7 +733,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to open EWF image file(s).\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -752,9 +748,9 @@ int main( int argc, char * const argv[] )
 	{
 		if( process_status_initialize(
 		     &process_status,
-		     _SYSTEM_CHARACTER_T_STRING( "Verify" ),
-		     _SYSTEM_CHARACTER_T_STRING( "verified" ),
-		     _SYSTEM_CHARACTER_T_STRING( "Read" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "Verify" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "verified" ),
+		     _LIBSYSTEM_CHARACTER_T_STRING( "Read" ),
 		     stdout,
 		     print_status_information,
 		     &error ) != 1 )
@@ -763,7 +759,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to initialize process status.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -785,7 +781,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to start process status.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -814,7 +810,7 @@ int main( int argc, char * const argv[] )
 
 		if( verify_count <= -1 )
 		{
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -840,7 +836,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to stop process status.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -866,7 +862,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free process status.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
@@ -884,8 +880,8 @@ int main( int argc, char * const argv[] )
 	{
 		if( calculate_md5 == 1 )
 		{
-			stored_md5_hash_string = (system_character_t *) memory_allocate(
-			                                                 sizeof( system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
+			stored_md5_hash_string = (libsystem_character_t *) memory_allocate(
+			                                                    sizeof( libsystem_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( stored_md5_hash_string == NULL )
 			{
@@ -902,8 +898,8 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			calculated_md5_hash_string = (system_character_t *) memory_allocate(
-			                                                     sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
+			calculated_md5_hash_string = (libsystem_character_t *) memory_allocate(
+			                                                        sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( calculated_md5_hash_string == NULL )
 			{
@@ -926,8 +922,8 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_string = (system_character_t *) memory_allocate(
-			                                                  sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+			stored_sha1_hash_string = (libsystem_character_t *) memory_allocate(
+			                                                     sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
 			if( stored_sha1_hash_string == NULL )
 			{
@@ -951,8 +947,8 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			calculated_sha1_hash_string = (system_character_t *) memory_allocate(
-			                                                      sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+			calculated_sha1_hash_string = (libsystem_character_t *) memory_allocate(
+			                                                         sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
 			if( calculated_sha1_hash_string == NULL )
 			{
@@ -998,7 +994,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to finalize verification handle.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1035,7 +1031,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to determine the amount of CRC errors.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1065,15 +1061,15 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_filename != NULL )
 		{
-			log_file_stream = system_string_fopen(
+			log_file_stream = libsystem_string_fopen(
 					   log_filename,
-					   _SYSTEM_CHARACTER_T_STRING( "a" ) );
+					   _LIBSYSTEM_CHARACTER_T_STRING( "a" ) );
 
 			if( log_file_stream == NULL )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to open log file: %" PRIs_SYSTEM ".\n",
+				 "Unable to open log file: %" PRIs_LIBSYSTEM ".\n",
 				 log_filename );
 			}
 		}
@@ -1090,7 +1086,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to print crc errors.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1105,7 +1101,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to write crc errors in log file.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1129,30 +1125,30 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stdout,
-				 "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
+				 "MD5 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
 				 stored_md5_hash_string );
 
 				if( log_file_stream != NULL )
 				{
 					fprintf(
 					 log_file_stream,
-					 "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
+					 "MD5 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
 					 stored_md5_hash_string );
 				}
 			}
 			fprintf(
 			 stdout,
-			 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_md5_hash_string );
 
 			if( log_file_stream != NULL )
 			{
 				fprintf(
 				 log_file_stream,
-				 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+				 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 				 calculated_md5_hash_string );
 			}
-			match_md5_hash = ( system_string_compare(
+			match_md5_hash = ( libsystem_string_compare(
 					    stored_md5_hash_string,
 					    calculated_md5_hash_string,
 					    DIGEST_HASH_STRING_SIZE_MD5 ) == 0 );
@@ -1175,30 +1171,30 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stdout,
-				 "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
+				 "SHA1 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
 				 stored_sha1_hash_string );
 
 				if( log_file_stream != NULL )
 				{
 					fprintf(
 					 log_file_stream,
-					 "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
+					 "SHA1 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
 					 stored_sha1_hash_string );
 				}
 			}
 			fprintf(
 			 stdout,
-			 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_sha1_hash_string );
 
 			if( log_file_stream != NULL )
 			{
 				fprintf(
 				 log_file_stream,
-				 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+				 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 				 calculated_sha1_hash_string );
 			}
-			match_sha1_hash = ( system_string_compare(
+			match_sha1_hash = ( libsystem_string_compare(
 					     stored_sha1_hash_string,
 					     calculated_sha1_hash_string,
 					     DIGEST_HASH_STRING_SIZE_SHA1 ) == 0 );
@@ -1212,7 +1208,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to print additional hash values.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1227,7 +1223,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to write additional hash values in log file.\n" );
 
-			notify_error_backtrace(
+			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
@@ -1255,14 +1251,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close EWF file(s).\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		verification_handle_free(
@@ -1279,14 +1275,14 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free verification handle.\n" );
 
-		notify_error_backtrace(
+		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
 
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1295,7 +1291,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_file_stream != NULL )
 		{
-			file_stream_io_fclose(
+			libsystem_file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1308,7 +1304,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( file_stream_io_fclose(
+		if( libsystem_file_stream_io_fclose(
 		     log_file_stream ) != 0 )
 		{
 			fprintf(

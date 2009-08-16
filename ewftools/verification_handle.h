@@ -28,16 +28,15 @@
 
 #include <liberror.h>
 
-#include <stdio.h>
-
 #include <libewf.h>
+
+#include <libsystem.h>
 
 #include "digest_context.h"
 #include "digest_hash.h"
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
-#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -100,7 +99,7 @@ int verification_handle_signal_abort(
 
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     system_character_t * const * filenames,
+     libsystem_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
@@ -140,7 +139,7 @@ int verification_handle_get_hash_value(
      verification_handle_t *verification_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     libsystem_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error );
 
@@ -162,14 +161,14 @@ int verification_handle_add_read_error(
 
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
-     system_character_t *calculated_md5_hash_string,
+     libsystem_character_t *calculated_md5_hash_string,
      size_t calculated_md5_hash_string_size,
-     system_character_t *stored_md5_hash_string,
+     libsystem_character_t *stored_md5_hash_string,
      size_t stored_md5_hash_string_size,
      int *stored_md5_hash_available,
-     system_character_t *calculated_sha1_hash_string,
+     libsystem_character_t *calculated_sha1_hash_string,
      size_t calculated_sha1_hash_string_size,
-     system_character_t *stored_sha1_hash_string,
+     libsystem_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,
      liberror_error_t **error );

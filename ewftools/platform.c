@@ -31,7 +31,9 @@
 #include <sys/utsname.h>
 #endif
 
-#include "system_string.h"
+#include <libsystem.h>
+
+#include "platform.h"
 
 #if !defined( LIBEWF_OPERATING_SYSTEM )
 #define LIBEWF_OPERATING_SYSTEM "Unknown"
@@ -41,7 +43,7 @@
  * Return 1 if successful or -1 on error
  */
 int platform_get_operating_system(
-     system_character_t *operating_system_string,
+     libsystem_character_t *operating_system_string,
      size_t operating_system_string_size,
      liberror_error_t **error )
 {
@@ -99,7 +101,7 @@ int platform_get_operating_system(
 
 		return( -1 );
 	}	
-	if( system_string_copy_from_utf8_string(
+	if( libsystem_string_copy_from_utf8_string(
 	     operating_system_string,
 	     operating_system_string_size,
 	     (uint8_t *) operating_system,
