@@ -1061,7 +1061,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_filename != NULL )
 		{
-			log_file_stream = libsystem_string_fopen(
+			log_file_stream = libsystem_file_stream_open(
 					   log_filename,
 					   _LIBSYSTEM_CHARACTER_T_STRING( "a" ) );
 

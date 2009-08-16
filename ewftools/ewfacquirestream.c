@@ -42,7 +42,6 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "file_io.h"
 #include "imaging_handle.h"
 #include "platform.h"
 #include "process_status.h"
@@ -685,7 +684,7 @@ ssize_t ewfacquirestream_read_chunk(
 
 		while( read_amount_of_errors <= read_error_retry )
 		{
-			read_count = file_io_read(
+			read_count = libsystem_file_io_read(
 			              input_file_descriptor,
 			              &( buffer[ buffer_offset + read_error_offset ] ),
 			              bytes_to_read );
@@ -2227,7 +2226,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_filename != NULL )
 		{
-			log_file_stream = libsystem_string_fopen(
+			log_file_stream = libsystem_file_stream_open(
 					   log_filename,
 					   _LIBSYSTEM_CHARACTER_T_STRING( "a" ) );
 

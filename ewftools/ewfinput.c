@@ -878,10 +878,10 @@ int ewfinput_get_string_variable(
 		 "%" PRIs_LIBSYSTEM ": ",
 		 request_string );
 
-		result_string = libsystem_string_fgets(
+		result_string = libsystem_file_stream_get_string(
+		                 stdin,
 		                 string_variable,
-		                 string_variable_size - 1,
-		                 stdin );
+		                 string_variable_size - 1 );
 
 		if( result_string != NULL )
 		{
@@ -898,10 +898,10 @@ int ewfinput_get_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_string_fgets(
+					result_string = libsystem_file_stream_get_string(
+					                 stdin,
 					                 string_variable,
-					                 string_variable_size - 1,
-					                 stdin );
+					                 string_variable_size - 1 );
 
 					end_of_input = libsystem_string_search(
 					                string_variable,
@@ -1025,10 +1025,10 @@ int ewfinput_get_size_variable(
 		 maximum,
 		 default_value );
 
-		result_string = libsystem_string_fgets(
+		result_string = libsystem_file_stream_get_string(
+		                 stdin,
 		                 input_buffer,
-		                 input_buffer_size - 1,
-		                 stdin );
+		                 input_buffer_size - 1 );
 
 		if( result_string != NULL )
 		{
@@ -1045,10 +1045,10 @@ int ewfinput_get_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_string_fgets(
+					result_string = libsystem_file_stream_get_string(
+					                 stdin,
 					                 input_buffer,
-					                 input_buffer_size - 1,
-					                 stdin );
+					                 input_buffer_size - 1 );
 
 					end_of_input = libsystem_string_search(
 					                input_buffer,
@@ -1242,10 +1242,10 @@ int ewfinput_get_byte_size_variable(
 		 maximum_size_string,
 		 default_size_string );
 
-		result_string = libsystem_string_fgets(
+		result_string = libsystem_file_stream_get_string(
+		                 stdin,
 		                 input_buffer,
-		                 input_buffer_size - 1,
-		                 stdin );
+		                 input_buffer_size - 1 );
 
 		if( result_string != NULL )
 		{
@@ -1262,10 +1262,10 @@ int ewfinput_get_byte_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_string_fgets(
+					result_string = libsystem_file_stream_get_string(
+					                 stdin,
 					                 input_buffer,
-					                 input_buffer_size - 1,
-					                 stdin );
+					                 input_buffer_size - 1 );
 
 					end_of_input = libsystem_string_search(
 					                input_buffer,
@@ -1414,7 +1414,9 @@ int ewfinput_get_fixed_string_variable(
 		 "%" PRIs_LIBSYSTEM " (",
 		 request_string );
 
-		for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
+		for( value_iterator = 0;
+		     value_iterator < amount_of_values;
+		     value_iterator++ )
 		{
 			if( value_iterator > 0 )
 			{
@@ -1432,10 +1434,10 @@ int ewfinput_get_fixed_string_variable(
 		 ") [%" PRIs_LIBSYSTEM "]: ",
 		 values[ default_value ] );
 
-		result_string = libsystem_string_fgets(
+		result_string = libsystem_file_stream_get_string(
+		                 stdin,
 		                 input_buffer,
-		                 input_buffer_size - 1,
-		                 stdin );
+		                 input_buffer_size - 1 );
 
 		if( result_string != NULL )
 		{
@@ -1452,10 +1454,10 @@ int ewfinput_get_fixed_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_string_fgets(
+					result_string = libsystem_file_stream_get_string(
+					                 stdin,
 					                 input_buffer,
-					                 input_buffer_size - 1,
-					                 stdin );
+					                 input_buffer_size - 1 );
 
 					end_of_input = libsystem_string_search(
 					                input_buffer,
@@ -1477,7 +1479,9 @@ int ewfinput_get_fixed_string_variable(
 
 				return( 0 );
 			}
-			for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
+			for( value_iterator = 0;
+			     value_iterator < amount_of_values;
+			     value_iterator++ )
 			{
 				value_length = libsystem_string_length(
 						values[ value_iterator ] );

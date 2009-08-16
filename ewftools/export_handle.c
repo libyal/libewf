@@ -41,7 +41,6 @@
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "export_handle.h"
-#include "file_io.h"
 #include "guid.h"
 #include "md5.h"
 #include "sha1.h"
@@ -654,13 +653,13 @@ int export_handle_open_output(
 		else
 		{
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER_TYPE )
-			export_handle->raw_output_file_descriptor = file_io_wopen(
+			export_handle->raw_output_file_descriptor = libsystem_file_io_wopen(
 			                                             filename,
-			                                             FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC );
+			                                             LIBSYSTEM_FILE_IO_O_CREAT | LIBSYSTEM_FILE_IO_O_WRONLY | LIBSYSTEM_FILE_IO_O_TRUNC );
 #else
-			export_handle->raw_output_file_descriptor = file_io_open(
+			export_handle->raw_output_file_descriptor = libsystem_file_io_open(
 			                                             filename,
-			                                             FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC );
+			                                             LIBSYSTEM_FILE_IO_O_CREAT | LIBSYSTEM_FILE_IO_O_WRONLY | LIBSYSTEM_FILE_IO_O_TRUNC );
 #endif
 
 			if( export_handle->raw_output_file_descriptor == -1 )
@@ -760,7 +759,7 @@ int export_handle_close(
 
 	if( export_handle->raw_output_file_descriptor != -1 )
 	{
-		if( file_io_close(
+		if( libsystem_file_io_close(
 		     export_handle->raw_output_file_descriptor ) != 0 )
 		{
 			liberror_error_set(
@@ -1251,7 +1250,7 @@ ssize_t export_handle_write_buffer(
 
 			return( -1 );
 		}
-		write_count = file_io_write(
+		write_count = libsystem_file_io_write(
 		               export_handle->raw_output_file_descriptor,
 			       storage_media_buffer->raw_buffer,
 			       write_size );

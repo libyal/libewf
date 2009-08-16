@@ -225,6 +225,9 @@ CodeGear project files
 * libewf
 * ewftools
 
+Version: 20090816
+* worked on common system library for ewftools
+
 Version: 20090815
 * worked on common system library for ewftools
 * rewrote ewftools date and time functions
