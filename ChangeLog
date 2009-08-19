@@ -228,6 +228,8 @@ CodeGear project files
 Version: 20090817
 * worked on common system library for ewftools
 * updated msvscpp solution files
+* updated libewf_date_time
+* updated include/libewf/codepage.h
 
 Version: 20090816
 * worked on common system library for ewftools

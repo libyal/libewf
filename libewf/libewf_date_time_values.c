@@ -51,7 +51,8 @@ int libewf_date_time_values_copy_from_timestamp(
      time_t timestamp,
      liberror_error_t **error )
 {
-	struct tm *time_elements = NULL;
+	struct tm time_elements;
+
 	static char *function    = "libewf_date_time_values_copy_from_timestamp";
 	int print_count          = 0;
 
@@ -88,11 +89,10 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	time_elements = libewf_date_time_localtime(
-			 &timestamp,
-	                 error );
-
-	if( time_elements == NULL )
+	if( libewf_date_time_localtime(
+	     &timestamp,
+	     &time_elements,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -107,12 +107,12 @@ int libewf_date_time_values_copy_from_timestamp(
 		       date_time_values_string,
 		       date_time_values_string_size,
 		       "%04d %02d %02d %02d %02d %02d",
-		       time_elements->tm_year + 1900,
-		       time_elements->tm_mon + 1,
-		       time_elements->tm_mday,
-		       time_elements->tm_hour,
-		       time_elements->tm_min,
-		       time_elements->tm_sec );
+		       time_elements.tm_year + 1900,
+		       time_elements.tm_mon + 1,
+		       time_elements.tm_mday,
+		       time_elements.tm_hour,
+		       time_elements.tm_min,
+		       time_elements.tm_sec );
 
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > date_time_values_string_size ) )
@@ -124,14 +124,8 @@ int libewf_date_time_values_copy_from_timestamp(
 		 "%s: unable to set date time values string.",
 		 function );
 
-		memory_free(
-		 time_elements );
-
 		return( -1 );
 	}
-	memory_free(
-	 time_elements );
-
 	return( 1 );
 }
 
@@ -299,7 +293,8 @@ int libewf_date_time_values_copy_to_string(
      size_t string_size,
      liberror_error_t **error )
 {
-	struct tm *time_elements        = NULL;
+	struct tm time_elements;
+
 	libewf_character_t *day_of_week = NULL;
 	libewf_character_t *month       = NULL;
 	static char *function           = "libewf_date_time_values_copy_to_string";
@@ -390,11 +385,10 @@ int libewf_date_time_values_copy_to_string(
 
 		return( -1 );
 	}
-	time_elements = libewf_date_time_localtime(
-			 &timestamp,
-	                 error );
-
-	if( time_elements == NULL )
+	if( libewf_date_time_localtime(
+	     &timestamp,
+	     &time_elements,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -418,7 +412,7 @@ int libewf_date_time_values_copy_to_string(
 
 			return( -1 );
 		}
-		switch( time_elements->tm_wday )
+		switch( time_elements.tm_wday )
 		{
 			case 0:
 				day_of_week = _LIBEWF_STRING( "Sun" );
@@ -450,12 +444,9 @@ int libewf_date_time_values_copy_to_string(
 				 "%s: unsupported day of the week value.",
 				 function );
 
-				memory_free(
-				 time_elements );
-
 				return( -1 );
 		}
-		switch( time_elements->tm_mon )
+		switch( time_elements.tm_mon )
 		{
 			case 0:
 				month = _LIBEWF_STRING( "Jan" );
@@ -502,9 +493,6 @@ int libewf_date_time_values_copy_to_string(
 				 "%s: unsupported month value.",
 				 function );
 
-				memory_free(
-				 time_elements );
-
 				return( -1 );
 		}
 		print_count = libewf_string_snprintf(
@@ -513,11 +501,11 @@ int libewf_date_time_values_copy_to_string(
 			       "%s %s %2d %02d:%02d:%02d %04d",
 			       (char *) day_of_week,
 			       (char *) month,
-			       time_elements->tm_mday,
-			       time_elements->tm_hour,
-			       time_elements->tm_min,
-			       time_elements->tm_sec,
-			       time_elements->tm_year + 1900 );
+			       time_elements.tm_mday,
+			       time_elements.tm_hour,
+			       time_elements.tm_min,
+			       time_elements.tm_sec,
+			       time_elements.tm_year + 1900 );
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	{
@@ -525,12 +513,12 @@ int libewf_date_time_values_copy_to_string(
 			       string,
 			       string_size,
 			       "%02d/%02d/%04d %02d:%02d:%02d",
-			       time_elements->tm_mon + 1,
-			       time_elements->tm_mday,
-			       time_elements->tm_year + 1900,
-			       time_elements->tm_hour,
-			       time_elements->tm_min,
-			       time_elements->tm_sec );
+			       time_elements.tm_mon + 1,
+			       time_elements.tm_mday,
+			       time_elements.tm_year + 1900,
+			       time_elements.tm_hour,
+			       time_elements.tm_min,
+			       time_elements.tm_sec );
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 	{
@@ -538,12 +526,12 @@ int libewf_date_time_values_copy_to_string(
 			       string,
 			       string_size,
 			       "%02d/%02d/%04d %02d:%02d:%02d",
-			       time_elements->tm_mday,
-			       time_elements->tm_mon + 1,
-			       time_elements->tm_year + 1900,
-			       time_elements->tm_hour,
-			       time_elements->tm_min,
-			       time_elements->tm_sec );
+			       time_elements.tm_mday,
+			       time_elements.tm_mon + 1,
+			       time_elements.tm_year + 1900,
+			       time_elements.tm_hour,
+			       time_elements.tm_min,
+			       time_elements.tm_sec );
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 	{
@@ -551,12 +539,12 @@ int libewf_date_time_values_copy_to_string(
 			       string,
 			       string_size,
 			       "%04d-%02d-%02dT%02d:%02d:%02d",
-			       time_elements->tm_year + 1900,
-			       time_elements->tm_mon + 1,
-			       time_elements->tm_mday,
-			       time_elements->tm_hour,
-			       time_elements->tm_min,
-			       time_elements->tm_sec );
+			       time_elements.tm_year + 1900,
+			       time_elements.tm_mon + 1,
+			       time_elements.tm_mday,
+			       time_elements.tm_hour,
+			       time_elements.tm_min,
+			       time_elements.tm_sec );
 	}
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > string_size ) )
@@ -567,9 +555,6 @@ int libewf_date_time_values_copy_to_string(
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set string.",
 		 function );
-
-		memory_free(
-		 time_elements );
 
 		return( -1 );
 	}
@@ -605,15 +590,9 @@ int libewf_date_time_values_copy_to_string(
 			 "%s: unable to set string.",
 			 function );
 
-			memory_free(
-			 time_elements );
-
 			return( -1 );
 		}
 	}
-	memory_free(
-	 time_elements );
-
 	return( 1 );
 }
 

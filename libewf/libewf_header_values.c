@@ -559,9 +559,10 @@ int libewf_generate_date_header_value(
      size_t *date_time_values_string_size,
      liberror_error_t **error )
 {
-	struct tm *time_elements = NULL;
-	static char *function    = "libewf_generate_date_header_value";
-	int print_count          = 0;
+	struct tm time_elements;
+
+	static char *function = "libewf_generate_date_header_value";
+	int print_count       = 0;
 
 	if( date_time_values_string == NULL )
 	{
@@ -596,11 +597,10 @@ int libewf_generate_date_header_value(
 
 		return( -1 );
 	}
-	time_elements = libewf_date_time_localtime(
-	                 &timestamp,
-	                 error );
-
-	if( time_elements == NULL )
+	if( libewf_date_time_localtime(
+	     &timestamp,
+	     &time_elements,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -625,9 +625,6 @@ int libewf_generate_date_header_value(
 		 "%s: unable to create date time values string.",
 		 function );
 
-		memory_free(
-		 time_elements );
-
 		*date_time_values_string_size = 0;
 
 		return( -1 );
@@ -636,12 +633,12 @@ int libewf_generate_date_header_value(
 	               *date_time_values_string,
 	               *date_time_values_string_size,
 	               "%4d %d %d %d %d %d",
-	               time_elements->tm_year + 1900,
-	               time_elements->tm_mon + 1,
-	               time_elements->tm_mday,
-	               time_elements->tm_hour,
-	               time_elements->tm_min,
-	               time_elements->tm_sec );
+	               time_elements.tm_year + 1900,
+	               time_elements.tm_mon + 1,
+	               time_elements.tm_mday,
+	               time_elements.tm_hour,
+	               time_elements.tm_min,
+	               time_elements.tm_sec );
 
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *date_time_values_string_size ) )
@@ -655,17 +652,12 @@ int libewf_generate_date_header_value(
 
 		memory_free(
 		 *date_time_values_string );
-		memory_free(
-		 time_elements );
 
 		*date_time_values_string      = NULL;
 		*date_time_values_string_size = 0;
 
 		return( -1 );
 	}
-	memory_free(
-	 time_elements );
-
 	return( 1 );
 }
 
@@ -5856,7 +5848,8 @@ int libewf_generate_date_xheader_value(
      size_t *date_time_values_string_size,
      liberror_error_t **error )
 {
-	struct tm *time_elements        = NULL;
+	struct tm time_elements;
+
 	libewf_character_t *day_of_week = NULL;
 	libewf_character_t *month       = NULL;
 	static char *function           = "libewf_generate_date_xheader_value";
@@ -5895,11 +5888,10 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	time_elements = libewf_date_time_localtime(
-			 &timestamp,
-	                 error );
-
-	if( time_elements == NULL )
+	if( libewf_date_time_localtime(
+	     &timestamp,
+	     &time_elements,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -5910,7 +5902,7 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	switch( time_elements->tm_wday )
+	switch( time_elements.tm_wday )
 	{
 		case 0:
 			day_of_week = _LIBEWF_STRING( "Sun" );
@@ -5942,12 +5934,9 @@ int libewf_generate_date_xheader_value(
 			 "%s: unsupported day of the week value.",
 			 function );
 
-			memory_free(
-			 time_elements );
-
 			return( -1 );
 	}
-	switch( time_elements->tm_mon )
+	switch( time_elements.tm_mon )
 	{
 		case 0:
 			month = _LIBEWF_STRING( "Jan" );
@@ -5994,9 +5983,6 @@ int libewf_generate_date_xheader_value(
 			 "%s: unsupported month value.",
 			 function );
 
-			memory_free(
-			 time_elements );
-
 			return( -1 );
 	}
 	*date_time_values_string_size = 64;
@@ -6018,7 +6004,7 @@ int libewf_generate_date_xheader_value(
 		return( -1 );
 	}
 #if defined( _BSD_SOURCE )
-	time_elements->tm_gmtoff /= 60;
+	time_elements.tm_gmtoff /= 60;
 
 	print_count = libewf_string_snprintf(
 		       *date_time_values_string,
@@ -6026,14 +6012,14 @@ int libewf_generate_date_xheader_value(
 		       "%s %s %2d %02d:%02d:%02d %04d %+03ld:%02ld (%s)",
 		       (char *) day_of_week,
 		       (char *) month,
-		       time_elements->tm_mday,
-		       time_elements->tm_hour,
-		       time_elements->tm_min,
-		       time_elements->tm_sec,
-		       time_elements->tm_year + 1900,
-	               time_elements->tm_gmtoff / 60,
-	               time_elements->tm_gmtoff % 60,
-		       time_elements->tm_zone );
+		       time_elements.tm_mday,
+		       time_elements.tm_hour,
+		       time_elements.tm_min,
+		       time_elements.tm_sec,
+		       time_elements.tm_year + 1900,
+	               time_elements.tm_gmtoff / 60,
+	               time_elements.tm_gmtoff % 60,
+		       time_elements.tm_zone );
 #else
 	print_count = libewf_string_snprintf(
 		       *date_time_values_string,
@@ -6041,16 +6027,13 @@ int libewf_generate_date_xheader_value(
 		       "%s %s %2d %02d:%02d:%02d %04d %s",
 		       (char *) day_of_week,
 		       (char *) month,
-		       time_elements->tm_mday,
-		       time_elements->tm_hour,
-		       time_elements->tm_min,
-		       time_elements->tm_sec,
-		       time_elements->tm_year + 1900,
-		       tzname[ time_elements->tm_isdst ] );
+		       time_elements.tm_mday,
+		       time_elements.tm_hour,
+		       time_elements.tm_min,
+		       time_elements.tm_sec,
+		       time_elements.tm_year + 1900,
+		       tzname[ time_elements.tm_isdst ] );
 #endif
-
-	memory_free(
-	 time_elements );
 
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *date_time_values_string_size ) )

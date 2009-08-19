@@ -41,14 +41,14 @@
 
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-struct tm *libewf_date_time_localtime(
-            const time_t *timestamp,
-            liberror_error_t **error )
+int libewf_date_time_localtime(
+     const time_t *timestamp,
+     struct tm *time_elements,
+     liberror_error_t **error )
 {
-#if !defined( HAVE_LOCALTIME_R ) && defined( HAVE_LOCALTIME )
+#if ( defined( HAVE_LOCALTIME ) && !defined( HAVE_LOCALTIME_R ) ) || ( defined( WINAPI ) && !defined( _MSC_VER ) )
 	struct tm *static_time_elements = NULL;
 #endif
-	struct tm *time_elements        = NULL;
 	static char *function           = "libewf_date_time_localtime";
 
 	if( timestamp == NULL )
@@ -60,32 +60,23 @@ struct tm *libewf_date_time_localtime(
 		 "%s: invalid time stamp.",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	time_elements = (struct tm *) memory_allocate(
-	                               sizeof( struct tm ) );
-
 	if( time_elements == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create time elements.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid time elements.",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-#if defined( HAVE_LOCALTIME_R )
-#if defined( WINAPI )
+#if defined( _MSC_VER )
 	if( localtime_s(
 	     time_elements,
 	     timestamp ) != 0 )
-#else
-	if( localtime_r(
-	     timestamp,
-	     time_elements ) == NULL )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -94,12 +85,23 @@ struct tm *libewf_date_time_localtime(
 		 "%s: unable to set time elements.",
 		 function );
 
-		memory_free(
-		 time_elements );
-
-		return( NULL );
+		return( -1 );
 	}
-#elif defined( HAVE_LOCALTIME )
+#elif defined( HAVE_LOCALTIME_R )
+	if( localtime_r(
+	     timestamp,
+	     time_elements ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set time elements.",
+		 function );
+
+		return( -1 );
+	}
+#elif defined( HAVE_LOCALTIME ) || defined( WINAPI )
 	static_time_elements = localtime(
 	                        timestamp );
 
@@ -112,10 +114,7 @@ struct tm *libewf_date_time_localtime(
 		 "%s: unable to create static time elements.",
 		 function );
 
-		memory_free(
-		 time_elements );
-
-		return( NULL );
+		return( -1 );
 	}
 	if( memory_copy(
 	     time_elements,
@@ -129,12 +128,9 @@ struct tm *libewf_date_time_localtime(
 		 "%s: unable to set time elements.",
 		 function );
 
-		memory_free(
-		 time_elements );
-
-		return( NULL );
+		return( -1 );
 	}
 #endif
-	return( time_elements );
+	return( 1 );
 }
 

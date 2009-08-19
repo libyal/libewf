@@ -53,9 +53,10 @@ extern "C" {
 #error Missing mktime function
 #endif
 
-struct tm *libewf_date_time_localtime(
-            const time_t *timestamp,
-            liberror_error_t **error );
+int libewf_date_time_localtime(
+     const time_t *timestamp,
+     struct tm *time_elements,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }
