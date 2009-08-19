@@ -225,6 +225,10 @@ CodeGear project files
 * libewf
 * ewftools
 
+Version: 20090817
+* worked on common system library for ewftools
+* updated msvscpp solution files
+
 Version: 20090816
 * worked on common system library for ewftools
 

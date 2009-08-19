@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ewfacquire"
 	ProjectGUID="{7D57918B-6B13-4F5D-BA51-04BB6047A91C}"
 	RootNamespace="ewfacquire"
@@ -41,7 +41,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\zlib\include"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsystem;..\zlib\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -108,10 +108,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\date_time.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\device_handle.c"
 				>
 			</File>
@@ -124,15 +120,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\error_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfacquire.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfgetopt.c"
 				>
 			</File>
 			<File
@@ -148,15 +136,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\file_io.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\guid.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\glob.c"
 				>
 			</File>
 			<File
@@ -180,10 +160,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\notify.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\platform.c"
 				>
 			</File>
@@ -195,10 +171,6 @@
 				RelativePath="..\..\ewftools\storage_media_buffer.c"
 				>
 			</File>
-			<File
-				RelativePath="..\..\ewftools\system_string.c"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -207,10 +179,6 @@
 			>
 			<File
 				RelativePath="..\..\ewftools\byte_size_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\date_time.h"
 				>
 			</File>
 			<File
@@ -226,15 +194,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\error_string.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfcommon.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfgetopt.h"
 				>
 			</File>
 			<File
@@ -250,19 +210,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\file_io.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\file_stream_io.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\guid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\glob.h"
 				>
 			</File>
 			<File
@@ -294,10 +242,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\notify.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\platform.h"
 				>
 			</File>
@@ -311,10 +255,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\storage_media_buffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\system_string.h"
 				>
 			</File>
 		</Filter>

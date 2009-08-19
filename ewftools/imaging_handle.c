@@ -352,7 +352,7 @@ int imaging_handle_open_output(
 		first_filename_length = libsystem_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
@@ -406,7 +406,7 @@ int imaging_handle_open_output(
 		libewf_filenames = filenames;
 		flags            = LIBEWF_OPEN_WRITE;
 	}
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     imaging_handle->output_handle,

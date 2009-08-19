@@ -112,7 +112,7 @@ void ewfdebug_signal_handler(
 
 /* The main program
  */
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
@@ -300,7 +300,7 @@ int main( int argc, char * const argv[] )
 		first_filename_length = libsystem_string_length(
 		                         argv_filenames[ 0 ] );
 
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     argv_filenames[ 0 ],

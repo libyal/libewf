@@ -2,10 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ewfverify"
-	ProjectGUID="{E47BC48E-4CDC-49CC-B82E-4468DE2540DE}"
-	RootNamespace="ewfverify"
-	Keyword="Win32Proj"
+	Name="libsystem"
+	ProjectGUID="{A2B861D5-6751-43A9-B085-8D48F8754AC5}"
+	RootNamespace="libsystem"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -20,9 +19,8 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,13 +39,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsystem;..\zlib\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
 				WarningLevel="4"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
+				WarnAsError="false"
 				CompileAs="1"
 			/>
 			<Tool
@@ -60,23 +56,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib liberror.lib libuna.lib"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\libsystem.lib"
+				ModuleDefinitionFile=""
+				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -86,9 +72,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -104,43 +87,35 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.c"
+				RelativePath="..\..\libsystem\libsystem_date_time.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_context.c"
+				RelativePath="..\..\libsystem\libsystem_error.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_hash.c"
+				RelativePath="..\..\libsystem\libsystem_file.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfinput.c"
+				RelativePath="..\..\libsystem\libsystem_getopt.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfoutput.c"
+				RelativePath="..\..\libsystem\libsystem_glob.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.c"
+				RelativePath="..\..\libsystem\libsystem_notify.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfverify.c"
+				RelativePath="..\..\libsystem\libsystem_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\process_status.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\storage_media_buffer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\verification_handle.c"
+				RelativePath="..\..\libsystem\libsystem_support.c"
 				>
 			</File>
 		</Filter>
@@ -150,51 +125,63 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.h"
+				RelativePath="..\..\libsystem\libsystem.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_context.h"
+				RelativePath="..\..\libsystem\libsystem_date_time.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_hash.h"
+				RelativePath="..\..\libsystem\libsystem_directory.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfcommon.h"
+				RelativePath="..\..\libsystem\libsystem_directory_io.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfinput.h"
+				RelativePath="..\..\libsystem\libsystem_error.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfoutput.h"
+				RelativePath="..\..\libsystem\libsystem_file.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.h"
+				RelativePath="..\..\libsystem\libsystem_file_io.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\md5.h"
+				RelativePath="..\..\libsystem\libsystem_file_stream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\process_status.h"
+				RelativePath="..\..\libsystem\libsystem_file_stream_io.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\sha1.h"
+				RelativePath="..\..\libsystem\libsystem_getopt.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\storage_media_buffer.h"
+				RelativePath="..\..\libsystem\libsystem_glob.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\verification_handle.h"
+				RelativePath="..\..\libsystem\libsystem_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsystem\libsystem_notify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsystem\libsystem_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsystem\libsystem_support.h"
 				>
 			</File>
 		</Filter>

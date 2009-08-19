@@ -285,7 +285,7 @@ int alteration_handle_open_input(
 		first_filename_length = libsystem_string_length(
 		                         filenames[ 0 ]);
 
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
@@ -334,7 +334,7 @@ int alteration_handle_open_input(
 		}
 		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     alteration_handle->input_handle,
@@ -1111,7 +1111,7 @@ int alteration_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_set_delta_segment_filename_wide(
 	     alteration_handle->input_handle,

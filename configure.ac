@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090816],
+ [20090817],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090816])
+ [20090817])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -518,7 +518,7 @@ AC_CHECK_FUNCS(
 dnl Commandline argument/option parsing functions in libsystem/libsystem_getopt.h
 AC_CHECK_FUNCS([getopt])
 
-dnl Check for locale functions in libsystem/libsystem_string.h
+dnl Check for locale functions in libsystem/libsystem_support.h
 AC_CHECK_FUNCS(
  [setlocale],
  [],

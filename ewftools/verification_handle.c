@@ -349,7 +349,7 @@ int verification_handle_open_input(
 		first_filename_length = libsystem_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
@@ -398,7 +398,7 @@ int verification_handle_open_input(
 		}
 		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     verification_handle->input_handle,
@@ -1996,7 +1996,7 @@ int verification_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 				if( libewf_handle_get_filename_size_wide(
 				     verification_handle->input_handle,
 				     &filename_size,
@@ -2042,7 +2042,7 @@ int verification_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( LIBSYSTEM_WIDE_CHARACTER_TYPE )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 				if( libewf_handle_get_filename_wide(
 				     verification_handle->input_handle,
 				     filename,
