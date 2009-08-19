@@ -26,7 +26,7 @@ ewfacquire_SOURCES = \
 	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h
 
-ewfacquire_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @LIBUNA_LIBADD@ @MEMWATCH_LIBADD@
+ewfacquire_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -45,7 +45,7 @@ ewfacquirestream_SOURCES = \
 	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h
 
-ewfacquirestream_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @LIBUNA_LIBADD@ @MEMWATCH_LIBADD@
+ewfacquirestream_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
 ewfalter_SOURCES = \
 	alteration_handle.c alteration_handle.h \
@@ -57,7 +57,7 @@ ewfalter_SOURCES = \
 	ewfsignal.c ewfsignal.h \
 	storage_media_buffer.c storage_media_buffer.h
 
-ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @LIBUNA_LIBADD@ @MEMWATCH_LIBADD@
+ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
 ewfdebug_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -66,7 +66,7 @@ ewfdebug_SOURCES = \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h
 
-ewfdebug_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @LIBUNA_LIBADD@ @MEMWATCH_LIBADD@
+ewfdebug_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
 ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -85,7 +85,7 @@ ewfexport_SOURCES = \
 	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h
 
-ewfexport_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @LIBUNA_LIBADD@ @MEMWATCH_LIBADD@
+ewfexport_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
 ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -97,7 +97,7 @@ ewfinfo_SOURCES = \
 	guid.c guid.h \
 	info_handle.c info_handle.h
 
-ewfinfo_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @LIBUNA_LIBADD@ @MEMWATCH_LIBADD@
+ewfinfo_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -114,7 +114,7 @@ ewfverify_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h \
 	verification_handle.c verification_handle.h
 
-ewfverify_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @LIBUNA_LIBADD@ @MEMWATCH_LIBADD@
+ewfverify_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
 distclean: clean
 	/bin/rm -f Makefile

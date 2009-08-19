@@ -225,6 +225,12 @@ CodeGear project files
 * libewf
 * ewftools
 
+Version: 20090819
+* updated libbfio
+* updated libsystem_file
+* moved libuna include from ewftools to libsystem
+* fixed some small memory leaks in ewftools
+
 Version: 20090817
 * worked on common system library for ewftools
 * updated msvscpp solution files

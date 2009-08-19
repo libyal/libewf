@@ -1100,6 +1100,10 @@ ssize64_t ewfacquirestream_read_input(
 			 "%s: unable to update process status.",
 			 function );
 
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
 			return( -1 );
 		}
 		if( ewfacquirestream_abort != 0 )
