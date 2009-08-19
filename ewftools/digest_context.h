@@ -28,10 +28,12 @@
 
 #include <liberror.h>
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-#include <openssl/evp.h>
-#elif defined( HAVE_WINCPRYPT_H )
+#elif defined( WINAPI )
 #include <wincrypt.h>
+
+#elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+#include <openssl/evp.h>
+
 #endif
 
 #include "digest_hash.h"
@@ -40,13 +42,13 @@
 extern "C" {
 #endif
 
-#define DIGEST_CONTEXT_TYPE_MD5		(uint8_t) 'm'
-#define DIGEST_CONTEXT_TYPE_SHA1	(uint8_t) 's'
+enum DIGEST_CONTEXT_TYPES
+{
+	DIGEST_CONTEXT_TYPE_MD5		= (int) 'm',
+	DIGEST_CONTEXT_TYPE_SHA1	= (int) 's'
+};
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-typedef EVP_MD_CTX digest_context_t;
-
-#elif defined( HAVE_WINCPRYPT_H )
+#if defined( WINAPI )
 typedef struct digest_context digest_context_t;
 
 struct digest_context
@@ -54,6 +56,9 @@ struct digest_context
 	HCRYPTPROV crypt_provider;
 	HCRYPTHASH hash;
 };
+
+#elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+typedef EVP_MD_CTX digest_context_t;
 
 #else
 typedef int digest_context_t;

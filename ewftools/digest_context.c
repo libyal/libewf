@@ -35,10 +35,10 @@ int digest_context_initialize(
      uint8_t type,
      liberror_error_t **error )
 {
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-	const EVP_MD *digest_type = NULL;
-#elif defined( HAVE_WINCPRYPT_H )
+#if defined( WINAPI )
 	DWORD digest_type         = 0;
+#elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+	const EVP_MD *digest_type = NULL;
 #endif
 	static char *function     = "digest_context_initialize";
 
@@ -65,32 +65,7 @@ int digest_context_initialize(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-	EVP_MD_CTX_init( digest_context );
-
-	if( type == DIGEST_CONTEXT_TYPE_MD5 )
-	{
-		digest_type = EVP_md5();
-	}
-	else if( type == DIGEST_CONTEXT_TYPE_SHA1 )
-	{
-		digest_type = EVP_sha1();
-	}
-	if( EVP_DigestInit_ex(
-	     digest_context,
-	     digest_type,
-	     NULL ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize context.",
-		 function );
-
-		return( 0 );
-	}
-#elif defined( HAVE_WINCPRYPT_H )
+#if defined( HAVE_WINCPRYPT_H )
 	digest_context->crypt_provider = 0;
 	digest_context->hash           = 0;
 
@@ -159,6 +134,32 @@ int digest_context_initialize(
 
 		return( 0 );
 	}
+
+#elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+	EVP_MD_CTX_init( digest_context );
+
+	if( type == DIGEST_CONTEXT_TYPE_MD5 )
+	{
+		digest_type = EVP_md5();
+	}
+	else if( type == DIGEST_CONTEXT_TYPE_SHA1 )
+	{
+		digest_type = EVP_sha1();
+	}
+	if( EVP_DigestInit_ex(
+	     digest_context,
+	     digest_type,
+	     NULL ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize context.",
+		 function );
+
+		return( 0 );
+	}
 #endif
 	return( 1 );
 }
@@ -207,22 +208,7 @@ int digest_context_update(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-	if( EVP_DigestUpdate(
-	     digest_context,
-	     (const void *) buffer,
-	     (unsigned long) size ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to update digest hash.",
-		 function );
-
-		return( 0 );
-	}
-#elif defined( HAVE_WINCPRYPT_H )
+#if defined( WINAPI )
 	if( digest_context->hash == 0 )
 	{
 		liberror_error_set(
@@ -245,6 +231,22 @@ int digest_context_update(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to update digest context hash.",
+		 function );
+
+		return( 0 );
+	}
+
+#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+	if( EVP_DigestUpdate(
+	     digest_context,
+	     (const void *) buffer,
+	     (unsigned long) size ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to update digest hash.",
 		 function );
 
 		return( 0 );
@@ -297,32 +299,7 @@ int digest_context_finalize(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-	if( EVP_DigestFinal_ex(
-	     digest_context,
-	     (unsigned char *) digest_hash,
-	     (unsigned int *) size ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to finalize digest hash.",
-		 function );
-
-		return( 0 );
-	}
-	if( EVP_MD_CTX_cleanup(
-	     digest_context ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to clean up digest context.",
-		 function );
-	}
-#elif defined( HAVE_WINCPRYPT_H )
+#if defined( WINAPI )
 	if( digest_context->hash == 0 )
 	{
 		liberror_error_set(
@@ -360,6 +337,32 @@ int digest_context_finalize(
 	{
 		CryptDestroyHash(
 		 digest_context->hash );
+	}
+
+#elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+	if( EVP_DigestFinal_ex(
+	     digest_context,
+	     (unsigned char *) digest_hash,
+	     (unsigned int *) size ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to finalize digest hash.",
+		 function );
+
+		return( 0 );
+	}
+	if( EVP_MD_CTX_cleanup(
+	     digest_context ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to clean up digest context.",
+		 function );
 	}
 #endif
 	return( 1 );

@@ -230,6 +230,7 @@ Version: 20090817
 * updated msvscpp solution files
 * updated libewf_date_time
 * updated include/libewf/codepage.h
+* updated libbfio
 
 Version: 20090816
 * worked on common system library for ewftools
