@@ -43,6 +43,14 @@
 #include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
 
+#if defined( _MSC_VER )
+
+/* This inclusion is needed otherwise MSVSC++ messes up exporting
+ * the legacy functions
+ */
+#include "libewf_legacy.h"
+#endif
+
 #if defined( __cplusplus )
 extern "C" {
 #endif

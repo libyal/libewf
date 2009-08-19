@@ -65,7 +65,7 @@ int digest_context_initialize(
 
 		return( -1 );
 	}
-#if defined( HAVE_WINCPRYPT_H )
+#if defined( WINAPI )
 	digest_context->crypt_provider = 0;
 	digest_context->hash           = 0;
 
@@ -236,7 +236,7 @@ int digest_context_update(
 		return( 0 );
 	}
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+#elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 	if( EVP_DigestUpdate(
 	     digest_context,
 	     (const void *) buffer,

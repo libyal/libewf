@@ -201,8 +201,10 @@ int device_handle_open_input(
 #if defined( WINAPI )
 	PVOID error_string               = NULL;
 	LARGE_INTEGER large_integer_size = DEVICE_HANDLE_LARGE_INTEGER_ZERO;
+	DWORD dword_size                 = 0;
 	DWORD error_code                 = 0;
 	DWORD file_type                  = 0;
+	DWORD windows_version            = 0;
 #else
 	struct stat file_stat;
 #endif
@@ -368,20 +370,42 @@ int device_handle_open_input(
 		}
 		device_handle->type = DEVICE_HANDLE_TYPE_FILE;
 
-		if( GetFileSizeEx(
-		     device_handle->file_handle,
-		     &large_integer_size ) == 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine file or device size.",
-			 function );
+		windows_version = GetVersion();
 
-			return( -1 );
+		if( windows_version >= 0x80000000 )
+		{
+			if( GetFileSize(
+			     device_handle->file_handle,
+			     &dword_size ) == 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine file or device size.",
+				 function );
+
+				return( -1 );
+			}
+			file_size = (size64_t) dword_size;
 		}
-		file_size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
+		else
+		{
+			if( GetFileSizeEx(
+			     device_handle->file_handle,
+			     &large_integer_size ) == 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine file or device size.",
+				 function );
+
+				return( -1 );
+			}
+			file_size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
+		}
 	}
 #else
 	device_handle->file_descriptor = open(

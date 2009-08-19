@@ -55,6 +55,13 @@ int platform_get_operating_system(
 	static char *function          = "platform_get_operating_system";
 	size_t operating_system_length = 0;
 
+#if defined( WINAPI )
+	DWORD windows_version          = 0; 
+	DWORD windows_major_version    = 0;
+	DWORD windows_minor_version    = 0; 
+	DWORD windows_build_number     = 0;
+#endif
+
 	if( operating_system_string == NULL )
 	{
 		liberror_error_set(
@@ -68,6 +75,85 @@ int platform_get_operating_system(
 	}
 #if defined( WINAPI )
 	operating_system = "Windows";
+
+	windows_version = GetVersion();
+ 
+	windows_major_version = (DWORD) ( LOBYTE( LOWORD( windows_version ) ) );
+	windows_minor_version = (DWORD) ( HIBYTE( LOWORD( windows_version ) ) );
+
+/*
+	if( windows_version < 0x80000000 )
+	{
+		windows_build_number = (DWORD)( HIWORD( windows_version ) );
+	}
+*/
+	if( windows_major_version == 3 )
+	{
+		if( windows_version < 0x80000000 )
+		{
+			if( windows_minor_version == 51 )
+			{
+				operating_system = "Windows NT 3.51";
+			}
+		}
+	}
+	else if( windows_major_version == 4 )
+	{
+		if( windows_version < 0x80000000 )
+		{
+			if( windows_minor_version == 0 )
+			{
+				operating_system = "Windows NT 4";
+			}
+		}
+		else
+		{
+			if( windows_minor_version == 0 )
+			{
+				operating_system = "Windows 95";
+			}
+			else if( windows_minor_version == 10 )
+			{
+				operating_system = "Windows 98";
+			}
+			else if( windows_minor_version == 90 )
+			{
+				operating_system = "Windows ME";
+			}
+		}
+	}
+	else if( windows_major_version == 5 )
+	{
+		if( windows_version < 0x80000000 )
+		{
+			if( windows_minor_version == 0 )
+			{
+				operating_system = "Windows 2000";
+			}
+			else if( windows_minor_version == 1 )
+			{
+				operating_system = "Windows XP";
+			}
+			else if( windows_minor_version == 2 )
+			{
+				operating_system = "Windows 2003";
+			}
+		}
+	}
+	else if( windows_major_version == 6 )
+	{
+		if( windows_version < 0x80000000 )
+		{
+			if( windows_minor_version == 0 )
+			{
+				operating_system = "Windows Vista/2008";
+			}
+			else if( windows_minor_version == 1 )
+			{
+				operating_system = "Windows 7";
+			}
+		}
+	}
 
 #elif defined( HAVE_UNAME )
 	/* Determine the operating system

@@ -28,7 +28,7 @@
 
 #include <liberror.h>
 
-#elif defined( WINAPI )
+#if defined( WINAPI )
 #include <wincrypt.h>
 
 #elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
