@@ -144,6 +144,7 @@ ewftools:
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
   - allow different input and output header codepages?
+  - handle ewf/raw like in smioexport
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -223,6 +224,7 @@ Version: 20090820
 * worked msvscpp solution files
 * worked codegear project files
 * small corrections in include/libewf/types.h.in
+* fixed libsystem_file_io open mode
 
 Version: 20090819
 * updated libbfio
