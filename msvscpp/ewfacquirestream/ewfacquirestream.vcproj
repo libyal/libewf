@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ewfacquirestream"
 	ProjectGUID="{A7DD27F1-73B6-447B-ADF4-424518923A98}"
 	RootNamespace="ewfacquirestream"
@@ -128,10 +128,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\guid.c"
 				>
 			</File>
@@ -179,10 +175,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfsignal.h"
 				>
 			</File>
 			<File

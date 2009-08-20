@@ -30,7 +30,7 @@
 #include <libewf/features.h>
 #include <libewf/types.h>
 
-#if @HAVE_V1_API@
+#if @HAVE_V1_API@ || defined( HAVE_V1_API )
 #include <libewf/handle.h>
 #endif
 
@@ -72,7 +72,7 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
 /* Determines if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename,
                    libewf_error_t **error );
@@ -85,7 +85,7 @@ LIBEWF_EXTERN int libewf_check_file_signature(
 /* Determines if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_check_file_signature_wide(
                    const wchar_t *filename,
                    libewf_error_t **error );
@@ -100,7 +100,7 @@ LIBEWF_EXTERN int libewf_check_file_signature_wide(
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_glob(
                    const char *filename,
                    size_t filename_length,
@@ -121,7 +121,7 @@ LIBEWF_EXTERN int libewf_glob(
                    char **filenames[] );
 #endif
 
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 /* Frees the globbed filenames
  * Returns 1 if successful or -1 on error
  */
@@ -137,7 +137,7 @@ LIBEWF_EXTERN int libewf_glob_free(
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_glob_wide(
                    const wchar_t *filename,
                    size_t filename_length,
@@ -158,7 +158,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    wchar_t **filenames[] );
 #endif
 
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 /* Frees the globbed filenames
  * Returns 1 if successful or -1 on error
  */
@@ -173,7 +173,7 @@ LIBEWF_EXTERN int libewf_glob_free(
  * Notify functions (APIv1)
  * ------------------------------------------------------------------------- */
 
-#if @HAVE_V1_API@
+#if @HAVE_V1_API@ || defined( HAVE_V1_API )
 
 /* Set the notify values
  */
@@ -187,7 +187,7 @@ LIBEWF_EXTERN void libewf_set_notify_values(
  * Notify functions (APIv2)
  * ------------------------------------------------------------------------- */
 
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Set the verbose notification
  */
@@ -221,7 +221,7 @@ LIBEWF_EXTERN int libewf_notify_stream_close(
  * Error functions (APIv2)
  * ------------------------------------------------------------------------- */
 
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Frees the error including elements
  */
@@ -264,7 +264,7 @@ LIBEWF_EXTERN int libewf_error_backtrace_sprint(
  * File/Handle functions (APIv1)
  * ------------------------------------------------------------------------- */
 
-#if @HAVE_V1_API@
+#if @HAVE_V1_API@ || defined( HAVE_V1_API )
 
 /* Signals the libewf handle to abort its current activity
  * Returns 1 if successful or -1 on error
@@ -525,7 +525,7 @@ LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
  * File/Handle functions (APIv2)
  * ------------------------------------------------------------------------- */
 
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Initialize the handle
  * Returns 1 if successful or -1 on error
@@ -909,7 +909,7 @@ LIBEWF_EXTERN int libewf_handle_get_filename_wide(
  * Meta data functions (APIv1)
  * ------------------------------------------------------------------------- */
 
-#if @HAVE_V1_API@
+#if @HAVE_V1_API@ || defined( HAVE_V1_API )
 
 /* Retrieves the amount of sectors per chunk from the media information
  * Returns 1 if successful or -1 on error
@@ -1532,7 +1532,7 @@ LIBEWF_EXTERN int libewf_parse_hash_values(
  * Meta data functions (APIv2)
  * ------------------------------------------------------------------------- */
 
-#if @HAVE_V2_API@
+#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Retrieves the amount of sectors per chunk from the media information
  * Returns 1 if successful or -1 on error

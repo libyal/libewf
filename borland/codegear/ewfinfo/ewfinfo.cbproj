@@ -19,7 +19,7 @@
 			<AllPackageLibs>rtl.lib</AllPackageLibs>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<NoVCL>true</NoVCL>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libuna;..\..\..\libbfio;..\..\..\libewf;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libuna;..\..\..\libbfio;..\..\..\libewf;..\..\..\libsystem;$(BCC_IncludePath)</BCC_IncludePath>
 			<ProjectType>CppConsoleApplication</ProjectType>
 			<Multithreaded>true</Multithreaded>
 			<BCC_waus>false</BCC_waus>
@@ -39,6 +39,57 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
+			<None Include="..\..\..\ewftools\notify.h">
+				<BuildOrder>17</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\ewfcommon.h">
+				<BuildOrder>18</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfgetopt.c">
+				<BuildOrder>19</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\guid.c">
+				<BuildOrder>14</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\guid.h">
+				<BuildOrder>15</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\notify.c">
+				<BuildOrder>16</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\ewfgetopt.h">
+				<BuildOrder>20</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfsignal.c">
+				<BuildOrder>24</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\ewfsignal.h">
+				<BuildOrder>25</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\system_string.c">
+				<BuildOrder>26</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\ewfinfo.c">
+				<BuildOrder>21</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
+				<BuildOrder>22</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\ewfoutput.h">
+				<BuildOrder>23</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\glob.h">
+				<BuildOrder>13</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\system_string.h">
+				<BuildOrder>3</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\date_time.c">
+				<BuildOrder>4</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\date_time.h">
+				<BuildOrder>5</BuildOrder>
+			</None>
 			<LibFiles Include="..\Release\libuna.lib">
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>34</BuildOrder>
@@ -51,27 +102,9 @@
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>24</BuildOrder>
 			</LibFiles>
-			<None Include="..\..\..\ewftools\system_string.h">
-				<BuildOrder>3</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\date_time.c">
-				<BuildOrder>4</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\date_time.h">
-				<BuildOrder>5</BuildOrder>
-			</None>
 			<None Include="..\..\..\ewftools\directory_io.h">
 				<BuildOrder>6</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\ewftools\error_string.c">
-				<BuildOrder>7</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\error_string.h">
-				<BuildOrder>8</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\file_io.c">
-				<BuildOrder>9</BuildOrder>
-			</CppCompile>
 			<None Include="..\..\..\ewftools\file_io.h">
 				<BuildOrder>10</BuildOrder>
 			</None>
@@ -81,47 +114,14 @@
 			<CppCompile Include="..\..\..\ewftools\glob.c">
 				<BuildOrder>12</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\ewftools\glob.h">
-				<BuildOrder>13</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\guid.c">
-				<BuildOrder>14</BuildOrder>
+			<CppCompile Include="..\..\..\ewftools\error_string.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\ewftools\guid.h">
-				<BuildOrder>15</BuildOrder>
+			<None Include="..\..\..\ewftools\error_string.h">
+				<BuildOrder>8</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\ewftools\notify.c">
-				<BuildOrder>16</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\notify.h">
-				<BuildOrder>17</BuildOrder>
-			</None>
-			<None Include="..\..\..\ewftools\ewfcommon.h">
-				<BuildOrder>18</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\ewfgetopt.c">
-				<BuildOrder>19</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\ewfgetopt.h">
-				<BuildOrder>20</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\ewfinfo.c">
-				<BuildOrder>21</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
-				<BuildOrder>22</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\ewfoutput.h">
-				<BuildOrder>23</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\ewfsignal.c">
-				<BuildOrder>24</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\ewfsignal.h">
-				<BuildOrder>25</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\system_string.c">
-				<BuildOrder>26</BuildOrder>
+			<CppCompile Include="..\..\..\ewftools\file_io.c">
+				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

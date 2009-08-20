@@ -36,7 +36,7 @@
  */
 #if defined( _MSC_VER )
 
-/* Define LIBEWF_DEFINITION_INTEGER_TYPES to avoid conflict if types are already defined
+/* Define LIBEWF_DEFINITION_INTEGER_TYPES to avoid conflict
  */
 #if !defined( LIBEWF_DEFINITION_INTEGER_TYPES )
 #define LIBEWF_DEFINITION_INTEGER_TYPES
@@ -45,7 +45,7 @@
 extern "C" {
 #endif
 
-/* Microsoft Visual Studio C++ Compiler does not have <inttypes.h> or <stdint.h>
+/* The Microsoft Visual Studio C++ compiler does not have <inttypes.h> or <stdint.h>
  * therefore it does not support the (u)int#_t type definitions
  * it has __int# defintions instead
  */
@@ -70,24 +70,38 @@ typedef __int32			ssize_t;
 
 #endif
 
-/* Type definitions for earlier versions of the Borland/CodeGear C++ Builder compiler
+#elif defined( __BORLANDC__ )
+
+#if __BORLANDC__ >= 0x0560
+#include <stdint.h>
+
+#else
+
+/* Define LIBEWF_DEFINITION_INTEGER_TYPES to avoid conflict
  */
-#elif defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+#if !defined( LIBEWF_DEFINITION_INTEGER_TYPES )
+#define LIBEWF_DEFINITION_INTEGER_TYPES
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Earlier versions of the Borland/CodeGear C++ Builder compiler do not
- * have the intptr_t
+/* Earlier versions of the Borland/CodeGear C++ Builder compiler
+ * do not have the intptr_t
  */
+#if defined( _WIN64 )
+typedef unsigned __int64	intptr_t;
+#else
 typedef unsigned __int32	intptr_t;
-
-/* TODO what about a 64-bit version of the intptr_t ? */
+#endif
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LIBEWF_DEFINITION_INTEGER_TYPES */
+
+#endif /* __BORLANDC__ >= 0x0560 */
 
 /* Type definitions for compilers that have access to
  * <inttypes.h> or <stdint.h>

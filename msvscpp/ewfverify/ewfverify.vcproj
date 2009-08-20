@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ewfverify"
 	ProjectGUID="{E47BC48E-4CDC-49CC-B82E-4468DE2540DE}"
 	RootNamespace="ewfverify"
@@ -124,10 +124,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfverify.c"
 				>
 			</File>
@@ -171,10 +167,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfsignal.h"
 				>
 			</File>
 			<File

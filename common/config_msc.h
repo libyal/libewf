@@ -61,5 +61,9 @@
 
 #define HAVE_V1_API		1
 
+/* Enable version 2 API
+#define HAVE_V2_API		1
+*/
+
 #endif
 

@@ -59,7 +59,9 @@ int platform_get_operating_system(
 	DWORD windows_version          = 0; 
 	DWORD windows_major_version    = 0;
 	DWORD windows_minor_version    = 0; 
+/*
 	DWORD windows_build_number     = 0;
+ */
 #endif
 
 	if( operating_system_string == NULL )

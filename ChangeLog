@@ -219,6 +219,11 @@ CodeGear project files
 * libewf
 * ewftools
 
+Version: 20090820
+* worked msvscpp solution files
+* worked codegear project files
+* small corrections in include/libewf/types.h.in
+
 Version: 20090819
 * updated libbfio
 * updated libsystem_file

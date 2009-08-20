@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ewfalter"
 	ProjectGUID="{DB9753F2-57F5-4C1A-8A40-06D32359562D}"
 	RootNamespace="ewfacquire"
@@ -124,10 +124,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\storage_media_buffer.c"
 				>
 			</File>
@@ -155,10 +151,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfsignal.h"
 				>
 			</File>
 			<File

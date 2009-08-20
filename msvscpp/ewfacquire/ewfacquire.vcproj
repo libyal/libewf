@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ewfacquire"
 	ProjectGUID="{7D57918B-6B13-4F5D-BA51-04BB6047A91C}"
 	RootNamespace="ewfacquire"
@@ -132,10 +132,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\guid.c"
 				>
 			</File>
@@ -203,10 +199,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfsignal.h"
 				>
 			</File>
 			<File
