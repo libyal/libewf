@@ -12,7 +12,6 @@ ewfacquire_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
-	ewfsignal.c ewfsignal.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	io_ata.c io_ata.h \
@@ -36,7 +35,6 @@ ewfacquirestream_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
-	ewfsignal.c ewfsignal.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	md5.h \
@@ -54,7 +52,6 @@ ewfalter_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
-	ewfsignal.c ewfsignal.h \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
@@ -63,8 +60,7 @@ ewfdebug_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	ewfdebug.c \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
-	ewfsignal.c ewfsignal.h
+	ewfoutput.c ewfoutput.h
 
 ewfdebug_LDADD  = ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la @MEMWATCH_LIBADD@
 
@@ -76,7 +72,6 @@ ewfexport_SOURCES = \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
-	ewfsignal.c ewfsignal.h \
 	export_handle.c export_handle.h \
 	guid.c guid.h \
 	md5.h \
@@ -93,7 +88,6 @@ ewfinfo_SOURCES = \
 	ewfinfo.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
-	ewfsignal.c ewfsignal.h \
 	guid.c guid.h \
 	info_handle.c info_handle.h
 
@@ -106,7 +100,6 @@ ewfverify_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
-	ewfsignal.c ewfsignal.h \
 	ewfverify.c \
 	md5.h \
 	process_status.c process_status.h \

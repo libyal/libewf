@@ -120,16 +120,10 @@ ewftools:
 * add getoptlong support
 * log handle
   - implement libpff log handle
-* liberror
-  - implement use of liberror
-  - date_time.[ch] (no, wraps date time functions)
-  - ewfoutput.[ch] (not necessary)
-  - ewfsignal.[ch] ?
 * make compilation resilient for missing crypto library
   - compile on system without libcrypto
   - remove the cryptographic options if crypto library is missing
 * have failed on open return a more sensible error (extract from error)
-* fix ewfcommon_signal_handler per tool
 * ewfacquire
   - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
     no, although not set in EWF file, the granualarity is still used in handling read errors
@@ -230,6 +224,7 @@ Version: 20090819
 * updated libsystem_file
 * moved libuna include from ewftools to libsystem
 * fixed some small memory leaks in ewftools
+* moved ewfsignal to libsystem_signal
 
 Version: 20090817
 * worked on common system library for ewftools

@@ -40,7 +40,6 @@
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
-#include "ewfsignal.h"
 
 #define EWFALTER_INPUT_BUFFER_SIZE	64
 
@@ -431,7 +430,7 @@ ssize64_t ewfalter_alter_input(
 /* Signal handler for ewfalter
  */
 void ewfalter_signal_handler(
-      ewfsignal_t signal )
+      libsystem_signal_t signal )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfalter_signal_handler";
@@ -701,12 +700,18 @@ int main( int argc, char * const argv[] )
 	 verbose );
 #endif
 
-	if( ewfsignal_attach(
-	     ewfalter_signal_handler ) != 1 )
+	if( libsystem_signal_attach(
+	     ewfalter_signal_handler,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to attach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 	if( libsystem_glob_initialize(
@@ -869,11 +874,17 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfalter_abort == 0 )
 	{
-		if( ewfsignal_detach() != 1 )
+		if( libsystem_signal_detach(
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to detach signal handler.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 		}
 		/* Request the necessary case data
 		 */
@@ -996,17 +1007,25 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "\n" );
 
-		if( ewfsignal_attach(
-		     ewfalter_signal_handler ) != 1 )
+		if( libsystem_signal_attach(
+		     ewfalter_signal_handler,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to attach signal handler.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 		}
 	}
 	if( ewfalter_abort == 0 )
 	{
-		for( alteration_run = 0; alteration_run < alteration_runs; alteration_run++ )
+		for( alteration_run = 0;
+		     alteration_run < alteration_runs;
+		     alteration_run++ )
 		{
 			fprintf(
 			 stdout,
@@ -1080,11 +1099,17 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( ewfsignal_detach() != 1 )
+	if( libsystem_signal_detach(
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to detach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 	if( ewfalter_abort != 0 )
 	{

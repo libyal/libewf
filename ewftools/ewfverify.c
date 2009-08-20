@@ -40,7 +40,6 @@
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
-#include "ewfsignal.h"
 #include "md5.h"
 #include "process_status.h"
 #include "sha1.h"
@@ -358,7 +357,7 @@ ssize64_t ewfverify_read_input(
 /* Signal handler for ewfverify
  */
 void ewfverify_signal_handler(
-      ewfsignal_t signal )
+      libsystem_signal_t signal )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfverify_signal_handler";
@@ -604,12 +603,18 @@ int main( int argc, char * const argv[] )
 	 verbose );
 #endif
 
-	if( ewfsignal_attach(
-	     ewfverify_signal_handler ) != 1 )
+	if( libsystem_signal_attach(
+	     ewfverify_signal_handler,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to attach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 	if( libsystem_glob_initialize(
@@ -1300,11 +1305,17 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( ewfsignal_detach() != 1 )
+	if( libsystem_signal_detach(
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to detach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 	if( log_file_stream != NULL )
 	{

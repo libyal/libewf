@@ -40,7 +40,6 @@
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
-#include "ewfsignal.h"
 #include "imaging_handle.h"
 #include "platform.h"
 #include "process_status.h"
@@ -1649,7 +1648,7 @@ ssize64_t ewfacquire_read_input(
 /* Signal handler for ewfacquire
  */
 void ewfacquire_signal_handler(
-      ewfsignal_t signal )
+      libsystem_signal_t signal )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfacquire_signal_handler";
@@ -3586,12 +3585,18 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-	if( ewfsignal_attach(
-	     ewfacquire_signal_handler ) != 1 )
+	if( libsystem_signal_attach(
+	     ewfacquire_signal_handler,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to attach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 	if( ewfacquire_abort == 0 )
 	{
@@ -4209,11 +4214,17 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( ewfsignal_detach() != 1 )
+	if( libsystem_signal_detach(
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to detach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
         if( status != PROCESS_STATUS_COMPLETED )
         {

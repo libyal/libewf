@@ -38,7 +38,6 @@
 #include "byte_size_string.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
-#include "ewfsignal.h"
 #include "guid.h"
 #include "info_handle.h"
 
@@ -77,7 +76,7 @@ void usage_fprint(
 /* Signal handler for ewfinfo
  */
 void ewfinfo_signal_handler(
-      ewfsignal_t signal )
+      libsystem_signal_t signal )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfinfo_signal_handler";
@@ -326,12 +325,18 @@ int main( int argc, char * const argv[] )
 	 verbose );
 #endif
 
-	if( ewfsignal_attach(
-	     ewfinfo_signal_handler ) != 1 )
+	if( libsystem_signal_attach(
+	     ewfinfo_signal_handler,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to attach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 	if( libsystem_glob_initialize(
@@ -551,11 +556,17 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 	}
-	if( ewfsignal_detach() != 1 )
+	if( libsystem_signal_detach(
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to detach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 	if( info_handle_close(
 	     info_handle,
