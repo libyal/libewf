@@ -23,6 +23,9 @@
 #include <common.h>
 #include <endian.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #include <liberror.h>
 #include <libnotify.h>

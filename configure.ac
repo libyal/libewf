@@ -285,6 +285,13 @@ AC_CHECK_FUNCS(
 
 dnl Narrow character string functions used in common/narrow_string.h
 AC_CHECK_FUNCS(
+ [fgets],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fgets],
+  [1]) ])
+
+AC_CHECK_FUNCS(
  [snprintf],
  [],
  [AC_CHECK_FUNCS(
@@ -293,6 +300,13 @@ AC_CHECK_FUNCS(
   [AC_MSG_FAILURE(
    [Missing functions: snprintf and sprintf],
    [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [sscanf],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: sscanf],
+  [1]) ])
 
 AC_CHECK_FUNCS(
  [strlen],
