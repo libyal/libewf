@@ -71,9 +71,6 @@
 			<None Include="..\..\..\libsystem\libsystem_signal.h">
 				<BuildOrder>21</BuildOrder>
 			</None>
-			<None Include="..\..\..\libsystem\libsystem_file_stream_io.h">
-				<BuildOrder>12</BuildOrder>
-			</None>
 			<None Include="..\..\..\libsystem\libsystem_date_time.h">
 				<BuildOrder>3</BuildOrder>
 			</None>

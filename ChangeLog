@@ -220,11 +220,15 @@ CodeGear project files
 * libewf
 * ewftools
 
-Fix
-* handling 0 entries in libewf_values_table_initialize
+Version: 20090822
+* small adjustments
+* updated common: narrow_string, memory
+* updated libnotify
+* bug fix in libewf_values_table
 
 Version: 20090821
 * small adjustments
+* fixed handling 0 entries in libewf_values_table_initialize
 
 Version: 20090820
 * worked msvscpp solution files

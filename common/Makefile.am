@@ -6,6 +6,7 @@ EXTRA_DIST = \
 	config_borlandc.h \
 	config_msc.h \
 	endian.h \
+	file_stream.h \
 	memory.h \
 	narrow_string.h \
 	types.h \

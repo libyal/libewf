@@ -29,6 +29,10 @@
 #include "memwatch.h"
 #endif
 
+#if defined( HAVE_GLIB_H )
+#include <glib.h>
+#endif
+
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
@@ -43,21 +47,33 @@ extern "C" {
 
 /* Memory allocation
  */
-#if defined( HAVE_MALLOC ) || defined( WINAPI )
+#if defined( HAVE_GLIB_H )
+#define memory_allocate( size ) \
+	g_malloc( (gsize) size )
+
+#elif defined( HAVE_MALLOC ) || defined( WINAPI )
 #define memory_allocate( size ) \
 	malloc( size )
 #endif
 
 /* Memory reallocation
  */
-#if defined( HAVE_REALLOC ) || defined( WINAPI )
+#if defined( HAVE_GLIB_H )
+#define memory_reallocate( buffer, size ) \
+	g_realloc( (gpointer) buffer, (gsize) size )
+
+#elif defined( HAVE_REALLOC ) || defined( WINAPI )
 #define memory_reallocate( buffer, size ) \
 	realloc( (void *) buffer, size )
 #endif
 
 /* Memory free
  */
-#if defined( HAVE_FREE ) || defined( WINAPI )
+#if defined( HAVE_GLIB_H )
+#define memory_free( buffer ) \
+	g_free( (gpointer) buffer )
+
+#elif defined( HAVE_FREE ) || defined( WINAPI )
 #define memory_free( buffer ) \
 	free( (void *) buffer )
 #endif

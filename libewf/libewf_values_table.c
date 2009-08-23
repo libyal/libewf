@@ -105,6 +105,25 @@ int libewf_values_table_initialize(
 
 			return( -1 );
 		}
+		if( memory_set(
+		     *values_table,
+		     0,
+		     sizeof( libewf_values_table_t ) ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear values table.",
+			 function );
+
+			memory_free(
+			 *values_table );
+
+			*values_table = NULL;
+
+			return( -1 );
+		}
 		if( amount_of_values > 0 )
 		{
 			( *values_table )->identifier = (uint8_t **) memory_allocate(
@@ -121,6 +140,8 @@ int libewf_values_table_initialize(
 
 				memory_free(
 				 *values_table );
+
+				*values_table = NULL;
 
 				return( -1 );
 			}
@@ -141,6 +162,8 @@ int libewf_values_table_initialize(
 				memory_free(
 				 *values_table );
 
+				*values_table = NULL;
+
 				return( -1 );
 			}
 			( *values_table )->identifier_length = (size_t *) memory_allocate(
@@ -159,6 +182,8 @@ int libewf_values_table_initialize(
 				 ( *values_table )->identifier );
 				memory_free(
 				 *values_table );
+
+				*values_table = NULL;
 
 				return( -1 );
 			}
@@ -181,6 +206,8 @@ int libewf_values_table_initialize(
 				memory_free(
 				 *values_table );
 
+				*values_table = NULL;
+
 				return( -1 );
 			}
 			( *values_table )->value = (uint8_t **) memory_allocate(
@@ -201,6 +228,8 @@ int libewf_values_table_initialize(
 				 ( *values_table )->identifier );
 				memory_free(
 				 *values_table );
+
+				*values_table = NULL;
 
 				return( -1 );
 			}
@@ -225,6 +254,8 @@ int libewf_values_table_initialize(
 				memory_free(
 				 *values_table );
 
+				*values_table = NULL;
+
 				return( -1 );
 			}
 			( *values_table )->value_length = (size_t *) memory_allocate(
@@ -247,6 +278,8 @@ int libewf_values_table_initialize(
 				 ( *values_table )->identifier );
 				memory_free(
 				 *values_table );
+
+				*values_table = NULL;
 
 				return( -1 );
 			}
@@ -272,6 +305,8 @@ int libewf_values_table_initialize(
 				 ( *values_table )->identifier );
 				memory_free(
 				 *values_table );
+
+				*values_table = NULL;
 
 				return( -1 );
 			}

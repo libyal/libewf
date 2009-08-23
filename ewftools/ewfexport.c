@@ -2203,7 +2203,7 @@ int main( int argc, char * const argv[] )
 
 		if( log_file_stream != NULL )
 		{
-			libsystem_file_stream_io_fclose(
+			libsystem_file_stream_close(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -2237,7 +2237,7 @@ int main( int argc, char * const argv[] )
 
 		if( log_file_stream != NULL )
 		{
-			libsystem_file_stream_io_fclose(
+			libsystem_file_stream_close(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -2268,7 +2268,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_file_stream != NULL )
 		{
-			libsystem_file_stream_io_fclose(
+			libsystem_file_stream_close(
 			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
@@ -2319,7 +2319,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( libsystem_file_stream_io_fclose(
+		if( libsystem_file_stream_close(
 		     log_file_stream ) != 0 )
 		{
 			fprintf(

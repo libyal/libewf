@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090820],
+ [20090822],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090820])
+ [20090822])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -126,21 +126,21 @@ AC_CHECK_HEADER(
 dnl Headers included in common/types.h
 AC_CHECK_HEADERS([limits.h])
 
-dnl Headers included in common/narrow_string.h
+dnl Headers included in common/narrow_string.h and common/memory.h
 AC_CHECK_HEADERS([string.h])
-
-dnl Headers included in common/memory.h
 AC_CHECK_HEADERS([stdlib.h])
-
-dnl Headers included in libbfio/libbfio_file.h and libsystem/libsystem_file_io.h
-AC_CHECK_HEADERS([sys/stat.h])
-AC_CHECK_HEADERS([errno.h])
-AC_CHECK_HEADERS([fcntl.h])
-AC_CHECK_HEADERS([unistd.h])
 
 dnl Headers included in libnotify/libnotify.c
 AC_CHECK_HEADERS([stdarg.h])
 AC_CHECK_HEADERS([varargs.h])
+
+dnl Headers included in libnotify/libnotify.c and libbfio/libbfio_file.c
+AC_CHECK_HEADERS([errno.h])
+
+dnl Headers included in libbfio/libbfio_file.c and libsystem/libsystem_file_io.h
+AC_CHECK_HEADERS([sys/stat.h])
+AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([unistd.h])
 
 dnl Headers included in libewf/libewf_date_time.h
 AC_HEADER_TIME
@@ -152,7 +152,7 @@ dnl Headers included in libsytem/libsystem_support.c
 AC_CHECK_HEADERS([langinfo.h])
 AC_CHECK_HEADERS([locale.h])
 
-dnl Headers included in ewftools/ewfsignal.h
+dnl Headers included in libsystem/libsystem_signal.h
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([sys/signal.h])
 
@@ -240,6 +240,56 @@ AC_CHECK_SIZEOF([off_t])
 AC_CHECK_SIZEOF([size_t])
 
 dnl Check for functions
+dnl File stream functions used in common/file_stream.h
+AC_CHECK_FUNCS(
+ [fclose],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fclose],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [feof],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: feof],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fgets],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fgets],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fopen],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fopen],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fread],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fread],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fwrite],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fwrite],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [vfprintf],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: vfprintf],
+  [1]) ])
+
 dnl Memory functions used in common/memory.h
 AC_CHECK_FUNCS(
  [free],
@@ -284,13 +334,6 @@ AC_CHECK_FUNCS(
   [1]) ])
 
 dnl Narrow character string functions used in common/narrow_string.h
-AC_CHECK_FUNCS(
- [fgets],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fgets],
-  [1]) ])
-
 AC_CHECK_FUNCS(
  [snprintf],
  [],
@@ -387,14 +430,6 @@ AC_CHECK_FUNCS(
   [Missing function: vsnprintf],
   [1]) ])
 
-dnl File input/output functions used in libnotify/libnotify.h
-AC_CHECK_FUNCS(
- [vfprintf],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: vfprintf],
-  [1]) ])
-
 dnl File input/output functions used in libbdio/libbfio_file.h
 AC_CHECK_FUNCS(
  [close],
@@ -485,49 +520,6 @@ AC_FUNC_STRERROR_R(
   [AC_MSG_FAILURE(
    [Missing functions: strerror_r and strerror],
    [1]) ]) ])
-
-dnl File input/output functions used in libsystem/libsystem_file_stream_io.h
-AC_CHECK_FUNCS(
- [fclose],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fclose],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [feof],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: feof],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fgets],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fgets],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fopen],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fopen],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fread],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fread],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fwrite],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fwrite],
-  [1]) ])
 
 dnl Commandline argument/option parsing functions in libsystem/libsystem_getopt.h
 AC_CHECK_FUNCS([getopt])
@@ -1219,6 +1211,14 @@ AS_IF(
 
 	dnl Check for wide character string functions
 
+	dnl Wide character string functions used in common/file_stream.h
+	AC_CHECK_FUNCS(
+	 [fgetws],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing function: fgetws],
+	  [1]) ])
+
 	dnl Wide character string functions used in common/wide_string.h
 	AC_CHECK_FUNCS(
 	 [swprintf],
@@ -1292,14 +1292,6 @@ AS_IF(
 	 [],
 	 [AC_MSG_FAILURE(
 	  [Missing function: wcstoull],
-	  [1]) ])
-
-	dnl Wide character string functions used in ewftools/file_stream_io.h
-	AC_CHECK_FUNCS(
-	 [fgetws],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: fgetws],
 	  [1]) ])
 
 	dnl Make the necessary definitions

@@ -116,23 +116,16 @@ extern "C" {
 /* String formatted print (snprinf)
  */
 #if defined( _MSC_VER )
-#define wide_string_snprintf( target, size, format, ... ) \
-	swprintf_s( target, size, format, __VA_ARGS__ )
+#define wide_string_snprintf( target, size, ... ) \
+	swprintf_s( target, size, __VA_ARGS__ )
 
 #elif defined( __BORLANDC__ )
-#define wide_string_snprintf( target, size, format, ... ) \
-	swprintf( target, format, __VA_ARGS__ )
+#define wide_string_snprintf( target, size, ... ) \
+	swprintf( target, __VA_ARGS__ )
 
 #elif defined( HAVE_SWPRINTF ) || defined( WINAPI )
-#define wide_string_snprintf( target, size, format, ... ) \
-	swprintf( target, size, format, __VA_ARGS__ )
-#endif
-
-/* String retrieve from stream (fgets)
- */
-#if defined( HAVE_FGETWS ) || defined( WINAPI )
-#define wide_string_get_from_stream( string, size, stream ) \
-	fgetws( string, size, stream )
+#define wide_string_snprintf( target, size, ... ) \
+	swprintf( target, size, __VA_ARGS__ )
 #endif
 
 /* String to singed long long (int64)

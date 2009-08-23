@@ -1267,7 +1267,7 @@ int main( int argc, char * const argv[] )
 
 		if( log_file_stream != NULL )
 		{
-			libsystem_file_stream_io_fclose(
+			libsystem_file_stream_close(
 			 log_file_stream );
 		}
 		verification_handle_free(
@@ -1291,7 +1291,7 @@ int main( int argc, char * const argv[] )
 
 		if( log_file_stream != NULL )
 		{
-			libsystem_file_stream_io_fclose(
+			libsystem_file_stream_close(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1300,7 +1300,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_file_stream != NULL )
 		{
-			libsystem_file_stream_io_fclose(
+			libsystem_file_stream_close(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1319,7 +1319,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( libsystem_file_stream_io_fclose(
+		if( libsystem_file_stream_close(
 		     log_file_stream ) != 0 )
 		{
 			fprintf(
