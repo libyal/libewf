@@ -35,7 +35,12 @@
 extern "C" {
 #endif
 
-#define LIBEWF_HASH_VALUES_DEFAULT_AMOUNT	0
+enum LIBEWF_HASH_VALUES_INDEXES
+{
+	/* Value to indicate the amount of hash values
+	 */
+	LIBEWF_HASH_VALUES_DEFAULT_AMOUNT
+};
 
 int libewf_hash_values_initialize(
      libewf_values_table_t *hash_values,

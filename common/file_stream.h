@@ -91,6 +91,13 @@ extern "C" {
 	fwrite( data, 1, size, stream )
 #endif
 
+/* FILE stream seek
+ */
+#if defined( HAVE_FSEEKO ) || defined( WINAPI )
+#define file_stream_seek_offset( stream, offset, whence ) \
+	fseeko( stream, offset, whence )
+#endif
+
 /* End of FILE stream
  */
 #if defined( HAVE_FEOF ) || defined( WINAPI )

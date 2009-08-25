@@ -220,8 +220,10 @@ CodeGear project files
 * libewf
 * ewftools
 
+Version: 20090823
+* minor adjustments
+
 Version: 20090822
-* small adjustments
 * updated common: narrow_string, memory
 * updated libnotify
 * bug fix in libewf_values_table

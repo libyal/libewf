@@ -161,7 +161,9 @@ int libewf_hash_values_parse_md5_hash(
 	{
 		return( 1 );
 	}
-	for( md5_hash_iterator = 0; md5_hash_iterator < md5_hash_size; md5_hash_iterator++ )
+	for( md5_hash_iterator = 0;
+	     md5_hash_iterator < md5_hash_size;
+	     md5_hash_iterator++ )
 	{
 		md5_digit = md5_hash[ md5_hash_iterator ] / 16;
 
@@ -309,7 +311,9 @@ int libewf_hash_values_parse_sha1_hash(
 	{
 		return( 1 );
 	}
-	for( sha1_hash_iterator = 0; sha1_hash_iterator < sha1_hash_size; sha1_hash_iterator++ )
+	for( sha1_hash_iterator = 0;
+	     sha1_hash_iterator < sha1_hash_size;
+	     sha1_hash_iterator++ )
 	{
 		sha1_digit = sha1_hash[ sha1_hash_iterator ] / 16;
 
@@ -428,7 +432,9 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		return( -1 );
 	}
-	for( line_iterator = 0; line_iterator < amount_of_lines; line_iterator++ )
+	for( line_iterator = 0;
+	     line_iterator < amount_of_lines;
+	     line_iterator++ )
 	{
 		if( ( lines[ line_iterator ] == NULL )
 		 || ( lines[ line_iterator ] == (libewf_character_t *) _LIBEWF_STRING( "" ) ) )
@@ -898,7 +904,9 @@ int libewf_hash_values_generate_hash_string_xml(
 	*hash_string_size += 1 + libewf_string_length(
 	                          xml_close_tag_xhash );
 
-	for( values_table_iterator = 0; values_table_iterator < hash_values->amount_of_values; values_table_iterator++ )
+	for( values_table_iterator = 0;
+	     values_table_iterator < hash_values->amount_of_values;
+	     values_table_iterator++ )
 	{
 		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
 		 || ( hash_values->identifier_length[ values_table_iterator ] == 0 ) )
@@ -968,7 +976,9 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	string_offset = print_count;
 
-	for( values_table_iterator = 0; values_table_iterator < hash_values->amount_of_values; values_table_iterator++ )
+	for( values_table_iterator = 0;
+	     values_table_iterator < hash_values->amount_of_values;
+	     values_table_iterator++ )
 	{
 		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
 		 || ( hash_values->identifier_length[ values_table_iterator ] == 0 ) )
@@ -1130,7 +1140,9 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( 1 );
 	}
-	for( md5_hash_string_iterator = 0; md5_hash_string_iterator < 33; md5_hash_string_iterator++ )
+	for( md5_hash_string_iterator = 0;
+	     md5_hash_string_iterator < 33;
+	     md5_hash_string_iterator++ )
 	{
 		if( ( md5_hash_string[ md5_hash_string_iterator ] >= (libewf_character_t) '0' )
 		 && ( md5_hash_string[ md5_hash_string_iterator ] <= (libewf_character_t) '9' ) )
@@ -1262,7 +1274,9 @@ int libewf_hash_values_generate_sha1_hash(
 
 		return( 1 );
 	}
-	for( sha1_hash_string_iterator = 0; sha1_hash_string_iterator < 41; sha1_hash_string_iterator++ )
+	for( sha1_hash_string_iterator = 0;
+	     sha1_hash_string_iterator < 41;
+	     sha1_hash_string_iterator++ )
 	{
 		if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libewf_character_t) '0' )
 		 && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libewf_character_t) '9' ) )

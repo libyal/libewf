@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090822],
+ [20090823],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090822])
+ [20090823])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -274,6 +274,13 @@ AC_CHECK_FUNCS(
  [],
  [AC_MSG_FAILURE(
   [Missing function: fread],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fseeko],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fseeko],
   [1]) ])
 
 AC_CHECK_FUNCS(

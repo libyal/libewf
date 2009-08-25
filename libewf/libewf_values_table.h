@@ -73,6 +73,11 @@ int libewf_values_table_resize(
      int amount_of_values,
      liberror_error_t **error );
 
+int libewf_values_table_get_amount_of_values(
+     libewf_values_table_t *values_table,
+     int *amount_of_values,
+     liberror_error_t **error );
+
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
      const uint8_t *identifier,
