@@ -220,6 +220,9 @@ CodeGear project files
 * libewf
 * ewftools
 
+Version: 20090824
+* adjustments in ewftools io access
+
 Version: 20090823
 * minor adjustments
 

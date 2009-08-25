@@ -31,10 +31,6 @@
 #include <sys/ioctl.h>
 #endif
 
-#if defined( WINAPI )
-
-#else
-
 #if defined( HAVE_SCSI_SCSI_H )
 #include <scsi/scsi.h>
 #endif
@@ -47,14 +43,12 @@
 #include <scsi/sg.h>
 #endif
 
-#endif
-
 #include <libsystem.h>
 
 #include "io_bus.h"
 #include "io_scsi.h"
 
-#if defined( HAVE_IO_SCSI )
+#if defined( HAVE_SCSI_SG_H )
 
 /* Sends a SCSI command to the file descriptor
  * Returns 1 if successful or -1 on error
@@ -199,7 +193,7 @@ int io_scsi_command(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_IOCTL_FAILED,
-		 "%s: error while querying device: scsi status: %X, host status: %X, driver status: %X.\n",
+		 "%s: error while querying device: scsi status: %X, host status: %X, driver status: %X.",
 		 function,
 		 sg_io_header.status,
 		 sg_io_header.host_status,

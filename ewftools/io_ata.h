@@ -28,25 +28,23 @@
 
 #include <liberror.h>
 
+#if defined( HAVE_CYGWIN_HDREG_H )
+#include <cygwin/hdreg.h>
+#endif
+
+#if defined( HAVE_LINUX_HDREG_H )
+#include <linux/hdreg.h>
+#endif
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( WINAPI )
-
-#elif defined( HAVE_LINUX_HDREG_H )
-#include <linux/hdreg.h>
-
-#define HAVE_IO_ATA
-#endif
-
-#if defined( HAVE_IO_ATA )
-
+#if defined( HDIO_GET_IDENTITY )
 int io_ata_get_device_configuration(
      int file_descriptor,
      struct hd_driveid *device_configuration,
      liberror_error_t **error );
-
 #endif
 
 #if defined( __cplusplus )

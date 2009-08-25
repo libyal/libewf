@@ -32,18 +32,12 @@
 #include <sys/ioctl.h>
 #endif
 
-#if defined( WINAPI )
-
-#else
-
 #if defined( HAVE_LINUX_USBDEVICE_FS_H )
 #include <linux/usbdevice_fs.h>
 #endif
 
 #if defined( HAVE_LINUX_USB_CH9_H )
 #include <linux/usb/ch9.h>
-#endif
-
 #endif
 
 #include <libsystem.h>
@@ -53,7 +47,7 @@
 
 #define IO_USB_CONTROL_COMMAND_TIMEOUT	5000
 
-#if defined( HAVE_IO_USB )
+#if defined( HAVE_LINUX_USB_CH9_H )
 
 /* Sends an USB ioctl to the file descriptor
  * Returns 1 if successful or -1 on error

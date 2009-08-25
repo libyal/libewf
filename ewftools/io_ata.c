@@ -32,10 +32,6 @@
 #include <sys/ioctl.h>
 #endif
 
-#if defined( WINAPI )
-
-#else
-
 #if defined( HAVE_CYGWIN_HDREG_H )
 #include <cygwin/hdreg.h>
 #endif
@@ -44,13 +40,11 @@
 #include <linux/hdreg.h>
 #endif
 
-#endif
-
 #include <libsystem.h>
 
 #include "io_ata.h"
 
-#if defined( HAVE_IO_ATA )
+#if defined( HDIO_GET_IDENTITY )
 
 /* Sends a ATA DEVICE CONFIGURATION IDENTIFY to the file descriptor
  * Returns 1 if successful or -1 on error
