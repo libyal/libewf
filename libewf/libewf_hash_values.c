@@ -37,18 +37,21 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_initialize(
-     libewf_values_table_t *hash_values,
+     libewf_values_table_t **hash_values,
      liberror_error_t **error )
 {
 	static char *function = "libewf_hash_values_initialize";
 
-	if( hash_values == NULL )
+	if( libewf_values_table_initialize(
+	     hash_values,
+	     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash values.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create hash values.",
 		 function );
 
 		return( -1 );
@@ -60,7 +63,7 @@ int libewf_hash_values_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_md5_hash(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
      liberror_error_t **error )
@@ -106,38 +109,8 @@ int libewf_hash_values_parse_md5_hash(
 
 		return( -1 );
 	}
-	if( *hash_values == NULL )
-	{
-		if( libewf_values_table_initialize(
-		     hash_values,
-		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash values.",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_hash_values_initialize(
-		     *hash_values,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize the hash values.",
-			 function );
-
-			return( -1 );
-		}
-	}
 	result = libewf_values_table_get_value(
-	          *hash_values,
+	          hash_values,
 	          _LIBEWF_STRING( "MD5" ),
 	          3,
 	          md5_hash_string,
@@ -187,7 +160,7 @@ int libewf_hash_values_parse_md5_hash(
 		}
 	}
 	result = libewf_values_table_set_value(
-		  *hash_values,
+		  hash_values,
 		  _LIBEWF_STRING( "MD5" ),
 		  3,
 		  md5_hash_string,
@@ -210,7 +183,7 @@ int libewf_hash_values_parse_md5_hash(
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_sha1_hash(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
      liberror_error_t **error )
@@ -256,38 +229,8 @@ int libewf_hash_values_parse_sha1_hash(
 
 		return( -1 );
 	}
-	if( *hash_values == NULL )
-	{
-		if( libewf_values_table_initialize(
-		     hash_values,
-		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash values.",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_hash_values_initialize(
-		     *hash_values,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize the hash values.",
-			 function );
-
-			return( -1 );
-		}
-	}
 	result = libewf_values_table_get_value(
-	          *hash_values,
+	          hash_values,
 	          _LIBEWF_STRING( "SHA1" ),
 	          4,
 	          sha1_hash_string,
@@ -337,7 +280,7 @@ int libewf_hash_values_parse_sha1_hash(
 		}
 	}
 	result = libewf_values_table_set_value(
-		  *hash_values,
+		  hash_values,
 		  _LIBEWF_STRING( "SHA1" ),
 		  4,
 		  sha1_hash_string,
@@ -360,7 +303,7 @@ int libewf_hash_values_parse_sha1_hash(
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_hash_string_xml(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      libewf_character_t *hash_string_xml,
      size_t hash_string_xml_size,
      liberror_error_t **error )
@@ -384,33 +327,6 @@ int libewf_hash_values_parse_hash_string_xml(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash string.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_values_table_initialize(
-	     hash_values,
-	     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create hash values.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_hash_values_initialize(
-	     *hash_values,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize the hash values.",
 		 function );
 
 		return( -1 );
@@ -517,7 +433,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		*open_tag_end = 0;
 
 		if( libewf_values_table_set_value(
-		     *hash_values,
+		     hash_values,
 		     &open_tag_start[ 1 ],
 		     identifier_length,
 		     &open_tag_end[ 1 ],
@@ -561,7 +477,7 @@ int libewf_hash_values_parse_hash_string_xml(
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_xhash(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      uint8_t *xhash,
      size_t xhash_size,
      liberror_error_t **error )

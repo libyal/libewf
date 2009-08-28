@@ -2266,7 +2266,9 @@ int info_handle_hash_values_fprint(
 
 		return( -1 );
 	}
-	for( hash_value_iterator = 0; hash_value_iterator < amount_of_values; hash_value_iterator++ )
+	for( hash_value_iterator = 0;
+	     hash_value_iterator < amount_of_values;
+	     hash_value_iterator++ )
 	{
 #if defined( HAVE_V2_API )
 		if( libewf_handle_get_hash_value_identifier_size(

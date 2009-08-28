@@ -43,29 +43,29 @@ enum LIBEWF_HASH_VALUES_INDEXES
 };
 
 int libewf_hash_values_initialize(
-     libewf_values_table_t *hash_values,
+     libewf_values_table_t **hash_values,
      liberror_error_t **error );
 
 int libewf_hash_values_parse_md5_hash(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
      liberror_error_t **error );
 
 int libewf_hash_values_parse_sha1_hash(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
      liberror_error_t **error );
 
 int libewf_hash_values_parse_hash_string_xml(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      libewf_character_t *hash_string_xml,
      size_t hash_string_xml_size,
      liberror_error_t **error );
 
 int libewf_hash_values_parse_xhash(
-     libewf_values_table_t **hash_values,
+     libewf_values_table_t *hash_values,
      uint8_t *xhash,
      size_t xhash_size,
      liberror_error_t **error );

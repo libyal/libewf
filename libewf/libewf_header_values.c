@@ -52,24 +52,27 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_initialize(
-     libewf_values_table_t *header_values,
+     libewf_values_table_t **header_values,
      liberror_error_t **error )
 {
 	static char *function = "libewf_header_values_initialize";
 
-	if( header_values == NULL )
+	if( libewf_values_table_initialize(
+	     header_values,
+	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header values.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create header values.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER,
 	     _LIBEWF_STRING( "case_number" ),
 	     11,
@@ -85,7 +88,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION,
 	     _LIBEWF_STRING( "description" ),
 	     11,
@@ -101,7 +104,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME,
 	     _LIBEWF_STRING( "examiner_name" ),
 	     13,
@@ -117,7 +120,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER,
 	     _LIBEWF_STRING( "evidence_number" ),
 	     15,
@@ -133,7 +136,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_NOTES,
 	     _LIBEWF_STRING( "notes" ),
 	     5,
@@ -149,7 +152,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE,
 	     _LIBEWF_STRING( "acquiry_date" ),
 	     12,
@@ -165,7 +168,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE,
 	     _LIBEWF_STRING( "system_date" ),
 	     11,
@@ -181,7 +184,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM,
 	     _LIBEWF_STRING( "acquiry_operating_system" ),
 	     24,
@@ -197,7 +200,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION,
 	     _LIBEWF_STRING( "acquiry_software_version" ),
 	     24,
@@ -213,7 +216,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_PASSWORD,
 	     _LIBEWF_STRING( "password" ),
 	     8,
@@ -229,7 +232,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE,
 	     _LIBEWF_STRING( "compression_type" ),
 	     16,
@@ -245,7 +248,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_MODEL,
 	     _LIBEWF_STRING( "model" ),
 	     5,
@@ -261,7 +264,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER,
 	     _LIBEWF_STRING( "serial_number" ),
 	     13,
@@ -277,7 +280,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_PROCESS_IDENTIFIER,
 	     _LIBEWF_STRING( "process_identifier" ),
 	     18,
@@ -293,7 +296,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC,
 	     _LIBEWF_STRING( "unknown_dc" ),
 	     10,
@@ -309,7 +312,7 @@ int libewf_header_values_initialize(
 		return( -1 );
 	}
 	if( libewf_values_table_set_identifier(
-	     header_values,
+	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_EXTENTS,
 	     _LIBEWF_STRING( "extents" ),
 	     7,
@@ -1016,7 +1019,7 @@ int libewf_header_values_copy(
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header_string(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      libewf_character_t *header_string,
      size_t header_string_size,
      liberror_error_t **error )
@@ -1056,33 +1059,6 @@ int libewf_header_values_parse_header_string(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_values_table_initialize(
-	     header_values,
-	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header values.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_header_values_initialize(
-	     *header_values,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize the header values.",
 		 function );
 
 		return( -1 );
@@ -1206,7 +1182,7 @@ int libewf_header_values_parse_header_string(
 				     type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "extents" ),
 					     7,
 					     value_string,
@@ -1238,7 +1214,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "process_identifier" ),
 					     18,
 					     value_string,
@@ -1273,7 +1249,7 @@ int libewf_header_values_parse_header_string(
 				     type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "acquiry_software_version" ),
 					     24,
 					     value_string,
@@ -1305,7 +1281,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "unknown_dc" ),
 					     10,
 					     value_string,
@@ -1337,7 +1313,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "model" ),
 					     5,
 					     value_string,
@@ -1369,7 +1345,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "acquiry_operating_system" ),
 					     24,
 					     value_string,
@@ -1401,7 +1377,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "serial_number" ),
 					     13,
 					     value_string,
@@ -1489,7 +1465,7 @@ int libewf_header_values_parse_header_string(
 						     1 ) == 0 )
 						{
 							if( libewf_values_table_set_value(
-							     *header_values,
+							     header_values,
 							     _LIBEWF_STRING( "acquiry_date" ),
 							     12,
 							     date_time_values_string,
@@ -1521,7 +1497,7 @@ int libewf_header_values_parse_header_string(
 							  1 ) == 0 )
 						{
 							if( libewf_values_table_set_value(
-							     *header_values,
+							     header_values,
 							     _LIBEWF_STRING( "system_date" ),
 							     11,
 							     date_time_values_string,
@@ -1572,7 +1548,7 @@ int libewf_header_values_parse_header_string(
 					else
 					{
 						if( libewf_values_table_set_value(
-						     *header_values,
+						     header_values,
 						     _LIBEWF_STRING( "password" ),
 						     8,
 						     value_string,
@@ -1605,7 +1581,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "description" ),
 					     11,
 					     value_string,
@@ -1637,7 +1613,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "case_number" ),
 					     11,
 					     value_string,
@@ -1669,7 +1645,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "evidence_number" ),
 					     15,
 					     value_string,
@@ -1701,7 +1677,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "examiner_name" ),
 					     13,
 					     value_string,
@@ -1733,7 +1709,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "notes" ),
 					     5,
 					     value_string,
@@ -1765,7 +1741,7 @@ int libewf_header_values_parse_header_string(
 					  type_string_length ) == 0 )
 				{
 					if( libewf_values_table_set_value(
-					     *header_values,
+					     header_values,
 					     _LIBEWF_STRING( "compression_type" ),
 					     16,
 					     value_string,
@@ -1867,7 +1843,7 @@ int libewf_header_values_parse_header_string(
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      uint8_t *header,
      size_t header_size,
      int codepage,
@@ -1964,7 +1940,7 @@ int libewf_header_values_parse_header(
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header2(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      uint8_t *header2,
      size_t header2_size,
      liberror_error_t **error )
@@ -6063,7 +6039,7 @@ int libewf_generate_date_xheader_value(
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header_string_xml(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      libewf_character_t *header_string_xml,
      size_t header_string_xml_size,
      liberror_error_t **error )
@@ -6101,33 +6077,6 @@ int libewf_header_values_parse_header_string_xml(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_values_table_initialize(
-	     header_values,
-	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header values.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_header_values_initialize(
-	     *header_values,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize the header values.",
 		 function );
 
 		return( -1 );
@@ -6269,7 +6218,7 @@ int libewf_header_values_parse_header_string_xml(
 				                                  date_time_values_string );
 
 				if( libewf_values_table_set_value(
-				     *header_values,
+				     header_values,
 				     &open_tag_start[ 1 ],
 				     identifier_length,
 				     date_time_values_string,
@@ -6301,7 +6250,7 @@ int libewf_header_values_parse_header_string_xml(
 		else
 		{
 			if( libewf_values_table_set_value(
-			     *header_values,
+			     header_values,
 			     &open_tag_start[ 1 ],
 			     identifier_length,
 			     &open_tag_end[ 1 ],
@@ -6346,7 +6295,7 @@ int libewf_header_values_parse_header_string_xml(
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_xheader(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      uint8_t *xheader,
      size_t xheader_size,
      liberror_error_t **error )

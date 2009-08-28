@@ -67,7 +67,7 @@ enum LIBEWF_HEADER_VALUES_INDEXES
 };
 
 int libewf_header_values_initialize(
-     libewf_values_table_t *header_values,
+     libewf_values_table_t **header_values,
      liberror_error_t **error );
 
 int libewf_header_values_realloc(
@@ -111,20 +111,20 @@ int libewf_header_values_copy(
      liberror_error_t **error );
 
 int libewf_header_values_parse_header_string(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      libewf_character_t *header_string,
      size_t header_string_size,
      liberror_error_t **error );
 
 int libewf_header_values_parse_header(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      uint8_t *header,
      size_t header_size,
      int codepage,
      liberror_error_t **error );
 
 int libewf_header_values_parse_header2(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      uint8_t *header2,
      size_t header2_size,
      liberror_error_t **error );
@@ -304,13 +304,13 @@ int libewf_generate_date_xheader_value(
      liberror_error_t **error );
 
 int libewf_header_values_parse_header_string_xml(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      libewf_character_t *header_string_xml,
      size_t header_string_xml_size,
      liberror_error_t **error );
 
 int libewf_header_values_parse_xheader(
-     libewf_values_table_t **header_values,
+     libewf_values_table_t *header_values,
      uint8_t *xheader,
      size_t size,
      liberror_error_t **error );

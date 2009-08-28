@@ -519,18 +519,9 @@ PyObject *pyewf_file_get_header_value(
 	{
 		return( NULL );
 	}
+#if !defined( HAVE_V2_API )
 	/* Make sure the header values are parsed
 	 */
-#if defined( HAVE_V2_API )
-	if( libewf_handle_parse_header_values(
-	     pyewf_file->handle,
-	     NULL ) == -1 )
-	{
-		return( PyErr_Format(
-		         PyExc_IOError,
-		         "libewf_handle_parse_header_values failed to parse header values" ) );
-	}
-#else
 	if( libewf_parse_header_values(
 	     pyewf_file->handle,
 	     LIBEWF_DATE_FORMAT_CTIME ) == -1 )
@@ -663,18 +654,9 @@ PyObject *pyewf_file_get_header_values(
 	size_t header_value_identifier_length = 0;
 #endif
 
+#if !defined( HAVE_V2_API )
 	/* Make sure the header values are parsed
 	 */
-#if defined( HAVE_V2_API )
-	if( libewf_handle_parse_header_values(
-	     pyewf_file->handle,
-	     NULL ) == -1 )
-	{
-		return( PyErr_Format(
-		         PyExc_IOError,
-		         "libewf_handle_parse_header_values failed to parse header values" ) );
-	}
-#else
 	if( libewf_parse_header_values(
 	     pyewf_file->handle,
 	     LIBEWF_DATE_FORMAT_CTIME ) == -1 )

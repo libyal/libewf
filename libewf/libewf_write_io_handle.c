@@ -1847,22 +1847,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			if( *header_values == NULL )
 			{
-				if( libewf_values_table_initialize(
-				     header_values,
-				     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create header values.",
-					 function );
-
-					return( -1 );
-				}
 				if( libewf_header_values_initialize(
-				     *header_values,
+				     header_values,
 				     error ) != 1 )
 				{
 					liberror_error_set(

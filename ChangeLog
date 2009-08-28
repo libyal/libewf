@@ -213,7 +213,6 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * ewfacquire resume does not allow break when input requested
 * check make distclean
-* parse all header sections for additional values
 
 CodeGear project files
 * update libuna (build order)
@@ -224,7 +223,9 @@ CodeGear project files
 
 Version: 20090828
 * updated libuna, libbfio
-* removed parse functions from API v2 the parsing is now handled by the library
+* the parsing of the header and hash values is now handled by the library
+  the corresponding parse functions were removed from API v2
+* all header and hash sections are now parsed for additional values
 
 Version: 20090824
 * adjustments in ewftools io access
