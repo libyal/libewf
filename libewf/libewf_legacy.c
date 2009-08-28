@@ -3058,7 +3058,6 @@ int libewf_parse_header_values(
 	libewf_internal_handle_t *internal_handle = NULL;
 	liberror_error_t *error                   = NULL;
 	static char *function                     = "libewf_parse_header_values";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3097,13 +3096,13 @@ int libewf_parse_header_values(
 
 		return( -1 );
 	}
-	internal_handle->date_format = date_format;
-
-	result = libewf_handle_parse_header_values(
-	          handle,
-	          &error );
-
-	if( result == -1 )
+	if( internal_handle->header_values_parsed != 0 )
+	{
+		return( 0 );
+	}
+	if( libewf_handle_parse_header_values(
+	     internal_handle,
+	     &error ) != 1 )
 	{
 		liberror_error_set(
 		 &error,
@@ -3116,8 +3115,13 @@ int libewf_parse_header_values(
 		 error );
 		liberror_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	internal_handle->header_values_parsed = 1;
+	internal_handle->date_format          = date_format;
+
+	return( 1 );
 }
 
 /* Retrieves the amount of hash values
@@ -3412,15 +3416,35 @@ int libewf_set_hash_value(
 int libewf_parse_hash_values(
      libewf_handle_t *handle )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_parse_hash_values";
-	int result              = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	liberror_error_t *error                   = NULL;
+	static char *function                     = "libewf_parse_hash_values";
 
-	result = libewf_handle_parse_hash_values(
-	          handle,
-	          &error );
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
 
-	if( result == -1 )
+		libnotify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->hash_values_parsed != 0 )
+	{
+		return( 0 );
+	}
+	if( libewf_handle_parse_hash_values(
+	     internal_handle,
+	     &error ) != 1 )
 	{
 		liberror_error_set(
 		 &error,
@@ -3433,8 +3457,12 @@ int libewf_parse_hash_values(
 		 error );
 		liberror_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	internal_handle->hash_values_parsed = 1;
+
+	return( 1 );
 }
 
 #endif

@@ -295,9 +295,9 @@ LIBEWF_EXTERN int libewf_handle_set_header_value(
                    size_t value_length,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_parse_header_values(
-                   libewf_handle_t *handle,
-                   liberror_error_t **error );
+int libewf_handle_parse_header_values(
+     libewf_internal_handle_t *internal_handle,
+     liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_copy_header_values(
                    libewf_handle_t *destination_handle,
@@ -345,9 +345,9 @@ LIBEWF_EXTERN int libewf_handle_set_hash_value(
                    size_t value_length,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_parse_hash_values(
-                   libewf_handle_t *handle,
-                   liberror_error_t **error );
+int libewf_handle_parse_hash_values(
+     libewf_internal_handle_t *internal_handle,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

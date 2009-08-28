@@ -108,9 +108,17 @@ struct libewf_internal_handle
 	 */
 	libewf_values_table_t *header_values;
 
+	/* Value to indicate the header values were parsed
+	 */
+	uint8_t header_values_parsed;
+
 	/* The hash values
 	 */
 	libewf_values_table_t *hash_values;
+
+	/* Value to indicate the hash values were parsed
+	 */
+	uint8_t hash_values_parsed;
 
 	/* The stored sessions information
 	 */

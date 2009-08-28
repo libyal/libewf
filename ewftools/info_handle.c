@@ -820,15 +820,10 @@ int info_handle_header_values_fprint(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_parse_header_values(
-	     info_handle->input_handle,
-	     error ) != 1 )
-#else
+#if !defined( HAVE_V2_API )
 	if( libewf_parse_header_values(
 	     info_handle->input_handle,
 	     date_format ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -839,6 +834,7 @@ int info_handle_header_values_fprint(
 
 		return( -1 );
 	}
+#endif
 #if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_values_date_format(
 	     info_handle->input_handle,
@@ -2236,14 +2232,9 @@ int info_handle_hash_values_fprint(
 		 stored_md5_hash_string );
 	}
 #endif
-#if defined( HAVE_V2_API )
-	if( libewf_handle_parse_hash_values(
-	     info_handle->input_handle,
-	     error ) == -1 )
-#else
+#if !defined( HAVE_V2_API )
 	if( libewf_parse_hash_values(
 	     info_handle->input_handle ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2254,6 +2245,7 @@ int info_handle_hash_values_fprint(
 
 		return( -1 );
 	}
+#endif
 #if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_hash_values(
 	     info_handle->input_handle,

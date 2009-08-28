@@ -2626,6 +2626,23 @@ int libewf_handle_get_amount_of_header_values(
 
 		return( -1 );
 	}
+	if( internal_handle->header_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_header_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->header_values_parsed = 1;
+	}
 	if( internal_handle->header_values == NULL )
 	{
 		return( 0 );
@@ -2662,6 +2679,23 @@ int libewf_handle_get_header_value_identifier_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->header_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_header_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->header_values_parsed = 1;
+	}
 	if( internal_handle->header_values == NULL )
 	{
 		return( 0 );
@@ -2714,6 +2748,23 @@ int libewf_handle_get_header_value_identifier(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->header_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_header_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->header_values_parsed = 1;
+	}
 	if( internal_handle->header_values == NULL )
 	{
 		return( 0 );
@@ -2780,6 +2831,23 @@ int libewf_handle_get_header_value_size(
 		 function );
 
 		return( -1 );
+	}
+	if( internal_handle->header_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_header_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->header_values_parsed = 1;
 	}
 	if( internal_handle->header_values == NULL )
 	{
@@ -2913,6 +2981,23 @@ int libewf_handle_get_header_value(
 		 function );
 
 		return( -1 );
+	}
+	if( internal_handle->header_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_header_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->header_values_parsed = 1;
 	}
 	if( internal_handle->header_values == NULL )
 	{
@@ -3132,6 +3217,23 @@ int libewf_handle_copy_header_values(
 	internal_destination_handle = (libewf_internal_handle_t *) destination_handle;
 	internal_source_handle      = (libewf_internal_handle_t *) source_handle;
 
+	if( internal_source_handle->header_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_header_values(
+		     internal_source_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse source handle header values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_source_handle->header_values_parsed = 1;
+	}
 	if( internal_source_handle->header_values == NULL )
 	{
 		liberror_error_set(
@@ -3192,28 +3294,25 @@ int libewf_handle_copy_header_values(
 
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above
- * Returns 1 if successful, 0 if already parsed or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_parse_header_values(
-     libewf_handle_t *handle,
+     libewf_internal_handle_t *internal_handle,
      liberror_error_t **error )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_parse_header_values";
+	static char *function = "libewf_handle_parse_header_values";
 
-	if( handle == NULL )
+	if( internal_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
+		 "%s: invalid internal handle.",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
 	if( internal_handle->io_handle == NULL )
 	{
 		liberror_error_set(
@@ -3238,7 +3337,14 @@ int libewf_handle_parse_header_values(
 	}
 	if( internal_handle->header_values != NULL )
 	{
-		return( 0 );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - header values already set.",
+		 function );
+
+		return( -1 );
 	}
 	if( ( internal_handle->header_sections->xheader != NULL )
 	 && ( libewf_header_values_parse_xheader(
@@ -3360,6 +3466,23 @@ int libewf_handle_get_amount_of_hash_values(
 
 		return( -1 );
 	}
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
 	if( internal_handle->hash_values == NULL )
 	{
 		return( 0 );
@@ -3396,6 +3519,23 @@ int libewf_handle_get_hash_value_identifier_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
 	if( internal_handle->hash_values == NULL )
 	{
 		return( 0 );
@@ -3447,6 +3587,23 @@ int libewf_handle_get_hash_value_identifier(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
 	if( internal_handle->hash_values == NULL )
 	{
 		return( 0 );
@@ -3508,6 +3665,23 @@ int libewf_handle_get_hash_value_size(
 		 function );
 
 		return( -1 );
+	}
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
 	}
 	if( ( internal_handle->hash_values == NULL )
 	 && ( internal_handle->hash_sections != NULL )
@@ -3608,6 +3782,23 @@ int libewf_handle_get_hash_value(
 		 function );
 
 		return( -1 );
+	}
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
 	}
 	if( ( internal_handle->hash_values == NULL )
 	 && ( internal_handle->hash_sections != NULL )
@@ -3836,16 +4027,15 @@ int libewf_handle_set_hash_value(
 }
 
 /* Parses the hash values from the xhash section
- * Returns 1 if successful, 0 if already parsed or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_parse_hash_values(
-     libewf_handle_t *handle,
+     libewf_internal_handle_t *internal_handle,
      liberror_error_t **error )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_parse_hash_values";
+	static char *function = "libewf_handle_parse_hash_values";
 
-	if( handle == NULL )
+	if( internal_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -3856,8 +4046,6 @@ int libewf_handle_parse_hash_values(
 
 		return( -1 );
 	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
 	if( internal_handle->hash_sections == NULL )
 	{
 		liberror_error_set(
@@ -3871,7 +4059,14 @@ int libewf_handle_parse_hash_values(
 	}
 	if( internal_handle->hash_values != NULL )
 	{
-		return( 0 );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - hash sections already set.",
+		 function );
+
+		return( -1 );
 	}
 	if( ( internal_handle->hash_sections->xhash != NULL )
 	 && ( libewf_hash_values_parse_xhash(

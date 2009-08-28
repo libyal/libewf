@@ -1372,15 +1372,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_parse_header_values(
-	     imaging_handle->output_handle,
-	     error ) != 1 )
-#else
+#if !defined( HAVE_V2_API )
 	if( libewf_parse_header_values(
 	     imaging_handle->output_handle,
 	     LIBEWF_DATE_FORMAT_CTIME ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1391,6 +1386,7 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
+#endif
 	/* Get case number
 	 */
 	if( imaging_handle_get_header_value(

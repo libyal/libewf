@@ -1864,17 +1864,10 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		/* TODO is this the required date format ?
-		 */
-#if defined( HAVE_V2_API )
-		if( libewf_handle_parse_header_values(
-		     export_handle->input_handle,
-		     error ) != 1 )
-#else
+#if !defined( HAVE_V2_API )
 		if( libewf_parse_header_values(
 		     export_handle->input_handle,
 		     LIBEWF_DATE_FORMAT_ISO8601 ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -1885,6 +1878,7 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
+#endif
 #if defined( HAVE_V2_API )
 		if( libewf_handle_copy_header_values(
 		     export_handle->ewf_output_handle,

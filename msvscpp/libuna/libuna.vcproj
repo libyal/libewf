@@ -141,6 +141,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_874.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libuna\libuna_codepage_windows_1250.c"
 				>
 			</File>
@@ -284,6 +288,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libuna\libuna_codepage_iso_8859_16.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_874.h"
 				>
 			</File>
 			<File
