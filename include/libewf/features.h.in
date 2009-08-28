@@ -23,8 +23,16 @@
 #if !defined( _LIBEWF_FEATURES_H )
 #define _LIBEWF_FEATURES_H
 
-#if defined( WINAPI ) ||  @HAVE_WIDE_CHARACTER_TYPE@
-#define LIBEWF_WIDE_CHARACTER_TYPE      1
+#if defined( WINAPI ) || @HAVE_WIDE_CHARACTER_TYPE@
+#define LIBEWF_HAVE_WIDE_CHARACTER_TYPE		1
+
+/* Old definition kept for compatibility (for now)
+ */
+#define LIBEWF_WIDE_CHARACTER_TYPE		1
+#endif
+
+#if defined( HAVE_LIBBFIO ) || @HAVE_LIBBFIO@
+#define LIBEWF_HAVE_BFIO
 #endif
 
 #endif

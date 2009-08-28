@@ -904,35 +904,148 @@ AS_IF(
 	 [],
 	 [ac_libewf_have_libbfio=no])
 
-	dnl Basic file IO functions
+	dnl Handle functions
 	AC_CHECK_LIB(
 	 bfio,
-	 libbfio_initialize,
+	 libbfio_handle_free,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libbfio=no])
 	AC_CHECK_LIB(
 	 bfio,
-	 libbfio_free,
+	 libbfio_handle_open,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libbfio=no])
 	AC_CHECK_LIB(
 	 bfio,
-	 libbfio_open,
+	 libbfio_handle_close,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libbfio=no])
 	AC_CHECK_LIB(
 	 bfio,
-	 libbfio_close,
+	 libbfio_handle_exists,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libbfio=no])
 	AC_CHECK_LIB(
 	 bfio,
-	 libbfio_seek_offset,
+	 libbfio_handle_read,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libbfio=no])
 	AC_CHECK_LIB(
 	 bfio,
-	 libbfio_read,
+	 libbfio_handle_set_track_offsets_read,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+
+	dnl File functions
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_file_initialize,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_file_get_name_size,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_file_get_name,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_file_set_name,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+
+	AS_IF(
+		[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
+		[AC_CHECK_LIB(
+		 bfio,
+		 libbfio_file_get_name_size_wide,
+		 [ac_libewf_dummy=yes],
+		 [ac_libewf_have_libbfio=no])
+		AC_CHECK_LIB(
+		 bfio,
+		 libbfio_file_get_name_wide,
+		 [ac_libewf_dummy=yes],
+		 [ac_libewf_have_libbfio=no])
+		AC_CHECK_LIB(
+		 bfio,
+		 libbfio_file_set_name_wide,
+		 [ac_libewf_dummy=yes],
+		 [ac_libewf_have_libbfio=no]) ])
+
+	dnl Pool functions
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_initialize,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_free,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_open,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_reopen,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_close,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_close_all,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_read,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_write,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_seek_offset,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_get_amount_of_handles,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_get_handle,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_add_handle,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_get_offset,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_get_size,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libbfio=no])
 	])
@@ -953,7 +1066,10 @@ AS_IF(
 	 [])
 	AC_SUBST(
 	 [LIBBFIO_LIBADD],
-	 []) ],
+	 [])
+	AC_SUBST(
+	 [HAVE_LIBBFIO],
+	 [1]) ],
 	[dnl If libbfio is not available use the (local) version that came with libewf
 	AC_DEFINE(
 	 [HAVE_LOCAL_LIBBFIO],
@@ -977,6 +1093,9 @@ AS_IF(
 	AC_SUBST(
 	 [LIBBFIO_LIBADD],
 	 [../libbfio/libbfio.la])
+	AC_SUBST(
+	 [HAVE_LIBBFIO],
+	 [0])
 	ac_libewf_have_libbfio=local])
 
 AM_CONDITIONAL(
@@ -1194,6 +1313,23 @@ AS_IF(
 	  [1],
 	  [Defines if uuid_generate_time funtion is present.])
 	 ])
+	])
+
+AS_IF(
+	[test "x$ac_libewf_have_guid_support" = xlibuuid],
+	[AC_SUBST(
+	 [libewf_spec_requires_libuuid],
+	 [e2fsprogs-devel])
+	AC_SUBST(
+	 [libewf_spec_build_requires_libuuid],
+	 [e2fsprogs-devel]) ],
+	[AC_SUBST(
+	 [libewf_spec_requires_libuuid],
+	 [])
+	AC_SUBST(
+	 [libewf_spec_build_requires_libuuid],
+	 [])
+	ac_libewf_dummy=yes
 	])
 
 dnl Check if libewf should be build with wide character type support

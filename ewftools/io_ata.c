@@ -40,6 +40,10 @@
 #include <linux/hdreg.h>
 #endif
 
+#if defined( HAVE_ERRNO_H ) || defined( WINAPI )
+#include <errno.h>
+#endif
+
 #include <libsystem.h>
 
 #include "io_ata.h"

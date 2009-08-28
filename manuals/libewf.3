@@ -31,13 +31,17 @@ Available when compiled with wide character string support:
 .Ft int
 .Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t ** filenames[]"
 .Pp
+Available when compiled with libbfio support:
+.Ft int
+.Fn libewf_check_file_signature_file_io_handle "libbfio_handle_t *bfio_handle, libewf_error_t **error"
+.Pp
 Support functions (APIv2)
 .Ft int
 .Fn libewf_check_file_signature "const char *filename, libewf_error_t **error"
 .Ft int
 .Fn libewf_glob "const char *filename, size_t filename_length, uint8_t format, char **filenames[], int *amount_of_filenames, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob_free "char *filenames[], int amount_of_filenames, liberror_error_t **error"
+.Fn libewf_glob_free "char *filenames[], int amount_of_filenames, libewf_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
@@ -45,7 +49,7 @@ Available when compiled with wide character string support:
 .Ft int
 .Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t **filenames[], int *amount_of_filenames, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob_free_wide "wchar_t *filenames[], int amount_of_filenames, liberror_error_t **error"
+.Fn libewf_glob_free_wide "wchar_t *filenames[], int amount_of_filenames, libewf_error_t **error"
 .Pp
 Notify functions (APIv1)
 .Ft void
@@ -208,6 +212,12 @@ Available when compiled with wide character string support:
 .Fn libewf_handle_get_filename_size_wide "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t filename_size, libewf_error_t **error"
+.Pp
+Available when compiled with libbfio support:
+.Ft int
+.Fn libewf_handle_open_file_io_pool "libewf_handle_t *handle, libbfio_pool_t *file_io_pool, uint8_t flags, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_file_io_handle "libewf_handle_t *handle, libbfio_handle_t **file_io_handle, libewf_error_t **error"
 .Pp
 Meta data functions (APIv1)
 .Ft int
@@ -668,7 +678,7 @@ or pass the definition
  to the compiler (i.e. in case of Microsoft Visual Studio (MSVS) C++).
 
 To have other code to determine if libewf was compiled with wide character support it defines
-.Ar LIBEWF_WIDE_CHARACTER_TYPE
+.Ar LIBEWF_HAVE_WIDE_CHARACTER_TYPE
  in libewf/features.h.
 
 As of version 20080903 libewf uses UTF-8 encoded strings except for filenames.
@@ -682,6 +692,14 @@ The header in a set of EWF files contains an extended ASCII string using the cod
  allows to set the required codepage for reading and writing. The default codepage is ASCII and replaces all extended characters to the Unicode replacement character (U+fffd) when reading and the ASCII substitude character (0x1a) when writing. 
 
 The header2 contains UTF-16 little endian stream and the xheader and xhash contain a UTF-8 stream without or with byte order mark (as of version 20080903).
+
+libewf allows to be compiled with chained IO support using libbfio.
+libewf will automatically detect if a compatible version of libbfio is available.
+
+To have other code to determine if libewf was compiled with libbfio support it defines
+.Ar LIBEWF_HAVE_BFIO
+ in libewf/features.h.
+
 .Sh BUGS
 Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website:
 http://libewf.sourceforge.net/

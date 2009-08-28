@@ -95,9 +95,9 @@ API changes
   - add means to set pools open handle limit in libewf (partial completed)
   - add means to obtain libbfio handle of media data in ewf
   - add means to set narrow string codepage
-  - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
-  - refactor glob functions to use libbfio handle input and return libbfio pool?
-  - think about libewf_glob_file_io_handle and abstration of file io handle get/set name
+  - export libewf_glob_file_io_handle
+    refactor glob functions to use libbfio handle input and return libbfio pool?
+    think about libewf_glob_file_io_handle and abstration of file io handle get/set name
 * low level API
   - add function to retrieve the segment file names and amount?
   - add function to retrieve EWFX xml header/hash directly
@@ -200,7 +200,6 @@ Work in progress:
 * fix automated tests:
   - variating buffer sizes
 * test: read/write of EnCase 6.12 SHA1
-* test: windows acquiry of 40 GB disk
 
 Beta after next stable release
 * remove DISABLED in ewfexport
@@ -226,6 +225,8 @@ Version: 20090828
 * the parsing of the header and hash values is now handled by the library
   the corresponding parse functions were removed from API v2
 * all header and hash sections are now parsed for additional values
+* updated libbfio detection
+* worked on libbfio API extensions
 
 Version: 20090824
 * adjustments in ewftools io access

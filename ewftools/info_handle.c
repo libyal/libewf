@@ -1605,6 +1605,7 @@ int info_handle_media_information_fprint(
 #endif
 	uint32_t bytes_per_sector  = 0;
 	uint32_t error_granularity = 0;
+	uint32_t sectors_per_chunk = 0;
 	uint8_t compression_flags  = 0;
 	uint8_t media_type         = 0;
 	uint8_t media_flags        = 0;
@@ -1738,6 +1739,33 @@ int info_handle_media_information_fprint(
 	 || ( format == LIBEWF_FORMAT_LINEN6 )
 	 || ( format == LIBEWF_FORMAT_EWFX ) )
 	{
+#if defined( HAVE_V2_API )
+		if( libewf_handle_get_sectors_per_chunk(
+		     info_handle->input_handle,
+		     &sectors_per_chunk,
+		     error ) == 1 )
+#else
+		if( libewf_get_sectors_per_chunk(
+		     info_handle->input_handle,
+		     &sectors_per_chunk ) == 1 )
+#endif
+		{
+			fprintf(
+			 stream,
+			 "\tSectors per chunk:\t%" PRIu32 "\n",
+			 sectors_per_chunk );
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sectors per chunk.",
+			 function );
+
+			result = -1;
+		}
 #if defined( HAVE_V2_API )
 		if( libewf_handle_get_error_granularity(
 		     info_handle->input_handle,

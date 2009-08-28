@@ -74,9 +74,9 @@ LIBEWF_EXTERN int libewf_check_file_signature_wide(
 #endif
 #endif
 
-int libewf_check_file_signature_file_io_handle(
-     libbfio_handle_t *bfio_handle,
-     liberror_error_t **error );
+LIBEWF_EXTERN int libewf_check_file_signature_file_io_handle(
+                   libbfio_handle_t *bfio_handle,
+                   liberror_error_t **error );
 
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_glob(
@@ -101,11 +101,13 @@ LIBEWF_EXTERN int libewf_glob_free(
                    liberror_error_t **error );
 #endif
 
+/* TODO
 LIBEWF_EXTERN int libewf_glob_file_io_handle(
                    libbfio_handle_t *file_io_handle,
                    uint8_t format,
                    libbfio_pool_t *file_io_pool,
                    liberror_error_t **error );
+*/
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
