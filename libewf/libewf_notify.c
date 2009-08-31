@@ -34,6 +34,8 @@
 
 #include "libewf_notify.h"
 
+#if !defined( HAVE_LOCAL_LIBEWF )
+
 /* Set the verbose notification
  */
 void libewf_notify_set_verbose(
@@ -116,4 +118,6 @@ int libewf_notify_stream_close(
 	}
 	return( 0 );
 }
+
+#endif
 

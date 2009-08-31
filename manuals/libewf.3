@@ -1,4 +1,4 @@
-.Dd August 28, 2009
+.Dd August 29, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -31,10 +31,6 @@ Available when compiled with wide character string support:
 .Ft int
 .Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t ** filenames[]"
 .Pp
-Available when compiled with libbfio support:
-.Ft int
-.Fn libewf_check_file_signature_file_io_handle "libbfio_handle_t *bfio_handle, libewf_error_t **error"
-.Pp
 Support functions (APIv2)
 .Ft int
 .Fn libewf_check_file_signature "const char *filename, libewf_error_t **error"
@@ -50,6 +46,10 @@ Available when compiled with wide character string support:
 .Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t **filenames[], int *amount_of_filenames, libewf_error_t **error"
 .Ft int
 .Fn libewf_glob_free_wide "wchar_t *filenames[], int amount_of_filenames, libewf_error_t **error"
+.Pp
+Available when compiled with libbfio support:
+.Ft int
+.Fn libewf_check_file_signature_file_io_handle "libbfio_handle_t *bfio_handle, libewf_error_t **error"
 .Pp
 Notify functions (APIv1)
 .Ft void

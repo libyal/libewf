@@ -37,6 +37,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBEWF )
+
 LIBEWF_EXTERN void libewf_notify_set_verbose(
                     int verbose );
 
@@ -50,6 +52,8 @@ LIBEWF_EXTERN int libewf_notify_stream_open(
 
 LIBEWF_EXTERN int libewf_notify_stream_close(
                    liberror_error_t **error );
+
+#endif
 
 #if defined( __cplusplus )
 }
