@@ -215,10 +215,14 @@ Next stable release:
 
 CodeGear project files
 * update libuna (build order)
+* update libbfio (build order)
 * zlib ?
 * libsystem
 * libewf
 * ewftools
+
+Version: 20090829
+* updated msvscpp libbfio project
 
 Version: 20090828
 * updated libuna, libbfio

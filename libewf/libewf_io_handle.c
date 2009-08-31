@@ -117,6 +117,7 @@ int libewf_io_handle_free(
 	if( *io_handle != NULL )
 	{
 		if( ( ( *io_handle )->pool_created_in_library != 0 )
+		 && ( ( *io_handle )->file_io_pool != NULL )
 		 && ( libbfio_pool_free(
 		       &( ( *io_handle )->file_io_pool ),
 		       error ) != 1 ) )
