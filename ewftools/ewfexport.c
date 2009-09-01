@@ -874,10 +874,17 @@ int main( int argc, char * const argv[] )
 	 program );
 
 #if defined( WINAPI )
+#if defined( _MSC_VER )
 	if( _setmode(
 	     _fileno(
 	      stdout ),
 	     _O_BINARY ) == -1 )
+#else
+	if( setmode(
+	     _fileno(
+	      stdout ),
+	     _O_BINARY ) == -1 )
+#endif
 	{
 		fprintf(
 		 stderr,

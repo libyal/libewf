@@ -160,7 +160,7 @@ ssize_t libewf_section_start_read(
 	              sizeof( ewf_section_t ),
 	              error );
 
-	if( read_count != sizeof( ewf_section_t ) )
+	if( read_count != (ssize_t) sizeof( ewf_section_t ) )
 	{
 		liberror_error_set(
 		 error,
@@ -402,7 +402,7 @@ ssize_t libewf_section_start_write(
 	               sizeof( ewf_section_t ),
 	               error );
 
-	if( write_count != sizeof( ewf_section_t ) )
+	if( write_count != (ssize_t) sizeof( ewf_section_t ) )
 	{
 		liberror_error_set(
 		 error,
@@ -6640,7 +6640,7 @@ ssize_t libewf_section_delta_chunk_write(
 			       sizeof( ewf_crc_t ),
 		               error );
 
-		if( write_count != (size_t) sizeof( ewf_crc_t ) )
+		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
 			liberror_error_set(
 			 error,

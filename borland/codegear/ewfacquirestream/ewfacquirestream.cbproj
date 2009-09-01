@@ -1,6 +1,6 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{60559BF3-A6FE-47DA-9DA8-991A06FB4A3D}</ProjectGuid>
+			<ProjectGuid>{AC1696C6-13D0-48DC-AF57-03B4633F07B9}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Release</Config>
 		</PropertyGroup>
@@ -13,18 +13,22 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<FinalOutputDir>..\Release</FinalOutputDir>
-			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libnotify;..\..\..\libuna;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(BCC_IncludePath)</BCC_IncludePath>
-			<OutputExt>lib</OutputExt>
-			<Multithreaded>true</Multithreaded>
+			<LinkPackageStatics>rtl.lib</LinkPackageStatics>
+			<AllPackageLibs>rtl.lib</AllPackageLibs>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
-			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
-			<ProjectType>CppStaticLibrary</ProjectType>
+			<NoVCL>true</NoVCL>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libuna;..\..\..\libbfio;..\..\..\libewf;..\..\..\libsystem;..\..\zlib-1.2.3;$(BCC_IncludePath)</BCC_IncludePath>
+			<ProjectType>CppConsoleApplication</ProjectType>
+			<Multithreaded>true</Multithreaded>
+			<BCC_waus>false</BCC_waus>
+			<OutputExt>exe</OutputExt>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;HAVE_LOCAL_LIBUNA;$(Defines)</Defines>
-			<IncludePath>..\..\..\libfmapi;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
-			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<Defines>NO_STRICT;ZLIB_DLL;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT;$(Defines)</Defines>
+			<DynamicRTL>true</DynamicRTL>
+			<IncludePath>..\..\..\ewftools;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
+			<ILINK_LibraryPath>..\..\..\ewftools;..\Release;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
 			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
 		</PropertyGroup>
@@ -35,87 +39,127 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libfmapi\libfmapi_lzfu.h">
-				<BuildOrder>17</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_property_type.c">
-				<BuildOrder>18</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_property_type.h">
-				<BuildOrder>19</BuildOrder>
-			</None>
-			<None Include="..\..\..\libfmapi\libfmapi_guid.h">
-				<BuildOrder>14</BuildOrder>
-			</None>
-			<None Include="..\..\..\libfmapi\libfmapi_libuna.h">
-				<BuildOrder>15</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_lzfu.c">
-				<BuildOrder>16</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_security_identifier.c">
-				<BuildOrder>20</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_types.h">
-				<BuildOrder>24</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_value_type.c">
+			<LibFiles Include="..\Release\libewf.lib">
+				<IgnorePath>true</IgnorePath>
 				<BuildOrder>25</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_value_type.h">
-				<BuildOrder>26</BuildOrder>
-			</None>
-			<None Include="..\..\..\libfmapi\libfmapi_security_identifier.h">
-				<BuildOrder>21</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_service_provider_identifier.c">
-				<BuildOrder>22</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_service_provider_identifier.h">
-				<BuildOrder>23</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_guid.c">
-				<BuildOrder>13</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_class_identifier.h">
-				<BuildOrder>3</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_crc.c">
-				<BuildOrder>4</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_crc.h">
-				<BuildOrder>5</BuildOrder>
-			</None>
-			<None Include="..\..\..\libfmapi\libfmapi_x400_object_identifier.h">
-				<BuildOrder>0</BuildOrder>
-			</None>
-			<None Include="..\..\..\libfmapi\libfmapi.h">
-				<BuildOrder>1</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_class_identifier.c">
+			</LibFiles>
+			<LibFiles Include="..\Release\libsystem.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>33</BuildOrder>
+			</LibFiles>
+			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
 				<BuildOrder>2</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_debug.c">
+			<None Include="..\..\..\ewftools\byte_size_string.h">
+				<BuildOrder>3</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\device_handle.c">
+				<BuildOrder>4</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\device_handle.h">
+				<BuildOrder>5</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\digest_context.c">
 				<BuildOrder>6</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_entry_identifier.h">
-				<BuildOrder>10</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_filetime.c">
-				<BuildOrder>11</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libfmapi\libfmapi_filetime.h">
-				<BuildOrder>12</BuildOrder>
-			</None>
-			<None Include="..\..\..\libfmapi\libfmapi_debug.h">
+			<None Include="..\..\..\ewftools\digest_context.h">
 				<BuildOrder>7</BuildOrder>
 			</None>
-			<None Include="..\..\..\libfmapi\libfmapi_definitions.h">
+			<CppCompile Include="..\..\..\ewftools\digest_hash.c">
 				<BuildOrder>8</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libfmapi\libfmapi_entry_identifier.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
+			<None Include="..\..\..\ewftools\digest_hash.h">
+				<BuildOrder>9</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\ewfcommon.h">
+				<BuildOrder>11</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
+				<BuildOrder>12</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\ewfinput.h">
+				<BuildOrder>13</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
+				<BuildOrder>14</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\ewfoutput.h">
+				<BuildOrder>15</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\guid.c">
+				<BuildOrder>16</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\guid.h">
+				<BuildOrder>17</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\imaging_handle.c">
+				<BuildOrder>18</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\imaging_handle.h">
+				<BuildOrder>19</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\io_ata.c">
+				<BuildOrder>20</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\io_ata.h">
+				<BuildOrder>21</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\io_bus.h">
+				<BuildOrder>22</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\io_optical_disk.c">
+				<BuildOrder>23</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\io_optical_disk.h">
+				<BuildOrder>24</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\io_scsi.c">
+				<BuildOrder>25</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\io_scsi.h">
+				<BuildOrder>26</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\io_usb.c">
+				<BuildOrder>27</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\io_usb.h">
+				<BuildOrder>28</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\md5.h">
+				<BuildOrder>29</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\platform.c">
+				<BuildOrder>30</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\platform.h">
+				<BuildOrder>31</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\process_status.c">
+				<BuildOrder>32</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\process_status.h">
+				<BuildOrder>33</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\sha1.h">
+				<BuildOrder>34</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\storage_media_buffer.c">
+				<BuildOrder>35</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\storage_media_buffer.h">
+				<BuildOrder>36</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfacquirestream.c">
+				<BuildOrder>36</BuildOrder>
+			</CppCompile>
+			<LibFiles Include="..\Release\liberror.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>37</BuildOrder>
+			</LibFiles>
+			<LibFiles Include="..\Release\libuna.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>38</BuildOrder>
+			</LibFiles>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -127,7 +171,7 @@
 		<Import Project="$(BDS)\Bin\CodeGear.Cpp.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')"/>
 		<ProjectExtensions>
 			<Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
-			<Borland.ProjectType>CppStaticLibrary</Borland.ProjectType>
+			<Borland.ProjectType>CppConsoleApplication</Borland.ProjectType>
 			<BorlandProject>
 				<CPlusPlusBuilder.Personality>
 					<VersionInfo>

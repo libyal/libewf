@@ -62,7 +62,7 @@
 #include <libbfio.h>
 #endif
 
-#if defined( HAVE_ZLIB_H )
+#if defined( HAVE_ZLIB_H ) || defined( ZLIB_DLL )
 #include <zlib.h>
 #endif
 

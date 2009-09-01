@@ -26,11 +26,11 @@
 #include <liberror.h>
 #include <libnotify.h>
 
-#if defined( HAVE_STDLIB_H ) | defined( WINAPI )
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#if defined( HAVE_ZLIB_H )
+#if defined( HAVE_ZLIB_H ) || defined( ZLIB_DLL )
 #include <zlib.h>
 #endif
 

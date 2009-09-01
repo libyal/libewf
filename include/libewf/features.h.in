@@ -31,7 +31,7 @@
 #define LIBEWF_WIDE_CHARACTER_TYPE		1
 #endif
 
-#if defined( HAVE_LIBBFIO ) || @HAVE_LIBBFIO@
+#if defined( HAVE_LIBBFIO ) || ( !defined( WINAPI ) && @HAVE_LIBBFIO@ )
 #define LIBEWF_HAVE_BFIO
 #endif
 

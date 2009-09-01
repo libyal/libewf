@@ -125,10 +125,6 @@ extern "C" {
 #define file_stream_vfprintf( stream, format, ... ) \
 	g_vfprintf( stream, format, __VA_ARGS__ )
 
-#elif defined( _MSC_VER )
-#define file_stream_vfprintf( stream, format, ... ) \
-	_vfprintf( stream, format, __VA_ARGS__ )
-
 #elif defined( HAVE_VFPRINTF ) || defined( WINAPI )
 #define file_stream_vfprintf( stream, format, ... ) \
 	vfprintf( stream, format, __VA_ARGS__ )

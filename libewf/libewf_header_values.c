@@ -39,6 +39,10 @@
 #include <time.h>
 #endif
 
+#if defined( HAVE_ERRNO_H ) || defined( WINAPI )
+#include <errno.h>
+#endif
+
 #include "libewf_date_time.h"
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
@@ -718,12 +722,14 @@ int libewf_convert_date_header2_value(
 	}
 	end_of_header_value = &( header_value[ header_value_length ] );
 
+	errno = 0;
+
 	timestamp_value = libewf_string_to_uint64(
 	                   header_value,
 	                   &end_of_header_value,
 	                   0 );
 
-	if( timestamp_value >= (uint64_t) LONG_MAX )
+	if( errno != 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -5999,6 +6005,21 @@ int libewf_generate_date_xheader_value(
 	               time_elements.tm_gmtoff / 60,
 	               time_elements.tm_gmtoff % 60,
 		       time_elements.tm_zone );
+
+#elif defined( __BORLANDC__ )
+	print_count = libewf_string_snprintf(
+		       *date_time_values_string,
+		       *date_time_values_string_size,
+		       "%s %s %2d %02d:%02d:%02d %04d %s",
+		       (char *) day_of_week,
+		       (char *) month,
+		       time_elements.tm_mday,
+		       time_elements.tm_hour,
+		       time_elements.tm_min,
+		       time_elements.tm_sec,
+		       time_elements.tm_year + 1900,
+		       _tzname[ time_elements.tm_isdst ] );
+
 #else
 	print_count = libewf_string_snprintf(
 		       *date_time_values_string,

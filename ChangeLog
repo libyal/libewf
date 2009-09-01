@@ -214,12 +214,11 @@ Next stable release:
 * check make distclean
 
 CodeGear project files
-* update libuna (build order)
-* update libbfio (build order)
-* zlib ?
-* libsystem
-* libewf
-* ewftools
+* get ewftools working (glob and getopt fail)
+
+Version: 20090901
+* worked on Borland C++ compiler support
+* updated common/file_stream.h
 
 Version: 20090829
 * updated msvscpp libbfio project

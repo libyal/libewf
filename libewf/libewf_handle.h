@@ -43,10 +43,10 @@
 #include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
 
-#if defined( _MSC_VER )
+#if defined( _MSC_VER ) || defined( __BORLANDC__ )
 
-/* This inclusion is needed otherwise MSVSC++ messes up exporting
- * the legacy functions
+/* This inclusion is needed otherwise some linkers
+ * mess up exporting the legacy functions
  */
 #include "libewf_legacy.h"
 #endif
