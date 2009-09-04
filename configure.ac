@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090901],
+ [20090904],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090901])
+ [20090904])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -137,8 +137,10 @@ AC_CHECK_HEADERS([varargs.h])
 dnl Headers included in libnotify/libnotify.c, libbfio/libbfio_file.c and libewf/libewf_header_values.c
 AC_CHECK_HEADERS([errno.h])
 
-dnl Headers included in libbfio/libbfio_file.c and libsystem/libsystem_file_io.h
+dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_directory_io.h and libsystem/libsystem_file_io.h
 AC_CHECK_HEADERS([sys/stat.h])
+
+dnl Headers included in libbfio/libbfio_file.c and libsystem/libsystem_file_io.h
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([unistd.h])
 
@@ -175,11 +177,14 @@ AC_CHECK_HEADERS([sys/disk.h])
 AC_CHECK_HEADERS([sys/disklabel.h])
 AC_CHECK_HEADERS([sys/ioctl.h])
 
-dnl Other headers
+dnl Headers included in ewftools/platform.c
 AC_CHECK_HEADERS([sys/utsname.h])
 
+dnl Headers included in ewftools/ewfoutput.c
 AC_CHECK_HEADERS([openssl/opensslv.h])
 AC_CHECK_HEADERS([zlib.h])
+
+dnl Other headers
 
 dnl Check for type definitions
 AC_STRUCT_TM
@@ -376,6 +381,16 @@ AC_CHECK_FUNCS(
    [1]) ]) ])
 
 AC_CHECK_FUNCS(
+ [strncasecmp],
+ [],
+ [AC_CHECK_FUNCS(
+  [strcasecmp],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strncasecmp and strcasecmp],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
  [strncmp],
  [],
  [AC_CHECK_FUNCS(
@@ -437,7 +452,7 @@ AC_CHECK_FUNCS(
   [Missing function: vsnprintf],
   [1]) ])
 
-dnl File input/output functions used in libbdio/libbfio_file.h
+dnl File input/output functions used in libbfio/libbfio_file.h
 AC_CHECK_FUNCS(
  [close],
  [],
@@ -516,6 +531,21 @@ AC_CHECK_FUNCS(
  [],
  [AC_MSG_FAILURE(
   [Missing function: time],
+  [1]) ])
+
+dnl Directory functions used in libsystem/libsystem_directory_io.h
+AC_CHECK_FUNCS(
+ [chdir],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing functions: chdir],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [mkdir],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing functions: mkdir],
   [1]) ])
 
 dnl Check for error string functions used in libsystem/libsystem_error.c
@@ -1378,6 +1408,16 @@ AS_IF(
 	  [],
 	  [AC_MSG_FAILURE(
 	   [Missing functions: wcschr and wmemchr],
+	   [1]) ]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcsncasecmp],
+	 [],
+	 [AC_CHECK_FUNCS(
+	  [wcscasecmp],
+	  [],
+	  [AC_MSG_FAILURE(
+	   [Missing functions: wcsncasecmp and wcscasecmp],
 	   [1]) ]) ])
 
 	AC_CHECK_FUNCS(

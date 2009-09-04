@@ -32,7 +32,7 @@
 #endif
 
 #if defined( HAVE_LIBBFIO ) || ( !defined( WINAPI ) && @HAVE_LIBBFIO@ )
-#define LIBEWF_HAVE_BFIO
+#define LIBEWF_HAVE_BFIO			1
 #endif
 
 #endif
