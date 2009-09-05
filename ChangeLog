@@ -216,6 +216,9 @@ Next stable release:
 CodeGear project files
 * get ewftools working (glob and getopt fail)
 
+Version: 20090905
+* updated ewfinput codepage detection with libuna version
+
 Version: 20090904
 * updated codpage definitions
 
