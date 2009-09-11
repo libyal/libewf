@@ -116,7 +116,7 @@ typedef unsigned __int32	intptr_t;
 #error Missing integer type definitions (inttypes.h, stdint.h)
 #endif
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
 
 #if @HAVE_WCHAR_H@ || defined( HAVE_WCHAR_H )
 
