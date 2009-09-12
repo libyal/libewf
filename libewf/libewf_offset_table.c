@@ -28,6 +28,7 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_chunk_offset.h"
 #include "libewf_definitions.h"
 #include "libewf_libbfio.h"
 #include "libewf_list_type.h"
@@ -35,6 +36,7 @@
 #include "libewf_section_list.h"
 
 #include "ewf_definitions.h"
+#include "ewf_table.h"
 
 /* Initialize the offset table
  * Returns 1 if successful or -1 on error
@@ -315,6 +317,17 @@ int libewf_offset_table_fill(
 
 		return( -1 );
 	}
+	if( offsets == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offsets.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file_handle == NULL )
 	{
 		liberror_error_set(
@@ -329,20 +342,22 @@ int libewf_offset_table_fill(
 	/* Allocate additional entries in the offset table if needed
 	 * - a single reallocation saves processing time
 	 */
-	if( ( offset_table->amount_of_chunk_offsets < ( offset_table->last_chunk_offset_filled + amount_of_chunks ) )
-	 && ( libewf_offset_table_resize(
-	       offset_table,
-	       offset_table->last_chunk_offset_filled + amount_of_chunks,
-	       error ) != 1 ) )
+	if( offset_table->amount_of_chunk_offsets < ( offset_table->last_chunk_offset_filled + amount_of_chunks ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.",
-		 function );
+		if( libewf_offset_table_resize(
+		     offset_table,
+		     offset_table->last_chunk_offset_filled + amount_of_chunks,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize offset table.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	endian_little_convert_32bit(
 	 raw_offset,
@@ -869,6 +884,17 @@ int libewf_offset_table_compare(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( offsets == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offsets.",
 		 function );
 
 		return( -1 );
