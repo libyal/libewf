@@ -1430,20 +1430,22 @@ ssize_t libewf_segment_file_write_chunk(
 	}
 	/* Make sure the chunk is available in the offset table
 	 */
-	if( ( offset_table->amount_of_chunk_offsets < ( chunk + 1 ) )
-	 && ( libewf_offset_table_resize(
-	       offset_table,
-	       chunk + 1,
-	       error ) != 1 ) )
+	if( offset_table->amount_of_chunk_offsets < ( chunk + 1 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.",
-		 function );
+		if( libewf_offset_table_resize(
+		     offset_table,
+		     chunk + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize offset table.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( libbfio_pool_get_offset(
 	     io_handle->file_io_pool,
@@ -1494,7 +1496,7 @@ ssize_t libewf_segment_file_write_chunk(
 	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
 	 chunk_type,
-	 chunk + 1,
+	 chunk,
 	 segment_file_offset,
 	 offset_table->chunk_offset[ chunk ].size,
 	 *chunk_crc );
@@ -1670,7 +1672,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	libnotify_verbose_printf(
 	 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
-	 ( chunk + 1 ),
+	 chunk,
 	 segment_file_offset,
 	 chunk_size,
 	 *chunk_crc );

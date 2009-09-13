@@ -505,7 +505,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIu64 " with size: %" PRIzd ".\n",
 	 function,
 	 chunk_type,
-	 chunk + 1,
+	 chunk,
 	 offset_table->amount_of_chunk_offsets,
 	 offset_table->chunk_offset[ chunk ].file_offset,
 	 offset_table->chunk_offset[ chunk ].size );

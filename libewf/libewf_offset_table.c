@@ -464,7 +464,7 @@ int libewf_offset_table_fill(
 		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 		 function,
 		 chunk_type,
-		 offset_table->last_chunk_offset_filled + 1,
+		 offset_table->last_chunk_offset_filled,
 		 base_offset,
 		 current_offset,
 		 chunk_size,
@@ -546,7 +546,7 @@ int libewf_offset_table_fill(
 	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
 	 function,
 	 chunk_type,
-	 ( offset_table->last_chunk_offset_filled + 1 ),
+	 offset_table->last_chunk_offset_filled,
 	 base_offset,
 	 current_offset,
 	 remarks );
@@ -708,7 +708,7 @@ int libewf_offset_table_fill_last_offset(
 			libnotify_verbose_printf(
 			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
 			 function,
-			 offset_table->last_chunk_offset_filled + 1,
+			 offset_table->last_chunk_offset_filled,
 			 last_offset,
 			 (size_t) chunk_size,
 			 remarks );
@@ -1082,7 +1082,7 @@ int libewf_offset_table_compare(
 		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 		 function,
 		 chunk_type,
-		 offset_table->last_chunk_offset_compared + 1,
+		 offset_table->last_chunk_offset_compared,
 		 base_offset,
 		 current_offset,
 		 chunk_size,
@@ -1191,7 +1191,7 @@ int libewf_offset_table_compare(
 	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
 	 function,
 	 chunk_type,
-	 offset_table->last_chunk_offset_compared + 1,
+	 offset_table->last_chunk_offset_compared
 	 base_offset,
 	 current_offset,
 	 remarks );
@@ -1362,7 +1362,7 @@ int libewf_offset_table_compare_last_offset(
 			libnotify_verbose_printf(
 			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
 			 function,
-			 offset_table->last_chunk_offset_compared + 1,
+			 offset_table->last_chunk_offset_compared,
 			 last_offset,
 			 (size_t) chunk_size,
 			 remarks );

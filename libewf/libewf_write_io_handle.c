@@ -2588,7 +2588,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	libnotify_verbose_printf(
 	 "%s: writing delta chunk: %" PRIu32 " with size: %" PRIzd " (data size: %" PRIzd ").\n",
 	 function,
-	 ( chunk + 1 ),
+	 chunk,
 	 chunk_size,
 	 chunk_data_size );
 #endif
@@ -3439,7 +3439,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		libnotify_verbose_printf(
 		 "%s: updating data in chunk: %" PRIu32 " at offset: %" PRIu32 " with size: %" PRIzd ".\n",
 		 function,
-		 ( chunk + 1 ),
+		 chunk,
 		 chunk_offset,
 		 data_size );
 #endif
@@ -3457,7 +3457,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to update data in chunk: %" PRIu32 ".",
 			 function,
-			 (chunk + 1 ) );
+			 chunk );
 
 			return( -1 );
 		}

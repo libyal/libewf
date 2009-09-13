@@ -393,6 +393,7 @@ int libewf_handle_free(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_internal_handle_free";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -419,6 +420,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free io handle.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_read_io_handle_free(
 		     &( internal_handle->read_io_handle ),
@@ -430,6 +433,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free read io handle.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_write_io_handle_free(
 		     &( internal_handle->write_io_handle ),
@@ -441,6 +446,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free write io handle.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_segment_table_free(
 		     &( internal_handle->segment_table ),
@@ -452,6 +459,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free segment table.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_segment_table_free(
 		     &( internal_handle->delta_segment_table ),
@@ -463,6 +472,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free delta segment table.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_offset_table_free(
 		     &( internal_handle->offset_table ),
@@ -474,6 +485,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free offset table.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_chunk_cache_free(
 		     &( internal_handle->chunk_cache ),
@@ -485,6 +498,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunk cache.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_media_values_free(
 		     &( internal_handle->media_values ),
@@ -496,6 +511,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free media values.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_header_sections_free(
 		     &( internal_handle->header_sections ),
@@ -507,6 +524,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free header sections.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_hash_sections_free(
 		     &( internal_handle->hash_sections ),
@@ -518,6 +537,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free hash sections.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_values_table_free(
 		     &( internal_handle->header_values ),
@@ -529,6 +550,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free header values.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_values_table_free(
 		     &( internal_handle->hash_values ),
@@ -540,6 +563,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free hash values.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_sector_table_free(
 		     &( internal_handle->sessions ),
@@ -551,6 +576,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sessions.",
 			 function );
+
+			result = -1;
 		}
 		if( libewf_sector_table_free(
 		     &( internal_handle->acquiry_errors ),
@@ -562,6 +589,8 @@ int libewf_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free acquiry errors.",
 			 function );
+
+			result = -1;
 		}
 		memory_free(
 		 internal_handle );
@@ -2362,7 +2391,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: chunk: %d does not exist.",
 				 function,
-				 ( internal_handle->io_handle->current_chunk + 1 ) );
+				 internal_handle->io_handle->current_chunk );
 
 				return( -1 );
 			}
@@ -2525,7 +2554,7 @@ ssize_t libewf_handle_write_chunk(
 	libnotify_verbose_printf(
 	 "%s: writing chunk: %d of total: %d.\n",
 	 function,
-	 ( internal_handle->io_handle->current_chunk + 1 ),
+	 internal_handle->io_handle->current_chunk,
 	 internal_handle->offset_table->amount_of_chunk_offsets );
 	libnotify_verbose_printf(
 	 "%s: writing chunk buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
@@ -2549,7 +2578,7 @@ ssize_t libewf_handle_write_chunk(
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: chunk: %d does not exist.",
 			 function,
-			 internal_handle->io_handle->current_chunk + 1 );
+			 internal_handle->io_handle->current_chunk );
 
 			return( -1 );
 		}
@@ -2770,7 +2799,7 @@ ssize_t libewf_handle_write_buffer(
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: chunk: %d does not exist.",
 				 function,
-				 ( internal_handle->io_handle->current_chunk + 1 ) );
+				 internal_handle->io_handle->current_chunk );
 
 				return( -1 );
 			}
@@ -4332,7 +4361,7 @@ int libewf_handle_get_file_io_handle(
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid segment file handle for chunk: %" PRIu32 ".",
 		 function,
-		 internal_handle->io_handle->current_chunk + 1 );
+		 internal_handle->io_handle->current_chunk );
 
 		return( -1 );
 	}
@@ -4351,7 +4380,7 @@ int libewf_handle_get_file_io_handle(
 		 "%s: unable to retrieve file io handle for pool entry: %d (chunk: %" PRIu32 ").",
 		 function,
 		 file_io_pool_entry,
-		 internal_handle->io_handle->current_chunk + 1 );
+		 internal_handle->io_handle->current_chunk );
 
 		return( -1 );
 	}
