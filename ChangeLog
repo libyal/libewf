@@ -136,6 +136,7 @@ ewftools:
   - what about wipe on error - does this do anything? (remove if not used)
   - add parameter to set sector size?
   - allow user to set bytes per sector for raw file conversion
+  - secondary image output
 * stream handle
   - implement
 * ewfalter
@@ -220,6 +221,9 @@ CodeGear project files
 * worked on initialization issue
   - set sectors per chunk is now read protected
   - fixed bug in legacy wrapper set bytes per sector
+* small fix in verbose output
+* worked on secondary image output
+* small cross platform fixes in ewfacquire and ewfacquirestream
 
 20090911
 * updated libsystem

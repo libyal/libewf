@@ -190,6 +190,7 @@ int export_handle_free(
      liberror_error_t **error )
 {
 	static char *function = "export_handle_free";
+	int result            = 1;
 
 	if( export_handle == NULL )
 	{
@@ -216,6 +217,8 @@ int export_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free input handle.",
 			 function );
+
+			result = -1;
 		}
 		if( ( ( *export_handle )->ewf_output_handle != NULL )
 		 && ( libewf_handle_free(
@@ -228,6 +231,8 @@ int export_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free ewf output handle.",
 			 function );
+
+			result = -1;
 		}
 #endif
 		memory_free(
@@ -235,7 +240,7 @@ int export_handle_free(
 
 		*export_handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Signals the export handle to abort

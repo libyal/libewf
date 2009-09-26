@@ -1,4 +1,4 @@
-.Dd May 3, 2009
+.Dd Sep 26, 2009
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -27,6 +27,7 @@
 .Op Fl r Ar read_error_retries
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
+.Op Fl 2 Ar target
 .Op Fl hqRsuvVw
 .Ar source
 .Sh DESCRIPTION
@@ -117,6 +118,8 @@ verbose output to stderr
 print version
 .It Fl w
 wipe sectors on read error (mimic EnCase like behavior)
+.It Fl t Ar secondary_target
+the secondary target file (without extension) to write to (default is acquire2)
 .El
 .Pp
 .Nm ewfacquire

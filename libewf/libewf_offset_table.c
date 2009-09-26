@@ -1191,7 +1191,7 @@ int libewf_offset_table_compare(
 	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
 	 function,
 	 chunk_type,
-	 offset_table->last_chunk_offset_compared
+	 offset_table->last_chunk_offset_compared,
 	 base_offset,
 	 current_offset,
 	 remarks );

@@ -1660,7 +1660,7 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( memory_copy(
+			else if( libsystem_string_copy(
 			          case_number,
 			          option_case_number,
 			          string_length + 1 ) == NULL )
@@ -1692,7 +1692,7 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( memory_copy(
+			else if( libsystem_string_copy(
 			          description,
 			          option_description,
 			          string_length + 1 ) == NULL )
@@ -1724,7 +1724,7 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( memory_copy(
+			else if( libsystem_string_copy(
 			          examiner_name,
 			          option_examiner_name,
 			          string_length + 1 ) == NULL )
@@ -1756,7 +1756,7 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( memory_copy(
+			else if( libsystem_string_copy(
 			          evidence_number,
 			          option_evidence_number,
 			          string_length + 1 ) == NULL )
@@ -1788,7 +1788,7 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( memory_copy(
+			else if( libsystem_string_copy(
 			          notes,
 			          option_notes,
 			          string_length + 1 ) == NULL )

@@ -184,6 +184,7 @@ int verification_handle_free(
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_free";
+	int result            = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -210,6 +211,8 @@ int verification_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free input handle.",
 			 function );
+
+			result = -1;
 		}
 #endif
 		memory_free(
@@ -217,7 +220,7 @@ int verification_handle_free(
 
 		*verification_handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Signals the verification handle to abort

@@ -66,6 +66,10 @@ struct imaging_handle
 	 */
 	libewf_handle_t *output_handle;
 
+	/* The secondary libewf output handle
+	 */
+	libewf_handle_t *secondary_output_handle;
+
 	/* The amount of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
@@ -86,6 +90,12 @@ int imaging_handle_signal_abort(
      liberror_error_t **error );
 
 int imaging_handle_open_output(
+     imaging_handle_t *imaging_handle,
+     const libsystem_character_t *filename,
+     uint8_t resume,
+     liberror_error_t **error );
+
+int imaging_handle_open_secondary_output(
      imaging_handle_t *imaging_handle,
      const libsystem_character_t *filename,
      uint8_t resume,
@@ -228,6 +238,12 @@ int imaging_handle_set_hash_value(
      liberror_error_t **error );
 
 int imaging_handle_add_read_error(
+      imaging_handle_t *imaging_handle,
+      off64_t start_offset,
+      size_t amount_of_bytes,
+      liberror_error_t **error );
+
+int imaging_handle_add_session(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
       size_t amount_of_bytes,

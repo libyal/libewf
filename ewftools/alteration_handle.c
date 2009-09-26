@@ -120,6 +120,7 @@ int alteration_handle_free(
      liberror_error_t **error )
 {
 	static char *function = "alteration_handle_free";
+	int result            = 1;
 
 	if( alteration_handle == NULL )
 	{
@@ -146,6 +147,8 @@ int alteration_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free input handle.",
 			 function );
+
+			result = -1;
 		}
 #endif
 		memory_free(
@@ -153,7 +156,7 @@ int alteration_handle_free(
 
 		*alteration_handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Signals the alteration handle to abort

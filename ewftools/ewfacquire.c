@@ -111,7 +111,7 @@ void usage_fprint(
 	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ] [ -o offset ]\n"
 	                 "                  [ -p process_buffer_size ] [ -P bytes_per_sector ]\n"
 	                 "                  [ -r read_error_retries ] [ -S segment_file_size ]\n"
-	                 "                  [ -t target ] [ -hqRsuvVw ] source\n\n" );
+	                 "                  [ -t target ] [ -2 secondary_target ] [ -hqRsuvVw ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
@@ -174,6 +174,7 @@ void usage_fprint(
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 	fprintf( stream, "\t-w:     wipe sectors on read error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write to (default is acquire2)\n" );
 }
 
 /* Prints an overview of the acquiry parameters and asks the for confirmation
@@ -185,6 +186,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         size_t input_buffer_size,
         uint8_t resume_acquiry,
         libsystem_character_t *filename,
+        libsystem_character_t *filename_secondary_copy,
         libsystem_character_t *case_number,
         libsystem_character_t *description,
         libsystem_character_t *evidence_number,
@@ -260,6 +262,39 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	 stream,
 	 "\n" );
 
+	if( filename_secondary_copy != NULL )
+	{
+		fprintf(
+		 stream,
+		 "Secondary copy:\t\t\t%" PRIs_LIBSYSTEM "",
+		 filename_secondary_copy );
+
+		if( resume_acquiry == 0 )
+		{
+			if( ewf_format == LIBEWF_FORMAT_SMART )
+			{
+				fprintf(
+				 stream,
+				 ".s01" );
+			}
+			else if( ( ewf_format == LIBEWF_FORMAT_EWF )
+			      || ( ewf_format == LIBEWF_FORMAT_EWFX ) )
+			{
+				fprintf(
+				 stream,
+				 ".e01" );
+			}
+			else
+			{
+				fprintf(
+				 stream,
+				 ".E01" );
+			}
+		}
+		fprintf(
+		 stream,
+		 "\n" );
+	}
 	fprintf(
 	 stream,
 	 "Case number:\t\t\t" );
@@ -1695,79 +1730,83 @@ int main( int argc, char * const argv[] )
 	libsystem_character_t media_information_model[ 64 ];
 	libsystem_character_t media_information_serial_number[ 64 ];
 
-	device_handle_t *device_handle                     = NULL;
+	device_handle_t *device_handle                          = NULL;
 
-	liberror_error_t *error                            = NULL;
+	liberror_error_t *error                                 = NULL;
 
-	process_status_t *process_status                   = NULL;
+	process_status_t *process_status                        = NULL;
 
-	libsystem_character_t *acquiry_software_version    = NULL;
-	libsystem_character_t *calculated_md5_hash_string  = NULL;
-	libsystem_character_t *calculated_sha1_hash_string = NULL;
-	libsystem_character_t *case_number                 = NULL;
-	libsystem_character_t *description                 = NULL;
-	libsystem_character_t *evidence_number             = NULL;
-	libsystem_character_t *examiner_name               = NULL;
-	libsystem_character_t *fixed_string_variable       = NULL;
-	libsystem_character_t *log_filename                = NULL;
-	libsystem_character_t *notes                       = NULL;
-	libsystem_character_t *option_case_number          = NULL;
-	libsystem_character_t *option_description          = NULL;
-	libsystem_character_t *option_examiner_name        = NULL;
-	libsystem_character_t *option_evidence_number      = NULL;
-	libsystem_character_t *option_notes                = NULL;
-	libsystem_character_t *option_target_filename      = NULL;
-	libsystem_character_t *program                     = _LIBSYSTEM_CHARACTER_T_STRING( "ewfacquire" );
-	libsystem_character_t *target_filename             = NULL;
+	libsystem_character_t *acquiry_software_version         = NULL;
+	libsystem_character_t *calculated_md5_hash_string       = NULL;
+	libsystem_character_t *calculated_sha1_hash_string      = NULL;
+	libsystem_character_t *case_number                      = NULL;
+	libsystem_character_t *description                      = NULL;
+	libsystem_character_t *evidence_number                  = NULL;
+	libsystem_character_t *examiner_name                    = NULL;
+	libsystem_character_t *fixed_string_variable            = NULL;
+	libsystem_character_t *log_filename                     = NULL;
+	libsystem_character_t *notes                            = NULL;
+	libsystem_character_t *option_case_number               = NULL;
+	libsystem_character_t *option_description               = NULL;
+	libsystem_character_t *option_examiner_name             = NULL;
+	libsystem_character_t *option_evidence_number           = NULL;
+	libsystem_character_t *option_notes                     = NULL;
+	libsystem_character_t *option_secondary_target_filename = NULL;
+	libsystem_character_t *option_target_filename           = NULL;
+	libsystem_character_t *program                          = _LIBSYSTEM_CHARACTER_T_STRING( "ewfacquire" );
+	libsystem_character_t *secondary_target_filename        = NULL;
+	libsystem_character_t *target_filename                  = NULL;
 
-	FILE *log_file_stream                              = NULL;
+	FILE *log_file_stream                                   = NULL;
 
-	libsystem_integer_t option                         = 0;
-	off64_t resume_acquiry_offset                      = 0;
-	ssize64_t read_count                               = 0;
-	size_t string_length                               = 0;
-	uint64_t acquiry_offset                            = 0;
-	uint64_t acquiry_size                              = 0;
-	uint64_t input_size_variable                       = 0;
-	uint64_t maximum_segment_file_size                 = 0;
-	uint64_t media_size                                = 0;
-	uint64_t process_buffer_size                       = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint64_t segment_file_size                         = 0;
-	uint32_t bytes_per_sector                          = 512;
-	uint32_t sector_error_granularity                  = 0;
-	uint32_t sectors_per_chunk                         = 0;
-	uint8_t calculate_md5                              = 1;
-	uint8_t calculate_sha1                             = 0;
-	uint8_t compression_flags                          = 0;
-	uint8_t ewf_format                                 = LIBEWF_FORMAT_ENCASE6;
-	uint8_t media_flags                                = LIBEWF_MEDIA_FLAG_PHYSICAL;
-	uint8_t media_type                                 = LIBEWF_MEDIA_TYPE_FIXED;
-	uint8_t print_status_information                   = 1;
-	uint8_t read_error_retry                           = 2;
-	uint8_t resume_acquiry                             = 0;
-	uint8_t swap_byte_pairs                            = 0;
-	uint8_t verbose                                    = 0;
-	uint8_t wipe_block_on_read_error                   = 0;
-	int8_t acquiry_parameters_confirmed                = 0;
-	int8_t compression_level                           = LIBEWF_COMPRESSION_NONE;
-	int argument_set_compression                       = 0;
-	int argument_set_bytes_per_sector                  = 0;
-	int argument_set_format                            = 0;
-	int argument_set_media_type                        = 0;
-	int argument_set_offset                            = 0;
-	int argument_set_read_error_retry                  = 0;
-	int argument_set_sector_error_granularity          = 0;
-	int argument_set_sectors_per_chunk                 = 0;
-	int argument_set_segment_file_size                 = 0;
-	int argument_set_size                              = 0;
-	int argument_set_media_flags                       = 0;
-	int argument_set_wipe_block_on_read_error          = 0;
-	int default_media_flags                            = 0;
-	int error_abort                                    = 0;
-	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
-	int interactive_mode                               = 1;
-	int result                                         = 0;
-	int status                                         = 0;
+	libsystem_integer_t option                              = 0;
+	off64_t resume_acquiry_offset                           = 0;
+	ssize64_t read_count                                    = 0;
+	size_t string_length                                    = 0;
+	size_t secondary_target_filename_size                   = 0;
+	size_t target_filename_size                             = 0;
+	uint64_t acquiry_offset                                 = 0;
+	uint64_t acquiry_size                                   = 0;
+	uint64_t input_size_variable                            = 0;
+	uint64_t maximum_segment_file_size                      = 0;
+	uint64_t media_size                                     = 0;
+	uint64_t process_buffer_size                            = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint64_t segment_file_size                              = 0;
+	uint32_t bytes_per_sector                               = 512;
+	uint32_t sector_error_granularity                       = 0;
+	uint32_t sectors_per_chunk                              = 0;
+	uint8_t calculate_md5                                   = 1;
+	uint8_t calculate_sha1                                  = 0;
+	uint8_t compression_flags                               = 0;
+	uint8_t ewf_format                                      = LIBEWF_FORMAT_ENCASE6;
+	uint8_t media_flags                                     = LIBEWF_MEDIA_FLAG_PHYSICAL;
+	uint8_t media_type                                      = LIBEWF_MEDIA_TYPE_FIXED;
+	uint8_t print_status_information                        = 1;
+	uint8_t read_error_retry                                = 2;
+	uint8_t resume_acquiry                                  = 0;
+	uint8_t swap_byte_pairs                                 = 0;
+	uint8_t verbose                                         = 0;
+	uint8_t wipe_block_on_read_error                        = 0;
+	int8_t acquiry_parameters_confirmed                     = 0;
+	int8_t compression_level                                = LIBEWF_COMPRESSION_NONE;
+	int argument_set_compression                            = 0;
+	int argument_set_bytes_per_sector                       = 0;
+	int argument_set_format                                 = 0;
+	int argument_set_media_type                             = 0;
+	int argument_set_offset                                 = 0;
+	int argument_set_read_error_retry                       = 0;
+	int argument_set_sector_error_granularity               = 0;
+	int argument_set_sectors_per_chunk                      = 0;
+	int argument_set_segment_file_size                      = 0;
+	int argument_set_size                                   = 0;
+	int argument_set_media_flags                            = 0;
+	int argument_set_wipe_block_on_read_error               = 0;
+	int default_media_flags                                 = 0;
+	int error_abort                                         = 0;
+	int header_codepage                                     = LIBEWF_CODEPAGE_ASCII;
+	int interactive_mode                                    = 1;
+	int result                                              = 0;
+	int status                                              = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -1796,7 +1835,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:uvVw" ) ) ) != (libsystem_integer_t) -1 )
+	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:uvVw2:" ) ) ) != (libsystem_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -2246,6 +2285,11 @@ int main( int argc, char * const argv[] )
 				argument_set_wipe_block_on_read_error = 1;
 
 				break;
+
+			case (libsystem_integer_t) '2':
+				option_secondary_target_filename = optarg;
+
+				break;
 		}
 	}
 	if( optind == argc )
@@ -2423,7 +2467,7 @@ int main( int argc, char * const argv[] )
 	{
 		acquiry_size = media_size - acquiry_offset;
 	}
-	/* Create the input buffers
+	/* Create the output targets
 	 */
 	if( option_target_filename != NULL )
 	{
@@ -2432,8 +2476,10 @@ int main( int argc, char * const argv[] )
 
 		if( string_length > 0 )
 		{
+			target_filename_size = string_length + 1;
+
 			target_filename = (libsystem_character_t *) memory_allocate(
-			                                             sizeof( libsystem_character_t ) * ( string_length + 1 ) );
+			                                             sizeof( libsystem_character_t ) * target_filename_size );
 
 			if( target_filename == NULL )
 			{
@@ -2443,10 +2489,10 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( memory_copy(
+			else if( libsystem_string_copy(
 				  target_filename,
 				  option_target_filename,
-				  string_length + 1 ) == NULL )
+				  target_filename_size ) == NULL )
 			{
 				fprintf(
 				 stderr,
@@ -2458,8 +2504,10 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
+		target_filename_size = 1024;
+
 		target_filename = (libsystem_character_t *) memory_allocate(
-		                                             sizeof( libsystem_character_t ) * 1024 );
+		                                             sizeof( libsystem_character_t ) * target_filename_size );
 
 		if( target_filename == NULL )
 		{
@@ -2473,7 +2521,7 @@ int main( int argc, char * const argv[] )
 		 */
 		else if( interactive_mode == 0 )
 		{
-			if( memory_copy(
+			if( libsystem_string_copy(
 			     target_filename,
 			     _LIBSYSTEM_CHARACTER_T_STRING( "acquiry" ),
 			     7 ) == NULL )
@@ -2487,6 +2535,53 @@ int main( int argc, char * const argv[] )
 			target_filename[ 7 ] = 0;
 		}
 	}
+	if( option_secondary_target_filename != NULL )
+	{
+		string_length = libsystem_string_length(
+				 option_secondary_target_filename );
+
+		if( string_length > 0 )
+		{
+			secondary_target_filename_size = string_length + 1;
+
+			secondary_target_filename = (libsystem_character_t *) memory_allocate(
+			                                                       sizeof( libsystem_character_t ) * secondary_target_filename_size );
+
+			if( secondary_target_filename == NULL )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to create secondary target filename string.\n" );
+
+				error_abort = 1;
+			}
+			else if( libsystem_string_copy(
+				  secondary_target_filename,
+				  option_secondary_target_filename,
+				  secondary_target_filename_size ) == NULL )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to set secondary target filename string.\n" );
+
+				error_abort = 1;
+			}
+		}
+		if( ( target_filename_size == secondary_target_filename_size )
+		 && ( libsystem_string_compare(
+		       target_filename,
+		       secondary_target_filename,
+		       target_filename_size ) == 0 ) )
+		{
+			fprintf(
+			 stderr,
+			 "Primary and secondary target cannot be the same.\n" );
+
+			error_abort = 1;
+		}
+	}
+	/* Create the input buffers
+	 */
 	if( error_abort == 0 )
 	{
 		if( option_case_number != NULL )
@@ -2507,7 +2602,7 @@ int main( int argc, char * const argv[] )
 
 					error_abort = 1;
 				}
-				else if( memory_copy(
+				else if( libsystem_string_copy(
 					  case_number,
 					  option_case_number,
 					  string_length + 1 ) == NULL )
@@ -2555,7 +2650,7 @@ int main( int argc, char * const argv[] )
 
 					error_abort = 1;
 				}
-				else if( memory_copy(
+				else if( libsystem_string_copy(
 					  description,
 					  option_description,
 					  string_length + 1 ) == NULL )
@@ -2603,7 +2698,7 @@ int main( int argc, char * const argv[] )
 
 					error_abort = 1;
 				}
-				else if( memory_copy(
+				else if( libsystem_string_copy(
 					  examiner_name,
 					  option_examiner_name,
 					  string_length + 1 ) == NULL )
@@ -2651,7 +2746,7 @@ int main( int argc, char * const argv[] )
 
 					error_abort = 1;
 				}
-				else if( memory_copy(
+				else if( libsystem_string_copy(
 					  evidence_number,
 					  option_evidence_number,
 					  string_length + 1 ) == NULL )
@@ -2699,7 +2794,7 @@ int main( int argc, char * const argv[] )
 
 					error_abort = 1;
 				}
-				else if( memory_copy(
+				else if( libsystem_string_copy(
 					  notes,
 					  option_notes,
 					  string_length + 1 ) == NULL )
@@ -2772,6 +2867,11 @@ int main( int argc, char * const argv[] )
 		{
 			memory_free(
 			 notes );
+		}
+		if( secondary_target_filename != NULL )
+		{
+			memory_free(
+			 secondary_target_filename );
 		}
 		if( target_filename != NULL )
 		{
@@ -3508,6 +3608,7 @@ int main( int argc, char * const argv[] )
 		                                EWFACQUIRE_INPUT_BUFFER_SIZE,
 		                                resume_acquiry,
 		                                target_filename,
+		                                secondary_target_filename,
 		                                case_number,
 		                                description,
 		                                evidence_number,
@@ -3598,9 +3699,9 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 	}
-	if( ewfacquire_abort == 0 )
+	if( resume_acquiry == 0 )
 	{
-		if( resume_acquiry == 0 )
+		if( ewfacquire_abort == 0 )
 		{
 			if( platform_get_operating_system(
 			     acquiry_operating_system,
@@ -3674,50 +3775,75 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( imaging_handle_set_output_values(
-				  ewfacquire_imaging_handle,
-				  case_number,
-				  libsystem_string_length(
-				   case_number ),
-				  description,
-				  libsystem_string_length(
-				   description ),
-				  evidence_number,
-				  libsystem_string_length(
-				   evidence_number ),
-				  examiner_name,
-				  libsystem_string_length(
-				   examiner_name ),
-				  notes,
-				  libsystem_string_length(
-				   notes ),
-				  acquiry_operating_system,
-				  libsystem_string_length(
-				   acquiry_operating_system ),
-				  program,
-				  libsystem_string_length(
-				   program ),
-				  acquiry_software_version,
-				  libsystem_string_length(
-				   acquiry_software_version ),
-			          media_information_model,
-				  libsystem_string_length(
-				   media_information_model ),
-			          media_information_serial_number,
-				  libsystem_string_length(
-				   media_information_serial_number ),
-				  header_codepage,
-				  bytes_per_sector,
-				  acquiry_size,
-				  media_type,
-				  media_flags,
-				  compression_level,
-				  compression_flags,
-				  ewf_format,
-			          segment_file_size,
-				  sectors_per_chunk,
-				  sector_error_granularity,
-				  &error ) != 1 )
+		}
+		if( error_abort == 0 )
+		{
+			if( secondary_target_filename != NULL )
+			{
+				if( imaging_handle_open_secondary_output(
+				     ewfacquire_imaging_handle,
+				     secondary_target_filename,
+				     resume_acquiry,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to open secondary output file(s).\n" );
+
+					imaging_handle_free(
+					 &ewfacquire_imaging_handle,
+					 NULL );
+
+					error_abort = 1;
+				}
+			}
+		}
+		if( error_abort == 0 )
+		{
+			if( imaging_handle_set_output_values(
+			     ewfacquire_imaging_handle,
+			     case_number,
+			     libsystem_string_length(
+			      case_number ),
+			     description,
+			     libsystem_string_length(
+			      description ),
+			     evidence_number,
+			     libsystem_string_length(
+			      evidence_number ),
+			     examiner_name,
+			     libsystem_string_length(
+			      examiner_name ),
+			     notes,
+			     libsystem_string_length(
+			      notes ),
+			     acquiry_operating_system,
+			     libsystem_string_length(
+			      acquiry_operating_system ),
+			     program,
+			     libsystem_string_length(
+			      program ),
+			     acquiry_software_version,
+			     libsystem_string_length(
+			      acquiry_software_version ),
+			     media_information_model,
+			     libsystem_string_length(
+			      media_information_model ),
+			     media_information_serial_number,
+			     libsystem_string_length(
+			      media_information_serial_number ),
+			     header_codepage,
+			     bytes_per_sector,
+			     acquiry_size,
+			     media_type,
+			     media_flags,
+			     compression_level,
+			     compression_flags,
+			     ewf_format,
+			     segment_file_size,
+			     sectors_per_chunk,
+			     sector_error_granularity,
+			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
@@ -3728,6 +3854,42 @@ int main( int argc, char * const argv[] )
 				 NULL );
 
 				error_abort = 1;
+			}
+		}
+		if( error_abort == 0 )
+		{
+			/* TODO for now just fake one session
+			 */
+			if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+			{
+				if( media_size > (size_t) UINT32_MAX )
+				{
+					fprintf(
+					 stderr,
+					 "Invalid media size value out of range to add session.\n" );
+
+					imaging_handle_close(
+					 ewfacquire_imaging_handle,
+					 NULL );
+
+					error_abort = 1;
+				}
+				if( imaging_handle_add_session(
+				     ewfacquire_imaging_handle,
+				     bytes_per_sector,
+				     media_size,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to add session.\n" );
+
+					imaging_handle_close(
+					 ewfacquire_imaging_handle,
+					 NULL );
+
+					error_abort = 1;
+				}
 			}
 		}
 	}
@@ -3741,6 +3903,12 @@ int main( int argc, char * const argv[] )
 	 description );
 	memory_free(
 	 case_number );
+
+	if( secondary_target_filename != NULL )
+	{
+		memory_free(
+		 secondary_target_filename );
+	}
 	memory_free(
 	 target_filename );
 
