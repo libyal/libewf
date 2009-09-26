@@ -216,6 +216,11 @@ Next stable release:
 CodeGear project files
 * get ewftools working (glob and getopt fail)
 
+20090926
+* worked on initialization issue
+  - set sectors per chunk is now read protected
+  - fixed bug in legacy wrapper set bytes per sector
+
 20090911
 * updated libsystem
 

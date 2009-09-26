@@ -136,7 +136,8 @@ int libewf_handle_set_sectors_per_chunk(
 
 		return( -1 );
 	}
-	if( ( internal_handle->write_io_handle == NULL )
+	if( ( internal_handle->read_io_handle != NULL )
+	 || ( internal_handle->write_io_handle == NULL )
 	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
 	{
 		liberror_error_set(

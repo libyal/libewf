@@ -1250,7 +1250,7 @@ int libewf_set_bytes_per_sector(
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_set_bytes_per_sector";
 
-	if( libewf_handle_set_sectors_per_chunk(
+	if( libewf_handle_set_bytes_per_sector(
 	     handle,
 	     bytes_per_sector,
 	     &error ) != 1 )

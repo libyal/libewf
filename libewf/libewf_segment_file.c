@@ -82,6 +82,31 @@ ssize_t libewf_segment_file_read_file_header(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	libnotify_verbose_printf(
+	 "%s: reading file header at offset: %" PRIu64 " (0x%08" PRIx64 ")\n",
+	 function,
+	 0,
+	 0 );
+#endif
+
+	if( libbfio_pool_seek_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     0,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek file header offset: %" PRIu64 ".",
+		 function,
+		 0 );
+
+		return( -1 );
+	}
 	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
