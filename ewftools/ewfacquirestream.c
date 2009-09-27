@@ -33,6 +33,13 @@
 #include <stdlib.h>
 #endif
 
+/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+ * before including libewf.h
+ */
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_IMPORT
+#endif
+
 #include <libewf.h>
 
 #include <libsystem.h>
@@ -109,7 +116,8 @@ void usage_fprint(
 	                 "                        [ -E evidence_number ] [ -f format ] [ -l log_filename ]\n"
 	                 "                        [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
 	                 "                        [ -o offset ] [ -p process_buffer_size ]\n"
-	                 "                        [ -S segment_file_size ] [ -t target ] [ -hqsvVw ]\n\n" );
+	                 "                        [ -S segment_file_size ] [ -t target ]\n"
+	                 "                        [ -2 secondary_target ] [ -hqsvVw ]\n\n" );
 
 	fprintf( stream, "\tReads data from stdin\n\n" );
 
@@ -159,10 +167,11 @@ void usage_fprint(
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
 		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
 	}
-	fprintf( stream, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
+	fprintf( stream, "\t-t: specify the target file (without extension) to write to (default is image)\n" );
 	fprintf( stream, "\t-v: verbose output to stderr\n" );
 	fprintf( stream, "\t-V: print version\n" );
 	fprintf( stream, "\t-w: wipe sectors on read error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write to\n" );
 }
 
 /* Prints an overview of the aquiry parameters
@@ -171,6 +180,7 @@ void usage_fprint(
 int ewfacquirestream_acquiry_parameters_fprint(
      FILE *stream,
      libsystem_character_t *filename,
+     libsystem_character_t *filename_secondary_copy,
      libsystem_character_t *case_number,
      libsystem_character_t *description,
      libsystem_character_t *evidence_number,
@@ -235,6 +245,36 @@ int ewfacquirestream_acquiry_parameters_fprint(
 		fprintf(
 		 stream,
 		 "E01\n" );
+	}
+	if( filename_secondary_copy != NULL )
+	{
+		fprintf(
+		 stream,
+		 "Secondary copy:\t\t\t%" PRIs_LIBSYSTEM "",
+		 filename_secondary_copy );
+
+		if( ewf_format == LIBEWF_FORMAT_SMART )
+		{
+			fprintf(
+			 stream,
+			 ".s01" );
+		}
+		else if( ( ewf_format == LIBEWF_FORMAT_EWF )
+		      || ( ewf_format == LIBEWF_FORMAT_EWFX ) )
+		{
+			fprintf(
+			 stream,
+			 ".e01" );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 ".E01" );
+		}
+		fprintf(
+		 stream,
+		 "\n" );
 	}
 	fprintf(
 	 stream,
@@ -1213,7 +1253,8 @@ int main( int argc, char * const argv[] )
 	libsystem_character_t *option_evidence_number      = NULL;
 	libsystem_character_t *option_notes                = NULL;
 	libsystem_character_t *program                     = _LIBSYSTEM_CHARACTER_T_STRING( "ewfacquirestream" );
-	libsystem_character_t *target_filename             = _LIBSYSTEM_CHARACTER_T_STRING( "stream" );
+	libsystem_character_t *secondary_target_filename   = NULL;
+	libsystem_character_t *target_filename             = _LIBSYSTEM_CHARACTER_T_STRING( "image" );
 
 	FILE *log_file_stream                              = NULL;
 
@@ -1296,7 +1337,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:qsS:t:vVw" ) ) ) != (libsystem_integer_t) -1 )
+	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:qsS:t:vVw2:" ) ) ) != (libsystem_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1626,6 +1667,11 @@ int main( int argc, char * const argv[] )
 				wipe_block_on_read_error = 1;
 
 				break;
+
+			case (libsystem_integer_t) '2':
+				secondary_target_filename = optarg;
+
+				break;
 		}
 	}
 	libsystem_notify_set_verbose(
@@ -1866,6 +1912,7 @@ int main( int argc, char * const argv[] )
 		if( ewfacquirestream_acquiry_parameters_fprint(
 		     stdout,
 		     target_filename,
+		     secondary_target_filename,
 		     case_number,
 		     description,
 		     evidence_number,
@@ -1892,11 +1939,15 @@ int main( int argc, char * const argv[] )
 
 			error_abort = 1;
 		}
-		else if( imaging_handle_initialize(
-		          &ewfacquirestream_imaging_handle,
-		          calculate_md5,
-		          calculate_sha1,
-		          &error ) != 1 )
+	}
+	if( ( ewfacquirestream_abort == 0 )
+	 && ( error_abort == 0 ) )
+	{
+		if( imaging_handle_initialize(
+		     &ewfacquirestream_imaging_handle,
+		     calculate_md5,
+		     calculate_sha1,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -1904,11 +1955,15 @@ int main( int argc, char * const argv[] )
 
 			error_abort = 1;
 		}
-		else if( imaging_handle_open_output(
-		          ewfacquirestream_imaging_handle,
-		          target_filename,
-		          resume_acquiry,
-		          &error ) != 1 )
+	}
+	if( ( ewfacquirestream_abort == 0 )
+	 && ( error_abort == 0 ) )
+	{
+		if( imaging_handle_open_output(
+		     ewfacquirestream_imaging_handle,
+		     target_filename,
+		     resume_acquiry,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -1920,48 +1975,75 @@ int main( int argc, char * const argv[] )
 
 			error_abort = 1;
 		}
-		else if( imaging_handle_set_output_values(
-		          ewfacquirestream_imaging_handle,
-			  case_number,
-			  libsystem_string_length(
-			   case_number ),
-			  description,
-			  libsystem_string_length(
-			   description ),
-			  evidence_number,
-			  libsystem_string_length(
-			   evidence_number ),
-			  examiner_name,
-			  libsystem_string_length(
-			   examiner_name ),
-			  notes,
-			  libsystem_string_length(
-			   notes ),
-			  acquiry_operating_system,
-			  libsystem_string_length(
-			   acquiry_operating_system ),
-			  program,
-			  libsystem_string_length(
-			   program ),
-			  acquiry_software_version,
-			  libsystem_string_length(
-			   acquiry_software_version ),
-		          NULL,
-		          0,
-		          NULL,
-		          0,
-		          header_codepage,
-		          bytes_per_sector,
-		          acquiry_size,
-		          media_type,
-		          media_flags,
-		          compression_level,
-		          compression_flags,
-		          ewf_format,
-		          segment_file_size,
-		          sectors_per_chunk,
-		          sector_error_granularity,
-		          &error ) != 1 )
+	}
+	if( ( ewfacquirestream_abort == 0 )
+	 && ( error_abort == 0 ) )
+	{
+		if( secondary_target_filename != NULL )
+		{
+			if( imaging_handle_open_secondary_output(
+			     ewfacquirestream_imaging_handle,
+			     secondary_target_filename,
+			     resume_acquiry,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to open secondary output file(s).\n" );
+
+				imaging_handle_free(
+				 &ewfacquirestream_imaging_handle,
+				 NULL );
+
+				error_abort = 1;
+			}
+		}
+	}
+	if( ( ewfacquirestream_abort == 0 )
+	 && ( error_abort == 0 ) )
+	{
+		if( imaging_handle_set_output_values(
+		     ewfacquirestream_imaging_handle,
+		     case_number,
+		     libsystem_string_length(
+		      case_number ),
+		     description,
+		     libsystem_string_length(
+		      description ),
+		     evidence_number,
+		     libsystem_string_length(
+		      evidence_number ),
+		     examiner_name,
+		     libsystem_string_length(
+		      examiner_name ),
+		     notes,
+		     libsystem_string_length(
+		      notes ),
+		     acquiry_operating_system,
+		     libsystem_string_length(
+		      acquiry_operating_system ),
+		     program,
+		     libsystem_string_length(
+		      program ),
+		     acquiry_software_version,
+		     libsystem_string_length(
+		      acquiry_software_version ),
+		     NULL,
+		     0,
+		     NULL,
+		     0,
+		     header_codepage,
+		     bytes_per_sector,
+		     acquiry_size,
+		     media_type,
+		     media_flags,
+		     compression_level,
+		     compression_flags,
+		     ewf_format,
+		     segment_file_size,
+		     sectors_per_chunk,
+		     sector_error_granularity,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,

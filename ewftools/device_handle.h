@@ -110,6 +110,10 @@ struct device_handle
 	 */
 	uint8_t serial_number[ 64 ];
 
+	/* The amount of sessions for an optical disc
+	 */
+	uint16_t amount_of_sessions;
+
 	/* Value to indicate the media information values were set
 	 */
 	uint8_t media_information_set;
@@ -160,6 +164,11 @@ off64_t device_handle_seek_offset(
 int device_handle_get_media_size(
      device_handle_t *device_handle,
      size64_t *media_size,
+     liberror_error_t **error );
+
+int device_handle_get_media_type(
+     device_handle_t *device_handle,
+     uint8_t *media_type,
      liberror_error_t **error );
 
 int device_handle_get_bytes_per_sector(

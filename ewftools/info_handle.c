@@ -27,6 +27,13 @@
 
 #include <liberror.h>
 
+/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+ * before including libewf.h
+ */
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_IMPORT
+#endif
+
 #include <libewf.h>
 
 #include <libsystem.h>
@@ -130,6 +137,7 @@ int info_handle_free(
      liberror_error_t **error )
 {
 	static char *function = "info_handle_free";
+	int result            = 1;
 
 	if( info_handle == NULL )
 	{
@@ -156,6 +164,8 @@ int info_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free input handle.",
 			 function );
+
+			result = -1;
 		}
 #endif
 		memory_free(
@@ -163,7 +173,7 @@ int info_handle_free(
 
 		*info_handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Signals the info handle to abort
@@ -188,32 +198,24 @@ int info_handle_signal_abort(
 	}
 	if( info_handle->input_handle != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid info handle - input handle already set.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_V2_API )
-	if( libewf_handle_signal_abort(
-	     info_handle->input_handle,
-	     error ) != 1 )
+		if( libewf_handle_signal_abort(
+		     info_handle->input_handle,
+		     error ) != 1 )
 #else
-	if( libewf_signal_abort(
-	     info_handle->input_handle ) != 1 )
+		if( libewf_signal_abort(
+		     info_handle->input_handle ) != 1 )
 #endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to signal input handle to abort.",
-		 function );
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to signal input handle to abort.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	return( 1 );
 }

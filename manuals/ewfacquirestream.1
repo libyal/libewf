@@ -1,4 +1,4 @@
-.Dd May 9, 2009
+.Dd Sep 27, 2009
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -24,6 +24,7 @@
 .Op Fl p Ar process_buffer_size
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
+.Op Fl 2 Ar secondary_target
 .Op Fl hqsvVw
 .Sh DESCRIPTION
 .Nm ewfacquirestream
@@ -89,13 +90,15 @@ swap byte pairs of the media data (from AB to BA) (use this for big to little en
 .It Fl S Ar segment_file_size
 the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats)
 .It Fl t Ar target
-the target file (without extension) to write to (default is stream)
+the target file (without extension) to write to (default is image)
 .It Fl v
 verbose output to stderr
 .It Fl V
 print version
 .It Fl w
 wipe sectors on read error (mimic EnCase like behavior)
+.It Fl 2 Ar secondary_target
+the secondary target file (without extension) to write to
 .El
 .Pp
 .Nm ewfacquirestream

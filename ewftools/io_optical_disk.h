@@ -32,13 +32,7 @@
 extern "C" {
 #endif
 
-#if defined( WINAPI )
-
-#elif defined( HAVE_LINUX_CDROM_H )
-#define HAVE_IO_OPTICAL_DISK
-#endif
-
-#if defined( HAVE_IO_OPTICAL_DISK )
+#if defined( HAVE_LINUX_CDROM_H )
 
 int io_optical_disk_get_table_of_contents(
      int file_descriptor,

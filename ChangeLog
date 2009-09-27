@@ -132,11 +132,11 @@ ewftools:
   - move ewfacquire_read_buffer to device_handle, list read errors
   - warn if media does not fit using chunk size or APIv1
     a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
+  - for EnCase 6 format request serial number and model if not set ?
 * ewfacquirestream
   - what about wipe on error - does this do anything? (remove if not used)
   - add parameter to set sector size?
   - allow user to set bytes per sector for raw file conversion
-  - secondary image output
 * stream handle
   - implement
 * ewfalter
@@ -161,7 +161,6 @@ Windows build
   - print output convert to system string
   - reduce string conversions, use as much as possible the system string type in the tools
 * ewftools check char/wchar in/output
-* add directory_io.h to msvscpp project files
 
 Testing
 * add export unattended to automated tests
@@ -172,12 +171,6 @@ Deployment
   - implement non local libuna and libbfio support like in spec file
 * configure
   - remove enable-v1-api after testing?
-
-Code clean up
-* rewrite glob marcros to function macros (including arguments) ?
-* rename length into size, make sure string size contains end of string character
-  - length is used when the value does not contain the EOS
-  - size is used when the value contains the EOS or otherwise
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -198,8 +191,6 @@ Work in progress:
   - force set header value to require string formatted in the date format ?
 * check TODO
 * ewfexport: fix different input and output chunk sizes for low level functions
-* fix automated tests:
-  - variating buffer sizes
 * test: read/write of EnCase 6.12 SHA1
 
 Beta after next stable release
@@ -211,11 +202,17 @@ Next stable release:
 * remove/disable --enable-v1-api from configure
 * remove/disable ewfdebug
 * check into resume write error for 32-bit compile
-* ewfacquire resume does not allow break when input requested
 * check make distclean
 
-CodeGear project files
-* get ewftools working (glob and getopt fail)
+20090927
+* worked on secondary image output
+* added open resume signal handling in ewfacquire
+* worked on CodeGear project files
+* several minor fixes
+* updated libbfio for fix of CodeGear _sopen issue
+  which results in files being created using libbfio_file_exists check
+* ewfacquire now provides default media type based on device information
+* updated list type
 
 20090926
 * worked on initialization issue
@@ -224,6 +221,7 @@ CodeGear project files
 * small fix in verbose output
 * worked on secondary image output
 * small cross platform fixes in ewfacquire and ewfacquirestream
+* moved session handling from imaging handle to ewfacquire
 
 20090911
 * updated libsystem

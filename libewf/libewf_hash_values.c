@@ -243,7 +243,7 @@ int libewf_hash_values_parse_sha1_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if MD5 hash value was set.",
+		 "%s: unable to determine if SHA1 hash value was set.",
 		 function );
 
 		return( -1 );

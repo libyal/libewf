@@ -73,6 +73,15 @@ struct libewf_list
 	libewf_list_element_t *last;
 };
 
+int libewf_list_element_initialize(
+     libewf_list_element_t **list_element,
+     liberror_error_t **error );
+
+int libewf_list_element_free(
+     libewf_list_element_t **list_element,
+     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
+     liberror_error_t **error );
+
 int libewf_list_initialize(
      libewf_list_t **list,
      liberror_error_t **error );
@@ -132,6 +141,7 @@ int libewf_list_remove_element(
 
 int libewf_list_get_amount_of_elements(
      libewf_list_t *list,
+     int *amount_of_elements,
      liberror_error_t **error );
 
 int libewf_list_get_element(

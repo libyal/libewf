@@ -544,21 +544,29 @@ int io_scsi_get_bus_type(
 	 sg_probe_host.buffer );
 #endif
 
-	if( ( sg_probe_host_length == 4 )
-	 && ( narrow_string_compare(
-	       sg_probe_host.buffer,
-	       "ahci",
-	       4 ) == 0 ) )
+	if( sg_probe_host_length >= 4 )
 	{
-		*bus_type = IO_BUS_TYPE_ATA;
-	}
-	else if( ( sg_probe_host_length == 7 )
-	      && ( narrow_string_compare(
-	            sg_probe_host.buffer,
-	            "sata_nv",
-	            7 ) == 0 ) )
-	{
-		*bus_type = IO_BUS_TYPE_ATA;
+		if( narrow_string_compare(
+		     sg_probe_host.buffer,
+		     "ahci",
+		     4 ) == 0 )
+		{
+			*bus_type = IO_BUS_TYPE_ATA;
+		}
+		else if( narrow_string_compare(
+		          sg_probe_host.buffer,
+		          "pata",
+		          4 ) == 0 )
+		{
+			*bus_type = IO_BUS_TYPE_ATA;
+		}
+		else if( narrow_string_compare(
+		          sg_probe_host.buffer,
+		          "sata",
+		          4 ) == 0 )
+		{
+			*bus_type = IO_BUS_TYPE_ATA;
+		}
 	}
 	/* Serial Bus Protocol (SBP-2)
 	 */
@@ -637,6 +645,20 @@ int io_scsi_get_pci_bus_address(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: invalid PCI bus address size value too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     pci_bus_address,
+	     0,
+	     pci_bus_address_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear PCI bus address.",
 		 function );
 
 		return( -1 );

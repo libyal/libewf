@@ -31,6 +31,13 @@
 #include <stdlib.h>
 #endif
 
+/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+ * before including libewf.h
+ */
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_IMPORT
+#endif
+
 #include <libewf.h>
 
 #include <libsystem.h>
@@ -169,12 +176,12 @@ void usage_fprint(
 		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
 	}
 
-	fprintf( stream, "\t-t:     specify the target file (without extension) to write to (default is acquire)\n" );
+	fprintf( stream, "\t-t:     specify the target file (without extension) to write to\n" );
 	fprintf( stream, "\t-u:     unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 	fprintf( stream, "\t-w:     wipe sectors on read error (mimic EnCase like behavior)\n" );
-	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write to (default is acquire2)\n" );
+	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write to\n" );
 }
 
 /* Prints an overview of the acquiry parameters and asks the for confirmation
@@ -1802,6 +1809,7 @@ int main( int argc, char * const argv[] )
 	int argument_set_media_flags                            = 0;
 	int argument_set_wipe_block_on_read_error               = 0;
 	int default_media_flags                                 = 0;
+	int default_media_type                                  = 0;
 	int error_abort                                         = 0;
 	int header_codepage                                     = LIBEWF_CODEPAGE_ASCII;
 	int interactive_mode                                    = 1;
@@ -2415,15 +2423,15 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	result = device_handle_determine_media_information(
-	          device_handle,
-	          &error );
-
-	if( result == -1 )
+	if( ( argument_set_media_type == 0 )
+	 && ( device_handle_get_media_type(
+	       device_handle,
+	       &media_type,
+	       &error ) != 1 ) )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to determine media information.\n" );
+		 "Unable to retrieve media type.\n" );
 
 		libsystem_notify_print_error_backtrace(
 		 error );
@@ -2523,7 +2531,7 @@ int main( int argc, char * const argv[] )
 		{
 			if( libsystem_string_copy(
 			     target_filename,
-			     _LIBSYSTEM_CHARACTER_T_STRING( "acquiry" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "image" ),
 			     7 ) == NULL )
 			{
 				fprintf(
@@ -2938,6 +2946,19 @@ int main( int argc, char * const argv[] )
 		}
 		if( resume_acquiry != 0 )
 		{
+			if( libsystem_signal_attach(
+			     ewfacquire_signal_handler,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to attach signal handler.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+			}
 			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
 			     target_filename,
@@ -2954,6 +2975,18 @@ int main( int argc, char * const argv[] )
 				 &error );
 
 				resume_acquiry = 0;
+			}
+			if( libsystem_signal_detach(
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to detach signal handler.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 			}
 		}
 		if( resume_acquiry != 0 )
@@ -3139,6 +3172,22 @@ int main( int argc, char * const argv[] )
 			 */
 			if( argument_set_media_type == 0 )
 			{
+				if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
+				{
+					default_media_type = 1;
+				}
+				else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+				{
+					default_media_type = 2;
+				}
+				else if( media_type == LIBEWF_MEDIA_TYPE_MEMORY )
+				{
+					default_media_type = 3;
+				}
+				else
+				{
+					default_media_type = EWFINPUT_MEDIA_TYPES_DEFAULT;
+				}
 				if( ewfinput_get_fixed_string_variable(
 				     stdout,
 				     input_buffer,
@@ -3146,7 +3195,7 @@ int main( int argc, char * const argv[] )
 				     _LIBSYSTEM_CHARACTER_T_STRING( "Media type" ),
 				     ewfinput_media_types,
 				     EWFINPUT_MEDIA_TYPES_AMOUNT,
-				     EWFINPUT_MEDIA_TYPES_DEFAULT,
+				     default_media_type,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{
@@ -3776,7 +3825,8 @@ int main( int argc, char * const argv[] )
 				error_abort = 1;
 			}
 		}
-		if( error_abort == 0 )
+		if( ( ewfacquire_abort == 0 )
+		 && ( error_abort == 0 ) )
 		{
 			if( secondary_target_filename != NULL )
 			{
@@ -3798,7 +3848,8 @@ int main( int argc, char * const argv[] )
 				}
 			}
 		}
-		if( error_abort == 0 )
+		if( ( ewfacquire_abort == 0 )
+		 && ( error_abort == 0 ) )
 		{
 			if( imaging_handle_set_output_values(
 			     ewfacquire_imaging_handle,
@@ -3856,7 +3907,8 @@ int main( int argc, char * const argv[] )
 				error_abort = 1;
 			}
 		}
-		if( error_abort == 0 )
+		if( ( ewfacquire_abort == 0 )
+		 && ( error_abort == 0 ) )
 		{
 			/* TODO for now just fake one session
 			 */

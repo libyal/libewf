@@ -33,6 +33,13 @@
 #include <uuid/uuid.h>
 #endif
 
+/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+ * before including libewf.h
+ */
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_IMPORT
+#endif
+
 #include <libewf.h>
 
 #include <libsystem.h>
@@ -265,32 +272,24 @@ int export_handle_signal_abort(
 	}
 	if( export_handle->input_handle != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid export handle - input handle already set.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_V2_API )
-	if( libewf_handle_signal_abort(
-	     export_handle->input_handle,
-	     error ) != 1 )
+		if( libewf_handle_signal_abort(
+		     export_handle->input_handle,
+		     error ) != 1 )
 #else
-	if( libewf_signal_abort(
-	     export_handle->input_handle ) != 1 )
+		if( libewf_signal_abort(
+		     export_handle->input_handle ) != 1 )
 #endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to signal input handle to abort.",
-		 function );
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to signal input handle to abort.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( export_handle->ewf_output_handle != NULL )
 	{

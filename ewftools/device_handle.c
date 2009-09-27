@@ -80,6 +80,15 @@ typedef size_t u64;
 
 #endif
 
+/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+ * before including libewf.h
+ */
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_IMPORT
+#endif
+
+#include <libewf.h>
+
 #include "byte_size_string.h"
 #include "device_handle.h"
 #include "io_ata.h"
@@ -1023,6 +1032,101 @@ int device_handle_get_media_size(
 	return( 1 );
 }
 
+/* Retrieves the media type
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_media_type(
+     device_handle_t *device_handle,
+     uint8_t *media_type,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_media_type";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( WINAPI )
+	if( device_handle->file_handle == INVALID_HANDLE_VALUE )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid device handle - missing file handle.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( device_handle->file_descriptor == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid device handle - missing file descriptor.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( media_type == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media type.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->media_information_set == 0 )
+	{
+		if( device_handle_determine_media_information(
+		     device_handle,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine media information.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( device_handle->media_information_set != 0 )
+	{
+		if( device_handle->device_type == 0x05 )
+		{
+			*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
+		}
+		else if( device_handle->removable != 0 )
+		{
+			*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
+		}
+		else
+		{
+			*media_type = LIBEWF_MEDIA_TYPE_FIXED;
+		}
+	}
+	else
+	{
+		*media_type = 0;
+	}
+	return( 1 );
+}
+
 /* Retrieves the amount of bytes per sector
  * Returns 1 if successful or -1 on error
  */
@@ -1294,11 +1398,11 @@ int device_handle_determine_media_information(
 	DWORD response_count   = 0;
 
 #else
-#if defined( HAVE_IO_SCSI )
+#if defined( HAVE_SCSI_SG_H )
 	uint8_t response[ 255 ];
 	ssize_t response_count = 0;
 #endif
-#if defined( HAVE_IO_ATA )
+#if defined( HDIO_GET_IDENTITY )
 	struct hd_driveid device_configuration;
 #endif
 #endif
@@ -1631,7 +1735,7 @@ int device_handle_determine_media_information(
 		 response );
 	}
 #else
-#if defined( HAVE_IO_SCSI )
+#if defined( HAVE_SCSI_SG_H )
 	/* Use the Linux sg (generic SCSI) driver to determine device information
 	 */
 	if( io_scsi_get_bus_type(
@@ -1787,7 +1891,7 @@ int device_handle_determine_media_information(
 		}
 	}
 #endif
-#if defined( HAVE_IO_ATA )
+#if defined( HDIO_GET_IDENTITY )
 	if( device_handle->bus_type == IO_BUS_TYPE_ATA )
 	{
 		if( io_ata_get_device_configuration(
@@ -1865,7 +1969,7 @@ int device_handle_determine_media_information(
 		}
 	}
 #endif
-#if defined( HAVE_IO_OPTICAL_DISK )
+#if defined( HAVE_LINUX_CDROM_H )
 	if( device_handle->device_type == 0x05 )
 	{
 		if( io_optical_disk_get_table_of_contents(
@@ -1884,7 +1988,7 @@ int device_handle_determine_media_information(
 	}
 #endif
 /* Disabled for now
-#if defined( HAVE_IO_USB )
+#if defined( HAVE_LINUX_USB_CH9_H )
 	if( device_handle->bus_type == IO_BUS_TYPE_USB )
 	{
 		if( io_usb_test(
@@ -1956,6 +2060,22 @@ int device_handle_get_media_information_value(
 
 		return( -1 );
 	}
+	if( device_handle->media_information_set == 0 )
+	{
+		if( device_handle_determine_media_information(
+		     device_handle,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine media information.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	if( ( media_information_value_identifier_length == 5 )
 	 && ( narrow_string_compare(
 	       "model",
@@ -1966,17 +2086,17 @@ int device_handle_get_media_information_value(
 	}
 	else if( ( media_information_value_identifier_length == 6 )
 	      && ( narrow_string_compare(
-	            "vendor",
-	            media_information_value_identifier,
-	            media_information_value_identifier_length ) == 0 ) )
+		    "vendor",
+		    media_information_value_identifier,
+		    media_information_value_identifier_length ) == 0 ) )
 	{
 		utf8_media_information_value = (uint8_t *) device_handle->vendor;
 	}
 	else if( ( media_information_value_identifier_length == 13 )
 	      && ( narrow_string_compare(
-	            "serial_number",
-	            media_information_value_identifier,
-	            media_information_value_identifier_length ) == 0 ) )
+		    "serial_number",
+		    media_information_value_identifier,
+		    media_information_value_identifier_length ) == 0 ) )
 	{
 		utf8_media_information_value = (uint8_t *) device_handle->serial_number;
 	}
@@ -1993,7 +2113,7 @@ int device_handle_get_media_information_value(
 		/* Determine the header value size
 		 */
 		utf8_media_information_value_size = 1 + narrow_string_length(
-		                                         (char *) utf8_media_information_value );
+							 (char *) utf8_media_information_value );
 
 		if( libsystem_string_size_from_utf8_string(
 		     utf8_media_information_value,
@@ -2105,6 +2225,22 @@ int device_handle_media_information_fprint(
 		 function );
 
 		return( -1 );
+	}
+	if( device_handle->media_information_set == 0 )
+	{
+		if( device_handle_determine_media_information(
+		     device_handle,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine media information.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	fprintf(
 	 stream,

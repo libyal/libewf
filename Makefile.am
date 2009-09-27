@@ -14,7 +14,7 @@ SUBDIRS = \
 	documents \
 	manuals \
 	macosx \
-	borland \
+	borlandc \
 	msvscpp
 
 DEBIAN_FILES = \

@@ -31,21 +31,15 @@
 #include <sys/ioctl.h>
 #endif
 
-#if defined( WINAPI )
-
-#else
-
 #if defined( HAVE_LINUX_CDROM_H )
 #include <linux/cdrom.h>
-#endif
-
 #endif
 
 #include <libsystem.h>
 
 #include "io_optical_disk.h"
 
-#if defined( HAVE_IO_OPTICAL_DISK )
+#if defined( HAVE_LINUX_CDROM_H )
 
 /* Retrieves the table of contents (toc) from the optical disk
  * Returns 1 if successful or -1 on error
@@ -98,7 +92,9 @@ int io_optical_disk_get_table_of_contents(
 	 last_entry );
 #endif
 
-	for( entry_iterator = (uint16_t) first_entry; entry_iterator <= (uint16_t) last_entry; entry_iterator++ )
+	for( entry_iterator = (uint16_t) first_entry;
+	     entry_iterator <= (uint16_t) last_entry;
+	     entry_iterator++ )
 	{
 		if( memory_set(
 		     &toc_entry,
@@ -159,7 +155,6 @@ int io_optical_disk_get_table_of_contents(
 		if( ( toc_entry.cdte_ctrl & CDROM_DATA_TRACK ) == CDROM_DATA_TRACK )
 		{
 		}
-
 	}
 	if( memory_set(
 	     &toc_entry,
