@@ -1813,7 +1813,7 @@ off64_t libewf_handle_seek_offset(
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libnotify_verbose_printf(
-	 "%s: seeking offset: %" PRIjd ".\n",
+	 "%s: seeking offset: %" PRIi64 ".\n",
 	 function,
 	 offset );
 #endif

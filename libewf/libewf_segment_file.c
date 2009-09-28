@@ -1217,7 +1217,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		libnotify_verbose_printf(
-		 "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
+		 "%s: correcting table section size: %" PRIu64 " offset: %" PRIi64 ".\n",
 		 function,
 		 chunks_section_size,
 		 chunks_section_offset );
@@ -1256,7 +1256,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		libnotify_verbose_printf(
-		 "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
+		 "%s: correcting sectors section size: %" PRIu64 " offset: %" PRIi64 ".\n",
 		 function,
 		 chunks_section_size,
 		 chunks_section_offset );
@@ -1518,7 +1518,7 @@ ssize_t libewf_segment_file_write_chunk(
 		chunk_type = "compressed";
 	}
 	libnotify_verbose_printf(
-	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
 	 chunk_type,
 	 chunk,
@@ -1695,7 +1695,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libnotify_verbose_printf(
-	 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+	 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
 	 chunk,
 	 segment_file_offset,

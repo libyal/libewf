@@ -2697,7 +2697,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_IO,
 				 LIBERROR_IO_ERROR_SEEK_FAILED,
-				 "%s: cannot find offset: %" PRIjd ".",
+				 "%s: cannot find offset: %" PRIi64 ".",
 				 function,
 				 last_section_start_offset );
 
@@ -2871,7 +2871,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		return( -1 );
 	}
 	libnotify_verbose_printf(
-	 "%s: writing chunk at offset: %" PRIjd ".\n",
+	 "%s: writing chunk at offset: %" PRIi64 ".\n",
 	 function,
 	 segment_file_offset );
 #endif

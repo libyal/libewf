@@ -1453,7 +1453,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to find chunk offset: %" PRIjd ".",
+		 "%s: unable to find chunk offset: %" PRIi64 ".",
 		 function,
 		 offset_table->chunk_offset[ chunk ].file_offset );
 
