@@ -167,7 +167,7 @@ int libewf_string_split(
 		return( 1 );
 	}
 	*split_values = (libewf_character_t **) memory_allocate(
-	                                         ( sizeof( libewf_character_t * ) * *amount_of_split_values ) );
+	                                         sizeof( libewf_character_t * ) * *amount_of_split_values );
 
 	if( *split_values == NULL )
 	{
@@ -207,7 +207,9 @@ int libewf_string_split(
 
 	/* Empty values are stored as strings only containing the end of character
 	 */
-	for( split_value_iterator = 0; split_value_iterator < *amount_of_split_values; split_value_iterator++ )
+	for( split_value_iterator = 0;
+	     split_value_iterator < *amount_of_split_values;
+	     split_value_iterator++ )
 	{
 		if( split_value_end != string )
 		{
@@ -278,7 +280,7 @@ int libewf_string_split(
 
 				return( -1 );
 			}
-			( *split_values )[ split_value_iterator ][ split_value_size - 1 ] = 0;
+			( ( *split_values )[ split_value_iterator ] )[ split_value_size - 1 ] = 0;
 		}
 		/* Include delimiter character
 		 */
@@ -316,7 +318,9 @@ int libewf_string_split_values_free(
 
 		return( -1 );
 	}
-	for( split_value_iterator = 0; split_value_iterator < amount_of_split_values; split_value_iterator++ )
+	for( split_value_iterator = 0;
+	     split_value_iterator < amount_of_split_values;
+	     split_value_iterator++ )
 	{
 		if( split_values[ split_value_iterator ] != NULL )
 		{

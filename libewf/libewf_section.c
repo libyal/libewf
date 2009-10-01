@@ -428,7 +428,6 @@ ssize_t libewf_section_compressed_string_read(
          liberror_error_t **error )
 {
 	uint8_t *compressed_string = NULL;
-	uint8_t *uncompressed      = NULL;
 	static char *function      = "libewf_section_compressed_string_read";
 	void *reallocation         = NULL;
 	ssize_t read_count         = 0;
@@ -445,14 +444,24 @@ ssize_t libewf_section_compressed_string_read(
 
 		return( -1 );
 	}
-	if( ( uncompressed_string == NULL )
-	 || ( *uncompressed_string != NULL ) )
+	if( uncompressed_string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed string.",
+		 function );
+
+		return( -1 );
+	}
+	if( *uncompressed_string != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid uncompressed string value already set.",
 		 function );
 
 		return( -1 );
@@ -518,10 +527,10 @@ ssize_t libewf_section_compressed_string_read(
 	 */
 	*uncompressed_string_size = 2 * compressed_string_size;
 
-	uncompressed = (uint8_t *) memory_allocate(
-	                            sizeof( uint8_t ) * *uncompressed_string_size );
+	*uncompressed_string = (uint8_t *) memory_allocate(
+	                                    sizeof( uint8_t ) * *uncompressed_string_size );
 
-	if( uncompressed == NULL )
+	if( *uncompressed_string == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -536,7 +545,7 @@ ssize_t libewf_section_compressed_string_read(
 		return( -1 );
 	}
 	result = libewf_uncompress(
-	          uncompressed,
+	          *uncompressed_string,
 	          uncompressed_string_size,
 	          compressed_string,
 	          compressed_string_size,
@@ -549,7 +558,7 @@ ssize_t libewf_section_compressed_string_read(
 		 error );
 
 		reallocation = memory_reallocate(
-		                uncompressed,
+		                *uncompressed_string,
 		                sizeof( uint8_t ) * *uncompressed_string_size );
 
 		if( reallocation == NULL )
@@ -564,14 +573,16 @@ ssize_t libewf_section_compressed_string_read(
 			memory_free(
 			 compressed_string );
 			memory_free(
-			 uncompressed );
+			 *uncompressed_string );
+
+			*uncompressed_string = NULL;
 
 			return( -1 );
 		}
-		uncompressed = (uint8_t *) reallocation;
+		*uncompressed_string = (uint8_t *) reallocation;
 
 		result = libewf_uncompress(
-		          uncompressed,
+		          *uncompressed_string,
 		          uncompressed_string_size,
 		          compressed_string,
 		          compressed_string_size,
@@ -590,11 +601,20 @@ ssize_t libewf_section_compressed_string_read(
 		 function );
 
 		memory_free(
-		 uncompressed );
+		 *uncompressed_string );
+
+		*uncompressed_string = NULL;
 
 		return( -1 );
 	}
-	*uncompressed_string = uncompressed;
+#if defined( HAVE_DEBUG_OUTPUT )
+	libnotify_verbose_printf(
+	 "%s: uncompressed string:\n",
+	 function );
+	libnotify_verbose_print_data(
+	 *uncompressed_string,
+	 *uncompressed_string_size );
+#endif
 
 	return( read_count );
 }
@@ -4189,7 +4209,8 @@ ssize_t libewf_section_data_read(
 	 data->signature,
 	 5 );
 #endif
-	if( media_values->media_type != data->media_type )
+	if( ( data->media_type != 0 )
+	 && ( data->media_type != media_values->media_type ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4207,7 +4228,8 @@ ssize_t libewf_section_data_read(
 	 amount_of_chunks,
 	 data->amount_of_chunks );
 
-	if( media_values->amount_of_chunks != amount_of_chunks )
+	if( ( amount_of_chunks != 0 )
+	 && ( amount_of_chunks != media_values->amount_of_chunks ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4227,7 +4249,8 @@ ssize_t libewf_section_data_read(
 	 sectors_per_chunk,
 	 data->sectors_per_chunk );
 
-	if( media_values->sectors_per_chunk != sectors_per_chunk )
+	if( ( sectors_per_chunk != 0 )
+	 && ( sectors_per_chunk != media_values->sectors_per_chunk ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4245,7 +4268,8 @@ ssize_t libewf_section_data_read(
 	 bytes_per_sector,
 	 data->bytes_per_sector );
 
-	if( media_values->bytes_per_sector != bytes_per_sector )
+	if( ( bytes_per_sector != 0 )
+	 && ( bytes_per_sector != media_values->bytes_per_sector ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4263,7 +4287,8 @@ ssize_t libewf_section_data_read(
 	 amount_of_sectors,
 	 data->amount_of_sectors );
 
-	if( media_values->amount_of_sectors != amount_of_sectors )
+	if( ( amount_of_sectors != 0 )
+	 && ( amount_of_sectors != media_values->amount_of_sectors ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4281,7 +4306,8 @@ ssize_t libewf_section_data_read(
 	 error_granularity,
 	 data->error_granularity );
 
-	if( media_values->error_granularity != error_granularity )
+	if( ( error_granularity != 0 )
+	 && ( error_granularity != media_values->error_granularity ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4295,7 +4321,8 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	if( media_values->media_flags != data->media_flags )
+	if( ( data->media_flags != 0 )
+	 && ( data->media_flags != media_values->media_flags ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4309,22 +4336,40 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	if( memory_compare(
-	     media_values->guid,
-	     data->guid,
-	     16 ) != 0 )
+	if( ( data->guid[ 0 ] != 0 )
+	 || ( data->guid[ 1 ] != 0 )
+	 || ( data->guid[ 2 ] != 0 )
+	 || ( data->guid[ 3 ] != 0 )
+	 || ( data->guid[ 4 ] != 0 )
+	 || ( data->guid[ 5 ] != 0 )
+	 || ( data->guid[ 6 ] != 0 )
+	 || ( data->guid[ 7 ] != 0 )
+	 || ( data->guid[ 8 ] != 0 )
+	 || ( data->guid[ 9 ] != 0 )
+	 || ( data->guid[ 10 ] != 0 )
+	 || ( data->guid[ 11 ] != 0 )
+	 || ( data->guid[ 12 ] != 0 )
+	 || ( data->guid[ 13 ] != 0 )
+	 || ( data->guid[ 14 ] != 0 )
+	 || ( data->guid[ 15 ] != 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: GUID does not match in data section.",
-		 function );
+		if( memory_compare(
+		     media_values->guid,
+		     data->guid,
+		     16 ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_INPUT,
+			 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: GUID does not match in data section.",
+			 function );
 
-		memory_free(
-		 data );
+			memory_free(
+			 data );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	memory_free(
 	 data );

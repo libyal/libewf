@@ -204,6 +204,12 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * check make distclean
 
+20091001
+* small changes in common
+* made libewf a little more tollerant in allowing the data section not
+  to contain values, the values must be 0 otherwise libewf still enforces
+  validity checks
+
 20090929
 * worked on CodeGear project files
   - disabled creation of pre compiled headers

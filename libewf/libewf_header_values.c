@@ -1088,6 +1088,23 @@ int libewf_header_values_parse_header_string(
 	}
 	if( amount_of_lines > 0 )
 	{
+		if( ( lines[ 0 ][ 0 ] < (libewf_character_t) '0' )
+		 || ( lines[ 0 ][ 0 ] > (libewf_character_t) '9' ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: header values string not supported.",
+			 function );
+
+			libewf_string_split_values_free(
+			 lines,
+			 amount_of_lines,
+			 NULL );
+
+			return( -1 );
+		}
 		types_line_size = ( lines[ 2 ] == NULL ) ? 0 : 1 + libewf_string_length(
 		                                                    lines[ 2 ] );
 
@@ -1150,7 +1167,9 @@ int libewf_header_values_parse_header_string(
 			 function );
 		}
 #endif
-		for( iterator = 0; iterator < amount_of_types; iterator++ )
+		for( iterator = 0;
+		     iterator < amount_of_types;
+		     iterator++ )
 		{
 			type_string_length = libewf_string_length(
 					      types[ iterator ] );
@@ -1421,13 +1440,18 @@ int libewf_header_values_parse_header_string(
 				       _LIBEWF_STRING( "u" ),
 				       type_string_length ) == 0 ) )
 				{
+					if( ( value_string == NULL )
+					 || ( value_string == (libewf_character_t *) _LIBEWF_STRING( "" ) ) )
+					{
+						/* the string search function is not NULL safe */
+					}
 					/* If the date time values string contains spaces it's in the old header
 					 * format otherwise is in new header2 format
 					 */
-					if( libewf_string_search(
-					     value_string,
-					     (libewf_character_t) ' ',
-					     value_string_length ) != NULL )
+					else if( libewf_string_search(
+					          value_string,
+					          (libewf_character_t) ' ',
+					          value_string_length ) != NULL )
 					{
 						result = libewf_convert_date_header_value(
 							  value_string,
