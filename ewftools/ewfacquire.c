@@ -3195,7 +3195,7 @@ int main( int argc, char * const argv[] )
 				     _LIBSYSTEM_CHARACTER_T_STRING( "Media type" ),
 				     ewfinput_media_types,
 				     EWFINPUT_MEDIA_TYPES_AMOUNT,
-				     default_media_type,
+				     (uint8_t) default_media_type,
 				     &fixed_string_variable,
 				     &error ) == -1 )
 				{

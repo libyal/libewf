@@ -7,7 +7,7 @@
  * Refer to AUTHORS for acknowledgements.
  *
  * This software is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -16,7 +16,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -253,7 +253,7 @@ int imaging_handle_add_read_error(
 int imaging_handle_add_session(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
-      size_t amount_of_bytes,
+      size64_t amount_of_bytes,
       liberror_error_t **error );
 
 ssize_t imaging_handle_finalize(

@@ -204,6 +204,16 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * check make distclean
 
+20091003
+* several fixes for Debian integration based on patches by Cristian Greco
+* corrected license in list and array type and several of the pfftool handles
+* updated libuna, libbfio
+* updated several manpages
+* changes to autoconf/make scripts to not link libcrypto and libuuid to libewf
+* renamed debian to dpkg
+* remove ZLIB_WINAPI from msvscpp configuration
+* several fixes to configure scripts
+
 20091001
 * small changes in common
 * made libewf a little more tollerant in allowing the data section not

@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio;..\..\libewf;..\zlib\include"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;ZLIB_DLL;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				CompileAs="1"

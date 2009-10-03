@@ -176,13 +176,13 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_CTIME],
 				  [1]) ]) ])
 			])
 		])
-	AC_LANG_POP(C) ]) ],
+	AC_LANG_POP(C) ],
 	[AC_CHECK_FUNCS(
 	 [ctime],
 	 [],
 	 [AC_MSG_FAILURE(
 	  [Missing function: ctime_r and ctime],
-	  [1]) ])
+	  [1]) ]) ])
 ])
 
 dnl Function to determine the operating system

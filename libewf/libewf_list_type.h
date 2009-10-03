@@ -7,16 +7,16 @@
  * Refer to AUTHORS for acknowledgements.
  *
  * This software is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -102,6 +102,23 @@ int libewf_list_clone(
      int (*value_clone_function)( intptr_t **destination, intptr_t *source, liberror_error_t **error ),
      liberror_error_t **error );
 
+int libewf_list_get_amount_of_elements(
+     libewf_list_t *list,
+     int *amount_of_elements,
+     liberror_error_t **error );
+
+int libewf_list_get_element(
+     libewf_list_t *list,
+     int element_index,
+     libewf_list_element_t **element,
+     liberror_error_t **error );
+
+int libewf_list_get_value(
+     libewf_list_t *list,
+     int element_index,
+     intptr_t **value,
+     liberror_error_t **error );
+
 int libewf_list_prepend_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
@@ -137,17 +154,6 @@ int libewf_list_insert_value(
 int libewf_list_remove_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     liberror_error_t **error );
-
-int libewf_list_get_amount_of_elements(
-     libewf_list_t *list,
-     int *amount_of_elements,
-     liberror_error_t **error );
-
-int libewf_list_get_element(
-     libewf_list_t *list,
-     int element_index,
-     libewf_list_element_t **element,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

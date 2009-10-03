@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20091001],
+ [20091003],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20091001])
+ [20091003])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -609,7 +609,7 @@ AC_CHECK_LIB(
  [AC_DEFINE(
   [HAVE_COMPRESS_BOUND],
   [1],
-  [Defines if compressBound funtion is present in zlib.])])
+  [Define to 1 if compressBound funtion is available in zlib.])])
 
 AC_CHECK_LIB(
  z,
@@ -1165,7 +1165,13 @@ AS_IF(
 	AC_CHECK_LIB(
 	 crypto,
 	 EVP_md5,
-	 [],
+	 [AC_SUBST(
+	  [LIBCRYPTO_LIBADD],
+	  [-lcrypto])
+	 AC_DEFINE(
+	  [HAVE_LIBCRYPTO],
+	  [1],
+	  [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
 	 [ac_libewf_have_libcrypto_evp=no])
 	AC_CHECK_LIB(
 	 crypto,
@@ -1203,7 +1209,7 @@ AS_IF(
 	[test "x$ac_libewf_have_libcrypto_evp" = xno],
 	[AC_SUBST(
 	 [HAVE_OPENSSL_EVP_H],
-	 [0])] )
+	 [0]) ])
 
 AS_IF(
 	[test "x$ac_libewf_have_libcrypto_evp" = xyes],
@@ -1224,7 +1230,13 @@ AS_IF(
 	AC_CHECK_LIB(
 	 crypto,
 	 MD5_Init,
-	 [],
+	 [AC_SUBST(
+	  [LIBCRYPTO_LIBADD],
+	  [-lcrypto])
+	 AC_DEFINE(
+	  [HAVE_LIBCRYPTO],
+	  [1],
+	  [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
 	 [ac_libewf_have_libcrypto_md5=no])
 	AC_CHECK_LIB(
 	 crypto,
@@ -1294,7 +1306,13 @@ AS_IF(
 	  AC_CHECK_LIB(
 	  [uuid],
 	  [uuid_generate],
-	  [],
+	  [AC_SUBST(
+	   [LIBUUID_LIBADD],
+	   [-luuid])
+	  AC_DEFINE(
+	   [HAVE_LIBUUID],
+	   [1],
+	   [Define to 1 if you have the 'uuid' library (-luuid).]) ],
 	  [ac_libewf_have_guid_support=no])
 	 ])
 	])
@@ -1315,7 +1333,7 @@ AS_IF(
 	 [AC_DEFINE(
 	  [HAVE_UUID_GENERATE_RANDOM],
 	  [1],
-	  [Defines if uuid_generate_random funtion is present in libuuid.])
+	  [Define to 1 if uuid_generate_random funtion is available in libuuid.])
 	 ])
 	AC_CHECK_LIB(
 	 [uuid],
@@ -1323,7 +1341,7 @@ AS_IF(
 	 [AC_DEFINE(
 	  [HAVE_UUID_GENERATE_TIME],
 	  [1],
-	  [Defines if uuid_generate_time funtion is present in libuuid.])
+	  [Define to 1 if uuid_generate_time funtion is available in libuuid.])
 	 ])
 	])
 
@@ -1334,14 +1352,14 @@ AS_IF(
 	 [AC_DEFINE(
 	  [HAVE_UUID_GENERATE_RANDOM],
 	  [1],
-	  [Defines if uuid_generate_random funtion is present.])
+	  [Define to 1 if uuid_generate_random funtion is available.])
 	 ])
 	AC_CHECK_FUNC(
 	 [uuid_generate_time],
 	 [AC_DEFINE(
 	  [HAVE_UUID_GENERATE_TIME],
 	  [1],
-	  [Defines if uuid_generate_time funtion is present.])
+	  [Define to 1 if uuid_generate_time funtion is available.])
 	 ])
 	])
 
@@ -1481,7 +1499,7 @@ AS_IF(
 	AC_DEFINE(
 	 [HAVE_WIDE_CHARACTER_TYPE],
 	 [1],
-	 [Defines if wide character type should be used])
+	 [Define to 1 if wide character type should be used.])
 	AC_SUBST(
 	 [HAVE_WIDE_CHARACTER_TYPE],
 	 [1])
@@ -1508,7 +1526,7 @@ AS_IF(
 	[AC_DEFINE(
 	 [HAVE_LOW_LEVEL_FUNCTIONS],
 	 [1],
-	 [Defines if libewf's low level read and write functions should be used in the ewf tools] )
+	 [Define to 1 if libewfs low level read and write functions should be used in the ewf tools.])
 	ac_cv_libewf_enable_low_level_functions=yes])
 
 dnl Check if libewf should be build with verbose output
@@ -1517,7 +1535,7 @@ AS_IF(
 	[AC_DEFINE(
 	 [HAVE_VERBOSE_OUTPUT],
 	 [1],
-	 [Defines if verbose output should be used] )
+	 [Define to 1 if verbose output should be used.])
 	ac_cv_libewf_enable_verbose_output=yes])
 
 dnl Check if libewf should be build with debug output
@@ -1526,7 +1544,7 @@ AS_IF(
 	[AC_DEFINE(
 	 [HAVE_DEBUG_OUTPUT],
 	 [1],
-	 [Defines if debug output should be used] )
+	 [Define to 1 if debug output should be used.])
 	ac_cv_libewf_enable_debug_output=yes])
 
 dnl Check if libewf python bindings (pyewf) should be built
@@ -1550,7 +1568,7 @@ AS_IF(
 	[AC_DEFINE(
 	 [HAVE_V1_API],
 	 [1],
-	 [Defines if experimental version 1 API should be used] )
+	 [Define to 1 if experimental version 1 API should be used.])
 	AC_SUBST(
 	 [HAVE_V1_API],
 	 [1])
@@ -1569,7 +1587,7 @@ AS_IF(
 	[AC_DEFINE(
 	 [HAVE_V2_API],
 	 [1],
-	 [Defines if experimental version 2 API should be used] )
+	 [Define to 1 if experimental version 2 API should be used.])
 	AC_SUBST(
 	 [HAVE_V2_API],
 	 [1])
@@ -1641,8 +1659,8 @@ AC_CONFIG_FILES([include/libewf/types.h])
 AC_CONFIG_FILES([libewf/libewf_definitions.h])
 dnl Have configure make distribution specific files
 AC_CONFIG_FILES([common/types.h])
-AC_CONFIG_FILES([debian/changelog])
-AC_CONFIG_FILES([debian/shlibs.local.ex])
+AC_CONFIG_FILES([dpkg/changelog])
+AC_CONFIG_FILES([dpkg/shlibs.local.ex])
 AC_CONFIG_FILES([macosx/Introduction.rtf])
 AC_CONFIG_FILES([libewf.pc])
 AC_CONFIG_FILES([libewf.spec])

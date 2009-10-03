@@ -17,50 +17,50 @@ SUBDIRS = \
 	borlandc \
 	msvscpp
 
-DEBIAN_FILES = \
-	debian/changelog \
-	debian/changelog.in \
-	debian/compat \
-	debian/control \
-	debian/copyright \
-	debian/cron.d.ex \
-	debian/emacsen-install.ex \
-	debian/emacsen-startup.ex \
-	debian/emacsen-remove.ex \
-	debian/init.d.ex \
-	debian/libewf.install \
-	debian/libewf.dirs \
-	debian/libewf.docs \
-	debian/libewf.postinst.debhelper \
-	debian/libewf.postrm.debhelper \
-	debian/libewf-default.ex \
-	debian/libewf-dev.dirs \
-	debian/libewf-dev.docs \
-	debian/libewf-dev.install \
-	debian/libewf-tools.dirs \
-	debian/libewf-tools.docs \
-	debian/libewf-tools.install \
-	debian/libewf.doc-base.EX \
-	debian/manpage.1.ex \
-	debian/manpage.sgml.ex \
-	debian/manpage.xml.ex \
-	debian/menu.ex \
-	debian/rules \
-	debian/postinst.ex \
-	debian/postrm.ex \
-	debian/preinst.ex \
-	debian/prerm.ex \
-	debian/shlibs.local.ex \
-	debian/shlibs.local.ex.in \
-	debian/watch.ex
+DPKG_FILES = \
+	dpkg/changelog \
+	dpkg/changelog.in \
+	dpkg/compat \
+	dpkg/control \
+	dpkg/copyright \
+	dpkg/cron.d.ex \
+	dpkg/emacsen-install.ex \
+	dpkg/emacsen-startup.ex \
+	dpkg/emacsen-remove.ex \
+	dpkg/init.d.ex \
+	dpkg/libewf.install \
+	dpkg/libewf.dirs \
+	dpkg/libewf.docs \
+	dpkg/libewf.postinst.debhelper \
+	dpkg/libewf.postrm.debhelper \
+	dpkg/libewf-default.ex \
+	dpkg/libewf-dev.dirs \
+	dpkg/libewf-dev.docs \
+	dpkg/libewf-dev.install \
+	dpkg/libewf-tools.dirs \
+	dpkg/libewf-tools.docs \
+	dpkg/libewf-tools.install \
+	dpkg/libewf.doc-base.EX \
+	dpkg/manpage.1.ex \
+	dpkg/manpage.sgml.ex \
+	dpkg/manpage.xml.ex \
+	dpkg/menu.ex \
+	dpkg/rules \
+	dpkg/postinst.ex \
+	dpkg/postrm.ex \
+	dpkg/preinst.ex \
+	dpkg/prerm.ex \
+	dpkg/shlibs.local.ex \
+	dpkg/shlibs.local.ex.in \
+	dpkg/watch.ex
 
-REDHAT_FILES = \
+SPEC_FILES = \
 	libewf.spec \
 	libewf.spec.in
 
 EXTRA_DIST = \
-	$(DEBIAN_FILES) \
-	$(REDHAT_FILES) \
+	$(DPKG_FILES) \
+	$(SPEC_FILES) \
 	libewf.pc \
 	libewf.pc.in
 
@@ -89,8 +89,8 @@ distclean: clean
 	/bin/rm -f config.log
 	/bin/rm -f libewf.pc
 	/bin/rm -f libewf.spec
-	/bin/rm -f debian/changelog
-	/bin/rm -f debian/shlibs.local.ex
+	/bin/rm -f dpkg/changelog
+	/bin/rm -f dpkg/shlibs.local.ex
 	@for dir in ${subdirs}; do \
 		(cd $$dir && $(MAKE) distclean) \
 		|| case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \

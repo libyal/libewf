@@ -38,6 +38,8 @@ ewfacquire_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBUUID_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfacquirestream_SOURCES = \
@@ -60,6 +62,8 @@ ewfacquirestream_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBUUID_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfalter_SOURCES = \
@@ -109,6 +113,8 @@ ewfexport_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBUUID_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfinfo_SOURCES = \
@@ -124,6 +130,7 @@ ewfinfo_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBUUID_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfverify_SOURCES = \
@@ -144,6 +151,7 @@ ewfverify_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBCRYPTO_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 distclean: clean

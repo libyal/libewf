@@ -1,4 +1,4 @@
-.Dd June 9, 2009
+.Dd October 3, 2009
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -63,7 +63,7 @@ swap byte pairs of the media data (from AB to BA) (use this for big to little en
 .It Fl S Ar segment_file_size
 the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats) (not used for raw format)
 .It Fl t Ar target
-the target file to export to, use - for stdout (default is export) stdout is only supported for the raw format
+the target file to export to, use \- for stdout (default is export) stdout is only supported for the raw format
 .It Fl u
 unattended mode (disables user interaction)
 .It Fl v
@@ -86,7 +86,7 @@ ewfexport 20090229 (libewf 20090229, libuna 20090124, zlib 1.2.3, libcrypto 0.9.
 
 Information for export required, please provide the necessary input
 Export to file format (raw, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
-Target path and filename with extension or - for stdout: floppy.raw
+Target path and filename with extension or \- for stdout: floppy.raw
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:
 

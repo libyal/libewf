@@ -7,7 +7,7 @@
  * Refer to AUTHORS for acknowledgements.
  *
  * This software is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -16,7 +16,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -3352,7 +3352,7 @@ int imaging_handle_add_read_error(
 int imaging_handle_add_session(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
-      size_t amount_of_bytes,
+      size64_t amount_of_bytes,
       liberror_error_t **error )
 {
 	static char *function      = "imaging_handle_add_session";
@@ -3395,6 +3395,19 @@ int imaging_handle_add_session(
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
 	amount_of_sectors = amount_of_bytes / imaging_handle->bytes_per_sector;
 
+#if !defined( HAVE_V2_API )
+	if( amount_of_sectors > (uint64_t) UINT32_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid amount of sectors value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_V2_API )
 	if( libewf_handle_add_session(
 	     imaging_handle->output_handle,
