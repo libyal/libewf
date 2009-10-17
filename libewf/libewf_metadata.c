@@ -2,7 +2,7 @@
  * Interface functions
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations. All rights reserved.
+ * Hoffmann Investigations.
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -2497,6 +2497,7 @@ int libewf_handle_set_header_codepage(
 		return( -1 );
 	}
 	if( ( header_codepage != LIBEWF_CODEPAGE_ASCII )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_874 )
 	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1250 )
 	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1251 )
 	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1252 )

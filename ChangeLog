@@ -1,7 +1,7 @@
 Roadmap:
 * support missing segment files (chunks)
 * multiple platform device handle
-* libbfio API extensions
+* libbfio API extensions (partial)
 * low and high level API
   - to allow low level access to sections etc. (for recovery)
 * lvf support
@@ -12,7 +12,7 @@ Roadmap:
   - getoptlong
 * internationalisation
   - Unicode support (added)
-  - locale support
+  - locale support (partial)
   - multi language string support (gettext)
 * enhance thread safety
   - protect writing to internal data structures
@@ -203,6 +203,10 @@ Next stable release:
 * remove/disable ewfdebug
 * check into resume write error for 32-bit compile
 * check make distclean
+
+20091017
+* preperation for stable release
+* removed All rights reserved because it has no additional legal value what so ever
 
 20091003
 * several fixes for Debian integration based on patches by Cristian Greco

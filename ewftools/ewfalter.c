@@ -3,7 +3,7 @@
  * Alters media data in EWF files
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations. All rights reserved.
+ * Hoffmann Investigations.
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -69,8 +69,8 @@ void usage_fprint(
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
-	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-1250,\n"
-	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-874,\n"
+	                 "\t           windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-B:        specify the amount of bytes to alter (default is all bytes)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );

@@ -3,7 +3,7 @@
  * Reads data from a file or device and writes it in EWF format
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations. All rights reserved.
+ * Hoffmann Investigations.
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -122,8 +122,8 @@ void usage_fprint(
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
-	fprintf( stream, "\t-A:     codepage of header section, options: ascii (default), windows-1250,\n"
-	                 "\t        windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	fprintf( stream, "\t-A:     codepage of header section, options: ascii (default), windows-874,\n"
+	                 "\t        windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t        windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-b:     specify the amount of sectors to read at once (per chunk), options:\n"
 	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
