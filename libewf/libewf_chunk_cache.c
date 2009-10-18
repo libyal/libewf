@@ -172,6 +172,11 @@ int libewf_chunk_cache_free(
 			memory_free(
 			 ( *chunk_cache )->data );
 		}
+		if( ( *chunk_cache )->zero_byte_empty_block_compressed != NULL )
+		{
+			memory_free(
+			 ( *chunk_cache )->zero_byte_empty_block_compressed );
+		}
 		memory_free(
 		 *chunk_cache );
 

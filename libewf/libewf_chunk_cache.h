@@ -63,6 +63,18 @@ struct libewf_chunk_cache
 	/* The data buffer
 	 */
 	uint8_t *data;
+
+	/* The zero byte empty block compressed data buffer
+	 */
+	uint8_t *zero_byte_empty_block_compressed;
+
+	/* The size of the compressed zero byte empty block data
+	 */
+	size_t zero_byte_empty_block_compressed_size;
+
+	/* The size of the uncompress zero byte empty block data
+	 */
+	size_t zero_byte_empty_block_uncompressed_size;
 };
 
 int libewf_chunk_cache_initialize(

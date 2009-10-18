@@ -135,7 +135,7 @@ void usage_fprint(
 	fprintf( stream, "\t-e: specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E: specify the evidence number (default is evidence_number).\n" );
 	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3,\n"
-	                 "\t    encase4, encase5 (default), encase6, linen5, linen6, ewfx\n" );
+	                 "\t    encase4, encase5, encase6 (default), linen5, linen6, ewfx\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
 	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable, optical, memory\n" );
@@ -171,7 +171,7 @@ void usage_fprint(
 	fprintf( stream, "\t-v: verbose output to stderr\n" );
 	fprintf( stream, "\t-V: print version\n" );
 	fprintf( stream, "\t-w: wipe sectors on read error (mimic EnCase like behavior)\n" );
-	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write to\n" );
+	fprintf( stream, "\t-2: specify the secondary target file (without extension) to write to\n" );
 }
 
 /* Prints an overview of the aquiry parameters
@@ -1259,6 +1259,11 @@ int main( int argc, char * const argv[] )
 	FILE *log_file_stream                              = NULL;
 
 	libsystem_integer_t option                         = 0;
+	size_t case_number_length                          = 0;
+	size_t description_length                          = 0;
+	size_t evidence_number_length                      = 0;
+	size_t examiner_name_length                        = 0;
+	size_t notes_length                                = 0;
 	size_t string_length                               = 0;
 	int64_t write_count                                = 0;
 	uint64_t acquiry_offset                            = 0;
@@ -1690,13 +1695,13 @@ int main( int argc, char * const argv[] )
 
 	if( option_case_number != NULL )
 	{
-		string_length = libsystem_string_length(
-		                 option_case_number );
+		case_number_length = libsystem_string_length(
+		                      option_case_number );
 
-		if( string_length > 0 )
+		if( case_number_length > 0 )
 		{
 			case_number = (libsystem_character_t *) memory_allocate(
-			                                         sizeof( libsystem_character_t ) * ( string_length + 1 ) );
+			                                         sizeof( libsystem_character_t ) * ( case_number_length + 1 ) );
 
 			if( case_number == NULL )
 			{
@@ -1709,7 +1714,7 @@ int main( int argc, char * const argv[] )
 			else if( libsystem_string_copy(
 			          case_number,
 			          option_case_number,
-			          string_length + 1 ) == NULL )
+			          case_number_length + 1 ) == NULL )
 			{
 				fprintf(
 				 stderr,
@@ -1722,13 +1727,13 @@ int main( int argc, char * const argv[] )
 	if( ( error_abort == 0 )
 	 && ( option_description != NULL ) )
 	{
-		string_length = libsystem_string_length(
-		                 option_description );
+		description_length = libsystem_string_length(
+		                      option_description );
 
-		if( string_length > 0 )
+		if( description_length > 0 )
 		{
 			description = (libsystem_character_t *) memory_allocate(
-			                                         sizeof( libsystem_character_t ) * ( string_length + 1 ) );
+			                                         sizeof( libsystem_character_t ) * ( description_length + 1 ) );
 
 			if( description == NULL )
 			{
@@ -1741,7 +1746,7 @@ int main( int argc, char * const argv[] )
 			else if( libsystem_string_copy(
 			          description,
 			          option_description,
-			          string_length + 1 ) == NULL )
+			          description_length + 1 ) == NULL )
 			{
 				fprintf(
 				 stderr,
@@ -1754,13 +1759,13 @@ int main( int argc, char * const argv[] )
 	if( ( error_abort == 0 )
 	 && ( option_examiner_name != NULL ) )
 	{
-		string_length = libsystem_string_length(
-		                 option_examiner_name );
+		examiner_name_length = libsystem_string_length(
+		                        option_examiner_name );
 
-		if( string_length > 0 )
+		if( examiner_name_length > 0 )
 		{
 			examiner_name = (libsystem_character_t *) memory_allocate(
-			                                           sizeof( libsystem_character_t ) * ( string_length + 1 ) );
+			                                           sizeof( libsystem_character_t ) * ( examiner_name_length + 1 ) );
 
 			if( examiner_name == NULL )
 			{
@@ -1773,7 +1778,7 @@ int main( int argc, char * const argv[] )
 			else if( libsystem_string_copy(
 			          examiner_name,
 			          option_examiner_name,
-			          string_length + 1 ) == NULL )
+			          examiner_name_length + 1 ) == NULL )
 			{
 				fprintf(
 				 stderr,
@@ -1786,13 +1791,13 @@ int main( int argc, char * const argv[] )
 	if( ( error_abort == 0 )
 	 && ( option_evidence_number != NULL ) )
 	{
-		string_length = libsystem_string_length(
-		                 option_evidence_number );
+		evidence_number_length = libsystem_string_length(
+		                          option_evidence_number );
 
-		if( string_length > 0 )
+		if( evidence_number_length > 0 )
 		{
 			evidence_number = (libsystem_character_t *) memory_allocate(
-			                                             sizeof( libsystem_character_t ) * ( string_length + 1 ) );
+			                                             sizeof( libsystem_character_t ) * ( evidence_number_length + 1 ) );
 
 			if( evidence_number == NULL )
 			{
@@ -1805,7 +1810,7 @@ int main( int argc, char * const argv[] )
 			else if( libsystem_string_copy(
 			          evidence_number,
 			          option_evidence_number,
-			          string_length + 1 ) == NULL )
+			          evidence_number_length + 1 ) == NULL )
 			{
 				fprintf(
 				 stderr,
@@ -1818,13 +1823,13 @@ int main( int argc, char * const argv[] )
 	if( ( error_abort == 0 )
 	 && ( option_notes != NULL ) )
 	{
-		string_length = libsystem_string_length(
-		                 option_notes );
+		notes_length = libsystem_string_length(
+		                option_notes );
 
-		if( string_length > 0 )
+		if( notes_length > 0 )
 		{
 			notes = (libsystem_character_t *) memory_allocate(
-			                                   sizeof( libsystem_character_t ) * ( string_length + 1 ) );
+			                                   sizeof( libsystem_character_t ) * ( notes_length + 1 ) );
 
 			if( notes == NULL )
 			{
@@ -1837,7 +1842,7 @@ int main( int argc, char * const argv[] )
 			else if( libsystem_string_copy(
 			          notes,
 			          option_notes,
-			          string_length + 1 ) == NULL )
+			          notes_length + 1 ) == NULL )
 			{
 				fprintf(
 				 stderr,
@@ -2005,20 +2010,15 @@ int main( int argc, char * const argv[] )
 		if( imaging_handle_set_output_values(
 		     ewfacquirestream_imaging_handle,
 		     case_number,
-		     libsystem_string_length(
-		      case_number ),
+		     case_number_length,
 		     description,
-		     libsystem_string_length(
-		      description ),
+		     description_length,
 		     evidence_number,
-		     libsystem_string_length(
-		      evidence_number ),
+		     evidence_number_length,
 		     examiner_name,
-		     libsystem_string_length(
-		      examiner_name ),
+		     examiner_name_length,
 		     notes,
-		     libsystem_string_length(
-		      notes ),
+		     notes_length,
 		     acquiry_operating_system,
 		     libsystem_string_length(
 		      acquiry_operating_system ),

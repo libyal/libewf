@@ -72,6 +72,8 @@ Possible performance improvements:
 * optimize empty block test
 * optimize string functions
   - pass length/size as much as possible
+* pass zero byte empty block compressed data cache as a pointer
+  do not copy data to compressed chunk cache
 
 Error handling/tollerance
 * what about a function that translates error into an equivalent errno?
@@ -206,6 +208,9 @@ Next stable release:
 
 20091018
 * worked on aligned empty block test
+* fixed error in help output of ewfacquirestream
+* fixed error in ewfacquirestream regarding missing strings
+* worked on cached zero byte emtpy block based on idea by Bas Kloet
 
 20091017
 * preperation for stable release

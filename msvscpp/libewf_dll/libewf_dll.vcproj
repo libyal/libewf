@@ -308,6 +308,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_empty_block.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_empty_block.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_error.h"
 				>
 			</File>

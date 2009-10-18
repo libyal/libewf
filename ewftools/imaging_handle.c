@@ -2135,100 +2135,120 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-	/* Set case number
-	 */
-	if( imaging_handle_set_header_value(
-	     imaging_handle,
-	     "case_number",
-	     11,
-	     case_number,
-	     case_number_length,
-	     error ) != 1 )
+	if( ( case_number != NULL )
+	 && ( case_number_length > 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: case number.",
-		 function );
+		/* Set case number
+		 */
+		if( imaging_handle_set_header_value(
+		     imaging_handle,
+		     "case_number",
+		     11,
+		     case_number,
+		     case_number_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: case number.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	/* Set description
-	 */
-	if( imaging_handle_set_header_value(
-	     imaging_handle,
-	     "description",
-	     11,
-	     description,
-	     description_length,
-	     error ) != 1 )
+	if( ( description != NULL )
+	 && ( description_length > 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: description.",
-		 function );
+		/* Set description
+		 */
+		if( imaging_handle_set_header_value(
+		     imaging_handle,
+		     "description",
+		     11,
+		     description,
+		     description_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: description.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	/* Set evidence number
-	 */
-	if( imaging_handle_set_header_value(
-	     imaging_handle,
-	     "evidence_number",
-	     15,
-	     evidence_number,
-	     evidence_number_length,
-	     error ) != 1 )
+	if( ( evidence_number != NULL )
+	 && ( evidence_number_length > 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: evidence number.",
-		 function );
+		/* Set evidence number
+		 */
+		if( imaging_handle_set_header_value(
+		     imaging_handle,
+		     "evidence_number",
+		     15,
+		     evidence_number,
+		     evidence_number_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: evidence number.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	/* Set examiner name
-	 */
-	if( imaging_handle_set_header_value(
-	     imaging_handle,
-	     "examiner_name",
-	     13,
-	     examiner_name,
-	     examiner_name_length,
-	     error ) != 1 )
+	if( ( examiner_name != NULL )
+	 && ( examiner_name_length > 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: examiner name.",
-		 function );
+		/* Set examiner name
+		 */
+		if( imaging_handle_set_header_value(
+		     imaging_handle,
+		     "examiner_name",
+		     13,
+		     examiner_name,
+		     examiner_name_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: examiner name.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	/* Set notes
-	 */
-	if( imaging_handle_set_header_value(
-	     imaging_handle,
-	     "notes",
-	     5,
-	     notes,
-	     notes_length,
-	     error ) != 1 )
+	if( ( notes != NULL )
+	 && ( notes_length > 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: notes.",
-		 function );
+		/* Set notes
+		 */
+		if( imaging_handle_set_header_value(
+		     imaging_handle,
+		     "notes",
+		     5,
+		     notes,
+		     notes_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: notes.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	/* Password is not used within libewf
 	 */
