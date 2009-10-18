@@ -25,6 +25,7 @@ libewf_la_SOURCES = \
 	libewf_date_time_values.c libewf_date_time_values.h \
 	libewf_debug.c libewf_debug.h \
 	libewf_definitions.h \
+	libewf_empty_block.c libewf_empty_block.h \
 	libewf_error.c libewf_error.h \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \

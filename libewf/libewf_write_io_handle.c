@@ -31,6 +31,7 @@
 #include "libewf_chunk_cache.h"
 #include "libewf_compression.h"
 #include "libewf_definitions.h"
+#include "libewf_empty_block.h"
 #include "libewf_header_values.h"
 #include "libewf_libbfio.h"
 #include "libewf_media_values.h"
@@ -1412,10 +1413,17 @@ ssize_t libewf_write_io_handle_process_chunk(
 	 */
 	if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
 	{
+#ifdef OPTIMIZETEST
+		result = libewf_empty_block_test(
+		          chunk_data,
+		          chunk_data_size,
+		          error );
+#else
 		result = libewf_write_io_handle_test_empty_block(
 		          chunk_data,
 		          chunk_data_size,
 		          error );
+#endif
 
 		if( result == -1 )
 		{
