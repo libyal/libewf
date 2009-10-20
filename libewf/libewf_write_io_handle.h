@@ -113,7 +113,7 @@ struct libewf_write_io_handle
 
 	/* The current chunks section number
 	 */
-	uint8_t chunks_section_number;
+	uint32_t chunks_section_number;
 
 	/* Value to indicate if the offset table should not be restricted
 	 * to the maximum amount of offsets
@@ -181,7 +181,7 @@ int libewf_write_io_handle_calculate_chunks_per_chunks_section(
      uint32_t *chunks_per_chunks_section,
      uint32_t maximum_section_amount_of_chunks,
      uint32_t chunks_per_segment,
-     uint8_t chunks_section_number,
+     uint32_t chunks_section_number,
      uint8_t unrestrict_offset_amount,
      liberror_error_t **error );
 
