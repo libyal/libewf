@@ -433,6 +433,26 @@ int device_handle_open_input(
 
 		return( -1 );
 	}
+#if defined( HAVE_POSIX_FADVISE )
+	/* Use this function to double the read-ahead system buffer
+	 * This provides for some additional performance
+	 */
+	if( posix_fadvise(
+	     device_handle->file_descriptor,
+	     0,
+	     0,
+	     POSIX_FADV_SEQUENTIAL ) != 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_GENERIC,
+		 "%s: unable to advice file handle.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( fstat(
 	     device_handle->file_descriptor,
 	     &file_stat ) != 0 )

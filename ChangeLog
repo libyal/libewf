@@ -206,6 +206,9 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * check make distclean
 
+20091024
+* add falign in device handle, small performance improvement
+
 20091020
 * fixed overflow of chunks_section_number in write io handle
 
