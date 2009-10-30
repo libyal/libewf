@@ -21,7 +21,7 @@
  */
 
 #include <common.h>
-#include <endian.h>
+#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -87,9 +87,9 @@ int libewf_debug_dump_data(
 
 	crc_data = &data[ data_size - sizeof( ewf_crc_t ) ];
 
-	endian_little_convert_32bit(
-	 stored_crc,
-	 crc_data );
+	byte_stream_copy_to_uint32_little_endian(
+	 crc_data,
+	 stored_crc );
 
 	libnotify_printf(
 	 "%" PRIs_LIBEWF ":\n",
@@ -137,17 +137,17 @@ int libewf_debug_section_print(
 	                  sizeof( ewf_section_t ) - sizeof( ewf_crc_t ),
 	                  1 );
 
-	endian_little_convert_32bit(
-	 stored_crc,
-	 section->crc );
+	byte_stream_copy_to_uint32_little_endian(
+	 section->crc,
+	 stored_crc );
 
-	endian_little_convert_64bit(
-	 section_next,
-	 section->next );
+	byte_stream_copy_to_uint64_little_endian(
+	 section->next,
+	 section_next );
 
-	endian_little_convert_64bit(
-	 section_size,
-	 section->size );
+	byte_stream_copy_to_uint64_little_endian(
+	 section->size,
+	 section_size );
 
 	libnotify_printf(
 	 "Section:\n"

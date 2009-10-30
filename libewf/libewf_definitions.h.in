@@ -24,12 +24,12 @@
 #define _LIBEWF_INTERNAL_DEFINITIONS_H
 
 #include <common.h>
-#include <endian.h>
+#include <byte_stream.h>
 
-#define LIBEWF_ENDIAN_BIG	_ENDIAN_BIG
-#define LIBEWF_ENDIAN_LITTLE	_ENDIAN_LITTLE
+#define LIBEWF_ENDIAN_BIG			_BYTE_STREAM_ENDIAN_BIG
+#define LIBEWF_ENDIAN_LITTLE			_BYTE_STREAM_ENDIAN_LITTLE
 
-#define LIBEWF_2_TIB		0x20000000000ULL
+#define LIBEWF_2_TIB				0x20000000000ULL
 
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */

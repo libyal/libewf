@@ -1734,9 +1734,10 @@ int libewf_handle_close(
 
 		return( -1 );
 	}
-	if( libbfio_pool_close_all(
-	     internal_handle->io_handle->file_io_pool,
-	     error ) != 0 )
+	if( ( internal_handle->io_handle->pool_created_in_library != 0 )
+	 && ( libbfio_pool_close_all(
+	       internal_handle->io_handle->file_io_pool,
+	       error ) != 0 ) )
 	{
 		liberror_error_set(
 		 error,
@@ -1778,6 +1779,17 @@ off64_t libewf_handle_seek_offset(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->media_values == NULL )
 	{
 		liberror_error_set(
@@ -2026,6 +2038,17 @@ ssize_t libewf_handle_read_chunk(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->chunk_cache == NULL )
 	{
 		liberror_error_set(
@@ -2105,6 +2128,17 @@ ssize_t libewf_handle_read_buffer(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->media_values == NULL )
 	{
 		liberror_error_set(
@@ -2339,6 +2373,17 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->chunk_cache == NULL )
 	{
 		liberror_error_set(
@@ -2466,6 +2511,17 @@ ssize_t libewf_handle_write_chunk(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->media_values == NULL )
 	{
 		liberror_error_set(
@@ -2669,6 +2725,17 @@ ssize_t libewf_handle_write_buffer(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->write_io_handle == NULL )
 	{
 		liberror_error_set(
@@ -3015,6 +3082,17 @@ int libewf_handle_get_offset(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->media_values == NULL )
 	{
 		liberror_error_set(
@@ -4412,6 +4490,17 @@ int libewf_internal_handle_add_segment_file(
 
 		return( -1 );
 	}
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( file_io_pool_entry < 0 )
 	{
 		liberror_error_set(
@@ -4827,6 +4916,17 @@ int libewf_internal_handle_set_format(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
 		 function );
 
 		return( -1 );

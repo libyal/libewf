@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <endian.h>
 #include <memory.h>
 #include <types.h>
 

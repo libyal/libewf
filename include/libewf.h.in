@@ -105,7 +105,7 @@ LIBEWF_EXTERN int libewf_check_file_signature_wide(
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBEWF_EXTERN int libewf_check_file_signature_file_io_handle(
-                   libbfio_handle_t *bfio_handle,
+                   libbfio_handle_t *file_io_handle,
                    libewf_error_t **error );
 #endif
 #endif

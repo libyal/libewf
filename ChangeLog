@@ -206,6 +206,11 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * check make distclean
 
+20091030
+* changed endian.h into byte_stream.h
+* updated libuna, libbfio
+* updated behavior of unmanaged file io handle
+
 20091024
 * add falign in device handle, small performance improvement
 

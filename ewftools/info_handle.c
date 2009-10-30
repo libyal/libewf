@@ -21,7 +21,7 @@
  */
 
 #include <common.h>
-#include <endian.h>
+#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -1869,7 +1869,7 @@ int info_handle_media_information_fprint(
 		else if( guid_to_string(
 		          guid,
 		          GUID_SIZE,
-		          _ENDIAN_LITTLE,
+		          _BYTE_STREAM_ENDIAN_LITTLE,
 		          guid_string,
 		          GUID_STRING_SIZE,
 		          NULL ) != 1 )

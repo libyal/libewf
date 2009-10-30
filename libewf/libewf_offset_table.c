@@ -21,7 +21,7 @@
  */
 
 #include <common.h>
-#include <endian.h>
+#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -290,7 +290,7 @@ int libewf_offset_table_fill(
 	uint32_t current_offset             = 0;
 	uint32_t next_offset                = 0;
 	uint32_t raw_offset                 = 0;
-	uint32_t iterator                   = 0;
+	uint32_t offset_iterator            = 0;
 	uint8_t compressed                  = 0;
 	uint8_t corrupted                   = 0;
 	uint8_t overflow                    = 0;
@@ -359,13 +359,13 @@ int libewf_offset_table_fill(
 			return( -1 );
 		}
 	}
-	endian_little_convert_32bit(
-	 raw_offset,
-	 offsets[ iterator ].offset );
+	byte_stream_copy_to_uint32_little_endian(
+	 offsets[ offset_iterator ].offset,
+	 raw_offset );
 
 	/* The size of the last chunk must be determined differently
 	 */
-	while( iterator < ( amount_of_chunks - 1 ) )
+	while( offset_iterator < ( amount_of_chunks - 1 ) )
 	{
 		if( overflow == 0 )
 		{
@@ -376,9 +376,9 @@ int libewf_offset_table_fill(
 		{
 			current_offset = raw_offset;
 		}
-		endian_little_convert_32bit(
-		 raw_offset,
-		 offsets[ iterator + 1 ].offset );
+		byte_stream_copy_to_uint32_little_endian(
+		 offsets[ offset_iterator + 1 ].offset,
+		 raw_offset );
 
 		if( overflow == 0 )
 		{
@@ -504,11 +504,11 @@ int libewf_offset_table_fill(
 			overflow   = 1;
 			compressed = 0;
 		}
-		iterator++;
+		offset_iterator++;
 	}
-	endian_little_convert_32bit(
-	 raw_offset,
-	 offsets[ iterator ].offset );
+	byte_stream_copy_to_uint32_little_endian(
+	 offsets[ offset_iterator ].offset,
+	 raw_offset );
 
 	if( overflow == 0 )
 	{
@@ -750,7 +750,7 @@ int libewf_offset_table_fill_offsets(
 	static char *function               = "libewf_offset_table_fill_offsets";
 	off64_t offset64_value              = 0;
 	uint32_t offset32_value             = 0;
-	uint32_t iterator                   = 0;
+	uint32_t offset_iterator            = 0;
 
 	if( offset_table == NULL )
 	{
@@ -807,9 +807,11 @@ int libewf_offset_table_fill_offsets(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < amount_of_chunk_offsets; iterator++ )
+	for( offset_iterator = 0;
+	     offset_iterator < amount_of_chunk_offsets;
+	     offset_iterator++ )
 	{
-		chunk_offset   = &( offset_table->chunk_offset[ offset_table_index + iterator ] );
+		chunk_offset   = &( offset_table->chunk_offset[ offset_table_index + offset_iterator ] );
 		offset64_value = chunk_offset->file_offset - base_offset;
 
 		if( ( offset64_value < 0 )
@@ -830,8 +832,8 @@ int libewf_offset_table_fill_offsets(
 		{
 			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
-		endian_little_revert_32bit(
-		 offsets[ iterator ].offset,
+		byte_stream_copy_from_uint32_little_endian(
+		 offsets[ offset_iterator ].offset,
 		 offset32_value );
 	}
 	return( 1 );
@@ -860,7 +862,7 @@ int libewf_offset_table_compare(
 	uint32_t current_offset             = 0;
 	uint32_t next_offset                = 0;
 	uint32_t raw_offset                 = 0;
-	uint32_t iterator                   = 0;
+	uint32_t offset_iterator            = 0;
 	uint8_t compressed                  = 0;
 	uint8_t corrupted                   = 0;
 	uint8_t mismatch                    = 0;
@@ -928,13 +930,13 @@ int libewf_offset_table_compare(
 
 		return( -1 );
 	}
-	endian_little_convert_32bit(
-	 raw_offset,
-	 offsets[ iterator ].offset );
+	byte_stream_copy_to_uint32_little_endian(
+	 offsets[ offset_iterator ].offset,
+	 raw_offset );
 
 	/* The size of the last chunk must be determined differently
 	 */
-	while( iterator < ( amount_of_chunks - 1 ) )
+	while( offset_iterator < ( amount_of_chunks - 1 ) )
 	{
 		if( overflow == 0 )
 		{
@@ -945,9 +947,9 @@ int libewf_offset_table_compare(
 		{
 			current_offset = raw_offset;
 		}
-		endian_little_convert_32bit(
-		 raw_offset,
-		 offsets[ iterator + 1 ].offset );
+		byte_stream_copy_to_uint32_little_endian(
+		 offsets[ offset_iterator + 1 ].offset,
+		 raw_offset );
 
 		if( overflow == 0 )
 		{
@@ -1117,11 +1119,11 @@ int libewf_offset_table_compare(
 			overflow   = 1;
 			compressed = 0;
 		}
-		iterator++;
+		offset_iterator++;
 	}
-	endian_little_convert_32bit(
-	 raw_offset,
-	 offsets[ iterator ].offset );
+	byte_stream_copy_to_uint32_little_endian(
+	 offsets[ offset_iterator ].offset,
+	 raw_offset );
 
 	if( overflow == 0 )
 	{

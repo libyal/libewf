@@ -21,7 +21,7 @@
  */
 
 #include <common.h>
-#include <endian.h>
+#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -159,9 +159,9 @@ ssize_t libewf_segment_file_read_file_header(
 
 		return( -1 );
 	}
-	endian_little_convert_16bit(
-	 *segment_number,
-	 file_header.fields_segment );
+	byte_stream_copy_to_uint16_little_endian(
+	 file_header.fields_segment,
+	 *segment_number );
 
 	return( read_count );
 }
@@ -810,7 +810,7 @@ ssize_t libewf_segment_file_write_start(
 
 		return( -1 );
 	}
-	endian_little_revert_16bit(
+	byte_stream_copy_from_uint16_little_endian(
 	 file_header.fields_segment,
 	 segment_number );
 
@@ -1544,7 +1544,7 @@ ssize_t libewf_segment_file_write_chunk(
 
 			return( -1 );
 		}
-		endian_little_revert_32bit(
+		byte_stream_copy_from_uint32_little_endian(
 		 crc_buffer,
 		 *chunk_crc );
 

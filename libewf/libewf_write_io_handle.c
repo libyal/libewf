@@ -21,7 +21,7 @@
  */
 
 #include <common.h>
-#include <endian.h>
+#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -1618,7 +1618,7 @@ ssize_t libewf_write_io_handle_process_chunk(
 		{
 			chunk_data_crc = &( chunk_data[ chunk_data_size ] );
 
-			endian_little_revert_32bit(
+			byte_stream_copy_from_uint32_little_endian(
 			 chunk_data_crc,
 			 *chunk_crc );
 

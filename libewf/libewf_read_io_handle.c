@@ -21,7 +21,7 @@
  */
 
 #include <common.h>
-#include <endian.h>
+#include <byte_stream.h>
 #include <types.h>
 
 #include <liberror.h>
@@ -227,9 +227,9 @@ ssize_t libewf_read_io_handle_process_chunk(
 			chunk_buffer_size -= sizeof( ewf_crc_t );
 			crc_buffer         = &( chunk_buffer[ chunk_buffer_size ] );
 
-			endian_little_convert_32bit(
-			 chunk_crc,
-			 crc_buffer );
+			byte_stream_copy_to_uint32_little_endian(
+			 crc_buffer,
+			 chunk_crc );
 		}
 		calculated_crc = ewf_crc_calculate(
 		                  chunk_buffer,
@@ -583,9 +583,9 @@ ssize_t libewf_read_io_handle_read_chunk(
 			}
 			total_read_count += read_count;
 		}
-		endian_little_convert_32bit(
-		 *chunk_crc,
-		 crc_buffer );
+		byte_stream_copy_to_uint32_little_endian(
+		 crc_buffer,
+		 *chunk_crc );
 	}
 	return( total_read_count );
 }
