@@ -2,7 +2,7 @@
  * Byte stream functions
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations. All rights reserved.
+ * Hoffmann Investigations.
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -50,12 +50,12 @@ typedef union byte_stream_float64
 #define byte_stream_copy_to_uint16_big_endian( byte_stream, value ) \
 	value   = ( byte_stream )[ 0 ]; \
 	value <<= 8; \
-	value  |= ( byte_stream )[ 1 ]
+	value  |= ( byte_stream )[ 1 ];
 
 #define byte_stream_copy_to_uint16_little_endian( byte_stream, value ) \
 	value   = ( byte_stream )[ 1 ]; \
 	value <<= 8; \
-	value  |= ( byte_stream )[ 0 ]
+	value  |= ( byte_stream )[ 0 ];
 
 #define byte_stream_copy_to_uint32_big_endian( byte_stream, value ) \
 	value   = ( byte_stream )[ 0 ]; \
@@ -64,7 +64,7 @@ typedef union byte_stream_float64
 	value <<= 8; \
 	value  |= ( byte_stream )[ 2 ]; \
 	value <<= 8; \
-	value  |= ( byte_stream )[ 3 ]
+	value  |= ( byte_stream )[ 3 ];
 
 #define byte_stream_copy_to_uint32_little_endian( byte_stream, value ) \
 	value   = ( byte_stream )[ 3 ]; \
@@ -73,7 +73,7 @@ typedef union byte_stream_float64
 	value <<= 8; \
 	value  |= ( byte_stream )[ 1 ]; \
 	value <<= 8; \
-	value  |= ( byte_stream )[ 0 ]
+	value  |= ( byte_stream )[ 0 ];
 
 #define byte_stream_copy_to_uint64_big_endian( byte_stream, value ) \
 	value   = ( byte_stream )[ 0 ]; \
@@ -90,7 +90,7 @@ typedef union byte_stream_float64
 	value <<= 8; \
 	value  |= ( byte_stream )[ 6 ]; \
 	value <<= 8; \
-	value  |= ( byte_stream )[ 7 ]
+	value  |= ( byte_stream )[ 7 ];
 
 #define byte_stream_copy_to_uint64_little_endian( byte_stream, value ) \
 	value   = ( byte_stream )[ 7 ]; \
@@ -107,7 +107,7 @@ typedef union byte_stream_float64
 	value <<= 8; \
 	value  |= ( byte_stream )[ 1 ]; \
 	value <<= 8; \
-	value  |= ( byte_stream )[ 0 ]
+	value  |= ( byte_stream )[ 0 ];
 
 #define byte_stream_copy_from_uint16_big_endian( byte_stream, value ) \
 	( byte_stream )[ 0 ] = (uint8_t) ( ( value >> 8 ) & 0x0ff ); \

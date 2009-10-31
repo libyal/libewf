@@ -37,6 +37,8 @@
 
 #if defined( HAVE_V1_API )
 
+#if !defined( HAVE_LOCAL_LIBEWF )
+
 /* Set the notify values
  */
 void libewf_set_notify_values(
@@ -65,6 +67,8 @@ void libewf_set_notify_values(
 	libewf_notify_set_verbose(
 	 verbose );
 }
+
+#endif
 
 /* Signals the libewf handle to abort its current activity
  * Returns 1 if successful or -1 on error

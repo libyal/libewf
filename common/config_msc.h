@@ -62,18 +62,12 @@
  */
 
 /* Enable verbose output
-#define HAVE_VERBOSE_OUTPUT     1
+#define HAVE_VERBOSE_OUTPUT	1
  */
 
 /* Enable debug output
-#define HAVE_DEBUG_OUTPUT       1
+#define HAVE_DEBUG_OUTPUT	1
  */
-
-#define HAVE_V1_API		1
-
-/* Enable version 2 API
-#define HAVE_V2_API		1
-*/
 
 #endif
 

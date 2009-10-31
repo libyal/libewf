@@ -69,7 +69,5 @@
 #define HAVE_DEBUG_OUTPUT       1
  */
 
-#define HAVE_V1_API		1
-
 #endif
 

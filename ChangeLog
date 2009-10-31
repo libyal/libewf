@@ -206,6 +206,9 @@ Next stable release:
 * check into resume write error for 32-bit compile
 * check make distclean
 
+20091031
+* fix for local use of libewf
+
 20091030
 * changed endian.h into byte_stream.h
 * updated libuna, libbfio
