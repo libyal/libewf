@@ -198,13 +198,13 @@ Work in progress:
 Beta after next stable release
 * remove DISABLED in ewfexport
 * move manuals/ewfexport.1.backup to manuals/ewfexport.1
+* check into resume write error for 32-bit compile
+* check make distclean
 
 Next stable release:
 * full test
 * remove/disable --enable-v1-api from configure
 * remove/disable ewfdebug
-* check into resume write error for 32-bit compile
-* check make distclean
 
 20091031
 * fix for local use of libewf
