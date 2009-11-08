@@ -148,6 +148,7 @@ ewftools:
   - handle different input and ouput chunk sizes in low level functions build
   - allow different input and output header codepages?
   - handle ewf/raw like in smioexport
+  - creates write only raw export file with msvscpp compilation
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -205,6 +206,14 @@ Next stable release:
 * full test
 * remove/disable --enable-v1-api from configure
 * remove/disable ewfdebug
+
+TODO
+* fix borland c compilation (libuna)
+
+20091108
+* fix for MSVSCPP compilation
+* fixed incorrect return value in libsystem_glob
+* fix for print of program name
 
 20091031
 * fix for local use of libewf

@@ -122,19 +122,19 @@ int guid_generate(
 #endif
 	}
 #if defined( WINAPI )
-	endian_little_revert_32bit(
+	byte_stream_copy_from_uint32_little_endian(
 	 guid,
 	 uuid.Data1 );
 
 	guid += 4;
 
-	endian_little_revert_16bit(
+	byte_stream_copy_from_uint16_little_endian(
 	 guid,
 	 uuid.Data2 );
 
 	guid += 2;
 
-	endian_little_revert_16bit(
+	byte_stream_copy_from_uint16_little_endian(
 	 guid,
 	 uuid.Data3 );
 

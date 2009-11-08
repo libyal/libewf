@@ -1347,7 +1347,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "\n%s: SUCCESS\n",
+		 "\n%" PRIs_LIBSYSTEM ": SUCCESS\n",
 		 program );
 
 		result = EXIT_SUCCESS;
@@ -1356,7 +1356,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "\n%s: FAILURE\n",
+		 "\n%" PRIs_LIBSYSTEM ": FAILURE\n",
 		 program );
 
 		result = EXIT_FAILURE;

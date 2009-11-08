@@ -612,7 +612,7 @@ int main( int argc, char * const argv[] )
 	if( ewfinfo_abort != 0 )
 	{
 		fprintf(
-		 stdout, "%s: ABORTED\n",
+		 stdout, "%" PRIs_LIBSYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

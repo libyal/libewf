@@ -485,7 +485,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "%s: ABORTED\n",
+		 "%" PRIs_LIBSYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );
