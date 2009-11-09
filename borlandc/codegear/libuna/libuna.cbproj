@@ -37,6 +37,14 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
+			<CppCompile Include="..\..\..\libuna\libuna_base64_stream.c">
+			</CppCompile>
+			<None Include="..\..\..\libuna\libuna_base64_stream.h">
+			</None>
+			<CppCompile Include="..\..\..\libuna\libuna_base64url_stream.c">
+			</CppCompile>
+			<None Include="..\..\..\libuna\libuna_base64url_stream.h">
+			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_byte_stream.c">
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_byte_stream.h">
