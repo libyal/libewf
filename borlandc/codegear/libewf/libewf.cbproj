@@ -91,6 +91,8 @@
 			</None>
 			<None Include="..\..\..\libewf\libewf_chunk_offset.h">
 			</None>
+			<None Include="..\..\..\libewf\libewf_codepage.h">
+			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_compression.c">
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_compression.h">

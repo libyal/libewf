@@ -28,6 +28,7 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_codepage.h"
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
 #include "libewf_handle.h"

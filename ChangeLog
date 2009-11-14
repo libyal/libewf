@@ -207,6 +207,11 @@ Next stable release:
 * remove/disable --enable-v1-api from configure
 * remove/disable ewfdebug
 
+20091114
+* moved codepage definitions to libewf_codepage.h
+* updated libbfio
+* updated MacOS-X package project file
+
 20091109
 * fix for borland c compilation
 * update to MSVSCPP project files

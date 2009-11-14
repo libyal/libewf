@@ -292,6 +292,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_codepage.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_compression.h"
 				>
 			</File>

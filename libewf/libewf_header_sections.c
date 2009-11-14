@@ -26,6 +26,7 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_codepage.h"
 #include "libewf_definitions.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"

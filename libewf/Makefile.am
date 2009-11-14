@@ -1,4 +1,11 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror -I$(top_srcdir)/libnotify @LIBUNA_CPPFLAGS@ @LIBBFIO_CPPFLAGS@ @MEMWATCH_CPPFLAGS@
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/common \
+	-I$(top_srcdir)/liberror \
+	-I$(top_srcdir)/libnotify \
+	@LIBUNA_CPPFLAGS@ \
+	@LIBBFIO_CPPFLAGS@ \
+	@MEMWATCH_CPPFLAGS@
 
 lib_LTLIBRARIES = libewf.la
 
@@ -20,6 +27,7 @@ libewf_la_SOURCES = \
 	libewf.c \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
 	libewf_chunk_offset.h \
+	libewf_codepage.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_date_time.c libewf_date_time.h \
 	libewf_date_time_values.c libewf_date_time_values.h \
@@ -57,7 +65,11 @@ libewf_la_SOURCES = \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h
 
-libewf_la_LIBADD  = ../liberror/liberror.la ../libnotify/libnotify.la @LIBUNA_LIBADD@ @LIBBFIO_LIBADD@
+libewf_la_LIBADD = \
+	../liberror/liberror.la \
+	../libnotify/libnotify.la \
+	@LIBUNA_LIBADD@ \
+	@LIBBFIO_LIBADD@
 
 if HAVE_V2_API
 libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
