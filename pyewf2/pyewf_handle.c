@@ -241,7 +241,6 @@ int pyewf_handle_initialize(
      pyewf_handle_t *pyewf_handle,
      liberror_error_t **error )
 {
-#if defined( HAVE_V2_API )
 	static char *function = "pyewf_handle_initialize";
 
 	if( libewf_handle_initialize(
@@ -259,7 +258,6 @@ int pyewf_handle_initialize(
 
 		return( -1 );
 	}
-#endif
 	return( 1 );
 }
 
@@ -278,11 +276,8 @@ void pyewf_handle_free(
 PyObject* pyewf_handle_signal_abort(
            pyewf_handle_t *pyewf_handle )
 {
-	static char *function   = "pyewf_handle_signal_abort";
-
-#if defined( HAVE_V2_API )
 	liberror_error_t *error = NULL;
-#endif
+	static char *function   = "pyewf_handle_signal_abort";
 
 	if( pyewf_handle == NULL )
 	{
@@ -302,7 +297,6 @@ PyObject* pyewf_handle_signal_abort(
 
 		return( NULL );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_signal_abort(
 	     pyewf_handle->handle,
 	     &error ) != 0 )
@@ -319,18 +313,6 @@ PyObject* pyewf_handle_signal_abort(
 
 		return( NULL );
 	}
-#else
-	if( libewf_signal_abort(
-	     pyewf_handle->handle ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to signal abort.",
-		 function );
-
-		return( NULL );
-	}
-#endif
 	return( Py_None );
 }
 
@@ -342,6 +324,7 @@ PyObject* pyewf_handle_open(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error     = NULL;
 	char **filenames            = NULL;
 	static char *keyword_list[] = { "files", NULL };
 	PyObject *sequence_object   = NULL;
@@ -350,10 +333,6 @@ PyObject* pyewf_handle_open(
 	size_t filename_size        = 0;
 	int amount_of_filenames     = 0;
 	int filename_iterator       = 0;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error     = NULL;
-#endif
 
 	if( pyewf_handle == NULL )
 	{
@@ -480,7 +459,6 @@ PyObject* pyewf_handle_open(
 		Py_DECREF(
 		 string_object );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open(
 	     pyewf_handle->handle,
              filenames,
@@ -508,31 +486,9 @@ PyObject* pyewf_handle_open(
 
 		return( NULL );
 	}
-#else
-	pyewf_handle->handle = libewf_open(
-	                        filenames,
-	                        amount_of_filenames,
-	                        LIBEWF_OPEN_READ );
-
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to open file(s).",
-		 function );
-
-		for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
-		{
-			memory_free(
-			 filenames[ filename_iterator ] );
-		}
-		memory_free(
-		 filenames );
-
-		return( NULL );
-	}
-#endif
-	for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+	for( filename_iterator = 0;
+	     filename_iterator < amount_of_filenames;
+	     filename_iterator++ )
 	{
 		memory_free(
 		 filenames[ filename_iterator ] );
@@ -549,11 +505,8 @@ PyObject* pyewf_handle_open(
 PyObject* pyewf_handle_close(
            pyewf_handle_t *pyewf_handle )
 {
-	static char *function   = "pyewf_handle_close";
-
-#if defined( HAVE_V2_API )
 	liberror_error_t *error = NULL;
-#endif
+	static char *function   = "pyewf_handle_close";
 
 	if( pyewf_handle == NULL )
 	{
@@ -573,7 +526,6 @@ PyObject* pyewf_handle_close(
 
 		return( NULL );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_close(
 	     pyewf_handle->handle,
 	     &error ) != 0 )
@@ -606,19 +558,6 @@ PyObject* pyewf_handle_close(
 
 		return( NULL );
 	}
-#else
-	if( libewf_close(
-	     pyewf_handle->handle ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to close file(s).",
-		 function );
-
-		return( NULL );
-	}
-	pyewf_handle->handle = NULL;
-#endif
 	return( Py_None );
 }
 
@@ -630,15 +569,12 @@ PyObject* pyewf_handle_read_buffer(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
 	ssize_t read_count          = 0;
 	int read_size               = -1;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error     = NULL;
-#endif
 
 	if( pyewf_handle == NULL )
 	{
@@ -691,7 +627,6 @@ PyObject* pyewf_handle_read_buffer(
 	               NULL,
 	               read_size );
 
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_buffer(
 	              pyewf_handle->handle,
 	              PyString_AsString(
@@ -715,25 +650,6 @@ PyObject* pyewf_handle_read_buffer(
 
 		return( NULL );
 	}
-#else
-	read_count = libewf_read_buffer(
-	              pyewf_handle->handle,
-	              PyString_AsString(
-	               result_data ),
-	              (size_t) read_size );
-
-	if( read_count != (ssize_t) read_size )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to read data (requested %d, returned %" PRIzd ").",
-		 function,
-		 read_size,
-		 read_count );
-
-		return( NULL );
-	}
-#endif
 	return( result_data );
 }
 
@@ -745,16 +661,13 @@ PyObject* pyewf_handle_read_random(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
 	ssize_t read_count          = 0;
 	off64_t read_offset         = 0;
 	int read_size               = 0;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error     = NULL;
-#endif
 
 	if( pyewf_handle == NULL )
 	{
@@ -808,7 +721,6 @@ PyObject* pyewf_handle_read_random(
 	               NULL,
 	               read_size );
 
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_random(
 	              pyewf_handle->handle,
 	              PyString_AsString(
@@ -833,26 +745,6 @@ PyObject* pyewf_handle_read_random(
 
 		return( NULL );
 	}
-#else
-	read_count = libewf_read_random(
-	              pyewf_handle->handle,
-	              PyString_AsString(
-	               result_data ),
-	              (size_t) read_size,
-	              (off64_t) read_offset );
-
-	if( read_count != (ssize_t) read_size )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to read data (requested %d, returned %" PRIzd ").",
-		 function,
-		 read_size,
-		 read_count );
-
-		return( NULL );
-	}
-#endif
 	return( result_data );
 }
 
@@ -864,15 +756,12 @@ PyObject* pyewf_handle_write_buffer(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_write_buffer";
 	static char *keyword_list[] = { "size", NULL };
 	ssize_t write_count         = 0;
 	int write_size              = -1;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error     = NULL;
-#endif
 
 	if( pyewf_handle == NULL )
 	{
@@ -925,7 +814,6 @@ PyObject* pyewf_handle_write_buffer(
 	               NULL,
 	               write_size );
 
-#if defined( HAVE_V2_API )
 	write_count = libewf_handle_write_buffer(
 	               pyewf_handle->handle,
 	               PyString_AsString(
@@ -949,25 +837,6 @@ PyObject* pyewf_handle_write_buffer(
 
 		return( NULL );
 	}
-#else
-	write_count = libewf_write_buffer(
-	               pyewf_handle->handle,
-	               PyString_AsString(
-	                result_data ),
-	               write_size );
-
-	if( write_count != (ssize_t) write_size )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to write data (requested %" PRId32 ", returned %" PRIzd ").",
-		 function,
-		 write_size,
-		 write_count );
-
-		return( NULL );
-	}
-#endif
 	return( result_data );
 }
 
@@ -979,17 +848,11 @@ PyObject* pyewf_handle_seek_offset(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error     = NULL;
 	static char *function       = "pyewf_handle_seek_offset";
 	static char *keyword_list[] = { "offset", "whence", NULL };
 	off64_t offset              = 0;
 	int whence                  = 0;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error     = NULL;
-#else
-	off64_t current_offset      = 0;
-	size64_t media_size         = 0;
-#endif
 
 	if( pyewf_handle == NULL )
 	{
@@ -1018,7 +881,6 @@ PyObject* pyewf_handle_seek_offset(
 	{
 		return( NULL );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_seek_offset(
 	     pyewf_handle->handle,
 	     offset,
@@ -1037,69 +899,6 @@ PyObject* pyewf_handle_seek_offset(
 
 		return( NULL );
 	}
-#else
-	current_offset = libewf_get_offset(
-	                  pyewf_handle->handle );
-
-	if( current_offset < 0 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve offset.",
-		 function );
-
-		return( NULL );
-	}
-	if( libewf_get_media_size(
-	     pyewf_handle->handle,
-	     &media_size ) != 1 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve media size.",
-		 function );
-
-		return( NULL );
-	}
-	switch( whence )
-	{
-		case 0:
-			current_offset = offset;
-
-			break;
-
-		case 1:
-			current_offset += offset;
-
-			break;
-
-		case 2:
-			current_offset = media_size + offset;
-
-			break;
-
-		default:
-			PyErr_Format(
-			 PyExc_ValueError,
-			 "%s: invalid argument whence: %d.",
-			 function,
-			 whence );
-
-			return( NULL );
-	}
-	if( libewf_seek_offset(
-	     pyewf_handle->handle,
-	     current_offset ) < 0 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to seek offset: %" PRIu64 ".",
-		 function,
-		 current_offset );
-
-		return( NULL );
-	}
-#endif
 	return( Py_None );
 }
 
@@ -1109,14 +908,10 @@ PyObject* pyewf_handle_seek_offset(
 PyObject* pyewf_handle_get_offset(
            pyewf_handle_t *pyewf_handle )
 {
+	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_get_offset";
 	off64_t current_offset  = 0;
 
-#if defined( HAVE_V2_API )
-	liberror_error_t *error = NULL;
-#endif
-
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_offset(
 	     pyewf_handle->handle,
 	     &current_offset,
@@ -1134,20 +929,6 @@ PyObject* pyewf_handle_get_offset(
 
 		return( NULL );
 	}
-#else
-	current_offset = libewf_get_offset(
-	                  pyewf_handle->handle );
-
-	if( current_offset < 0 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve offset.",
-		 function );
-
-		return( NULL );
-	}
-#endif
 	return( PyLong_FromLongLong(
 	         current_offset ) );
 }

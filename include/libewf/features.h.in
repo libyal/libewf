@@ -35,5 +35,13 @@
 #define LIBEWF_HAVE_BFIO			1
 #endif
 
+#if !defined( LIBEWF_DEPRECATED )
+#if defined( __GNUC__ ) && __GNUC__ >= 3
+#define LIBEWF_DEPRECATED       __attribute__ ((__deprecated__))
+#else
+#define LIBEWF_DEPRECATED
+#endif
+#endif
+
 #endif
 

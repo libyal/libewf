@@ -113,7 +113,6 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_initialize(
 		     &( ( *export_handle )->input_handle ),
 		     error ) != 1 )
@@ -132,7 +131,6 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
-#endif
 		( *export_handle )->calculate_md5              = calculate_md5;
 		( *export_handle )->calculate_sha1             = calculate_sha1;
 		( *export_handle )->raw_output_file_descriptor = -1;
@@ -149,11 +147,9 @@ int export_handle_initialize(
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
-#if defined( HAVE_V2_API )
 			libewf_handle_free(
 			 &( ( *export_handle )->ewf_output_handle ),
 			 NULL );
-#endif
 			memory_free(
 			 *export_handle );
 
@@ -173,11 +169,9 @@ int export_handle_initialize(
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
-#if defined( HAVE_V2_API )
 			libewf_handle_free(
 			 &( ( *export_handle )->ewf_output_handle ),
 			 NULL );
-#endif
 			memory_free(
 			 *export_handle );
 
@@ -212,7 +206,6 @@ int export_handle_free(
 	}
 	if( *export_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( ( ( *export_handle )->input_handle != NULL )
 		 && ( libewf_handle_free(
 		       &( ( *export_handle )->input_handle ),
@@ -241,7 +234,6 @@ int export_handle_free(
 
 			result = -1;
 		}
-#endif
 		memory_free(
 		 *export_handle );
 
@@ -272,14 +264,9 @@ int export_handle_signal_abort(
 	}
 	if( export_handle->input_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_signal_abort(
 		     export_handle->input_handle,
 		     error ) != 1 )
-#else
-		if( libewf_signal_abort(
-		     export_handle->input_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -293,14 +280,9 @@ int export_handle_signal_abort(
 	}
 	if( export_handle->ewf_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_signal_abort(
 		     export_handle->ewf_output_handle,
 		     error ) != 1 )
-#else
-		if( libewf_signal_abort(
-		     export_handle->ewf_output_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -340,7 +322,6 @@ int export_handle_open_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( export_handle->input_handle == NULL )
 	{
 		liberror_error_set(
@@ -352,19 +333,6 @@ int export_handle_open_input(
 
 		return( -1 );
 	}
-#else
-	if( export_handle->input_handle != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid export handle - input handle already set.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( filenames == NULL )
 	{
 		liberror_error_set(
@@ -393,7 +361,6 @@ int export_handle_open_input(
 		                         filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -402,16 +369,6 @@ int export_handle_open_input(
 		     &amount_of_filenames,
 		     error ) != 1 )
 #else
-		amount_of_filenames = libewf_glob_wide(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
-#else
-#if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -419,15 +376,6 @@ int export_handle_open_input(
 		     &libewf_filenames,
 		     &amount_of_filenames,
 		     error ) != 1 )
-#else
-		amount_of_filenames = libewf_glob(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
 #endif
 		{
 			liberror_error_set(
@@ -442,7 +390,6 @@ int export_handle_open_input(
 		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     export_handle->input_handle,
 	     filenames,
@@ -450,29 +397,12 @@ int export_handle_open_input(
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
-	export_handle->input_handle = libewf_open_wide(
-	                               filenames,
-	                               amount_of_filenames,
-	                               LIBEWF_OPEN_READ );
-
-	if( export_handle->input_handle == NULL )
-#endif
-#else
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open(
 	     export_handle->input_handle,
 	     filenames,
 	     amount_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
-#else
-	export_handle->input_handle = libewf_open(
-	                               filenames,
-	                               amount_of_filenames,
-	                               LIBEWF_OPEN_READ );
-
-	if( export_handle->input_handle == NULL )
-#endif
 #endif
 	{
 		liberror_error_set(
@@ -494,16 +424,10 @@ int export_handle_open_input(
 		memory_free(
 		 libewf_filenames );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_chunk_size(
 	     export_handle->input_handle,
 	     &( export_handle->input_chunk_size ),
 	     error ) != 1 )
-#else
-	if( libewf_get_chunk_size(
-	     export_handle->input_handle,
-	     &( export_handle->input_chunk_size ) ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -579,7 +503,6 @@ int export_handle_open_output(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_initialize(
 		     &( export_handle->ewf_output_handle ),
 		     error ) != 1 )
@@ -593,11 +516,9 @@ int export_handle_open_output(
 
 			return( -1 );
 		}
-#endif
 		filenames[ 0 ] = (libsystem_character_t *) filename;
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 		if( libewf_handle_open_wide(
 		     export_handle->ewf_output_handle,
 		     filenames,
@@ -605,29 +526,12 @@ int export_handle_open_output(
 		     LIBEWF_OPEN_WRITE,
 		     error ) != 1 )
 #else
-		export_handle->ewf_output_handle = libewf_open_wide(
-		                                     filenames,
-		                                     1,
-		                                     LIBEWF_OPEN_WRITE );
-
-		if( export_handle->ewf_output_handle == NULL )
-#endif
-#else
-#if defined( HAVE_V2_API )
 		if( libewf_handle_open(
 		     export_handle->ewf_output_handle,
 		     filenames,
 		     1,
 		     LIBEWF_OPEN_WRITE,
 		     error ) != 1 )
-#else
-		export_handle->ewf_output_handle = libewf_open(
-		                                     filenames,
-		                                     1,
-		                                     LIBEWF_OPEN_WRITE );
-
-		if( export_handle->ewf_output_handle == NULL )
-#endif
 #endif
 		{
 			liberror_error_set(
@@ -714,14 +618,9 @@ int export_handle_close(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_close(
 	     export_handle->input_handle,
 	     error ) != 0 )
-#else
-	if( libewf_close(
-	     export_handle->input_handle ) != 0 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -732,20 +631,11 @@ int export_handle_close(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	export_handle->input_handle = NULL;
-#endif
-
 	if( export_handle->ewf_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_close(
 		     export_handle->ewf_output_handle,
 		     error ) != 0 )
-#else
-		if( libewf_close(
-		     export_handle->ewf_output_handle ) != 0 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -756,11 +646,7 @@ int export_handle_close(
 
 			return( -1 );
 		}
-#if !defined( HAVE_V2_API )
-		export_handle->ewf_output_handle = NULL;
-#endif
 	}
-
 	if( export_handle->raw_output_file_descriptor != -1 )
 	{
 		if( libsystem_file_io_close(
@@ -827,7 +713,6 @@ ssize_t export_handle_prepare_read_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
-#if defined( HAVE_V2_API )
 	process_count = libewf_handle_prepare_read_chunk(
 	                 export_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
@@ -838,17 +723,7 @@ ssize_t export_handle_prepare_read_buffer(
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
 	                 error );
-#else
-	process_count = libewf_raw_read_prepare_buffer(
-	                 export_handle->input_handle,
-	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
-	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
-	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->crc,
-	                 storage_media_buffer->process_crc );
-#endif
+
 	if( process_count == -1 )
 	{
 		liberror_error_free(
@@ -969,7 +844,6 @@ ssize_t export_handle_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_chunk(
                       export_handle->input_handle,
                       storage_media_buffer->compression_buffer,
@@ -980,28 +854,13 @@ ssize_t export_handle_read_buffer(
 	              &( storage_media_buffer->process_crc ),
 	              error );
 #else
-	read_count = libewf_raw_read_buffer(
-	              export_handle->input_handle,
-	              storage_media_buffer->compression_buffer,
-	              storage_media_buffer->compression_buffer_size,
-	              &( storage_media_buffer->is_compressed ),
-	              &( storage_media_buffer->crc ),
-	              &( storage_media_buffer->process_crc ) );
-#endif
-#else
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_buffer(
                       export_handle->input_handle,
                       storage_media_buffer->raw_buffer,
                       read_size,
 	              error );
-#else
-	read_count = libewf_read_buffer(
-                      export_handle->input_handle,
-                      storage_media_buffer->raw_buffer,
-                      read_size );
 #endif
-#endif
+
 	if( read_count == -1 )
 	{
 		liberror_error_set(
@@ -1071,7 +930,6 @@ ssize_t export_handle_prepare_write_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
 
-#if defined( HAVE_V2_API )
 		process_count = libewf_handle_prepare_write_chunk(
 				 export_handle->ewf_output_handle,
 				 storage_media_buffer->raw_buffer,
@@ -1082,17 +940,6 @@ ssize_t export_handle_prepare_write_buffer(
 				 &( storage_media_buffer->crc ),
 				 &( storage_media_buffer->process_crc ),
 				 error );
-#else
-		process_count = libewf_raw_write_prepare_buffer(
-				 export_handle->ewf_output_handle,
-				 storage_media_buffer->raw_buffer,
-				 storage_media_buffer->raw_buffer_amount,
-				 storage_media_buffer->compression_buffer,
-				 (size_t *) &( storage_media_buffer->compression_buffer_amount ),
-				 &( storage_media_buffer->is_compressed ),
-				 &( storage_media_buffer->crc ),
-				 &( storage_media_buffer->process_crc ) );
-#endif
 
 		if( process_count == -1 )
 		{
@@ -1194,7 +1041,6 @@ ssize_t export_handle_write_buffer(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		write_count = libewf_handle_write_chunk(
 			       export_handle->ewf_output_handle,
 			       raw_write_buffer,
@@ -1206,29 +1052,13 @@ ssize_t export_handle_write_buffer(
 			       storage_media_buffer->process_crc,
 			       error );
 #else
-		write_count = libewf_raw_write_buffer(
-			       export_handle->ewf_output_handle,
-			       raw_write_buffer,
-			       raw_write_buffer_size,
-			       storage_media_buffer->raw_buffer_amount,
-			       storage_media_buffer->is_compressed,
-			       storage_media_buffer->crc,
-			       storage_media_buffer->process_crc );
-#endif
-#else
-#if defined( HAVE_V2_API )
 		write_count = libewf_handle_write_buffer(
 			       export_handle->ewf_output_handle,
 			       storage_media_buffer->raw_buffer,
 			       write_size,
 			       error );
-#else
-		write_count = libewf_write_buffer(
-			       export_handle->ewf_output_handle,
-			       storage_media_buffer->raw_buffer,
-			       write_size );
 #endif
-#endif
+
 		if( write_count == -1 )
 		{
 			liberror_error_set(
@@ -1306,17 +1136,11 @@ off64_t export_handle_seek_offset(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_seek_offset(
 	     export_handle->input_handle,
 	     offset,
 	     SEEK_SET,
 	     error ) == -1 )
-#else
-	if( libewf_seek_offset(
-	     export_handle->input_handle,
-	     offset ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1568,16 +1392,10 @@ int export_handle_get_input_media_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_size(
 	     export_handle->input_handle,
 	     media_size,
 	     error ) != 1 )
-#else
-	if( libewf_get_media_size(
-	     export_handle->input_handle,
-	     media_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1684,16 +1502,10 @@ int export_handle_get_output_chunk_size(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_chunk_size(
 		     export_handle->ewf_output_handle,
 		     chunk_size,
 		     error ) != 1 )
-#else
-		if( libewf_get_chunk_size(
-		     export_handle->ewf_output_handle,
-		     chunk_size ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -1744,16 +1556,10 @@ int export_handle_set_header_codepage(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_codepage(
 	     export_handle->input_handle,
 	     header_codepage,
 	     error ) != 1 )
-#else
-	if( libewf_set_header_codepage(
-	     export_handle->input_handle,
-	     header_codepage ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1815,16 +1621,10 @@ int export_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_bytes_per_sector(
 	     export_handle->input_handle,
 	     &( export_handle->bytes_per_sector ),
 	     error ) != 1 )
-#else
-	if( libewf_get_bytes_per_sector(
-	     export_handle->input_handle,
-	     &( export_handle->bytes_per_sector ) ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1835,16 +1635,10 @@ int export_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_read_wipe_chunk_on_error(
 	     export_handle->input_handle,
 	     wipe_chunk_on_error,
 	     error ) != 1 )
-#else
-	if( libewf_set_read_wipe_chunk_on_error(
-	     export_handle->input_handle,
-	     wipe_chunk_on_error ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1868,31 +1662,10 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if !defined( HAVE_V2_API )
-		if( libewf_parse_header_values(
-		     export_handle->input_handle,
-		     LIBEWF_DATE_FORMAT_ISO8601 ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to parse header values.",
-			 function );
-
-			return( -1 );
-		}
-#endif
-#if defined( HAVE_V2_API )
 		if( libewf_handle_copy_header_values(
 		     export_handle->ewf_output_handle,
 		     export_handle->input_handle,
 		     error ) != 1 )
-#else
-		if( libewf_copy_header_values(
-		     export_handle->ewf_output_handle,
-		     export_handle->input_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -1960,16 +1733,10 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_header_codepage(
 		     export_handle->ewf_output_handle,
 		     header_codepage,
 		     error ) != 1 )
-#else
-		if( libewf_set_header_codepage(
-		     export_handle->ewf_output_handle,
-		     header_codepage ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -1980,16 +1747,10 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_copy_media_values(
 		     export_handle->ewf_output_handle,
 		     export_handle->input_handle,
 		     error ) != 1 )
-#else
-		if( libewf_copy_media_values(
-		     export_handle->ewf_output_handle,
-		     export_handle->input_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2000,16 +1761,10 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_media_size(
 		     export_handle->ewf_output_handle,
 		     media_size,
 		     error ) != 1 )
-#else
-		if( libewf_set_media_size(
-		     export_handle->ewf_output_handle,
-		     media_size ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2020,18 +1775,11 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_compression_values(
 		     export_handle->ewf_output_handle,
 		     compression_level,
 		     compression_flags,
 		     error ) != 1 )
-#else
-		if( libewf_set_compression_values(
-		     export_handle->ewf_output_handle,
-		     compression_level,
-		     compression_flags ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2054,16 +1802,10 @@ int export_handle_set_output_values(
 
 		/* Format needs to be set before segment file size
 		 */
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_format(
 		     export_handle->ewf_output_handle,
 		     libewf_format,
 		     error ) != 1 )
-#else
-		if( libewf_set_format(
-		     export_handle->ewf_output_handle,
-		     libewf_format ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2074,16 +1816,10 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_segment_file_size(
 		     export_handle->ewf_output_handle,
 		     segment_file_size,
 		     error ) != 1 )
-#else
-		if( libewf_set_segment_file_size(
-		     export_handle->ewf_output_handle,
-		     segment_file_size ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2094,16 +1830,10 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_sectors_per_chunk(
 		     export_handle->ewf_output_handle,
 		     sectors_per_chunk,
 		     error ) != 1 )
-#else
-		if( libewf_set_sectors_per_chunk(
-		     export_handle->ewf_output_handle,
-		     sectors_per_chunk ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2145,18 +1875,11 @@ int export_handle_set_output_values(
 
 				return( -1 );
 			}
-#if defined( HAVE_V2_API )
 			if( libewf_handle_set_guid(
 			     export_handle->ewf_output_handle,
 			     guid,
 			     16,
 			     error ) != 1 )
-#else
-			if( libewf_set_guid(
-			     export_handle->ewf_output_handle,
-			     guid,
-			     16 ) != 1 )
-#endif
 			{
 				liberror_error_set(
 				 error,
@@ -2258,7 +1981,6 @@ int export_handle_set_header_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_value(
 	     export_handle->ewf_output_handle,
 	     (uint8_t *) header_value_identifier,
@@ -2266,13 +1988,6 @@ int export_handle_set_header_value(
 	     utf8_header_value,
 	     utf8_header_value_size - 1,
 	     error ) != 1 )
-#else
-	if( libewf_set_header_value(
-	     export_handle->ewf_output_handle,
-	     header_value_identifier,
-	     (char *) utf8_header_value,
-	     utf8_header_value_size - 1 ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2378,7 +2093,6 @@ int export_handle_set_hash_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_hash_value(
 	     export_handle->ewf_output_handle,
 	     (uint8_t *) hash_value_identifier,
@@ -2386,13 +2100,6 @@ int export_handle_set_hash_value(
 	     utf8_hash_value,
 	     utf8_hash_value_size - 1,
 	     error ) != 1 )
-#else
-	if( libewf_set_hash_value(
-	     export_handle->ewf_output_handle,
-	     hash_value_identifier,
-	     (char *) utf8_hash_value,
-	     utf8_hash_value_size - 1 ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2465,18 +2172,11 @@ int export_handle_add_read_error(
 	amount_of_sectors = amount_of_bytes / export_handle->bytes_per_sector;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-#if defined( HAVE_V2_API )
 	if( libewf_handle_add_crc_error(
 	     export_handle->input_handle,
 	     start_sector,
 	     amount_of_sectors,
 	     error ) != 1 )
-#else
-	if( libewf_add_crc_error(
-	     export_handle->input_handle,
-	     (off64_t) start_sector,
-	     (uint32_t) amount_of_sectors ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2502,18 +2202,11 @@ int export_handle_add_read_error(
 			return( -1 );
 		}
 
-#if defined( HAVE_V2_API )
 		if( libewf_handle_add_acquiry_error(
 		     export_handle->ewf_output_handle,
 		     start_sector,
 		     amount_of_sectors,
 		     error ) != 1 )
-#else
-		if( libewf_add_acquiry_error(
-		     export_handle->ewf_output_handle,
-		     (off64_t) start_sector,
-		     (uint32_t) amount_of_sectors ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2684,14 +2377,9 @@ ssize_t export_handle_finalize(
 	}
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
-#if defined( HAVE_V2_API )
 		write_count = libewf_handle_write_finalize(
 		               export_handle->ewf_output_handle,
 	        	       error );
-#else
-		write_count = libewf_write_finalize(
-		               export_handle->ewf_output_handle );
-#endif
 
 		if( write_count == -1 )
 		{
@@ -2716,24 +2404,17 @@ int export_handle_crc_errors_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
+	libsystem_character_t *filename      = NULL;
+	libsystem_character_t *last_filename = NULL;
 	static char *function                = "export_handle_crc_errors_fprint";
+	size_t filename_size                 = 0;
+	size_t last_filename_size            = 0;
 	uint64_t start_sector                = 0;
 	uint64_t last_sector                 = 0;
-#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors           = 0;
-#else
-	uint32_t amount_of_sectors           = 0;
-#endif
 	uint32_t amount_of_errors            = 0;
 	uint32_t error_iterator              = 0;
 	int result                           = 1;
-
-#if defined( HAVE_V2_API )
-	libsystem_character_t *filename      = NULL;
-	libsystem_character_t *last_filename = NULL;
-	size_t filename_size                 = 0;
-	size_t last_filename_size            = 0;
-#endif
 
 	if( export_handle == NULL )
 	{
@@ -2768,16 +2449,10 @@ int export_handle_crc_errors_fprint(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_crc_errors(
 	     export_handle->input_handle,
 	     &amount_of_errors,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_crc_errors(
-	     export_handle->input_handle,
-	     &amount_of_errors ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2800,20 +2475,12 @@ int export_handle_crc_errors_fprint(
 		
 		for( error_iterator = 0; error_iterator < amount_of_errors; error_iterator++ )
 		{
-#if defined( HAVE_V2_API )
 			if( libewf_handle_get_crc_error(
 			     export_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
 			     &amount_of_sectors,
 			     error ) != 1 )
-#else
-			if( libewf_get_crc_error(
-			     export_handle->input_handle,
-			     error_iterator,
-			     (off64_t *) &start_sector,
-			     &amount_of_sectors ) != 1 )
-#endif
 			{
 				liberror_error_set(
 				 error,
@@ -2830,23 +2497,13 @@ int export_handle_crc_errors_fprint(
 			}
 			last_sector = start_sector + amount_of_sectors;
 
-#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu64 ")",
 			 start_sector,
 			 last_sector,
 			 amount_of_sectors );
-#else
-			fprintf(
-			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu32 ")",
-			 start_sector,
-			 last_sector,
-			 amount_of_sectors );
-#endif
 
-#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 " in segment file(s):" );
@@ -2993,7 +2650,7 @@ int export_handle_crc_errors_fprint(
 
 			last_filename      = NULL;
 			last_filename_size = 0;
-#endif
+
 			fprintf(
 			 stream,
 			 "\n" );

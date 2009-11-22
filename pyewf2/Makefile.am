@@ -1,4 +1,8 @@
-AM_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror @MEMWATCH_CPPFLAGS@
+AM_CFLAGS = \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/common \
+	-I$(top_srcdir)/liberror \
+	@MEMWATCH_CPPFLAGS@
 
 if HAVE_PYTHON
 

@@ -73,9 +73,5 @@
  */
 #define HAVE_V1_API		1
 
-/* Enable the v2 API
-#define HAVE_V2_API		1
- */
-
 #endif
 

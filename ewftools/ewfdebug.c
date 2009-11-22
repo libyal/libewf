@@ -83,25 +83,18 @@ void ewfdebug_signal_handler(
 	ewfdebug_abort = 1;
 
 	if( ( ewfdebug_input_handle != NULL )
-#if defined( HAVE_V2_API )
 	 && ( libewf_handle_signal_abort(
 	       ewfdebug_input_handle,
 	       &error ) != 1 ) )
-#else
-	 && ( libewf_signal_abort(
-	       ewfdebug_input_handle ) != 1 ) )
-#endif
 	{
 		libsystem_notify_printf(
 		 "%s: unable to signal input handle to abort.\n",
 		 function );
 
-#if defined( HAVE_V2_API )
 		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
-#endif
 
 		return;
 	}
@@ -238,17 +231,11 @@ int main( int argc, char * const argv[] )
 	}
 	libsystem_notify_set_verbose(
 	 verbose );
-#if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
-#else
-	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-#endif
 
 	if( libsystem_signal_attach(
 	     ewfdebug_signal_handler,
@@ -313,7 +300,6 @@ int main( int argc, char * const argv[] )
 		                         argv_filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     argv_filenames[ 0 ],
 		     first_filename_length,
@@ -322,16 +308,6 @@ int main( int argc, char * const argv[] )
 		     &amount_of_filenames,
 		     &error ) != 1 )
 #else
-		amount_of_filenames = libewf_glob_wide(
-		                       argv_filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &ewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
-#else
-#if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     argv_filenames[ 0 ],
 		     first_filename_length,
@@ -339,27 +315,16 @@ int main( int argc, char * const argv[] )
 		     &ewf_filenames,
 		     &amount_of_filenames,
 		     &error ) != 1 )
-#else
-		amount_of_filenames = libewf_glob(
-		                       argv_filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &ewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
 #endif
 		{
 			fprintf(
 			 stderr,
 			 "Unable to resolve ewf file(s).\n" );
 
-#if defined( HAVE_V2_API )
 			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
-#endif
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 			libsystem_glob_free(
@@ -371,7 +336,6 @@ int main( int argc, char * const argv[] )
 		}
 		argv_filenames = (libsystem_character_t * const *) ewf_filenames;
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_initialize(
 	     &ewfdebug_input_handle,
 	     &error ) != 1 )
@@ -495,13 +459,5 @@ int main( int argc, char * const argv[] )
 	 "Debug completed.\n" );
 
 	return( EXIT_SUCCESS );
-#else
-	fprintf(
-	 stdout,
-	 "Requires libewf version 2 API.\n" );
-
-	return( EXIT_SUCCESS );
-	
-#endif
 }
 

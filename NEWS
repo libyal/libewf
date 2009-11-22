@@ -1,10 +1,5 @@
 library:
-* added support for EnCase 6.12 SHA-1 digest hash
-* added expirimental version 2 of the API
-* added write resume mode
-
-ewftools:
-* ewfacquire
-  - added support for \\.\PhysicalDrive# on Windows requires MS Visual Studio build
-  - added resume acquiry support requires -R argument
+* switched to v2 API
+  - breaks libewf_check_file_signature, libewf_check_file_signature_wide,
+    libewf_glob, libewf_glob_wide
 

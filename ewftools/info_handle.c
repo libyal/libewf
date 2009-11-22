@@ -105,7 +105,6 @@ int info_handle_initialize(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_initialize(
 		     &( ( *info_handle )->input_handle ),
 		     error ) != 1 )
@@ -124,7 +123,6 @@ int info_handle_initialize(
 
 			return( -1 );
 		}
-#endif
 	}
 	return( 1 );
 }
@@ -152,7 +150,6 @@ int info_handle_free(
 	}
 	if( *info_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( ( ( *info_handle )->input_handle != NULL )
 		 && ( libewf_handle_free(
 		       &( ( *info_handle )->input_handle ),
@@ -167,7 +164,6 @@ int info_handle_free(
 
 			result = -1;
 		}
-#endif
 		memory_free(
 		 *info_handle );
 
@@ -198,14 +194,9 @@ int info_handle_signal_abort(
 	}
 	if( info_handle->input_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_signal_abort(
 		     info_handle->input_handle,
 		     error ) != 1 )
-#else
-		if( libewf_signal_abort(
-		     info_handle->input_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -245,7 +236,6 @@ int info_handle_open_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( info_handle->input_handle == NULL )
 	{
 		liberror_error_set(
@@ -257,19 +247,6 @@ int info_handle_open_input(
 
 		return( -1 );
 	}
-#else
-	if( info_handle->input_handle != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid info handle - input handle already set.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( filenames == NULL )
 	{
 		liberror_error_set(
@@ -298,7 +275,6 @@ int info_handle_open_input(
 		                         filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -307,16 +283,6 @@ int info_handle_open_input(
 		     &amount_of_filenames,
 		     error ) != 1 )
 #else
-		amount_of_filenames = libewf_glob_wide(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
-#else
-#if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -324,15 +290,6 @@ int info_handle_open_input(
 		     &libewf_filenames,
 		     &amount_of_filenames,
 		     error ) != 1 )
-#else
-		amount_of_filenames = libewf_glob(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
 #endif
 		{
 			liberror_error_set(
@@ -347,7 +304,6 @@ int info_handle_open_input(
 		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     info_handle->input_handle,
 	     filenames,
@@ -355,29 +311,12 @@ int info_handle_open_input(
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
-	info_handle->input_handle = libewf_open_wide(
-	                             filenames,
-	                             amount_of_filenames,
-	                             LIBEWF_OPEN_READ );
-
-	if( info_handle->input_handle == NULL )
-#endif
-#else
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open(
 	     info_handle->input_handle,
 	     filenames,
 	     amount_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
-#else
-	info_handle->input_handle = libewf_open(
-	                             filenames,
-	                             amount_of_filenames,
-	                             LIBEWF_OPEN_READ );
-
-	if( info_handle->input_handle == NULL )
-#endif
 #endif
 	{
 		liberror_error_set(
@@ -433,14 +372,9 @@ int info_handle_close(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_close(
 	     info_handle->input_handle,
 	     error ) != 0 )
-#else
-	if( libewf_close(
-	     info_handle->input_handle ) != 0 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -451,9 +385,6 @@ int info_handle_close(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	info_handle->input_handle = NULL;
-#endif
 	return( 0 );
 }
 
@@ -497,7 +428,6 @@ int info_handle_get_header_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	result = libewf_handle_get_header_value(
 	          info_handle->input_handle,
 	          (uint8_t *) header_value_identifier,
@@ -505,13 +435,6 @@ int info_handle_get_header_value(
 	          utf8_header_value,
 	          utf8_header_value_size,
 	          error );
-#else
-	result = libewf_get_header_value(
-	          info_handle->input_handle,
-	          header_value_identifier,
-	          (char *) utf8_header_value,
-	          utf8_header_value_size );
-#endif
 
 	if( result == -1 )
 	{
@@ -618,7 +541,6 @@ int info_handle_get_hash_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	result = libewf_handle_get_hash_value(
 	          info_handle->input_handle,
 	          (uint8_t *) hash_value_identifier,
@@ -626,13 +548,6 @@ int info_handle_get_hash_value(
 	          utf8_hash_value,
 	          utf8_hash_value_size,
 	          error );
-#else
-	result = libewf_get_hash_value(
-	          info_handle->input_handle,
-	          hash_value_identifier,
-	          (char *) utf8_hash_value,
-	          utf8_hash_value_size );
-#endif
 
 	if( result == -1 )
 	{
@@ -731,16 +646,10 @@ int info_handle_set_header_codepage(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_codepage(
 	     info_handle->input_handle,
 	     header_codepage,
 	     error ) != 1 )
-#else
-	if( libewf_set_header_codepage(
-	     info_handle->input_handle,
-	     header_codepage ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -822,22 +731,6 @@ int info_handle_header_values_fprint(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	if( libewf_parse_header_values(
-	     info_handle->input_handle,
-	     date_format ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to parse header values.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_values_date_format(
 	     info_handle->input_handle,
 	     date_format,
@@ -856,11 +749,6 @@ int info_handle_header_values_fprint(
 	     info_handle->input_handle,
 	     &amount_of_values,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_header_values(
-	     info_handle->input_handle,
-	     &amount_of_values ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1388,9 +1276,10 @@ int info_handle_header_values_fprint(
 			 stream,
 			 "\n\tAdditional values:\n" );
 
-			for( header_value_iterator = 16; header_value_iterator < amount_of_values; header_value_iterator++ )
+			for( header_value_iterator = 16;
+			     header_value_iterator < amount_of_values;
+			     header_value_iterator++ )
 			{
-#if defined( HAVE_V2_API )
 				if( libewf_handle_get_header_value_identifier_size(
 				     info_handle->input_handle,
 				     header_value_iterator,
@@ -1429,15 +1318,6 @@ int info_handle_header_values_fprint(
 				     (uint8_t *) header_value_identifier,
 				     header_value_identifier_size,
 				     error ) != 1 )
-#else
-				header_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
-
-				if( libewf_get_header_value_identifier(
-				     info_handle->input_handle,
-				     header_value_iterator,
-				     header_value_identifier,
-				     header_value_identifier_size ) != 1 )
-#endif
 				{
 					liberror_error_set(
 					 error,
@@ -1451,10 +1331,6 @@ int info_handle_header_values_fprint(
 
 					continue;
 				}
-#if !defined( HAVE_V2_API )
-				header_value_identifier_size = 1 + narrow_string_length(
-				                                    header_value_identifier );
-#endif
 				header_value_result = info_handle_get_header_value(
 				                       info_handle,
 				                       header_value_identifier,
@@ -1600,11 +1476,7 @@ int info_handle_media_information_fprint(
 	char *format_string        = NULL;
 	static char *function      = "info_handle_media_information_fprint";
 	size64_t media_size        = 0;
-#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors = 0;
-#else
-	uint32_t amount_of_sectors = 0;
-#endif
 	uint32_t bytes_per_sector  = 0;
 	uint32_t error_granularity = 0;
 	uint32_t sectors_per_chunk = 0;
@@ -1652,16 +1524,10 @@ int info_handle_media_information_fprint(
 	 stream,
 	 "EWF information\n" );
 
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_format(
 	     info_handle->input_handle,
 	     &format,
 	     error ) != 1 )
-#else
-	if( libewf_get_format(
-	     info_handle->input_handle,
-	     &format ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1741,16 +1607,10 @@ int info_handle_media_information_fprint(
 	 || ( format == LIBEWF_FORMAT_LINEN6 )
 	 || ( format == LIBEWF_FORMAT_EWFX ) )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_sectors_per_chunk(
 		     info_handle->input_handle,
 		     &sectors_per_chunk,
 		     error ) == 1 )
-#else
-		if( libewf_get_sectors_per_chunk(
-		     info_handle->input_handle,
-		     &sectors_per_chunk ) == 1 )
-#endif
 		{
 			fprintf(
 			 stream,
@@ -1768,16 +1628,10 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_error_granularity(
 		     info_handle->input_handle,
 		     &error_granularity,
 		     error ) == 1 )
-#else
-		if( libewf_get_error_granularity(
-		     info_handle->input_handle,
-		     &error_granularity ) == 1 )
-#endif
 		{
 			fprintf(
 			 stream,
@@ -1795,18 +1649,11 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_compression_values(
 		     info_handle->input_handle,
 		     &compression_level,
 		     &compression_flags,
 		     error ) == 1 )
-#else
-		if( libewf_get_compression_values(
-		     info_handle->input_handle,
-		     &compression_level,
-		     &compression_flags ) == 1 )
-#endif
 		{
 			if( compression_level == LIBEWF_COMPRESSION_NONE )
 			{
@@ -1844,18 +1691,11 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_guid(
 		     info_handle->input_handle,
 		     guid,
 		     GUID_SIZE,
 		     error ) != 1 )
-#else
-		if( libewf_get_guid(
-		     info_handle->input_handle,
-		     guid,
-		     GUID_SIZE ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -1901,16 +1741,10 @@ int info_handle_media_information_fprint(
 	if( ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_SMART ) )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_media_type(
 		     info_handle->input_handle,
 		     &media_type,
 		     error ) == 1 )
-#else
-		if( libewf_get_media_type(
-		     info_handle->input_handle,
-		     &media_type ) == 1 )
-#endif
 		{
 			if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
 			{
@@ -1956,16 +1790,10 @@ int info_handle_media_information_fprint(
 			result = -1;
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_media_flags(
 		     info_handle->input_handle,
 		     &media_flags,
 		     error ) == 1 )
-#else
-		if( libewf_get_media_flags(
-		     info_handle->input_handle,
-		     &media_flags ) == 1 )
-#endif
 		{
 			fprintf(
 			 stream,
@@ -2017,16 +1845,10 @@ int info_handle_media_information_fprint(
 			 "\tWrite blocked:\t\tTableau\n" );
 		}
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_bytes_per_sector(
 	     info_handle->input_handle,
 	     &bytes_per_sector,
 	     error ) == 1 )
-#else
-	if( libewf_get_bytes_per_sector(
-	     info_handle->input_handle,
-	     &bytes_per_sector ) == 1 )
-#endif
 	{
 		fprintf(
 		 stream,
@@ -2044,7 +1866,6 @@ int info_handle_media_information_fprint(
 
 		result = -1;
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_sectors(
 	     info_handle->input_handle,
 	     &amount_of_sectors,
@@ -2055,17 +1876,6 @@ int info_handle_media_information_fprint(
 		 "\tAmount of sectors:\t%" PRIu64 "\n",
 		 amount_of_sectors );
 	}
-#else
-	if( libewf_get_amount_of_sectors(
-	     info_handle->input_handle,
-	     &amount_of_sectors ) == 1 )
-	{
-		fprintf(
-		 stream,
-		 "\tAmount of sectors:\t%" PRIu32 "\n",
-		 amount_of_sectors );
-	}
-#endif
 	else
 	{
 		liberror_error_set(
@@ -2077,16 +1887,10 @@ int info_handle_media_information_fprint(
 
 		result = -1;
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_size(
 	     info_handle->input_handle,
 	     &media_size,
 	     error ) == 1 )
-#else
-	if( libewf_get_media_size(
-	     info_handle->input_handle,
-	     &media_size ) == 1 )
-#endif
 	{
 		if( byte_size_string_create(
 		     media_size_string,
@@ -2186,18 +1990,11 @@ int info_handle_hash_values_fprint(
 		return( -1 );
 	}
 #if defined( USE_LIBEWF_GET_MD5_HASH )
-#if defined( HAVE_V2_API )
 	result = libewf_handle_get_md5_hash(
 		  handle,
 		  md5_hash,
 		  DIGEST_HASH_SIZE_MD5,
 	          error );
-#else
-	result = libewf_get_md5_hash(
-		  handle,
-		  md5_hash,
-		  DIGEST_HASH_SIZE_MD5 );
-#endif
 
 	if( result == -1 )
 	{
@@ -2262,30 +2059,10 @@ int info_handle_hash_values_fprint(
 		 stored_md5_hash_string );
 	}
 #endif
-#if !defined( HAVE_V2_API )
-	if( libewf_parse_hash_values(
-	     info_handle->input_handle ) == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to parse hash values.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_hash_values(
 	     info_handle->input_handle,
 	     &amount_of_values,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_hash_values(
-	     info_handle->input_handle,
-	     &amount_of_values ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2300,7 +2077,6 @@ int info_handle_hash_values_fprint(
 	     hash_value_iterator < amount_of_values;
 	     hash_value_iterator++ )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_hash_value_identifier_size(
 		     info_handle->input_handle,
 		     hash_value_iterator,
@@ -2339,15 +2115,6 @@ int info_handle_hash_values_fprint(
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_size,
 		     error ) != 1 )
-#else
-		hash_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
-
-		if( libewf_get_hash_value_identifier(
-		     info_handle->input_handle,
-		     hash_value_iterator,
-		     hash_value_identifier,
-		     hash_value_identifier_size ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2361,10 +2128,6 @@ int info_handle_hash_values_fprint(
 
 			continue;
 		}
-#if !defined( HAVE_V2_API )
-		hash_value_identifier_size = 1 + narrow_string_length(
-		                                  hash_value_identifier );
-#endif
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 		if( narrow_string_compare(
 		     hash_value_identifier,
@@ -2428,11 +2191,7 @@ int info_handle_acquiry_errors_fprint(
 {
 	static char *function      = "info_handle_acquiry_errors_fprint";
 	uint64_t start_sector      = 0;
-#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors = 0;
-#else
-	uint32_t amount_of_sectors = 0;
-#endif
 	uint32_t amount_of_errors  = 0;
 	uint32_t error_iterator    = 0;
 	int result                 = 1;
@@ -2470,16 +2229,10 @@ int info_handle_acquiry_errors_fprint(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_acquiry_errors(
 	     info_handle->input_handle,
 	     &amount_of_errors,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_acquiry_errors(
-	     info_handle->input_handle,
-	     &amount_of_errors ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2502,20 +2255,12 @@ int info_handle_acquiry_errors_fprint(
 		
 		for( error_iterator = 0; error_iterator < amount_of_errors; error_iterator++ )
 		{
-#if defined( HAVE_V2_API )
 			if( libewf_handle_get_acquiry_error(
 			     info_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
 			     &amount_of_sectors,
 			     error ) != 1 )
-#else
-			if( libewf_get_acquiry_error(
-			     info_handle->input_handle,
-			     error_iterator,
-			     (off64_t *) &start_sector,
-			     &amount_of_sectors ) != 1 )
-#endif
 			{
 				liberror_error_set(
 				 error,
@@ -2530,21 +2275,12 @@ int info_handle_acquiry_errors_fprint(
 
 				result = -1;
 			}
-#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
 			 start_sector,
 			 start_sector + amount_of_sectors,
 			 amount_of_sectors );
-#else
-			fprintf(
-			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 start_sector,
-			 start_sector + amount_of_sectors,
-			 amount_of_sectors );
-#endif
 		}
 		fprintf(
 		 stream,
@@ -2563,11 +2299,7 @@ int info_handle_sessions_fprint(
 {
 	static char *function       = "info_handle_sessions_fprint";
 	uint64_t start_sector       = 0;
-#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors  = 0;
-#else
-	uint32_t amount_of_sectors  = 0;
-#endif
 	uint32_t amount_of_sessions = 0;
 	uint32_t session_iterator   = 0;
 	int result                  = 1;
@@ -2605,16 +2337,10 @@ int info_handle_sessions_fprint(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_sessions(
 	     info_handle->input_handle,
 	     &amount_of_sessions,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_sessions(
-	     info_handle->input_handle,
-	     &amount_of_sessions ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2637,20 +2363,12 @@ int info_handle_sessions_fprint(
 
 		for( session_iterator = 0; session_iterator < amount_of_sessions; session_iterator++ )
 		{
-#if defined( HAVE_V2_API )
 			if( libewf_handle_get_session(
 			     info_handle->input_handle,
 			     session_iterator,
 			     &start_sector,
 			     &amount_of_sectors,
 			     error ) != 1 )
-#else
-			if( libewf_get_session(
-			     info_handle->input_handle,
-			     session_iterator,
-			     (off64_t *) &start_sector,
-			     &amount_of_sectors ) != 1 )
-#endif
 			{
 				liberror_error_set(
 				 error,
@@ -2665,21 +2383,12 @@ int info_handle_sessions_fprint(
 
 				result = -1;
 			}
-#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
 			 start_sector,
 			 start_sector + amount_of_sectors,
 			 amount_of_sectors );
-#else
-			fprintf(
-			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 start_sector,
-			 start_sector + amount_of_sectors,
-			 amount_of_sectors );
-#endif
 		}
 		fprintf(
 		 stream,

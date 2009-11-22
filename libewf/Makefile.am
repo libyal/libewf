@@ -71,11 +71,7 @@ libewf_la_LIBADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBBFIO_LIBADD@
 
-if HAVE_V2_API
 libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
-else
-libewf_la_LDFLAGS = -no-undefined -version-info 1:4:0
-endif
 
 EXTRA_DIST = \
 	libewf_definitions.h.in

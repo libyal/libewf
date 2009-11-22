@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20091114],
+ [20091122],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20091114])
+ [20091122])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -61,11 +61,6 @@ LIBEWF_TEST_ENABLE(
  [v1_api],
  [enable version 1 API],
  [yes])
-LIBEWF_TEST_ENABLE(
- [v2-api],
- [v2_api],
- [enable experimental version 2 API],
- [no])
 
 dnl Check for libtool DLL support
 AC_LIBTOOL_WIN32_DLL
@@ -1569,7 +1564,7 @@ AS_IF(
 	[AC_DEFINE(
 	 [HAVE_V1_API],
 	 [1],
-	 [Define to 1 if experimental version 1 API should be used.])
+	 [Define to 1 if the version 1 API should be available.])
 	AC_SUBST(
 	 [HAVE_V1_API],
 	 [1])
@@ -1581,25 +1576,6 @@ AS_IF(
 AM_CONDITIONAL(
  HAVE_V1_API,
  [test "x$ac_cv_libewf_enable_v1_api" != xno])
-
-dnl Check if libewf should be build with experimental version 2 API
-AS_IF(
-	[test "x$ac_cv_libewf_enable_v2_api" != xno],
-	[AC_DEFINE(
-	 [HAVE_V2_API],
-	 [1],
-	 [Define to 1 if experimental version 2 API should be used.])
-	AC_SUBST(
-	 [HAVE_V2_API],
-	 [1])
-	ac_cv_libewf_enable_v2_api=yes],
-	[AC_SUBST(
-	 [HAVE_V2_API],
-	 [0]) ])
-
-AM_CONDITIONAL(
- HAVE_V2_API,
- [test "x$ac_cv_libewf_enable_v2_api" != xno])
 
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
@@ -1687,7 +1663,6 @@ Features:
    Python (pyewf) support:                          $ac_cv_libewf_enable_python
    Verbose output:                                  $ac_cv_libewf_enable_verbose_output
    Debug output:                                    $ac_cv_libewf_enable_debug_output
-   Version 1 API:                                   $ac_cv_libewf_enable_v1_api
-   Experimental version 2 API:                      $ac_cv_libewf_enable_v2_api
+   Version 1 API compatibility:                     $ac_cv_libewf_enable_v1_api
 ]);
 

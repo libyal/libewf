@@ -207,6 +207,9 @@ Next stable release:
 * remove/disable --enable-v1-api from configure
 * remove/disable ewfdebug
 
+20091122
+* deprecated the v1 API
+
 20091114
 * moved codepage definitions to libewf_codepage.h
 * updated libbfio

@@ -76,30 +76,19 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
 /* Determines if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename,
                    libewf_error_t **error );
-#else
-LIBEWF_EXTERN int libewf_check_file_signature(
-                   const char *filename );
-#endif
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
 /* Determines if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_check_file_signature_wide(
                    const wchar_t *filename,
                    libewf_error_t **error );
-#else
-LIBEWF_EXTERN int libewf_check_file_signature_wide(
-                   const wchar_t *filename );
-#endif
 #endif
 
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 #if defined( LIBEWF_HAVE_BFIO )
 /* Determines if a file is an EWF file (check for the EWF file signature) using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
@@ -108,14 +97,12 @@ LIBEWF_EXTERN int libewf_check_file_signature_file_io_handle(
                    libbfio_handle_t *file_io_handle,
                    libewf_error_t **error );
 #endif
-#endif
 
 /* Globs the segment files according to the EWF naming schema
  * if the format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_glob(
                    const char *filename,
                    size_t filename_length,
@@ -123,20 +110,7 @@ LIBEWF_EXTERN int libewf_glob(
                    char **filenames[],
                    int *amount_of_filenames,
                    libewf_error_t **error );
-#else
-/* Globs the segment files according to the EWF naming schema
- * if the format is known the filename should contain the base of the filename
- * otherwise the function will try to determine the format based on the extension
- * Returns the amount of filenames if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_glob(
-                   const char *filename,
-                   size_t filename_length,
-                   uint8_t format,
-                   char **filenames[] );
-#endif
 
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 /* Frees the globbed filenames
  * Returns 1 if successful or -1 on error
  */
@@ -144,7 +118,6 @@ LIBEWF_EXTERN int libewf_glob_free(
                    char *filenames[],
                    int amount_of_filenames,
                    libewf_error_t **error );
-#endif
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
 /* Globs the segment files according to the EWF naming schema
@@ -152,7 +125,6 @@ LIBEWF_EXTERN int libewf_glob_free(
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_glob_wide(
                    const wchar_t *filename,
                    size_t filename_length,
@@ -160,20 +132,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    wchar_t **filenames[],
                    int *amount_of_filenames,
                    libewf_error_t **error );
-#else
-/* Globs the segment files according to the EWF naming schema
- * if the format is known the filename should contain the base of the filename
- * otherwise the function will try to determine the format based on the extension
- * Returns the amount of filenames if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_glob_wide(
-                   const wchar_t *filename,
-                   size_t filename_length,
-                   uint8_t format,
-                   wchar_t **filenames[] );
-#endif
 
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 /* Frees the globbed filenames
  * Returns 1 if successful or -1 on error
  */
@@ -182,27 +141,10 @@ LIBEWF_EXTERN int libewf_glob_free(
                    int amount_of_filenames,
                    libewf_error_t **error );
 #endif
-#endif
 
 /* -------------------------------------------------------------------------
- * Notify functions (APIv1)
+ * Notify functions
  * ------------------------------------------------------------------------- */
-
-#if @HAVE_V1_API@ || defined( HAVE_V1_API )
-
-/* Set the notify values
- */
-LIBEWF_EXTERN void libewf_set_notify_values(
-                    FILE *stream,
-                    uint8_t verbose );
-
-#endif
-
-/* -------------------------------------------------------------------------
- * Notify functions (APIv2)
- * ------------------------------------------------------------------------- */
-
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Set the verbose notification
  */
@@ -230,13 +172,9 @@ LIBEWF_EXTERN int libewf_notify_stream_open(
 LIBEWF_EXTERN int libewf_notify_stream_close(
                    libewf_error_t **error );
 
-#endif
-
 /* -------------------------------------------------------------------------
- * Error functions (APIv2)
+ * Error functions
  * ------------------------------------------------------------------------- */
-
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Frees the error including elements
  */
@@ -273,274 +211,9 @@ LIBEWF_EXTERN int libewf_error_backtrace_sprint(
                    char *string,
                    size_t size );
 
-#endif
-
 /* -------------------------------------------------------------------------
- * File/Handle functions (APIv1)
+ * File/Handle functions
  * ------------------------------------------------------------------------- */
-
-#if @HAVE_V1_API@ || defined( HAVE_V1_API )
-
-/* Signals the libewf handle to abort its current activity
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_signal_abort(
-                   libewf_handle_t *handle );
-
-/* Opens a set of EWF file(s)
- * For reading files should contain all filenames that make up an EWF image
- * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
- * Returns a pointer to the new instance of handle, NULL on error
- */
-LIBEWF_EXTERN libewf_handle_t *libewf_open(
-                                char * const filenames[],
-                                int amount_of_filenames,
-                                uint8_t flags );
-
-#if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
-/* Opens a set of EWF file(s)
- * For reading files should contain all filenames that make up an EWF image
- * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
- * Returns a pointer to the new instance of handle, NULL on error
- */
-LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
-                                wchar_t * const filenames[],
-                                int amount_of_filenames,
-                                uint8_t flags );
-#endif
-
-/* Closes the EWF handle and frees memory used within the handle
- * Returns 0 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_close(
-                   libewf_handle_t *handle );
-
-/* Seeks a certain offset of the media data within the EWF file(s)
- * It will set the related file offset to the specific chunk offset
- * Returns the offset if seek is successful or -1 on error
- */
-LIBEWF_EXTERN off64_t libewf_seek_offset(
-                       libewf_handle_t *handle,
-                       off64_t offset );
-
-/* Retrieves the current offset of the media data within the EWF file(s)
- * Returns the offset if successful or -1 on error
- */
-LIBEWF_EXTERN off64_t libewf_get_offset(
-                       libewf_handle_t *handle );
-
-/* Prepares a buffer with chunk data after reading it according to the handle settings
- * intended for raw read
- * The buffer size cannot be larger than the chunk size
- * Returns the resulting chunk size or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size,
-                       void *uncompressed_buffer,
-                       size_t *uncompressed_buffer_size,
-                       int8_t is_compressed,
-                       uint32_t chunk_crc,
-                       int8_t read_crc );
-
-/* Reads 'raw' data from the curent offset into a buffer
- * size contains the size of the buffer
- * The function sets the chunk crc, is compressed and read crc values
- * Returns the amount of bytes read or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size,
-                       int8_t *is_compressed,
-                       uint32_t *chunk_crc,
-                       int8_t *read_crc );
-
-/* Reads data from the curent offset into a buffer
- * Returns the amount of bytes read or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_read_buffer(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size );
-
-/* Reads media data from an offset into a buffer
- * Returns the amount of bytes read or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_read_random(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size,
-                       off64_t offset );
-
-/* Prepares a buffer with chunk data before writing according to the handle settings
- * intended for raw write
- * The buffer size cannot be larger than the chunk size
- * The function sets the chunk crc, is compressed and write crc values
- * Returns the resulting chunk size or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size,
-                       void *compressed_buffer,
-                       size_t *compressed_buffer_size,
-                       int8_t *is_compressed,
-                       uint32_t *chunk_crc,
-                       int8_t *write_crc );
-
-/* Writes 'raw' data in EWF format from a buffer at the current offset
- * the necessary settings of the write values must have been made
- * size contains the size of the data within the buffer while
- * data size contains the size of the actual input data
- * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size,
-                       size_t data_size,
-                       int8_t is_compressed,
-                       uint32_t chunk_crc,
-                       int8_t write_crc );
-
-/* Writes data in EWF format from a buffer at the current offset
- * the necessary settings of the write values must have been made
- * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_write_buffer(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size );
-
-/* Writes data in EWF format from a buffer at an specific offset,
- * the necessary settings of the write values must have been made
- * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_write_random(
-                       libewf_handle_t *handle,
-                       void *buffer,
-                       size_t buffer_size,
-                       off64_t offset );
-
-/* Finalizes the write by correcting the EWF the meta data in the segment files
- * This function is required after writing from stream
- * Returns the amount of input bytes written or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_write_finalize(
-                       libewf_handle_t *handle );
-
-/* Retrieves the segment filename
- * The filename size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_segment_filename(
-                   libewf_handle_t *handle,
-                   char *filename,
-                   size_t filename_size );
-
-/* Sets the segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_segment_filename(
-                   libewf_handle_t *handle,
-                   const char *filename,
-                   size_t filename_length );
-
-#if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
-/* Retrieves the segment filename
- * The filename size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   wchar_t *filename,
-                   size_t filename_size );
-
-/* Sets the segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *filename,
-                   size_t filename_length );
-#endif
-
-/* Retrieves the segment file size
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_segment_file_size(
-                   libewf_handle_t *handle,
-                   size64_t *segment_file_size );
-
-/* Sets the segment file size
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_segment_file_size(
-                   libewf_handle_t *handle,
-                   size64_t segment_file_size );
-
-/* Retrieves the delta segment filename
- * The filename size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_delta_segment_filename(
-                   libewf_handle_t *handle,
-                   char *filename,
-                   size_t filename_size );
-
-/* Sets the delta segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_delta_segment_filename(
-                   libewf_handle_t *handle,
-                   const char *filename,
-                   size_t filename_length );
-
-#if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
-/* Retrieves the delta segment filename
- * The filename size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_delta_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   wchar_t *filename,
-                   size_t filename_size );
-
-/* Sets the delta segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *filename,
-                   size_t filename_length );
-#endif
-
-/* Retrieves the delta segment file size
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_delta_segment_file_size(
-                   libewf_handle_t *handle,
-                   size64_t *delta_segment_file_size );
-
-/* Sets the delta segment file size
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
-                   libewf_handle_t *handle,
-                   size64_t delta_segment_file_size );
-
-#endif
-
-/* -------------------------------------------------------------------------
- * File/Handle functions (APIv2)
- * ------------------------------------------------------------------------- */
-
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Initialize the handle
  * Returns 1 if successful or -1 on error
@@ -939,636 +612,9 @@ LIBEWF_EXTERN int libewf_handle_get_file_io_handle(
                    libewf_error_t **error );
 #endif
 
-#endif
-
 /* -------------------------------------------------------------------------
- * Meta data functions (APIv1)
+ * Meta data functions
  * ------------------------------------------------------------------------- */
-
-#if @HAVE_V1_API@ || defined( HAVE_V1_API )
-
-/* Retrieves the amount of sectors per chunk from the media information
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_sectors_per_chunk(
-                   libewf_handle_t *handle,
-                   uint32_t *sectors_per_chunk );
-
-/* Sets the amount of sectors per chunk in the media information
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_sectors_per_chunk(
-                   libewf_handle_t *handle,
-                   uint32_t sectors_per_chunk );
-
-/* Retrieves the amount of bytes per sector from the media information
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_bytes_per_sector(
-                   libewf_handle_t *handle,
-                   uint32_t *bytes_per_sector );
-
-/* Sets the amount of bytes per sector in the media information
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_bytes_per_sector(
-                   libewf_handle_t *handle,
-                   uint32_t bytes_per_sector );
-
-/* Retrieves the amount of sectors from the media information
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_amount_of_sectors(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_sectors );
-
-/* Retrieves the chunk size from the media information
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_chunk_size(
-                   libewf_handle_t *handle,
-                   size32_t *chunk_size );
-
-/* Retrieves the error granularity from the media information
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_error_granularity(
-                   libewf_handle_t *handle,
-                   uint32_t *error_granularity );
-
-/* Sets the error granularity
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_error_granularity(
-                   libewf_handle_t *handle,
-                   uint32_t error_granularity );
-
-/* Retrieves the compression values
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_compression_values(
-                   libewf_handle_t *handle,
-                   int8_t *compression_level,
-                   uint8_t *compress_empty_block );
-
-/* Sets the compression values
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_compression_values(
-                   libewf_handle_t *handle,
-                   int8_t compression_level,
-                   uint8_t compress_empty_block );
-
-/* Retrieves the size of the contained media data
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_media_size(
-                   libewf_handle_t *handle,
-                   size64_t *media_size );
-
-/* Sets the media size
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_media_size(
-                   libewf_handle_t *handle,
-                   size64_t media_size );
-
-/* Retrieves the media type value
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_media_type(
-                   libewf_handle_t *handle,
-                   uint8_t *media_type );
-
-/* Sets the media type
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_media_type(
-                   libewf_handle_t *handle,
-                   uint8_t media_type );
-
-/* Retrieves the media flags
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_media_flags(
-                   libewf_handle_t *handle,
-                   uint8_t *media_flags );
-
-/* Sets the media flags
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_media_flags(
-                   libewf_handle_t *handle,
-                   uint8_t media_flags );
-
-/* Retrieves the volume type value
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_volume_type(
-                   libewf_handle_t *handle,
-                   uint8_t *volume_type );
-
-/* Sets the volume type
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_volume_type(
-                   libewf_handle_t *handle,
-                   uint8_t volume_type );
-
-/* Retrieves the format type value
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_format(
-                   libewf_handle_t *handle,
-                   uint8_t *format );
-
-/* Sets the output format
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_format(
-                   libewf_handle_t *handle,
-                   uint8_t format );
-
-/* Retrieves the GUID
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_guid(
-                   libewf_handle_t *handle,
-                   uint8_t *guid,
-                   size_t size );
-
-/* Sets the GUID
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_guid(
-                   libewf_handle_t *handle,
-                   uint8_t *guid,
-                   size_t size );
-
-/* Retrieves the MD5 hash
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_md5_hash(
-                   libewf_handle_t *handle,
-                   uint8_t *md5_hash,
-                   size_t size );
-
-/* Sets the MD5 hash
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_md5_hash(
-                   libewf_handle_t *handle,
-                   uint8_t *md5_hash,
-                   size_t size );
-
-/* Retrieves the SHA1 hash
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_sha1_hash(
-                   libewf_handle_t *handle,
-                   uint8_t *sha1_hash,
-                   size_t size );
-
-/* Sets the SHA1 hash
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_sha1_hash(
-                   libewf_handle_t *handle,
-                   uint8_t *sha1_hash,
-                   size_t size );
-
-/* Retrieves the amount of chunks written
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_write_amount_of_chunks(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_chunks );
-
-/* Sets the read wipe chunk on error
- * The chunk is not wiped if read raw is used
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(
-                   libewf_handle_t *handle,
-                   uint8_t wipe_on_error );
-
-/* Copies the media values from the source to the destination handle
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_copy_media_values(
-                   libewf_handle_t *destination_handle,
-                   libewf_handle_t *source_handle );
-
-/* Retrieves the amount of acquiry errors
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_errors );
-
-/* Retrieves the information of an acquiry error
- * Returns 1 if successful, 0 if no acquiry error could be found or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_acquiry_error(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   off64_t *first_sector,
-                   uint32_t *amount_of_sectors );
-
-/* Add an acquiry error
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_add_acquiry_error(
-                   libewf_handle_t *handle,
-                   off64_t first_sector,
-                   uint32_t amount_of_sectors );
-
-/* Retrieves the amount of CRC errors
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_amount_of_crc_errors(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_errors );
-
-/* Retrieves the information of a CRC error
- * Returns 1 if successful, 0 if no CRC error could be found or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_crc_error(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   off64_t *first_sector,
-                   uint32_t *amount_of_sectors );
-
-/* Add a CRC error
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_add_crc_error(
-                   libewf_handle_t *handle,
-                   off64_t first_sector,
-                   uint32_t amount_of_sectors );
-
-/* Retrieves the amount of sessions
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_amount_of_sessions(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_sessions );
-
-/* Retrieves the information of a session
- * Returns 1 if successful, 0 if no sessions could be found or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_session(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   off64_t *first_sector,
-                   uint32_t *amount_of_sectors );
-
-/* Add a session
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_add_session(
-                   libewf_handle_t *handle,
-                   off64_t first_sector,
-                   uint32_t amount_of_sectors );
-
-/* Retrieves the header codepage
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_header_codepage(
-                   libewf_handle_t *handle,
-                   int *header_codepage );
-
-/* Sets the header codepage
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_header_codepage(
-                   libewf_handle_t *handle,
-                   int header_codepage );
-
-/* Retrieves the amount of header values
- * Returns 1 if successful, 0 if no header values are present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_amount_of_header_values(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_values );
-
-/* Retrieves the header value identifier size specified by its index
- * The identifier size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_header_value_identifier_size(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   size_t *identifier_size );
-
-/* Retrieves the header value identifier specified by its index
- * The strings are encoded in UTF-8
- * The identifier size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_header_value_identifier(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   char *identifier,
-                   size_t identifier_size );
-
-/* Retrieves the header value size specified by the identifier
- * The value size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_header_value_size(
-                   libewf_handle_t *handle,
-                   const char *identifier,
-                   size_t *value_size );
-
-/* Retrieves the header value specified by the identifier
- * The strings are encoded in UTF-8
- * The value size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_header_value(
-                   libewf_handle_t *handle,
-                   const char *identifier,
-                   char *value,
-                   size_t value_size );
-
-/* Retrieves the header value case number
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_case_number( handle, value, value_size ) \
-        libewf_get_header_value( handle, "case_number", value, value_size )
-
-/* Retrieves the header value description
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_description( handle, value, value_size ) \
-        libewf_get_header_value( handle, "description", value, value_size )
-
-/* Retrieves the header value examiner name
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_examiner_name( handle, value, value_size ) \
-        libewf_get_header_value( handle, "examiner_name", value, value_size )
-
-/* Retrieves the header value evidence number
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_evidence_number( handle, value, value_size ) \
-        libewf_get_header_value( handle, "evidence_number", value, value_size )
-
-/* Retrieves the header value notes
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_notes( handle, value, value_size ) \
-        libewf_get_header_value( handle, "notes", value, value_size )
-
-/* Retrieves the header value acquiry date
- * The string is formatted according to the date format
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_acquiry_date( handle, value, value_size ) \
-        libewf_get_header_value( handle, "acquiry_date", value, value_size )
-
-/* Retrieves the header value system date
- * The string is formatted according to the date format
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_system_date( handle, value, value_size ) \
-        libewf_get_header_value( handle, "system_date", value, value_size )
-
-/* Retrieves the header value acquiry operating system
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_acquiry_operating_system( handle, value, value_size ) \
-        libewf_get_header_value( handle, "acquiry_operating_system", value, value_size )
-
-/* Retrieves the header value acquiry software version
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_acquiry_software_version( handle, value, value_size ) \
-        libewf_get_header_value( handle, "acquiry_software_version", value, value_size )
-
-/* Retrieves the header value password
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_password( handle, value, value_size ) \
-        libewf_get_header_value( handle, "password", value, value_size )
-
-/* Retrieves the header value compression type
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_compression_type( handle, value, value_size ) \
-        libewf_get_header_value( handle, "compression_type", value, value_size )
-
-/* Retrieves the header value model
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_model( handle, value, value_size ) \
-        libewf_get_header_value( handle, "model", value, value_size )
-
-/* Retrieves the header value serial number
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_header_value_serial_number( handle, value, value_size ) \
-        libewf_get_header_value( handle, "serial_number", value, value_size )
-
-/* Sets the header value specified by the identifier
- * The strings are encoded in UTF-8
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_header_value(
-                   libewf_handle_t *handle,
-                   const char *identifier,
-                   const char *value,
-                   size_t value_length );
-
-/* Sets the header value case number
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_case_number( handle, value, value_length ) \
-        libewf_set_header_value( handle, "case_number", value, value_length )
-
-/* Sets the header value description
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_description( handle, value, value_length ) \
-        libewf_set_header_value( handle, "description", value, value_length )
-
-/* Sets the header value examiner name
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_examiner_name( handle, value, value_length ) \
-        libewf_set_header_value( handle, "examiner_name", value, value_length )
-
-/* Sets the header value evidence number
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_evidence_number( handle, value, value_length ) \
-        libewf_set_header_value( handle, "evidence_number", value, value_length )
-
-/* Sets the header value notes
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_notes( handle, value, value_length ) \
-        libewf_set_header_value( handle, "notes", value, value_length )
-
-/* Sets the header value acquiry date
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_acquiry_date( handle, value, value_length ) \
-        libewf_set_header_value( handle, "acquiry_date", value, value_length )
-
-/* Sets the header value system date
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_system_date( handle, value, value_length ) \
-        libewf_set_header_value( handle, "system_date", value, value_length )
-
-/* Sets the header value acquiry operating system
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_acquiry_operating_system( handle, value, value_length ) \
-        libewf_set_header_value( handle, "acquiry_operating_system", value, value_length )
-
-/* Sets the header value acquiry software version
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_acquiry_software_version( handle, value, value_length ) \
-        libewf_set_header_value( handle, "acquiry_software_version", value, value_length )
-
-/* Sets the header value password
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_password( handle, value, value_length ) \
-        libewf_set_header_value( handle, "password", value, value_length )
-
-/* Sets the header value compression type
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_compression_type( handle, value, value_length ) \
-        libewf_set_header_value( handle, "compression_type", value, value_length )
-
-/* Sets the header value model
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_model( handle, value, value_length ) \
-        libewf_set_header_value( handle, "model", value, value_length )
-
-/* Sets the header value serial number
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_header_value_serial_number( handle, value, value_length ) \
-        libewf_set_header_value( handle, "serial_number", value, value_length )
-
-/* Parses the header values from the xheader, header2 or header section
- * Will parse the first available header in order mentioned above
- * Returns 1 if successful, 0 if already parsed or -1 on error
- */
-LIBEWF_EXTERN int libewf_parse_header_values(
-                   libewf_handle_t *handle,
-                   uint8_t date_format );
-
-/* Copies the header values from the source to the destination handle
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_copy_header_values(
-                   libewf_handle_t *destination_handle,
-                   libewf_handle_t *source_handle );
-
-/* Retrieves the amount of hash values
- * Returns 1 if successful, 0 if no hash values are present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_values );
-
-/* Retrieves the hash value identifier size specified by its index
- * The identifier size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_hash_value_identifier_size(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   size_t *identifier_size );
-
-/* Retrieves the hash value identifier specified by its index
- * The strings are encoded in UTF-8
- * The identifier size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_hash_value_identifier(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   char *identifier,
-                   size_t identifier_size );
-
-/* Retrieves the hash value size specified by the identifier
- * The value size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_hash_value_size(
-                   libewf_handle_t *handle,
-                   const char *identifier,
-                   size_t *value_size );
-
-/* Retrieves the hash value specified by the identifier
- * The strings are encoded in UTF-8
- * The value size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_hash_value(
-                   libewf_handle_t *handle,
-                   const char *identifier,
-                   char *value,
-                   size_t value_size );
-
-/* Retrieves the hash value MD5
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_hash_value_md5( handle, value, value_size ) \
-        libewf_get_hash_value( handle, "MD5", value, value_size )
-
-/* Retrieves the hash value SHA1
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-#define libewf_get_hash_value_sha1( handle, value, value_size ) \
-        libewf_get_hash_value( handle, "SHA1", value, value_size )
-
-/* Sets the hash value specified by the identifier
- * The strings are encoded in UTF-8
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_hash_value(
-                   libewf_handle_t *handle,
-                   const char *identifier,
-                   const char *value,
-                   size_t value_length );
-
-/* Sets the hash value MD5
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_hash_value_md5( handle, value, value_length ) \
-        libewf_set_hash_value( handle, "MD5", value, value_length )
-
-/* Sets the hash value SHA1
- * Returns 1 if successful or -1 on error
- */
-#define libewf_set_hash_value_sha1( handle, value, value_length ) \
-        libewf_set_hash_value( handle, "SHA1", value, value_length )
-
-/* Parses the hash values from the xhash section
- * Returns 1 if successful, 0 if already parsed or -1 on error
- */
-LIBEWF_EXTERN int libewf_parse_hash_values(
-                   libewf_handle_t *handle );
-
-#endif
-
-/* -------------------------------------------------------------------------
- * Meta data functions (APIv2)
- * ------------------------------------------------------------------------- */
-
-#if @HAVE_V2_API@ || defined( HAVE_V2_API )
 
 /* Retrieves the amount of sectors per chunk from the media information
  * Returns 1 if successful or -1 on error
@@ -2229,6 +1275,1064 @@ LIBEWF_EXTERN int libewf_handle_set_hash_value(
  */
 #define libewf_handle_set_hash_value_sha1( handle, value, value_length, error ) \
         libewf_handle_set_hash_value( handle, "SHA1", 4, value, value_length, error )
+
+/* -------------------------------------------------------------------------
+ * APIv1 functions
+ * ------------------------------------------------------------------------- */
+
+#if @HAVE_V1_API@ || defined( HAVE_V1_API )
+
+/* -------------------------------------------------------------------------
+ * Notify functions
+ * ------------------------------------------------------------------------- */
+
+/* Set the notify values
+ *
+ * This function is deprecated use libewf_notify_set_value instead
+ */
+LIBEWF_EXTERN void libewf_set_notify_values(
+                    FILE *stream,
+                    uint8_t verbose ) LIBEWF_DEPRECATED;
+
+/* -------------------------------------------------------------------------
+ * File/Handle functions
+ * ------------------------------------------------------------------------- */
+
+/* Signals the libewf handle to abort its current activity
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_signal_abort instead
+ */
+LIBEWF_EXTERN int libewf_signal_abort(
+                   libewf_handle_t *handle ) LIBEWF_DEPRECATED;
+
+/* Opens a set of EWF file(s)
+ * For reading files should contain all filenames that make up an EWF image
+ * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
+ * Returns a pointer to the new instance of handle, NULL on error
+ *
+ * This function deprecated use libewf_handle_open instead
+ */
+LIBEWF_EXTERN libewf_handle_t *libewf_open(
+                                char * const filenames[],
+                                int amount_of_filenames,
+                                uint8_t flags ) LIBEWF_DEPRECATED;
+
+#if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+/* Opens a set of EWF file(s)
+ * For reading files should contain all filenames that make up an EWF image
+ * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
+ * Returns a pointer to the new instance of handle, NULL on error
+ *
+ * This function deprecated use libewf_handle_open_wide instead
+ */
+LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
+                                wchar_t * const filenames[],
+                                int amount_of_filenames,
+                                uint8_t flags ) LIBEWF_DEPRECATED;
+#endif
+
+/* Closes the EWF handle and frees memory used within the handle
+ * Returns 0 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_close instead
+ */
+LIBEWF_EXTERN int libewf_close(
+                   libewf_handle_t *handle ) LIBEWF_DEPRECATED;
+
+/* Seeks a certain offset of the media data within the EWF file(s)
+ * It will set the related file offset to the specific chunk offset
+ * Returns the offset if seek is successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_seek_offset instead
+ */
+LIBEWF_EXTERN off64_t libewf_seek_offset(
+                       libewf_handle_t *handle,
+                       off64_t offset ) LIBEWF_DEPRECATED;
+
+/* Retrieves the current offset of the media data within the EWF file(s)
+ * Returns the offset if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_offset instead
+ */
+LIBEWF_EXTERN off64_t libewf_get_offset(
+                       libewf_handle_t *handle ) LIBEWF_DEPRECATED;
+
+/* Prepares a buffer with chunk data after reading it according to the handle settings
+ * intended for raw read
+ * The buffer size cannot be larger than the chunk size
+ * Returns the resulting chunk size or -1 on error
+ *
+ * This function is deprecated use libewf_handle_prepare_read_chunk instead
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       void *uncompressed_buffer,
+                       size_t *uncompressed_buffer_size,
+                       int8_t is_compressed,
+                       uint32_t chunk_crc,
+                       int8_t read_crc ) LIBEWF_DEPRECATED;
+
+/* Reads 'raw' data from the curent offset into a buffer
+ * size contains the size of the buffer
+ * The function sets the chunk crc, is compressed and read crc values
+ * Returns the amount of bytes read or -1 on error
+ *
+ * This function is deprecated use libewf_handle_read_chunk instead
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       int8_t *is_compressed,
+                       uint32_t *chunk_crc,
+                       int8_t *read_crc ) LIBEWF_DEPRECATED;
+
+/* Reads data from the curent offset into a buffer
+ * Returns the amount of bytes read or -1 on error
+ *
+ * This function is deprecated use libewf_handle_read_buffer instead
+ */
+LIBEWF_EXTERN ssize_t libewf_read_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size ) LIBEWF_DEPRECATED;
+
+/* Reads media data from an offset into a buffer
+ * Returns the amount of bytes read or -1 on error
+ *
+ * This function is deprecated use libewf_handle_read_random instead
+ */
+LIBEWF_EXTERN ssize_t libewf_read_random(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       off64_t offset ) LIBEWF_DEPRECATED;
+
+/* Prepares a buffer with chunk data before writing according to the handle settings
+ * intended for raw write
+ * The buffer size cannot be larger than the chunk size
+ * The function sets the chunk crc, is compressed and write crc values
+ * Returns the resulting chunk size or -1 on error
+ *
+ * This function is deprecated use libewf_handle_prepare_write_chunk instead
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       void *compressed_buffer,
+                       size_t *compressed_buffer_size,
+                       int8_t *is_compressed,
+                       uint32_t *chunk_crc,
+                       int8_t *write_crc ) LIBEWF_DEPRECATED;
+
+/* Writes 'raw' data in EWF format from a buffer at the current offset
+ * the necessary settings of the write values must have been made
+ * size contains the size of the data within the buffer while
+ * data size contains the size of the actual input data
+ * Will initialize write if necessary
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
+ *
+ * This function is deprecated use libewf_handle_write_chunk instead
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       size_t data_size,
+                       int8_t is_compressed,
+                       uint32_t chunk_crc,
+                       int8_t write_crc ) LIBEWF_DEPRECATED;
+
+/* Writes data in EWF format from a buffer at the current offset
+ * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
+ *
+ * This function is deprecated use libewf_handle_write_buffer instead
+ */
+LIBEWF_EXTERN ssize_t libewf_write_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size ) LIBEWF_DEPRECATED;
+
+/* Writes data in EWF format from a buffer at an specific offset,
+ * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
+ *
+ * This function is deprecated use libewf_handle_write_random instead
+ */
+LIBEWF_EXTERN ssize_t libewf_write_random(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       off64_t offset ) LIBEWF_DEPRECATED;
+
+/* Finalizes the write by correcting the EWF the meta data in the segment files
+ * This function is required after writing from stream
+ * Returns the amount of input bytes written or -1 on error
+ *
+ * This function is deprecated use libewf_handle_write_finalize instead
+ */
+LIBEWF_EXTERN ssize_t libewf_write_finalize(
+                       libewf_handle_t *handle ) LIBEWF_DEPRECATED;
+
+/* Retrieves the segment filename
+ * The filename size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_segment_filename instead
+ */
+LIBEWF_EXTERN int libewf_get_segment_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t filename_size ) LIBEWF_DEPRECATED;
+
+/* Sets the segment filename
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_segment_filename instead
+ */
+LIBEWF_EXTERN int libewf_set_segment_filename(
+                   libewf_handle_t *handle,
+                   const char *filename,
+                   size_t filename_length ) LIBEWF_DEPRECATED;
+
+#if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+/* Retrieves the segment filename
+ * The filename size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_segment_filename_wide instead
+ */
+LIBEWF_EXTERN int libewf_get_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t filename_size ) LIBEWF_DEPRECATED;
+
+/* Sets the segment filename
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_segment_filename_wide instead
+ */
+LIBEWF_EXTERN int libewf_set_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   const wchar_t *filename,
+                   size_t filename_length ) LIBEWF_DEPRECATED;
+#endif
+
+/* Retrieves the segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_segment_file_size instead
+ */
+LIBEWF_EXTERN int libewf_get_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *segment_file_size ) LIBEWF_DEPRECATED;
+
+/* Sets the segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_segment_file_size instead
+ */
+LIBEWF_EXTERN int libewf_set_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t segment_file_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the delta segment filename
+ * The filename size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_delta_segment_filename instead
+ */
+LIBEWF_EXTERN int libewf_get_delta_segment_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t filename_size ) LIBEWF_DEPRECATED;
+
+/* Sets the delta segment filename
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_delta_segment_filename instead
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_filename(
+                   libewf_handle_t *handle,
+                   const char *filename,
+                   size_t filename_length ) LIBEWF_DEPRECATED;
+
+#if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+/* Retrieves the delta segment filename
+ * The filename size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_delta_segment_filename_wide instead
+ */
+LIBEWF_EXTERN int libewf_get_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t filename_size ) LIBEWF_DEPRECATED;
+
+/* Sets the delta segment filename
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_delta_segment_filename_wide instead
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   const wchar_t *filename,
+                   size_t filename_length ) LIBEWF_DEPRECATED;
+#endif
+
+/* Retrieves the delta segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_delta_segment_file_size instead
+ */
+LIBEWF_EXTERN int libewf_get_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *delta_segment_file_size ) LIBEWF_DEPRECATED;
+
+/* Sets the delta segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_delta_segment_file_size instead
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t delta_segment_file_size ) LIBEWF_DEPRECATED;
+
+/* -------------------------------------------------------------------------
+ * Meta data functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the amount of sectors per chunk from the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_sectors_per_chunk instead
+ */
+LIBEWF_EXTERN int libewf_get_sectors_per_chunk(
+                   libewf_handle_t *handle,
+                   uint32_t *sectors_per_chunk ) LIBEWF_DEPRECATED;
+
+/* Sets the amount of sectors per chunk in the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_sectors_per_chunk instead
+ */
+LIBEWF_EXTERN int libewf_set_sectors_per_chunk(
+                   libewf_handle_t *handle,
+                   uint32_t sectors_per_chunk ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of bytes per sector from the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_bytes_per_sector instead
+ */
+LIBEWF_EXTERN int libewf_get_bytes_per_sector(
+                   libewf_handle_t *handle,
+                   uint32_t *bytes_per_sector ) LIBEWF_DEPRECATED;
+
+/* Sets the amount of bytes per sector in the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_bytes_per_sector instead
+ */
+LIBEWF_EXTERN int libewf_set_bytes_per_sector(
+                   libewf_handle_t *handle,
+                   uint32_t bytes_per_sector ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of sectors from the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_amount_of_sectors instead
+ */
+LIBEWF_EXTERN int libewf_get_amount_of_sectors(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_sectors ) LIBEWF_DEPRECATED;
+
+/* Retrieves the chunk size from the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_chunk_size instead
+ */
+LIBEWF_EXTERN int libewf_get_chunk_size(
+                   libewf_handle_t *handle,
+                   size32_t *chunk_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the error granularity from the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_error_granularity instead
+ */
+LIBEWF_EXTERN int libewf_get_error_granularity(
+                   libewf_handle_t *handle,
+                   uint32_t *error_granularity ) LIBEWF_DEPRECATED;
+
+/* Sets the error granularity
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_error_granularity instead
+ */
+LIBEWF_EXTERN int libewf_set_error_granularity(
+                   libewf_handle_t *handle,
+                   uint32_t error_granularity ) LIBEWF_DEPRECATED;
+
+/* Retrieves the compression values
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_compression_values instead
+ */
+LIBEWF_EXTERN int libewf_get_compression_values(
+                   libewf_handle_t *handle,
+                   int8_t *compression_level,
+                   uint8_t *compress_empty_block ) LIBEWF_DEPRECATED;
+
+/* Sets the compression values
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_compression_values instead
+ */
+LIBEWF_EXTERN int libewf_set_compression_values(
+                   libewf_handle_t *handle,
+                   int8_t compression_level,
+                   uint8_t compress_empty_block ) LIBEWF_DEPRECATED;
+
+/* Retrieves the size of the contained media data
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_media_size instead
+ */
+LIBEWF_EXTERN int libewf_get_media_size(
+                   libewf_handle_t *handle,
+                   size64_t *media_size ) LIBEWF_DEPRECATED;
+
+/* Sets the media size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_media_size instead
+ */
+LIBEWF_EXTERN int libewf_set_media_size(
+                   libewf_handle_t *handle,
+                   size64_t media_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the media type value
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_media_type instead
+ */
+LIBEWF_EXTERN int libewf_get_media_type(
+                   libewf_handle_t *handle,
+                   uint8_t *media_type ) LIBEWF_DEPRECATED;
+
+/* Sets the media type
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_media_type instead
+ */
+LIBEWF_EXTERN int libewf_set_media_type(
+                   libewf_handle_t *handle,
+                   uint8_t media_type ) LIBEWF_DEPRECATED;
+
+/* Retrieves the media flags
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_media_flags instead
+ */
+LIBEWF_EXTERN int libewf_get_media_flags(
+                   libewf_handle_t *handle,
+                   uint8_t *media_flags ) LIBEWF_DEPRECATED;
+
+/* Sets the media flags
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_media_flags instead
+ */
+LIBEWF_EXTERN int libewf_set_media_flags(
+                   libewf_handle_t *handle,
+                   uint8_t media_flags ) LIBEWF_DEPRECATED;
+
+/* Retrieves the volume type value
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_media_flags instead
+ */
+LIBEWF_EXTERN int libewf_get_volume_type(
+                   libewf_handle_t *handle,
+                   uint8_t *volume_type ) LIBEWF_DEPRECATED;
+
+/* Sets the volume type
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_media_flags instead
+ */
+LIBEWF_EXTERN int libewf_set_volume_type(
+                   libewf_handle_t *handle,
+                   uint8_t volume_type ) LIBEWF_DEPRECATED;
+
+/* Retrieves the format type value
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_format instead
+ */
+LIBEWF_EXTERN int libewf_get_format(
+                   libewf_handle_t *handle,
+                   uint8_t *format ) LIBEWF_DEPRECATED;
+
+/* Sets the output format
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_format instead
+ */
+LIBEWF_EXTERN int libewf_set_format(
+                   libewf_handle_t *handle,
+                   uint8_t format ) LIBEWF_DEPRECATED;
+
+/* Retrieves the GUID
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_guid instead
+ */
+LIBEWF_EXTERN int libewf_get_guid(
+                   libewf_handle_t *handle,
+                   uint8_t *guid,
+                   size_t size ) LIBEWF_DEPRECATED;
+
+/* Sets the GUID
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_guid instead
+ */
+LIBEWF_EXTERN int libewf_set_guid(
+                   libewf_handle_t *handle,
+                   uint8_t *guid,
+                   size_t size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the MD5 hash
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_md5_hash instead
+ */
+LIBEWF_EXTERN int libewf_get_md5_hash(
+                   libewf_handle_t *handle,
+                   uint8_t *md5_hash,
+                   size_t size ) LIBEWF_DEPRECATED;
+
+/* Sets the MD5 hash
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_md5_hash instead
+ */
+LIBEWF_EXTERN int libewf_set_md5_hash(
+                   libewf_handle_t *handle,
+                   uint8_t *md5_hash,
+                   size_t size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the SHA1 hash
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_sha1_hash instead
+ */
+LIBEWF_EXTERN int libewf_get_sha1_hash(
+                   libewf_handle_t *handle,
+                   uint8_t *sha1_hash,
+                   size_t size ) LIBEWF_DEPRECATED;
+
+/* Sets the SHA1 hash
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_sha1_hash instead
+ */
+LIBEWF_EXTERN int libewf_set_sha1_hash(
+                   libewf_handle_t *handle,
+                   uint8_t *sha1_hash,
+                   size_t size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of chunks written
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_write_amount_of_chunks instead
+ */
+LIBEWF_EXTERN int libewf_get_write_amount_of_chunks(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_chunks ) LIBEWF_DEPRECATED;
+
+/* Sets the read wipe chunk on error
+ * The chunk is not wiped if read raw is used
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_read_wipe_chunk_on_error instead
+ */
+LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(
+                   libewf_handle_t *handle,
+                   uint8_t wipe_on_error ) LIBEWF_DEPRECATED;
+
+/* Copies the media values from the source to the destination handle
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_copy_media_values instead
+ */
+LIBEWF_EXTERN int libewf_copy_media_values(
+                   libewf_handle_t *destination_handle,
+                   libewf_handle_t *source_handle ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of acquiry errors
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_amount_of_acquiry_errors instead
+ */
+LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_errors ) LIBEWF_DEPRECATED;
+
+/* Retrieves the information of an acquiry error
+ * Returns 1 if successful, 0 if no acquiry error could be found or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_acquiry_error instead
+ */
+LIBEWF_EXTERN int libewf_get_acquiry_error(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   off64_t *first_sector,
+                   uint32_t *amount_of_sectors ) LIBEWF_DEPRECATED;
+
+/* Add an acquiry error
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_add_acquiry_error instead
+ */
+LIBEWF_EXTERN int libewf_add_acquiry_error(
+                   libewf_handle_t *handle,
+                   off64_t first_sector,
+                   uint32_t amount_of_sectors ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of CRC errors
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_amount_of_crc_errors instead
+ */
+LIBEWF_EXTERN int libewf_get_amount_of_crc_errors(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_errors ) LIBEWF_DEPRECATED;
+
+/* Retrieves the information of a CRC error
+ * Returns 1 if successful, 0 if no CRC error could be found or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_crc_error instead
+ */
+LIBEWF_EXTERN int libewf_get_crc_error(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   off64_t *first_sector,
+                   uint32_t *amount_of_sectors ) LIBEWF_DEPRECATED;
+
+/* Add a CRC error
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_add_crc_error instead
+ */
+LIBEWF_EXTERN int libewf_add_crc_error(
+                   libewf_handle_t *handle,
+                   off64_t first_sector,
+                   uint32_t amount_of_sectors ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of sessions
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_amount_of_sessions instead
+ */
+LIBEWF_EXTERN int libewf_get_amount_of_sessions(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_sessions ) LIBEWF_DEPRECATED;
+
+/* Retrieves the information of a session
+ * Returns 1 if successful, 0 if no sessions could be found or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_session instead
+ */
+LIBEWF_EXTERN int libewf_get_session(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   off64_t *first_sector,
+                   uint32_t *amount_of_sectors ) LIBEWF_DEPRECATED;
+
+/* Add a session
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_add_session instead
+ */
+LIBEWF_EXTERN int libewf_add_session(
+                   libewf_handle_t *handle,
+                   off64_t first_sector,
+                   uint32_t amount_of_sectors ) LIBEWF_DEPRECATED;
+
+/* Retrieves the header codepage
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_header_codepage instead
+ */
+LIBEWF_EXTERN int libewf_get_header_codepage(
+                   libewf_handle_t *handle,
+                   int *header_codepage ) LIBEWF_DEPRECATED;
+
+/* Sets the header codepage
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_header_codepage instead
+ */
+LIBEWF_EXTERN int libewf_set_header_codepage(
+                   libewf_handle_t *handle,
+                   int header_codepage ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of header values
+ * Returns 1 if successful, 0 if no header values are present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_amount_of_header_values instead
+ */
+LIBEWF_EXTERN int libewf_get_amount_of_header_values(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_values ) LIBEWF_DEPRECATED;
+
+/* Retrieves the header value identifier size specified by its index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_header_value_identifier_size instead
+ */
+LIBEWF_EXTERN int libewf_get_header_value_identifier_size(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   size_t *identifier_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the header value identifier specified by its index
+ * The strings are encoded in UTF-8
+ * The identifier size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_header_value_identifier instead
+ */
+LIBEWF_EXTERN int libewf_get_header_value_identifier(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   char *identifier,
+                   size_t identifier_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the header value size specified by the identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_header_value_size instead
+ */
+LIBEWF_EXTERN int libewf_get_header_value_size(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   size_t *value_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the header value specified by the identifier
+ * The strings are encoded in UTF-8
+ * The value size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_header_value instead
+ */
+LIBEWF_EXTERN int libewf_get_header_value(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   char *value,
+                   size_t value_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the header value case number
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_case_number( handle, value, value_size ) \
+        libewf_get_header_value( handle, "case_number", value, value_size )
+
+/* Retrieves the header value description
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_description( handle, value, value_size ) \
+        libewf_get_header_value( handle, "description", value, value_size )
+
+/* Retrieves the header value examiner name
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_examiner_name( handle, value, value_size ) \
+        libewf_get_header_value( handle, "examiner_name", value, value_size )
+
+/* Retrieves the header value evidence number
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_evidence_number( handle, value, value_size ) \
+        libewf_get_header_value( handle, "evidence_number", value, value_size )
+
+/* Retrieves the header value notes
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_notes( handle, value, value_size ) \
+        libewf_get_header_value( handle, "notes", value, value_size )
+
+/* Retrieves the header value acquiry date
+ * The string is formatted according to the date format
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_acquiry_date( handle, value, value_size ) \
+        libewf_get_header_value( handle, "acquiry_date", value, value_size )
+
+/* Retrieves the header value system date
+ * The string is formatted according to the date format
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_system_date( handle, value, value_size ) \
+        libewf_get_header_value( handle, "system_date", value, value_size )
+
+/* Retrieves the header value acquiry operating system
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_acquiry_operating_system( handle, value, value_size ) \
+        libewf_get_header_value( handle, "acquiry_operating_system", value, value_size )
+
+/* Retrieves the header value acquiry software version
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_acquiry_software_version( handle, value, value_size ) \
+        libewf_get_header_value( handle, "acquiry_software_version", value, value_size )
+
+/* Retrieves the header value password
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_password( handle, value, value_size ) \
+        libewf_get_header_value( handle, "password", value, value_size )
+
+/* Retrieves the header value compression type
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_compression_type( handle, value, value_size ) \
+        libewf_get_header_value( handle, "compression_type", value, value_size )
+
+/* Retrieves the header value model
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_model( handle, value, value_size ) \
+        libewf_get_header_value( handle, "model", value, value_size )
+
+/* Retrieves the header value serial number
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_header_value_serial_number( handle, value, value_size ) \
+        libewf_get_header_value( handle, "serial_number", value, value_size )
+
+/* Sets the header value specified by the identifier
+ * The strings are encoded in UTF-8
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_header_value instead
+ */
+LIBEWF_EXTERN int libewf_set_header_value(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   const char *value,
+                   size_t value_length ) LIBEWF_DEPRECATED;
+
+/* Sets the header value case number
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_case_number( handle, value, value_length ) \
+        libewf_set_header_value( handle, "case_number", value, value_length )
+
+/* Sets the header value description
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_description( handle, value, value_length ) \
+        libewf_set_header_value( handle, "description", value, value_length )
+
+/* Sets the header value examiner name
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_examiner_name( handle, value, value_length ) \
+        libewf_set_header_value( handle, "examiner_name", value, value_length )
+
+/* Sets the header value evidence number
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_evidence_number( handle, value, value_length ) \
+        libewf_set_header_value( handle, "evidence_number", value, value_length )
+
+/* Sets the header value notes
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_notes( handle, value, value_length ) \
+        libewf_set_header_value( handle, "notes", value, value_length )
+
+/* Sets the header value acquiry date
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_acquiry_date( handle, value, value_length ) \
+        libewf_set_header_value( handle, "acquiry_date", value, value_length )
+
+/* Sets the header value system date
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_system_date( handle, value, value_length ) \
+        libewf_set_header_value( handle, "system_date", value, value_length )
+
+/* Sets the header value acquiry operating system
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_acquiry_operating_system( handle, value, value_length ) \
+        libewf_set_header_value( handle, "acquiry_operating_system", value, value_length )
+
+/* Sets the header value acquiry software version
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_acquiry_software_version( handle, value, value_length ) \
+        libewf_set_header_value( handle, "acquiry_software_version", value, value_length )
+
+/* Sets the header value password
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_password( handle, value, value_length ) \
+        libewf_set_header_value( handle, "password", value, value_length )
+
+/* Sets the header value compression type
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_compression_type( handle, value, value_length ) \
+        libewf_set_header_value( handle, "compression_type", value, value_length )
+
+/* Sets the header value model
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_model( handle, value, value_length ) \
+        libewf_set_header_value( handle, "model", value, value_length )
+
+/* Sets the header value serial number
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_header_value_serial_number( handle, value, value_length ) \
+        libewf_set_header_value( handle, "serial_number", value, value_length )
+
+/* Parses the header values from the xheader, header2 or header section
+ * Will parse the first available header in order mentioned above
+ * Returns 1 if successful, 0 if already parsed or -1 on error
+ *
+ * This function is deprecated and no longer required
+ */
+LIBEWF_EXTERN int libewf_parse_header_values(
+                   libewf_handle_t *handle,
+                   uint8_t date_format ) LIBEWF_DEPRECATED;
+
+/* Copies the header values from the source to the destination handle
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_copy_header_values instead
+ */
+LIBEWF_EXTERN int libewf_copy_header_values(
+                   libewf_handle_t *destination_handle,
+                   libewf_handle_t *source_handle ) LIBEWF_DEPRECATED;
+
+/* Retrieves the amount of hash values
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_amount_of_hash_values instead
+ */
+LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_values ) LIBEWF_DEPRECATED;
+
+/* Retrieves the hash value identifier size specified by its index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_hash_value_identifier_size instead
+ */
+LIBEWF_EXTERN int libewf_get_hash_value_identifier_size(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   size_t *identifier_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the hash value identifier specified by its index
+ * The strings are encoded in UTF-8
+ * The identifier size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_hash_value_identifier instead
+ */
+LIBEWF_EXTERN int libewf_get_hash_value_identifier(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   char *identifier,
+                   size_t identifier_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the hash value size specified by the identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_hash_value_size instead
+ */
+LIBEWF_EXTERN int libewf_get_hash_value_size(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   size_t *value_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the hash value specified by the identifier
+ * The strings are encoded in UTF-8
+ * The value size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function is deprecated use libewf_handle_get_hash_value instead
+ */
+LIBEWF_EXTERN int libewf_get_hash_value(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   char *value,
+                   size_t value_size ) LIBEWF_DEPRECATED;
+
+/* Retrieves the hash value MD5
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_hash_value_md5( handle, value, value_size ) \
+        libewf_get_hash_value( handle, "MD5", value, value_size )
+
+/* Retrieves the hash value SHA1
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#define libewf_get_hash_value_sha1( handle, value, value_size ) \
+        libewf_get_hash_value( handle, "SHA1", value, value_size )
+
+/* Sets the hash value specified by the identifier
+ * The strings are encoded in UTF-8
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_hash_value instead
+ */
+LIBEWF_EXTERN int libewf_set_hash_value(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   const char *value,
+                   size_t value_length ) LIBEWF_DEPRECATED;
+
+/* Sets the hash value MD5
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_hash_value_md5( handle, value, value_length ) \
+        libewf_set_hash_value( handle, "MD5", value, value_length )
+
+/* Sets the hash value SHA1
+ * Returns 1 if successful or -1 on error
+ */
+#define libewf_set_hash_value_sha1( handle, value, value_length ) \
+        libewf_set_hash_value( handle, "SHA1", value, value_length )
+
+/* Parses the hash values from the xhash section
+ * Returns 1 if successful, 0 if already parsed or -1 on error
+ *
+ * This function is deprecated and no longer required
+ */
+LIBEWF_EXTERN int libewf_parse_hash_values(
+                   libewf_handle_t *handle ) LIBEWF_DEPRECATED;
 
 #endif
 

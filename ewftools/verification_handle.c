@@ -108,7 +108,6 @@ int verification_handle_initialize(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_initialize(
 		     &( ( *verification_handle )->input_handle ),
 		     error ) != 1 )
@@ -127,7 +126,6 @@ int verification_handle_initialize(
 
 			return( -1 );
 		}
-#endif
 		( *verification_handle )->calculate_md5  = calculate_md5;
 		( *verification_handle )->calculate_sha1 = calculate_sha1;
 
@@ -143,11 +141,9 @@ int verification_handle_initialize(
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
-#if defined( HAVE_V2_API )
 			libewf_handle_free(
 			 &( ( *verification_handle )->input_handle ),
 			 NULL );
-#endif
 			memory_free(
 			 *verification_handle );
 
@@ -167,11 +163,9 @@ int verification_handle_initialize(
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
-#if defined( HAVE_V2_API )
 			libewf_handle_free(
 			 &( ( *verification_handle )->input_handle ),
 			 NULL );
-#endif
 			memory_free(
 			 *verification_handle );
 
@@ -206,7 +200,6 @@ int verification_handle_free(
 	}
 	if( *verification_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( ( ( *verification_handle )->input_handle != NULL )
 		 && ( libewf_handle_free(
 		       &( ( *verification_handle )->input_handle ),
@@ -221,7 +214,6 @@ int verification_handle_free(
 
 			result = -1;
 		}
-#endif
 		memory_free(
 		 *verification_handle );
 
@@ -252,14 +244,9 @@ int verification_handle_signal_abort(
 	}
 	if( verification_handle->input_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_signal_abort(
 		     verification_handle->input_handle,
 		     error ) != 1 )
-#else
-		if( libewf_signal_abort(
-		     verification_handle->input_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -299,7 +286,6 @@ int verification_handle_open_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( verification_handle->input_handle == NULL )
 	{
 		liberror_error_set(
@@ -311,19 +297,6 @@ int verification_handle_open_input(
 
 		return( -1 );
 	}
-#else
-	if( verification_handle->input_handle != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid verification handle - input handle already set.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( filenames == NULL )
 	{
 		liberror_error_set(
@@ -352,7 +325,6 @@ int verification_handle_open_input(
 		                         filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -361,16 +333,6 @@ int verification_handle_open_input(
 		     &amount_of_filenames,
 		     error ) != 1 )
 #else
-		amount_of_filenames = libewf_glob_wide(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
-#else
-#if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -378,15 +340,6 @@ int verification_handle_open_input(
 		     &libewf_filenames,
 		     &amount_of_filenames,
 		     error ) != 1 )
-#else
-		amount_of_filenames = libewf_glob(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
 #endif
 		{
 			liberror_error_set(
@@ -401,7 +354,6 @@ int verification_handle_open_input(
 		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     verification_handle->input_handle,
 	     filenames,
@@ -409,29 +361,12 @@ int verification_handle_open_input(
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
-	verification_handle->input_handle = libewf_open_wide(
-	                                     filenames,
-	                                     amount_of_filenames,
-	                                     LIBEWF_OPEN_READ );
-
-	if( verification_handle->input_handle == NULL )
-#endif
-#else
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open(
 	     verification_handle->input_handle,
 	     filenames,
 	     amount_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
-#else
-	verification_handle->input_handle = libewf_open(
-	                                     filenames,
-	                                     amount_of_filenames,
-	                                     LIBEWF_OPEN_READ );
-
-	if( verification_handle->input_handle == NULL )
-#endif
 #endif
 	{
 		liberror_error_set(
@@ -453,16 +388,10 @@ int verification_handle_open_input(
 		memory_free(
 		 libewf_filenames );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_chunk_size(
 	     verification_handle->input_handle,
 	     &( verification_handle->chunk_size ),
 	     error ) != 1 )
-#else
-	if( libewf_get_chunk_size(
-	     verification_handle->input_handle,
-	     &( verification_handle->chunk_size ) ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -507,14 +436,9 @@ int verification_handle_close(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_close(
 	     verification_handle->input_handle,
 	     error ) != 0 )
-#else
-	if( libewf_close(
-	     verification_handle->input_handle ) != 0 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -525,9 +449,6 @@ int verification_handle_close(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	verification_handle->input_handle = NULL;
-#endif
 	return( 0 );
 }
 
@@ -578,7 +499,6 @@ ssize_t verification_handle_prepare_read_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
-#if defined( HAVE_V2_API )
 	process_count = libewf_handle_prepare_read_chunk(
 	                 verification_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
@@ -589,17 +509,6 @@ ssize_t verification_handle_prepare_read_buffer(
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
 	                 error );
-#else
-	process_count = libewf_raw_read_prepare_buffer(
-	                 verification_handle->input_handle,
-	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
-	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
-	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->crc,
-	                 storage_media_buffer->process_crc );
-#endif
 
 	if( process_count == -1 )
 	{
@@ -722,7 +631,6 @@ ssize_t verification_handle_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_chunk(
                       verification_handle->input_handle,
                       storage_media_buffer->compression_buffer,
@@ -733,28 +641,13 @@ ssize_t verification_handle_read_buffer(
 	              &( storage_media_buffer->process_crc ),
 	              error );
 #else
-	read_count = libewf_raw_read_buffer(
-	              verification_handle->input_handle,
-	              storage_media_buffer->compression_buffer,
-	              storage_media_buffer->compression_buffer_size,
-	              &( storage_media_buffer->is_compressed ),
-	              &( storage_media_buffer->crc ),
-	              &( storage_media_buffer->process_crc ) );
-#endif
-#else
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_buffer(
                       verification_handle->input_handle,
                       storage_media_buffer->raw_buffer,
                       read_size,
 	              error );
-#else
-	read_count = libewf_read_buffer(
-                      verification_handle->input_handle,
-                      storage_media_buffer->raw_buffer,
-                      read_size );
 #endif
-#endif
+
 	if( read_count == -1 )
 	{
 		liberror_error_set(
@@ -929,16 +822,10 @@ int verification_handle_get_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_size(
 	     verification_handle->input_handle,
 	     media_size,
 	     error ) != 1 )
-#else
-	if( libewf_get_media_size(
-	     verification_handle->input_handle,
-	     media_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -949,16 +836,10 @@ int verification_handle_get_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_bytes_per_sector(
 	     verification_handle->input_handle,
 	     &( verification_handle->bytes_per_sector ),
 	     error ) != 1 )
-#else
-	if( libewf_get_bytes_per_sector(
-	     verification_handle->input_handle,
-	     &( verification_handle->bytes_per_sector ) ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1018,16 +899,10 @@ int verification_handle_get_amount_of_crc_errors(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_crc_errors(
 	     verification_handle->input_handle,
 	     amount_of_errors,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_crc_errors(
-	     verification_handle->input_handle,
-	     amount_of_errors ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1081,7 +956,6 @@ int verification_handle_get_hash_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	result = libewf_handle_get_hash_value(
 	          verification_handle->input_handle,
 	          (uint8_t *) hash_value_identifier,
@@ -1089,13 +963,6 @@ int verification_handle_get_hash_value(
 	          utf8_hash_value,
 	          utf8_hash_value_size,
 	          error );
-#else
-	result = libewf_get_hash_value(
-	          verification_handle->input_handle,
-	          hash_value_identifier,
-	          (char *) utf8_hash_value,
-	          utf8_hash_value_size );
-#endif
 
 	if( result == -1 )
 	{
@@ -1194,16 +1061,10 @@ int verification_handle_set_header_codepage(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_codepage(
 	     verification_handle->input_handle,
 	     header_codepage,
 	     error ) != 1 )
-#else
-	if( libewf_set_header_codepage(
-	     verification_handle->input_handle,
-	     header_codepage ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1249,16 +1110,10 @@ int verification_handle_set_error_handling_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_read_wipe_chunk_on_error(
 	     verification_handle->input_handle,
 	     (uint8_t) wipe_chunk_on_error,
 	     error ) != 1 )
-#else
-	if( libewf_set_read_wipe_chunk_on_error(
-	     verification_handle->input_handle,
-	     (uint8_t) wipe_chunk_on_error ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1325,18 +1180,11 @@ int verification_handle_add_read_error(
 	start_sector      = start_offset / verification_handle->bytes_per_sector;
 	amount_of_sectors = amount_of_bytes / verification_handle->bytes_per_sector;
 
-#if defined( HAVE_V2_API )
 	if( libewf_handle_add_crc_error(
 	     verification_handle->input_handle,
 	     start_sector,
 	     amount_of_sectors,
 	     error ) != 1 )
-#else
-	if( libewf_add_crc_error(
-	     verification_handle->input_handle,
-	     (off64_t) start_sector,
-	     (uint32_t) amount_of_sectors ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1401,38 +1249,6 @@ int verification_handle_finalize(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-#if defined( USE_LIBEWF_GET_MD5_HASH )
-	if( verification_handle->calculate_sha1 != 0 )
-	{
-		if( libewf_parse_hash_values(
-		     verification_handle->input_handle ) == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-	}
-#elif defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
-	if( libewf_parse_hash_values(
-	     verification_handle->input_handle ) == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to parse hash values.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-#endif
 	if( verification_handle->calculate_md5 != 0 )
 	{
 		/* Finalize the MD5 hash calculation
@@ -1480,18 +1296,11 @@ int verification_handle_finalize(
 			return( -1 );
 		}
 #if defined( USE_LIBEWF_GET_MD5_HASH )
-#if defined( HAVE_V2_API )
 		*stored_md5_hash_available = libewf_handle_get_md5_hash(
 					      verification_handle->input_handle,
 					      md5_hash,
 					      DIGEST_HASH_SIZE_MD5,
 					      error );
-#else
-		*stored_md5_hash_available = libewf_get_md5_hash(
-					      verification_handle->input_handle,
-					      md5_hash,
-					      DIGEST_HASH_SIZE_MD5 );
-#endif
 
 		if( *stored_md5_hash_available == -1 )
 		{
@@ -1662,30 +1471,10 @@ int verification_handle_additional_hash_values_fprint(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	if( libewf_parse_hash_values(
-	     verification_handle->input_handle ) == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to parse hash values.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_hash_values(
 	     verification_handle->input_handle,
 	     &amount_of_values,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_hash_values(
-	     verification_handle->input_handle,
-	     &amount_of_values ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1698,7 +1487,6 @@ int verification_handle_additional_hash_values_fprint(
 	}
 	for( hash_value_iterator = 0; hash_value_iterator < amount_of_values; hash_value_iterator++ )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_hash_value_identifier_size(
 		     verification_handle->input_handle,
 		     hash_value_iterator,
@@ -1737,15 +1525,6 @@ int verification_handle_additional_hash_values_fprint(
 		     (uint8_t *) hash_identifier,
 		     hash_value_identifier_size,
 		     error ) != 1 )
-#else
-		hash_value_identifier_size = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
-
-		if( libewf_get_hash_value_identifier(
-		     verification_handle->input_handle,
-		     hash_value_iterator,
-		     hash_identifier,
-		     hash_value_identifier_size ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -1821,24 +1600,17 @@ int verification_handle_crc_errors_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
+	libsystem_character_t *filename      = NULL;
+	libsystem_character_t *last_filename = NULL;
 	static char *function                = "verification_handle_crc_errors_fprint";
+	size_t filename_size                 = 0;
+	size_t last_filename_size            = 0;
 	uint64_t start_sector                = 0;
 	uint64_t last_sector                 = 0;
-#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors           = 0;
-#else
-	uint32_t amount_of_sectors           = 0;
-#endif
 	uint32_t amount_of_errors            = 0;
 	uint32_t error_iterator              = 0;
 	int result                           = 1;
-
-#if defined( HAVE_V2_API )
-	libsystem_character_t *filename      = NULL;
-	libsystem_character_t *last_filename = NULL;
-	size_t filename_size                 = 0;
-	size_t last_filename_size            = 0;
-#endif
 
 	if( verification_handle == NULL )
 	{
@@ -1873,16 +1645,10 @@ int verification_handle_crc_errors_fprint(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_crc_errors(
 	     verification_handle->input_handle,
 	     &amount_of_errors,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_crc_errors(
-	     verification_handle->input_handle,
-	     &amount_of_errors ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1905,20 +1671,12 @@ int verification_handle_crc_errors_fprint(
 
 		for( error_iterator = 0; error_iterator < amount_of_errors; error_iterator++ )
 		{
-#if defined( HAVE_V2_API )
 			if( libewf_handle_get_crc_error(
 			     verification_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
 			     &amount_of_sectors,
 			     error ) != 1 )
-#else
-			if( libewf_get_crc_error(
-			     verification_handle->input_handle,
-			     error_iterator,
-			     (off64_t *) &start_sector,
-			     &amount_of_sectors ) != 1 )
-#endif
 			{
 				liberror_error_set(
 				 error,
@@ -1937,23 +1695,13 @@ int verification_handle_crc_errors_fprint(
 			}
 			last_sector = start_sector + amount_of_sectors;
 
-#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu64 ")",
 			 start_sector,
 			 last_sector,
 			 amount_of_sectors );
-#else
-			fprintf(
-			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu32 ")",
-			 start_sector,
-			 last_sector,
-			 amount_of_sectors );
-#endif
 
-#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 " in segment file(s):" );
@@ -2100,7 +1848,7 @@ int verification_handle_crc_errors_fprint(
 
 			last_filename      = NULL;
 			last_filename_size = 0;
-#endif
+
 			fprintf(
 			 stream,
 			 "\n" );

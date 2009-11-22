@@ -23,6 +23,7 @@
 #if !defined( _LIBEWF_HANDLE_H )
 #define _LIBEWF_HANDLE_H
 
+#include <libewf/features.h>
 #include <libewf/types.h>
 
 #ifdef __cplusplus
@@ -32,7 +33,8 @@ extern "C" {
 /* TODO remove definition in v2 of API
  * HAVE_V2_API
  */
-#define LIBEWF_HANDLE libewf_handle_t
+#define LIBEWF_HANDLE \
+	LIBEWF_DEPRECATED( LIBEWF_HANDLE, libewf_handle_t ); libewf_handle_t
 
 #ifdef __cplusplus
 }

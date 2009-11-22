@@ -1,6 +1,8 @@
 if HAVE_PYTHON
 
-AM_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common
+AM_CFLAGS = \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/common
 
 # This is for the libewf python module (pyewf)
 pyexec_LTLIBRARIES = pyewf.la

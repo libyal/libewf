@@ -95,7 +95,6 @@ int alteration_handle_initialize(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_initialize(
 		     &( ( *alteration_handle )->input_handle ),
 		     error ) != 1 )
@@ -114,7 +113,6 @@ int alteration_handle_initialize(
 
 			return( -1 );
 		}
-#endif
 	}
 	return( 1 );
 }
@@ -142,7 +140,6 @@ int alteration_handle_free(
 	}
 	if( *alteration_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( ( ( *alteration_handle )->input_handle != NULL )
 		 && ( libewf_handle_free(
 		       &( ( *alteration_handle )->input_handle ),
@@ -157,7 +154,6 @@ int alteration_handle_free(
 
 			result = -1;
 		}
-#endif
 		memory_free(
 		 *alteration_handle );
 
@@ -188,14 +184,9 @@ int alteration_handle_signal_abort(
 	}
 	if( alteration_handle->input_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_signal_abort(
 		     alteration_handle->input_handle,
 		     error ) != 1 )
-#else
-		if( libewf_signal_abort(
-		     alteration_handle->input_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -235,7 +226,6 @@ int alteration_handle_open_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( alteration_handle->input_handle == NULL )
 	{
 		liberror_error_set(
@@ -247,19 +237,6 @@ int alteration_handle_open_input(
 
 		return( -1 );
 	}
-#else
-	if( alteration_handle->input_handle != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid alteration handle - input handle already set.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( filenames == NULL )
 	{
 		liberror_error_set(
@@ -288,7 +265,6 @@ int alteration_handle_open_input(
 		                         filenames[ 0 ]);
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -297,16 +273,6 @@ int alteration_handle_open_input(
 		     &amount_of_filenames,
 		     error ) != 1 )
 #else
-		amount_of_filenames = libewf_glob_wide(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
-#else
-#if defined( HAVE_V2_API )
 		if( libewf_glob(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -314,15 +280,6 @@ int alteration_handle_open_input(
 		     &libewf_filenames,
 		     &amount_of_filenames,
 		     error ) != 1 )
-#else
-		amount_of_filenames = libewf_glob(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-		if( amount_of_filenames <= 0 )
-#endif
 #endif
 		{
 			liberror_error_set(
@@ -337,7 +294,6 @@ int alteration_handle_open_input(
 		filenames = (libsystem_character_t * const *) libewf_filenames;
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open_wide(
 	     alteration_handle->input_handle,
 	     filenames,
@@ -345,29 +301,12 @@ int alteration_handle_open_input(
 	     LIBEWF_OPEN_READ_WRITE,
 	     error ) != 1 )
 #else
-	alteration_handle->input_handle = libewf_open_wide(
-	                                   filenames,
-	                                   amount_of_filenames,
-	                                   LIBEWF_OPEN_READ_WRITE );
-
-	if( alteration_handle->input_handle == NULL )
-#endif
-#else
-#if defined( HAVE_V2_API )
 	if( libewf_handle_open(
 	     alteration_handle->input_handle,
 	     filenames,
 	     amount_of_filenames,
 	     LIBEWF_OPEN_READ_WRITE,
 	     error ) != 1 )
-#else
-	alteration_handle->input_handle = libewf_open(
-	                                   filenames,
-	                                   amount_of_filenames,
-	                                   LIBEWF_OPEN_READ_WRITE );
-
-	if( alteration_handle->input_handle == NULL )
-#endif
 #endif
 	{
 		liberror_error_set(
@@ -423,14 +362,9 @@ int alteration_handle_close(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_close(
 	     alteration_handle->input_handle,
 	     error ) != 0 )
-#else
-	if( libewf_close(
-	     alteration_handle->input_handle ) != 0 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -441,9 +375,6 @@ int alteration_handle_close(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	alteration_handle->input_handle = NULL;
-#endif
 	return( 0 );
 }
 
@@ -495,7 +426,6 @@ ssize_t alteration_handle_prepare_read_buffer(
 	}
 	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
-#if defined( HAVE_V2_API )
 	process_count = libewf_handle_prepare_read_chunk(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
@@ -506,17 +436,6 @@ ssize_t alteration_handle_prepare_read_buffer(
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
 	                 error );
-#else
-	process_count = libewf_raw_read_prepare_buffer(
-	                 alteration_handle->input_handle,
-	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
-	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
-	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->crc,
-	                 storage_media_buffer->process_crc );
-#endif
 
 	if( process_count == -1 )
 	{
@@ -585,7 +504,6 @@ ssize_t alteration_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_chunk(
                       alteration_handle->input_handle,
                       storage_media_buffer->compression_buffer,
@@ -595,15 +513,7 @@ ssize_t alteration_handle_read_buffer(
 	              &( storage_media_buffer->crc ),
 	              &( storage_media_buffer->process_crc ),
 	              error );
-#else
-	read_count = libewf_raw_read_buffer(
-	              alteration_handle->input_handle,
-	              storage_media_buffer->compression_buffer,
-	              storage_media_buffer->compression_buffer_size,
-	              &( storage_media_buffer->is_compressed ),
-	              &( storage_media_buffer->crc ),
-	              &( storage_media_buffer->process_crc ) );
-#endif
+
 	if( read_count == -1 )
 	{
 		liberror_error_set(
@@ -669,7 +579,6 @@ ssize_t alteration_handle_prepare_write_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
 
-#if defined( HAVE_V2_API )
 	process_count = libewf_handle_prepare_write_chunk(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->raw_buffer,
@@ -680,17 +589,6 @@ ssize_t alteration_handle_prepare_write_buffer(
 	                 &( storage_media_buffer->crc ),
 	                 &( storage_media_buffer->process_crc ),
 	                 error );
-#else
-	process_count = libewf_raw_write_prepare_buffer(
-	                 alteration_handle->input_handle,
-	                 storage_media_buffer->raw_buffer,
-	                 storage_media_buffer->raw_buffer_amount,
-	                 storage_media_buffer->compression_buffer,
-	                 (size_t *) &( storage_media_buffer->compression_buffer_amount ),
-	                 &( storage_media_buffer->is_compressed ),
-	                 &( storage_media_buffer->crc ),
-	                 &( storage_media_buffer->process_crc ) );
-#endif
 
 	if( process_count == -1 )
 	{
@@ -786,7 +684,6 @@ ssize_t alteration_handle_write_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	write_count = libewf_handle_write_chunk(
 	               alteration_handle->input_handle,
 	               raw_write_buffer,
@@ -798,29 +695,13 @@ ssize_t alteration_handle_write_buffer(
 	               storage_media_buffer->process_crc,
 	               error );
 #else
-	write_count = libewf_raw_write_buffer(
-	               alteration_handle->input_handle,
-	               raw_write_buffer,
-	               raw_write_buffer_size,
-	               storage_media_buffer->raw_buffer_amount,
-	               storage_media_buffer->is_compressed,
-	               storage_media_buffer->crc,
-	               storage_media_buffer->process_crc );
-#endif
-#else
-#if defined( HAVE_V2_API )
 	write_count = libewf_handle_write_buffer(
 	               alteration_handle->input_handle,
 	               storage_media_buffer->raw_buffer,
 	               write_size,
 	               error );
-#else
-	write_count = libewf_write_buffer(
-	               alteration_handle->input_handle,
-	               storage_media_buffer->raw_buffer,
-	               write_size );
 #endif
-#endif
+
 	if( write_count == -1 )
 	{
 		liberror_error_set(
@@ -867,17 +748,11 @@ off64_t alteration_handle_seek_offset(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	offset = libewf_handle_seek_offset(
 	          alteration_handle->input_handle,
 	          offset,
 	          SEEK_SET,
 	          error );
-#else
-	offset = libewf_seek_offset(
-	          alteration_handle->input_handle,
-	          offset );
-#endif
 
 	if( offset == -1 )
 	{
@@ -936,16 +811,10 @@ int alteration_handle_get_media_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_size(
 	     alteration_handle->input_handle,
 	     media_size,
 	     error ) != 1 )
-#else
-	if( libewf_get_media_size(
-	     alteration_handle->input_handle,
-	     media_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1002,16 +871,10 @@ int alteration_handle_get_chunk_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_chunk_size(
 	     alteration_handle->input_handle,
 	     chunk_size,
 	     error ) != 1 )
-#else
-	if( libewf_get_chunk_size(
-	     alteration_handle->input_handle,
-	     chunk_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1057,16 +920,10 @@ int alteration_handle_set_header_codepage(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_codepage(
 	     alteration_handle->input_handle,
 	     header_codepage,
 	     error ) != 1 )
-#else
-	if( libewf_set_header_codepage(
-	     alteration_handle->input_handle,
-	     header_codepage ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1114,31 +971,17 @@ int alteration_handle_set_output_values(
 		return( -1 );
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_delta_segment_filename_wide(
 	     alteration_handle->input_handle,
 	     delta_segment_filename,
 	     delta_segment_filename_length,
 	     error ) != 1 )
 #else
-	if( libewf_set_delta_segment_filename_wide(
-	     alteration_handle->input_handle,
-	     delta_segment_filename,
-	     delta_segment_filename_length ) != 1 )
-#endif
-#else
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_delta_segment_filename(
 	     alteration_handle->input_handle,
 	     delta_segment_filename,
 	     delta_segment_filename_length,
 	     error ) != 1 )
-#else
-	if( libewf_set_delta_segment_filename(
-	     alteration_handle->input_handle,
-	     delta_segment_filename,
-	     delta_segment_filename_length ) != 1 )
-#endif
 #endif
 	{
 		liberror_error_set(

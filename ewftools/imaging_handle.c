@@ -116,7 +116,6 @@ int imaging_handle_initialize(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_initialize(
 		     &( ( *imaging_handle )->output_handle ),
 		     error ) != 1 )
@@ -135,7 +134,6 @@ int imaging_handle_initialize(
 
 			return( -1 );
 		}
-#endif
 		( *imaging_handle )->calculate_md5  = calculate_md5;
 		( *imaging_handle )->calculate_sha1 = calculate_sha1;
 
@@ -151,11 +149,9 @@ int imaging_handle_initialize(
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
-#if defined( HAVE_V2_API )
 			libewf_handle_free(
 			 &( ( *imaging_handle )->output_handle ),
 			 NULL );
-#endif
 			memory_free(
 			 *imaging_handle );
 
@@ -175,11 +171,9 @@ int imaging_handle_initialize(
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
-#if defined( HAVE_V2_API )
 			libewf_handle_free(
 			 &( ( *imaging_handle )->output_handle ),
 			 NULL );
-#endif
 			memory_free(
 			 *imaging_handle );
 
@@ -214,7 +208,6 @@ int imaging_handle_free(
 	}
 	if( *imaging_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( ( ( *imaging_handle )->output_handle != NULL )
 		 && ( libewf_handle_free(
 		       &( ( *imaging_handle )->output_handle ),
@@ -243,7 +236,6 @@ int imaging_handle_free(
 
 			result = -1;
 		}
-#endif
 		memory_free(
 		 *imaging_handle );
 
@@ -274,14 +266,9 @@ int imaging_handle_signal_abort(
 	}
 	if( imaging_handle->output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_signal_abort(
 		     imaging_handle->output_handle,
 		     error ) != 1 )
-#else
-		if( libewf_signal_abort(
-		     imaging_handle->output_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -295,14 +282,9 @@ int imaging_handle_signal_abort(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{	
-#if defined( HAVE_V2_API )
 		if( libewf_handle_signal_abort(
 		     imaging_handle->output_handle,
 		     error ) != 1 )
-#else
-		if( libewf_signal_abort(
-		     imaging_handle->output_handle ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -345,7 +327,6 @@ int imaging_handle_open_output(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( imaging_handle->output_handle == NULL )
 	{
 		liberror_error_set(
@@ -357,19 +338,6 @@ int imaging_handle_open_output(
 
 		return( -1 );
 	}
-#else
-	if( imaging_handle->output_handle != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid imaging handle - output handle already set.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( filename == NULL )
 	{
 		liberror_error_set(
@@ -389,7 +357,6 @@ int imaging_handle_open_output(
 		first_filename_length = libsystem_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( HAVE_V2_API )
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
@@ -417,33 +384,6 @@ int imaging_handle_open_output(
 
 			return( -1 );
 		}
-#else
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-		amount_of_filenames = libewf_glob_wide(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-#else
-		amount_of_filenames = libewf_glob(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-#endif
-		if( amount_of_filenames <= 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to resolve filename(s).",
-			 function );
-
-			return( -1 );
-		}
-#endif
 		flags = LIBEWF_OPEN_WRITE_RESUME;
 	}
 	else
@@ -451,7 +391,6 @@ int imaging_handle_open_output(
 		libewf_filenames = filenames;
 		flags            = LIBEWF_OPEN_WRITE;
 	}
-#if defined( HAVE_V2_API )
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 	if( libewf_handle_open_wide(
 	     imaging_handle->output_handle,
@@ -477,30 +416,6 @@ int imaging_handle_open_output(
 
 		result = -1;
 	}
-#else
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-	imaging_handle->output_handle = libewf_open_wide(
-	                                 libewf_filenames,
-	                                 amount_of_filenames,
-	                                 (uint8_t) flags );
-#else
-	imaging_handle->output_handle = libewf_open(
-	                                 libewf_filenames,
-	                                 amount_of_filenames,
-	                                 (uint8_t) flags );
-#endif
-	if( imaging_handle->output_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file.",
-		 function );
-
-		result = -1;
-	}
-#endif
 	if( libewf_filenames != filenames )
 	{
 		for( ; amount_of_filenames > 0; amount_of_filenames-- )
@@ -572,7 +487,6 @@ int imaging_handle_open_secondary_output(
 		first_filename_length = libsystem_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( HAVE_V2_API )
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
@@ -600,33 +514,6 @@ int imaging_handle_open_secondary_output(
 
 			return( -1 );
 		}
-#else
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-		amount_of_filenames = libewf_glob_wide(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-#else
-		amount_of_filenames = libewf_glob(
-		                       filenames[ 0 ],
-		                       first_filename_length,
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &libewf_filenames );
-
-#endif
-		if( amount_of_filenames <= 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to resolve filename(s).",
-			 function );
-
-			return( -1 );
-		}
-#endif
 		flags = LIBEWF_OPEN_WRITE_RESUME;
 	}
 	else
@@ -634,7 +521,6 @@ int imaging_handle_open_secondary_output(
 		libewf_filenames = filenames;
 		flags            = LIBEWF_OPEN_WRITE;
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_initialize(
 	     &( imaging_handle->secondary_output_handle ),
 	     error ) != 1 )
@@ -673,30 +559,6 @@ int imaging_handle_open_secondary_output(
 
 		result = -1;
 	}
-#else
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-	imaging_handle->secondary_output_handle = libewf_open_wide(
-	                                           libewf_filenames,
-	                                           amount_of_filenames,
-	                                           (uint8_t) flags );
-#else
-	imaging_handle->secondary_output_handle = libewf_open(
-	                                           libewf_filenames,
-	                                           amount_of_filenames,
-	                                           (uint8_t) flags );
-#endif
-	if( imaging_handle->secondary_output_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file.",
-		 function );
-
-		result = -1;
-	}
-#endif
 	if( libewf_filenames != filenames )
 	{
 		for( ; amount_of_filenames > 0; amount_of_filenames-- )
@@ -741,14 +603,9 @@ int imaging_handle_close(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_close(
 	     imaging_handle->output_handle,
 	     error ) != 0 )
-#else
-	if( libewf_close(
-	     imaging_handle->output_handle ) != 0 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -759,20 +616,11 @@ int imaging_handle_close(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	imaging_handle->output_handle = NULL;
-#endif
-
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_close(
 		     imaging_handle->secondary_output_handle,
 		     error ) != 0 )
-#else
-		if( libewf_close(
-		     imaging_handle->secondary_output_handle ) != 0 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -783,9 +631,6 @@ int imaging_handle_close(
 
 			return( -1 );
 		}
-#if !defined( HAVE_V2_API )
-		imaging_handle->secondary_output_handle = NULL;
-#endif
 	}
 	return( 0 );
 }
@@ -837,7 +682,6 @@ ssize_t imaging_handle_prepare_read_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
-#if defined( HAVE_V2_API )
 	process_count = libewf_handle_prepare_read_chunk(
 	                 imaging_handle->output_handle,
 	                 storage_media_buffer->compression_buffer,
@@ -848,17 +692,6 @@ ssize_t imaging_handle_prepare_read_buffer(
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
 	                 error );
-#else
-	process_count = libewf_raw_read_prepare_buffer(
-	                 imaging_handle->output_handle,
-	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
-	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
-	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->crc,
-	                 storage_media_buffer->process_crc );
-#endif
 
 	if( process_count == -1 )
 	{
@@ -932,7 +765,6 @@ ssize_t imaging_handle_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_chunk(
                       imaging_handle->output_handle,
                       storage_media_buffer->compression_buffer,
@@ -943,28 +775,13 @@ ssize_t imaging_handle_read_buffer(
 	              &( storage_media_buffer->process_crc ),
 	              error );
 #else
-	read_count = libewf_raw_read_buffer(
-	              imaging_handle->output_handle,
-	              storage_media_buffer->compression_buffer,
-	              storage_media_buffer->compression_buffer_size,
-	              &( storage_media_buffer->is_compressed ),
-	              &( storage_media_buffer->crc ),
-	              &( storage_media_buffer->process_crc ) );
-#endif
-#else
-#if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_buffer(
                       imaging_handle->output_handle,
                       storage_media_buffer->raw_buffer,
                       read_size,
 	              error );
-#else
-	read_count = libewf_read_buffer(
-                      imaging_handle->output_handle,
-                      storage_media_buffer->raw_buffer,
-                      read_size );
 #endif
-#endif
+
 	if( read_count == -1 )
 	{
 		liberror_error_set(
@@ -979,7 +796,6 @@ ssize_t imaging_handle_read_buffer(
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-#if defined( HAVE_V2_API )
 		secondary_read_count = libewf_handle_read_chunk(
 			                imaging_handle->secondary_output_handle,
 			                storage_media_buffer->compression_buffer,
@@ -990,28 +806,13 @@ ssize_t imaging_handle_read_buffer(
 			                &( storage_media_buffer->process_crc ),
 			                error );
 #else
-		secondary_read_count = libewf_raw_read_buffer(
-		                        imaging_handle->secondary_output_handle,
-		                        storage_media_buffer->compression_buffer,
-		                        storage_media_buffer->compression_buffer_size,
-		                        &( storage_media_buffer->is_compressed ),
-		                        &( storage_media_buffer->crc ),
-		                        &( storage_media_buffer->process_crc ) );
-#endif
-#else
-#if defined( HAVE_V2_API )
 		secondary_read_count = libewf_handle_read_buffer(
 		                        imaging_handle->secondary_output_handle,
 		                        storage_media_buffer->raw_buffer,
 		                        read_size,
 		                        error );
-#else
-		secondary_read_count = libewf_read_buffer(
-		                        imaging_handle->secondary_output_handle,
-		                        storage_media_buffer->raw_buffer,
-		                        read_size );
 #endif
-#endif
+
 		if( secondary_read_count == -1 )
 		{
 			liberror_error_set(
@@ -1080,7 +881,6 @@ ssize_t imaging_handle_prepare_write_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
 
-#if defined( HAVE_V2_API )
 	process_count = libewf_handle_prepare_write_chunk(
 	                 imaging_handle->output_handle,
 	                 storage_media_buffer->raw_buffer,
@@ -1091,17 +891,6 @@ ssize_t imaging_handle_prepare_write_buffer(
 	                 &( storage_media_buffer->crc ),
 	                 &( storage_media_buffer->process_crc ),
 	                 error );
-#else
-	process_count = libewf_raw_write_prepare_buffer(
-	                 imaging_handle->output_handle,
-	                 storage_media_buffer->raw_buffer,
-	                 storage_media_buffer->raw_buffer_amount,
-	                 storage_media_buffer->compression_buffer,
-	                 (size_t *) &( storage_media_buffer->compression_buffer_amount ),
-	                 &( storage_media_buffer->is_compressed ),
-	                 &( storage_media_buffer->crc ),
-	                 &( storage_media_buffer->process_crc ) );
-#endif
 
 	if( process_count == -1 )
 	{
@@ -1198,7 +987,6 @@ ssize_t imaging_handle_write_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	write_count = libewf_handle_write_chunk(
 	               imaging_handle->output_handle,
 	               raw_write_buffer,
@@ -1210,29 +998,13 @@ ssize_t imaging_handle_write_buffer(
 	               storage_media_buffer->process_crc,
 	               error );
 #else
-	write_count = libewf_raw_write_buffer(
-	               imaging_handle->output_handle,
-	               raw_write_buffer,
-	               raw_write_buffer_size,
-	               storage_media_buffer->raw_buffer_amount,
-	               storage_media_buffer->is_compressed,
-	               storage_media_buffer->crc,
-	               storage_media_buffer->process_crc );
-#endif
-#else
-#if defined( HAVE_V2_API )
 	write_count = libewf_handle_write_buffer(
 	               imaging_handle->output_handle,
 	               storage_media_buffer->raw_buffer,
 	               write_size,
 	               error );
-#else
-	write_count = libewf_write_buffer(
-	               imaging_handle->output_handle,
-	               storage_media_buffer->raw_buffer,
-	               write_size );
 #endif
-#endif
+
 	if( write_count == -1 )
 	{
 		liberror_error_set(
@@ -1247,7 +1019,6 @@ ssize_t imaging_handle_write_buffer(
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-#if defined( HAVE_V2_API )
 		secondary_write_count = libewf_handle_write_chunk(
 		                         imaging_handle->secondary_output_handle,
 		                         raw_write_buffer,
@@ -1259,29 +1030,13 @@ ssize_t imaging_handle_write_buffer(
 		                         storage_media_buffer->process_crc,
 		                         error );
 #else
-		secondary_write_count = libewf_raw_write_buffer(
-		                         imaging_handle->secondary_output_handle,
-		                         raw_write_buffer,
-		                         raw_write_buffer_size,
-		                         storage_media_buffer->raw_buffer_amount,
-		                         storage_media_buffer->is_compressed,
-		                         storage_media_buffer->crc,
-		                         storage_media_buffer->process_crc );
-#endif
-#else
-#if defined( HAVE_V2_API )
 		secondary_write_count = libewf_handle_write_buffer(
 		                         imaging_handle->secondary_output_handle,
 		                         storage_media_buffer->raw_buffer,
 		                         write_size,
 		                         error );
-#else
-		secondary_write_count = libewf_write_buffer(
-		                         imaging_handle->secondary_output_handle,
-		                         storage_media_buffer->raw_buffer,
-		                         write_size );
 #endif
-#endif
+
 		if( secondary_write_count == -1 )
 		{
 			liberror_error_set(
@@ -1330,17 +1085,11 @@ off64_t imaging_handle_seek_offset(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	offset = libewf_handle_seek_offset(
 	          imaging_handle->output_handle,
 	          offset,
 	          SEEK_SET,
 	          error );
-#else
-	offset = libewf_seek_offset(
-	          imaging_handle->output_handle,
-	          offset );
-#endif
 
 	if( offset == -1 )
 	{
@@ -1355,17 +1104,11 @@ off64_t imaging_handle_seek_offset(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		secondary_offset = libewf_handle_seek_offset(
 		                    imaging_handle->secondary_output_handle,
 		                    offset,
 		                    SEEK_SET,
 		                    error );
-#else
-		secondary_offset = libewf_seek_offset(
-		                    imaging_handle->secondary_output_handle,
-		                    offset );
-#endif
 
 		if( secondary_offset == -1 )
 		{
@@ -1425,17 +1168,10 @@ int imaging_handle_get_offset(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_offset(
 	     imaging_handle->output_handle,
 	     offset,
 	     error ) != 1 )
-#else
-	*offset = libewf_get_offset(
-	           imaging_handle->output_handle );
-
-	if( *offset == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1698,16 +1434,10 @@ int imaging_handle_get_chunk_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_chunk_size(
 	     imaging_handle->output_handle,
 	     chunk_size,
 	     error ) != 1 )
-#else
-	if( libewf_get_chunk_size(
-	     imaging_handle->output_handle,
-	     chunk_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1772,21 +1502,6 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	if( libewf_parse_header_values(
-	     imaging_handle->output_handle,
-	     LIBEWF_DATE_FORMAT_CTIME ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to parse header values.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	/* Get case number
 	 */
 	if( imaging_handle_get_header_value(
@@ -1882,16 +1597,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_bytes_per_sector(
 	     imaging_handle->output_handle,
 	     bytes_per_sector,
 	     error ) != 1 )
-#else
-	if( libewf_get_bytes_per_sector(
-	     imaging_handle->output_handle,
-	     bytes_per_sector ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1902,16 +1611,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_size(
 	     imaging_handle->output_handle,
 	     media_size,
 	     error ) != 1 )
-#else
-	if( libewf_get_media_size(
-	     imaging_handle->output_handle,
-	     media_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1922,16 +1625,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_type(
 	     imaging_handle->output_handle,
 	     media_type,
 	     error ) != 1 )
-#else
-	if( libewf_get_media_type(
-	     imaging_handle->output_handle,
-	     media_type ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1942,16 +1639,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_flags(
 	     imaging_handle->output_handle,
 	     media_flags,
 	     error ) != 1 )
-#else
-	if( libewf_get_media_flags(
-	     imaging_handle->output_handle,
-	     media_flags ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1962,18 +1653,11 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_compression_values(
 	     imaging_handle->output_handle,
 	     compression_level,
 	     compression_flags,
 	     error ) != 1 )
-#else
-	if( libewf_get_compression_values(
-	     imaging_handle->output_handle,
-	     compression_level,
-	     compression_flags ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -1984,16 +1668,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_format(
 	     imaging_handle->output_handle,
 	     libewf_format,
 	     error ) != 1 )
-#else
-	if( libewf_get_format(
-	     imaging_handle->output_handle,
-	     libewf_format ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2004,16 +1682,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_segment_file_size(
 	     imaging_handle->output_handle,
 	     segment_file_size,
 	     error ) != 1 )
-#else
-	if( libewf_get_segment_file_size(
-	     imaging_handle->output_handle,
-	     segment_file_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2024,16 +1696,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_sectors_per_chunk(
 	     imaging_handle->output_handle,
 	     sectors_per_chunk,
 	     error ) != 1 )
-#else
-	if( libewf_get_sectors_per_chunk(
-	     imaging_handle->output_handle,
-	     sectors_per_chunk ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2044,16 +1710,10 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_error_granularity(
 	     imaging_handle->output_handle,
 	     sector_error_granularity,
 	     error ) != 1 )
-#else
-	if( libewf_get_error_granularity(
-	     imaging_handle->output_handle,
-	     sector_error_granularity ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2346,16 +2006,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_codepage(
 	     imaging_handle->output_handle,
 	     header_codepage,
 	     error ) != 1 )
-#else
-	if( libewf_set_header_codepage(
-	     imaging_handle->output_handle,
-	     header_codepage ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2366,16 +2020,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_bytes_per_sector(
 	     imaging_handle->output_handle,
 	     bytes_per_sector,
 	     error ) != 1 )
-#else
-	if( libewf_set_bytes_per_sector(
-	     imaging_handle->output_handle,
-	     bytes_per_sector ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2386,16 +2034,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_media_size(
 	     imaging_handle->output_handle,
 	     media_size,
 	     error ) != 1 )
-#else
-	if( libewf_set_media_size(
-	     imaging_handle->output_handle,
-	     media_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2406,16 +2048,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_media_type(
 	     imaging_handle->output_handle,
 	     media_type,
 	     error ) != 1 )
-#else
-	if( libewf_set_media_type(
-	     imaging_handle->output_handle,
-	     media_type ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2426,16 +2062,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_media_flags(
 	     imaging_handle->output_handle,
 	     media_flags,
 	     error ) != 1 )
-#else
-	if( libewf_set_media_flags(
-	     imaging_handle->output_handle,
-	     media_flags ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2446,18 +2076,11 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_compression_values(
 	     imaging_handle->output_handle,
 	     compression_level,
 	     compression_flags,
 	     error ) != 1 )
-#else
-	if( libewf_set_compression_values(
-	     imaging_handle->output_handle,
-	     compression_level,
-	     compression_flags ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2470,16 +2093,10 @@ int imaging_handle_set_output_values(
 	}
 	/* Format needs to be set before segment file size
 	 */
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_format(
 	     imaging_handle->output_handle,
 	     libewf_format,
 	     error ) != 1 )
-#else
-	if( libewf_set_format(
-	     imaging_handle->output_handle,
-	     libewf_format ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2490,16 +2107,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_segment_file_size(
 	     imaging_handle->output_handle,
 	     segment_file_size,
 	     error ) != 1 )
-#else
-	if( libewf_set_segment_file_size(
-	     imaging_handle->output_handle,
-	     segment_file_size ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2510,16 +2121,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_sectors_per_chunk(
 	     imaging_handle->output_handle,
 	     sectors_per_chunk,
 	     error ) != 1 )
-#else
-	if( libewf_set_sectors_per_chunk(
-	     imaging_handle->output_handle,
-	     sectors_per_chunk ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2530,16 +2135,10 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_error_granularity(
 	     imaging_handle->output_handle,
 	     sector_error_granularity,
 	     error ) != 1 )
-#else
-	if( libewf_set_error_granularity(
-	     imaging_handle->output_handle,
-	     sector_error_granularity ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -2552,16 +2151,10 @@ int imaging_handle_set_output_values(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_header_codepage(
 		     imaging_handle->secondary_output_handle,
 		     header_codepage,
 		     error ) != 1 )
-#else
-		if( libewf_set_header_codepage(
-		     imaging_handle->secondary_output_handle,
-		     header_codepage ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2572,16 +2165,10 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_bytes_per_sector(
 		     imaging_handle->secondary_output_handle,
 		     bytes_per_sector,
 		     error ) != 1 )
-#else
-		if( libewf_set_bytes_per_sector(
-		     imaging_handle->secondary_output_handle,
-		     bytes_per_sector ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2592,16 +2179,10 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_media_size(
 		     imaging_handle->secondary_output_handle,
 		     media_size,
 		     error ) != 1 )
-#else
-		if( libewf_set_media_size(
-		     imaging_handle->secondary_output_handle,
-		     media_size ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2612,16 +2193,10 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_media_type(
 		     imaging_handle->secondary_output_handle,
 		     media_type,
 		     error ) != 1 )
-#else
-		if( libewf_set_media_type(
-		     imaging_handle->secondary_output_handle,
-		     media_type ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2632,16 +2207,10 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_media_flags(
 		     imaging_handle->secondary_output_handle,
 		     media_flags,
 		     error ) != 1 )
-#else
-		if( libewf_set_media_flags(
-		     imaging_handle->secondary_output_handle,
-		     media_flags ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2652,18 +2221,11 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_compression_values(
 		     imaging_handle->secondary_output_handle,
 		     compression_level,
 		     compression_flags,
 		     error ) != 1 )
-#else
-		if( libewf_set_compression_values(
-		     imaging_handle->secondary_output_handle,
-		     compression_level,
-		     compression_flags ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2676,16 +2238,10 @@ int imaging_handle_set_output_values(
 		}
 		/* Format needs to be set before segment file size
 		 */
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_format(
 		     imaging_handle->secondary_output_handle,
 		     libewf_format,
 		     error ) != 1 )
-#else
-		if( libewf_set_format(
-		     imaging_handle->secondary_output_handle,
-		     libewf_format ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2696,16 +2252,10 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_segment_file_size(
 		     imaging_handle->secondary_output_handle,
 		     segment_file_size,
 		     error ) != 1 )
-#else
-		if( libewf_set_segment_file_size(
-		     imaging_handle->secondary_output_handle,
-		     segment_file_size ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2716,16 +2266,10 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_sectors_per_chunk(
 		     imaging_handle->secondary_output_handle,
 		     sectors_per_chunk,
 		     error ) != 1 )
-#else
-		if( libewf_set_sectors_per_chunk(
-		     imaging_handle->secondary_output_handle,
-		     sectors_per_chunk ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2736,16 +2280,10 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_error_granularity(
 		     imaging_handle->secondary_output_handle,
 		     sector_error_granularity,
 		     error ) != 1 )
-#else
-		if( libewf_set_error_granularity(
-		     imaging_handle->secondary_output_handle,
-		     sector_error_granularity ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2788,18 +2326,11 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_guid(
 		     imaging_handle->output_handle,
 		     guid,
 		     GUID_SIZE,
 		     error ) != 1 )
-#else
-		if( libewf_set_guid(
-		     imaging_handle->output_handle,
-		     guid,
-		     GUID_SIZE ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -2812,18 +2343,11 @@ int imaging_handle_set_output_values(
 		}
 		if( imaging_handle->secondary_output_handle != NULL )
 		{
-#if defined( HAVE_V2_API )
 			if( libewf_handle_set_guid(
 			     imaging_handle->secondary_output_handle,
 			     guid,
 			     GUID_SIZE,
 			     error ) != 1 )
-#else
-			if( libewf_set_guid(
-			     imaging_handle->secondary_output_handle,
-			     guid,
-			     GUID_SIZE ) != 1 )
-#endif
 			{
 				liberror_error_set(
 				 error,
@@ -2882,7 +2406,6 @@ int imaging_handle_get_header_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	result = libewf_handle_get_header_value(
 	          imaging_handle->output_handle,
 	          (uint8_t *) header_value_identifier,
@@ -2890,13 +2413,6 @@ int imaging_handle_get_header_value(
 	          utf8_header_value,
 	          utf8_header_value_size,
 	          error );
-#else
-	result = libewf_get_header_value(
-	          imaging_handle->output_handle,
-	          header_value_identifier,
-	          (char *) utf8_header_value,
-	          utf8_header_value_size );
-#endif
 
 	if( result == -1 )
 	{
@@ -3048,7 +2564,6 @@ int imaging_handle_set_header_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_header_value(
 	     imaging_handle->output_handle,
 	     (uint8_t *) header_value_identifier,
@@ -3056,13 +2571,6 @@ int imaging_handle_set_header_value(
 	     utf8_header_value,
 	     utf8_header_value_size - 1,
 	     error ) != 1 )
-#else
-	if( libewf_set_header_value(
-	     imaging_handle->output_handle,
-	     header_value_identifier,
-	     (char *) utf8_header_value,
-	     utf8_header_value_size - 1 ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -3079,7 +2587,6 @@ int imaging_handle_set_header_value(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_header_value(
 		     imaging_handle->secondary_output_handle,
 		     (uint8_t *) header_value_identifier,
@@ -3087,13 +2594,6 @@ int imaging_handle_set_header_value(
 		     utf8_header_value,
 		     utf8_header_value_size - 1,
 		     error ) != 1 )
-#else
-		if( libewf_set_header_value(
-		     imaging_handle->secondary_output_handle,
-		     header_value_identifier,
-		     (char *) utf8_header_value,
-		     utf8_header_value_size - 1 ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -3200,7 +2700,6 @@ int imaging_handle_set_hash_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_set_hash_value(
 	     imaging_handle->output_handle,
 	     (uint8_t *) hash_value_identifier,
@@ -3208,13 +2707,6 @@ int imaging_handle_set_hash_value(
 	     utf8_hash_value,
 	     utf8_hash_value_size - 1,
 	     error ) != 1 )
-#else
-	if( libewf_set_hash_value(
-	     imaging_handle->output_handle,
-	     hash_value_identifier,
-	     (char *) utf8_hash_value,
-	     utf8_hash_value_size - 1 ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -3231,7 +2723,6 @@ int imaging_handle_set_hash_value(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_set_hash_value(
 		     imaging_handle->secondary_output_handle,
 		     (uint8_t *) hash_value_identifier,
@@ -3239,13 +2730,6 @@ int imaging_handle_set_hash_value(
 		     utf8_hash_value,
 		     utf8_hash_value_size - 1,
 		     error ) != 1 )
-#else
-		if( libewf_set_hash_value(
-		     imaging_handle->secondary_output_handle,
-		     hash_value_identifier,
-		     (char *) utf8_hash_value,
-		     utf8_hash_value_size - 1 ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -3316,18 +2800,11 @@ int imaging_handle_add_read_error(
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
 	amount_of_sectors = amount_of_bytes / imaging_handle->bytes_per_sector;
 
-#if defined( HAVE_V2_API )
 	if( libewf_handle_add_acquiry_error(
 	     imaging_handle->output_handle,
 	     start_sector,
 	     amount_of_sectors,
 	     error ) != 1 )
-#else
-	if( libewf_add_acquiry_error(
-	     imaging_handle->output_handle,
-	     (off64_t) start_sector,
-	     (uint32_t) amount_of_sectors ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -3340,18 +2817,11 @@ int imaging_handle_add_read_error(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_add_acquiry_error(
 		     imaging_handle->secondary_output_handle,
 		     start_sector,
 		     amount_of_sectors,
 		     error ) != 1 )
-#else
-		if( libewf_add_acquiry_error(
-		     imaging_handle->secondary_output_handle,
-		     (off64_t) start_sector,
-		     (uint32_t) amount_of_sectors ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -3415,31 +2885,11 @@ int imaging_handle_add_session(
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
 	amount_of_sectors = amount_of_bytes / imaging_handle->bytes_per_sector;
 
-#if !defined( HAVE_V2_API )
-	if( amount_of_sectors > (uint64_t) UINT32_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid amount of sectors value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-#if defined( HAVE_V2_API )
 	if( libewf_handle_add_session(
 	     imaging_handle->output_handle,
 	     start_sector,
 	     amount_of_sectors,
 	     error ) != 1 )
-#else
-	if( libewf_add_session(
-	     imaging_handle->output_handle,
-	     (off64_t) start_sector,
-	     (uint32_t) amount_of_sectors ) != 1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -3452,18 +2902,11 @@ int imaging_handle_add_session(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_add_session(
 		     imaging_handle->secondary_output_handle,
 		     start_sector,
 		     amount_of_sectors,
 		     error ) != 1 )
-#else
-		if( libewf_add_session(
-		     imaging_handle->secondary_output_handle,
-		     (off64_t) start_sector,
-		     (uint32_t) amount_of_sectors ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
@@ -3630,14 +3073,9 @@ ssize_t imaging_handle_finalize(
 			return( -1 );
 		}
 	}
-#if defined( HAVE_V2_API )
 	write_count = libewf_handle_write_finalize(
 	               imaging_handle->output_handle,
 	               error );
-#else
-	write_count = libewf_write_finalize(
-	               imaging_handle->output_handle );
-#endif
 
 	if( write_count == -1 )
 	{
@@ -3652,14 +3090,9 @@ ssize_t imaging_handle_finalize(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_V2_API )
 		secondary_write_count = libewf_handle_write_finalize(
 		                         imaging_handle->secondary_output_handle,
 		                         error );
-#else
-		secondary_write_count = libewf_write_finalize(
-		                         imaging_handle->secondary_output_handle );
-#endif
 
 		if( write_count == -1 )
 		{
@@ -3686,11 +3119,7 @@ int imaging_handle_acquiry_errors_fprint(
 {
 	static char *function      = "imaging_handle_acquiry_errors_fprint";
 	uint64_t start_sector      = 0;
-#if defined( HAVE_V2_API )
 	uint64_t amount_of_sectors = 0;
-#else
-	uint32_t amount_of_sectors = 0;
-#endif
 	uint32_t amount_of_errors  = 0;
 	uint32_t error_iterator    = 0;
 	int result                 = 1;
@@ -3728,16 +3157,10 @@ int imaging_handle_acquiry_errors_fprint(
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_acquiry_errors(
 	     imaging_handle->output_handle,
 	     &amount_of_errors,
 	     error ) == -1 )
-#else
-	if( libewf_get_amount_of_acquiry_errors(
-	     imaging_handle->output_handle,
-	     &amount_of_errors ) == -1 )
-#endif
 	{
 		liberror_error_set(
 		 error,
@@ -3760,20 +3183,12 @@ int imaging_handle_acquiry_errors_fprint(
 		
 		for( error_iterator = 0; error_iterator < amount_of_errors; error_iterator++ )
 		{
-#if defined( HAVE_V2_API )
 			if( libewf_handle_get_acquiry_error(
 			     imaging_handle->output_handle,
 			     error_iterator,
 			     &start_sector,
 			     &amount_of_sectors,
 			     error ) != 1 )
-#else
-			if( libewf_get_acquiry_error(
-			     imaging_handle->output_handle,
-			     error_iterator,
-			     (off64_t *) &start_sector,
-			     &amount_of_sectors ) != 1 )
-#endif
 			{
 				liberror_error_set(
 				 error,
@@ -3788,21 +3203,12 @@ int imaging_handle_acquiry_errors_fprint(
 
 				result = -1;
 			}
-#if defined( HAVE_V2_API )
 			fprintf(
 			 stream,
 			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
 			 start_sector,
 			 start_sector + amount_of_sectors,
 			 amount_of_sectors );
-#else
-			fprintf(
-			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 start_sector,
-			 start_sector + amount_of_sectors,
-			 amount_of_sectors );
-#endif
 		}
 		fprintf(
 		 stream,

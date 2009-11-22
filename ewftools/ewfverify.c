@@ -598,17 +598,11 @@ int main( int argc, char * const argv[] )
 	}
 	libsystem_notify_set_verbose(
 	 verbose );
-#if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
-#else
-	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-#endif
 
 	if( libsystem_signal_attach(
 	     ewfverify_signal_handler,
@@ -690,7 +684,6 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-#if defined( HAVE_V2_API )
 	if( verification_handle_set_header_codepage(
 	     verification_handle,
 	     header_codepage,
@@ -717,7 +710,6 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-#endif
 	result = verification_handle_open_input(
 	          verification_handle,
 	          argv_filenames,

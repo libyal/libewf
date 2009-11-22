@@ -51,14 +51,10 @@
 PyObject* pyewf_handle_get_media_size(
            pyewf_handle_t *pyewf_handle )
 {
+	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_get_media_size";
 	size64_t media_size     = 0;
 
-#if defined( HAVE_V2_API )
-	liberror_error_t *error = NULL;
-#endif
-
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_media_size(
 	     pyewf_handle->handle,
 	     &media_size,
@@ -76,19 +72,6 @@ PyObject* pyewf_handle_get_media_size(
 
 		return( NULL );
 	}
-#else
-	if( libewf_get_media_size(
-	     pyewf_handle->handle,
-	     &media_size ) != 1 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve offset.",
-		 function );
-
-		return( NULL );
-	}
-#endif
 	return( PyLong_FromLongLong(
 	         media_size ) );
 }
@@ -101,19 +84,16 @@ PyObject *pyewf_handle_get_header_value(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error               = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_value";
 	static char *keyword_list[]           = { "identifier", NULL };
 	const char *errors                    = NULL;
 	char *header_value_identifier         = NULL;
 	char *header_value                    = NULL;
+	size_t header_value_identifier_length = 0;
 	size_t header_value_size              = 0;
 	int result                            = 0;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error               = NULL;
-	size_t header_value_identifier_length = 0;
-#endif
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
@@ -124,22 +104,6 @@ PyObject *pyewf_handle_get_header_value(
 	{
 		return( NULL );
 	}
-#if !defined( HAVE_V2_API )
-	/* Make sure the header values are parsed
-	 */
-	if( libewf_parse_header_values(
-	     pyewf_handle->handle,
-	     LIBEWF_DATE_FORMAT_CTIME ) == -1 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to parse header values.",
-		 function );
-
-		return( NULL );
-	}
-#endif
-#if defined( HAVE_V2_API )
 	header_value_identifier_length = narrow_string_length(
 	                                  header_value_identifier );
 
@@ -165,23 +129,6 @@ PyObject *pyewf_handle_get_header_value(
 
 		return( NULL );
 	}
-#else
-	result = libewf_get_header_value_size(
-	          pyewf_handle->handle,
-	          header_value_identifier,
-	          &header_value_size );
-
-	if( result == -1 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-	         "%s: unable to retrieve header value size: %s.",
-		 function,
-		 header_value_identifier );
-
-		return( NULL );
-	}
-#endif
 	/* Check if header value is present
 	 */
 	else if( result == 0 )
@@ -200,7 +147,6 @@ PyObject *pyewf_handle_get_header_value(
 
 		return( NULL );
 	}
-#if defined( HAVE_V2_API )
 	result = libewf_handle_get_header_value(
 	          pyewf_handle->handle,
 	          (uint8_t *) header_value_identifier,
@@ -226,27 +172,6 @@ PyObject *pyewf_handle_get_header_value(
 
 		return( NULL );
 	}
-#else
-	result = libewf_get_header_value(
-	          pyewf_handle->handle,
-	          header_value_identifier,
-	          header_value,
-	          header_value_size );
-
-	if( result == -1 )
-	{
-		memory_free(
-		 header_value );
-
-		PyErr_Format(
-		 PyExc_IOError,
-	         "%s: unable to retrieve header value: %s.",
-		 function,
-		 header_value_identifier );
-
-		return( NULL );
-	}
-#endif
 	/* Check if the header value is present
 	 */
 	else if( result == 0 )
@@ -273,38 +198,19 @@ PyObject *pyewf_handle_get_header_value(
 PyObject *pyewf_handle_get_header_values(
            pyewf_handle_t *pyewf_handle )
 {
+	liberror_error_t *error               = NULL;
 	PyObject *dictionary_object           = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_values";
 	const char *errors                    = NULL;
 	char *header_value                    = NULL;
 	char *header_value_identifier         = NULL;
+	size_t header_value_identifier_length = 0;
+	size_t header_value_identifier_size   = 0;
+	size_t header_value_size              = 0;
 	uint32_t amount_of_header_values      = 0;
 	uint32_t header_value_iterator        = 0;
-	size_t header_value_size              = 0;
-	size_t header_value_identifier_size   = 0;
 
-#if defined( HAVE_V2_API )
-	liberror_error_t *error               = NULL;
-	size_t header_value_identifier_length = 0;
-#endif
-
-#if !defined( HAVE_V2_API )
-	/* Make sure the header values are parsed
-	 */
-	if( libewf_parse_header_values(
-	     pyewf_handle->handle,
-	     LIBEWF_DATE_FORMAT_CTIME ) == -1 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to parse header values.",
-		 function );
-
-		return( NULL );
-	}
-#endif
-#if defined( HAVE_V2_API )
 	if( libewf_handle_get_amount_of_header_values(
 	     pyewf_handle->handle,
 	     &amount_of_header_values,
@@ -322,24 +228,12 @@ PyObject *pyewf_handle_get_header_values(
 
 		return( NULL );
 	}
-#else
-	if( libewf_get_amount_of_header_values(
-	     pyewf_handle->handle,
-	     &amount_of_header_values ) != 1 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve amount of header values.",
-		 function );
-
-		return( NULL );
-	}
-#endif
 	dictionary_object = PyDict_New();
 
-	for( header_value_iterator = 0; header_value_iterator < amount_of_header_values; header_value_iterator++ )
+	for( header_value_iterator = 0;
+	     header_value_iterator < amount_of_header_values;
+	     header_value_iterator++ )
 	{
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_header_value_identifier_size(
 		     pyewf_handle->handle,
 		     header_value_iterator,
@@ -359,21 +253,6 @@ PyObject *pyewf_handle_get_header_values(
 
 			return( NULL );
 		}
-#else
-		if( libewf_get_header_value_identifier_size(
-		     pyewf_handle->handle,
-		     header_value_iterator,
-		     &header_value_identifier_size ) != 1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header value identifier size: %d.",
-			 function,
-			 header_value_iterator + 1 );
-
-			return( NULL );
-		}
-#endif
 		header_value_identifier = (char *) memory_allocate(
 		                                    sizeof( char ) * header_value_identifier_size );
 
@@ -386,7 +265,6 @@ PyObject *pyewf_handle_get_header_values(
 
 			return( NULL );
 		}
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_header_value_identifier(
 		     pyewf_handle->handle,
 		     header_value_iterator,
@@ -409,26 +287,6 @@ PyObject *pyewf_handle_get_header_values(
 
 			return( NULL );
 		}
-#else
-		if( libewf_get_header_value_identifier(
-		     pyewf_handle->handle,
-		     header_value_iterator,
-		     header_value_identifier,
-		     header_value_identifier_size ) != 1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header value identifier: %d.",
-			 function,
-			 header_value_iterator + 1 );
-
-			memory_free(
-			 header_value_identifier );
-
-			return( NULL );
-		}
-#endif
-#if defined( HAVE_V2_API )
 		header_value_identifier_length = narrow_string_length(
 						  header_value_identifier );
 
@@ -454,24 +312,6 @@ PyObject *pyewf_handle_get_header_values(
 
 			return( NULL );
 		}
-#else
-		if( libewf_get_header_value_size(
-		     pyewf_handle->handle,
-		     header_value_identifier,
-		     &header_value_size ) != 1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header value size: %s.",
-			 function,
-			 header_value_identifier + 1 );
-
-			memory_free(
-			 header_value_identifier );
-
-			return( NULL );
-		}
-#endif
 		header_value = (char *) memory_allocate(
 		                         sizeof( char ) * header_value_size );
 
@@ -489,7 +329,6 @@ PyObject *pyewf_handle_get_header_values(
 		}
 		/* Ignore emtpy header values
 		 */
-#if defined( HAVE_V2_API )
 		if( libewf_handle_get_header_value(
 		     pyewf_handle->handle,
 		     (uint8_t *) header_value_identifier,
@@ -497,13 +336,6 @@ PyObject *pyewf_handle_get_header_values(
 		     (uint8_t *) header_value,
 		     header_value_size,
 		     NULL ) == 1 )
-#else
-		if( libewf_get_header_value(
-		     pyewf_handle->handle,
-		     header_value_identifier,
-		     header_value,
-		     header_value_size ) == 1 )
-#endif
 		{
 			string_object = PyUnicode_DecodeUTF8(
 			                 header_value,

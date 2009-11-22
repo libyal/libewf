@@ -168,14 +168,11 @@ PyObject* pyewf_check_file_signature(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error     = NULL;
 	static char *function       = "pyewf_check_file_signature";
 	static char *keyword_list[] = { "filename", NULL };
 	const char *filename        = NULL;
 	int result                  = 0;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error     = NULL;
-#endif
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
@@ -186,7 +183,6 @@ PyObject* pyewf_check_file_signature(
 	{
 		return( NULL );
 	}
-#if defined( HAVE_V2_API )
 	result = libewf_check_file_signature(
 	          filename,
 	          &error );
@@ -205,20 +201,6 @@ PyObject* pyewf_check_file_signature(
 
 		return( NULL );
 	}
-#else
-	result = libewf_check_file_signature(
-	          filename );
-
-	if( result == -1 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: unable to check file signature.",
-		 function );
-
-		return( NULL );
-	}
-#endif
 	if( result != 0 )
 	{
 		return( Py_True );
@@ -234,13 +216,10 @@ PyObject* pyewf_glob(
            PyObject *arguments,
            PyObject *keywords )
 {
+	liberror_error_t *error     = NULL;
 	static char *function       = "pyewf_glob";
 	static char *keyword_list[] = { "filename", NULL };
 	const char *filename        = NULL;
-
-#if defined( HAVE_V2_API )
-	liberror_error_t *error     = NULL;
-#endif
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,

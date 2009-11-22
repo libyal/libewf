@@ -1681,17 +1681,11 @@ int main( int argc, char * const argv[] )
 	}
 	libsystem_notify_set_verbose(
 	 verbose );
-#if defined( HAVE_V2_API )
 	libewf_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
-#else
-	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-#endif
 
 	if( option_case_number != NULL )
 	{
