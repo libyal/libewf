@@ -48,6 +48,7 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "imaging_handle.h"
+#include "log_handle.h"
 #include "platform.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
@@ -1741,8 +1742,6 @@ int main( int argc, char * const argv[] )
 
 	liberror_error_t *error                                 = NULL;
 
-	process_status_t *process_status                        = NULL;
-
 	libsystem_character_t *acquiry_software_version         = NULL;
 	libsystem_character_t *calculated_md5_hash_string       = NULL;
 	libsystem_character_t *calculated_sha1_hash_string      = NULL;
@@ -1764,7 +1763,9 @@ int main( int argc, char * const argv[] )
 	libsystem_character_t *secondary_target_filename        = NULL;
 	libsystem_character_t *target_filename                  = NULL;
 
-	FILE *log_file_stream                                   = NULL;
+	log_handle_t *log_handle                                = NULL;
+
+	process_status_t *process_status                        = NULL;
 
 	libsystem_integer_t option                              = 0;
 	off64_t resume_acquiry_offset                           = 0;
@@ -4322,16 +4323,37 @@ int main( int argc, char * const argv[] )
 	{
 		if( log_filename != NULL )
 		{
-			log_file_stream = libsystem_file_stream_open(
-					   log_filename,
-					   _LIBSYSTEM_CHARACTER_T_STRING( "a" ) );
-
-			if( log_file_stream == NULL )
+			if( log_handle_initialize(
+			     &log_handle,
+			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to open log file: %s.\n",
+				 "Unable to create log handle.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+			}
+			else if( log_handle_open(
+			          log_handle,
+			          log_filename,
+			          &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to open log file: %" PRIs_LIBSYSTEM ".\n",
 				 log_filename );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				log_handle_free(
+				 &log_handle,
+				 NULL );
 			}
 		}
 		if( imaging_handle_acquiry_errors_fprint(
@@ -4348,20 +4370,22 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 		}
-		if( ( log_file_stream != NULL )
-		 && ( imaging_handle_acquiry_errors_fprint(
-		       ewfacquire_imaging_handle,
-		       log_file_stream,
-		       &error ) != 1 ) )
+		if( log_handle != NULL )
 		{
-			fprintf(
-			 stderr,
-			 "Unable to write acquiry errors in log file.\n" );
+			if( imaging_handle_acquiry_errors_fprint(
+			    ewfacquire_imaging_handle,
+			    log_handle->log_stream,
+			    &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to write acquiry errors in log file.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+			}
 		}
 	}
 	if( imaging_handle_close(
@@ -4377,10 +4401,14 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 
-		if( log_file_stream != NULL )
+		if( log_handle != NULL )
 		{
-			libsystem_file_stream_close(
-			 log_file_stream );
+			log_handle_close(
+			 log_handle,
+			 NULL );
+			log_handle_free(
+			 &log_handle,
+			 NULL );
 		}
 		if( calculate_sha1 == 1 )
 		{
@@ -4411,10 +4439,14 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 
-		if( log_file_stream != NULL )
+		if( log_handle != NULL )
 		{
-			libsystem_file_stream_close(
-			 log_file_stream );
+			log_handle_close(
+			 log_handle,
+			 NULL );
+			log_handle_free(
+			 &log_handle,
+			 NULL );
 		}
 		if( calculate_sha1 == 1 )
 		{
@@ -4442,10 +4474,14 @@ int main( int argc, char * const argv[] )
 	}
         if( status != PROCESS_STATUS_COMPLETED )
         {
-		if( log_file_stream != NULL )
+		if( log_handle != NULL )
 		{
-			libsystem_file_stream_close(
-			 log_file_stream );
+			log_handle_close(
+			 log_handle,
+			 NULL );
+			log_handle_free(
+			 &log_handle,
+			 NULL );
 		}
 		if( calculate_sha1 == 1 )
 		{
@@ -4466,10 +4502,10 @@ int main( int argc, char * const argv[] )
 		 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 		 calculated_md5_hash_string );
 
-		if( log_file_stream != NULL )
+		if( log_handle != NULL )
 		{
-			fprintf(
-			 log_file_stream,
+			log_handle_printf(
+			 log_handle,
 			 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_md5_hash_string );
 		}
@@ -4483,25 +4519,48 @@ int main( int argc, char * const argv[] )
 		 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 		 calculated_sha1_hash_string );
 
-		if( log_file_stream != NULL )
+		if( log_handle != NULL )
 		{
-			fprintf(
-			 log_file_stream,
+			log_handle_printf(
+			 log_handle,
 			 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
 			 calculated_sha1_hash_string );
 		}
 		memory_free(
 		 calculated_sha1_hash_string );
 	}
-	if( log_file_stream != NULL )
+	if( log_handle != NULL )
 	{
-		if( libsystem_file_stream_close(
-		     log_file_stream ) != 0 )
+		if( log_handle_close(
+		     log_handle,
+		     &error ) != 0 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to close log file: %s.\n",
+			 "Unable to close log file: %" PRIs_LIBSYSTEM ".\n",
 			 log_filename );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			log_handle_free(
+			 &log_handle,
+			 NULL );
+		}
+		else if( log_handle_free(
+		          &log_handle,
+		          &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to free log handle.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 		}
 	}
 	return( EXIT_SUCCESS );

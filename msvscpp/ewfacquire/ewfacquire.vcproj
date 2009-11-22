@@ -156,6 +156,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\log_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\platform.c"
 				>
 			</File>
@@ -227,6 +231,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\io_usb.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\log_handle.h"
 				>
 			</File>
 			<File

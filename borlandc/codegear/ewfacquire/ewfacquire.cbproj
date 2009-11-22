@@ -43,124 +43,89 @@
 		<ItemGroup>
 			<LibFiles Include="..\Release\libewf.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>25</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\libsystem.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>33</BuildOrder>
 			</LibFiles>
 			<None Include="..\..\..\ewftools\process_status.h">
-				<BuildOrder>2</BuildOrder>
 			</None>
 			<None Include="..\..\..\ewftools\sha1.h">
-				<BuildOrder>3</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\storage_media_buffer.c">
-				<BuildOrder>4</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\storage_media_buffer.h">
-				<BuildOrder>5</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
-				<BuildOrder>6</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\byte_size_string.h">
-				<BuildOrder>7</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\device_handle.c">
-				<BuildOrder>8</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\device_handle.h">
-				<BuildOrder>9</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\digest_context.c">
-				<BuildOrder>10</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\digest_context.h">
-				<BuildOrder>11</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\digest_hash.c">
-				<BuildOrder>12</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\digest_hash.h">
-				<BuildOrder>13</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\ewfacquire.c">
-				<BuildOrder>14</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\ewfcommon.h">
-				<BuildOrder>15</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
-				<BuildOrder>16</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\ewfinput.h">
-				<BuildOrder>17</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
-				<BuildOrder>18</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\ewfoutput.h">
-				<BuildOrder>19</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\guid.c">
-				<BuildOrder>20</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\guid.h">
-				<BuildOrder>21</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\imaging_handle.c">
-				<BuildOrder>22</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\imaging_handle.h">
-				<BuildOrder>23</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\io_ata.c">
-				<BuildOrder>24</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\io_ata.h">
-				<BuildOrder>25</BuildOrder>
 			</None>
 			<None Include="..\..\..\ewftools\io_bus.h">
-				<BuildOrder>26</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\io_optical_disk.c">
-				<BuildOrder>27</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\io_optical_disk.h">
-				<BuildOrder>28</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\io_scsi.c">
-				<BuildOrder>29</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\io_scsi.h">
-				<BuildOrder>30</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\io_usb.c">
-				<BuildOrder>31</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\io_usb.h">
-				<BuildOrder>32</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\log_handle.c">
+			</CppCompile>
+			<None Include="..\..\..\ewftools\log_handle.h">
 			</None>
 			<None Include="..\..\..\ewftools\md5.h">
-				<BuildOrder>33</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\platform.c">
-				<BuildOrder>34</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\platform.h">
-				<BuildOrder>35</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\process_status.c">
-				<BuildOrder>36</BuildOrder>
 			</CppCompile>
 			<LibFiles Include="..\Release\libuna.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>37</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\liberror.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>38</BuildOrder>
 			</LibFiles>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

@@ -27,6 +27,7 @@
 #define _PYEWF_H
 
 #include <common.h>
+#include <types.h>
 
 /* Fix HAVE_FSTAT define in pyport.h
  */
@@ -38,10 +39,38 @@
 extern "C" {
 #endif
 
-PyObject* pyewf_open(
+PyObject* pyewf_get_version(
+           PyObject *self );
+
+PyObject* pyewf_get_flags_read(
+           PyObject *self );
+
+PyObject* pyewf_get_flags_read_write(
+           PyObject *self );
+
+PyObject* pyewf_get_flags_write(
+           PyObject *self );
+
+PyObject* pyewf_get_flags_write_resume(
+           PyObject *self );
+
+PyObject* pyewf_check_file_signature(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
+
+PyObject* pyewf_glob(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject* pyewf_set_notify_values(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject* pyewf_new_handle(
+           PyObject *self );
 
 PyMODINIT_FUNC initpyewf(
                 void );

@@ -1,5 +1,5 @@
 /*
- * Python bindings for libewf (pyewf)
+ * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
  * Copyright (c) 2009, Joachim Metz <forensics@hoffmannbv.nl>
@@ -24,7 +24,10 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
+
+#include <liberror.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -36,210 +39,58 @@
 
 #include <Python.h>
 
+#include <libewf.h>
+
 #include "pyewf.h"
-#include "pyewf_file.h"
+#include "pyewf_handle.h"
 
-PyMethodDef pyewf_object_methods[] = {
-	{ "close",
-	  (PyCFunction) pyewf_file_close,
-	  METH_NOARGS,
-	 "Close the EWF file(s)" },
-
-	{ "read",
-	  (PyCFunction) pyewf_file_read,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Read media data from EWF file(s)" },
-
-	{ "seek",
-	  (PyCFunction) pyewf_file_seek_offset,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Seek within the media data" },
-
-	{ "tell",
-	  (PyCFunction) pyewf_file_get_offset,
-	  METH_NOARGS,
-	  "Return the current offset within the media data" },
-
-	{ "get_header_value",
-	  (PyCFunction) pyewf_file_get_header_value,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Retrieve a header value by its name" },
-
-	{ "get_header_values",
-	  (PyCFunction) pyewf_file_get_header_values,
-	  METH_NOARGS,
-	  "Retrieve all header values" },
-
-	/* Sentinel */
-	{ NULL, NULL, 0, NULL }
-};
-
-PyTypeObject pyewf_type_object = {
-	PyObject_HEAD_INIT( NULL )
-
-	/* ob_size */
-	0,
-	/* tp_name */
-	"pyewf.file",
-	/* tp_basicsize */
-	sizeof(pyewf_file_t),
-	/* tp_itemsize */
-	0,
-	/* tp_dealloc */
-	(destructor) pyewf_file_free,
-	/* tp_print */
-	0,
-	/* tp_getattr */
-	0,
-	/* tp_setattr */
-	0,
-	/* tp_compare */
-	0,
-	/* tp_repr */
-	0,
-	/* tp_as_number */
-	0,
-	/* tp_as_sequence */
-	0,
-	/* tp_as_mapping */
-	0,
-	/* tp_hash */
-	0,
-	/* tp_call */
-	0,
-	/* tp_str */
-	0,
-	/* tp_getattro */
-	0,
-	/* tp_setattro */
-	0,
-	/* tp_as_buffer */
-	0,
-        /* tp_flags */
-	Py_TPFLAGS_DEFAULT,
-	/* tp_doc */
-	"libewf File Object",
-	/* tp_traverse */
-	0,
-	/* tp_clear */
-	0,
-	/* tp_richcompare */
-	0,
-	/* tp_weaklistoffset */
-	0,
-	/* tp_iter */
-	0,
-	/* tp_iternext */
-	0,
-	/* tp_methods */
-	pyewf_object_methods,
-	/* tp_members */
-	0,
-	/* tp_getset */
-	0,
-	/* tp_base */
-	0,
-	/* tp_dict */
-	0,
-	/* tp_descr_get */
-	0,
-	/* tp_descr_set */
-	0,
-	/* tp_dictoffset */
-	0,
-	/* tp_init */
-	(initproc) pyewf_file_initialize,
-	/* tp_alloc */
-	0,
-	/* tp_new */
-	0,
-	/* tp_free */
-	0,
-	/* tp_is_gc */
-	0,
-	/* tp_bases */
-	NULL,
-	/* tp_mro */
-	NULL,
-	/* tp_cache */
-	NULL,
-	/* tp_subclasses */
-	NULL,
-	/* tp_weaklist */
-	NULL,
-	/* tp_del */
-	0
-};
-
-PyObject* pyewf_open(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *files             = NULL;
-	PyObject *file_arguments    = NULL;
-	PyObject *file_keywords     = NULL;
-	pyewf_file_t *pyewf_file    = NULL;
-	static char *keyword_list[] = { "files", NULL };
-	int result                  = 0;
-
-	if( PyArg_ParseTupleAndKeywords(
-	     arguments,
-	     keywords,
-	     "O",
-	     keyword_list,
-	     &files ) == 0 )
-	{
-		return( NULL );
-	}
-	/* Create an pyewf_file object and return it
-	 */
-	file_arguments = PyTuple_New( 0 );
-
-	if( file_arguments == NULL )
-	{
-		return( NULL );
-	}
-	file_keywords = Py_BuildValue(
-	                 "{sO}",
-	                 "files",
-	                 files );
-
-	if( file_keywords == NULL )
-	{
-		return( NULL );
-	}
-	pyewf_file = PyObject_New(
-	              struct pyewf_file,
-	              &pyewf_type_object );
-
-	result = pyewf_file_initialize(
-	          pyewf_file,
-	          file_arguments,
-	          file_keywords );
-
-	Py_DECREF(
-	 file_arguments );
-	Py_DECREF(
-	 file_keywords );
-
-	if( result == -1 )
-	{
-		Py_DECREF(
-		 pyewf_file );
-
-		return( NULL );
-	}
-	return( (PyObject *) pyewf_file );
-}
-
-/* These are the module methods
+/* The pyewf module methods
  */
 PyMethodDef pyewf_module_methods[] = {
-	{ "open",
-	  (PyCFunction)pyewf_open,
-	  METH_VARARGS|METH_KEYWORDS,
-	  "Open Expert Wittness Compression Format (EWF) file(s)" },
+	{ "get_version",
+	  (PyCFunction) pyewf_get_version,
+	  METH_NOARGS,
+	  "Retrieves the pyewf (libewf) version" },
+
+	{ "get_flags_read",
+	  (PyCFunction) pyewf_get_flags_read,
+	  METH_NOARGS,
+	  "Retrieves the read open flags" },
+
+	{ "get_flags_read_write",
+	  (PyCFunction) pyewf_get_flags_read_write,
+	  METH_NOARGS,
+	  "Retrieves the read write open flags" },
+
+	{ "get_flags_write",
+	  (PyCFunction) pyewf_get_flags_write,
+	  METH_NOARGS,
+	  "Retrieves the write open flags" },
+
+	{ "get_flags_write_resume",
+	  (PyCFunction) pyewf_get_flags_write_resume,
+	  METH_NOARGS,
+	  "Retrieves the resume write open flags" },
+
+	{ "check_file_signature",
+	  (PyCFunction) pyewf_check_file_signature,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "Checks if a file has an EWF signature" },
+
+	{ "glob",
+	  (PyCFunction) pyewf_glob,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "Globs filenames according to the EWF segment file naming schema" },
+
+	{ "set_notify_values",
+	  (PyCFunction) pyewf_set_notify_values,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "Sets pyewf (libewf) notification values" },
+
+	{ "new_handle",
+	  (PyCFunction) pyewf_new_handle,
+	  METH_NOARGS,
+	  "Creates a new pyewf handle object" },
 
 	/* Sentinel */
 	{ NULL,
@@ -248,46 +99,231 @@ PyMethodDef pyewf_module_methods[] = {
 	  NULL}
 };
 
+/* Retrieves the pyewf/libewf version
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_get_version(
+           PyObject *self )
+{
+	const char *errors         = NULL;
+	const char *version_string = NULL;
+	size_t version_string_size = 0;
+
+	version_string = libewf_get_version();
+
+	version_string_size = 1 + narrow_string_length(
+	                           version_string );
+
+	return( PyUnicode_DecodeUTF8(
+	         version_string,
+	         (Py_ssize_t) version_string_size,
+	         errors ) );
+}
+
+/* Retrieves the pyewf/libewf read open flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_get_flags_read(
+           PyObject *self )
+{
+	return( PyInt_FromLong(
+	         (long) libewf_get_flags_read ) );
+}
+
+/* Retrieves the pyewf/libewf read write open flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_get_flags_read_write(
+           PyObject *self )
+{
+	return( PyInt_FromLong(
+	         (long) libewf_get_flags_read_write ) );
+}
+
+/* Retrieves the pyewf/libewf write open flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_get_flags_write(
+           PyObject *self )
+{
+	return( PyInt_FromLong(
+	         (long) libewf_get_flags_write() ) );
+}
+
+/* Retrieves the pyewf/libewf resume write open flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_get_flags_write_resume(
+           PyObject *self )
+{
+	return( PyInt_FromLong(
+	         (long) libewf_get_flags_write_resume() ) );
+}
+
+/* Checks if the file has an EWF signature
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_check_file_signature(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	liberror_error_t *error     = NULL;
+	static char *function       = "pyewf_check_file_signature";
+	static char *keyword_list[] = { "filename", NULL };
+	const char *filename        = NULL;
+	int result                  = 0;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "|s",
+	     keyword_list,
+	     &filename ) == 0 )
+	{
+		return( NULL );
+	}
+	result = libewf_check_file_signature(
+	          filename,
+	          &error );
+
+	if( result == -1 )
+	{
+		/* TODO something with error */
+
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to check file signature.",
+		 function );
+
+		liberror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( result != 0 )
+	{
+		return( Py_True );
+	}
+	return( Py_False );
+}
+
+/* Globs filenames according to the EWF segment file naming schema
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_glob(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	liberror_error_t *error     = NULL;
+	static char *function       = "pyewf_glob";
+	static char *keyword_list[] = { "filename", NULL };
+	const char *filename        = NULL;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "|s",
+	     keyword_list,
+	     &filename ) == 0 )
+	{
+		return( NULL );
+	}
+	/* TODO implement function */
+
+	return( Py_None );
+}
+
+/* Sets the pyewf (libewf) notification values
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_set_notify_values(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	static char *function       = "pyewf_set_notify_values";
+	static char *keyword_list[] = { "stream", "verbose", NULL };
+
+	/* TODO implement function */
+
+	return( Py_None );
+}
+
+/* Creates a new pyewf handle object
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject* pyewf_new_handle(
+           PyObject *self )
+{
+	static char *function       = "pyewf_new_handle";
+	pyewf_handle_t *pyewf_handle = NULL;
+	liberror_error_t *error      = NULL;
+
+	pyewf_handle = PyObject_New(
+	                struct pyewf_handle,
+	                &pyewf_handle_type_object );
+
+	if( pyewf_handle_initialize(
+	     pyewf_handle,
+	     &error ) != 1 )
+	{
+		/* TODO something with error */
+
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: failed to initialize pyewf handle.",
+		 function );
+
+		liberror_error_free(
+		 &error );
+		Py_DECREF(
+		 pyewf_handle );
+
+		return( NULL );
+	}
+	return( (PyObject *) pyewf_handle );
+}
+
 /* Declarations for DLL import/export
  */
 #ifndef PyMODINIT_FUNC
 #define PyMODINIT_FUNC void
 #endif
 
+/* Initializes the pyewf module
+ */
 PyMODINIT_FUNC initpyewf(
                 void ) 
 {
-	PyObject* module          = NULL;
-	PyTypeObject *type_object = NULL;
+	PyObject* module                 = NULL;
+	PyTypeObject *handle_type_object = NULL;
 
-	/* Create module
+	/* Create the module
 	 */
 	module = Py_InitModule3(
 	          "pyewf",
 	           pyewf_module_methods,
-	           "Python libewf module." );
+	           "Python libewf module (pyewf)." );
 
-	/* Setup pyewf_file type
+	/* Setup the handle type object
 	 */
-	pyewf_type_object.tp_new = PyType_GenericNew;
+	pyewf_handle_type_object.tp_new = PyType_GenericNew;
 
 	if( PyType_Ready(
-	     &pyewf_type_object ) < 0 )
+	     &pyewf_handle_type_object ) < 0 )
 	{
 		return;
 	}
 	Py_INCREF(
-	 &pyewf_type_object );
+	 &pyewf_handle_type_object );
 
-	type_object = &pyewf_type_object;
+	handle_type_object = &pyewf_handle_type_object;
 
 	PyModule_AddObject(
 	 module,
-	"pyewf_file",
-	(PyObject *) type_object );
-
-	libewf_set_notify_values(
-	 stderr,
-	 1 );
+	"pyewf_handle",
+	(PyObject *) handle_type_object );
 }
 

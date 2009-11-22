@@ -128,6 +128,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\log_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\process_status.c"
 				>
 			</File>
@@ -167,6 +171,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\log_handle.h"
 				>
 			</File>
 			<File
