@@ -3493,10 +3493,20 @@ ssize_t libewf_section_ltree_read(
 		return( -1 );
 	}
 #endif
+	if( libewf_single_file_entries_parse_ltree(
+	     ltree_data,
+	     ltree_data_size,
+	     error ) != 1 )
+	{
+		memory_free(
+		 ltree_data );
+
+		return( -1 );
+	}
 	memory_free(
 	 ltree_data );
 
-	return( read_count );
+	return( section_read_count );
 }
 
 /* Reads a session section from file

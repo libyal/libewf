@@ -396,7 +396,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open EWF file(s)" );
+		 "Unable to open EWF file(s).\n" );
 
 		libewf_handle_close(
 		 ewfdebug_input_handle,

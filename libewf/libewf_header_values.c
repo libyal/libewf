@@ -1104,9 +1104,11 @@ int libewf_header_values_parse_header_string(
 
 			return( -1 );
 		}
-		types_line_size = ( lines[ 2 ] == NULL ) ? 0 : 1 + libewf_string_length(
-		                                                    lines[ 2 ] );
-
+		if(  lines[ 2 ] != NULL )
+		{
+			types_line_size = 1 + libewf_string_length(
+		                               lines[ 2 ] );
+		}
 		if( libewf_string_split(
 		     lines[ 2 ],
 		     types_line_size,
@@ -1129,9 +1131,11 @@ int libewf_header_values_parse_header_string(
 
 			return( -1 );
 		}
-		values_line_size = ( lines[ 3 ] == NULL ) ? 0 : 1 + libewf_string_length(
-		                                                     lines[ 3 ] );
-
+		if( lines[ 3 ] != NULL )
+		{
+			values_line_size = 1 + libewf_string_length(
+		                                lines[ 3 ] );
+		}
 		if(libewf_string_split(
 		    lines[ 3 ],
 		    values_line_size,
@@ -1148,12 +1152,12 @@ int libewf_header_values_parse_header_string(
 			 function );
 
 			libewf_string_split_values_free(
-			 lines,
-			 amount_of_lines,
-			 NULL );
-			libewf_string_split_values_free(
 			 types,
 			 amount_of_types,
+			 NULL );
+			libewf_string_split_values_free(
+			 lines,
+			 amount_of_lines,
 			 NULL );
 
 			return( -1 );
@@ -1221,12 +1225,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1253,12 +1261,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1288,12 +1300,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1320,12 +1336,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1352,12 +1372,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1384,12 +1408,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1416,12 +1444,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1509,12 +1541,16 @@ int libewf_header_values_parse_header_string(
 								 function );
 
 								libewf_string_split_values_free(
-								 lines,
-								 amount_of_lines,
+								 values,
+								 amount_of_values,
 								 NULL );
 								libewf_string_split_values_free(
 								 types,
 								 amount_of_types,
+								 NULL );
+								libewf_string_split_values_free(
+								 lines,
+								 amount_of_lines,
 								 NULL );
 
 								return( -1 );
@@ -1541,12 +1577,16 @@ int libewf_header_values_parse_header_string(
 								 function );
 
 								libewf_string_split_values_free(
-								 lines,
-								 amount_of_lines,
+								 values,
+								 amount_of_values,
 								 NULL );
 								libewf_string_split_values_free(
 								 types,
 								 amount_of_types,
+								 NULL );
+								libewf_string_split_values_free(
+								 lines,
+								 amount_of_lines,
 								 NULL );
 
 								return( -1 );
@@ -1592,12 +1632,16 @@ int libewf_header_values_parse_header_string(
 							 function );
 
 							libewf_string_split_values_free(
-							 lines,
-							 amount_of_lines,
+							 values,
+							 amount_of_values,
 							 NULL );
 							libewf_string_split_values_free(
 							 types,
 							 amount_of_types,
+							 NULL );
+							libewf_string_split_values_free(
+							 lines,
+							 amount_of_lines,
 							 NULL );
 
 							return( -1 );
@@ -1625,12 +1669,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1657,12 +1705,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1689,12 +1741,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1721,12 +1777,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1753,12 +1813,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1785,12 +1849,16 @@ int libewf_header_values_parse_header_string(
 						 function );
 
 						libewf_string_split_values_free(
-						 lines,
-						 amount_of_lines,
+						 values,
+						 amount_of_values,
 						 NULL );
 						libewf_string_split_values_free(
 						 types,
 						 amount_of_types,
+						 NULL );
+						libewf_string_split_values_free(
+						 lines,
+						 amount_of_lines,
 						 NULL );
 
 						return( -1 );
@@ -1825,7 +1893,7 @@ int libewf_header_values_parse_header_string(
 			 amount_of_types,
 			 NULL );
 			libewf_string_split_values_free(
-			 values,
+			 lines,
 			 amount_of_values,
 			 NULL );
 

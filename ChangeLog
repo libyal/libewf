@@ -183,6 +183,9 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
 Work in progress:
+* move split function to split values
+  - do not copy sub strings, maintain offset and sizes in a separate structure ?
+
 * check sprintf use
    - liberror -> liberror_error_vsnprintf
    - libewf -> libewf_hash_values, libewf_header_values
@@ -201,7 +204,6 @@ Beta after next stable release
 * check make distclean
 
 Deprecated functions
-* MSC support +/-
 * BORLANDC support
 
 Next stable release:
@@ -212,6 +214,8 @@ Next stable release:
 * deprecated the v1 API
 * worked on pyewf rewrite
 * worked on implementing log handle in ewftools
+* small changes
+* worked on reading LVF files
 
 20091114
 * moved codepage definitions to libewf_codepage.h

@@ -205,6 +205,14 @@
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_segment_table.h">
 			</None>
+			<CppCompile Include="..\..\..\libewf\libewf_single_file_entries.c">
+			</CppCompile>
+			<None Include="..\..\..\libewf\libewf_single_file_entries.h">
+			</None>
+			<CppCompile Include="..\..\..\libewf\libewf_split_values.c">
+			</CppCompile>
+			<None Include="..\..\..\libewf\libewf_split_values.h">
+			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_string.c">
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_string.h">

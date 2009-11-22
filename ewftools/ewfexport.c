@@ -1350,7 +1350,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open EWF file(s)" );
+		 "Unable to open EWF file(s).\n" );
 
 		libsystem_notify_print_error_backtrace(
 		 error );

@@ -1590,6 +1590,10 @@ int info_handle_media_information_fprint(
 				format_string = "EWFX (extended EWF)";
 				break;
 
+			case LIBEWF_FORMAT_LVF:
+				format_string = "EnCase Logical File Evidence (LVF)";
+				break;
+
 			case LIBEWF_FORMAT_UNKNOWN:
 			default:
 				format_string = "unknown";
@@ -1757,6 +1761,12 @@ int info_handle_media_information_fprint(
 				fprintf(
 				 stream,
 				 "\tMedia type:\t\tfixed disk\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_SINGLE_FILES )
+			{
+				fprintf(
+				 stream,
+				 "\tMedia type:\t\tsingle files\n" );
 			}
 			else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
 			{

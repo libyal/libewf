@@ -206,6 +206,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_single_file_entries.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_split_values.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_string.c"
 				>
 			</File>
@@ -413,6 +421,14 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_segment_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_entries.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_split_values.h"
 				>
 			</File>
 			<File
