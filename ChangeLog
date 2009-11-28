@@ -210,6 +210,9 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20091128
+* updated byte stream
+
 20091122
 * deprecated the v1 API
 * worked on pyewf rewrite
