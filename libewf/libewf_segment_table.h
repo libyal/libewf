@@ -35,6 +35,7 @@
 #include "libewf_section_list.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_single_files.h"
 #include "libewf_system_string.h"
 
 #include "ewf_data.h"
@@ -92,6 +93,7 @@ int libewf_segment_table_build(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
+     libewf_single_files_t *single_files,
      int *abort,
      liberror_error_t **error );
 

@@ -39,6 +39,7 @@
 #include "libewf_read_io_handle.h"
 #include "libewf_segment_table.h"
 #include "libewf_sector_table.h"
+#include "libewf_single_files.h"
 #include "libewf_types.h"
 #include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
@@ -127,6 +128,14 @@ struct libewf_internal_handle
 	/* The sectors with acquiry read errors
 	 */
 	libewf_sector_table_t *acquiry_errors;
+
+	/* The single files
+	 */
+	libewf_single_files_t *single_files;
+
+	/* Value to indicate the single file entries were parsed
+	 */
+	uint8_t single_file_entries_parsed;
 
 	/* Value to indicate if abort was signalled
 	 */

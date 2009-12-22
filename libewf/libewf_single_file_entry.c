@@ -1,5 +1,5 @@
 /*
- * IO handle functions
+ * Low level reading functions
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
@@ -26,117 +26,95 @@
 
 #include <liberror.h>
 
-#include "libewf_definitions.h"
-#include "libewf_libbfio.h"
-#include "libewf_io_handle.h"
+#include "libewf_single_file_entry.h"
 
-#include "ewf_definitions.h"
-
-/* Initialize the write io handle
+/* Initialize the single file entry
  * Returns 1 if successful or -1 on error
  */
-int libewf_io_handle_initialize(
-     libewf_io_handle_t **io_handle,
+int libewf_single_file_entry_initialize(
+     libewf_single_file_entry_t **single_file_entry,
      liberror_error_t **error )
 {
-	static char *function = "libewf_io_handle_initialize";
+	static char *function = "libewf_single_file_entry_initialize";
 
-	if( io_handle == NULL )
+	if( single_file_entry == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid single file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( *io_handle == NULL )
+	if( *single_file_entry == NULL )
 	{
-		*io_handle = (libewf_io_handle_t *) memory_allocate(
-		                                     sizeof( libewf_io_handle_t ) );
+		*single_file_entry = (libewf_single_file_entry_t *) memory_allocate(
+		                                                     sizeof( libewf_single_file_entry_t ) );
 
-		if( io_handle == NULL )
+		if( *single_file_entry == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create write io handle.",
+			 "%s: unable to create single file entry.",
 			 function );
 
 			return( -1 );
 		}
 		if( memory_set(
-		     *io_handle,
+		     *single_file_entry,
 		     0,
-		     sizeof( libewf_io_handle_t ) ) == NULL )
+		     sizeof( libewf_single_file_entry_t ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear write io handle.",
+			 "%s: unable to clear single file entry.",
 			 function );
 
 			memory_free(
-			 *io_handle );
+			 *single_file_entry );
 
-			*io_handle = NULL;
+			*single_file_entry = NULL;
 
 			return( -1 );
 		}
-		( *io_handle )->format            = LIBEWF_FORMAT_UNKNOWN;
-		( *io_handle )->ewf_format        = EWF_FORMAT_UNKNOWN;
-		( *io_handle )->compression_level = EWF_COMPRESSION_UNKNOWN;
 	}
 	return( 1 );
 }
 
-/* Frees the write io handle including elements
+/* Frees the single file entry including elements
  * Returns 1 if successful or -1 on error
  */
-int libewf_io_handle_free(
-     libewf_io_handle_t **io_handle,
+int libewf_single_file_entry_free(
+     intptr_t *single_file_entry,
      liberror_error_t **error )
 {
-	static char *function = "libewf_io_handle_free";
-	int result            = 1;
+	static char *function = "libewf_single_file_entry_free";
 
-	if( io_handle == NULL )
+	if( single_file_entry == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid single file entry.",
 		 function );
 
 		return( 1 );
 	}
-	if( *io_handle != NULL )
+	if( ( (libewf_single_file_entry_t *) single_file_entry )->name != NULL )
 	{
-		if( ( ( *io_handle )->pool_created_in_library != 0 )
-		 && ( ( *io_handle )->file_io_pool != NULL )
-		 && ( libbfio_pool_free(
-		       &( ( *io_handle )->file_io_pool ),
-		       error ) != 1 ) )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free file io pool.",
-			 function );
-
-			result = -1;
-		}
 		memory_free(
-		 *io_handle );
-
-		*io_handle = NULL;
+		 ( (libewf_single_file_entry_t *) single_file_entry )->name );
 	}
-	return( result );
+	memory_free(
+	 single_file_entry );
+
+	return( 1 );
 }
 

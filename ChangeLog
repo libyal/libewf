@@ -210,6 +210,16 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+Refactor:
+* file io pool out of io handle?
+* rename uncompress to decompress
+
+20091222
+* applied multi header patch
+* updated libuna, libbfio, libsystem
+* improved free return value
+* worked on reading LVF files
+
 20091128
 * updated byte stream
 

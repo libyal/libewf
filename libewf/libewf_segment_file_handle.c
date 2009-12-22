@@ -140,6 +140,7 @@ int libewf_segment_file_handle_free(
      liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_free";
+	int result            = 1;
 
 	if( segment_file_handle == NULL )
 	{
@@ -167,6 +168,8 @@ int libewf_segment_file_handle_free(
 				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free section list.",
 				 function );
+
+				result = -1;
 			}
 		}
 		memory_free(
@@ -174,6 +177,6 @@ int libewf_segment_file_handle_free(
 
 		*segment_file_handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 

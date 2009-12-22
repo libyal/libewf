@@ -127,6 +127,7 @@ int libewf_read_io_handle_free(
      liberror_error_t **error )
 {
 	static char *function = "libewf_read_io_handle_free";
+	int result            = 1;
 
 	if( read_io_handle == NULL )
 	{
@@ -151,13 +152,15 @@ int libewf_read_io_handle_free(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free crc errors.",
 			 function );
+
+			result = -1;
 		}
 		memory_free(
 		 *read_io_handle );
 
 		*read_io_handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Processes the chunk data, applies decompression if necessary and validates the CRC

@@ -36,6 +36,7 @@
 #include "libewf_header_values.h"
 #include "libewf_metadata.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_single_files.h"
 #include "libewf_types.h"
 
 #include "ewf_definitions.h"
@@ -3313,7 +3314,9 @@ int libewf_handle_parse_header_values(
      liberror_error_t **error )
 {
 	static char *function = "libewf_handle_parse_header_values";
-	int result            = 1;
+	int result_header     = 1;
+	int result_header2    = 1;
+	int result_xheader    = 1;
 
 	if( internal_handle == NULL )
 	{
@@ -3387,7 +3390,7 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse header.",
 		 function );
 
-		result = -1;
+		result_header = -1;
 	}
 	if( ( internal_handle->header_sections->header2 != NULL )
 	 && ( libewf_header_values_parse_header2(
@@ -3403,7 +3406,7 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse header2.",
 		 function );
 
-		result = -1;
+		result_header2 = -1;
 	}
 	if( ( internal_handle->header_sections->xheader != NULL )
 	 && ( libewf_header_values_parse_xheader(
@@ -3419,11 +3422,20 @@ int libewf_handle_parse_header_values(
 		 "%s: unable to parse xheader.",
 		 function );
 
-		result = -1;
+		result_xheader = -1;
 	}
-	if( result != 1 )
+	if( ( result_header != 1 )
+	 && ( result_header2 != 1 )
+	 && ( result_xheader != 1 ) )
 	{
 		return( -1 );
+	}
+	if( ( result_header != 1 )
+	 || ( result_header2 != 1 )
+	 || ( result_xheader != 1 ) )
+	{
+		liberror_error_free(
+		 error );
 	}
 	/* The EnCase2 and EnCase3 format are the same
 	 * only the acquiry software version provides insight in which version of EnCase was used
@@ -4102,6 +4114,64 @@ int libewf_handle_parse_hash_values(
 	if( result != 1 )
 	{
 		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the single files test
+ * Returns 1 if successful, 0 if no single files are present or -1 on error
+ */
+int libewf_handle_get_single_files_test(
+     libewf_handle_t *handle,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_single_files_test";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->single_files == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->single_file_entries_parsed == 0 )
+	{
+		if( libewf_single_files_parse(
+		     internal_handle->single_files,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse single files.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->single_file_entries_parsed = 1;
+	}
+	if( internal_handle->single_files->root_file_entry_node == NULL )
+	{
+		return( 0 );
 	}
 	return( 1 );
 }

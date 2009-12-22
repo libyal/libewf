@@ -34,6 +34,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_single_files.h"
 #include "libewf_string.h"
 #include "libewf_types.h"
 #include "libewf_write_io_handle.h"
@@ -379,6 +380,49 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
+		if( libewf_single_files_initialize(
+		     &( internal_handle->single_files ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create single files.",
+			 function );
+
+			libewf_sector_table_free(
+			 &( internal_handle->acquiry_errors ),
+			 NULL );
+			libewf_sector_table_free(
+			 &( internal_handle->sessions ),
+			 NULL );
+			libewf_hash_sections_free(
+			 &( internal_handle->hash_sections ),
+			 NULL );
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ),
+			 NULL );
+			libewf_media_values_free(
+			 &( internal_handle->media_values ),
+			 NULL );
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ),
+			 NULL );
+			libewf_offset_table_free(
+			 &( internal_handle->offset_table ),
+			 NULL );
+			libewf_segment_table_free(
+			 &( internal_handle->delta_segment_table ),
+			 NULL );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ),
+			 NULL );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
 		*handle = (libewf_handle_t *) internal_handle;
 	}
 	return( 1 );
@@ -592,12 +636,25 @@ int libewf_handle_free(
 
 			result = -1;
 		}
+		if( libewf_single_files_free(
+		     &( internal_handle->single_files ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free single files.",
+			 function );
+
+			result = -1;
+		}
 		memory_free(
 		 internal_handle );
 
 		*handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Signals the libewf handle to abort its current activity
@@ -1548,6 +1605,7 @@ int libewf_handle_open_file_io_pool(
 		          internal_handle->offset_table,
 		          internal_handle->sessions,
 		          internal_handle->acquiry_errors,
+		          internal_handle->single_files,
 		          &( internal_handle->abort ),
 		          error );
 
@@ -1586,6 +1644,7 @@ int libewf_handle_open_file_io_pool(
 			       internal_handle->offset_table,
 			       internal_handle->sessions,
 			       internal_handle->acquiry_errors,
+			       internal_handle->single_files,
 			       &( internal_handle->abort ),
 			       error ) != 1 ) )
 			{

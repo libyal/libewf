@@ -1538,73 +1538,71 @@ int info_handle_media_information_fprint(
 
 		return( -1 );
 	}
-	else
+	switch( format )
 	{
-		switch( format )
-		{
-			case LIBEWF_FORMAT_EWF:
-				format_string = "original EWF";
-				break;
+		case LIBEWF_FORMAT_EWF:
+			format_string = "original EWF";
+			break;
 
-			case LIBEWF_FORMAT_SMART:
-				format_string = "SMART";
-				break;
+		case LIBEWF_FORMAT_SMART:
+			format_string = "SMART";
+			break;
 
-			case LIBEWF_FORMAT_FTK:
-				format_string = "FTK Imager";
-				break;
+		case LIBEWF_FORMAT_FTK:
+			format_string = "FTK Imager";
+			break;
 
-			case LIBEWF_FORMAT_ENCASE1:
-				format_string = "EnCase 1";
-				break;
+		case LIBEWF_FORMAT_ENCASE1:
+			format_string = "EnCase 1";
+			break;
 
-			case LIBEWF_FORMAT_ENCASE2:
-				format_string = "EnCase 2";
-				break;
+		case LIBEWF_FORMAT_ENCASE2:
+			format_string = "EnCase 2";
+			break;
 
-			case LIBEWF_FORMAT_ENCASE3:
-				format_string = "EnCase 3";
-				break;
+		case LIBEWF_FORMAT_ENCASE3:
+			format_string = "EnCase 3";
+			break;
 
-			case LIBEWF_FORMAT_ENCASE4:
-				format_string = "EnCase 4";
-				break;
+		case LIBEWF_FORMAT_ENCASE4:
+			format_string = "EnCase 4";
+			break;
 
-			case LIBEWF_FORMAT_ENCASE5:
-				format_string = "EnCase 5";
-				break;
+		case LIBEWF_FORMAT_ENCASE5:
+			format_string = "EnCase 5";
+			break;
 
-			case LIBEWF_FORMAT_ENCASE6:
-				format_string = "EnCase 6";
-				break;
+		case LIBEWF_FORMAT_ENCASE6:
+			format_string = "EnCase 6";
+			break;
 
-			case LIBEWF_FORMAT_LINEN5:
-				format_string = "linen 5";
-				break;
+		case LIBEWF_FORMAT_LINEN5:
+			format_string = "linen 5";
+			break;
 
-			case LIBEWF_FORMAT_LINEN6:
-				format_string = "linen 6";
-				break;
+		case LIBEWF_FORMAT_LINEN6:
+			format_string = "linen 6";
+			break;
 
-			case LIBEWF_FORMAT_EWFX:
-				format_string = "EWFX (extended EWF)";
-				break;
+		case LIBEWF_FORMAT_EWFX:
+			format_string = "EWFX (extended EWF)";
+			break;
 
-			case LIBEWF_FORMAT_LVF:
-				format_string = "EnCase Logical File Evidence (LVF)";
-				break;
+		case LIBEWF_FORMAT_LVF:
+			format_string = "EnCase Logical File Evidence (LVF)";
+			break;
 
-			case LIBEWF_FORMAT_UNKNOWN:
-			default:
-				format_string = "unknown";
-				break;
+		case LIBEWF_FORMAT_UNKNOWN:
+		default:
+			format_string = "unknown";
+			break;
 
-		}
-		fprintf(
-		 stdout,
-		 "\tFile format:\t\t%s\n",
-		 format_string );
 	}
+	fprintf(
+	 stdout,
+	 "\tFile format:\t\t%s\n",
+	 format_string );
+
 	if( ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( format == LIBEWF_FORMAT_LINEN5 )
@@ -1938,6 +1936,15 @@ int info_handle_media_information_fprint(
 	 stream,
 	 "\n" );
 
+	if( format == LIBEWF_FORMAT_LVF )
+	{
+		if( libewf_handle_get_single_files_test(
+		     info_handle->input_handle,
+		     error ) != 1 )
+		{
+			return( -1 );
+		}
+	}
 	return( result );
 }
 

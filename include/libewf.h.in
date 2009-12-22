@@ -1277,6 +1277,17 @@ LIBEWF_EXTERN int libewf_handle_set_hash_value(
         libewf_handle_set_hash_value( handle, "SHA1", 4, value, value_length, error )
 
 /* -------------------------------------------------------------------------
+ * Single files functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the single files test
+ * Returns 1 if successful, 0 if no single files are present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_single_files_test(
+                   libewf_handle_t *handle,
+                   libewf_error_t **error );
+
+/* -------------------------------------------------------------------------
  * APIv1 functions
  * ------------------------------------------------------------------------- */
 

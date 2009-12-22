@@ -58,11 +58,13 @@ libewf_la_SOURCES = \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_file_handle.c libewf_segment_file_handle.h \
 	libewf_segment_table.c libewf_segment_table.h \
-	libewf_single_file_entries.c libewf_single_file_entries.h \
+	libewf_single_files.c libewf_single_files.h \
+	libewf_single_file_entry.c libewf_single_file_entry.h \
 	libewf_split_values.c libewf_split_values.h \
 	libewf_string.c libewf_string.h \
 	libewf_support.c libewf_support.h \
 	libewf_system_string.h \
+	libewf_tree_type.c libewf_tree_type.h \
 	libewf_types.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h

@@ -33,6 +33,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
+#include "libewf_single_files.h"
 #include "libewf_system_string.h"
 
 #include "ewf_data.h"
@@ -174,6 +175,7 @@ int libewf_segment_table_free(
 {
 	static char *function           = "libewf_segment_table_free";
 	uint16_t segment_table_iterator = 0;
+	int result                      = 1;
 
 	if( segment_table == NULL )
 	{
@@ -201,6 +203,8 @@ int libewf_segment_table_free(
 				 "%s: unable to free segment file handle: %" PRIu16 ".",
 				 function,
 				 segment_table_iterator + 1 );
+
+				result = -1;
 			}
 		}
 		memory_free(
@@ -216,7 +220,7 @@ int libewf_segment_table_free(
 
 		*segment_table = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Resizes the segment table
@@ -305,6 +309,7 @@ int libewf_segment_table_build(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
+     libewf_single_files_t *single_files,
      int *abort,
      liberror_error_t **error )
 {
@@ -391,6 +396,7 @@ int libewf_segment_table_build(
 		          offset_table,
 		          sessions,
 		          acquiry_errors,
+		          single_files,
 		          error );
 
 		if( result == -1 )

@@ -1,5 +1,5 @@
 /*
- * Single file entries functions
+ * Single files functions
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
@@ -20,26 +20,62 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_SINGLE_FILE_ENTRIES_H )
-#define _LIBEWF_SINGLE_FILE_ENTRIES_H
+#if !defined( _LIBEWF_SINGLE_FILES_H )
+#define _LIBEWF_SINGLE_FILES_H
 
 #include <common.h>
 #include <types.h>
 
+#include "libewf_extern.h"
+#include "libewf_split_values.h"
 #include "libewf_string.h"
+#include "libewf_tree_type.h"
+#include "libewf_types.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libewf_single_file_entries_parse_file_entries_string(
+typedef struct libewf_single_files libewf_single_files_t;
+
+struct libewf_single_files
+{
+	/* The ltree data
+	 */
+	uint8_t *ltree_data;
+
+	/* The ltree data size
+	 */
+	size_t ltree_data_size;
+
+	/* The single file entry tree
+	 */
+	libewf_tree_node_t *root_file_entry_node;
+};
+
+int libewf_single_files_initialize(
+     libewf_single_files_t **single_files,
+     liberror_error_t **error );
+
+int libewf_single_files_free(
+     libewf_single_files_t **single_files,
+     liberror_error_t **error );
+
+int libewf_single_files_parse(
+     libewf_single_files_t *single_files,
+     liberror_error_t **error );
+
+int libewf_single_files_parse_file_entries(
+     libewf_single_files_t *single_files,
      libewf_character_t *file_entries_string,
      size_t file_entries_string_size,
      liberror_error_t **error );
 
-int libewf_single_file_entries_parse_ltree(
-     uint8_t *ltree,
-     size_t ltree_size,
+int libewf_single_files_parse_file_entry(
+     libewf_tree_node_t *file_entry_node,
+     libewf_split_values_t *lines,
+     int *line_iterator,
+     libewf_split_values_t *types,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

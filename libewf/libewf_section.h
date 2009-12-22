@@ -36,6 +36,7 @@
 #include "libewf_section_list.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_single_files.h"
 
 #include "ewf_crc.h"
 #include "ewf_data.h"
@@ -213,6 +214,8 @@ ssize_t libewf_section_ltree_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t *ewf_format,
+         uint8_t **cached_ltree_data,
+         size_t *cached_ltree_data_size,
          liberror_error_t **error );
 
 ssize_t libewf_section_session_read(
@@ -365,6 +368,7 @@ int libewf_section_read(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
+     libewf_single_files_t *single_files,
      int8_t *compression_level,
      uint8_t *format,
      uint8_t *ewf_format,

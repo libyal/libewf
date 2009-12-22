@@ -8,8 +8,7 @@
  *
  * This software is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation,
- either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This software is distributed in the hope that it will be useful,
@@ -18,8 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this software.  If not,
- see <http://www.gnu.org/licenses/>.
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <common.h>
@@ -34,9 +32,17 @@
 #include "libewf_definitions.h"
 #include "libewf_compression.h"
 #include "libewf_debug.h"
+#include "libewf_hash_sections.h"
 #include "libewf_header_values.h"
+#include "libewf_header_sections.h"
 #include "libewf_libbfio.h"
+#include "libewf_media_values.h"
+#include "libewf_offset_table.h"
 #include "libewf_section.h"
+#include "libewf_section_list.h"
+#include "libewf_sector_table.h"
+#include "libewf_segment_file_handle.h"
+#include "libewf_single_files.h"
 
 #include "ewf_data.h"
 #include "ewf_definitions.h"
@@ -3312,14 +3318,16 @@ ssize_t libewf_section_ltree_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t *ewf_format,
+         uint8_t **cached_ltree_data,
+         size_t *cached_ltree_data_size,
          liberror_error_t **error )
 {
 	ewf_ltree_t *ltree         = NULL;
 	uint8_t *ltree_data        = NULL;
 	static char *function      = "libewf_section_ltree_read";
-	ssize_t section_read_count = 0;
-	ssize_t read_count         = 0;
 	size_t ltree_data_size     = 0;
+	ssize_t read_count         = 0;
+	ssize_t section_read_count = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3350,6 +3358,28 @@ ssize_t libewf_section_ltree_read(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid ewf format.",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_ltree_data == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid cached ltree.",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_ltree_data_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid cached ltree data size.",
 		 function );
 
 		return( -1 );
@@ -3493,19 +3523,16 @@ ssize_t libewf_section_ltree_read(
 		return( -1 );
 	}
 #endif
-	if( libewf_single_file_entries_parse_ltree(
-	     ltree_data,
-	     ltree_data_size,
-	     error ) != 1 )
+	if( *cached_ltree_data == NULL )
+	{
+		*cached_ltree_data      = ltree_data;
+		*cached_ltree_data_size = ltree_data_size;
+	}
+	else
 	{
 		memory_free(
 		 ltree_data );
-
-		return( -1 );
 	}
-	memory_free(
-	 ltree_data );
-
 	return( section_read_count );
 }
 
@@ -6892,6 +6919,7 @@ int libewf_section_read(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
+     libewf_single_files_t *single_files,
      int8_t *compression_level,
      uint8_t *format,
      uint8_t *ewf_format,
@@ -7276,6 +7304,8 @@ int libewf_section_read(
 		              segment_file_handle,
  		              (size_t) section_size,
 		              ewf_format,
+		              &( single_files->ltree_data ),
+		              &( single_files->ltree_data_size ),
  		              error );
 	}
 	/* Read the session section

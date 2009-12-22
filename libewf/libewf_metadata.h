@@ -349,6 +349,10 @@ int libewf_handle_parse_hash_values(
      libewf_internal_handle_t *internal_handle,
      liberror_error_t **error );
 
+LIBEWF_EXTERN int libewf_handle_get_single_files_test(
+                   libewf_handle_t *handle,
+                   liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
