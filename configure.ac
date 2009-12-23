@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20091222],
+ [20091223],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20091222])
+ [20091223])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -129,7 +129,7 @@ dnl Headers included in libnotify/libnotify.c
 AC_CHECK_HEADERS([stdarg.h])
 AC_CHECK_HEADERS([varargs.h])
 
-dnl Headers included in libnotify/libnotify.c, libbfio/libbfio_file.c and libewf/libewf_header_values.c
+dnl Headers included in libnotify/libnotify.c, libbfio/libbfio_file.c and libewf/libewf_string.c
 AC_CHECK_HEADERS([errno.h])
 
 dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_directory_io.h and libsystem/libsystem_file_io.h

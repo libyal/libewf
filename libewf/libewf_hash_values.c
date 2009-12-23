@@ -29,6 +29,7 @@
 #include "libewf_definitions.h"
 #include "libewf_hash_values.h"
 #include "libewf_libuna.h"
+#include "libewf_split_values.h"
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
@@ -308,17 +309,16 @@ int libewf_hash_values_parse_hash_string_xml(
      size_t hash_string_xml_size,
      liberror_error_t **error )
 {
-	libewf_character_t **lines          = NULL;
+	libewf_split_values_t *lines        = NULL;
 	libewf_character_t *open_tag_start  = NULL;
 	libewf_character_t *open_tag_end    = NULL;
 	libewf_character_t *close_tag_start = NULL;
 	libewf_character_t *close_tag_end   = NULL;
 	static char *function               = "libewf_hash_values_parse_hash_string_xml";
-	size_t amount_of_lines              = 0;
 	size_t identifier_length            = 0;
-	size_t line_iterator                = 0;
 	size_t string_length                = 0;
 	size_t value_length                 = 0;
+	int line_iterator                   = 0;
 
 	if( hash_string_xml == NULL )
 	{
@@ -331,12 +331,11 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		return( -1 );
 	}
-	if( libewf_string_split(
+	if( libewf_split_values_parse_string(
+	     &lines,
 	     hash_string_xml,
 	     hash_string_xml_size,
 	     (libewf_character_t) '\n',
-	     &lines,
-	     &amount_of_lines,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -349,25 +348,21 @@ int libewf_hash_values_parse_hash_string_xml(
 		return( -1 );
 	}
 	for( line_iterator = 0;
-	     line_iterator < amount_of_lines;
+	     line_iterator < lines->amount_of_values;
 	     line_iterator++ )
 	{
-		if( ( lines[ line_iterator ] == NULL )
-		 || ( lines[ line_iterator ] == (libewf_character_t *) _LIBEWF_STRING( "" ) ) )
-		{
-			continue;
-		}
-		string_length = libewf_string_length(
-		                 lines[ line_iterator ] );
-
 		/* Ignore empty lines
 		 */
-		if( string_length == 0 )
+		if( ( lines->sizes[ line_iterator ] <= 1 )
+		 || ( lines->values[ line_iterator ] == NULL )
+		 || ( ( lines->values[ line_iterator ] )[ 0 ] == 0 ) )
 		{
 			continue;
 		}
+		string_length = lines->sizes[ line_iterator ] - 1;
+
 		open_tag_start = libewf_string_search(
-		                  lines[ line_iterator ],
+		                  lines->values[ line_iterator ],
 		                  '<',
 		                  string_length );
 
@@ -378,7 +373,7 @@ int libewf_hash_values_parse_hash_string_xml(
 			continue;
 		}
 		open_tag_end = libewf_string_search(
-		                lines[ line_iterator ],
+		                lines->values[ line_iterator ],
 		                '>',
 		                string_length );
 
@@ -390,7 +385,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		/* Ignore the first part of the XML string
 		 */
-		string_length -= (size_t) ( open_tag_end - lines[ line_iterator ] );
+		string_length -= (size_t) ( open_tag_end - lines->values[ line_iterator ] );
 
 		/* Ignore lines only containing a single tag
 		 */
@@ -448,17 +443,15 @@ int libewf_hash_values_parse_hash_string_xml(
 			 function,
 			 (char *) &open_tag_start[ 1 ] );
 
-			libewf_string_split_values_free(
-			 lines,
-			 amount_of_lines,
+			libewf_split_values_free(
+			 &lines,
 			 NULL );
 
 			return( -1 );
 		}
 	}
-	if( libewf_string_split_values_free(
-	     lines,
-	     amount_of_lines,
+	if( libewf_split_values_free(
+	     &lines,
 	     error ) != 1 )
 	{
 		liberror_error_set(

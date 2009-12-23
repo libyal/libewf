@@ -72,7 +72,7 @@ int libewf_single_files_parse_file_entries(
      liberror_error_t **error );
 
 int libewf_single_files_parse_file_entry(
-     libewf_tree_node_t *file_entry_node,
+     libewf_tree_node_t *parent_file_entry_node,
      libewf_split_values_t *lines,
      int *line_iterator,
      libewf_split_values_t *types,

@@ -112,17 +112,10 @@ typedef libuna_utf8_character_t libewf_character_t;
 #define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
 	libuna_utf16_stream_copy_from_utf8( stream, stream_size, byte_order, string, string_size, error )
 
-int libewf_string_split(
+int libewf_string_copy_to_64bit(
      libewf_character_t *string,
      size_t string_size,
-     libewf_character_t delimiter,
-     libewf_character_t ***split_values,
-     size_t *amount_of_split_values,
-     liberror_error_t **error );
-
-int libewf_string_split_values_free(
-     libewf_character_t **split_values,
-     size_t amount_of_split_values,
+     uint64_t *value_64bit,
      liberror_error_t **error );
 
 #if defined( _cplusplus )

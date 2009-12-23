@@ -26,6 +26,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_date_time.h"
 #include "libewf_string.h"
 
 #if defined( __cplusplus )
@@ -36,6 +37,18 @@ typedef struct libewf_single_file_entry libewf_single_file_entry_t;
 
 struct libewf_single_file_entry
 {
+	/* The data segment file number
+	 */
+	uint16_t data_segment_number;
+
+	/* The data offset
+	 */
+	off64_t data_offset;
+
+	/* The data size
+	 */
+	size64_t data_size;
+
 	/* The name
 	 */
 	libewf_character_t *name;
@@ -44,29 +57,33 @@ struct libewf_single_file_entry
 	 */
 	size_t name_size;
 
-	/* The flags
+	/* The (file) size
 	 */
-	uint32_t flags;
+	size64_t size;
 
 	/* The creation date and time
 	 */
-	uint32_t creation_time;
+	time_t creation_time;
 
 	/* The last modification date and time
 	 */
-	uint32_t modification_time;
+	time_t modification_time;
 
 	/* The last access date and time
 	 */
-	uint32_t access_time;
+	time_t access_time;
 
 	/* The last (file system) entry modification date and time
 	 */
-	uint32_t entry_modification_time;
+	time_t entry_modification_time;
 
-	/* A value to indicate if a chunk should be wiped on error
+	/* The MD5 digest hash
 	 */
-	uint8_t wipe_on_error;
+	libewf_character_t *md5_hash;
+
+	/* The MD5 digest hash size
+	 */
+	size_t md5_hash_size;
 };
 
 int libewf_single_file_entry_initialize(

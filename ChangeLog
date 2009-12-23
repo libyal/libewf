@@ -213,6 +213,11 @@ Next stable release:
 Refactor:
 * file io pool out of io handle?
 * rename uncompress to decompress
+* make libewf_convert_date_header_value more strict
+
+20091223
+* replaced string split by split values
+* worked on reading LVF files
 
 20091222
 * applied multi header patch

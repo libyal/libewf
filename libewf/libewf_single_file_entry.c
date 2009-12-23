@@ -112,6 +112,11 @@ int libewf_single_file_entry_free(
 		memory_free(
 		 ( (libewf_single_file_entry_t *) single_file_entry )->name );
 	}
+	if( ( (libewf_single_file_entry_t *) single_file_entry )->md5_hash != NULL )
+	{
+		memory_free(
+		 ( (libewf_single_file_entry_t *) single_file_entry )->md5_hash );
+	}
 	memory_free(
 	 single_file_entry );
 

@@ -40,6 +40,8 @@
 #include "libewf_date_time.h"
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
+#include "libewf_split_values.h"
+#include "libewf_string.h"
 
 /* Copies date and time values string from a timestamp
  * The string must be at least 20 characters + the length of the timezone string and/or timezone name of size including the end of string character
@@ -140,9 +142,8 @@ int libewf_date_time_values_copy_to_timestamp(
 {
 	struct tm time_elements;
 
-	libewf_character_t **date_time_elements = NULL;
-	static char *function                   = "libewf_convert_date_header_value";
-	size_t amount_of_date_time_elements     = 0;
+	libewf_split_values_t *date_time_elements = NULL;
+	static char *function                     = "libewf_convert_date_header_value";
 
 	if( date_time_values_string == NULL )
 	{
@@ -177,12 +178,11 @@ int libewf_date_time_values_copy_to_timestamp(
 
 		return( -1 );
 	}
-	if( libewf_string_split(
-	     date_time_values_string,
-	     date_time_values_string_length,
-	     (libewf_character_t) ' ',
+	if( libewf_split_values_parse_string(
 	     &date_time_elements,
-	     &amount_of_date_time_elements,
+	     date_time_values_string,
+	     date_time_values_string_length + 1,
+	     (libewf_character_t) ' ',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -194,7 +194,7 @@ int libewf_date_time_values_copy_to_timestamp(
 
 		return( -1 );
 	}
-	if( amount_of_date_time_elements < 6 )
+	if( date_time_elements->amount_of_values < 6 )
 	{
 		liberror_error_set(
 		 error,
@@ -203,54 +203,52 @@ int libewf_date_time_values_copy_to_timestamp(
 		 "%s: unsupported amount of elements in date time values string.",
 		 function );
 
-		libewf_string_split_values_free(
-		 date_time_elements,
-		 amount_of_date_time_elements,
+		libewf_split_values_free(
+		 &date_time_elements,
 	         NULL );
 
 		return( -1 );
 	}
 	/* Set the year
 	 */
-	time_elements.tm_year = (int) ( ( ( date_time_elements[ 0 ][ 0 ] - (libewf_character_t) '0' ) * 1000 )
-	                      + ( ( date_time_elements[ 0 ][ 1 ] - (libewf_character_t) '0' ) * 100 )
-	                      + ( ( date_time_elements[ 0 ][ 2 ] - (libewf_character_t) '0' ) * 10 )
-	                      + ( date_time_elements[ 0 ][ 3 ] - (libewf_character_t) '0' )
+	time_elements.tm_year = (int) ( ( ( ( date_time_elements->values[ 0 ] )[ 0 ] - (libewf_character_t) '0' ) * 1000 )
+	                      + ( ( ( date_time_elements->values[ 0 ] )[ 1 ] - (libewf_character_t) '0' ) * 100 )
+	                      + ( ( ( date_time_elements->values[ 0 ] )[ 2 ] - (libewf_character_t) '0' ) * 10 )
+	                      + ( ( date_time_elements->values[ 0 ] )[ 3 ] - (libewf_character_t) '0' )
 	                      - 1900 );
 
 	/* Set the month
 	 */
-	time_elements.tm_mon = (int) ( ( ( date_time_elements[ 1 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                     + ( date_time_elements[ 1 ][ 1 ] - (libewf_character_t) '0' )
+	time_elements.tm_mon = (int) ( ( ( ( date_time_elements->values[ 1 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
+	                     + ( ( date_time_elements->values[ 1 ] )[ 1 ] - (libewf_character_t) '0' )
 	                     - 1 );
 
 	/* Set the day of the month
 	 */
-	time_elements.tm_mday = (int) ( ( ( date_time_elements[ 2 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                      + ( date_time_elements[ 2 ][ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_mday = (int) ( ( ( ( date_time_elements->values[ 2 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
+	                      + ( ( date_time_elements->values[ 2 ] )[ 1 ] - (libewf_character_t) '0' ) );
 
 	/* Set the hour
 	 */
-	time_elements.tm_hour = (int) ( ( ( date_time_elements[ 3 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                      + ( date_time_elements[ 3 ][ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_hour = (int) ( ( ( ( date_time_elements->values[ 3 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
+	                      + ( ( date_time_elements->values[ 3 ] )[ 1 ] - (libewf_character_t) '0' ) );
 
 	/* Set the minutes
 	 */
-	time_elements.tm_min = (int) ( ( ( date_time_elements[ 4 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                     + ( date_time_elements[ 4 ][ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_min = (int) ( ( ( ( date_time_elements->values[ 4 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
+	                     + ( ( date_time_elements->values[ 4 ] )[ 1 ] - (libewf_character_t) '0' ) );
 
 	/* Set the seconds
 	 */
-	time_elements.tm_sec = (int) ( ( ( date_time_elements[ 5 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                     + ( date_time_elements[ 5 ][ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_sec = (int) ( ( ( ( date_time_elements->values[ 5 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
+	                     + ( ( date_time_elements->values[ 5 ] )[ 1 ] - (libewf_character_t) '0' ) );
 
 	/* Set to ignore the daylight saving time
 	 */
 	time_elements.tm_isdst = -1;
 
-	if( libewf_string_split_values_free(
-	     date_time_elements,
-	     amount_of_date_time_elements,
+	if( libewf_split_values_free(
+	     &date_time_elements,
 	     error ) != 1 )
 	{
 		liberror_error_set(
