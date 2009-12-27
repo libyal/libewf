@@ -31,6 +31,7 @@
 #include "libewf_codepage.h"
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
+#include "libewf_file_entry.h"
 #include "libewf_handle.h"
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
@@ -2690,7 +2691,7 @@ int libewf_handle_get_amount_of_header_values(
 	return( 1 );
 }
 
-/* Retrieves the header value identifier size specified by its index
+/* Retrieves the size of the UTF-8 encoded header value identifier of a specific index
  * The identifier size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -2757,8 +2758,7 @@ int libewf_handle_get_header_value_identifier_size(
 }
 
 
-/* Retrieves the header value identifier specified by its index
- * The strings are encoded in UTF-8
+/* Retrieves the UTF-8 encoded header value identifier of a specific index
  * The identifier size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -2826,7 +2826,7 @@ int libewf_handle_get_header_value_identifier(
 	return( result );
 }
 
-/* Retrieves the header value size specified by the identifier
+/* Retrieves the size of the UTF-8 encoded header value of an UTF-8 encoded identifier
  * The value size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -2965,8 +2965,7 @@ int libewf_handle_get_header_value_size(
 	return( result );
 }
 
-/* Retrieves the header value specified by the identifier
- * The strings are encoded in UTF-8
+/* Retrieves the UTF-8 encoded header value of an UTF-8 encoded identifier
  * The value size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -3116,8 +3115,7 @@ int libewf_handle_get_header_value(
 	return( result );
 }
 
-/* Sets the header value specified by the identifier
- * The strings are encoded in UTF-8
+/* Sets the UTF-8 encoded header value specified by the UTF-8 encoded identifier
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_header_value(
@@ -3512,7 +3510,7 @@ int libewf_handle_get_amount_of_hash_values(
 	return( 1 );
 }
 
-/* Retrieves the hash value identifier size specified by its index
+/* Retrieves the size of the UTF-8 encoded hash value identifier of a specific index
  * The identifier size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -3578,8 +3576,7 @@ int libewf_handle_get_hash_value_identifier_size(
 	return( result );
 }
 
-/* Retrieves the hash value identifier specified by its index
- * The strings are encoded in UTF-8
+/* Retrieves the UTF-8 encoded hash value identifier of a specific index
  * The identifier size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -3647,7 +3644,7 @@ int libewf_handle_get_hash_value_identifier(
 	return( result );
 }
 
-/* Retrieves the hash value size specified by the identifier
+/* Retrieves the size of the UTF-8 encoded hash value of an UTF-8 encoded identifier
  * The value size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -3728,8 +3725,7 @@ int libewf_handle_get_hash_value_size(
 	return( result );
 }
 
-/* Retrieves the hash value specified by the identifier
- * The strings are encoded in UTF-8
+/* Retrieves the UTF-8 encoded hash value of an UTF-8 encoded identifier
  * The value size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -3823,8 +3819,7 @@ int libewf_handle_get_hash_value(
 	return( result );
 }
 
-/* Sets the hash value specified by the identifier
- * The strings are encoded in UTF-8
+/* Sets the UTF-8 encoded hash value specified by the UTF-8 encoded identifier
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_hash_value(
@@ -4118,15 +4113,16 @@ int libewf_handle_parse_hash_values(
 	return( 1 );
 }
 
-/* Retrieves the single files test
- * Returns 1 if successful, 0 if no single files are present or -1 on error
+/* Retrieves the root (single) file entry
+ * Returns 1 if successful, 0 if no file entries are present or -1 on error
  */
-int libewf_handle_get_single_files_test(
+int libewf_handle_get_root_file_entry(
      libewf_handle_t *handle,
+     libewf_file_entry_t **root_file_entry,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_single_files_test";
+	static char *function                     = "libewf_handle_get_root_file_entry";
 
 	if( handle == NULL )
 	{
@@ -4152,6 +4148,28 @@ int libewf_handle_get_single_files_test(
 
 		return( -1 );
 	}
+	if( root_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid root file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *root_file_entry != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: root file entry already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->single_file_entries_parsed == 0 )
 	{
 		if( libewf_single_files_parse(
@@ -4172,6 +4190,40 @@ int libewf_handle_get_single_files_test(
 	if( internal_handle->single_files->root_file_entry_node == NULL )
 	{
 		return( 0 );
+	}
+	if( libewf_file_entry_initialize(
+	     root_file_entry,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize root file entry.",
+		 function );
+
+		return( -1 );
+	}
+	/* TODO pass LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_IO_HANDLE */
+	if( libewf_file_entry_attach(
+	     (libewf_internal_file_entry_t *) *root_file_entry,
+	     internal_handle,
+	     internal_handle->single_files->root_file_entry_node,
+	     0,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to attach root file entry.",
+		 function );
+
+		libewf_file_entry_free(
+		 root_file_entry,
+		 NULL );
+
+		return( -1 );
 	}
 	return( 1 );
 }

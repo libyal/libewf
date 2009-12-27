@@ -555,6 +555,20 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 	}
+	if( info_handle_single_files_fprint(
+	     info_handle,
+	     stdout,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to print single files.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
 	if( libsystem_signal_detach(
 	     &error ) != 1 )
 	{

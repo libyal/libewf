@@ -1936,15 +1936,6 @@ int info_handle_media_information_fprint(
 	 stream,
 	 "\n" );
 
-	if( format == LIBEWF_FORMAT_LVF )
-	{
-		if( libewf_handle_get_single_files_test(
-		     info_handle->input_handle,
-		     error ) != 1 )
-		{
-			return( -1 );
-		}
-	}
 	return( result );
 }
 
@@ -2270,7 +2261,9 @@ int info_handle_acquiry_errors_fprint(
 		 "\ttotal amount: %" PRIu32 "\n",
 		 amount_of_errors );
 		
-		for( error_iterator = 0; error_iterator < amount_of_errors; error_iterator++ )
+		for( error_iterator = 0;
+		     error_iterator < amount_of_errors;
+		     error_iterator++ )
 		{
 			if( libewf_handle_get_acquiry_error(
 			     info_handle->input_handle,
@@ -2378,7 +2371,9 @@ int info_handle_sessions_fprint(
 		 "\ttotal amount: %" PRIu32 "\n",
 		 amount_of_sessions );
 
-		for( session_iterator = 0; session_iterator < amount_of_sessions; session_iterator++ )
+		for( session_iterator = 0;
+		     session_iterator < amount_of_sessions;
+		     session_iterator++ )
 		{
 			if( libewf_handle_get_session(
 			     info_handle->input_handle,
@@ -2412,5 +2407,285 @@ int info_handle_sessions_fprint(
 		 "\n" );
 	}
 	return( result );
+}
+
+/* Print the single files to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_single_files_fprint(
+     info_handle_t *info_handle,
+     FILE *stream,
+     liberror_error_t **error )
+{
+	libewf_file_entry_t *file_entry = NULL;
+	static char *function           = "info_handle_single_files_fprint";
+	int result                      = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid info handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_handle_get_root_file_entry(
+	          info_handle->input_handle,
+	          &file_entry,
+	          error );
+
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve root file entry.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 stream,
+		 "Single files:\n" );
+
+		if( info_handle_file_entry_fprint(
+		     info_handle,
+		      file_entry,
+		      stream,
+		      error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print header value: extents.",
+			 function );
+
+			libewf_file_entry_free(
+			 &file_entry,
+			 NULL );
+
+			return( -1 );
+		}
+		fprintf(
+		 stream,
+		 "\n" );
+
+		if( libewf_file_entry_free(
+		     &file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free root file entry.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Print the (single) file entry to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_file_entry_fprint(
+     info_handle_t *info_handle,
+     libewf_file_entry_t *file_entry,
+     FILE *stream,
+     liberror_error_t **error )
+{
+	libewf_file_entry_t *sub_file_entry = NULL;
+	uint8_t *name                       = NULL;
+	static char *function               = "info_handle_file_entry_fprint";
+	size_t name_size                    = 0;
+	int amount_of_sub_file_entries      = 0;
+	int sub_file_entry_iterator         = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_file_entry_get_name_size(
+	     file_entry,
+	     &name_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the name.",
+		 function );
+
+		return( -1 );
+	}
+	name = (uint8_t *) memory_allocate(
+	                    sizeof( uint8_t ) * name_size );
+
+	if( name == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create name.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_file_entry_get_name(
+	     file_entry,
+	     name,
+	     name_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the name.",
+		 function );
+
+		memory_free(
+		 name );
+
+		return( -1 );
+	}
+	fprintf(
+	 stream,
+	 "\tname\t: %s\n",
+	 name );
+
+	memory_free(
+	 name );
+
+	if( libewf_file_entry_get_amount_of_sub_file_entries(
+	     file_entry,
+	     &amount_of_sub_file_entries,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve amount of sub file entries.",
+		 function );
+
+		return( -1 );
+	}
+	for( sub_file_entry_iterator = 0;
+	     sub_file_entry_iterator < amount_of_sub_file_entries;
+	     sub_file_entry_iterator++ )
+	{
+		if( libewf_file_entry_get_sub_file_entry(
+		     file_entry,
+		     sub_file_entry_iterator,
+		     &sub_file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to free retrieve sub file entry: %d.",
+			 function,
+			 sub_file_entry_iterator );
+
+			return( -1 );
+		}
+		if( info_handle_file_entry_fprint(
+		     info_handle,
+		     sub_file_entry,
+		     stream,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print header value: extents.",
+			 function );
+
+			libewf_file_entry_free(
+			 &sub_file_entry,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libewf_file_entry_free(
+		     &sub_file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sub file entry.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
 }
 

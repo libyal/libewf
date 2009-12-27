@@ -127,6 +127,17 @@ int info_handle_sessions_fprint(
      FILE *stream,
      liberror_error_t **error );
 
+int info_handle_single_files_fprint(
+     info_handle_t *info_handle,
+     FILE *stream,
+     liberror_error_t **error );
+
+int info_handle_file_entry_fprint(
+     info_handle_t *info_handle,
+     libewf_file_entry_t *file_entry,
+     FILE *stream,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

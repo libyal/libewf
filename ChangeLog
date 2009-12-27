@@ -6,7 +6,9 @@ Roadmap:
   - to allow low level access to sections etc. (for recovery)
 * lvf support
   - add support for interaction with data in ltree section
-  - use libpff like item approach?
+  - add functions to manual
+* thread aware lvf support
+  - implement libewf_single_file_entry_clone
 * xsignature section to sign xhash and/or hash
 * library/tools enhancements
   - getoptlong
@@ -93,6 +95,7 @@ Python bindings
 
 API changes
 * add wide character functions definitions by default?
+* add both UTF-8 and UTF-16 header and hash values, file entry name functions
 * libbfio API extension
   - add means to set pools open handle limit in libewf (partial completed)
   - add means to obtain libbfio handle of media data in ewf
@@ -214,6 +217,9 @@ Refactor:
 * file io pool out of io handle?
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
+
+20091225
+* worked on reading LVF files
 
 20091224
 * fixed debug output of file header offset

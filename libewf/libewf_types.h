@@ -35,6 +35,7 @@
 /* The following type definitions hide internal data structures
  */
 typedef intptr_t libewf_handle_t;
+typedef intptr_t libewf_file_entry_t;
 
 #endif
 

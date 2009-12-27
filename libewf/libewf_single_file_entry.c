@@ -123,3 +123,15 @@ int libewf_single_file_entry_free(
 	return( 1 );
 }
 
+/* Clones the existing single file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_file_entry_clone(
+     intptr_t **destination,
+     intptr_t *source,
+     liberror_error_t **error )
+{
+	/* TODO */
+	return( -1 );
+}
+

@@ -94,6 +94,11 @@ int libewf_single_file_entry_free(
      intptr_t *single_file_entry,
      liberror_error_t **error );
 
+int libewf_single_file_entry_clone(
+     intptr_t **destination,
+     intptr_t *source,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

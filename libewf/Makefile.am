@@ -37,6 +37,7 @@ libewf_la_SOURCES = \
 	libewf_error.c libewf_error.h \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \
+	libewf_file_entry.c libewf_file_entry.h \
 	libewf_handle.c libewf_handle.h \
 	libewf_hash_sections.c libewf_hash_sections.h \
 	libewf_hash_values.c libewf_hash_values.h \

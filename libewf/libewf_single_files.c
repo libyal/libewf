@@ -1028,6 +1028,29 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 				  _LIBEWF_STRING( "mo" ),
 				  type_string_length ) == 0 )
 			{
+				if( libewf_string_copy_to_64bit(
+				     values->values[ value_iterator ],
+				     value_string_length + 1,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set entry modification time.",
+					 function );
+
+					libewf_single_file_entry_free(
+					 (intptr_t *) single_file_entry,
+					 NULL );
+					libewf_split_values_free(
+					 &values,
+					 NULL );
+
+					return( -1 );
+				}
+				single_file_entry->entry_modification_time = (time_t) value_64bit;
 			}
 			else if( libewf_string_compare(
 				  types->values[ value_iterator ],
@@ -1168,25 +1191,8 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 	}
 	*line_iterator += 1;
 
-	if( libewf_tree_node_initialize(
-	     &file_entry_node,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create single file entry node.",
-		 function );
-
-		libewf_single_file_entry_free(
-		 (intptr_t *) single_file_entry,
-		 NULL );
-
-		return( -1 );
-	}
 	if( libewf_tree_node_set_value(
-	     file_entry_node,
+	     parent_file_entry_node,
 	     (intptr_t *) single_file_entry,
 	     error ) != 1 )
 	{
@@ -1199,25 +1205,6 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 
 		libewf_single_file_entry_free(
 		 (intptr_t *) single_file_entry,
-		 NULL );
-
-		return( -1 );
-	}
-	if( libewf_tree_node_append_node(
-	     parent_file_entry_node,
-	     file_entry_node,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append single file entry node to parent.",
-		 function );
-
-		libewf_tree_node_free(
-		 &file_entry_node,
-		 &libewf_single_file_entry_free,
 		 NULL );
 
 		return( -1 );
@@ -1235,6 +1222,19 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 	}
 	while( amount_of_child_entries > 0 )
 	{
+		if( libewf_tree_node_initialize(
+		     &file_entry_node,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create single file entry node.",
+			 function );
+
+			return( -1 );
+		}
 		if( libewf_single_files_parse_file_entry(
 		     file_entry_node,
 		     lines,
@@ -1249,8 +1249,34 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 			 "%s: unable to parse file entry.",
 			 function );
 
+			libewf_tree_node_free(
+			 &file_entry_node,
+			 &libewf_single_file_entry_free,
+			 NULL );
+
 			return( -1 );
 		}
+		if( libewf_tree_node_append_node(
+		     parent_file_entry_node,
+		     file_entry_node,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append single file entry node to parent.",
+			 function );
+
+			libewf_tree_node_free(
+			 &file_entry_node,
+			 &libewf_single_file_entry_free,
+			 NULL );
+
+			return( -1 );
+		}
+		file_entry_node = NULL;
+
 		amount_of_child_entries--;
 	}
 	return( 1 );
