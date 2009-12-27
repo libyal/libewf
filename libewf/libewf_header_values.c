@@ -1516,10 +1516,13 @@ int libewf_header_values_parse_header_string(
 								return( -1 );
 							}
 						}
-						memory_free(
-						 date_time_values_string );
+						if( date_time_values_string != NULL )
+						{
+							memory_free(
+							 date_time_values_string );
 
-						date_time_values_string = NULL;
+							date_time_values_string = NULL;
+						}
 					}
 				}
 				else if( libewf_string_compare(

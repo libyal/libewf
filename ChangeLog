@@ -215,6 +215,10 @@ Refactor:
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
 
+20091224
+* fixed debug output of file header offset
+* worked on reading LVF files
+
 20091223
 * replaced string split by split values
 * worked on reading LVF files

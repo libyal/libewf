@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20091223],
+ [20091224],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20091223])
+ [20091224])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -1581,7 +1581,7 @@ dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
 dnl Set memwatch support
-ac_libewf_have_memwatch=no
+ac_libewf_have_memwatch=yes
 
 AS_IF(
 	[test "x$ac_libewf_have_memwatch" != xno ],

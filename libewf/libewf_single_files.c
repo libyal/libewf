@@ -121,8 +121,23 @@ int libewf_single_files_free(
 			memory_free(
 			 ( *single_files )->ltree_data );
 		}
-		/* TODO free tree */
+		if( ( *single_files )->root_file_entry_node != NULL )
+		{
+			if( libewf_tree_node_free(
+			     &( ( *single_files )->root_file_entry_node ),
+			     &libewf_single_file_entry_free,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free single file entry tree.",
+				 function );
 
+				result = -1;
+			}
+		}
 		memory_free(
 		 *single_files );
 
@@ -247,11 +262,10 @@ int libewf_single_files_parse_file_entries(
      size_t entries_string_size,
      liberror_error_t **error )
 {
-	libewf_split_values_t *lines        = NULL;
-	libewf_split_values_t *types        = NULL;
-	libewf_tree_node_t *file_entry_node = NULL;
-	static char *function               = "libewf_single_files_parse_file_entries";
-	int line_iterator                   = 0;
+	libewf_split_values_t *lines = NULL;
+	libewf_split_values_t *types = NULL;
+	static char *function        = "libewf_single_files_parse_file_entries";
+	int line_iterator            = 0;
 
 	if( single_files == NULL )
 	{
@@ -352,12 +366,27 @@ int libewf_single_files_parse_file_entries(
 			}
 			line_iterator += 1;
 
-			/* TODO create the root node
-			 * parse the first single file entry separately (it is different)
-			 */
+			if( libewf_tree_node_initialize(
+			     &( single_files->root_file_entry_node ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create root single file entry node.",
+				 function );
 
+				libewf_split_values_free(
+				 &lines,
+				 NULL );
+
+				return( -1 );
+			}
+			/* TODO parse first entries differently ?
+			 */
 			if( libewf_single_files_parse_file_entry(
-			     file_entry_node,
+			     single_files->root_file_entry_node,
 			     lines,
 			     &line_iterator,
 			     types,
@@ -442,7 +471,6 @@ int libewf_single_files_parse_file_entry(
 	uint64_t value_64bit                          = 0;
 	int value_iterator                            = 0;
 
-/* TODO
 	if( parent_file_entry_node == NULL )
 	{
 		liberror_error_set(
@@ -454,7 +482,6 @@ int libewf_single_files_parse_file_entry(
 
 		return( 1 );
 	}
-*/
 	if( lines == NULL )
 	{
 		liberror_error_set(
@@ -1122,27 +1149,6 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 		}
 #endif
 	}
-	/* TODO create a file entry node */
-	/* TODO append file entry to node */
-	/* TODO remove file entry free when file entry is added to node
-	 */
-	if( libewf_single_file_entry_free(
-	     (intptr_t *) single_file_entry,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free single file entry.",
-		 function );
-
-		libewf_split_values_free(
-		 &values,
-		 NULL );
-
-		return( -1 );
-	}
 	if( libewf_split_values_free(
 	     &values,
 	     error ) != 1 )
@@ -1154,10 +1160,68 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 		 "%s: unable to free split values.",
 		 function );
 
+		libewf_single_file_entry_free(
+		 (intptr_t *) single_file_entry,
+		 NULL );
+
 		return( -1 );
 	}
 	*line_iterator += 1;
 
+	if( libewf_tree_node_initialize(
+	     &file_entry_node,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create single file entry node.",
+		 function );
+
+		libewf_single_file_entry_free(
+		 (intptr_t *) single_file_entry,
+		 NULL );
+
+		return( -1 );
+	}
+	if( libewf_tree_node_set_value(
+	     file_entry_node,
+	     (intptr_t *) single_file_entry,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set single file entry in node.",
+		 function );
+
+		libewf_single_file_entry_free(
+		 (intptr_t *) single_file_entry,
+		 NULL );
+
+		return( -1 );
+	}
+	if( libewf_tree_node_append_node(
+	     parent_file_entry_node,
+	     file_entry_node,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append single file entry node to parent.",
+		 function );
+
+		libewf_tree_node_free(
+		 &file_entry_node,
+		 &libewf_single_file_entry_free,
+		 NULL );
+
+		return( -1 );
+	}
 	if( ( *line_iterator + amount_of_child_entries ) > (uint64_t) lines->amount_of_values )
 	{
 		liberror_error_set(
