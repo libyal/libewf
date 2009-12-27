@@ -2741,11 +2741,14 @@ int libewf_get_amount_of_header_values(
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_get_amount_of_header_values";
+	int result              = 0;
 
-	if( libewf_handle_get_amount_of_header_values(
-	     handle,
-	     amount_of_values,
-	     &error ) != 1 )
+	result = libewf_handle_get_amount_of_header_values(
+	          handle,
+	          amount_of_values,
+	          &error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 &error,
@@ -2761,7 +2764,7 @@ int libewf_get_amount_of_header_values(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the header value identifier size specified by its index

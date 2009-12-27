@@ -218,6 +218,7 @@ Refactor:
 20091224
 * fixed debug output of file header offset
 * worked on reading LVF files
+* aplied amount of headers patch for v1 api
 
 20091223
 * replaced string split by split values
