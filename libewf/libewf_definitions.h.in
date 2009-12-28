@@ -29,7 +29,11 @@
 #define LIBEWF_ENDIAN_BIG			_BYTE_STREAM_ENDIAN_BIG
 #define LIBEWF_ENDIAN_LITTLE			_BYTE_STREAM_ENDIAN_LITTLE
 
+#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+#define LIBEWF_2_TIB				0x20000000000UL
+#else
 #define LIBEWF_2_TIB				0x20000000000ULL
+#endif
 
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */

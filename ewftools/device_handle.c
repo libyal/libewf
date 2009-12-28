@@ -1021,11 +1021,14 @@ int device_handle_get_media_size(
 		device_handle->media_size_set = 1;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		libsystem_notify_verbose_printf(
-		 "%s: block size: %" PRIu32 " block count: %" PRIu64 " ",
-		 function,
-		 device_handle->bytes_per_sector,
-		 block_count );
+		if( libsystem_notify_verbose != 0 )
+		{
+			libsystem_notify_printf(
+			 "%s: block size: %" PRIu32 " block count: %" PRIu64 " ",
+			 function,
+			 device_handle->bytes_per_sector,
+			 block_count );
+		}
 #endif
 #endif
 	}
@@ -1041,10 +1044,13 @@ int device_handle_get_media_size(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libsystem_notify_verbose_printf(
-	 "%s: device size: %" PRIu64 "\n",
-	 function,
-	 device_handle->media_size );
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_printf(
+		 "%s: device size: %" PRIu64 "\n",
+		 function,
+		 device_handle->media_size );
+	}
 #endif
 
 	*media_size = device_handle->media_size;
@@ -1281,10 +1287,13 @@ int device_handle_get_bytes_per_sector(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libsystem_notify_verbose_printf(
-	 "%s: sector size: %" PRIu32 "\n",
-	 function,
-	 device_handle->bytes_per_sector );
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_printf(
+		 "%s: sector size: %" PRIu32 "\n",
+		 function,
+		 device_handle->bytes_per_sector );
+	}
 #endif
 
 	*bytes_per_sector = device_handle->bytes_per_sector;
@@ -1543,9 +1552,12 @@ int device_handle_determine_media_information(
 		if( (size_t) ( (STORAGE_DESCRIPTOR_HEADER *) response )->Size > sizeof( STORAGE_DEVICE_DESCRIPTOR ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			libsystem_notify_verbose_print_data(
-			 response,
-			 (size_t) response_count );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_print_data(
+				 response,
+				 (size_t) response_count );
+			}
 #endif
 
 			if( ( (STORAGE_DEVICE_DESCRIPTOR *) response )->VendorIdOffset > 0 )
@@ -1816,9 +1828,12 @@ int device_handle_determine_media_information(
 		if( response_count > 32 )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			libsystem_notify_verbose_print_data(
-			 response,
-			 response_count );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_print_data(
+				 response,
+				 response_count );
+			}
 #endif
 			result = device_handle_trim_copy_from_byte_stream(
 				  device_handle->vendor,
@@ -1882,9 +1897,12 @@ int device_handle_determine_media_information(
 		if( response_count > 4 )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			libsystem_notify_verbose_print_data(
-			 response,
-			 response_count );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_print_data(
+				 response,
+				 response_count );
+			}
 #endif
 			result = device_handle_trim_copy_from_byte_stream(
 				  device_handle->serial_number,

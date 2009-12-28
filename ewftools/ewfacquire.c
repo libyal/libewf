@@ -815,11 +815,14 @@ ssize_t ewfacquire_read_buffer(
 			      error );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libsystem_notify_verbose_printf(
-		 "%s: read buffer at offset: %" PRIu64 " of size: %" PRIzd ".\n",
-		 function,
-		 current_offset + (off64_t) read_error_buffer_offset,
-		 read_count );
+		if( libsystem_notify_verbose != 0 )
+		{
+			libsystem_notify_printf(
+			 "%s: read buffer at offset: %" PRIu64 " of size: %" PRIzd ".\n",
+			 function,
+			 current_offset + (off64_t) read_error_buffer_offset,
+			 read_count );
+		}
 #endif
 
 		if( read_count < 0 )
@@ -926,11 +929,14 @@ ssize_t ewfacquire_read_buffer(
 			if( current_read_offset != current_calculated_offset )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_verbose_printf(
-				 "%s: correcting offset drift calculated: %" PRIjd ", current: %" PRIjd ".\n",
-				 function,
-				 current_calculated_offset,
-				 current_read_offset );
+				if( libsystem_notify_verbose != 0 )
+				{
+					libsystem_notify_printf(
+					 "%s: correcting offset drift calculated: %" PRIjd ", current: %" PRIjd ".\n",
+					 function,
+					 current_calculated_offset,
+					 current_read_offset );
+				}
 #endif
 
 				if( current_read_offset < current_calculated_offset )
@@ -983,11 +989,14 @@ ssize_t ewfacquire_read_buffer(
 		read_amount_of_errors++;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libsystem_notify_verbose_printf(
-		 "%s: read error: %" PRIi16 " at offset %" PRIjd ".\n",
-		 function,
-		 read_amount_of_errors,
-		 current_offset + (off64_t) read_error_buffer_offset );
+		if( libsystem_notify_verbose != 0 )
+		{
+			libsystem_notify_printf(
+			 "%s: read error: %" PRIi16 " at offset %" PRIjd ".\n",
+			 function,
+			 read_amount_of_errors,
+			 current_offset + (off64_t) read_error_buffer_offset );
+		}
 #endif
 
 		if( read_amount_of_errors > (int16_t) read_error_retry )
@@ -1021,11 +1030,14 @@ ssize_t ewfacquire_read_buffer(
 			if( wipe_block_on_read_error == 1 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_verbose_printf(
-				 "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
-				 function,
-				 byte_error_granularity,
-				 error_granularity_offset );
+				if( libsystem_notify_verbose != 0 )
+				{
+					libsystem_notify_printf(
+					 "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
+					 function,
+					 byte_error_granularity,
+					 error_granularity_offset );
+				}
 #endif
 
 				if( memory_set(
@@ -1048,11 +1060,14 @@ ssize_t ewfacquire_read_buffer(
 			else
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_verbose_printf(
-				 "%s: wiping remainder of block: %" PRIu32 " at offset %" PRIzd ".\n",
-				 function,
-				 error_skip_bytes,
-				 read_error_buffer_offset );
+				if( libsystem_notify_verbose != 0 )
+				{
+					libsystem_notify_printf(
+					 "%s: wiping remainder of block: %" PRIu32 " at offset %" PRIzd ".\n",
+					 function,
+					 error_skip_bytes,
+					 read_error_buffer_offset );
+				}
 #endif
 
 				if( memory_set(
@@ -1073,11 +1088,14 @@ ssize_t ewfacquire_read_buffer(
 				read_error_amount_of_bytes = error_skip_bytes;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libsystem_notify_verbose_printf(
-			 "%s: adding read error at offset: %" PRIu64 ", amount of bytes: %" PRIu32 ".\n",
-			 function,
-			 read_error_offset,
-			 read_error_amount_of_bytes );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_printf(
+				 "%s: adding read error at offset: %" PRIu64 ", amount of bytes: %" PRIu32 ".\n",
+				 function,
+				 read_error_offset,
+				 read_error_amount_of_bytes );
+			}
 #endif
 
 			if( imaging_handle_add_read_error(
@@ -1100,9 +1118,12 @@ ssize_t ewfacquire_read_buffer(
 			if( ( current_offset + (off64_t) read_remaining_bytes ) >= (off64_t) total_input_size )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_verbose_printf(
-				 "%s: at end of input no remaining bytes to read from chunk.\n",
-				 function );
+				if( libsystem_notify_verbose != 0 )
+				{
+					libsystem_notify_printf(
+					 "%s: at end of input no remaining bytes to read from chunk.\n",
+					 function );
+				}
 #endif
 
 				read_count = (ssize_t) read_remaining_bytes;
@@ -1110,10 +1131,13 @@ ssize_t ewfacquire_read_buffer(
 				break;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libsystem_notify_verbose_printf(
-			 "%s: skipping %" PRIu32 " bytes.\n",
-			 function,
-			 error_skip_bytes );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_printf(
+				 "%s: skipping %" PRIu32 " bytes.\n",
+				 function,
+				 error_skip_bytes );
+			}
 #endif
 
 			if( device_handle_seek_offset(
@@ -1152,10 +1176,13 @@ ssize_t ewfacquire_read_buffer(
 				read_amount_of_errors     = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_verbose_printf(
-				 "%s: %" PRIzd " bytes remaining to read from chunk.\n",
-				 function,
-				 remaining_read_size );
+				if( libsystem_notify_verbose != 0 )
+				{
+					libsystem_notify_printf(
+					 "%s: %" PRIzd " bytes remaining to read from chunk.\n",
+					 function,
+					 remaining_read_size );
+				}
 #endif
 			}
 			else
@@ -1163,9 +1190,12 @@ ssize_t ewfacquire_read_buffer(
 				read_count = (ssize_t) read_remaining_bytes;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_verbose_printf(
-				 "%s: no bytes remaining to read from chunk.\n",
-				 function );
+				if( libsystem_notify_verbose != 0 )
+				{
+					libsystem_notify_printf(
+					 "%s: no bytes remaining to read from chunk.\n",
+					 function );
+				}
 #endif
 
 				break;

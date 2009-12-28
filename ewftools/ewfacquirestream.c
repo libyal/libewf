@@ -730,11 +730,14 @@ ssize_t ewfacquirestream_read_chunk(
 			              bytes_to_read );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libsystem_notify_verbose_printf(
-			 "%s: read buffer at: %" PRIu64 " of size: %" PRIzd ".\n",
-			 function,
-			 total_read_count,
-			 read_count );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_printf(
+				 "%s: read buffer at: %" PRIu64 " of size: %" PRIzd ".\n",
+				 function,
+				 total_read_count,
+				 read_count );
+			}
 #endif
 
 			if( read_count <= -1 )
@@ -826,11 +829,14 @@ ssize_t ewfacquirestream_read_chunk(
 					return( 0 );
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_verbose_printf(
-				 "%s: read error at offset %" PRIjd " after reading %" PRIzd " bytes.\n",
-				 function,
-				 total_read_count,
-				 read_count );
+				if( libsystem_notify_verbose != 0 )
+				{
+					libsystem_notify_printf(
+					 "%s: read error at offset %" PRIjd " after reading %" PRIzd " bytes.\n",
+					 function,
+					 total_read_count,
+					 read_count );
+				}
 #endif
 
 				/* There was a read error at a certain offset

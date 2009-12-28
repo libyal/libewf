@@ -211,9 +211,12 @@ int io_usb_control_command(
 	}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
-	libsystem_notify_verbose_print_data(
-	 buffer,
-	 buffer_size );
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_print_data(
+		 buffer,
+		 buffer_size );
+	}
 #endif
 	return( 1 );
 }
@@ -276,9 +279,12 @@ int io_usb_test(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libsystem_notify_verbose_print_data(
-	 (uint8_t *) &connection_information,
-	 sizeof( struct usbdevfs_connectinfo ) );
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_print_data(
+		 (uint8_t *) &connection_information,
+		 sizeof( struct usbdevfs_connectinfo ) );
+	}
 #endif
 #endif
 	return( 1 );

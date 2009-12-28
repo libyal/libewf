@@ -113,7 +113,7 @@ extern "C" {
 	(wchar_t *) wmemrchr( (void *) string, (wchar_t) character, size )
 #endif
 
-/* String formatted print (snprinf)
+/* String formatted print (swprintf)
  */
 #if defined( _MSC_VER )
 #define wide_string_snprintf( target, size, ... ) \

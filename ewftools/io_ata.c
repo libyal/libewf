@@ -115,36 +115,39 @@ int io_ata_get_device_configuration(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libsystem_notify_verbose_print_data(
-	 (uint8_t *) device_configuration,
-	 sizeof( struct hd_driveid ) );
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_print_data(
+		 (uint8_t *) device_configuration,
+		 sizeof( struct hd_driveid ) );
 
-	libsystem_notify_verbose_printf(
-	 "Feature sets:\n" );
-	libsystem_notify_verbose_printf(
-	 "SMART:\t\t\t%d\n",
-	 ( device_configuration->command_set_1 & 0x0001 ) );
-	libsystem_notify_verbose_printf(
-	 "Security Mode:\t\t%d (%d)\n",
-	 ( device_configuration->command_set_1 & 0x0002 ) >> 1,
-	 ( device_configuration->dlf & 0x0001 ) );
-	libsystem_notify_verbose_printf(
-	 "Security Mode enabled:\t%d\n",
-	 ( device_configuration->dlf & 0x0002 ) >> 1 );
-	libsystem_notify_verbose_printf(
-	 "Removable Media:\t%d\n",
-	 ( device_configuration->command_set_1 & 0x0004 ) >> 2 );
-	libsystem_notify_verbose_printf(
-	 "HPA:\t\t\t%d\n",
-	 ( device_configuration->command_set_1 & 0x0400 ) >> 10 );
-	libsystem_notify_verbose_printf(
-	 "DCO:\t\t\t%d\n",
-	 ( device_configuration->command_set_2 & 0x0800 ) >> 11 );
-	libsystem_notify_verbose_printf(
-	 "Media serial:\t\t%d\n",
-	 ( device_configuration->cfsse & 0x0004 ) >> 2 );
-	libsystem_notify_verbose_printf(
-	 "\n" );
+		libsystem_notify_printf(
+		 "Feature sets:\n" );
+		libsystem_notify_printf(
+		 "SMART:\t\t\t%d\n",
+		 ( device_configuration->command_set_1 & 0x0001 ) );
+		libsystem_notify_printf(
+		 "Security Mode:\t\t%d (%d)\n",
+		 ( device_configuration->command_set_1 & 0x0002 ) >> 1,
+		 ( device_configuration->dlf & 0x0001 ) );
+		libsystem_notify_printf(
+		 "Security Mode enabled:\t%d\n",
+		 ( device_configuration->dlf & 0x0002 ) >> 1 );
+		libsystem_notify_printf(
+		 "Removable Media:\t%d\n",
+		 ( device_configuration->command_set_1 & 0x0004 ) >> 2 );
+		libsystem_notify_printf(
+		 "HPA:\t\t\t%d\n",
+		 ( device_configuration->command_set_1 & 0x0400 ) >> 10 );
+		libsystem_notify_printf(
+		 "DCO:\t\t\t%d\n",
+		 ( device_configuration->command_set_2 & 0x0800 ) >> 11 );
+		libsystem_notify_printf(
+		 "Media serial:\t\t%d\n",
+		 ( device_configuration->cfsse & 0x0004 ) >> 2 );
+		libsystem_notify_printf(
+		 "\n" );
+	}
 #endif
 #endif
 	return( 1 );

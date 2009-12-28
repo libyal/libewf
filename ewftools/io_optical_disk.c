@@ -84,11 +84,14 @@ int io_optical_disk_get_table_of_contents(
 	last_entry  = toc_header.cdth_trk1;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libsystem_notify_verbose_printf(
-	 "Table of contents (TOC):\n" );
-	libsystem_notify_verbose_printf(
-	 "\tAmount of entries:\t%d\n",
-	 last_entry );
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_printf(
+		 "Table of contents (TOC):\n" );
+		libsystem_notify_printf(
+		 "\tAmount of entries:\t%d\n",
+		 last_entry );
+	}
 #endif
 
 	for( entry_iterator = (uint16_t) first_entry;
@@ -126,31 +129,41 @@ int io_optical_disk_get_table_of_contents(
 
 			return( -1 );
 		}
-		libsystem_notify_verbose_printf(
-		 "\tTrack: %" PRIu16 "",
-		 entry_iterator );
-
+		if( libsystem_notify_verbose != 0 )
+		{
+			libsystem_notify_printf(
+			 "\tTrack: %" PRIu16 "",
+			 entry_iterator );
+		}
 		if( toc_entry.cdte_format == CDROM_MSF )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			libsystem_notify_verbose_printf(
-			 " start:\t\t%02" PRIu8 ":%02" PRIu8 ".%" PRIu8 "",
-			 toc_entry.cdte_addr.msf.minute,
-			 toc_entry.cdte_addr.msf.second,
-			 toc_entry.cdte_addr.msf.frame );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_printf(
+				 " start:\t\t%02" PRIu8 ":%02" PRIu8 ".%" PRIu8 "",
+				 toc_entry.cdte_addr.msf.minute,
+				 toc_entry.cdte_addr.msf.second,
+				 toc_entry.cdte_addr.msf.frame );
+			}
 #endif
 		}
 		else if( toc_entry.cdte_format == CDROM_LBA )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			libsystem_notify_verbose_printf(
-			 " start:\t\t%" PRIu32 "",
-			 toc_entry.cdte_addr.lba );
+			if( libsystem_notify_verbose != 0 )
+			{
+				libsystem_notify_printf(
+				 " start:\t\t%" PRIu32 "",
+				 toc_entry.cdte_addr.lba );
+			}
 #endif
 		}
-		libsystem_notify_verbose_printf(
-		 "\n" );
-
+		if( libsystem_notify_verbose != 0 )
+		{
+			libsystem_notify_printf(
+			 "\n" );
+		}
 		if( ( toc_entry.cdte_ctrl & CDROM_DATA_TRACK ) == CDROM_DATA_TRACK )
 		{
 		}
@@ -186,30 +199,40 @@ int io_optical_disk_get_table_of_contents(
 
 		return( -1 );
 	}
-	libsystem_notify_verbose_printf(
-	 "\tLead out" );
-
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_printf(
+		 "\tLead out" );
+	}
 	if( toc_entry.cdte_format == CDROM_MSF )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		libsystem_notify_verbose_printf(
-		 " start:\t\t%02" PRIu8 ":%02" PRIu8 ".%" PRIu8 "",
-		 toc_entry.cdte_addr.msf.minute,
-		 toc_entry.cdte_addr.msf.second,
-		 toc_entry.cdte_addr.msf.frame );
+		if( libsystem_notify_verbose != 0 )
+		{
+			libsystem_notify_printf(
+			 " start:\t\t%02" PRIu8 ":%02" PRIu8 ".%" PRIu8 "",
+			 toc_entry.cdte_addr.msf.minute,
+			 toc_entry.cdte_addr.msf.second,
+			 toc_entry.cdte_addr.msf.frame );
+		}
 #endif
 	}
 	else if( toc_entry.cdte_format == CDROM_LBA )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		libsystem_notify_verbose_printf(
-		 " start:\t\t%" PRIu32 "",
-		 toc_entry.cdte_addr.lba );
+		if( libsystem_notify_verbose != 0 )
+		{
+			libsystem_notify_printf(
+			 " start:\t\t%" PRIu32 "",
+			 toc_entry.cdte_addr.lba );
+		}
 #endif
 	}
-	libsystem_notify_verbose_printf(
-	 "\n\n" );
-
+	if( libsystem_notify_verbose != 0 )
+	{
+		libsystem_notify_printf(
+		 "\n\n" );
+	}
 	return( 1 );
 }
 

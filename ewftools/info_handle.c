@@ -1378,10 +1378,9 @@ int info_handle_header_value_extents_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	libsystem_character_t **extents_elements = NULL;
-	static char *function                    = "info_handle_header_value_extents_fprint";
-	size_t amount_of_extents_elements        = 0;
-	size_t extents_element_iterator          = 0;
+	libsystem_split_values_t *extents_elements = NULL;
+	static char *function                      = "info_handle_header_value_extents_fprint";
+	int extents_element_iterator               = 0;
 
 	if( stream == NULL )
 	{
@@ -1394,12 +1393,11 @@ int info_handle_header_value_extents_fprint(
 
 		return( -1 );
 	}
-	if( libsystem_string_split(
+	if( libsystem_split_values_parse_string(
+	     &extents_elements,
 	     header_value,
 	     header_value_length,
 	     (libsystem_character_t) ' ',
-	     &extents_elements,
-	     &amount_of_extents_elements,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1411,7 +1409,7 @@ int info_handle_header_value_extents_fprint(
 
 		return( -1 );
 	}
-	if( ( amount_of_extents_elements % 4 ) != 1 )
+	if( ( extents_elements->amount_of_values % 4 ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1420,9 +1418,8 @@ int info_handle_header_value_extents_fprint(
 		 "%s: unsupported amount of extents elements in header value.",
 		 function );
 
-		libsystem_string_split_values_free(
-		 extents_elements,
-		 amount_of_extents_elements,
+		libsystem_split_values_free(
+		 &extents_elements,
 		 NULL );
 
 		return( -1 );
@@ -1430,23 +1427,22 @@ int info_handle_header_value_extents_fprint(
 	fprintf(
 	 stream,
 	 "\tExtents:\t\t%" PRIs_LIBSYSTEM "\n",
-	 extents_elements[ 0 ] );
+	 extents_elements->values[ 0 ] );
 
 	for( extents_element_iterator = 1;
-	     extents_element_iterator < amount_of_extents_elements;
+	     extents_element_iterator < extents_elements->amount_of_values;
 	     extents_element_iterator += 4 )
 	{
 		fprintf(
 		 stream,
 		 "\t\t\t\t%" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM "\n",
-		 extents_elements[ extents_element_iterator ],
-		 extents_elements[ extents_element_iterator + 1 ],
-		 extents_elements[ extents_element_iterator + 2 ],
-		 extents_elements[ extents_element_iterator + 3 ] );
+		 extents_elements->values[ extents_element_iterator ],
+		 extents_elements->values[ extents_element_iterator + 1 ],
+		 extents_elements->values[ extents_element_iterator + 2 ],
+		 extents_elements->values[ extents_element_iterator + 3 ] );
 	}
-	if( libsystem_string_split_values_free(
-	     extents_elements,
-	     amount_of_extents_elements,
+	if( libsystem_split_values_free(
+	     &extents_elements,
 	     error ) != 1 )
 	{
 		liberror_error_set(
