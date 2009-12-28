@@ -555,9 +555,9 @@ int libewf_header_sections_determine_format(
 					result  = 1;
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				else
+				else if( libnotify_verbose != 0 )
 				{
-					libnotify_verbose_printf(
+					libnotify_printf(
 					 "%s: unsupported header2 format: %c%c.\n",
 					 function,
 					 (char) header_sections->header2[ 36 ],
@@ -571,9 +571,9 @@ int libewf_header_sections_determine_format(
 				result  = 1;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			else
+			else if( libnotify_verbose != 0 )
 			{
-				libnotify_verbose_printf(
+				libnotify_printf(
 				 "%s: unsupported header2 version: %c.\n",
 				 function,
 				 (char) header_sections->header2[ 2 ] );
@@ -600,9 +600,9 @@ int libewf_header_sections_determine_format(
 					result  = 1;
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				else
+				else if( libnotify_verbose != 0 )
 				{
-					libnotify_verbose_printf(
+					libnotify_printf(
 					 "%s: unsupported header format: %c%c.\n",
 					 function,
 					 (char) header_sections->header[ 17 ],
@@ -624,9 +624,12 @@ int libewf_header_sections_determine_format(
 #if defined( HAVE_VERBOSE_OUTPUT )
 						if( header_sections->amount_of_header_sections != 1 )
 						{
-							libnotify_verbose_printf(
-							 "%s: multiple header sections found.\n",
-							 function );
+							if( libnotify_verbose != 0 )
+							{
+								libnotify_printf(
+								 "%s: multiple header sections found.\n",
+								 function );
+							}
 						}
 #endif
 					}
@@ -636,9 +639,9 @@ int libewf_header_sections_determine_format(
 						result  = 1;
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
-					else
+					else if( libnotify_verbose != 0 )
 					{
-						libnotify_verbose_printf(
+						libnotify_printf(
 						 "%s: unsupported header version.\n",
 						 function );
 					}
@@ -654,36 +657,36 @@ int libewf_header_sections_determine_format(
 						result  = 1;
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
-					else
+					else if( libnotify_verbose != 0 )
 					{
-						libnotify_verbose_printf(
+						libnotify_printf(
 						 "%s: unsupported header version.\n",
 						 function );
 					}
 #endif
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				else
+				else if( libnotify_verbose != 0 )
 				{
-					libnotify_verbose_printf(
+					libnotify_printf(
 					 "%s: unsupported header version.\n",
 					 function );
 				}
 #endif
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			else
+			else if( libnotify_verbose != 0 )
 			{
-				libnotify_verbose_printf(
+				libnotify_printf(
 				 "%s: unsupported header version.\n",
 				 function );
 			}
 #endif
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
-		else
+		else if( libnotify_verbose != 0 )
 		{
-			libnotify_verbose_printf(
+			libnotify_printf(
 			 "%s: missing header information.\n",
 			 function );
 		}
@@ -695,9 +698,9 @@ int libewf_header_sections_determine_format(
 		result  = 1;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	else
+	else if( libnotify_verbose != 0 )
 	{
-		libnotify_verbose_printf(
+		libnotify_printf(
 		 "%s: unsupported EWF file format.\n",
 		 function );
 	}

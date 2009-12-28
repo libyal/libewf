@@ -71,7 +71,6 @@ typedef __int32			ssize_t;
 #endif
 
 #elif defined( __BORLANDC__ )
-
 #if __BORLANDC__ >= 0x0560
 #include <stdint.h>
 
@@ -86,12 +85,24 @@ typedef __int32			ssize_t;
 extern "C" {
 #endif
 
-/* Earlier versions of the Borland/CodeGear C++ Builder compiler
- * do not have the intptr_t
+/* Earlier versions of the Borland C++ Builder compiler
+ * do not have <stdint.h> therefore they do not support
+ * the (u)int#_t type definitions they have __int# defintions instead
  */
+typedef __int8			int8_t;
+typedef unsigned __int8		uint8_t;
+typedef __int16			int16_t;
+typedef unsigned __int16	uint16_t;
+typedef __int32			int32_t;
+typedef unsigned __int32	uint32_t;
+typedef __int64			int64_t;
+typedef unsigned __int64	uint64_t;
+
 #if defined( _WIN64 )
+typedef __int64			ssize_t;
 typedef unsigned __int64	intptr_t;
 #else
+typedef __int32			ssize_t;
 typedef unsigned __int32	intptr_t;
 #endif
 
@@ -118,7 +129,19 @@ typedef unsigned __int32	intptr_t;
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
 
-#if @HAVE_WCHAR_H@ || defined( HAVE_WCHAR_H )
+#if defined( _MSC_VER )
+#include <wchar.h>
+
+#elif defined( __BORLANDC__ )
+#if __BORLANDC__ >= 0x0560
+#include <wchar.h>
+
+#else
+#include <string.h>
+
+#endif /* __BORLANDC__ >= 0x0560 */
+
+#elif @HAVE_WCHAR_H@ || defined( HAVE_WCHAR_H )
 
 /* __USE_UNIX98 is required to add swprintf definition
  */

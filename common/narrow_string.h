@@ -124,9 +124,13 @@ extern "C" {
 	(char *) memrchr( (void *) string, (int) character, size )
 #endif
 
-/* String formatted print (snprinf)
+/* String formatted print (snprintf)
  */
-#if defined( HAVE_GLIB_H )
+#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+/* No snprintf available
+ */
+
+#elif defined( HAVE_GLIB_H )
 #define narrow_string_snprintf( target, size, ... ) \
 	g_snprintf( target, size, __VA_ARGS__ )
 
@@ -137,15 +141,26 @@ extern "C" {
 #elif defined( HAVE_SNPRINTF ) || defined( WINAPI )
 #define narrow_string_snprintf( target, size, ... ) \
 	snprintf( target, size, __VA_ARGS__ )
+#endif
 
-#elif defined( HAVE_SPRINTF )
-#define narrow_string_snprintf( target, size, ... ) \
+/* String formatted print (sprintf)
+ */
+#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+#define narrow_string_sprintf \
+	sprintf
+
+#elif defined( HAVE_SPRINTF ) || defined( WINAPI )
+#define narrow_string_sprintf( target, ... ) \
 	sprintf( target, __VA_ARGS__ )
 #endif
 
 /* String input conversion (sscanf)
  */
-#if defined( HAVE_SSCANF ) || defined( WINAPI )
+#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+#define narrow_string_sscanf \
+	sscanf
+
+#elif defined( HAVE_SSCANF ) || defined( WINAPI )
 #define narrow_string_sscanf( string, format, ... ) \
 	sscanf( string, format, __VA_ARGS__ )
 #endif
@@ -188,9 +203,13 @@ extern "C" {
 	(uint64_t) atoll( string )
 #endif
 
-/* Variable arguments formatted print to string function
+/* Variable arguments formatted print to string function (vsnprintf)
  */
-#if defined( HAVE_GLIB_H )
+#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+/* No vsnprintf available
+ */
+
+#elif defined( HAVE_GLIB_H )
 #define narrow_string_vsnprintf( string, size, format, ... ) \
 	g_vsnprintf( string, size, format, __VA_ARGS__ )
 
@@ -203,6 +222,17 @@ extern "C" {
 #elif defined( HAVE_VSNPRINTF ) || defined( WINAPI )
 #define narrow_string_vsnprintf( string, size, format, ... ) \
 	vsnprintf( string, size, format, __VA_ARGS__ )
+#endif
+
+/* Variable arguments formatted print to string function (vnprintf)
+ */
+#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+#define narrow_string_vsprintf \
+	vsprintf
+
+#elif defined( HAVE_VSPRINTF ) || defined( WINAPI )
+#define narrow_vstring_vsprintf( string, format, ... ) \
+	vsprintf( string, format, __VA_ARGS__ )
 #endif
 
 #if defined( __cplusplus )

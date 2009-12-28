@@ -37,6 +37,10 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
+			<CppCompile Include="..\..\..\libuna\libuna_base16_stream.c">
+			</CppCompile>
+			<None Include="..\..\..\libuna\libuna_base16_stream.h">
+			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_base64_stream.c">
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_base64_stream.h">
@@ -155,10 +159,6 @@
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1258.h">
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_compare.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_compare.h">
-			</None>
 			<None Include="..\..\..\libuna\libuna_definitions.h">
 			</None>
 			<None Include="..\..\..\libuna\libuna_error.h">
@@ -177,13 +177,9 @@
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_unicode_character.h">
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf8_stream.c">
+			<CppCompile Include="..\..\..\libuna\libuna_url_stream.c">
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf8_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf8_string.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf8_string.h">
+			<None Include="..\..\..\libuna\libuna_url_stream.h">
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_utf16_stream.c">
 			</CppCompile>
@@ -200,6 +196,18 @@
 			<CppCompile Include="..\..\..\libuna\libuna_utf32_string.c">
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_utf32_string.h">
+			</None>
+			<CppCompile Include="..\..\..\libuna\libuna_utf7_stream.c">
+			</CppCompile>
+			<None Include="..\..\..\libuna\libuna_utf7_stream.h">
+			</None>
+			<CppCompile Include="..\..\..\libuna\libuna_utf8_stream.c">
+			</CppCompile>
+			<None Include="..\..\..\libuna\libuna_utf8_stream.h">
+			</None>
+			<CppCompile Include="..\..\..\libuna\libuna_utf8_string.c">
+			</CppCompile>
+			<None Include="..\..\..\libuna\libuna_utf8_string.h">
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

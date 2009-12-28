@@ -130,6 +130,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_file_entry.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_handle.c"
 				>
 			</File>
@@ -206,7 +210,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_single_file_entries.c"
+				RelativePath="..\..\libewf\libewf_single_files.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_entry.c"
 				>
 			</File>
 			<File
@@ -219,6 +227,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_support.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_tree_type.c"
 				>
 			</File>
 			<File
@@ -340,6 +352,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_file_entry.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_handle.h"
 				>
 			</File>
@@ -424,7 +440,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_single_file_entries.h"
+				RelativePath="..\..\libewf\libewf_single_files.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_entry.h"
 				>
 			</File>
 			<File
@@ -441,6 +461,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_system_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_tree_type.h"
 				>
 			</File>
 			<File

@@ -377,13 +377,18 @@ int libewf_segment_table_build(
 	}
 	/* Read the segment and offset table from the segment file(s)
 	 */
-	for( segment_number = 1; segment_number < segment_table->amount; segment_number++ )
+	for( segment_number = 1;
+	     segment_number < segment_table->amount;
+	     segment_number++ )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: reading section list for segment number: %" PRIu16 ".\n",
-		 function,
-		 segment_number );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: reading section list for segment number: %" PRIu16 ".\n",
+			 function,
+			 segment_number );
+		}
 #endif
 
 		result = libewf_segment_file_read_sections(
@@ -1162,11 +1167,14 @@ int libewf_segment_table_create_segment_file(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBEWF_SYSTEM ".\n",
-	 function,
-	 segment_number,
-	 filename );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 function,
+		 segment_number,
+		 filename );
+	}
 #endif
 
 	if( libbfio_file_initialize(

@@ -242,11 +242,14 @@ ssize_t libewf_read_io_handle_process_chunk(
 		if( chunk_crc != calculated_crc )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
-			 function,
-			 chunk_crc,
-			 calculated_crc );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+				 function,
+				 chunk_crc,
+				 calculated_crc );
+			}
 #endif
 
 			*crc_mismatch = 1;
@@ -504,14 +507,17 @@ ssize_t libewf_read_io_handle_read_chunk(
 	{
 		chunk_type = "compressed";
 	}
-	libnotify_verbose_printf(
-	 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIu64 " with size: %" PRIzd ".\n",
-	 function,
-	 chunk_type,
-	 chunk,
-	 offset_table->amount_of_chunk_offsets,
-	 offset_table->chunk_offset[ chunk ].file_offset,
-	 offset_table->chunk_offset[ chunk ].size );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIu64 " with size: %" PRIzd ".\n",
+		 function,
+		 chunk_type,
+		 chunk,
+		 offset_table->amount_of_chunk_offsets,
+		 offset_table->chunk_offset[ chunk ].file_offset,
+		 offset_table->chunk_offset[ chunk ].size );
+	}
 #endif
 
 	/* Check if the chunk and crc buffers are aligned
@@ -720,10 +726,13 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		if( chunk_size > chunk_cache->allocated_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: reallocating chunk size: %" PRIzu ".\n",
-			 function,
-			 chunk_size );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: reallocating chunk size: %" PRIzu ".\n",
+				 function,
+				 chunk_size );
+			}
 #endif
 
 			if( libewf_chunk_cache_resize(

@@ -398,19 +398,22 @@ int libewf_offset_table_fill(
 			if( raw_offset < current_offset )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libnotify_verbose_printf(
-				 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
-				 function,
-				 current_offset,
-				 raw_offset );
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
+					 function,
+					 current_offset,
+					 raw_offset );
+				}
 #endif
 
 				corrupted = 1;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			else
+			else if( libnotify_verbose != 0 )
 			{
-				libnotify_verbose_printf(
+				libnotify_printf(
 				 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -425,18 +428,22 @@ int libewf_offset_table_fill(
 		}
 		if( chunk_size == 0 )
 		{
-			libnotify_verbose_printf(
-			 "%s: invalid chunk size value is zero.\n",
-			 function );
-
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: invalid chunk size value is zero.\n",
+				 function );
+			}
 			corrupted = 1;
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-			libnotify_verbose_printf(
-			 "%s: invalid chunk size value exceeds maximum.\n",
-			 function );
-
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: invalid chunk size value exceeds maximum.\n",
+				 function );
+			}
 			corrupted = 1;
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -460,15 +467,18 @@ int libewf_offset_table_fill(
 		{
 			remarks = "";
 		}
-		libnotify_verbose_printf(
-		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
-		 function,
-		 chunk_type,
-		 offset_table->last_chunk_offset_filled,
-		 base_offset,
-		 current_offset,
-		 chunk_size,
-		 remarks );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
+			 function,
+			 chunk_type,
+			 offset_table->last_chunk_offset_filled,
+			 base_offset,
+			 current_offset,
+			 chunk_size,
+			 remarks );
+		}
 #endif
 
 		chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
@@ -495,10 +505,13 @@ int libewf_offset_table_fill(
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: chunk offset overflow at: %" PRIu32 ".\n",
-			 function,
-			 current_offset );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: chunk offset overflow at: %" PRIu32 ".\n",
+				 function,
+				 current_offset );
+			}
 #endif
 
 			overflow   = 1;
@@ -542,14 +555,17 @@ int libewf_offset_table_fill(
 	{
 		remarks = "";
 	}
-	libnotify_verbose_printf(
-	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
-	 function,
-	 chunk_type,
-	 offset_table->last_chunk_offset_filled,
-	 base_offset,
-	 current_offset,
-	 remarks );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
+		 function,
+		 chunk_type,
+		 offset_table->last_chunk_offset_filled,
+		 base_offset,
+		 current_offset,
+		 remarks );
+	}
 #endif
 
 	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
@@ -647,11 +663,14 @@ int libewf_offset_table_fill_last_offset(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
-		 function,
-		 section_list_values->start_offset,
-		 last_offset );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
+			 function,
+			 section_list_values->start_offset,
+			 last_offset );
+		}
 #endif
 
 		if( ( section_list_values->start_offset < last_offset )
@@ -675,9 +694,12 @@ int libewf_offset_table_fill_last_offset(
 			if( chunk_size == 0 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libnotify_verbose_printf(
-				 "%s: invalid chunk size value is zero.\n",
-				 function );
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: invalid chunk size value is zero.\n",
+					 function );
+				}
 #endif
 
 				corrupted = 1;
@@ -685,9 +707,12 @@ int libewf_offset_table_fill_last_offset(
 			if( chunk_size > (off64_t) INT32_MAX )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libnotify_verbose_printf(
-				 "%s: invalid chunk size value exceeds maximum.\n",
-				 function );
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: invalid chunk size value exceeds maximum.\n",
+					 function );
+				}
 #endif
 
 				corrupted = 1;
@@ -705,13 +730,16 @@ int libewf_offset_table_fill_last_offset(
 			{
 				remarks = "";
 			}
-			libnotify_verbose_printf(
-			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
-			 function,
-			 offset_table->last_chunk_offset_filled,
-			 last_offset,
-			 (size_t) chunk_size,
-			 remarks );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
+				 function,
+				 offset_table->last_chunk_offset_filled,
+				 last_offset,
+				 (size_t) chunk_size,
+				 remarks );
+			}
 #endif
 
 			chunk_offset->size = (size_t) chunk_size;
@@ -969,19 +997,22 @@ int libewf_offset_table_compare(
 			if( raw_offset < current_offset )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libnotify_verbose_printf(
-				 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
-				 function,
-				 current_offset,
-				 raw_offset );
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
+					 function,
+					 current_offset,
+					 raw_offset );
+				}
 #endif
 
 				corrupted = 1;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			else
+			else if( libnotify_verbose != 0 )
 			{
-				libnotify_verbose_printf(
+				libnotify_printf(
 				 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -999,9 +1030,12 @@ int libewf_offset_table_compare(
 		if( chunk_size == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: invalid chunk size - size is zero.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: invalid chunk size - size is zero.\n",
+				 function );
+			}
 #endif
 
 			corrupted = 1;
@@ -1009,9 +1043,12 @@ int libewf_offset_table_compare(
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: invalid chunk size value exceeds maximum.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: invalid chunk size value exceeds maximum.\n",
+				 function );
+			}
 #endif
 
 			corrupted = 1;
@@ -1021,10 +1058,13 @@ int libewf_offset_table_compare(
 		if( chunk_offset->file_offset != (off64_t) ( base_offset + current_offset ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: file offset mismatch for chunk offset: %" PRIu32 ".\n",
-			 function,
-			 offset_table->last_chunk_offset_compared );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: file offset mismatch for chunk offset: %" PRIu32 ".\n",
+				 function,
+				 offset_table->last_chunk_offset_compared );
+			}
 #endif
 
 			mismatch = 1;
@@ -1032,10 +1072,13 @@ int libewf_offset_table_compare(
 		else if( chunk_offset->size != (size_t) chunk_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: chunk size mismatch for chunk offset: %" PRIu32 ".\n",
-			 function,
-			 offset_table->last_chunk_offset_compared );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: chunk size mismatch for chunk offset: %" PRIu32 ".\n",
+				 function,
+				 offset_table->last_chunk_offset_compared );
+			}
 #endif
 
 			mismatch = 1;
@@ -1043,10 +1086,13 @@ int libewf_offset_table_compare(
 		else if( ( chunk_offset->flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) != compressed )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: compressed mismatch for chunk offset: %" PRIu32 ".\n",
-			 function,
-			 offset_table->last_chunk_offset_compared );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: compressed mismatch for chunk offset: %" PRIu32 ".\n",
+				 function,
+				 offset_table->last_chunk_offset_compared );
+			}
 #endif
 
 			mismatch = 1;
@@ -1080,15 +1126,18 @@ int libewf_offset_table_compare(
 		{
 			remarks = "";
 		}
-		libnotify_verbose_printf(
-		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
-		 function,
-		 chunk_type,
-		 offset_table->last_chunk_offset_compared,
-		 base_offset,
-		 current_offset,
-		 chunk_size,
-		 remarks );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
+			 function,
+			 chunk_type,
+			 offset_table->last_chunk_offset_compared,
+			 base_offset,
+			 current_offset,
+			 chunk_size,
+			 remarks );
+		}
 #endif
 
 		if( ( corrupted == 0 )
@@ -1110,10 +1159,13 @@ int libewf_offset_table_compare(
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: chunk offset overflow at: %" PRIu32 ".\n",
-			 function,
-			 current_offset );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: chunk offset overflow at: %" PRIu32 ".\n",
+				 function,
+				 current_offset );
+			}
 #endif
 
 			overflow   = 1;
@@ -1141,10 +1193,13 @@ int libewf_offset_table_compare(
 	if( chunk_offset->file_offset != (off64_t) ( base_offset + current_offset ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: file offset mismatch for chunk offset: %" PRIu32 ".\n",
-		 function,
-		 offset_table->last_chunk_offset_compared );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: file offset mismatch for chunk offset: %" PRIu32 ".\n",
+			 function,
+			 offset_table->last_chunk_offset_compared );
+		}
 #endif
 
 		mismatch = 1;
@@ -1152,10 +1207,13 @@ int libewf_offset_table_compare(
 	else if( ( chunk_offset->flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) != compressed )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: compressed mismatch for chunk offset: %" PRIu32 ".\n",
-		 function,
-		 offset_table->last_chunk_offset_compared );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: compressed mismatch for chunk offset: %" PRIu32 ".\n",
+			 function,
+			 offset_table->last_chunk_offset_compared );
+		}
 #endif
 
 		mismatch = 1;
@@ -1189,14 +1247,17 @@ int libewf_offset_table_compare(
 	{
 		remarks = "";
 	}
-	libnotify_verbose_printf(
-	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
-	 function,
-	 chunk_type,
-	 offset_table->last_chunk_offset_compared,
-	 base_offset,
-	 current_offset,
-	 remarks );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
+		 function,
+		 chunk_type,
+		 offset_table->last_chunk_offset_compared,
+		 base_offset,
+		 current_offset,
+		 remarks );
+	}
 #endif
 
 	if( ( corrupted == 0 )
@@ -1290,11 +1351,14 @@ int libewf_offset_table_compare_last_offset(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
-		 function,
-		 section_list_values->start_offset,
-		 last_offset );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
+			 function,
+			 section_list_values->start_offset,
+			 last_offset );
+		}
 #endif
 
 		if( ( section_list_values->start_offset < last_offset )
@@ -1315,27 +1379,34 @@ int libewf_offset_table_compare_last_offset(
 			}
 			if( chunk_size == 0 )
 			{
-				libnotify_verbose_printf(
-				 "%s: invalid chunk size - size is zero.\n",
-				 function );
-
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: invalid chunk size - size is zero.\n",
+					 function );
+				}
 				corrupted = 1;
 			}
 			if( chunk_size > (off64_t) INT32_MAX )
 			{
-				libnotify_verbose_printf(
-				 "%s: invalid chunk size value exceeds maximum.\n",
-				 function );
-
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+				 	"%s: invalid chunk size value exceeds maximum.\n",
+					 function );
+				}
 				corrupted = 1;
 			}
 			if( chunk_offset->size != (size_t) chunk_size )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libnotify_verbose_printf(
-				 "%s: chunk size mismatch for chunk offset: %" PRIu32 ".\n",
-				 function,
-				 offset_table->last_chunk_offset_compared );
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: chunk size mismatch for chunk offset: %" PRIu32 ".\n",
+					 function,
+					 offset_table->last_chunk_offset_compared );
+				}
 #endif
 
 				mismatch = 1;
@@ -1361,13 +1432,16 @@ int libewf_offset_table_compare_last_offset(
 			{
 				remarks = "";
 			}
-			libnotify_verbose_printf(
-			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
-			 function,
-			 offset_table->last_chunk_offset_compared,
-			 last_offset,
-			 (size_t) chunk_size,
-			 remarks );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
+				 function,
+				 offset_table->last_chunk_offset_compared,
+				 last_offset,
+				 (size_t) chunk_size,
+				 remarks );
+			}
 #endif
 
 			if( ( corrupted == 0 )

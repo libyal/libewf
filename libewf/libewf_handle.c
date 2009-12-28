@@ -874,11 +874,14 @@ int libewf_handle_open(
 				return( -1 );
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: added pool entry: %d with filename: %s.\n",
-			 function,
-			 file_io_pool_entry,
-			 filenames[ filename_iterator ] );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: added pool entry: %d with filename: %s.\n",
+				 function,
+				 file_io_pool_entry,
+				 filenames[ filename_iterator ] );
+			}
 #endif
 
 			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
@@ -1232,11 +1235,14 @@ int libewf_handle_open_wide(
 				return( -1 );
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: added pool entry: %d with filename: %ls.\n",
-			 function,
-			 file_io_pool_entry,
-			 filenames[ filename_iterator ] );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: added pool entry: %d with filename: %ls.\n",
+				 function,
+				 file_io_pool_entry,
+				 filenames[ filename_iterator ] );
+			}
 #endif
 
 			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
@@ -1542,10 +1548,13 @@ int libewf_handle_open_file_io_pool(
 				return( -1 );
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: processing pool entry: %d.\n",
-			 function,
-			 file_io_handle_iterator );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: processing pool entry: %d.\n",
+				 function,
+				 file_io_handle_iterator );
+			}
 #endif
 
 			result = libewf_internal_handle_add_segment_file(
@@ -1883,10 +1892,13 @@ off64_t libewf_handle_seek_offset(
 		offset += (off64_t) internal_handle->media_values->media_size;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: seeking offset: %" PRIi64 ".\n",
-	 function,
-	 offset );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: seeking offset: %" PRIi64 ".\n",
+		 function,
+		 offset );
+	}
 #endif
 
 	if( ( offset < 0 )
@@ -2255,10 +2267,13 @@ ssize_t libewf_handle_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: reading size: %" PRIzu ".\n",
-	 function,
-	 size );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: reading size: %" PRIzu ".\n",
+		 function,
+		 size );
+	}
 #endif
 
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
@@ -2269,10 +2284,13 @@ ssize_t libewf_handle_read_buffer(
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: reallocating chunk data size: %" PRIzu ".\n",
-		 function,
-		 chunk_data_size );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: reallocating chunk data size: %" PRIzu ".\n",
+			 function,
+			 chunk_data_size );
+		}
 #endif
 
 		if( libewf_chunk_cache_resize(
@@ -2666,16 +2684,19 @@ ssize_t libewf_handle_write_chunk(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: writing chunk: %d of total: %d.\n",
-	 function,
-	 internal_handle->io_handle->current_chunk,
-	 internal_handle->offset_table->amount_of_chunk_offsets );
-	libnotify_verbose_printf(
-	 "%s: writing chunk buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
-	 function,
-	 chunk_buffer_size,
-	 data_size );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: writing chunk: %d of total: %d.\n",
+		 function,
+		 internal_handle->io_handle->current_chunk,
+		 internal_handle->offset_table->amount_of_chunk_offsets );
+		libnotify_printf(
+		 "%s: writing chunk buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
+		 function,
+		 chunk_buffer_size,
+		 data_size );
+	}
 #endif
 
 	if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
@@ -2887,10 +2908,13 @@ ssize_t libewf_handle_write_buffer(
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: reallocating chunk data size: %" PRIzu ".\n",
-		 function,
-		 chunk_data_size );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: reallocating chunk data size: %" PRIzu ".\n",
+			 function,
+			 chunk_data_size );
+		}
 #endif
 
 		if( libewf_chunk_cache_resize(
@@ -4666,10 +4690,13 @@ int libewf_internal_handle_add_segment_file(
 		if( internal_handle->segment_table->segment_file_handle[ *segment_number ] != NULL )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: segment file: %" PRIu16 " already exists.\n",
-			 function,
-			 *segment_number );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: segment file: %" PRIu16 " already exists.\n",
+				 function,
+				 *segment_number );
+			}
 #endif
 
 			libewf_segment_file_handle_free(
@@ -4700,10 +4727,13 @@ int libewf_internal_handle_add_segment_file(
 		if( internal_handle->delta_segment_table->segment_file_handle[ *segment_number ] != NULL )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: delta segment file: %" PRIu16 " already exists.\n",
-			 function,
-			 *segment_number );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: delta segment file: %" PRIu16 " already exists.\n",
+				 function,
+				 *segment_number );
+			}
 #endif
 
 			libewf_segment_file_handle_free(

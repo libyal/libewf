@@ -952,10 +952,13 @@ int libewf_header_values_copy(
 		 || ( source_header_values->identifier_length[ values_table_index ] == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: missing identifier for index: %d.\n",
-			 function,
-			 values_table_index );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: missing identifier for index: %d.\n",
+				 function,
+				 values_table_index );
+			}
 #endif
 
 			continue;
@@ -966,10 +969,13 @@ int libewf_header_values_copy(
 		 || ( source_header_values->value_length[ values_table_index ] == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: missing value for index: %d.\n",
-			 function,
-			 values_table_index );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: missing value for index: %d.\n",
+				 function,
+				 values_table_index );
+			}
 #endif
 
 			continue;
@@ -1118,9 +1124,12 @@ int libewf_header_values_parse_header_string(
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( types->amount_of_values != values->amount_of_values )
 		{
-			libnotify_verbose_printf(
-			 "%s: mismatch in amount of types and values.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+			 	"%s: mismatch in amount of types and values.\n",
+				 function );
+			}
 		}
 #endif
 		for( iterator = 0;
@@ -1772,9 +1781,9 @@ int libewf_header_values_parse_header_string(
 				}
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			else
+			else if( libnotify_verbose != 0 )
 			{
-				libnotify_verbose_printf(
+				libnotify_printf(
 				 "%s: unsupported type: %s with value: %s.\n",
 				 function,
 				 (char *) types->values[ iterator ],

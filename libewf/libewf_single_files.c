@@ -1162,9 +1162,9 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 			}
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
-		else
+		else if( libnotify_verbose != 0 )
 		{
-			libnotify_verbose_printf(
+			libnotify_printf(
 			 "%s: unsupported type: %s with value: %s.\n",
 			 function,
 			 (char *) types->values[ value_iterator ],

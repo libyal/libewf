@@ -84,9 +84,12 @@ ssize_t libewf_segment_file_read_file_header(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: reading file header at offset: 0 (0x00000000)\n",
-	 function );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+	 	"%s: reading file header at offset: 0 (0x00000000)\n",
+		 function );
+	}
 #endif
 
 	if( libbfio_pool_seek_offset(
@@ -1191,10 +1194,13 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	/* Seek the start of the data chunks
 	*/
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
-	 function,
-	 chunks_section_offset );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+	 	"%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
+		 function,
+		 chunks_section_offset );
+	}
 #endif
 
 	if( libbfio_pool_seek_offset(
@@ -1217,11 +1223,14 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: correcting table section size: %" PRIu64 " offset: %" PRIi64 ".\n",
-		 function,
-		 chunks_section_size,
-		 chunks_section_offset );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: correcting table section size: %" PRIu64 " offset: %" PRIi64 ".\n",
+			 function,
+			 chunks_section_size,
+			 chunks_section_offset );
+		}
 #endif
 
 		/* Rewrite table section start
@@ -1256,11 +1265,14 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: correcting sectors section size: %" PRIu64 " offset: %" PRIi64 ".\n",
-		 function,
-		 chunks_section_size,
-		 chunks_section_offset );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+		 	"%s: correcting sectors section size: %" PRIu64 " offset: %" PRIi64 ".\n",
+			 function,
+			 chunks_section_size,
+			 chunks_section_offset );
+		}
 #endif
 
 		/* Rewrite sectors section start
@@ -1287,10 +1299,13 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	/* Seek the end of the chunks section
 	 */
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
-	 function,
-	 last_segment_file_offset );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
+		 function,
+		 last_segment_file_offset );
+	}
 #endif
 
 	if( libbfio_pool_seek_offset(
@@ -1518,14 +1533,17 @@ ssize_t libewf_segment_file_write_chunk(
 	{
 		chunk_type = "compressed";
 	}
-	libnotify_verbose_printf(
-	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
-	 function,
-	 chunk_type,
-	 chunk,
-	 segment_file_offset,
-	 offset_table->chunk_offset[ chunk ].size,
-	 *chunk_crc );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+		 function,
+		 chunk_type,
+		 chunk,
+		 segment_file_offset,
+		 offset_table->chunk_offset[ chunk ].size,
+		 *chunk_crc );
+	}
 #endif
 
 	write_size = chunk_size;
@@ -1695,13 +1713,16 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	segment_file_offset += sizeof( ewfx_delta_chunk_header_t ) + sizeof( ewf_section_t );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
-	 function,
-	 chunk,
-	 segment_file_offset,
-	 chunk_size,
-	 *chunk_crc );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+		 function,
+		 chunk,
+		 segment_file_offset,
+		 chunk_size,
+		 *chunk_crc );
+	}
 #endif
 
 	/* Write the chunk in the delta segment file
@@ -1976,9 +1997,12 @@ ssize_t libewf_segment_file_write_close(
 			if( hash_sections->xhash != NULL )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libnotify_verbose_printf(
-				 "%s: xhash already set - cleaning previous defintion.\n",
-				 function );
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+				 	"%s: xhash already set - cleaning previous defintion.\n",
+					 function );
+				}
 #endif
 
 				memory_free(
@@ -2168,10 +2192,13 @@ int libewf_segment_file_write_sections_correction(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: correcting sections in segment file: %" PRIu16 ".\n",
-	 function,
-	 segment_number );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: correcting sections in segment file: %" PRIu16 ".\n",
+		 function,
+		 segment_number );	
+	}
 #endif
 
 	while( section_list_element != NULL )
@@ -2196,9 +2223,12 @@ int libewf_segment_file_write_sections_correction(
 		     6 ) == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: correcting volume section.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: correcting volume section.\n",
+				 function );
+			}
 #endif
 
 			if( libbfio_pool_seek_offset(
@@ -2264,9 +2294,12 @@ int libewf_segment_file_write_sections_correction(
 			  4 ) == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: correcting data section.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: correcting data section.\n",
+				 function );
+			}
 #endif
 
 			if( libbfio_pool_seek_offset(
@@ -2326,9 +2359,12 @@ int libewf_segment_file_write_sections_correction(
 	if( correct_last_next_section != 0 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: correcting last next section.\n",
-		 function );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: correcting last next section.\n",
+			 function );
+		}
 #endif
 
 		if( libbfio_pool_seek_offset(

@@ -95,7 +95,7 @@ int libewf_debug_dump_data(
 	 "%" PRIs_LIBEWF ":\n",
 	 header );
 
-	libnotify_verbose_print_data(
+	libnotify_print_data(
 	 data,
 	 data_size );
 

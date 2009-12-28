@@ -200,28 +200,33 @@ ssize_t libewf_section_start_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_section_print(
-	       section,
-	       error ) != 1 ) )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print section.",
-		 function );
+		if( libewf_debug_section_print(
+		     section,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print section.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: padding:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 section->padding,
-	 40 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+	 	"%s: padding:\n",
+		 function );
+		libnotify_print_data(
+		 section->padding,
+		 40 );
+	}
 #endif
 
 	byte_stream_copy_to_uint64_little_endian(
@@ -393,12 +398,15 @@ ssize_t libewf_section_start_write(
 	 calculated_crc );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: writing section start of type: %s with size: %" PRIu64 " and CRC: %" PRIu32 ".\n",
-	 function,
-	 (char *) section_type,
-	 section_size,
-	 calculated_crc );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: writing section start of type: %s with size: %" PRIu64 " and CRC: %" PRIu32 ".\n",
+		 function,
+		 (char *) section_type,
+		 section_size,
+		 calculated_crc );
+	}
 #endif
 
 	write_count = libbfio_pool_write(
@@ -614,12 +622,15 @@ ssize_t libewf_section_compressed_string_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: uncompressed string:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 *uncompressed_string,
-	 *uncompressed_string_size );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: uncompressed string:\n",
+		 function );
+		libnotify_print_data(
+		 *uncompressed_string,
+		 *uncompressed_string_size );
+	}
 #endif
 
 	return( read_count );
@@ -1352,24 +1363,27 @@ ssize_t libewf_section_volume_s01_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: unknown1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown1,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown2:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown2,
-	 20 );
-	libnotify_verbose_printf(
-	 "%s: unknown3:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown3,
-	 45 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: unknown1:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown1,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown2:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown2,
+		 20 );
+		libnotify_printf(
+		 "%s: unknown3:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown3,
+		 45 );
+	}
 #endif
 
 	byte_stream_copy_to_uint32_little_endian(
@@ -1529,18 +1543,21 @@ ssize_t libewf_section_volume_s01_write(
 	 calculated_crc );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
-	 function,
-	 media_values->amount_of_chunks,
-	 media_values->chunk_size,
-	 media_values->sectors_per_chunk );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+		 function,
+		 media_values->amount_of_chunks,
+		 media_values->chunk_size,
+		 media_values->sectors_per_chunk );
 
-	libnotify_verbose_printf(
-	 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
-	 function,
-	 media_values->amount_of_sectors,
-	 media_values->bytes_per_sector );
+		libnotify_printf(
+		 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
+		 function,
+		 media_values->amount_of_sectors,
+		 media_values->bytes_per_sector );
+	}
 #endif
 
 	section_write_count = libewf_section_start_write(
@@ -1721,60 +1738,63 @@ ssize_t libewf_section_volume_e01_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: unknown1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown1,
-	 3 );
-	libnotify_verbose_printf(
-	 "%s: unknown2:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown2,
-	 3 );
-	libnotify_verbose_printf(
-	 "%s: PALM volume start sector.\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->palm_volume_start_sector,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown3:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown3,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: SMART logs start sector.\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->smart_logs_start_sector,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown4:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown4,
-	 3 );
-	libnotify_verbose_printf(
-	 "%s: unknown5:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown5,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown6:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->unknown6,
-	 963 );
-	libnotify_verbose_printf(
-	 "%s: signature:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 volume->signature,
-	 5 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: unknown1:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown1,
+		 3 );
+		libnotify_printf(
+		 "%s: unknown2:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown2,
+		 3 );
+		libnotify_printf(
+		 "%s: PALM volume start sector.\n",
+		 function );
+		libnotify_print_data(
+		 volume->palm_volume_start_sector,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown3:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown3,
+		 4 );
+		libnotify_printf(
+		 "%s: SMART logs start sector.\n",
+		 function );
+		libnotify_print_data(
+		 volume->smart_logs_start_sector,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown4:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown4,
+		 3 );
+		libnotify_printf(
+		 "%s: unknown5:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown5,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown6:\n",
+		 function );
+		libnotify_print_data(
+		 volume->unknown6,
+		 963 );
+		libnotify_printf(
+		 "%s: signature:\n",
+		 function );
+		libnotify_print_data(
+		 volume->signature,
+		 5 );
+	}
 #endif
 
 	byte_stream_copy_to_uint32_little_endian(
@@ -1978,18 +1998,21 @@ ssize_t libewf_section_volume_e01_write(
 	 calculated_crc );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
-	 function,
-	 media_values->amount_of_chunks,
-	 media_values->chunk_size,
-	 media_values->sectors_per_chunk );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+		 function,
+		 media_values->amount_of_chunks,
+		 media_values->chunk_size,
+		 media_values->sectors_per_chunk );
 
-	libnotify_verbose_printf(
-	 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
-	 function,
-	 media_values->amount_of_sectors,
-	 media_values->bytes_per_sector );
+		libnotify_printf(
+		 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
+		 function,
+		 media_values->amount_of_sectors,
+		 media_values->bytes_per_sector );
+	}
 #endif
 
 	section_write_count = libewf_section_start_write(
@@ -2190,11 +2213,13 @@ ssize_t libewf_section_volume_read(
 
 	if( bytes_per_chunk > (size64_t) INT32_MAX )
 	{
-		libnotify_verbose_printf(
-		 "%s: chunk size value exceeds maximum defaulting to: %d.n",
-		 function,
-		 EWF_MINIMUM_CHUNK_SIZE );
-
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: chunk size value exceeds maximum defaulting to: %d.n",
+			 function,
+			 EWF_MINIMUM_CHUNK_SIZE );
+		}
 		media_values->chunk_size = EWF_MINIMUM_CHUNK_SIZE;
 	}
 	else
@@ -2202,18 +2227,21 @@ ssize_t libewf_section_volume_read(
 		media_values->chunk_size = (uint32_t) bytes_per_chunk;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
-	 function,
-	 media_values->amount_of_chunks,
-	 media_values->chunk_size,
-	 media_values->sectors_per_chunk );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+		 function,
+		 media_values->amount_of_chunks,
+		 media_values->chunk_size,
+		 media_values->sectors_per_chunk );
 
-	libnotify_verbose_printf(
-	 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
-	 function,
-	 media_values->amount_of_sectors,
-	 media_values->bytes_per_sector );
+		libnotify_printf(
+		 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
+		 function,
+		 media_values->amount_of_sectors,
+		 media_values->bytes_per_sector );
+	}
 #endif
 
 	if( media_values->amount_of_chunks == 0 )
@@ -2352,26 +2380,32 @@ ssize_t libewf_section_table_read(
 	 base_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: padding1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 table.padding1,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: padding2:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 table.padding2,
-	 4 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: padding1:\n",
+		 function );
+		libnotify_print_data(
+		 table.padding1,
+		 4 );
+		libnotify_printf(
+		 "%s: padding2:\n",
+		 function );
+		libnotify_print_data(
+		 table.padding2,
+		 4 );
+	}
 #endif
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
-	 function,
-	 amount_of_chunks,
-	 stored_crc,
-	 calculated_crc );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
+		 function,
+		 amount_of_chunks,
+		 stored_crc,
+		 calculated_crc );
+	}
 #endif
 
 	if( amount_of_chunks > 0 )
@@ -2380,11 +2414,14 @@ ssize_t libewf_section_table_read(
 		 */
 		if( amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
 		{
-			libnotify_verbose_printf(
-			 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
-			 function,
-			 amount_of_chunks,
-			 EWF_MAXIMUM_OFFSETS_IN_TABLE );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
+				 function,
+				 amount_of_chunks,
+				 EWF_MAXIMUM_OFFSETS_IN_TABLE );
+			}
 		}
 		offsets_size = sizeof( ewf_table_offset_t ) * amount_of_chunks;
 
@@ -2476,12 +2513,14 @@ ssize_t libewf_section_table_read(
 
 			if( stored_crc != calculated_crc )
 			{
-				libnotify_verbose_printf(
-				 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
-				 function,
-				 stored_crc,
-				 calculated_crc );
-
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+					 function,
+					 stored_crc,
+					 calculated_crc );
+				}
 				/* The offsets cannot be fully trusted therefore mark them as tainted during fill 
 				 */
 				offsets_tainted = 1;
@@ -2527,19 +2566,22 @@ ssize_t libewf_section_table_read(
 			return( -1 );
 		}
 	}
-	else
+	else if( libnotify_verbose != 0 )
 	{
-		libnotify_verbose_printf(
-		 "%s: table contains no offsets.\n",
+		libnotify_printf(
+		"%s: table contains no offsets.\n",
 		 function );
 	}
 	if( section_size < (size_t) section_read_count )
 	{
-		libnotify_verbose_printf(
-		 "%s: section size: %" PRIzd " smaller than section read count: %" PRIzd ".\n",
-		 function,
-		 section_size,
-		 section_read_count );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: section size: %" PRIzd " smaller than section read count: %" PRIzd ".\n",
+			 function,
+			 section_size,
+			 section_read_count );
+		}
 	}
 	/* Skip the chunk data within the section
 	 * for chunks after the table section
@@ -2549,9 +2591,12 @@ ssize_t libewf_section_table_read(
 		if( ( ewf_format != EWF_FORMAT_S01 )
 		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
-			libnotify_verbose_printf(
-			 "%s: data found after table offsets.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+			 	"%s: data found after table offsets.\n",
+				 function );
+			}
 		}
 		if( libbfio_pool_seek_offset(
 		     file_io_pool,
@@ -2705,26 +2750,32 @@ ssize_t libewf_section_table2_read(
 	 base_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: padding1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 table.padding1,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: padding2:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 table.padding2,
-	 4 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: padding1:\n",
+		 function );
+		libnotify_print_data(
+		 table.padding1,
+		 4 );
+		libnotify_printf(
+		 "%s: padding2:\n",
+		 function );
+		libnotify_print_data(
+		 table.padding2,
+		 4 );
+	}
 #endif
 #if defined( HAVE_VERBOSE_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
-	 function,
-	 amount_of_chunks,
-	 stored_crc,
-	 calculated_crc );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
+		 function,
+		 amount_of_chunks,
+		 stored_crc,
+		 calculated_crc );
+	}
 #endif
 
 	if( amount_of_chunks > 0 )
@@ -2733,11 +2784,14 @@ ssize_t libewf_section_table2_read(
 		 */
 		if( amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
 		{
-			libnotify_verbose_printf(
-			 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
-			 function,
-			 amount_of_chunks,
-			 EWF_MAXIMUM_OFFSETS_IN_TABLE );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
+				 function,
+				 amount_of_chunks,
+				 EWF_MAXIMUM_OFFSETS_IN_TABLE );
+			}
 		}
 		offsets_size = sizeof( ewf_table_offset_t ) * amount_of_chunks;
 
@@ -2829,12 +2883,14 @@ ssize_t libewf_section_table2_read(
 
 			if( stored_crc != calculated_crc )
 			{
-				libnotify_verbose_printf(
-				 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
-				 function,
-				 stored_crc,
-				 calculated_crc );
-
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+					 function,
+					 stored_crc,
+					 calculated_crc );
+				}
 				/* The offsets cannot be trusted therefore do not try to correct corrupted offsets during compare
 				 */
 				offsets_tainted = 1;
@@ -2880,19 +2936,22 @@ ssize_t libewf_section_table2_read(
 			return( -1 );
 		}
 	}
-	else
+	else if( libnotify_verbose != 0 )
 	{
-		libnotify_verbose_printf(
+		libnotify_printf(
 		 "%s: table contains no offsets.\n",
 		 function );
 	}
 	if( section_size < (size_t) section_read_count )
 	{
-		libnotify_verbose_printf(
-		 "%s: section size: %" PRIzd " smaller than section read count: %" PRIzd ".\n",
-		 function,
-		 section_size,
-		 section_read_count );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: section size: %" PRIzd " smaller than section read count: %" PRIzd ".\n",
+			 function,
+			 section_size,
+			 section_read_count );
+		}
 	}
 	/* Skip the chunk data within the section
 	 * for chunks after the table section
@@ -2902,9 +2961,12 @@ ssize_t libewf_section_table2_read(
 		if( ( ewf_format != EWF_FORMAT_S01 )
 		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
-			libnotify_verbose_printf(
-			 "%s: unexpected data found after table offsets.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: unexpected data found after table offsets.\n",
+				 function );
+			}
 		}
 		if( libbfio_pool_seek_offset(
 		     file_io_pool,
@@ -3199,9 +3261,12 @@ ssize64_t libewf_section_sectors_read(
 	 */
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
-		libnotify_verbose_printf(
-		 "%s: EWF-S01 format should not contain sectors section.\n",
-		 function );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: EWF-S01 format should not contain sectors section.\n",
+			 function );
+		}
 	}
 	/* Skip the chunk data within the section
 	 */
@@ -3386,9 +3451,12 @@ ssize_t libewf_section_ltree_read(
 	}
 	if( *ewf_format == EWF_FORMAT_S01 )
 	{
-		libnotify_verbose_printf(
-		 "%s: EWF-S01 format should not contain ltree section.\n",
-		 function );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: EWF-S01 format should not contain ltree section.\n",
+			 function );
+		}
 	}
 	*ewf_format = EWF_FORMAT_L01;
 
@@ -3428,36 +3496,39 @@ ssize_t libewf_section_ltree_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: unknown1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 ltree->unknown1,
-	 16 );
-	libnotify_verbose_printf(
-	 "%s: tree size:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 ltree->tree_size,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown2:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 ltree->unknown2,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown3:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 ltree->unknown3,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown4:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 ltree->unknown4,
-	 20 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: unknown1:\n",
+		 function );
+		libnotify_print_data(
+		 ltree->unknown1,
+		 16 );
+		libnotify_printf(
+		 "%s: tree size:\n",
+		 function );
+		libnotify_print_data(
+		 ltree->tree_size,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown2:\n",
+		 function );
+		libnotify_print_data(
+		 ltree->unknown2,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown3:\n",
+		 function );
+		libnotify_print_data(
+		 ltree->unknown3,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown4:\n",
+		 function );
+		libnotify_print_data(
+		 ltree->unknown4,
+		 20 );
+	}
 #endif
 
 	memory_free(
@@ -3609,9 +3680,12 @@ ssize_t libewf_section_session_read(
 	}
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
-		libnotify_verbose_printf(
-		 "%s: EWF-S01 format should not contain session section.\n",
-		 function );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+		 	"%s: EWF-S01 format should not contain session section.\n",
+			 function );
+		}
 	}
 	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
@@ -3654,12 +3728,15 @@ ssize_t libewf_section_session_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: unknown1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 ewf_session.unknown1,
-	 28 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: unknown1:\n",
+		 function );
+		libnotify_print_data(
+		 ewf_session.unknown1,
+		 28 );
+	}
 #endif
 
 	byte_stream_copy_to_uint32_little_endian(
@@ -3667,10 +3744,13 @@ ssize_t libewf_section_session_read(
 	 amount_of_ewf_sessions );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: amount of sessions: %" PRIu32 "\n",
-	 function,
-	 amount_of_ewf_sessions );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: amount of sessions: %" PRIu32 "\n",
+		 function,
+		 amount_of_ewf_sessions );
+	}
 #endif
 
 	if( amount_of_ewf_sessions > 0 )
@@ -3760,19 +3840,25 @@ ssize_t libewf_section_session_read(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: sessions data:\n",
-		 function );
-		libnotify_verbose_print_data(
-		 (uint8_t *) ewf_sessions,
-		 ewf_sessions_size );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: sessions data:\n",
+			 function );
+			libnotify_print_data(
+			 (uint8_t *) ewf_sessions,
+			 ewf_sessions_size );
+		}
 #endif
 		if( sessions->sector != NULL )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: session entries already set in handle - removing previous one.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: session entries already set in handle - removing previous one.\n",
+				 function );
+			}
 #endif
 
 			memory_free(
@@ -3806,11 +3892,14 @@ ssize_t libewf_section_session_read(
 			 first_sector );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: session: %" PRIu32 " first sector: %" PRIu32 "\n",
-			 function,
-			 iterator,
-			 first_sector );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: session: %" PRIu32 " first sector: %" PRIu32 "\n",
+				 function,
+				 iterator,
+				 first_sector );
+			}
 #endif
 			sessions->sector[ iterator ].first_sector = (uint64_t) first_sector;
 
@@ -3828,13 +3917,12 @@ ssize_t libewf_section_session_read(
 		{
 			sessions->sector[ iterator - 1 ].amount_of_sectors = 0;
 		}
-
 		memory_free(
 		 ewf_sessions );
 	}
-	else
+	else if( libnotify_verbose != 0 )
 	{
-		libnotify_verbose_printf(
+		libnotify_printf(
 		 "%s: session contains no session data.\n",
 		 function );
 	}
@@ -4118,9 +4206,12 @@ ssize_t libewf_section_data_read(
 	}
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
-		libnotify_verbose_printf(
-		 "%s: EWF-S01 format should not contain data section.\n",
-		 function );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: EWF-S01 format should not contain data section.\n",
+			 function );
+		}
 	}
 	if( section_size != sizeof( ewf_data_t ) )
 	{
@@ -4191,60 +4282,63 @@ ssize_t libewf_section_data_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: unknown1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->unknown1,
-	 3 );
-	libnotify_verbose_printf(
-	 "%s: unknown2:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->unknown2,
-	 3 );
-	libnotify_verbose_printf(
-	 "%s: PALM volume start sector.\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->palm_volume_start_sector,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown3:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->unknown3,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: SMART logs start sector.\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->smart_logs_start_sector,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown4:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->unknown4,
-	 3 );
-	libnotify_verbose_printf(
-	 "%s: unknown5:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->unknown5,
-	 4 );
-	libnotify_verbose_printf(
-	 "%s: unknown6:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->unknown6,
-	 963 );
-	libnotify_verbose_printf(
-	 "%s: signature:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 data->signature,
-	 5 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: unknown1:\n",
+		 function );
+		libnotify_print_data(
+		 data->unknown1,
+		 3 );
+		libnotify_printf(
+		 "%s: unknown2:\n",
+		 function );
+		libnotify_print_data(
+		 data->unknown2,
+		 3 );
+		libnotify_printf(
+		 "%s: PALM volume start sector.\n",
+		 function );
+		libnotify_print_data(
+		 data->palm_volume_start_sector,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown3:\n",
+		 function );
+		libnotify_print_data(
+		 data->unknown3,
+		 4 );
+		libnotify_printf(
+		 "%s: SMART logs start sector.\n",
+		 function );
+		libnotify_print_data(
+		 data->smart_logs_start_sector,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown4:\n",
+		 function );
+		libnotify_print_data(
+		 data->unknown4,
+		 3 );
+		libnotify_printf(
+		 "%s: unknown5:\n",
+		 function );
+		libnotify_print_data(
+		 data->unknown5,
+		 4 );
+		libnotify_printf(
+		 "%s: unknown6:\n",
+		 function );
+		libnotify_print_data(
+		 data->unknown6,
+		 963 );
+		libnotify_printf(
+		 "%s: signature:\n",
+		 function );
+		libnotify_print_data(
+		 data->signature,
+		 5 );
+	}
 #endif
 	if( ( data->media_type != 0 )
 	 && ( data->media_type != media_values->media_type ) )
@@ -4700,9 +4794,12 @@ ssize_t libewf_section_error2_read(
 	}
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
-		libnotify_verbose_printf(
-		 "%s: EWF-S01 format should not contain error2 section.\n",
-		 function );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: EWF-S01 format should not contain error2 section.\n",
+			 function );
+		}
 	}
 	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
@@ -4749,12 +4846,15 @@ ssize_t libewf_section_error2_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: unknown:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 error2.unknown,
-	 200 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: unknown:\n",
+		 function );
+		libnotify_print_data(
+		 error2.unknown,
+		 200 );
+	}
 #endif
 
 	if( amount_of_errors > 0 )
@@ -4847,19 +4947,25 @@ ssize_t libewf_section_error2_read(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: error2 sectors:\n",
-		 function );
-		libnotify_verbose_print_data(
-		 (uint8_t *) error2_sectors,
-		 sectors_size );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: error2 sectors:\n",
+			 function );
+			libnotify_print_data(
+			 (uint8_t *) error2_sectors,
+			 sectors_size );
+		}
 #endif
 		if( acquiry_errors->sector != NULL )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_verbose_printf(
-			 "%s: acquiry error sectors already set in handle - removing previous one.\n",
-			 function );
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: acquiry error sectors already set in handle - removing previous one.\n",
+				 function );
+			}
 #endif
 
 			memory_free(
@@ -4901,9 +5007,9 @@ ssize_t libewf_section_error2_read(
 		memory_free(
 		 error2_sectors );
 	}
-	else
+	else if( libnotify_verbose != 0 )
 	{
-		libnotify_verbose_printf(
+		libnotify_printf(
 		 "%s: error2 contains no sectors!.\n",
 		 function );
 	}
@@ -5238,24 +5344,27 @@ ssize_t libewf_section_digest_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: MD5 hash:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 digest.md5_hash,
-	 16 );
-	libnotify_verbose_printf(
-	 "%s: SHA1 hash:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 digest.sha1_hash,
-	 20 );
-	libnotify_verbose_printf(
-	 "%s: padding:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 digest.padding1,
-	 40 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: MD5 hash:\n",
+		 function );
+		libnotify_print_data(
+		 digest.md5_hash,
+		 16 );
+		libnotify_printf(
+		 "%s: SHA1 hash:\n",
+		 function );
+		libnotify_print_data(
+		 digest.sha1_hash,
+		 20 );
+		libnotify_printf(
+		 "%s: padding:\n",
+		 function );
+		libnotify_print_data(
+		 digest.padding1,
+		 40 );
+	}
 #endif
 
 	if( memory_copy(
@@ -5400,18 +5509,21 @@ ssize_t libewf_section_digest_write(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: MD5 hash:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 digest.md5_hash,
-	 16 );
-	libnotify_verbose_printf(
-	 "%s: SHA1 hash:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 digest.sha1_hash,
-	 20 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: MD5 hash:\n",
+		 function );
+		libnotify_print_data(
+		 digest.md5_hash,
+		 16 );
+		libnotify_printf(
+		 "%s: SHA1 hash:\n",
+		 function );
+		libnotify_print_data(
+		 digest.sha1_hash,
+		 20 );
+	}
 #endif
 	calculated_crc = ewf_crc_calculate(
 	                  &digest,
@@ -5564,18 +5676,21 @@ ssize_t libewf_section_hash_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: MD5 hash:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 hash.md5_hash,
-	 16 );
-	libnotify_verbose_printf(
-	 "%s: unknown1:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 hash.unknown1,
-	 16 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: MD5 hash:\n",
+		 function );
+		libnotify_print_data(
+		 hash.md5_hash,
+		 16 );
+		libnotify_printf(
+		 "%s: unknown1:\n",
+		 function );
+		libnotify_print_data(
+		 hash.unknown1,
+		 16 );
+	}
 #endif
 
 	if( memory_copy(
@@ -5680,12 +5795,15 @@ ssize_t libewf_section_hash_write(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	libnotify_verbose_printf(
-	 "%s: MD5 hash:\n",
-	 function );
-	libnotify_verbose_print_data(
-	 hash.md5_hash,
-	 16 );
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: MD5 hash:\n",
+		 function );
+		libnotify_print_data(
+		 hash.md5_hash,
+		 16 );
+	}
 #endif
 	calculated_crc = ewf_crc_calculate(
 	                  &hash,
@@ -6455,12 +6573,14 @@ ssize_t libewf_section_delta_chunk_read(
 
 	if( chunk_size != ( section_size - sizeof( ewfx_delta_chunk_header_t ) ) )
 	{
-		libnotify_verbose_printf(
-		 "%s: chunk size: %" PRIu32 " does not match size of data in section correcting in: %" PRIzd ".\n",
-		 function,
-		 chunk_size,
-		 section_size - sizeof( ewfx_delta_chunk_header_t ) );
-
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: chunk size: %" PRIu32 " does not match size of data in section correcting in: %" PRIzd ".\n",
+			 function,
+			 chunk_size,
+			 section_size - sizeof( ewfx_delta_chunk_header_t ) );
+		}
 		chunk_size = (uint32_t) ( section_size - sizeof( ewfx_delta_chunk_header_t ) );
 	}
 	/* Update the chunk data in the offset table
@@ -7456,10 +7576,13 @@ int libewf_section_read(
 	else
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		libnotify_verbose_printf(
-		 "%s: unsupported section type: %s.\n",
-		 function,
-		 (char *) section->type );
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: unsupported section type: %s.\n",
+			 function,
+			 (char *) section->type );
+		}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( section_size > SSIZE_MAX )

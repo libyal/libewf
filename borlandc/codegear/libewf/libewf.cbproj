@@ -125,6 +125,10 @@
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_filename.h">
 			</None>
+			<CppCompile Include="..\..\..\libewf\libewf_file_entry.c">
+			</CppCompile>
+			<None Include="..\..\..\libewf\libewf_file_entry.h">
+			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_handle.c">
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_handle.h">
@@ -205,9 +209,13 @@
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_segment_table.h">
 			</None>
-			<CppCompile Include="..\..\..\libewf\libewf_single_file_entries.c">
+			<CppCompile Include="..\..\..\libewf\libewf_single_files.c">
 			</CppCompile>
-			<None Include="..\..\..\libewf\libewf_single_file_entries.h">
+			<None Include="..\..\..\libewf\libewf_single_files.h">
+			</None>
+			<CppCompile Include="..\..\..\libewf\libewf_single_file_entry.c">
+			</CppCompile>
+			<None Include="..\..\..\libewf\libewf_single_file_entry.h">
 			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_split_values.c">
 			</CppCompile>
@@ -222,6 +230,10 @@
 			<None Include="..\..\..\libewf\libewf_support.h">
 			</None>
 			<None Include="..\..\..\libewf\libewf_system_string.h">
+			</None>
+			<CppCompile Include="..\..\..\libewf\libewf_tree_type.c">
+			</CppCompile>
+			<None Include="..\..\..\libewf\libewf_tree_type.h">
 			</None>
 			<None Include="..\..\..\libewf\libewf_types.h">
 			</None>

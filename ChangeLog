@@ -218,6 +218,11 @@ Refactor:
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
 
+20091228
+* worked on windows builds
+* worked on Borland C++ 5 compiler support
+* updated libbfio
+
 20091225
 * worked on reading LVF files
 
