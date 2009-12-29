@@ -1,4 +1,4 @@
-.Dd October 17, 2009
+.Dd December 29, 2009
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -45,11 +45,12 @@ the codepage of header section, options: ascii (default), windows-874, windows-1
 .It Fl B Ar amount_of_bytes
 the amount of bytes to export
 .It Fl c Ar compression_type
-the compression type, options: none (default), empty-block, fast, best (not used for raw format)
+the compression type, options: none (default), empty-block, fast, best (not used for raw and files formats)
 .It Fl d Ar digest_type
-calculate additional digest (hash) types besides md5, options: sha1 (not used for raw format)
+calculate additional digest (hash) types besides md5, options: sha1 (not used for raw and files formats)
 .It Fl f Ar format
-the file format to write to, options: raw (default), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
+the output format to write to, options: raw (default), files, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
+(the files format is restricted to logical volume files)
 .It Fl h
 shows this help
 .It Fl l Ar log_filename
@@ -61,7 +62,7 @@ the process buffer size (default is the chunk size)
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats) (not used for raw format)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats) (not used for raw and files formats)
 .It Fl t Ar target
 the target file to export to, use \- for stdout (default is export) stdout is only supported for the raw format
 .It Fl u
@@ -85,7 +86,7 @@ will ask the information it needs.
 ewfexport 20090229 (libewf 20090229, libuna 20090124, zlib 1.2.3, libcrypto 0.9.8g, libuuid)
 
 Information for export required, please provide the necessary input
-Export to file format (raw, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
+Export to format (raw, files, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
 Target path and filename with extension or \- for stdout: floppy.raw
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:

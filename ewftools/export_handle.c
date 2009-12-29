@@ -81,7 +81,7 @@ int export_handle_initialize(
 	if( *export_handle == NULL )
 	{
 		*export_handle = (export_handle_t *) memory_allocate(
-								  sizeof( export_handle_t ) );
+		                                      sizeof( export_handle_t ) );
 
 		if( *export_handle == NULL )
 		{
@@ -293,6 +293,334 @@ int export_handle_signal_abort(
 
 			return( -1 );
 		}
+	}
+	return( 1 );
+}
+
+/* Create a directory
+ * Return 1 if successful or -1 on error
+ */
+int export_handle_make_directory(
+     export_handle_t *export_handle,
+     libsystem_character_t *directory_name,
+     log_handle_t *log_handle,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_make_directory";
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_name == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory name.",
+		 function );
+
+		return( -1 );
+	}
+	if( libsystem_directory_make(
+	     directory_name ) != 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to make directory: %" PRIs_LIBSYSTEM ".",
+		 function,
+		 directory_name );
+
+		return( -1 );
+	}
+	log_handle_printf(
+	 log_handle,
+	 "Created directory: %" PRIs_LIBSYSTEM ".\n",
+	 directory_name );
+
+	return( 1 );
+}
+
+/* Sanitizes the filename
+ * Return 1 if successful or -1 on error
+ */
+int export_handle_sanitize_filename(
+     export_handle_t *export_handle,
+     libsystem_character_t *filename,
+     size_t filename_size,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_sanitize_filename";
+	size_t iterator       = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( filename_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid filename size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < filename_size; iterator++ )
+	{
+		if( ( ( filename[ iterator ] >= 0x01 )
+		  && ( filename[ iterator ] <= 0x1f ) )
+		 || ( filename[ iterator ] == (libsystem_character_t) '!' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '$' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '%' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '&' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '*' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '+' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '/' )
+		 || ( filename[ iterator ] == (libsystem_character_t) ':' )
+		 || ( filename[ iterator ] == (libsystem_character_t) ';' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '<' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '>' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '?' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '@' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '\\' )
+		 || ( filename[ iterator ] == (libsystem_character_t) '~' )
+		 || ( filename[ iterator ] == 0x7e ) )
+		{
+			filename[ iterator ] = (libsystem_character_t) '_';
+		}
+	}
+	return( 1 );
+}
+
+/* Creates the target path
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_create_target_path(
+     export_handle_t *export_handle,
+     libsystem_character_t *export_path,
+     size_t export_path_size,
+     uint8_t *utf8_filename,
+     size_t utf8_filename_size,
+     libsystem_character_t **target_path,
+     size_t *target_path_size,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_create_target_path";
+	size_t filename_size  = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_path == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export path.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_filename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_filename_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-8 filename size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( target_path == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid target path.",
+		 function );
+
+		return( -1 );
+	}
+	if( *target_path != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid target path already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( target_path_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid target path size.",
+		 function );
+
+		return( -1 );
+	}
+	/* Make sure to check the UTF-8 filename length
+	 * the conversion routines are very strict about the string size
+	 */
+	utf8_filename_size = 1 + narrow_string_length(
+	                          (char *) utf8_filename );
+
+	if( libsystem_string_size_from_utf8_string(
+	     utf8_filename,
+	     utf8_filename_size,
+	     &filename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine UTF-8 filename size.",
+		 function );
+
+		return( -1 );
+	}
+	/* Include space for the separator and the end of string character
+	 */
+	*target_path_size = export_path_size + filename_size;
+
+	*target_path = (libsystem_character_t *) memory_allocate(
+	                                          sizeof( libsystem_character_t ) * *target_path_size );
+
+	if( *target_path == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create target path.",
+		 function );
+
+		*target_path_size = 0;
+
+		return( -1 );
+	}
+	if( libsystem_string_copy(
+	     *target_path,
+	     export_path,
+	     export_path_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set export path in target path.",
+		 function );
+
+		memory_free(
+		 target_path );
+
+		*target_path      = NULL;
+		*target_path_size = 0;
+
+		return( -1 );
+	}
+	( *target_path )[ export_path_size - 1 ] = (libsystem_character_t) PFFCOMMON_PATH_SEPARATOR;
+
+	if( libsystem_string_copy_from_utf8_string(
+	     &( ( *target_path )[ export_path_size ] ),
+	     filename_size,
+	     utf8_filename,
+	     utf8_filename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set filename in target path.",
+		 function );
+
+		memory_free(
+		 target_path );
+
+		*target_path      = NULL;
+		*target_path_size = 0;
+
+		return( -1 );
+	}
+	if( export_handle_sanitize_filename(
+	     export_handle,
+	     &( ( *target_path )[ export_path_size ] ),
+	     filename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable sanitize filename in target path.",
+		 function );
+
+		memory_free(
+		 target_path );
+
+		*target_path      = NULL;
+		*target_path_size = 0;
+
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -2394,6 +2722,256 @@ ssize_t export_handle_finalize(
 		}
 	}
 	return( write_count );
+}
+
+/* Exports the single files
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_export_single_files(
+     export_handle_t *export_handle,
+     liberror_error_t **error )
+{
+	libewf_file_entry_t *file_entry = NULL;
+	static char *function           = "export_handle_export_single_files";
+	int result                      = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid export handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_handle_get_root_file_entry(
+	          export_handle->input_handle,
+	          &file_entry,
+	          error );
+
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve root file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle_export_file_entry(
+	     export_handle,
+	     file_entry,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to export root file entry.",
+		 function );
+
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
+
+		return( -1 );
+	}
+	if( libewf_file_entry_free(
+	     &file_entry,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free root file entry.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Exports a (single) file entry
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_export_file_entry(
+     export_handle_t *export_handle,
+     libewf_file_entry_t *file_entry,
+     liberror_error_t **error )
+{
+	libewf_file_entry_t *sub_file_entry = NULL;
+	uint8_t *name                       = NULL;
+	static char *function               = "export_handle_export_file_entry";
+	size_t name_size                    = 0;
+	int amount_of_sub_file_entries      = 0;
+	int iterator                        = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_file_entry_get_name_size(
+	     file_entry,
+	     &name_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the name.",
+		 function );
+
+		return( -1 );
+	}
+	if( name_size > 0 )
+	{
+		name = (uint8_t *) memory_allocate(
+				    sizeof( uint8_t ) * name_size );
+
+		if( name == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create name.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_file_entry_get_name(
+		     file_entry,
+		     name,
+		     name_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve the name.",
+			 function );
+
+			memory_free(
+			 name );
+
+			return( -1 );
+		}
+		/* TODO create target path */
+
+		memory_free(
+		 name );
+	}
+	/* TODO determine file entry type
+	 * if entry is file export data
+	 * if entry is directory export files
+	 * what about NTFS streams ?
+	 */
+
+	if( libewf_file_entry_get_amount_of_sub_file_entries(
+	     file_entry,
+	     &amount_of_sub_file_entries,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve amount of sub file entries.",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0;
+	     iterator < amount_of_sub_file_entries;
+	     iterator++ )
+	{
+		if( libewf_file_entry_get_sub_file_entry(
+		     file_entry,
+		     iterator,
+		     &sub_file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to free retrieve sub file entry: %d.",
+			 function,
+			 iterator + 1 );
+
+			return( -1 );
+		}
+		if( export_handle_export_file_entry(
+		     export_handle,
+		     sub_file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to export sub file entry: %d.",
+			 function,
+			 iterator + 1 );
+
+			libewf_file_entry_free(
+			 &sub_file_entry,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libewf_file_entry_free(
+		     &sub_file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sub file entry: %d.",
+			 function,
+			 iterator + 1 );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
 }
 
 /* Print the CRC errors to a stream

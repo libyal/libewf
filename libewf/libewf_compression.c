@@ -188,17 +188,17 @@ int libewf_compress(
 	return( -1 );
 }
 
-/* Uncompresses data, wraps zlib uncompress function
+/* Decompresses data, wraps zlib uncompress function
  * Returns 1 on success, 0 on failure or -1 on error
  */
-int libewf_uncompress(
+int libewf_decompress(
      uint8_t *uncompressed_data,
      size_t *uncompressed_size,
      uint8_t *compressed_data,
      size_t compressed_size,
      liberror_error_t **error )
 {
-	static char *function         = "libewf_uncompress";
+	static char *function         = "libewf_decompress";
 	uLongf safe_uncompressed_size = 0;
 	int result                    = 0;
 

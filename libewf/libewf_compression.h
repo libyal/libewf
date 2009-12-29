@@ -40,7 +40,7 @@ int libewf_compress(
      int8_t compression_level,
      liberror_error_t **error );
 
-int libewf_uncompress(
+int libewf_decompress(
      uint8_t *uncompressed_data,
      size_t *uncompressed_size,
      uint8_t *compressed_data,

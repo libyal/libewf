@@ -41,6 +41,7 @@
 
 #include "digest_context.h"
 #include "digest_hash.h"
+#include "log_handle.h"
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
@@ -52,6 +53,7 @@ extern "C" {
 enum EXPORT_HANDLE_OUTPUT_FORMATS
 {
 	EXPORT_HANDLE_OUTPUT_FORMAT_EWF		= (int) 'e',
+	EXPORT_HANDLE_OUTPUT_FORMAT_FILES	= (int) 'f',
 	EXPORT_HANDLE_OUTPUT_FORMAT_RAW		= (int) 'r'
 };
 
@@ -126,6 +128,28 @@ int export_handle_free(
 
 int export_handle_signal_abort(
      export_handle_t *export_handle,
+     liberror_error_t **error );
+
+int export_handle_make_directory(
+     export_handle_t *export_handle,
+     libsystem_character_t *directory_name,
+     log_handle_t *log_handle,
+     liberror_error_t **error );
+
+int export_handle_sanitize_filename(
+     export_handle_t *export_handle,
+     libsystem_character_t *filename,
+     size_t filename_size,
+     liberror_error_t **error );
+
+int export_handle_create_target_path(
+     export_handle_t *export_handle,
+     libsystem_character_t *export_path,
+     size_t export_path_size,
+     uint8_t *utf8_filename,
+     size_t utf8_filename_size,
+     libsystem_character_t **target_path,
+     size_t *target_path_size,
      liberror_error_t **error );
 
 int export_handle_open_input(
@@ -249,6 +273,15 @@ ssize_t export_handle_finalize(
          libsystem_character_t *calculated_sha1_hash_string,
          size_t calculated_sha1_hash_string_size,
          liberror_error_t **error );
+
+int export_handle_export_single_files(
+     export_handle_t *export_handle,
+     liberror_error_t **error );
+
+int export_handle_export_file_entry(
+     export_handle_t *export_handle,
+     libewf_file_entry_t *file_entry,
+     liberror_error_t **error );
 
 int export_handle_crc_errors_fprint(
      export_handle_t *export_handle,

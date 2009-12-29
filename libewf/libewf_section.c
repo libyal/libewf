@@ -558,7 +558,7 @@ ssize_t libewf_section_compressed_string_read(
 
 		return( -1 );
 	}
-	result = libewf_uncompress(
+	result = libewf_decompress(
 	          *uncompressed_string,
 	          uncompressed_string_size,
 	          compressed_string,
@@ -595,7 +595,7 @@ ssize_t libewf_section_compressed_string_read(
 		}
 		*uncompressed_string = (uint8_t *) reallocation;
 
-		result = libewf_uncompress(
+		result = libewf_decompress(
 		          *uncompressed_string,
 		          uncompressed_string_size,
 		          compressed_string,
@@ -611,7 +611,7 @@ ssize_t libewf_section_compressed_string_read(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_COMPRESSION,
 		 LIBERROR_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
-		 "%s: unable to uncompress string.",
+		 "%s: unable to decompress string.",
 		 function );
 
 		memory_free(
@@ -1416,6 +1416,30 @@ ssize_t libewf_section_volume_s01_read(
 	memory_free(
 	 volume );
 
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: amount of chunks\t: %" PRIu32 "\n",
+		 function,
+		 media_values->amount_of_chunks );
+		libnotify_printf(
+		 "%s: sectors per chunk\t: %" PRIu32 "\n",
+		 function,
+		 media_values->sectors_per_chunk );
+		libnotify_printf(
+		 "%s: bytes per sector\t: %" PRIu32 "\n",
+		 function,
+		 media_values->bytes_per_sector );
+		libnotify_printf(
+		 "%s: amount of sectors\t: %" PRIu32 "\n",
+		 function,
+		 media_values->amount_of_sectors );
+		libnotify_printf(
+		 "\n" );
+	}
+#endif
+
 	return( read_count );
 }
 
@@ -1840,6 +1864,46 @@ ssize_t libewf_section_volume_e01_read(
 	}
 	memory_free(
 	 volume );
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: amount of chunks\t: %" PRIu32 "\n",
+		 function,
+		 media_values->amount_of_chunks );
+		libnotify_printf(
+		 "%s: sectors per chunk\t: %" PRIu32 "\n",
+		 function,
+		 media_values->sectors_per_chunk );
+		libnotify_printf(
+		 "%s: bytes per sector\t: %" PRIu32 "\n",
+		 function,
+		 media_values->bytes_per_sector );
+		libnotify_printf(
+		 "%s: amount of sectors\t: %" PRIu32 "\n",
+		 function,
+		 media_values->amount_of_sectors );
+		libnotify_printf(
+		 "%s: error granularity\t: %" PRIu32 "\n",
+		 function,
+		 media_values->error_granularity );
+		libnotify_printf(
+		 "%s: media type\t\t: 0x%02" PRIx8 "\n",
+		 function,
+		 media_values->media_type );
+		libnotify_printf(
+		 "%s: media flags\t\t: 0x%02" PRIx8 "\n",
+		 function,
+		 media_values->media_flags );
+		libnotify_printf(
+		 "%s: compression level\t: 0x%02" PRIx8 "\n",
+		 function,
+		 *compression_level);
+		libnotify_printf(
+		 "\n" );
+	}
+#endif
 
 	return( read_count );
 }
@@ -6982,7 +7046,7 @@ ssize_t libewf_section_debug_read(
 
 		return( -1 );
 	}
-	result = libewf_uncompress(
+	result = libewf_decompress(
 	          uncompressed_data,
 	          &uncompressed_size,
 	          data,

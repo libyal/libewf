@@ -80,13 +80,18 @@ int libewf_tree_node_initialize(
 
 int libewf_tree_node_free(
      libewf_tree_node_t **node,
-     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
+     int (*value_free_function)(
+            intptr_t *value,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_tree_node_clone(
      libewf_tree_node_t **destination_tree_node,
      libewf_tree_node_t *source_tree_node,
-     int (*value_clone_function)( intptr_t **destination, intptr_t *source, liberror_error_t **error ),
+     int (*value_clone_function)(
+            intptr_t **destination,
+            intptr_t *source,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_tree_node_get_value(
@@ -112,13 +117,19 @@ int libewf_tree_node_append_value(
 int libewf_tree_node_insert_node(
      libewf_tree_node_t *parent_node,
      libewf_tree_node_t *node,
-     int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, liberror_error_t **error ),
+     int (*value_compare_function)(
+            intptr_t *first_value,
+            intptr_t *second_value,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_tree_node_insert_value(
      libewf_tree_node_t *parent_node,
      intptr_t *value,
-     int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, liberror_error_t **error ),
+     int (*value_compare_function)(
+            intptr_t *first_value,
+            intptr_t *second_value,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_tree_node_remove_node(

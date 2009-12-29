@@ -1131,7 +1131,9 @@ int libewf_handle_open_wide(
 	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
-		for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+		for( filename_iterator = 0;
+		     filename_iterator < amount_of_filenames;
+		     filename_iterator++ )
 		{
 			filename_length = wide_string_length(
 					   filenames[ filename_iterator ] );
@@ -1688,10 +1690,32 @@ int libewf_handle_open_file_io_pool(
 
 			return( -1 );
 		}
-		/* Calculate the media size
-		 */
-		internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->amount_of_sectors
-		                                          * (size64_t) internal_handle->media_values->bytes_per_sector;
+		if( internal_handle->single_files->ltree_data != NULL )
+		{
+			/* Parse the single file entries
+			 */
+			if( libewf_single_files_parse(
+			     internal_handle->single_files,
+			     &( internal_handle->media_values->media_size ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to parse single files.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		else
+		{
+			/* Calculate the media size
+			 */
+			internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->amount_of_sectors
+			                                          * (size64_t) internal_handle->media_values->bytes_per_sector;
+		}
 	}
 	/* Make sure format specific values are set
 	 */
@@ -1819,160 +1843,7 @@ int libewf_handle_close(
 	return( 0 );
 }
 
-/* Seeks a certain offset of the media data within the EWF file(s)
- * It will set the related file offset to the specific chunk offset
- * Returns the offset if seek is successful or -1 on error
- */
-off64_t libewf_handle_seek_offset(
-         libewf_handle_t *handle,
-         off64_t offset,
-         int whence,
-         liberror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_seek_offset";
-	uint64_t chunk                            = 0;
-	uint64_t chunk_offset                     = 0;
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->io_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( whence != SEEK_CUR )
-	 && ( whence != SEEK_END )
-	 && ( whence != SEEK_SET ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported whence.",
-		 function );
-
-		return( -1 );
-	}
-	if( whence == SEEK_CUR )
-	{	
-		offset += (off64_t) ( ( internal_handle->media_values->chunk_size * internal_handle->io_handle->current_chunk )
-		                      + internal_handle->io_handle->current_chunk_offset );
-	}
-	else if( whence == SEEK_END )
-	{	
-		offset += (off64_t) internal_handle->media_values->media_size;
-	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( libnotify_verbose != 0 )
-	{
-		libnotify_printf(
-		 "%s: seeking offset: %" PRIi64 ".\n",
-		 function,
-		 offset );
-	}
-#endif
-
-	if( ( offset < 0 )
-	 || ( offset > (off64_t) internal_handle->media_values->media_size ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid offset value out of range.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset < (off64_t) internal_handle->media_values->media_size )
-	{
-		/* Determine the chunk that is requested
-		 */
-		chunk = offset / internal_handle->media_values->chunk_size;
-
-		if( chunk >= (uint64_t) INT32_MAX )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid chunk value exceeds maximum.",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_offset_table_seek_chunk_offset(
-		     internal_handle->offset_table,
-		     (uint32_t) chunk,
-		     internal_handle->io_handle->file_io_pool,
-		     error ) == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek chunk offset.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->io_handle->current_chunk = (uint32_t) chunk;
-
-		/* Determine the offset within the decompressed chunk that is requested
-		 */
-		chunk_offset = offset % internal_handle->media_values->chunk_size;
-
-		if( chunk_offset >= (uint64_t) INT32_MAX )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid chunk offset value exceeds maximum.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->io_handle->current_chunk_offset = (uint32_t) chunk_offset;
-	}
-	else
-	{
-		internal_handle->io_handle->current_chunk        = internal_handle->offset_table->amount_of_chunk_offsets;
-		internal_handle->io_handle->current_chunk_offset = 0;
-	}
-	return( offset );
-}
-
-/* Prepares chunk data after reading it according to the handle settings
+/* Prepares chunk of (media) data after reading it according to the handle settings
  * This function should be used after libewf_handle_read_chunk
  * The chunk buffer size should contain the actual chunk size
  * Returns the resulting chunk size or -1 on error
@@ -2077,7 +1948,7 @@ ssize_t libewf_handle_prepare_read_chunk(
 	return( chunk_data_size );
 }
 
-/* Reads a chunk from the curent offset into a buffer
+/* Reads a chunk of (media) data from the curent offset into a buffer
  * size contains the size of the chunk buffer
  * The function sets the chunk crc, is compressed and read crc values
  * Returns the amount of bytes read or -1 on error
@@ -2171,13 +2042,13 @@ ssize_t libewf_handle_read_chunk(
 	return( read_count );
 }
 
-/* Reads media data from the last current into a buffer
+/* Reads (media) data from the last current into a buffer
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_handle_read_buffer(
          libewf_handle_t *handle,
          void *buffer,
-         size_t size,
+         size_t buffer_size,
          liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2255,13 +2126,13 @@ ssize_t libewf_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( size > (size_t) SSIZE_MAX )
+	if( buffer_size > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.",
+		 "%s: invalid buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -2272,7 +2143,7 @@ ssize_t libewf_handle_read_buffer(
 		libnotify_printf(
 		 "%s: reading size: %" PRIzu ".\n",
 		 function,
-		 size );
+		 buffer_size );
 	}
 #endif
 
@@ -2308,7 +2179,7 @@ ssize_t libewf_handle_read_buffer(
 			return( -1 );
 		}
 	}
-	while( size > 0 )
+	while( buffer_size > 0 )
 	{
 		chunk_read_count = libewf_read_io_handle_read_chunk_data(
 		                    internal_handle->read_io_handle,
@@ -2319,7 +2190,7 @@ ssize_t libewf_handle_read_buffer(
 		                    internal_handle->io_handle->current_chunk,
 		                    internal_handle->io_handle->current_chunk_offset,
 		                    (uint8_t *) &( (uint8_t *) buffer )[ total_read_count ],
-		                    size,
+		                    buffer_size,
 		                    error );
 
 		if( chunk_read_count <= -1 )
@@ -2337,7 +2208,7 @@ ssize_t libewf_handle_read_buffer(
 		{
 			break;
 		}
-		size             -= chunk_read_count;
+		buffer_size      -= chunk_read_count;
 		total_read_count += chunk_read_count;
 
 		internal_handle->io_handle->current_chunk_offset += (uint32_t) chunk_read_count;
@@ -2366,13 +2237,13 @@ ssize_t libewf_handle_read_buffer(
 	return( total_read_count );
 }
 
-/* Reads media data from an offset into a buffer
+/* Reads (media) data from an offset into a buffer
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_handle_read_random(
          libewf_handle_t *handle,
          void *buffer,
-         size_t size,
+         size_t buffer_size,
          off64_t offset,
          liberror_error_t **error )
 {
@@ -2397,7 +2268,7 @@ ssize_t libewf_handle_read_random(
 	read_count = libewf_handle_read_buffer(
 	              handle,
 	              buffer,
-	              size,
+	              buffer_size,
 	              error );
 
 	if( read_count <= -1 )
@@ -2414,7 +2285,7 @@ ssize_t libewf_handle_read_random(
 	return( read_count );
 }
 
-/* Writes a chunk in EWF format from a buffer at the current offset
+/* Writes a chunk of (media) data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -2553,7 +2424,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	return( chunk_data_size );
 }
 
-/* Writes a chunk in EWF format from a buffer at the current offset
+/* Writes a chunk of (media) data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -2775,7 +2646,7 @@ ssize_t libewf_handle_write_chunk(
 	return( (ssize_t) chunk_buffer_size );
 }
 
-/* Writes data in EWF format from a buffer at the current offset
+/* Writes (media) data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -3037,7 +2908,7 @@ ssize_t libewf_handle_write_buffer(
 	return( total_write_count );
 }
 
-/* Writes data in EWF format from a buffer at an specific offset,
+/* Writes (media) data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -3141,7 +3012,159 @@ ssize_t libewf_handle_write_finalize(
 	return( write_count );
 }
 
-/* Retrieves the current offset of the media data within the EWF file(s)
+/* Seeks a certain offset of the (media) data
+ * Returns the offset if seek is successful or -1 on error
+ */
+off64_t libewf_handle_seek_offset(
+         libewf_handle_t *handle,
+         off64_t offset,
+         int whence,
+         liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_seek_offset";
+	uint64_t chunk                            = 0;
+	uint64_t chunk_offset                     = 0;
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( whence != SEEK_CUR )
+	 && ( whence != SEEK_END )
+	 && ( whence != SEEK_SET ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported whence.",
+		 function );
+
+		return( -1 );
+	}
+	if( whence == SEEK_CUR )
+	{	
+		offset += (off64_t) ( ( internal_handle->media_values->chunk_size * internal_handle->io_handle->current_chunk )
+		                      + internal_handle->io_handle->current_chunk_offset );
+	}
+	else if( whence == SEEK_END )
+	{	
+		offset += (off64_t) internal_handle->media_values->media_size;
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: seeking offset: %" PRIi64 ".\n",
+		 function,
+		 offset );
+	}
+#endif
+
+	if( ( offset < 0 )
+	 || ( offset > (off64_t) internal_handle->media_values->media_size ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid offset value out of range.",
+		 function );
+
+		return( -1 );
+	}
+	if( offset < (off64_t) internal_handle->media_values->media_size )
+	{
+		/* Determine the chunk that is requested
+		 */
+		chunk = offset / internal_handle->media_values->chunk_size;
+
+		if( chunk >= (uint64_t) INT32_MAX )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid chunk value exceeds maximum.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_offset_table_seek_chunk_offset(
+		     internal_handle->offset_table,
+		     (uint32_t) chunk,
+		     internal_handle->io_handle->file_io_pool,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek chunk offset.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->io_handle->current_chunk = (uint32_t) chunk;
+
+		/* Determine the offset within the decompressed chunk that is requested
+		 */
+		chunk_offset = offset % internal_handle->media_values->chunk_size;
+
+		if( chunk_offset >= (uint64_t) INT32_MAX )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid chunk offset value exceeds maximum.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->io_handle->current_chunk_offset = (uint32_t) chunk_offset;
+	}
+	else
+	{
+		internal_handle->io_handle->current_chunk        = internal_handle->offset_table->amount_of_chunk_offsets;
+		internal_handle->io_handle->current_chunk_offset = 0;
+	}
+	return( offset );
+}
+
+/* Retrieves the current offset of the (media) data
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_offset(

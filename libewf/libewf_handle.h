@@ -133,10 +133,6 @@ struct libewf_internal_handle
 	 */
 	libewf_single_files_t *single_files;
 
-	/* Value to indicate the single file entries were parsed
-	 */
-	uint8_t single_file_entries_parsed;
-
 	/* Value to indicate if abort was signalled
 	 */
 	int abort;
@@ -180,12 +176,6 @@ LIBEWF_EXTERN int libewf_handle_close(
                    libewf_handle_t *handle,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
-                       libewf_handle_t *handle,
-                       off64_t offset,
-                       int whence,
-                       liberror_error_t **error );
-
 LIBEWF_EXTERN ssize_t libewf_handle_prepare_read_chunk(
                        libewf_handle_t *handle,
                        void *chunk_buffer,
@@ -210,13 +200,13 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
 LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
-                       size_t size,
+                       size_t buffer_size,
                        liberror_error_t **error );
 
 LIBEWF_EXTERN ssize_t libewf_handle_read_random(
                        libewf_handle_t *handle,
                        void *buffer,
-                       size_t size,
+                       size_t buffer_size,
                        off64_t offset,
                        liberror_error_t **error );
 
@@ -257,6 +247,12 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_random(
 
 LIBEWF_EXTERN ssize_t libewf_handle_write_finalize(
                        libewf_handle_t *handle,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
+                       libewf_handle_t *handle,
+                       off64_t offset,
+                       int whence,
                        liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_offset(

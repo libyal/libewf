@@ -133,16 +133,17 @@ void usage_fprint(
 #ifdef DISABLED
 	fprintf( stream, "\t-b:        specify the amount of sectors to read at once (per chunk), options:\n"
 	                 "\t           64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n"
-	                 "\t           (not used for raw format)\n" );
+	                 "\t           (not used for raw and files formats)\n" );
 #endif
 	fprintf( stream, "\t-B:        specify the amount of bytes to export (default is all bytes)\n" );
 	fprintf( stream, "\t-c:        specify the compression type, options: none (default), empty-block,\n"
-	                 "\t           fast or best (not used for raw format)\n" );
+	                 "\t           fast or best (not used for raw and files format)\n" );
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5, options: sha1\n"
-	                 "\t           (not used for raw format)\n" );
-	fprintf( stream, "\t-f:        specify the file format to write to, options: raw (default), ewf,\n"
-	                 "\t           smart, encase1, encase2, encase3, encase4, encase5, encase6, linen5,\n"
-	                 "\t           linen6, ewfx\n" );
+	                 "\t           (not used for raw and files format)\n" );
+	fprintf( stream, "\t-f:        specify the output format to write to, options: raw (default), files,\n"
+	                 "\t           ewf, smart, encase1, encase2, encase3, encase4, encase5, encase6,\n"
+	                 "\t           linen5, linen6, ewfx\n"
+	                 "\t           (the files format is restricted to logical volume files)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-l:        logs export errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-o:        specify the offset to start the export (default is 0)\n" );
@@ -156,7 +157,7 @@ void usage_fprint(
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBSYSTEM ")\n"
 		                 "\t           (minimum is %" PRIs_LIBSYSTEM ", maximum is %" PRIs_LIBSYSTEM " for encase6 format\n"
 		                 "\t           and %" PRIs_LIBSYSTEM " for other formats)\n"
-		                 "\t           (not used for raw format)\n",
+		                 "\t           (not used for raw and files formats)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -167,7 +168,7 @@ void usage_fprint(
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIu32 ")\n"
 		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format\n"
 		                 "\t           and %" PRIu32 " for other formats)\n"
-		                 "\t           (not used for raw format)\n",
+		                 "\t           (not used for raw and files formats)\n",
 		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
@@ -822,7 +823,6 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                              = 1;
 	uint8_t calculate_sha1                             = 0;
 	uint8_t compression_flags                          = 0;
-	uint8_t export_handle_output_format                = 0;
 	uint8_t ewf_format                                 = LIBEWF_FORMAT_ENCASE6;
 	uint8_t print_status_information                   = 1;
 	uint8_t swap_byte_pairs                            = 0;
@@ -837,14 +837,15 @@ int main( int argc, char * const argv[] )
 	int argument_set_segment_file_size                 = 0;
 	int argument_set_size                              = 0;
 	int error_abort                                    = 0;
+	int export_handle_output_format                    = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
 	int interactive_mode                               = 1;
-	int output_raw                                     = 1;
 	int result                                         = 1;
 	int status                                         = 0;
 
-	libsystem_character_t *ewfexport_format_types[ 13 ] = \
+	libsystem_character_t *ewfexport_format_types[ 14 ] = \
 	 { _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
+	   _LIBSYSTEM_CHARACTER_T_STRING( "files" ),
 	   _LIBSYSTEM_CHARACTER_T_STRING( "ewf" ),
 	   _LIBSYSTEM_CHARACTER_T_STRING( "smart" ),
 	   _LIBSYSTEM_CHARACTER_T_STRING( "ftk" ),
@@ -1043,24 +1044,32 @@ int main( int argc, char * const argv[] )
 				     _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
 				     3 ) == 0 )
 				{
-					output_raw          = 1;
-					argument_set_format = 1;
+					export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+					argument_set_format         = 1;
+				}
+				else if( libsystem_string_compare(
+				          optarg,
+				          _LIBSYSTEM_CHARACTER_T_STRING( "files" ),
+				          5 ) == 0 )
+				{
+					export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
+					argument_set_format         = 1;
 				}
 				else if( ewfinput_determine_ewf_format(
 				          optarg,
 				          &ewf_format,
-				          &error ) != 1 )
+				          &error ) == 1 )
 				{
-					fprintf(
-					 stderr,
-					 "Unsupported file format type defaulting to: raw.\n" );
-
-					output_raw = 1;
+					export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
+					argument_set_format         = 1;
 				}
 				else
 				{
-					output_raw          = 0;
-					argument_set_format = 1;
+					fprintf(
+					 stderr,
+					 "Unsupported output format type defaulting to: raw.\n" );
+
+					export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 				}
 				break;
 
@@ -1500,9 +1509,9 @@ int main( int argc, char * const argv[] )
 			     stderr,
 			     input_buffer,
 			     EWFEXPORT_INPUT_BUFFER_SIZE,
-			     _LIBSYSTEM_CHARACTER_T_STRING( "Export to file format" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "Export to format" ),
 			     ewfexport_format_types,
-			     13,
+			     14,
 			     0,
 			     &fixed_string_variable,
 			     &error ) == -1 )
@@ -1514,21 +1523,32 @@ int main( int argc, char * const argv[] )
 
 				fprintf(
 				 stderr,
-				 "Unable to determine file format defaulting to: raw.\n" );
+				 "Unable to determine output format defaulting to: raw.\n" );
 
-				output_raw = 1;
+				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 			}
 			else if( libsystem_string_compare(
 			          fixed_string_variable,
 			          _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
 			          3 ) == 0 )
 			{
-				output_raw = 1;
+				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+			}
+			else if( libsystem_string_compare(
+			          fixed_string_variable,
+			          _LIBSYSTEM_CHARACTER_T_STRING( "files" ),
+			          4 ) == 0 )
+			{
+				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
 			}
 			else if( ewfinput_determine_ewf_format(
 			          fixed_string_variable,
 			          &ewf_format,
-			          &error ) != 1 )
+			          &error ) == 1 )
+			{
+				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
+			}
+			else
 			{
 				libsystem_notify_print_error_backtrace(
 				 error );
@@ -1537,16 +1557,12 @@ int main( int argc, char * const argv[] )
 
 				fprintf(
 				 stderr,
-				 "Unsupported file format defaulting to: raw.\n" );
+				 "Unsupported output format defaulting to: raw.\n" );
 
-				output_raw = 1;
-			}
-			else
-			{
-				output_raw = 0;
+				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 			}
 		}
-		if( output_raw == 0 )
+		if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 		{
 			/* Target filename
 			 */
@@ -1701,7 +1717,31 @@ int main( int argc, char * const argv[] )
 				}
 			}
 		}
-		else
+		else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
+		{
+			/* Target directory
+			 */
+			if( option_target_filename == NULL )
+			{
+				while( ewfinput_get_string_variable(
+					stderr,
+					_LIBSYSTEM_CHARACTER_T_STRING( "Target path" ),
+					target_filename,
+					1024,
+					&error ) != 1 )
+				{
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					fprintf(
+					 stderr,
+					 "Path is required, please try again or terminate using Ctrl^C.\n" );
+				}
+			}
+		}
+		else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 		{
 			/* Target filename
 			 */
@@ -1725,57 +1765,61 @@ int main( int argc, char * const argv[] )
 				}
 			}
 		}
-                /* Offset of data to export
-		 */
-		if( ( argument_set_offset == 0 )
-		 && ( ewfinput_get_size_variable(
-		       stderr,
-		       input_buffer,
-		       EWFEXPORT_INPUT_BUFFER_SIZE,
-		       _LIBSYSTEM_CHARACTER_T_STRING( "Start export at offset" ),
-		       0,
-		       media_size,
-		       export_offset,
-		       &export_offset,
-		       &error ) == -1 ) )
+		if( ( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+		 || ( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW ) )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			/* Offset of data to export
+			 */
+			if( ( argument_set_offset == 0 )
+			 && ( ewfinput_get_size_variable(
+			       stderr,
+			       input_buffer,
+			       EWFEXPORT_INPUT_BUFFER_SIZE,
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Start export at offset" ),
+			       0,
+			       media_size,
+			       export_offset,
+			       &export_offset,
+			       &error ) == -1 ) )
+			{
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
-			export_offset = 0;
+				export_offset = 0;
 
-			fprintf(
-			 stderr,
-			 "Unable to determine export offset defaulting to: %" PRIu64 ".\n",
-			 export_offset );
-		}
-                /* Size of data to export
-		 */
-		if( ( argument_set_size == 0 )
-		 && ( ewfinput_get_size_variable(
-		       stderr,
-		       input_buffer,
-		       EWFEXPORT_INPUT_BUFFER_SIZE,
-		       _LIBSYSTEM_CHARACTER_T_STRING( "Amount of bytes to export" ),
-		       0,
-		       ( media_size - export_offset ),
-		       export_size,
-		       &export_size,
-		       &error ) == -1 ) )
-		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+				fprintf(
+				 stderr,
+				 "Unable to determine export offset defaulting to: %" PRIu64 ".\n",
+				 export_offset );
+			}
+			/* Size of data to export
+			 */
+			if( ( argument_set_size == 0 )
+			 && ( ewfinput_get_size_variable(
+			       stderr,
+			       input_buffer,
+			       EWFEXPORT_INPUT_BUFFER_SIZE,
+			       _LIBSYSTEM_CHARACTER_T_STRING( "Amount of bytes to export" ),
+			       0,
+			       ( media_size - export_offset ),
+			       export_size,
+			       &export_size,
+			       &error ) == -1 ) )
+			{
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
-			export_size = media_size - export_offset;
+				export_size = media_size - export_offset;
 
-			fprintf(
-			 stderr,
-			 "Unable to determine export size defaulting to: %" PRIu64 ".\n",
-			 export_size );
+				fprintf(
+				 stderr,
+				 "Unable to determine export size defaulting to: %" PRIu64 ".\n",
+				 export_size );
+			}
 		}
 		if( libsystem_signal_attach(
 		     ewfexport_signal_handler,
@@ -1790,6 +1834,11 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 		}
+	}
+	if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
+	{
+		calculate_md5  = 0;
+		calculate_sha1 = 0;
 	}
 	if( calculate_md5 == 1 )
 	{
@@ -1928,14 +1977,6 @@ int main( int argc, char * const argv[] )
 			 NULL );
 
 			return( EXIT_FAILURE );
-		}
-		if( output_raw == 0 )
-		{
-			export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
-		}
-		else
-		{
-			export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 		}
 		if( export_handle_open_output(
 		     export_handle,

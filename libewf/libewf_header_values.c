@@ -1162,6 +1162,16 @@ int libewf_header_values_parse_header_string(
 			{
 				value_string_length -= 1;
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: type: %s with value: %s.\n",
+				 function,
+				 (char *) types->values[ iterator ],
+				 (char *) value_string );
+			}
+#endif
 			if( type_string_length == 3 )
 			{
 				if( libewf_string_compare(
@@ -1780,16 +1790,6 @@ int libewf_header_values_parse_header_string(
 					}
 				}
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			else if( libnotify_verbose != 0 )
-			{
-				libnotify_printf(
-				 "%s: unsupported type: %s with value: %s.\n",
-				 function,
-				 (char *) types->values[ iterator ],
-				 (char *) value_string );
-			}
-#endif
 		}
 		if( libewf_split_values_free(
 		     &values,

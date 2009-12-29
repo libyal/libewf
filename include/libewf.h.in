@@ -280,25 +280,7 @@ LIBEWF_EXTERN int libewf_handle_close(
                    libewf_handle_t *handle,
                    libewf_error_t **error );
 
-/* Seeks a certain offset of the media data within the EWF file(s)
- * It will set the related file offset to the specific chunk offset
- * Returns the offset if seek is successful or -1 on error
- */
-LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
-                       libewf_handle_t *handle,
-                       off64_t offset,
-                       int whence,
-                       libewf_error_t **error );
-
-/* Retrieves the current offset of the media data within the EWF file(s)
- * Returns the offset if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_handle_get_offset(
-                   libewf_handle_t *handle,
-                   off64_t *offset,
-                   libewf_error_t **error );
-
-/* Prepares chunk data after reading it according to the handle settings
+/* Prepares a chunk of (media) data after reading it according to the handle settings
  * This function should be used after libewf_handle_read_chunk
  * The chunk buffer size should contain the actual chunk size
  * Returns the resulting chunk size or -1 on error
@@ -314,7 +296,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_read_chunk(
                        int8_t read_crc,
                        libewf_error_t **error );
 
-/* Reads a chunk from the curent offset into a buffer
+/* Reads a chunk of (media) data from the curent offset into a buffer
  * size contains the size of the chunk buffer
  * The function sets the chunk crc, is compressed and read crc values
  * Returns the amount of bytes read or -1 on error
@@ -329,7 +311,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        int8_t *read_crc,
                        libewf_error_t **error );
 
-/* Reads data from the curent offset into a buffer
+/* Reads (media) data from the curent offset into a buffer
  * Returns the amount of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
@@ -338,7 +320,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
                        size_t buffer_size,
                        libewf_error_t **error );
 
-/* Reads media data from an offset into a buffer
+/* Reads (media) data from an offset into a buffer
  * Returns the amount of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_read_random(
@@ -348,7 +330,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_random(
                        off64_t offset,
                        libewf_error_t **error );
 
-/* Prepares a buffer with chunk data before writing according to the handle settings
+/* Prepares a chunk of (media) data before writing according to the handle settings
  * This function should be used before libewf_handle_write_chunk
  * The chunk buffer size should contain the actual chunk size
  * The function sets the chunk crc, is compressed and write crc values
@@ -365,7 +347,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_write_chunk(
                        int8_t *write_crc,
                        libewf_error_t **error );
 
-/* Writes a chunk in EWF format from a buffer at the current offset
+/* Writes a chunk of (media) data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -383,7 +365,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
                        int8_t write_crc,
                        libewf_error_t **error );
 
-/* Writes data in EWF format from a buffer at the current offset
+/* Writes (media) data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -394,7 +376,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_buffer(
                        size_t buffer_size,
                        libewf_error_t **error );
 
-/* Writes data in EWF format from a buffer at an specific offset,
+/* Writes (media) data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -413,6 +395,23 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_random(
 LIBEWF_EXTERN ssize_t libewf_handle_write_finalize(
                        libewf_handle_t *handle,
                        libewf_error_t **error );
+
+/* Seeks a certain offset of the (media) data
+ * Returns the offset if seek is successful or -1 on error
+ */
+LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
+                       libewf_handle_t *handle,
+                       off64_t offset,
+                       int whence,
+                       libewf_error_t **error );
+
+/* Retrieves the current offset of the (media) data
+ * Returns the offset if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_offset(
+                   libewf_handle_t *handle,
+                   off64_t *offset,
+                   libewf_error_t **error );
 
 /* Retrieves the segment filename size
  * The filename size includes the end of string character
@@ -698,7 +697,7 @@ LIBEWF_EXTERN int libewf_handle_set_compression_values(
                    uint8_t compression_flags,
                    libewf_error_t **error );
 
-/* Retrieves the size of the contained media data
+/* Retrieves the size of the contained (media) data
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_media_size(
@@ -1327,6 +1326,34 @@ LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
                    libewf_file_entry_t **sub_file_entry,
                    libewf_error_t **error );
 
+/* Reads data from the curent offset into a buffer
+ * Returns the amount of bytes read or -1 on error
+ */
+LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
+                       libewf_file_entry_t *file_entry,
+                       void *buffer,
+                       size_t buffer_size,
+                       libewf_error_t **error );
+
+/* Reads data from an offset into a buffer
+ * Returns the amount of bytes read or -1 on error
+ */
+LIBEWF_EXTERN ssize_t libewf_file_entry_read_random(
+                       libewf_file_entry_t *file_entry,
+                       void *buffer,
+                       size_t buffer_size,
+                       off64_t offset,
+                       libewf_error_t **error );
+
+/* Seeks a certain offset of the data
+ * Returns the offset if seek is successful or -1 on error
+ */
+LIBEWF_EXTERN off64_t libewf_file_entry_seek_offset(
+                       libewf_file_entry_t *file_entry,
+                       off64_t offset,
+                       int whence,
+                       libewf_error_t **error );
+
 /* -------------------------------------------------------------------------
  * APIv1 functions
  * ------------------------------------------------------------------------- */
@@ -1396,8 +1423,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_close(
                    libewf_handle_t *handle );
 
-/* Seeks a certain offset of the media data within the EWF file(s)
- * It will set the related file offset to the specific chunk offset
+/* Seeks a certain offset of the (media) data
  * Returns the offset if seek is successful or -1 on error
  *
  * This function is deprecated use libewf_handle_seek_offset instead
@@ -1407,7 +1433,7 @@ LIBEWF_EXTERN off64_t libewf_seek_offset(
                        libewf_handle_t *handle,
                        off64_t offset );
 
-/* Retrieves the current offset of the media data within the EWF file(s)
+/* Retrieves the current offset of the (media) data
  * Returns the offset if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_offset instead
@@ -1461,7 +1487,7 @@ LIBEWF_EXTERN ssize_t libewf_read_buffer(
                        void *buffer,
                        size_t buffer_size );
 
-/* Reads media data from an offset into a buffer
+/* Reads (media) data from an offset into a buffer
  * Returns the amount of bytes read or -1 on error
  *
  * This function is deprecated use libewf_handle_read_random instead
@@ -1790,7 +1816,7 @@ LIBEWF_EXTERN int libewf_set_compression_values(
                    int8_t compression_level,
                    uint8_t compress_empty_block );
 
-/* Retrieves the size of the contained media data
+/* Retrieves the size of the contained (media) data
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_media_size instead

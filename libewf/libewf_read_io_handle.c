@@ -291,7 +291,7 @@ ssize_t libewf_read_io_handle_process_chunk(
 
 			return( -1 );
 		}
-		if( libewf_uncompress(
+		if( libewf_decompress(
 		     uncompressed_buffer,
 		     uncompressed_buffer_size,
 		     chunk_buffer,
@@ -302,7 +302,7 @@ ssize_t libewf_read_io_handle_process_chunk(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_COMPRESSION,
 			 LIBERROR_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
-			 "%s: unable to uncompressed buffer.",
+			 "%s: unable to decompress buffer.",
 			 function );
 
 			return( -1 );

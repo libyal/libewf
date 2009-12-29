@@ -5,10 +5,11 @@ Roadmap:
 * low and high level API
   - to allow low level access to sections etc. (for recovery)
 * lvf support
-  - add support for interaction with data in ltree section
-  - add functions to manual
+  - set initial file entry offset
+  - add support for permissions
 * thread aware lvf support
   - implement libewf_single_file_entry_clone
+  - what about current offset and IO back-end ?
 * xsignature section to sign xhash and/or hash
 * library/tools enhancements
   - getoptlong
@@ -150,6 +151,7 @@ ewftools:
   - allow different input and output header codepages?
   - handle ewf/raw like in smioexport
   - creates write only raw export file with msvscpp compilation
+  - limit output formats for input types (lvf vs ewf)
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -217,6 +219,9 @@ Refactor:
 * file io pool out of io handle?
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
+
+20091229
+* worked on reading LVF files
 
 20091228
 * worked on windows builds

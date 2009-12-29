@@ -58,6 +58,10 @@ struct libewf_internal_file_entry
 	/* The file entry flags
 	 */
 	uint8_t flags;
+
+	/* The offset
+	 */
+	off64_t offset;
 };
 
 int libewf_file_entry_initialize(
@@ -100,6 +104,25 @@ LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
                    int sub_file_entry_index,
                    libewf_file_entry_t **sub_file_entry,
                    liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
+                       libewf_file_entry_t *file_entry,
+                       void *buffer,
+                       size_t buffer_size,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_file_entry_read_random(
+                       libewf_file_entry_t *file_entry,
+                       void *buffer,
+                       size_t buffer_size,
+                       off64_t offset,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN off64_t libewf_file_entry_seek_offset(
+                       libewf_file_entry_t *file_entry,
+                       off64_t offset,
+                       int whence,
+                       liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

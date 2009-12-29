@@ -136,6 +136,7 @@ int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
      FILE *stream,
+     int level,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

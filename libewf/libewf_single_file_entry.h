@@ -37,10 +37,6 @@ typedef struct libewf_single_file_entry libewf_single_file_entry_t;
 
 struct libewf_single_file_entry
 {
-	/* The data segment file number
-	 */
-	uint16_t data_segment_number;
-
 	/* The data offset
 	 */
 	off64_t data_offset;

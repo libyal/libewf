@@ -1849,47 +1849,50 @@ int info_handle_media_information_fprint(
 			 "\tWrite blocked:\t\tTableau\n" );
 		}
 	}
-	if( libewf_handle_get_bytes_per_sector(
-	     info_handle->input_handle,
-	     &bytes_per_sector,
-	     error ) == 1 )
+	if( format != LIBEWF_FORMAT_LVF )
 	{
-		fprintf(
-		 stream,
-		 "\tBytes per sector:\t%" PRIu32 "\n",
-		 bytes_per_sector );
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve bytes per sector.",
-		 function );
+		if( libewf_handle_get_bytes_per_sector(
+		     info_handle->input_handle,
+		     &bytes_per_sector,
+		     error ) == 1 )
+		{
+			fprintf(
+			 stream,
+			 "\tBytes per sector:\t%" PRIu32 "\n",
+			 bytes_per_sector );
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
 
-		result = -1;
-	}
-	if( libewf_handle_get_amount_of_sectors(
-	     info_handle->input_handle,
-	     &amount_of_sectors,
-	     error ) == 1 )
-	{
-		fprintf(
-		 stream,
-		 "\tAmount of sectors:\t%" PRIu64 "\n",
-		 amount_of_sectors );
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of sectors.",
-		 function );
+			result = -1;
+		}
+		if( libewf_handle_get_amount_of_sectors(
+		     info_handle->input_handle,
+		     &amount_of_sectors,
+		     error ) == 1 )
+		{
+			fprintf(
+			 stream,
+			 "\tAmount of sectors:\t%" PRIu64 "\n",
+			 amount_of_sectors );
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of sectors.",
+			 function );
 
-		result = -1;
+			result = -1;
+		}
 	}
 	if( libewf_handle_get_media_size(
 	     info_handle->input_handle,
@@ -2455,7 +2458,7 @@ int info_handle_single_files_fprint(
 	          &file_entry,
 	          error );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2474,15 +2477,16 @@ int info_handle_single_files_fprint(
 
 		if( info_handle_file_entry_fprint(
 		     info_handle,
-		      file_entry,
-		      stream,
-		      error ) != 1 )
+		     file_entry,
+		     stream,
+		     0,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print header value: extents.",
+			 "%s: unable to print root file entry.",
 			 function );
 
 			libewf_file_entry_free(
@@ -2519,6 +2523,7 @@ int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
      FILE *stream,
+     int level,
      liberror_error_t **error )
 {
 	libewf_file_entry_t *sub_file_entry = NULL;
@@ -2526,7 +2531,7 @@ int info_handle_file_entry_fprint(
 	static char *function               = "info_handle_file_entry_fprint";
 	size_t name_size                    = 0;
 	int amount_of_sub_file_entries      = 0;
-	int sub_file_entry_iterator         = 0;
+	int iterator                        = 0;
 
 	if( info_handle == NULL )
 	{
@@ -2575,46 +2580,60 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	name = (uint8_t *) memory_allocate(
-	                    sizeof( uint8_t ) * name_size );
-
-	if( name == NULL )
+	if( name_size > 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create name.",
-		 function );
+		name = (uint8_t *) memory_allocate(
+				    sizeof( uint8_t ) * name_size );
 
-		return( -1 );
-	}
-	if( libewf_file_entry_get_name(
-	     file_entry,
-	     name,
-	     name_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the name.",
-		 function );
+		if( name == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create name.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_file_entry_get_name(
+		     file_entry,
+		     name,
+		     name_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve the name.",
+			 function );
+
+			memory_free(
+			 name );
+
+			return( -1 );
+		}
+		fprintf(
+		 stream,
+		 "\t" );
+
+		for( iterator = 1;
+		     iterator < level;
+		     iterator++ )
+		{
+			fprintf(
+			 stream,
+			 " " );
+		}
+		fprintf(
+		 stream,
+		 "%s\n",
+		 name );
 
 		memory_free(
 		 name );
-
-		return( -1 );
 	}
-	fprintf(
-	 stream,
-	 "\tname\t: %s\n",
-	 name );
-
-	memory_free(
-	 name );
-
 	if( libewf_file_entry_get_amount_of_sub_file_entries(
 	     file_entry,
 	     &amount_of_sub_file_entries,
@@ -2629,13 +2648,13 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	for( sub_file_entry_iterator = 0;
-	     sub_file_entry_iterator < amount_of_sub_file_entries;
-	     sub_file_entry_iterator++ )
+	for( iterator = 0;
+	     iterator < amount_of_sub_file_entries;
+	     iterator++ )
 	{
 		if( libewf_file_entry_get_sub_file_entry(
 		     file_entry,
-		     sub_file_entry_iterator,
+		     iterator,
 		     &sub_file_entry,
 		     error ) != 1 )
 		{
@@ -2645,7 +2664,7 @@ int info_handle_file_entry_fprint(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to free retrieve sub file entry: %d.",
 			 function,
-			 sub_file_entry_iterator );
+			 iterator + 1 );
 
 			return( -1 );
 		}
@@ -2653,14 +2672,16 @@ int info_handle_file_entry_fprint(
 		     info_handle,
 		     sub_file_entry,
 		     stream,
+		     level + 1,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print header value: extents.",
-			 function );
+			 "%s: unable to print sub file entry: %d.",
+			 function,
+			 iterator + 1 );
 
 			libewf_file_entry_free(
 			 &sub_file_entry,
@@ -2676,8 +2697,9 @@ int info_handle_file_entry_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sub file entry.",
-			 function );
+			 "%s: unable to free sub file entry: %d.",
+			 function,
+			 iterator + 1 );
 
 			return( -1 );
 		}

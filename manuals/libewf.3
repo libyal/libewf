@@ -1,4 +1,4 @@
-.Dd November 22, 2009
+.Dd December 29, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -84,10 +84,6 @@ File/Handle functions
 .Fn libewf_handle_open "libewf_handle_t *handle, char * const filenames[], int amount_of_filenames, uint8_t flags, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_close "libewf_handle_t *handle, libewf_error_t **error"
-.Ft off64_t
-.Fn libewf_handle_seek_offset "libewf_handle_t *handle, off64_t offset, int whence, libewf_error_t **error"
-.Ft off64_t
-.Fn libewf_handle_get_offset "libewf_handle_t *handle, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_prepare_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t read_crc, libewf_error_t **error"
 .Ft ssize_t
@@ -106,6 +102,10 @@ File/Handle functions
 .Fn libewf_handle_write_random "libewf_handle_t *handle, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_finalize "libewf_handle_t *handle, libewf_error_t **error"
+.Ft off64_t
+.Fn libewf_handle_seek_offset "libewf_handle_t *handle, off64_t offset, int whence, libewf_error_t **error"
+.Ft off64_t
+.Fn libewf_handle_get_offset "libewf_handle_t *handle, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_segment_filename_size "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int
@@ -320,6 +320,24 @@ Meta data functions
 .Fn libewf_handle_set_hash_value_md5 "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_hash_value_sha1 "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Pp
+Single file entry functions
+.Ft int
+.Fn libewf_file_entry_free "libewf_file_entry_t **file_entry, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_name_size "libewf_file_entry_t *file_entry, size_t *name_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_name "libewf_file_entry_t *file_entry, uint8_t *name, size_t name_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_amount_of_sub_file_entries "libewf_file_entry_t *file_entry, int *amount_of_sub_file_entries, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_sub_file_entry "libewf_file_entry_t *file_entry, int sub_file_entry_index, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
+.Ft ssize_t
+.Fn libewf_file_entry_read_buffer "libewf_file_entry_t *file_entry, void *buffer, size_t buffer_size, libewf_error_t **error"
+.Ft ssize_t
+.Fn libewf_file_entry_read_random "libewf_file_entry_t *file_entry, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
+.Ft off64_t
+.Fn libewf_file_entry_seek_offset "libewf_file_entry_t *file_entry, off64_t offset, int whence, libewf_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libewf_get_version

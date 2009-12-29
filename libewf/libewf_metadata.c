@@ -4170,23 +4170,6 @@ int libewf_handle_get_root_file_entry(
 
 		return( -1 );
 	}
-	if( internal_handle->single_file_entries_parsed == 0 )
-	{
-		if( libewf_single_files_parse(
-		     internal_handle->single_files,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse single files.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->single_file_entries_parsed = 1;
-	}
 	if( internal_handle->single_files->root_file_entry_node == NULL )
 	{
 		return( 0 );

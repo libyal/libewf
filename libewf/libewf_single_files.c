@@ -151,6 +151,7 @@ int libewf_single_files_free(
  */
 int libewf_single_files_parse(
      libewf_single_files_t *single_files,
+     size64_t *media_size,
      liberror_error_t **error )
 {
 	libewf_character_t *file_entries_string = NULL;
@@ -231,6 +232,7 @@ int libewf_single_files_parse(
 	}
 	if( libewf_single_files_parse_file_entries(
 	     single_files,
+	     media_size,
 	     file_entries_string,
 	     file_entries_string_size,
 	     error ) != 1 )
@@ -258,6 +260,7 @@ int libewf_single_files_parse(
  */
 int libewf_single_files_parse_file_entries(
      libewf_single_files_t *single_files,
+     size64_t *media_size,
      libewf_character_t *entries_string,
      size_t entries_string_size,
      liberror_error_t **error )
@@ -323,6 +326,45 @@ int libewf_single_files_parse_file_entries(
 
 			return( -1 );
 		}
+		/* Find the line containing: "rec"
+		 */
+		for( line_iterator = 0;
+		     line_iterator < lines->amount_of_values;
+		     line_iterator++ )
+		{
+			if( lines->sizes[ line_iterator ] == 4 )
+			{
+				if( libewf_string_compare(
+				     lines->values[ line_iterator ],
+				     _LIBEWF_STRING( "rec" ),
+				     3 ) == 0 )
+				{
+					line_iterator += 1;
+
+					break;
+				}
+			}
+		}
+		if( libewf_single_files_parse_record_values(
+		     media_size,
+		     lines,
+		     &line_iterator,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to parse record values.",
+			 function );
+
+			libewf_split_values_free(
+			 &lines,
+			 NULL );
+
+			return( -1 );
+		}
+
 		/* Find the line containing: "entry"
 		 */
 		for( line_iterator = 0;
@@ -447,6 +489,246 @@ int libewf_single_files_parse_file_entries(
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Parse a record string for the values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_files_parse_record_values(
+     size64_t *media_size,
+     libewf_split_values_t *lines,
+     int *line_iterator,
+     liberror_error_t **error )
+{
+	libewf_split_values_t *types  = NULL;
+	libewf_split_values_t *values = NULL;
+	static char *function         = "libewf_single_files_parse_record_values";
+	size_t type_string_length     = 0;
+	size_t value_string_length    = 0;
+	uint64_t value_64bit          = 0;
+	int value_iterator            = 0;
+
+	if( media_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media size.",
+		 function );
+
+		return( 1 );
+	}
+	if( lines == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid lines.",
+		 function );
+
+		return( 1 );
+	}
+	if( line_iterator == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line iterator.",
+		 function );
+
+		return( 1 );
+	}
+	if( ( *line_iterator < 0 )
+	 || ( *line_iterator >= lines->amount_of_values ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: line iterator out of range.",
+		 function );
+
+		return( -1 );
+	}
+	/* Make sure there are at least 2 lines
+	 */
+	if( ( *line_iterator + 1 ) >= lines->amount_of_values )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: lines too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_split_values_parse_string(
+	     &types,
+	     lines->values[ *line_iterator ],
+	     lines->sizes[ *line_iterator ],
+	     (libewf_character_t) '\t',
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split entries string into types.",
+		 function );
+
+		return( -1 );
+	}
+	*line_iterator += 1;
+
+	if( libewf_split_values_parse_string(
+	     &values,
+	     lines->values[ *line_iterator ],
+	     lines->sizes[ *line_iterator ],
+	     (libewf_character_t) '\t',
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split entries string into values.",
+		 function );
+
+		libewf_split_values_free(
+		 &types,
+		 NULL );
+
+		return( -1 );
+	}
+	if( types->amount_of_values != values->amount_of_values )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported single file entry second line.",
+		 function );
+
+		libewf_split_values_free(
+		 &types,
+		 NULL );
+		libewf_split_values_free(
+		 &values,
+		 NULL );
+
+		return( -1 );
+	}
+	for( value_iterator = 0;
+	     value_iterator < values->amount_of_values;
+	     value_iterator++ )
+	{
+		type_string_length  = types->sizes[ value_iterator ] - 1;
+		value_string_length = values->sizes[ value_iterator ] - 1;
+
+		/* Remove trailing carriage return
+		 */
+		if( ( type_string_length > 0 )
+		 && ( ( types->values[ value_iterator ] )[ type_string_length - 1 ] == (libewf_character_t) '\r' ) )
+		{
+			type_string_length -= 1;
+		}
+		if( ( value_string_length > 0 )
+		 && ( ( types->values[ value_iterator ] )[ value_string_length - 1 ] == (libewf_character_t) '\r' ) )
+		{
+			value_string_length -= 1;
+		}
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: type: %s with value: %s.\n",
+			 function,
+			 (char *) types->values[ value_iterator ],
+			 (char *) values->values[ value_iterator ] );
+		}
+#endif
+		/* Ignore empty values
+		 */
+		if( value_string_length == 0 )
+		{
+			continue;
+		}
+		else if( type_string_length == 2 )
+		{
+			if( libewf_string_compare(
+			     types->values[ value_iterator ],
+			     _LIBEWF_STRING( "cl" ),
+			     type_string_length ) == 0 )
+			{
+			}
+			else if( libewf_string_compare(
+				  types->values[ value_iterator ],
+				  _LIBEWF_STRING( "tb" ),
+				  type_string_length ) == 0 )
+			{
+				if( libewf_string_copy_to_64bit(
+				     values->values[ value_iterator ],
+				     value_string_length + 1,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set access time.",
+					 function );
+
+					libewf_split_values_free(
+					 &types,
+					 NULL );
+					libewf_split_values_free(
+					 &values,
+					 NULL );
+
+					return( -1 );
+				}
+				*media_size = (size64_t) value_64bit;
+			}
+		}
+	}
+	if( libewf_split_values_free(
+	     &values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split values.",
+		 function );
+
+		libewf_split_values_free(
+		 &types,
+		 NULL );
+
+		return( -1 );
+	}
+	if( libewf_split_values_free(
+	     &types,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split types.",
+		 function );
+
+		return( -1 );
+	}
+	*line_iterator += 1;
+
 	return( 1 );
 }
 
@@ -677,15 +959,23 @@ int libewf_single_files_parse_file_entry(
 		{
 			value_string_length -= 1;
 		}
-fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ value_iterator ] );
-
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: type: %s with value: %s.\n",
+			 function,
+			 (char *) types->values[ value_iterator ],
+			 (char *) values->values[ value_iterator ] );
+		}
+#endif
 		/* Ignore empty values
 		 */
 		if( value_string_length == 0 )
 		{
 			continue;
 		}
-		if( type_string_length == 3 )
+		else if( type_string_length == 3 )
 		{
 			if( libewf_string_compare(
 			     types->values[ value_iterator ],
@@ -752,7 +1042,7 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 			{
 			}
 			/* Data offset
-			 * consist of: segment number, offset and size
+			 * consist of: unknown, offset and size
 			 */
 			else if( libewf_string_compare(
 				  types->values[ value_iterator ],
@@ -784,31 +1074,6 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 				}
 				if( offset_values->amount_of_values == 3 )
 				{
-					if( libewf_string_copy_to_64bit(
-					     offset_values->values[ 0 ],
-					     offset_values->sizes[ 0 ],
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set data segment number.",
-						 function );
-
-						libewf_single_file_entry_free(
-						 (intptr_t *) single_file_entry,
-						 NULL );
-						libewf_split_values_free(
-						 &values,
-						 NULL );
-
-						return( -1 );
-					}
-					/* TODO check value range */
-					single_file_entry->data_segment_number = (uint16_t) value_64bit;
-
 					if( libewf_string_copy_to_64bit(
 					     offset_values->values[ 1 ],
 					     offset_values->sizes[ 1 ],
@@ -1161,16 +1426,6 @@ fprintf( stderr, "%s\t: %s\n", types->values[ value_iterator ], values->values[ 
 				 */
 			}
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
-		else if( libnotify_verbose != 0 )
-		{
-			libnotify_printf(
-			 "%s: unsupported type: %s with value: %s.\n",
-			 function,
-			 (char *) types->values[ value_iterator ],
-			 (char *) values->values[ value_iterator ] );
-		}
-#endif
 	}
 	if( libewf_split_values_free(
 	     &values,
