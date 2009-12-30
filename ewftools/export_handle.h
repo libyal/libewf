@@ -65,17 +65,25 @@ struct export_handle
 	 */
 	uint8_t calculate_md5;
 
-	/* Value to indicate if the SHA1 digest hash should be calculated
-	 */
-	uint8_t calculate_sha1;
-
 	/* The MD5 digest context
 	 */
 	md5_context_t md5_context;
 
+	/* The calculated MD5 digest hash string
+	 */
+	libsystem_character_t *calculated_md5_hash_string;
+
+	/* Value to indicate if the SHA1 digest hash should be calculated
+	 */
+	uint8_t calculate_sha1;
+
 	/* The SHA1 digest context
 	 */
 	sha1_context_t sha1_context;
+
+	/* The calculated SHA1 digest hash string
+	 */
+	libsystem_character_t *calculated_sha1_hash_string;
 
 	/* The libewf input handle
 	 */
@@ -118,8 +126,6 @@ struct export_handle
 
 int export_handle_initialize(
      export_handle_t **export_handle,
-     uint8_t calculate_md5,
-     uint8_t calculate_sha1,
      liberror_error_t **error );
 
 int export_handle_free(
@@ -227,6 +233,12 @@ int export_handle_set_header_codepage(
      int header_codepage,
      liberror_error_t **error );
 
+int export_handle_set_processing_values(
+     export_handle_t *export_handle,
+     uint8_t calculate_md5,
+     uint8_t calculate_sha1,
+     liberror_error_t **error );
+
 int export_handle_set_output_values(
      export_handle_t *export_handle,
      libsystem_character_t *acquiry_operating_system,
@@ -268,10 +280,6 @@ int export_handle_add_read_error(
 
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
-         libsystem_character_t *calculated_md5_hash_string,
-         size_t calculated_md5_hash_string_size,
-         libsystem_character_t *calculated_sha1_hash_string,
-         size_t calculated_sha1_hash_string_size,
          liberror_error_t **error );
 
 int export_handle_export_single_files(
@@ -281,6 +289,11 @@ int export_handle_export_single_files(
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
+     liberror_error_t **error );
+
+int export_handle_hash_values_fprint(
+     export_handle_t *export_handle,
+     FILE *stream,
      liberror_error_t **error );
 
 int export_handle_crc_errors_fprint(

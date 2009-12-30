@@ -152,6 +152,7 @@ ewftools:
   - handle ewf/raw like in smioexport
   - creates write only raw export file with msvscpp compilation
   - limit output formats for input types (lvf vs ewf)
+  - does export handle require finalize of md5 and sha1 context?
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -219,6 +220,9 @@ Refactor:
 * file io pool out of io handle?
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
+
+20091230
+* worked on exporting LVF files
 
 20091229
 * worked on reading LVF files

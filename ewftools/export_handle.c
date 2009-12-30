@@ -61,8 +61,6 @@
  */
 int export_handle_initialize(
      export_handle_t **export_handle,
-     uint8_t calculate_md5,
-     uint8_t calculate_sha1,
      liberror_error_t **error )
 {
 	static char *function = "export_handle_initialize";
@@ -131,14 +129,11 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
-		( *export_handle )->calculate_md5              = calculate_md5;
-		( *export_handle )->calculate_sha1             = calculate_sha1;
 		( *export_handle )->raw_output_file_descriptor = -1;
 
-		if( ( ( *export_handle )->calculate_md5 != 0 )
-		 && ( md5_initialize(
-		       &( ( *export_handle )->md5_context ),
-		       error ) != 1 ) )
+		if( md5_initialize(
+		     &( ( *export_handle )->md5_context ),
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -157,10 +152,9 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
-		if( ( ( *export_handle )->calculate_sha1 != 0 )
-		 && ( sha1_initialize(
-		       &( ( *export_handle )->sha1_context ),
-		       error ) != 1 ) )
+		if( sha1_initialize(
+		     &( ( *export_handle )->sha1_context ),
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -233,6 +227,16 @@ int export_handle_free(
 			 function );
 
 			result = -1;
+		}
+		if( ( *export_handle )->calculated_md5_hash_string != NULL )
+		{
+			memory_free(
+			 ( *export_handle )->calculated_md5_hash_string );
+		}
+		if( ( *export_handle )->calculated_sha1_hash_string != NULL )
+		{
+			memory_free(
+			 ( *export_handle )->calculated_sha1_hash_string );
 		}
 		memory_free(
 		 *export_handle );
@@ -396,7 +400,9 @@ int export_handle_sanitize_filename(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < filename_size; iterator++ )
+	for( iterator = 0;
+	     iterator < filename_size;
+	     iterator++ )
 	{
 		if( ( ( filename[ iterator ] >= 0x01 )
 		  && ( filename[ iterator ] <= 0x1f ) )
@@ -577,7 +583,7 @@ int export_handle_create_target_path(
 
 		return( -1 );
 	}
-	( *target_path )[ export_path_size - 1 ] = (libsystem_character_t) PFFCOMMON_PATH_SEPARATOR;
+	( *target_path )[ export_path_size - 1 ] = (libsystem_character_t) LIBSYSTEM_PATH_SEPARATOR;
 
 	if( libsystem_string_copy_from_utf8_string(
 	     &( ( *target_path )[ export_path_size ] ),
@@ -1570,7 +1576,9 @@ int export_handle_swap_byte_pairs(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < read_size; iterator += 2 )
+	for( iterator = 0;
+	     iterator < read_size;
+	     iterator += 2 )
 	{
 		byte                 = data[ iterator ];
 		data[ iterator ]     = data[ iterator + 1 ];
@@ -1898,6 +1906,34 @@ int export_handle_set_header_codepage(
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Sets the processing values
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_set_processing_values(
+     export_handle_t *export_handle,
+     uint8_t calculate_md5,
+     uint8_t calculate_sha1,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_processing_values";
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	export_handle->calculate_md5  = calculate_md5;
+	export_handle->calculate_sha1 = calculate_sha1;
+
 	return( 1 );
 }
 
@@ -2554,10 +2590,6 @@ int export_handle_add_read_error(
  */
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
-         libsystem_character_t *calculated_md5_hash_string,
-         size_t calculated_md5_hash_string_size,
-         libsystem_character_t *calculated_sha1_hash_string,
-         size_t calculated_sha1_hash_string_size,
          liberror_error_t **error )
 {
 #if defined( USE_LIBEWF_GET_MD5_HASH )
@@ -2597,6 +2629,21 @@ ssize_t export_handle_finalize(
 	}
 	if( export_handle->calculate_md5 != 0 )
 	{
+		/* TODO check if calculated_md5_hash_string was already set */
+		export_handle->calculated_md5_hash_string = (libsystem_character_t *) memory_allocate(
+		                                                                       sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
+
+		if( export_handle->calculated_md5_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated md5 digest hash string.",
+			 function );
+
+			return( -1 );
+		}
 		/* Finalize the MD5 hash calculation
 		 */
 		if( md5_finalize(
@@ -2617,8 +2664,8 @@ ssize_t export_handle_finalize(
 		if( digest_hash_copy_to_string(
 		     calculated_md5_hash,
 		     calculated_md5_hash_size,
-		     calculated_md5_hash_string,
-		     calculated_md5_hash_string_size,
+		     export_handle->calculated_md5_hash_string,
+		     DIGEST_HASH_STRING_SIZE_MD5,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2635,8 +2682,8 @@ ssize_t export_handle_finalize(
 		       export_handle,
 		       "MD5",
 		       3,
-		       calculated_md5_hash_string,
-		       calculated_md5_hash_string_size - 1,
+		       export_handle->calculated_md5_hash_string,
+		       DIGEST_HASH_STRING_SIZE_MD5 - 1,
 		       error ) != 1 ) )
 		{
 			liberror_error_set(
@@ -2651,6 +2698,21 @@ ssize_t export_handle_finalize(
 	}
 	if( export_handle->calculate_sha1 != 0 )
 	{
+		/* TODO check if calculated_sha1_hash_string was already set */
+		export_handle->calculated_sha1_hash_string = (libsystem_character_t *) memory_allocate(
+		                                                                        sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+
+		if( export_handle->calculated_sha1_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated sha1 digest hash string.",
+			 function );
+
+			return( -1 );
+		}
 		/* Finalize the SHA1 hash calculation
 		 */
 		if( sha1_finalize(
@@ -2671,8 +2733,8 @@ ssize_t export_handle_finalize(
 		if( digest_hash_copy_to_string(
 		     calculated_sha1_hash,
 		     calculated_sha1_hash_size,
-		     calculated_sha1_hash_string,
-		     calculated_sha1_hash_string_size,
+		     export_handle->calculated_sha1_hash_string,
+		     DIGEST_HASH_STRING_SIZE_SHA1,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2689,8 +2751,8 @@ ssize_t export_handle_finalize(
 		       export_handle,
 		       "SHA1",
 		       4,
-		       calculated_sha1_hash_string,
-		       calculated_sha1_hash_string_size - 1,
+		       export_handle->calculated_sha1_hash_string,
+		       DIGEST_HASH_STRING_SIZE_SHA1 - 1,
 		       error ) != 1 ) )
 		{
 			liberror_error_set(
@@ -2974,6 +3036,59 @@ int export_handle_export_file_entry(
 	return( 1 );
 }
 
+/* Print the hash values to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_hash_values_fprint(
+     export_handle_t *export_handle,
+     FILE *stream,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_hash_values_fprint";
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->calculate_md5 == 1 )
+	{
+		/* TODO check if md5 hash is set */
+
+		fprintf(
+		 stream,
+		 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
+		 export_handle->calculated_md5_hash_string );
+	}
+	if( export_handle->calculate_sha1 == 1 )
+	{
+		/* TODO check if sha1 hash is set */
+
+		fprintf(
+		 stream,
+		 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
+		 export_handle->calculated_sha1_hash_string );
+	}
+	return( 1 );
+}
+
 /* Print the CRC errors to a stream
  * Returns 1 if successful or -1 on error
  */
@@ -3051,7 +3166,9 @@ int export_handle_crc_errors_fprint(
 		 "\ttotal amount: %" PRIu32 "\n",
 		 amount_of_errors );
 		
-		for( error_iterator = 0; error_iterator < amount_of_errors; error_iterator++ )
+		for( error_iterator = 0;
+		     error_iterator < amount_of_errors;
+		     error_iterator++ )
 		{
 			if( libewf_handle_get_crc_error(
 			     export_handle->input_handle,

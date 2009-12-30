@@ -184,24 +184,20 @@ void usage_fprint(
 }
 
 /* Reads the media data and exports it
- * Returns a -1 on error, the amount of bytes read on success
+ * Returns the amount of bytes read on success or -1 on error
  */
-ssize64_t ewfexport_read_input(
+ssize64_t ewfexport_export_image(
            export_handle_t *export_handle,
            size64_t media_size,
            size64_t export_size,
            off64_t read_offset,
-           libsystem_character_t *calculated_md5_hash_string,
-           size_t calculated_md5_hash_string_size,
-           libsystem_character_t *calculated_sha1_hash_string,
-           size_t calculated_sha1_hash_string_size,
            uint8_t swap_byte_pairs,
            size_t process_buffer_size,
            process_status_t *process_status,
 	   liberror_error_t **error )
 {
 	storage_media_buffer_t *storage_media_buffer        = NULL;
-	static char *function                               = "ewfexport_read_input";
+	static char *function                               = "ewfexport_export_image";
 	ssize64_t export_count                              = 0;
 	size32_t input_chunk_size                           = 0;
 	size_t read_size                                    = 0;
@@ -719,10 +715,6 @@ ssize64_t ewfexport_read_input(
 #endif
 	write_count = export_handle_finalize(
 	               export_handle,
-	               calculated_md5_hash_string,
-	               calculated_md5_hash_string_size,
-	               calculated_sha1_hash_string,
-	               calculated_sha1_hash_string_size,
 	               error );
 
 	if( write_count == -1 )
@@ -798,8 +790,6 @@ int main( int argc, char * const argv[] )
 #endif
 
 	libsystem_character_t *acquiry_software_version    = NULL;
-	libsystem_character_t *calculated_md5_hash_string  = NULL;
-	libsystem_character_t *calculated_sha1_hash_string = NULL;
 	libsystem_character_t *fixed_string_variable       = NULL;
 	libsystem_character_t *log_filename                = NULL;
 	libsystem_character_t *option_target_filename      = NULL;
@@ -1283,8 +1273,6 @@ int main( int argc, char * const argv[] )
 
 	if( export_handle_initialize(
 	     &export_handle,
-	     calculate_md5,
-	     calculate_sha1,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -1840,58 +1828,32 @@ int main( int argc, char * const argv[] )
 		calculate_md5  = 0;
 		calculate_sha1 = 0;
 	}
-	if( calculate_md5 == 1 )
+	if( export_handle_set_processing_values(
+	     export_handle,
+	     calculate_md5,
+	     calculate_sha1,
+	     &error ) != 1 )
 	{
-		calculated_md5_hash_string = (libsystem_character_t *) memory_allocate(
-		                                                        sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
+		fprintf(
+		 stderr,
+		 "Unable to set processing values.\n" );
 
-		if( calculated_md5_hash_string == NULL )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create calculated MD5 hash string.\n" );
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
-			memory_free(
-			 target_filename );
+		memory_free(
+		 target_filename );
 
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
+		export_handle_close(
+		 export_handle,
+		 NULL );
+		export_handle_free(
+		 &export_handle,
+		 NULL );
 
-			return( EXIT_FAILURE );
-		}
-	}
-	if( calculate_sha1 == 1 )
-	{
-		calculated_sha1_hash_string = (libsystem_character_t *) memory_allocate(
-		                                                         sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
-
-		if( calculated_sha1_hash_string == NULL )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create calculated SHA1 hash string.\n" );
-
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
-			memory_free(
-			 target_filename );
-
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
-		}
+		return( EXIT_FAILURE );
 	}
 	if( ewfexport_abort == 0 )
 	{
@@ -1917,16 +1879,6 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
 			memory_free(
 			 target_filename );
 
@@ -1956,16 +1908,6 @@ int main( int argc, char * const argv[] )
 			 &process_status,
 			 NULL );
 
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
 			memory_free(
 			 target_filename );
 
@@ -1997,16 +1939,6 @@ int main( int argc, char * const argv[] )
 			 &process_status,
 			 NULL );
 
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
 			memory_free(
 			 target_filename );
 
@@ -2068,16 +2000,6 @@ int main( int argc, char * const argv[] )
 			 &process_status,
 			 NULL );
 
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
 			export_handle_close(
 			 export_handle,
 			 NULL );
@@ -2087,17 +2009,13 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		/* Start exporting data
+		/* Exports image media data
 		 */
-		export_count = ewfexport_read_input(
+		export_count = ewfexport_export_image(
 				export_handle,
 				media_size,
 				export_size,
 				export_offset,
-				calculated_md5_hash_string,
-				DIGEST_HASH_STRING_SIZE_MD5,
-				calculated_sha1_hash_string,
-				DIGEST_HASH_STRING_SIZE_SHA1,
 				swap_byte_pairs,
 				(size_t) process_buffer_size,
 				process_status,
@@ -2140,16 +2058,6 @@ int main( int argc, char * const argv[] )
 		 &process_status,
 		 NULL );
 
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		export_handle_close(
 		 export_handle,
 		 NULL );
@@ -2172,16 +2080,6 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		export_handle_close(
 		 export_handle,
 		 NULL );
@@ -2228,6 +2126,37 @@ int main( int argc, char * const argv[] )
 				 NULL );
 			}
 		}
+		if( export_handle_hash_values_fprint(
+		     export_handle,
+		     stdout,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to print export hash values.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+		if( log_handle != NULL )
+		{
+			if( export_handle_hash_values_fprint(
+			     export_handle,
+			     log_handle->log_stream,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to write export hash values in log file.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+			}
+		}
 		if( export_handle_crc_errors_fprint(
 		     export_handle,
 		     stdout,
@@ -2259,6 +2188,36 @@ int main( int argc, char * const argv[] )
 				 &error );
 			}
 		}
+		if( log_handle != NULL )
+		{
+			if( log_handle_close(
+			     log_handle,
+			     &error ) != 0 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to close log file: %" PRIs_LIBSYSTEM ".\n",
+				 log_filename );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+			}
+			if( log_handle_free(
+			     &log_handle,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to free log handle.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+			}
+		}
 	}
 	if( export_handle_close(
 	     export_handle,
@@ -2273,25 +2232,6 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 
-		if( log_handle != NULL )
-		{
-			log_handle_close(
-			 log_handle,
-			 NULL );
-			log_handle_free(
-			 &log_handle,
-			 NULL );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		export_handle_free(
 		 &export_handle,
 		 NULL );
@@ -2311,25 +2251,6 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 
-		if( log_handle != NULL )
-		{
-			log_handle_close(
-			 log_handle,
-			 NULL );
-			log_handle_free(
-			 &log_handle,
-			 NULL );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		return( EXIT_FAILURE );
 	}
 	if( libsystem_signal_detach(
@@ -2346,94 +2267,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( status != PROCESS_STATUS_COMPLETED )
 	{
-		if( log_handle != NULL )
-		{
-			log_handle_close(
-			 log_handle,
-			 NULL );
-			log_handle_free(
-			 &log_handle,
-			 NULL );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		return( EXIT_FAILURE );
-	}
-	if( calculate_md5 == 1 )
-	{
-		fprintf(
-		 stderr,
-		 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
-		 calculated_md5_hash_string );
-
-		if( log_handle != NULL )
-		{
-			log_handle_printf(
-			 log_handle,
-			 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
-			 calculated_md5_hash_string );
-		}
-		memory_free(
-		 calculated_md5_hash_string );
-	}
-	if( calculate_sha1 == 1 )
-	{
-		fprintf(
-		 stderr,
-		 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
-		 calculated_sha1_hash_string );
-
-		if( log_handle != NULL )
-		{
-			log_handle_printf(
-			 log_handle,
-			 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
-			 calculated_sha1_hash_string );
-		}
-		memory_free(
-		 calculated_sha1_hash_string );
-	}
-	if( log_handle != NULL )
-	{
-		if( log_handle_close(
-		     log_handle,
-		     &error ) != 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to close log file: %" PRIs_LIBSYSTEM ".\n",
-			 log_filename );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			log_handle_free(
-			 &log_handle,
-			 NULL );
-		}
-		else if( log_handle_free(
-		          &log_handle,
-		          &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free log handle.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
 	}
 	return( EXIT_SUCCESS );
 }

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20091229],
+ [20091230],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20091229])
+ [20091230])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -35,11 +35,6 @@ LIBEWF_TEST_ENABLE(
  [low-level-functions],
  [low_level_functions],
  [use libewf's low level read and write functions in the ewftools],
- [no])
-LIBEWF_TEST_ENABLE(
- [low-memory-usage],
- [low_memory_usage],
- [enable low memory usage],
  [no])
 LIBEWF_TEST_ENABLE(
  [verbose-output],
