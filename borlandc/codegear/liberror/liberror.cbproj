@@ -37,20 +37,17 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\liberror\liberror_types.h">
-				<BuildOrder>0</BuildOrder>
-			</None>
 			<None Include="..\..\..\liberror\liberror.h">
-				<BuildOrder>1</BuildOrder>
 			</None>
 			<None Include="..\..\..\liberror\liberror_definitions.h">
-				<BuildOrder>2</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\liberror\liberror_error.c">
-				<BuildOrder>3</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\liberror\liberror_error.h">
-				<BuildOrder>4</BuildOrder>
+			</None>
+			<None Include="..\..\..\liberror\liberror_system_string.h">
+			</None>
+			<None Include="..\..\..\liberror\liberror_types.h">
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

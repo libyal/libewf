@@ -1,7 +1,7 @@
 /* 
  * Imaging handle
  *
- * Copyright (C) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
  * Refer to AUTHORS for acknowledgements.

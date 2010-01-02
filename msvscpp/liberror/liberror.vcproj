@@ -108,6 +108,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\liberror\liberror_system_string.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\liberror\liberror_types.h"
 				>
 			</File>

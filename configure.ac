@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20091230],
+ [20100102],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20091230])
+ [20100102])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -1410,6 +1410,13 @@ AS_IF(
 	 [],
 	 [AC_MSG_FAILURE(
 	  [Missing function: swprintf],
+	  [1]) ])
+
+	AC_CHECK_FUNCS(
+	 [vswprintf],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing function: vswprintf],
 	  [1]) ])
 
 	AC_CHECK_FUNCS(

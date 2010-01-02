@@ -79,6 +79,8 @@
 			</CppCompile>
 			<None Include="..\..\..\libbfio\libbfio_support.h">
 			</None>
+			<CppCompile Include="..\..\..\libbfio\libbfio_system_string.c">
+			</CppCompile>
 			<None Include="..\..\..\libbfio\libbfio_system_string.h">
 			</None>
 			<BuildConfiguration Include="Base">

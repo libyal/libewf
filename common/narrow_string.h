@@ -1,7 +1,7 @@
 /*
  * Narrow character string functions
  *
- * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -231,7 +231,7 @@ extern "C" {
 	vsprintf
 
 #elif defined( HAVE_VSPRINTF ) || defined( WINAPI )
-#define narrow_vstring_vsprintf( string, format, ... ) \
+#define narrow_string_vsprintf( string, format, ... ) \
 	vsprintf( string, format, __VA_ARGS__ )
 #endif
 

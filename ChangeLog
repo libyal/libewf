@@ -221,6 +221,12 @@ Refactor:
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
 
+20100102
+* 2010 update
+* updated liberror, libuna, libbfio
+* removed include/handle.h
+* worked on wide system string support in liberror
+
 20091230
 * worked on exporting LVF files
 

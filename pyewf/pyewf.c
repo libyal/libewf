@@ -2,7 +2,7 @@
  * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2009, Joachim Metz <forensics@hoffmannbv.nl>
+ * Copyright (c) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>
  *
  * Integration into libewf package by Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.

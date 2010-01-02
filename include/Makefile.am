@@ -7,7 +7,6 @@ pkginclude_HEADERS = \
 	libewf/error.h \
 	libewf/extern.h \
 	libewf/features.h \
-	libewf/handle.h \
 	libewf/types.h
 
 EXTRA_DIST = \
