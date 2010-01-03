@@ -1,6 +1,7 @@
 Roadmap:
+* improve python bindings
+* improve device handle
 * support missing segment files (chunks)
-* multiple platform device handle
 * libbfio API extensions (partial)
 * low and high level API
   - to allow low level access to sections etc. (for recovery)
@@ -220,6 +221,9 @@ Refactor:
 * file io pool out of io handle?
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
+
+20100103
+* worked on exporting LVF files
 
 20100102
 * 2010 update

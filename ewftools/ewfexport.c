@@ -1825,203 +1825,15 @@ int main( int argc, char * const argv[] )
 	}
 	if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
 	{
-		calculate_md5  = 0;
-		calculate_sha1 = 0;
-	}
-	if( export_handle_set_processing_values(
-	     export_handle,
-	     calculate_md5,
-	     calculate_sha1,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to set processing values.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		memory_free(
-		 target_filename );
-
-		export_handle_close(
-		 export_handle,
-		 NULL );
-		export_handle_free(
-		 &export_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( ewfexport_abort == 0 )
-	{
-		fprintf(
-		 stderr,
-		 "\n" );
-
-		if( process_status_initialize(
-		     &process_status,
-		     _LIBSYSTEM_CHARACTER_T_STRING( "Export" ),
-		     _LIBSYSTEM_CHARACTER_T_STRING( "exported" ),
-		     _LIBSYSTEM_CHARACTER_T_STRING( "Written" ),
-		     stderr,
-		     print_status_information,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to initialize process status.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			memory_free(
-			 target_filename );
-
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
-			
-			return( EXIT_FAILURE );
-		}
-		if( process_status_start(
-		     process_status,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to start process status.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			process_status_free(
-			 &process_status,
-			 NULL );
-
-			memory_free(
-			 target_filename );
-
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
-		}
-		if( export_handle_open_output(
-		     export_handle,
-		     export_handle_output_format,
-		     target_filename,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to open output.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			process_status_free(
-			 &process_status,
-			 NULL );
-
-			memory_free(
-			 target_filename );
-
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
-		}
-		memory_free(
-		 target_filename );
-
-		if( platform_get_operating_system(
-		     acquiry_operating_system,
-		     32,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to determine operating system.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			acquiry_operating_system[ 0 ] = 0;
-		}
-		acquiry_software_version = _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
-
-		if( export_handle_set_output_values(
-		     export_handle,
-		     acquiry_operating_system,
-		     program,
-		     acquiry_software_version,
-		     header_codepage,
-		     export_size,
-		     compression_level,
-		     compression_flags,
-		     ewf_format,
-		     segment_file_size,
-		     sectors_per_chunk,
-		     wipe_chunk_on_error,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set output values.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			process_status_free(
-			 &process_status,
-			 NULL );
-
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
-		}
-		/* Exports image media data
+		/* Exports the files 
 		 */
-		export_count = ewfexport_export_image(
-				export_handle,
-				media_size,
-				export_size,
-				export_offset,
-				swap_byte_pairs,
-				(size_t) process_buffer_size,
-				process_status,
-				&error );
-
-		if( export_count <= -1 )
+		if( export_handle_export_single_files(
+		     export_handle,
+		     target_filename,
+		     libsystem_string_length(
+		      target_filename ) + 1,
+		     NULL,
+		     &error ) != 1 )
 		{
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -2034,188 +1846,400 @@ int main( int argc, char * const argv[] )
 		{
 			status = PROCESS_STATUS_COMPLETED;
 		}
+		memory_free(
+		 target_filename );
 	}
-	if( ewfexport_abort != 0 )
+	else
 	{
-		status = PROCESS_STATUS_ABORTED;
-	}
-	if( process_status_stop(
-	     process_status,
-	     (size64_t) export_count,
-	     status,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to stop process status.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		process_status_free(
-		 &process_status,
-		 NULL );
-
-		export_handle_close(
-		 export_handle,
-		 NULL );
-		export_handle_free(
-		 &export_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( process_status_free(
-	     &process_status,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free process status.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		export_handle_close(
-		 export_handle,
-		 NULL );
-		export_handle_free(
-		 &export_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( status == PROCESS_STATUS_COMPLETED )
-	{
-		if( log_filename != NULL )
-		{
-			if( log_handle_initialize(
-			     &log_handle,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create log handle.\n" );
-
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-			}
-			else if( log_handle_open(
-			          log_handle,
-			          log_filename,
-			          &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to open log file: %" PRIs_LIBSYSTEM ".\n",
-				 log_filename );
-
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				log_handle_free(
-				 &log_handle,
-				 NULL );
-			}
-		}
-		if( export_handle_hash_values_fprint(
+		if( export_handle_set_processing_values(
 		     export_handle,
-		     stdout,
+		     calculate_md5,
+		     calculate_sha1,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to print export hash values.\n" );
+			 "Unable to set processing values.\n" );
 
 			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
+
+			memory_free(
+			 target_filename );
+
+			export_handle_close(
+			 export_handle,
+			 NULL );
+			export_handle_free(
+			 &export_handle,
+			 NULL );
+
+			return( EXIT_FAILURE );
 		}
-		if( log_handle != NULL )
+		if( ewfexport_abort == 0 )
 		{
+			fprintf(
+			 stderr,
+			 "\n" );
+
+			if( process_status_initialize(
+			     &process_status,
+			     _LIBSYSTEM_CHARACTER_T_STRING( "Export" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "exported" ),
+			     _LIBSYSTEM_CHARACTER_T_STRING( "Written" ),
+			     stderr,
+			     print_status_information,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to initialize process status.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				memory_free(
+				 target_filename );
+
+				export_handle_close(
+				 export_handle,
+				 NULL );
+				export_handle_free(
+				 &export_handle,
+				 NULL );
+				
+				return( EXIT_FAILURE );
+			}
+			if( process_status_start(
+			     process_status,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to start process status.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				process_status_free(
+				 &process_status,
+				 NULL );
+
+				memory_free(
+				 target_filename );
+
+				export_handle_close(
+				 export_handle,
+				 NULL );
+				export_handle_free(
+				 &export_handle,
+				 NULL );
+
+				return( EXIT_FAILURE );
+			}
+			if( export_handle_open_output(
+			     export_handle,
+			     export_handle_output_format,
+			     target_filename,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to open output.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				process_status_free(
+				 &process_status,
+				 NULL );
+
+				memory_free(
+				 target_filename );
+
+				export_handle_close(
+				 export_handle,
+				 NULL );
+				export_handle_free(
+				 &export_handle,
+				 NULL );
+
+				return( EXIT_FAILURE );
+			}
+			memory_free(
+			 target_filename );
+
+			if( platform_get_operating_system(
+			     acquiry_operating_system,
+			     32,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to determine operating system.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				acquiry_operating_system[ 0 ] = 0;
+			}
+			acquiry_software_version = _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
+
+			if( export_handle_set_output_values(
+			     export_handle,
+			     acquiry_operating_system,
+			     program,
+			     acquiry_software_version,
+			     header_codepage,
+			     export_size,
+			     compression_level,
+			     compression_flags,
+			     ewf_format,
+			     segment_file_size,
+			     sectors_per_chunk,
+			     wipe_chunk_on_error,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to set output values.\n" );
+
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				process_status_free(
+				 &process_status,
+				 NULL );
+
+				export_handle_close(
+				 export_handle,
+				 NULL );
+				export_handle_free(
+				 &export_handle,
+				 NULL );
+
+				return( EXIT_FAILURE );
+			}
+			/* Exports image media data
+			 */
+			export_count = ewfexport_export_image(
+					export_handle,
+					media_size,
+					export_size,
+					export_offset,
+					swap_byte_pairs,
+					(size_t) process_buffer_size,
+					process_status,
+					&error );
+
+			if( export_count <= -1 )
+			{
+				libsystem_notify_print_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
+
+				status = PROCESS_STATUS_FAILED;
+			}
+			else
+			{
+				status = PROCESS_STATUS_COMPLETED;
+			}
+		}
+		if( ewfexport_abort != 0 )
+		{
+			status = PROCESS_STATUS_ABORTED;
+		}
+		if( process_status_stop(
+		     process_status,
+		     (size64_t) export_count,
+		     status,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to stop process status.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			process_status_free(
+			 &process_status,
+			 NULL );
+
+			export_handle_close(
+			 export_handle,
+			 NULL );
+			export_handle_free(
+			 &export_handle,
+			 NULL );
+
+			return( EXIT_FAILURE );
+		}
+		if( process_status_free(
+		     &process_status,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to free process status.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			export_handle_close(
+			 export_handle,
+			 NULL );
+			export_handle_free(
+			 &export_handle,
+			 NULL );
+
+			return( EXIT_FAILURE );
+		}
+		if( status == PROCESS_STATUS_COMPLETED )
+		{
+			if( log_filename != NULL )
+			{
+				if( log_handle_initialize(
+				     &log_handle,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to create log handle.\n" );
+
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
+				else if( log_handle_open(
+					  log_handle,
+					  log_filename,
+					  &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to open log file: %" PRIs_LIBSYSTEM ".\n",
+					 log_filename );
+
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					log_handle_free(
+					 &log_handle,
+					 NULL );
+				}
+			}
 			if( export_handle_hash_values_fprint(
 			     export_handle,
-			     log_handle->log_stream,
+			     stdout,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to write export hash values in log file.\n" );
+				 "Unable to print export hash values.\n" );
 
 				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
 			}
-		}
-		if( export_handle_crc_errors_fprint(
-		     export_handle,
-		     stdout,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to print export errors.\n" );
+			if( log_handle != NULL )
+			{
+				if( export_handle_hash_values_fprint(
+				     export_handle,
+				     log_handle->log_stream,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to write export hash values in log file.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		if( log_handle != NULL )
-		{
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
+			}
 			if( export_handle_crc_errors_fprint(
 			     export_handle,
-			     log_handle->log_stream,
+			     stdout,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to write export errors in log file.\n" );
+				 "Unable to print export errors.\n" );
 
 				libsystem_notify_print_error_backtrace(
 				 error );
 				liberror_error_free(
 				 &error );
 			}
-		}
-		if( log_handle != NULL )
-		{
-			if( log_handle_close(
-			     log_handle,
-			     &error ) != 0 )
+			if( log_handle != NULL )
 			{
-				fprintf(
-				 stderr,
-				 "Unable to close log file: %" PRIs_LIBSYSTEM ".\n",
-				 log_filename );
+				if( export_handle_crc_errors_fprint(
+				     export_handle,
+				     log_handle->log_stream,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to write export errors in log file.\n" );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
 			}
-			if( log_handle_free(
-			     &log_handle,
-			     &error ) != 1 )
+			if( log_handle != NULL )
 			{
-				fprintf(
-				 stderr,
-				 "Unable to free log handle.\n" );
+				if( log_handle_close(
+				     log_handle,
+				     &error ) != 0 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to close log file: %" PRIs_LIBSYSTEM ".\n",
+					 log_filename );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
+				if( log_handle_free(
+				     &log_handle,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to free log handle.\n" );
+
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
 			}
 		}
 	}

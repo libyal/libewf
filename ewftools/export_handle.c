@@ -56,6 +56,8 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
+#define EXPORT_HANDLE_BUFFER_SIZE	8192
+
 /* Initializes the export handle
  * Returns 1 if successful or -1 on error
  */
@@ -2791,6 +2793,9 @@ ssize_t export_handle_finalize(
  */
 int export_handle_export_single_files(
      export_handle_t *export_handle,
+     libsystem_character_t *export_path,
+     size_t export_path_size,
+     log_handle_t *log_handle,
      liberror_error_t **error )
 {
 	libewf_file_entry_t *file_entry = NULL;
@@ -2838,6 +2843,9 @@ int export_handle_export_single_files(
 	if( export_handle_export_file_entry(
 	     export_handle,
 	     file_entry,
+	     export_path,
+	     export_path_size,
+	     log_handle,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2875,14 +2883,26 @@ int export_handle_export_single_files(
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
+     libsystem_character_t *export_path,
+     size_t export_path_size,
+     log_handle_t *log_handle,
      liberror_error_t **error )
 {
 	libewf_file_entry_t *sub_file_entry = NULL;
+	libsystem_character_t *target_path  = NULL;
+	FILE *file_entry_data_file_stream   = NULL;
+	uint8_t *file_entry_data            = NULL;
 	uint8_t *name                       = NULL;
 	static char *function               = "export_handle_export_file_entry";
+	size64_t file_entry_data_size       = 0;
 	size_t name_size                    = 0;
+	size_t read_size                    = 0;
+	size_t target_path_size             = 0;
+	ssize_t read_count                  = 0;
+	uint32_t file_entry_flags           = 0;
 	int amount_of_sub_file_entries      = 0;
 	int iterator                        = 0;
+	int result                          = 0;
 
 	if( export_handle == NULL )
 	{
@@ -2922,6 +2942,7 @@ int export_handle_export_file_entry(
 	}
 	if( name_size > 0 )
 	{
+
 		name = (uint8_t *) memory_allocate(
 				    sizeof( uint8_t ) * name_size );
 
@@ -2954,83 +2975,384 @@ int export_handle_export_file_entry(
 
 			return( -1 );
 		}
-		/* TODO create target path */
+		if( export_handle_create_target_path(
+		     export_handle,
+		     export_path,
+		     export_path_size,
+		     name,
+		     name_size,
+		     &target_path,
+		     &target_path_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create target path.",
+			 function );
 
+			memory_free(
+			 name );
+
+			return( -1 );
+		}
 		memory_free(
 		 name );
-	}
-	/* TODO determine file entry type
-	 * if entry is file export data
-	 * if entry is directory export files
-	 * what about NTFS streams ?
-	 */
 
-	if( libewf_file_entry_get_amount_of_sub_file_entries(
+		if( target_path == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid target path.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		target_path      = export_path;
+		target_path_size = export_path_size;
+	}
+	result = libsystem_file_exists(
+		  target_path,
+		  error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_GENERIC,
+		 "%s: unable to determine if %" PRIs_LIBSYSTEM " exists.",
+		 function,
+		 target_path );
+
+		if( target_path != export_path )
+		{
+			memory_free(
+			 target_path );
+		}
+		return( -1 );
+	}
+	else if( result == 1 )
+	{
+		log_handle_printf(
+		 log_handle,
+		 "Skipping file entry it already exists.\n" );
+
+		if( target_path != export_path )
+		{
+			memory_free(
+			 target_path );
+		}
+		return( 1 );
+	}
+	if( libewf_file_entry_get_flags(
 	     file_entry,
-	     &amount_of_sub_file_entries,
+	     &file_entry_flags,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of sub file entries.",
+		 "%s: unable to retrieve file entry flags.",
 		 function );
 
+		if( target_path != export_path )
+		{
+			memory_free(
+			 target_path );
+		}
 		return( -1 );
 	}
-	for( iterator = 0;
-	     iterator < amount_of_sub_file_entries;
-	     iterator++ )
+	/* TODO what about NTFS streams ?
+	 */
+	if( ( file_entry_flags & LIBEWF_FILE_ENTRY_FLAG_IS_FILE ) == LIBEWF_FILE_ENTRY_FLAG_IS_FILE )
 	{
-		if( libewf_file_entry_get_sub_file_entry(
+		/* Create the file entry data file
+		 */
+		file_entry_data_file_stream = libsystem_file_stream_open(
+		                               target_path,
+		                               _LIBSYSTEM_CHARACTER_T_STRING( FILE_STREAM_BINARY_OPEN_WRITE ) );
+
+		if( file_entry_data_file_stream == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open: %" PRIs_LIBSYSTEM ".",
+			 function,
+			 target_path );
+
+			if( target_path != export_path )
+			{
+				memory_free(
+				 target_path );
+			}
+			return( -1 );
+		}
+		if( target_path != export_path )
+		{
+			memory_free(
+			 target_path );
+		}
+		/* Export the file entry data
+		 */
+		if( libewf_file_entry_get_size(
 		     file_entry,
-		     iterator,
-		     &sub_file_entry,
+		     &file_entry_data_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to free retrieve sub file entry: %d.",
-			 function,
-			 iterator + 1 );
+			 "%s: unable to retrieve file entry data size.",
+			 function );
+
+			libsystem_file_stream_close(
+			 file_entry_data_file_stream );
 
 			return( -1 );
 		}
-		if( export_handle_export_file_entry(
+		/* If there is no file entry data an empty file is written
+		 */
+		if( file_entry_data_size > 0 )
+		{
+			/* This function in not necessary for normal use
+			 * but it was added for testing
+			 */
+			if( libewf_file_entry_seek_offset(
+			     file_entry,
+			     0,
+			     SEEK_SET,
+			     error ) != 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to seek the start of the file entry data.",
+				 function );
+
+				libsystem_file_stream_close(
+				 file_entry_data_file_stream );
+
+				return( -1 );
+			}
+			file_entry_data = (uint8_t *) memory_allocate(
+			                               sizeof( uint8_t ) * EXPORT_HANDLE_BUFFER_SIZE );
+
+			if( file_entry_data == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create file entry data.",
+				 function );
+
+				libsystem_file_stream_close(
+				 file_entry_data_file_stream );
+
+				return( -1 );
+			}
+			while( file_entry_data_size > 0 )
+			{
+				if( file_entry_data_size >= EXPORT_HANDLE_BUFFER_SIZE )
+				{
+					read_size = EXPORT_HANDLE_BUFFER_SIZE;
+				}
+				else
+				{
+					read_size = (size_t) file_entry_data_size;
+				}
+				file_entry_data_size -= read_size;
+
+				read_count = libewf_file_entry_read_buffer(
+				              file_entry,
+				              file_entry_data,
+				              read_size,
+				              error );
+
+				if( read_count != (ssize_t) read_size )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read file entry data.",
+					 function );
+
+					libsystem_file_stream_close(
+					 file_entry_data_file_stream );
+					memory_free(
+					 file_entry_data );
+
+					return( -1 );
+				}
+				if( libsystem_file_stream_write(
+				     file_entry_data_file_stream,
+				     file_entry_data,
+				     read_size ) != read_size )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 "%s: unable to write file entry data.",
+					 function );
+
+					libsystem_file_stream_close(
+					 file_entry_data_file_stream );
+					memory_free(
+					 file_entry_data );
+
+					return( -1 );
+				}
+			}
+			memory_free(
+			 file_entry_data );
+		}
+		/* Close the file entry data file
+		 */
+		if( libsystem_file_stream_close(
+		     file_entry_data_file_stream ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close file entry data file.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( export_handle_make_directory(
 		     export_handle,
-		     sub_file_entry,
+		     target_path,
+		     log_handle,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to export sub file entry: %d.",
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to create directory: %" PRIs_LIBSYSTEM "",
 			 function,
-			 iterator + 1 );
+			 target_path );
 
-			libewf_file_entry_free(
-			 &sub_file_entry,
-			 NULL );
-
+			if( target_path != export_path )
+			{
+				memory_free(
+				 target_path );
+			}
 			return( -1 );
 		}
-		if( libewf_file_entry_free(
-		     &sub_file_entry,
+		if( libewf_file_entry_get_amount_of_sub_file_entries(
+		     file_entry,
+		     &amount_of_sub_file_entries,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sub file entry: %d.",
-			 function,
-			 iterator + 1 );
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of sub file entries.",
+			 function );
 
+			if( target_path != export_path )
+			{
+				memory_free(
+				 target_path );
+			}
 			return( -1 );
+		}
+		for( iterator = 0;
+		     iterator < amount_of_sub_file_entries;
+		     iterator++ )
+		{
+			if( libewf_file_entry_get_sub_file_entry(
+			     file_entry,
+			     iterator,
+			     &sub_file_entry,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to free retrieve sub file entry: %d.",
+				 function,
+				 iterator + 1 );
+
+				if( target_path != export_path )
+				{
+					memory_free(
+					 target_path );
+				}
+				return( -1 );
+			}
+			if( export_handle_export_file_entry(
+			     export_handle,
+			     sub_file_entry,
+			     target_path,
+			     target_path_size,
+			     log_handle,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GENERIC,
+				 "%s: unable to export sub file entry: %d.",
+				 function,
+				 iterator + 1 );
+
+				libewf_file_entry_free(
+				 &sub_file_entry,
+				 NULL );
+
+				if( target_path != export_path )
+				{
+					memory_free(
+					 target_path );
+				}
+				return( -1 );
+			}
+			if( libewf_file_entry_free(
+			     &sub_file_entry,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free sub file entry: %d.",
+				 function,
+				 iterator + 1 );
+
+				if( target_path != export_path )
+				{
+					memory_free(
+					 target_path );
+				}
+				return( -1 );
+			}
+		}
+		if( target_path != export_path )
+		{
+			memory_free(
+			 target_path );
 		}
 	}
 	return( 1 );

@@ -38,9 +38,9 @@
 extern "C" {
 #endif
 
-enum LIBEWF_FILE_ENTRY_FLAGS
+enum LIBEWF_INTERNAL_FILE_ENTRY_FLAGS
 {
-	LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE	= 0x01,
+	LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE	= 0x01,
 };
 
 typedef struct libewf_internal_file_entry libewf_internal_file_entry_t;
@@ -83,6 +83,11 @@ int libewf_file_entry_detach(
      libewf_internal_file_entry_t *internal_file_entry,
      liberror_error_t **error );
 
+LIBEWF_EXTERN int libewf_file_entry_get_flags(
+                   libewf_file_entry_t *file_entry,
+                   uint32_t *flags,
+                   liberror_error_t **error );
+
 LIBEWF_EXTERN int libewf_file_entry_get_name_size(
                    libewf_file_entry_t *file_entry,
                    size_t *name_size,
@@ -92,6 +97,31 @@ LIBEWF_EXTERN int libewf_file_entry_get_name(
                    libewf_file_entry_t *file_entry,
                    uint8_t *name,
                    size_t name_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_file_entry_get_size(
+                   libewf_file_entry_t *file_entry,
+                   size64_t *size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_file_entry_get_creation_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *creation_time,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_file_entry_get_modification_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *modification_time,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_file_entry_get_access_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *access_time,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_file_entry_get_entry_modification_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *entry_modification_time,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_file_entry_get_amount_of_sub_file_entries(

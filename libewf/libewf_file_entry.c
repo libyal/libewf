@@ -180,7 +180,7 @@ int libewf_file_entry_attach(
 
 		return( -1 );
 	}
-	if( ( flags & ~( LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
+	if( ( flags & ~( LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -195,7 +195,7 @@ int libewf_file_entry_attach(
 	internal_file_entry->internal_handle = internal_handle;
 	internal_file_entry->flags           = flags;
 
-	if( ( flags & LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
+	if( ( flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
 	{
 		internal_file_entry->file_entry_tree_node = file_entry_tree_node;
 	}
@@ -245,7 +245,7 @@ int libewf_file_entry_detach(
 
 		return( -1 );
 	}
-	if( ( ( internal_file_entry->flags & LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE )
+	if( ( ( internal_file_entry->flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE )
 	 && ( internal_file_entry->file_entry_tree_node != NULL ) )
 	{
 		if( libewf_tree_node_free(
@@ -270,9 +270,74 @@ int libewf_file_entry_detach(
 	return( 1 );
 }
 
+/* Retrieves the flags from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_flags(
+     libewf_file_entry_t *file_entry,
+     uint32_t *flags,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_flags";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->file_entry_tree_node->value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - invalid file entry tree node - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	single_file_entry = (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value;
+
+	if( flags == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid flags.",
+		 function );
+
+		return( -1 );
+	}
+	*flags = single_file_entry->flags;
+
+	return( 1 );
+}
+
 /* Retrieves the size of the UTF-8 formatted name from the referenced file entry
  * The returned size includes the end of string character
- * Returns 1 if successful, 0 if the file_entry does not contain such value or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_get_name_size(
      libewf_file_entry_t *file_entry,
@@ -424,6 +489,331 @@ int libewf_file_entry_get_name(
 		return( -1 );
 	}
 	name[ single_file_entry->name_size - 1 ] = 0;
+
+	return( 1 );
+}
+
+/* Retrieves the size from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_size(
+     libewf_file_entry_t *file_entry,
+     size64_t *size,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_size";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->file_entry_tree_node->value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - invalid file entry tree node - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	single_file_entry = (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value;
+
+	if( size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid size.",
+		 function );
+
+		return( -1 );
+	}
+	*size = single_file_entry->size;
+
+	return( 1 );
+}
+
+/* Retrieves the creation date and time from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_creation_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *creation_time,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_creation_time";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->file_entry_tree_node->value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - invalid file entry tree node - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	single_file_entry = (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value;
+
+	if( creation_time == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid creation time.",
+		 function );
+
+		return( -1 );
+	}
+	*creation_time = single_file_entry->creation_time;
+
+	return( 1 );
+}
+
+/* Retrieves the (file) modification (last written) date and time from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_modification_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *modification_time,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_modification_time";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->file_entry_tree_node->value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - invalid file entry tree node - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	single_file_entry = (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value;
+
+	if( modification_time == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid modification time.",
+		 function );
+
+		return( -1 );
+	}
+	*modification_time = single_file_entry->modification_time;
+
+	return( 1 );
+}
+
+/* Retrieves the access date and time from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_access_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *access_time,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_access_time";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->file_entry_tree_node->value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - invalid file entry tree node - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	single_file_entry = (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value;
+
+	if( access_time == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access time.",
+		 function );
+
+		return( -1 );
+	}
+	*access_time = single_file_entry->access_time;
+
+	return( 1 );
+}
+
+/* Retrieves the (file system entry) modification date and time from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_entry_modification_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *entry_modification_time,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_entry_modification_time";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->file_entry_tree_node->value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - invalid file entry tree node - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	single_file_entry = (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value;
+
+	if( entry_modification_time == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid entry modification time.",
+		 function );
+
+		return( -1 );
+	}
+	*entry_modification_time = single_file_entry->entry_modification_time;
 
 	return( 1 );
 }
@@ -664,9 +1054,9 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
-	if( (off64_t) ( internal_file_entry->offset + buffer_size ) > (off64_t) single_file_entry->data_offset )
+	if( (off64_t) ( internal_file_entry->offset + buffer_size ) > (off64_t) single_file_entry->data_size )
 	{
-		buffer_size = (size_t) ( single_file_entry->data_offset - internal_file_entry->offset );
+		buffer_size = (size_t) ( buffer_size - internal_file_entry->offset );
 	}
 	read_count = libewf_handle_read_buffer(
 	              (libewf_handle_t *) internal_file_entry->internal_handle,

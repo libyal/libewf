@@ -284,11 +284,17 @@ ssize_t export_handle_finalize(
 
 int export_handle_export_single_files(
      export_handle_t *export_handle,
+     libsystem_character_t *export_path,
+     size_t export_path_size,
+     log_handle_t *log_handle,
      liberror_error_t **error );
 
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
+     libsystem_character_t *export_path,
+     size_t export_path_size,
+     log_handle_t *log_handle,
      liberror_error_t **error );
 
 int export_handle_hash_values_fprint(

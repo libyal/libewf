@@ -1,4 +1,4 @@
-.Dd January 2, 2010
+.Dd January 3, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -325,9 +325,13 @@ Single file entry functions
 .Ft int
 .Fn libewf_file_entry_free "libewf_file_entry_t **file_entry, libewf_error_t **error"
 .Ft int
+.Fn libewf_file_entry_get_flags "libewf_file_entry_t *file_entry, uint32_t *flags, libewf_error_t **error"
+.Ft int
 .Fn libewf_file_entry_get_name_size "libewf_file_entry_t *file_entry, size_t *name_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_name "libewf_file_entry_t *file_entry, uint8_t *name, size_t name_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_size "libewf_file_entry_t *file_entry, size64_t *size, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_amount_of_sub_file_entries "libewf_file_entry_t *file_entry, int *amount_of_sub_file_entries, libewf_error_t **error"
 .Ft int

@@ -61,12 +61,6 @@ typedef libuna_utf8_character_t libewf_character_t;
 #define libewf_string_search_reverse( string, character, size ) \
 	(libewf_character_t *) narrow_string_search_reverse( (char *) string, (int) character, size )
 
-#define libewf_string_to_int64( string, end_of_string, base ) \
-	narrow_string_to_signed_long_long( (char *) string, (char **) end_of_string, base )
-
-#define libewf_string_to_uint64( string, end_of_string, base ) \
-	narrow_string_to_unsigned_long_long( (char *) string, (char **) end_of_string, base )
-
 /* Byte stream functions
  */
 #define libewf_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error ) \
@@ -109,7 +103,13 @@ typedef libuna_utf8_character_t libewf_character_t;
 #define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
 	libuna_utf16_stream_copy_from_utf8( stream, stream_size, byte_order, string, string_size, error )
 
-int libewf_string_copy_to_64bit(
+int libewf_string_copy_to_64bit_decimal(
+     libewf_character_t *string,
+     size_t string_size,
+     uint64_t *value_64bit,
+     liberror_error_t **error );
+
+int libewf_string_copy_to_64bit_hexadecimal(
      libewf_character_t *string,
      size_t string_size,
      uint64_t *value_64bit,

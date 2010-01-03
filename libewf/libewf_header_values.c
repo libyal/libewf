@@ -699,7 +699,7 @@ int libewf_convert_date_header2_value(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_to_64bit(
+	if( libewf_string_copy_to_64bit_decimal(
 	     header_value,
 	     header_value_length + 1,
 	     &value_64bit,

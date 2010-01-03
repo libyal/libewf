@@ -671,7 +671,7 @@ int libewf_single_files_parse_record_values(
 				  _LIBEWF_STRING( "tb" ),
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit(
+				if( libewf_string_copy_to_64bit_decimal(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -855,7 +855,7 @@ int libewf_single_files_parse_file_entry(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_to_64bit(
+	if( libewf_string_copy_to_64bit_decimal(
 	     values->values[ 1 ],
 	     values->sizes[ 1 ],
 	     &amount_of_child_entries,
@@ -988,6 +988,30 @@ int libewf_single_files_parse_file_entry(
 				  _LIBEWF_STRING( "opr" ),
 				  type_string_length ) == 0 )
 			{
+				if( libewf_string_copy_to_64bit_decimal(
+				     values->values[ value_iterator ],
+				     value_string_length + 1,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set entry flags.",
+					 function );
+
+					libewf_single_file_entry_free(
+					 (intptr_t *) single_file_entry,
+					 NULL );
+					libewf_split_values_free(
+					 &values,
+					 NULL );
+
+					return( -1 );
+				}
+				/* TODO range check */
+				single_file_entry->flags = (uint32_t) value_64bit;
 			}
 			else if( libewf_string_compare(
 				  types->values[ value_iterator ],
@@ -1011,7 +1035,7 @@ int libewf_single_files_parse_file_entry(
 			     _LIBEWF_STRING( "ac" ),
 			     type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit(
+				if( libewf_string_copy_to_64bit_decimal(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1033,7 +1057,8 @@ int libewf_single_files_parse_file_entry(
 
 					return( -1 );
 				}
-				single_file_entry->access_time = (time_t) value_64bit;
+				/* TODO range check */
+				single_file_entry->access_time = value_64bit;
 			}
 			else if( libewf_string_compare(
 				  types->values[ value_iterator ],
@@ -1074,7 +1099,7 @@ int libewf_single_files_parse_file_entry(
 				}
 				if( offset_values->amount_of_values == 3 )
 				{
-					if( libewf_string_copy_to_64bit(
+					if( libewf_string_copy_to_64bit_hexadecimal(
 					     offset_values->values[ 1 ],
 					     offset_values->sizes[ 1 ],
 					     &value_64bit,
@@ -1098,7 +1123,7 @@ int libewf_single_files_parse_file_entry(
 					}
 					single_file_entry->data_offset = (off64_t) value_64bit;
 
-					if( libewf_string_copy_to_64bit(
+					if( libewf_string_copy_to_64bit_hexadecimal(
 					     offset_values->values[ 2 ],
 					     offset_values->sizes[ 2 ],
 					     &value_64bit,
@@ -1150,7 +1175,7 @@ int libewf_single_files_parse_file_entry(
 				  _LIBEWF_STRING( "cr" ),
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit(
+				if( libewf_string_copy_to_64bit_decimal(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1172,7 +1197,8 @@ int libewf_single_files_parse_file_entry(
 
 					return( -1 );
 				}
-				single_file_entry->creation_time = (time_t) value_64bit;
+				/* TODO range check */
+				single_file_entry->creation_time = value_64bit;
 			}
 			else if( libewf_string_compare(
 				  types->values[ value_iterator ],
@@ -1264,7 +1290,7 @@ int libewf_single_files_parse_file_entry(
 				  _LIBEWF_STRING( "ls" ),
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit(
+				if( libewf_string_copy_to_64bit_decimal(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1293,7 +1319,7 @@ int libewf_single_files_parse_file_entry(
 				  _LIBEWF_STRING( "mo" ),
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit(
+				if( libewf_string_copy_to_64bit_decimal(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1315,7 +1341,8 @@ int libewf_single_files_parse_file_entry(
 
 					return( -1 );
 				}
-				single_file_entry->entry_modification_time = (time_t) value_64bit;
+				/* TODO range check */
+				single_file_entry->entry_modification_time = value_64bit;
 			}
 			else if( libewf_string_compare(
 				  types->values[ value_iterator ],
@@ -1336,7 +1363,7 @@ int libewf_single_files_parse_file_entry(
 				  _LIBEWF_STRING( "wr" ),
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit(
+				if( libewf_string_copy_to_64bit_decimal(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1358,7 +1385,8 @@ int libewf_single_files_parse_file_entry(
 
 					return( -1 );
 				}
-				single_file_entry->modification_time = (time_t) value_64bit;
+				/* TODO range check */
+				single_file_entry->modification_time = value_64bit;
 			}
 		}
 		else if( type_string_length == 1 )

@@ -149,5 +149,12 @@ enum LIBEWF_SEGMENT_FILE_TYPES
 	LIBEWF_SEGMENT_FILE_TYPE_LWF		= (int) 'L'
 };
 
+/* The (single) file entry flags
+ */
+enum LIBEWF_FILE_ENTRY_FLAGS
+{
+	LIBEWF_FILE_ENTRY_FLAG_IS_FILE		= 0x08,
+};
+
 #endif
 

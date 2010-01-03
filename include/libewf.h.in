@@ -1285,9 +1285,17 @@ LIBEWF_EXTERN int libewf_file_entry_free(
                    libewf_file_entry_t **file_entry,
                    libewf_error_t **error );
 
+/* Retrieves the flags from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_file_entry_get_flags(
+                   libewf_file_entry_t *file_entry,
+                   uint32_t *flags,
+                   libewf_error_t **error );
+
 /* Retrieves the size of the UTF-8 formatted name from the referenced file entry
  * The returned size includes the end of string character
- * Returns 1 if successful, 0 if the file_entry does not contain such value or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_get_name_size(
                    libewf_file_entry_t *file_entry,
@@ -1302,6 +1310,14 @@ LIBEWF_EXTERN int libewf_file_entry_get_name(
                    libewf_file_entry_t *file_entry,
                    uint8_t *name,
                    size_t name_size,
+                   libewf_error_t **error );
+
+/* Retrieves the size from the referenced file entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_file_entry_get_size(
+                   libewf_file_entry_t *file_entry,
+                   size64_t *size,
                    libewf_error_t **error );
 
 /* Retrieves the amount of sub file entries from a file entry

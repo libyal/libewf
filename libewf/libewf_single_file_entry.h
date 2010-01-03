@@ -37,6 +37,10 @@ typedef struct libewf_single_file_entry libewf_single_file_entry_t;
 
 struct libewf_single_file_entry
 {
+	/* The flags
+	 */
+	uint32_t flags;
+
 	/* The data offset
 	 */
 	off64_t data_offset;
@@ -58,20 +62,24 @@ struct libewf_single_file_entry
 	size64_t size;
 
 	/* The creation date and time
+	 * stored as a Unix timestamp
 	 */
-	time_t creation_time;
+	uint64_t creation_time;
 
 	/* The last modification date and time
+	 * stored as a Unix timestamp
 	 */
-	time_t modification_time;
+	uint64_t modification_time;
 
 	/* The last access date and time
+	 * stored as a Unix timestamp
 	 */
-	time_t access_time;
+	uint64_t access_time;
 
 	/* The last (file system) entry modification date and time
+	 * stored as a Unix timestamp
 	 */
-	time_t entry_modification_time;
+	uint64_t entry_modification_time;
 
 	/* The MD5 digest hash
 	 */
