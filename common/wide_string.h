@@ -158,7 +158,11 @@ extern "C" {
 
 /* Variable arguments formatted print to string function (vswprintf)
  */
-#if defined( HAVE_VSPRINTF ) || defined( WINAPI )
+#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+#define narrow_string_vswprintf \
+        vswprintf
+
+#elif defined( HAVE_VSWPRINTF ) || defined( WINAPI )
 #define wide_string_vswprintf( string, format, ... ) \
 	vswprintf( string, format, __VA_ARGS__ )
 #endif

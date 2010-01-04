@@ -224,6 +224,7 @@ Refactor:
 
 20100104
 * fixes for windows build
+* updated libbfio
 
 20100103
 * worked on exporting LVF files
