@@ -827,11 +827,11 @@ int main( int argc, char * const argv[] )
 	int argument_set_segment_file_size                 = 0;
 	int argument_set_size                              = 0;
 	int error_abort                                    = 0;
-	int export_handle_output_format                    = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
 	int interactive_mode                               = 1;
 	int result                                         = 1;
 	int status                                         = 0;
+	uint8_t export_handle_output_format                = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 
 	libsystem_character_t *ewfexport_format_types[ 14 ] = \
 	 { _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
