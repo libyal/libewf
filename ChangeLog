@@ -222,6 +222,10 @@ Refactor:
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
 
+20100105
+* worked on Borland C++ 5 compiler support
+* removed sprintf support
+
 20100104
 * fixes for windows build
 * updated libbfio

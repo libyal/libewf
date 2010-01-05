@@ -143,17 +143,6 @@ extern "C" {
 	snprintf( target, size, __VA_ARGS__ )
 #endif
 
-/* String formatted print (sprintf)
- */
-#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
-#define narrow_string_sprintf \
-	sprintf
-
-#elif defined( HAVE_SPRINTF ) || defined( WINAPI )
-#define narrow_string_sprintf( target, ... ) \
-	sprintf( target, __VA_ARGS__ )
-#endif
-
 /* String input conversion (sscanf)
  */
 #if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560

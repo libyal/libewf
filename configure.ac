@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100104],
+ [20100105],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100104])
+ [20100105])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -339,12 +339,9 @@ dnl Narrow character string functions used in common/narrow_string.h
 AC_CHECK_FUNCS(
  [snprintf],
  [],
- [AC_CHECK_FUNCS(
-  [sprintf],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: snprintf and sprintf],
-   [1]) ]) ])
+ [AC_MSG_FAILURE(
+  [Missing function: snprintf],
+  [1]) ])
 
 AC_CHECK_FUNCS(
  [sscanf],
