@@ -120,14 +120,8 @@ extern "C" {
 	swprintf_s( target, size, __VA_ARGS__ )
 
 #elif defined( __BORLANDC__ )
-#if __BORLANDC__ >= 0x0560
 #define wide_string_swprintf( target, size, ... ) \
 	swprintf( target, __VA_ARGS__ )
-
-#else
-#define wide_string_swprintf \
-	swprintf
-#endif
 
 #elif defined( HAVE_SWPRINTF ) || defined( WINAPI )
 #define wide_string_swprintf( target, size, ... ) \
@@ -158,11 +152,7 @@ extern "C" {
 
 /* Variable arguments formatted print to string function (vswprintf)
  */
-#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
-#define narrow_string_vswprintf \
-        vswprintf
-
-#elif defined( HAVE_VSWPRINTF ) || defined( WINAPI )
+#if defined( HAVE_VSWPRINTF ) || defined( WINAPI )
 #define wide_string_vswprintf( string, format, ... ) \
 	vswprintf( string, format, __VA_ARGS__ )
 #endif

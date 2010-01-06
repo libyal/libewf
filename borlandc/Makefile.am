@@ -13,8 +13,12 @@ CODEGEAR_FILES = \
 	codegear/libsystem/libsystem.cbproj \
 	codegear/zlib/zlib.cbproj
 
+BUILDER5_FILES = \
+	builder5/libewf.mak
+
 EXTRA_DIST = \
-	$(CODEGEAR_FILES)
+	$(CODEGEAR_FILES) \
+	$(BUILDER5_FILES)
 
 distclean: clean
 	/bin/rm -f Makefile

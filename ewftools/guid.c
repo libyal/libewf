@@ -112,7 +112,7 @@ int guid_generate(
 	}
 	if( guid_type == GUID_TYPE_TIME )
 	{
-#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
+#if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x0520
 		/* No support for the time type GUID */
 
 #elif defined( WINAPI )

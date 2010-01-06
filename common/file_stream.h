@@ -121,11 +121,7 @@ extern "C" {
 
 /* Variable arguments formatted print to stream function
  */
-#if defined( __BORLANDC__ ) && __BORLANDC__ < 0x0560
-#define file_stream_vfprintf \
-	vfprintf
-
-#elif defined( HAVE_GLIB_H )
+#if defined( HAVE_GLIB_H )
 #define file_stream_vfprintf( stream, format, ... ) \
 	g_vfprintf( stream, format, __VA_ARGS__ )
 
