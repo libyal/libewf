@@ -222,6 +222,9 @@ Refactor:
 * rename uncompress to decompress
 * make libewf_convert_date_header_value more strict
 
+20100108
+* small changes
+
 20100106
 * updated libuna, libbfio
 * worked on Borland C++ 5 compiler support

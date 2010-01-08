@@ -1,5 +1,5 @@
 /*
- * Library for the Expert Witness Compression Format Support (EWF)
+ * Library to support the Expert Witness Compression Format (EWF)
  *
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
