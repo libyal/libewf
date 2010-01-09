@@ -1,6 +1,11 @@
+TODO
+* check borlanc build
+* refactor file io pool out of io handle?
+* make libewf_convert_date_header_value more strict
+
 Roadmap:
 * improve python bindings
-* improve device handle
+* improve device handle (libsmdev)
 * support missing segment files (chunks)
 * libbfio API extensions (partial)
 * low and high level API
@@ -171,14 +176,16 @@ Windows build
 * ewftools check char/wchar in/output
 
 Testing
+* add files export test
+* add export split raw test
+* change export raw test to handle additional segment file size input
 * add export unattended to automated tests
-* add encase 6.12 sha1 support to test
+* add encase 6.12 sha1 support to tests
+* read/write of EnCase 6.12 SHA1
 
 Deployment
 * debian package
   - implement non local libuna and libbfio support like in spec file
-* configure
-  - remove enable-v1-api after testing?
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -190,37 +197,27 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
 Work in progress:
-* move split function to split values
-  - do not copy sub strings, maintain offset and sizes in a separate structure ?
-
-* check sprintf use
-   - liberror -> liberror_error_vsnprintf
-   - libewf -> libewf_hash_values, libewf_header_values
-   - ewftools -> byte_size_string, guid
 * what about header values parsing with preservation of timestamps?
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
 * ewfexport: fix different input and output chunk sizes for low level functions
-* test: read/write of EnCase 6.12 SHA1
-
-Beta after next stable release
-* remove DISABLED in ewfexport
+* ewfexport: remove DISABLED
 * move manuals/ewfexport.1.backup to manuals/ewfexport.1
-* check into resume write error for 32-bit compile
+* check into resume write error for 32-bit compile (different zlib sizes)
 * check make distclean
 
 Deprecated functions
-* BORLANDC support
+* add BORLANDC deprecated function support
 
 Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
-Refactor:
-* file io pool out of io handle?
-* rename uncompress to decompress
-* make libewf_convert_date_header_value more strict
+20100109
+* small changes
+* worked on libsmraw integration into ewftools
+* applied fixes
 
 20100108
 * small changes

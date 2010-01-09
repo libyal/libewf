@@ -794,7 +794,9 @@ int libewf_glob_free(
 
 		return( -1 );
 	}
-	for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+	for( filename_iterator = 0;
+	     filename_iterator < amount_of_filenames;
+	     filename_iterator++ )
 	{
 		memory_free(
 		 filenames[ filename_iterator ] );
@@ -1171,7 +1173,9 @@ int libewf_glob_free_wide(
 
 		return( -1 );
 	}
-	for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+	for( filename_iterator = 0;
+	     filename_iterator < amount_of_filenames;
+	     filename_iterator++ )
 	{
 		memory_free(
 		 filenames[ filename_iterator ] );

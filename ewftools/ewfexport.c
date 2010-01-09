@@ -155,9 +155,9 @@ void usage_fprint(
 	if( result == 1 )
 	{
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBSYSTEM ")\n"
-		                 "\t           (minimum is %" PRIs_LIBSYSTEM ", maximum is %" PRIs_LIBSYSTEM " for encase6 format\n"
+		                 "\t           (minimum is %" PRIs_LIBSYSTEM ", maximum is %" PRIs_LIBSYSTEM " for raw and encase6 format\n"
 		                 "\t           and %" PRIs_LIBSYSTEM " for other formats)\n"
-		                 "\t           (not used for raw and files formats)\n",
+		                 "\t           (not used for files format)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -166,9 +166,9 @@ void usage_fprint(
 	else
 	{
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIu32 ")\n"
-		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format\n"
+		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for raw and encase6 format\n"
 		                 "\t           and %" PRIu32 " for other formats)\n"
-		                 "\t           (not used for raw and files formats)\n",
+		                 "\t           (not used for files format)\n",
 		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
@@ -1737,7 +1737,7 @@ int main( int argc, char * const argv[] )
 			{
 				while( ewfinput_get_string_variable(
 					stderr,
-					_LIBSYSTEM_CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ),
+					_LIBSYSTEM_CHARACTER_T_STRING( "Target path and filename without extension or - for stdout" ),
 					target_filename,
 					1024,
 					&error ) != 1 )
@@ -1750,6 +1750,47 @@ int main( int argc, char * const argv[] )
 					fprintf(
 					 stderr,
 					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				}
+			}
+			if( ( target_filename[ 0 ] == (libsystem_character_t) '-' )
+			 && ( target_filename[ 1 ] == 0 ) )
+			{
+				/* No need for segment files when exporting to stdout */
+			}
+			/* Segment file size
+			 */
+			else if( argument_set_segment_file_size == 0 )
+			{
+				maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+
+				if( ewfinput_get_byte_size_variable(
+				     stderr,
+				     input_buffer,
+				     EWFEXPORT_INPUT_BUFFER_SIZE,
+				     _LIBSYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
+				     maximum_segment_file_size,
+				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
+				     &segment_file_size,
+				     &error ) == -1 )
+				{
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
+					fprintf(
+					 stderr,
+					 "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
+					 segment_file_size );
+				}
+				/* Make sure the segment file size is smaller than or equal to the maximum
+				 */
+				if( segment_file_size > maximum_segment_file_size )
+				{
+					segment_file_size = maximum_segment_file_size;
 				}
 			}
 		}
@@ -2249,7 +2290,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to close EWF file(s).\n" );
+		 "Unable to close export handle.\n" );
 
 		libsystem_notify_print_error_backtrace(
 		 error );

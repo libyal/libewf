@@ -1140,18 +1140,33 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 		return( -1 );
 	}
-	if( ( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	  && ( chunks_section_size >= (size64_t) INT64_MAX ) )
-	 || ( chunks_section_size >= (size64_t) INT32_MAX ) )
+	if( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk section size value exceeds maximum.",
-		 function );
+		if( chunks_section_size >= (size64_t) INT64_MAX )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid chunk section size value exceeds maximum.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( chunks_section_size >= (size64_t) INT32_MAX )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid chunk section size value exceeds maximum.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 ) )

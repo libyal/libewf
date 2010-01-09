@@ -66,6 +66,8 @@
 #include <zlib.h>
 #endif
 
+#include <libewf.h>
+
 #if defined( HAVE_OPENSSL_OPENSSLV_H )
 #include <openssl/opensslv.h>
 #endif
@@ -74,7 +76,11 @@
 #include <uuid/uuid.h>
 #endif
 
-#include <libewf.h>
+#if defined( HAVE_LOCAL_LIBSMRAW )
+#include <libsmraw_definitions.h>
+#elif defined( HAVE_LIBSMRAW )
+#include <libsmraw.h>
+#endif
 
 #include <libsystem.h>
 
@@ -127,6 +133,11 @@ void ewfoutput_version_fprint(
 	 ", zlib %s",
 	 ZLIB_VERSION );
 #endif
+
+	fprintf(
+	 stream,
+	 ", libsmraw %s",
+	 LIBSMRAW_VERSION_STRING );
 
 #if defined( HAVE_LIBCRYPTO )
 	fprintf(

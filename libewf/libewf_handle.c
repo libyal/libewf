@@ -1542,8 +1542,9 @@ int libewf_handle_open_file_io_pool(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to retrieve file io handle from pool.",
-				 function );
+				 "%s: unable to retrieve file io handle from pool entry: %d.",
+				 function,
+				 file_io_handle_iterator );
 
 				internal_handle->io_handle->file_io_pool = NULL;
 
@@ -1777,7 +1778,7 @@ int libewf_handle_open_file_io_pool(
 	return( 1 );
 }
 
-/* Closes the EWF handle and frees memory used within the handle
+/* Closes the EWF handle
  * Returns 0 if successful or -1 on error
  */
 int libewf_handle_close(
@@ -1826,19 +1827,21 @@ int libewf_handle_close(
 
 		return( -1 );
 	}
-	if( ( internal_handle->io_handle->pool_created_in_library != 0 )
-	 && ( libbfio_pool_close_all(
-	       internal_handle->io_handle->file_io_pool,
-	       error ) != 0 ) )
+	if( internal_handle->io_handle->pool_created_in_library != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close all segment files.",
-		 function );
+		if( libbfio_pool_close_all(
+		     internal_handle->io_handle->file_io_pool,
+		     error ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close all segment files.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	return( 0 );
 }

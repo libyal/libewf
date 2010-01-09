@@ -24,10 +24,8 @@
 #define _LIBEWF_FILENAME_H
 
 #include <common.h>
-#include <narrow_string.h>
 #include <memory.h>
 #include <types.h>
-#include <wide_string.h>
 
 #include <liberror.h>
 

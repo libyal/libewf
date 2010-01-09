@@ -915,6 +915,7 @@ int libewf_write_io_handle_calculate_chunks_per_chunks_section(
      liberror_error_t **error )
 {
 	static char *function              = "libewf_write_io_handle_calculate_chunks_per_chunks_section";
+	int64_t maximum_amount_of_chunks   = 0;
 	int64_t remaining_amount_of_chunks = 0;
 
 	if( chunks_per_chunks_section == NULL )
@@ -955,11 +956,23 @@ int libewf_write_io_handle_calculate_chunks_per_chunks_section(
 
 	if( chunks_section_number > 1 )
 	{
-		remaining_amount_of_chunks -= ( chunks_section_number - 1 )
-		                            * maximum_section_amount_of_chunks;
+		maximum_amount_of_chunks = ( chunks_section_number - 1 )
+		                         * maximum_section_amount_of_chunks;
+
+		if( remaining_amount_of_chunks > maximum_amount_of_chunks )
+		{
+			remaining_amount_of_chunks -= maximum_amount_of_chunks;
+		}
 	}
 	if( remaining_amount_of_chunks <= 0 )
 	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: remaining amount of chunks out of range.",
+		 function );
+
 		return( -1 );
 	}
 	if( ( unrestrict_offset_amount == 0 )

@@ -8,6 +8,7 @@ SUBDIRS = \
 	libuna \
 	libbfio \
 	libewf \
+	libsmraw \
 	libsystem \
 	ewftools \
 	pyewf \
@@ -102,6 +103,7 @@ splint:
 	(cd $(srcdir)/libuna && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libbfio && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libewf && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libsmraw && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/ewftools && $(MAKE) splint $(AM_MAKEFLAGS))
 

@@ -42,6 +42,15 @@
 
 #include <libewf.h>
 
+#if defined( HAVE_LOCAL_LIBSMRAW )
+#include <libsmraw_definitions.h>
+#include <libsmraw_handle.h>
+#include <libsmraw_metadata.h>
+#include <libsmraw_types.h>
+#elif defined( HAVE_LIBSMRAW_H )
+#include <libsmraw.h>
+#endif
+
 #include <libsystem.h>
 
 #include "digest_context.h"
@@ -131,7 +140,9 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
+#if !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW )
 		( *export_handle )->raw_output_file_descriptor = -1;
+#endif /* !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) */
 
 		if( md5_initialize(
 		     &( ( *export_handle )->md5_context ),
@@ -144,9 +155,6 @@ int export_handle_initialize(
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
-			libewf_handle_free(
-			 &( ( *export_handle )->ewf_output_handle ),
-			 NULL );
 			memory_free(
 			 *export_handle );
 
@@ -165,9 +173,6 @@ int export_handle_initialize(
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
-			libewf_handle_free(
-			 &( ( *export_handle )->ewf_output_handle ),
-			 NULL );
 			memory_free(
 			 *export_handle );
 
@@ -202,34 +207,57 @@ int export_handle_free(
 	}
 	if( *export_handle != NULL )
 	{
-		if( ( ( *export_handle )->input_handle != NULL )
-		 && ( libewf_handle_free(
-		       &( ( *export_handle )->input_handle ),
-		       error ) != 1 ) )
+		if( ( *export_handle )->input_handle != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free input handle.",
-			 function );
+			if( libewf_handle_free(
+			     &( ( *export_handle )->input_handle ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free input handle.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
-		if( ( ( *export_handle )->ewf_output_handle != NULL )
-		 && ( libewf_handle_free(
-		       &( ( *export_handle )->ewf_output_handle ),
-		       error ) != 1 ) )
+		if( ( *export_handle )->ewf_output_handle != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free ewf output handle.",
-			 function );
+			if( libewf_handle_free(
+			     &( ( *export_handle )->ewf_output_handle ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free ewf output handle.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+		if( ( *export_handle )->raw_output_handle != NULL )
+		{
+			if( libsmraw_handle_free(
+			     &( ( *export_handle )->raw_output_handle ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free raw output handle.",
+				 function );
+
+				result = -1;
+			}
+		}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
+
 		if( ( *export_handle )->calculated_md5_hash_string != NULL )
 		{
 			memory_free(
@@ -284,7 +312,7 @@ int export_handle_signal_abort(
 			return( -1 );
 		}
 	}
-	if( export_handle->ewf_output_handle != NULL )
+	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
 		if( libewf_handle_signal_abort(
 		     export_handle->ewf_output_handle,
@@ -300,6 +328,25 @@ int export_handle_signal_abort(
 			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+	      && ( export_handle->use_stdout == 0 ) )
+	{
+		if( libsmraw_handle_signal_abort(
+		     export_handle->raw_output_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to signal raw output handle to abort.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	return( 1 );
 }
 
@@ -878,6 +925,10 @@ int export_handle_open_output(
 			 function,
 			 filename );
 
+			libewf_handle_free(
+			 &( export_handle->ewf_output_handle ),
+			 NULL );
+
 			return( 1 );
 		}
 	}
@@ -892,10 +943,68 @@ int export_handle_open_output(
 		       _LIBSYSTEM_CHARACTER_T_STRING( "-" ),
 		       1 ) == 0 ) )
 		{
-			export_handle->raw_output_file_descriptor = 1;
+			export_handle->use_stdout = 1;
 		}
 		else
 		{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+			if( export_handle->raw_output_handle != NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: invalid export handle - raw output handle already set.",
+				 function );
+
+				return( -1 );
+			}
+			if( libsmraw_handle_initialize(
+			     &( export_handle->raw_output_handle ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to initialize raw output handle.",
+				 function );
+
+				return( -1 );
+			}
+			filenames[ 0 ] = (libsystem_character_t *) filename;
+
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+			if( libsmraw_handle_open_wide(
+			     export_handle->raw_output_handle,
+			     filenames,
+			     1,
+			     LIBEWF_OPEN_WRITE,
+			     error ) != 1 )
+#else
+			if( libsmraw_handle_open(
+			     export_handle->raw_output_handle,
+			     filenames,
+			     1,
+			     LIBEWF_OPEN_WRITE,
+			     error ) != 1 )
+#endif /* defined( LIBSYSTEM_HAVE_WIDE_CHARACTER ) */
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_OPEN_FAILED,
+				 "%s: unable to open file: %" PRIs_LIBSYSTEM ".",
+				 function,
+				 filename );
+
+				libsmraw_handle_free(
+				 &( export_handle->raw_output_handle ),
+				 NULL );
+
+				return( 1 );
+			}
+#else
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 			export_handle->raw_output_file_descriptor = libsystem_file_io_wopen(
 			                                             filename,
@@ -904,7 +1013,7 @@ int export_handle_open_output(
 			export_handle->raw_output_file_descriptor = libsystem_file_io_open(
 			                                             filename,
 			                                             LIBSYSTEM_FILE_IO_O_CREAT | LIBSYSTEM_FILE_IO_O_WRONLY | LIBSYSTEM_FILE_IO_O_TRUNC );
-#endif
+#endif /* defined( LIBSYSTEM_HAVE_WIDE_CHARACTER ) */
 
 			if( export_handle->raw_output_file_descriptor == -1 )
 			{
@@ -918,6 +1027,7 @@ int export_handle_open_output(
 
 				return( -1 );
 			}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 		}
 	}
 	return( 1 );
@@ -983,6 +1093,24 @@ int export_handle_close(
 			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+	if( export_handle->raw_output_handle != NULL )
+	{
+		if( libsmraw_handle_close(
+		     export_handle->raw_output_handle,
+		     error ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close raw output handle.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#else
 	if( export_handle->raw_output_file_descriptor != -1 )
 	{
 		if( libsystem_file_io_close(
@@ -999,6 +1127,7 @@ int export_handle_close(
 		}
 		export_handle->raw_output_file_descriptor = -1;
 	}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	return( 0 );
 }
 
@@ -1409,22 +1538,39 @@ ssize_t export_handle_write_buffer(
 	}
 	else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	{
-		if( export_handle->raw_output_file_descriptor == -1 )
+		if( export_handle->use_stdout != 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid export handle - invalid raw output file descriptor.",
-			 function );
-
-			return( -1 );
+			write_count = libsystem_file_io_write(
+			               1,
+				       storage_media_buffer->raw_buffer,
+				       write_size );
 		}
-		write_count = libsystem_file_io_write(
-		               export_handle->raw_output_file_descriptor,
-			       storage_media_buffer->raw_buffer,
-			       write_size );
+		else
+		{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+			write_count = libsmraw_handle_write_buffer(
+				       export_handle->raw_output_handle,
+				       storage_media_buffer->raw_buffer,
+				       write_size,
+				       error );
+#else
+			if( export_handle->raw_output_file_descriptor == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid export handle - invalid raw output file descriptor.",
+				 function );
 
+				return( -1 );
+			}
+			write_count = libsystem_file_io_write(
+				       export_handle->raw_output_file_descriptor,
+				       storage_media_buffer->raw_buffer,
+				       write_size );
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
+		}
 		if( write_count == -1 )
 		{
 			liberror_error_set(
@@ -2259,6 +2405,40 @@ int export_handle_set_output_values(
 		}
 #endif
 	}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+	      && ( export_handle->use_stdout == 0 ) )
+	{
+		if( libsmraw_handle_set_media_size(
+		     export_handle->raw_output_handle,
+		     media_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set media size.",
+			 function );
+
+			return( -1 );
+		}
+		if( libsmraw_handle_set_segment_file_size(
+		     export_handle->raw_output_handle,
+		     segment_file_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set segment file size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	return( 1 );
 }
 
@@ -2400,17 +2580,6 @@ int export_handle_set_hash_value(
 
 		return( -1 );
 	}
-	if( export_handle->ewf_output_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing ewf output handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( libsystem_string_size_to_utf8_string(
 	     hash_value,
 	     hash_value_length + 1,
@@ -2459,27 +2628,57 @@ int export_handle_set_hash_value(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_hash_value(
-	     export_handle->ewf_output_handle,
-	     (uint8_t *) hash_value_identifier,
-	     hash_value_identifier_length,
-	     utf8_hash_value,
-	     utf8_hash_value_size - 1,
-	     error ) != 1 )
+	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set hash value: %s.",
-		 function,
-		 hash_value_identifier );
+		if( libewf_handle_set_hash_value(
+		     export_handle->ewf_output_handle,
+		     (uint8_t *) hash_value_identifier,
+		     hash_value_identifier_length,
+		     utf8_hash_value,
+		     utf8_hash_value_size - 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: %s.",
+			 function,
+			 hash_value_identifier );
 
-		memory_free(
-		 utf8_hash_value );
+			memory_free(
+			 utf8_hash_value );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+	      && ( export_handle->use_stdout == 0 ) )
+	{
+		if( libsmraw_handle_set_integrity_hash_value(
+		     export_handle->raw_output_handle,
+		     (uint8_t *) hash_value_identifier,
+		     hash_value_identifier_length,
+		     utf8_hash_value,
+		     utf8_hash_value_size - 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set integrity hash value: %s.",
+			 function,
+			 hash_value_identifier );
+
+			memory_free(
+			 utf8_hash_value );
+
+			return( -1 );
+		}
+	}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	memory_free(
 	 utf8_hash_value );
 
@@ -2679,14 +2878,13 @@ ssize_t export_handle_finalize(
 
 			return( -1 );
 		}
-		if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
-		 && ( export_handle_set_hash_value(
-		       export_handle,
-		       "MD5",
-		       3,
-		       export_handle->calculated_md5_hash_string,
-		       DIGEST_HASH_STRING_SIZE_MD5 - 1,
-		       error ) != 1 ) )
+		if( export_handle_set_hash_value(
+		     export_handle,
+		     "MD5",
+		     3,
+		     export_handle->calculated_md5_hash_string,
+		     DIGEST_HASH_STRING_SIZE_MD5 - 1,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -2748,14 +2946,13 @@ ssize_t export_handle_finalize(
 
 			return( -1 );
 		}
-		if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
-		 && ( export_handle_set_hash_value(
-		       export_handle,
-		       "SHA1",
-		       4,
-		       export_handle->calculated_sha1_hash_string,
-		       DIGEST_HASH_STRING_SIZE_SHA1 - 1,
-		       error ) != 1 ) )
+		if( export_handle_set_hash_value(
+		     export_handle,
+		     "SHA1",
+		     4,
+		     export_handle->calculated_sha1_hash_string,
+		     DIGEST_HASH_STRING_SIZE_SHA1 - 1,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,

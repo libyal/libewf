@@ -372,7 +372,10 @@ int byte_size_string_convert(
 	}
 #endif
 #if defined( HAVE_VERBOSE_OUTPUT )
-	if( byte_size_string[ byte_size_string_iterator ] != 0 )
+	if( ( byte_size_string[ byte_size_string_iterator ] != 0 )
+	 && ( byte_size_string[ byte_size_string_iterator ] != (libsystem_character_t) ' ' )
+	 && ( byte_size_string[ byte_size_string_iterator ] != (libsystem_character_t) '\n' )
+	 && ( byte_size_string[ byte_size_string_iterator ] != (libsystem_character_t) '\r' ) )
 	{
 		libsystem_notify_printf(
 		 "%s: trailing data in byte size string.\n",

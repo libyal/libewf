@@ -117,20 +117,24 @@ int libewf_io_handle_free(
 	}
 	if( *io_handle != NULL )
 	{
-		if( ( ( *io_handle )->pool_created_in_library != 0 )
-		 && ( ( *io_handle )->file_io_pool != NULL )
-		 && ( libbfio_pool_free(
-		       &( ( *io_handle )->file_io_pool ),
-		       error ) != 1 ) )
+		if( ( *io_handle )->pool_created_in_library != 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free file io pool.",
-			 function );
+			if( ( *io_handle )->file_io_pool != NULL )
+			{
+				if( libbfio_pool_free(
+				     &( ( *io_handle )->file_io_pool ),
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free file io pool.",
+					 function );
 
-			result = -1;
+					result = -1;
+				}
+			}
 		}
 		memory_free(
 		 *io_handle );

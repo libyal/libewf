@@ -1,4 +1,4 @@
-.Dd January 2, 2010
+.Dd January 9, 2010
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -62,7 +62,7 @@ the process buffer size (default is the chunk size)
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats) (not used for raw and files formats)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for raw and encase6 format and 1.9 GiB for other formats) (not used for files format)
 .It Fl t Ar target
 the target file to export to, use \- for stdout (default is export) stdout is only supported for the raw format
 .It Fl u
@@ -83,15 +83,16 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfexport floppy.E01
-ewfexport 20090229 (libewf 20090229, libuna 20090124, zlib 1.2.3, libcrypto 0.9.8g, libuuid)
+ewfexport 20100109 (libewf 20100109, libuna 20100105, libbfio 20100106, zlib 1.2.3, libsmraw 20100108, libcrypto 0.9.8k, libuuid)
 
 Information for export required, please provide the necessary input
 Export to format (raw, files, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
-Target path and filename with extension or \- for stdout: floppy.raw
+Target path and filename without extension or \- for stdout: floppy
+Evidence segment file size in bytes (1.0 MiB >= value >= 7.9 EiB) [1.4 GiB]:
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:
 
-Export started at: Sat Feb 28 19:19:40 2009
+Export started at: Sat Jan  9 19:19:40 2009
 
 This could take a while.
 
@@ -104,7 +105,7 @@ Status: at 100%.
         exported 1.4 MiB (1474560 bytes) of total 1.4 MiB (1474560 bytes).
         completion in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Export completed at: Sat Feb 28 19:19:41 2009
+Export completed at: Sat Jan  9 19:19:41 2009
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 MD5 hash calculated over data:  ae1ce8f5ac079d3ee93f97fe3792bda3

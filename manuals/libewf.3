@@ -1,4 +1,4 @@
-.Dd January 3, 2010
+.Dd January 9, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -20,18 +20,6 @@ Support functions
 .Fn libewf_get_flags_write
 .Ft uint8_t
 .Fn libewf_get_flags_write_resume
-.Ft int
-.Fn libewf_check_file_signature "const char *filename"
-.Ft int
-.Fn libewf_glob "const char *filename, size_t filename_length, uint8_t format, char ** filenames[]"
-.Pp
-Available when compiled with wide character string support:
-.Ft int
-.Fn libewf_check_file_signature_wide "const wchar_t *filename"
-.Ft int
-.Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t ** filenames[]"
-.Pp
-Support functions
 .Ft int
 .Fn libewf_check_file_signature "const char *filename, libewf_error_t **error"
 .Ft int
@@ -412,10 +400,7 @@ This information is read from a set of EWF files when
 .Fn libewf_open
 or
 .Fn libewf_open_wide
-is used. The
-.Fn libewf_parse_header_values,
-.Fn libewf_parse_hash_values
-functions need to be called before retrieving header or hash values.
+is used.
 .Pp
 The
 .Fn libewf_set_*
@@ -424,14 +409,6 @@ functions can be used to set information in the
 This information is written to a set of EWF files when
 .Fn libewf_write_buffer
 is used.
-.Pp
-The
-.Fn libewf_parse_header_values
-function can be used to parse the values in the header strings within a set of EWF files.
-.Pp
-The
-.Fn libewf_parse_hash_values
-function can be used to parse the values in the hash string within a set of EWF files. The hash string is currently only present in the EWF-X format.
 .Pp
 The
 .Fn libewf_add_acquiry_error

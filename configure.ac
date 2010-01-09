@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100108],
+ [20100109],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100108])
+ [20100109])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -1120,6 +1120,108 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBBFIO],
  [test "x$ac_libewf_have_libbfio" = xlocal])
 
+dnl Check for enabling libsmraw for basic file IO support
+AC_CHECK_HEADERS(
+ [libsmraw.h],
+ [],
+ [ac_libewf_have_libsmraw=no])
+
+AS_IF(
+	[test "x$ac_libewf_have_libsmraw" != xno],
+	[ac_libewf_have_libsmraw=yes
+	AC_CHECK_LIB(
+	 smraw,
+	 libsmraw_get_version,
+	 [],
+	 [ac_libewf_have_libsmraw=no])
+
+	dnl Handle functions
+	AC_CHECK_LIB(
+	 smraw,
+	 libsmraw_handle_initialize,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmraw=no])
+	AC_CHECK_LIB(
+	 smraw,
+	 libsmraw_handle_free,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmraw=no])
+	AC_CHECK_LIB(
+	 smraw,
+	 libsmraw_handle_open,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmraw=no])
+	AC_CHECK_LIB(
+	 smraw,
+	 libsmraw_handle_close,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmraw=no])
+	AC_CHECK_LIB(
+	 smraw,
+	 libsmraw_handle_read_buffer,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmraw=no])
+	AC_CHECK_LIB(
+	 smraw,
+	 libsmraw_handle_write_buffer,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmraw=no])
+
+	AS_IF(
+		[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
+		[AC_CHECK_LIB(
+		 smraw,
+		 libsmraw_handle_open_wide,
+		 [ac_libewf_dummy=yes],
+		 [ac_libewf_have_libsmraw=no]) ])
+	])
+
+AS_IF(
+	[test "x$ac_libewf_have_libsmraw" = xyes],
+	[AC_SUBST(
+	 [libewf_spec_requires_libsmraw],
+	 [libsmraw])
+	AC_SUBST(
+	 [libewf_spec_build_requires_libsmraw],
+	 [libsmraw-devel])
+	AC_SUBST(
+	 [LIBSMRAW_CPPFLAGS],
+	 [])
+	AC_SUBST(
+	 [LIBSMRAW_LIBADD],
+	 [])
+	AC_SUBST(
+	 [HAVE_LIBSMRAW],
+	 [1]) ],
+	[dnl If libsmraw is not available use the (local) version that came with libewf
+	AC_DEFINE(
+	 [HAVE_LOCAL_LIBSMRAW],
+	 [1],
+	 [Define to 1 if the local version of libsmraw is used.])
+	AC_SUBST(
+	 [HAVE_LOCAL_LIBSMRAW],
+	 [1])
+	AC_SUBST(
+	 [libewf_spec_requires_libsmraw],
+	 [])
+	AC_SUBST(
+	 [libewf_spec_build_requires_libsmraw],
+	 [])
+	AC_SUBST(
+	 [LIBSMRAW_CPPFLAGS],
+	 [-I../libsmraw])
+	AC_SUBST(
+	 [LIBSMRAW_LIBADD],
+	 [../libsmraw/libsmraw.la])
+	AC_SUBST(
+	 [HAVE_LIBSMRAW],
+	 [0])
+	ac_libewf_have_libsmraw=local])
+
+AM_CONDITIONAL(
+ [HAVE_LOCAL_LIBSMRAW],
+ [test "x$ac_libewf_have_libsmraw" = xlocal])
+
 dnl Check for enabling libcrypto EVP support
 AC_CHECK_HEADERS(
  [openssl/evp.h],
@@ -1619,6 +1721,7 @@ AC_CONFIG_FILES([libnotify/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
+AC_CONFIG_FILES([libsmraw/Makefile])
 AC_CONFIG_FILES([libsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([pyewf/Makefile])
@@ -1650,6 +1753,7 @@ AC_MSG_NOTICE([
 Building:
    libuna support:                                  $ac_libewf_have_libuna
    libbfio support:                                 $ac_libewf_have_libbfio
+   libsmraw support:                                $ac_libewf_have_libsmraw
    libcrypto EVP support:                           $ac_libewf_have_libcrypto_evp
    libcrypto MD5 support:                           $ac_libewf_have_libcrypto_md5
    libcrypto SHA1 support:                          $ac_libewf_have_libcrypto_sha1

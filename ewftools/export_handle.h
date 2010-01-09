@@ -37,6 +37,12 @@
 
 #include <libewf.h>
 
+#if defined( HAVE_LOCAL_LIBSMRAW )
+#include <libsmraw_types.h>
+#elif defined( HAVE_LIBSMRAW_H )
+#include <libsmraw.h>
+#endif
+
 #include <libsystem.h>
 
 #include "digest_context.h"
@@ -93,9 +99,19 @@ struct export_handle
 	 */
 	uint8_t output_format;
 
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+	/* The libsmraw output handle
+	 */
+	libsmraw_handle_t *raw_output_handle;
+#else
 	/* The raw output file descriptor
 	 */
 	int raw_output_file_descriptor;
+#endif
+
+	/* Value to indicate if stdout should be used
+	 */
+	uint8_t use_stdout;
 
 	/* The libewf output handle
 	 */

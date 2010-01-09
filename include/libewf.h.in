@@ -269,7 +269,7 @@ LIBEWF_EXTERN int libewf_handle_open_file_io_pool(
                    libewf_error_t **error );
 #endif
 
-/* Closes the EWF handle and frees memory used within the handle
+/* Closes the EWF handle
  * Returns 0 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_close(
