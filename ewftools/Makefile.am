@@ -5,6 +5,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libsystem \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
+	@LIBSMDEV_CPPFLAGS@ \
 	@LIBSMRAW_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
@@ -40,6 +41,8 @@ ewfacquire_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBSMDEV_LIBADD@ \
+	@LIBSMRAW_LIBADD@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
 	@MEMWATCH_LIBADD@

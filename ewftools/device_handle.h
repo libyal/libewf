@@ -28,11 +28,13 @@
 
 #include <liberror.h>
 
-#include <libsystem.h>
-
-#if defined( WINAPI )
-#include <windows.h>
+#if defined( HAVE_LOCAL_LIBSMDEV )
+#include <libsmdev_types.h>
+#elif defined( HAVE_LIBSMDEV_H )
+#include <libsmdev.h>
 #endif
+
+#include <libsystem.h>
 
 #include "storage_media_buffer.h"
 
@@ -60,6 +62,13 @@ struct device_handle
 	 */
 	int type;
 
+#if defined( HAVE_LIBSMDEV ) || defined( HAVE_LOCAL_LIBSMDEV )
+	/* Device handle
+	 */
+	libsmdev_handle_t *device_handle;
+
+#endif /* defined( HAVE_LIBSMDEV ) || defined( HAVE_LOCAL_LIBSMDEV ) */
+
 #if defined( WINAPI )
 	/* File handle
 	 */
@@ -85,38 +94,6 @@ struct device_handle
 	/* Value to indicate the media size value was set
 	 */
 	uint8_t media_size_set;
-
-	/* The bus type
-	 */
-	uint8_t bus_type;
-
-	/* The device type
-	 */
-	uint8_t device_type;
-
-	/* Value to indicate if the device is removable
-	 */
-	uint8_t removable;
-
-	/* The vendor string
-	 */
-	uint8_t vendor[ 64 ];
-
-	/* The model string
-	 */
-	uint8_t model[ 64 ];
-
-	/* The serial number string
-	 */
-	uint8_t serial_number[ 64 ];
-
-	/* The amount of sessions for an optical disc
-	 */
-	uint16_t amount_of_sessions;
-
-	/* Value to indicate the media information values were set
-	 */
-	uint8_t media_information_set;
 
 	/* The amount of read error retries
 	 */
@@ -176,30 +153,12 @@ int device_handle_get_bytes_per_sector(
      uint32_t *bytes_per_sector,
      liberror_error_t **error );
 
-int device_handle_trim_copy_from_byte_stream(
-     uint8_t *string,
-     size_t string_size,
-     const uint8_t *byte_stream,
-     size_t byte_stream_size,
-     liberror_error_t **error );
-
-int device_handle_determine_media_information(
-     device_handle_t *device_handle,
-     liberror_error_t **error );
-
 int device_handle_get_media_information_value(
      device_handle_t *device_handle,
      char *media_information_value_identifier,
      size_t media_information_value_identifier_length,
      libsystem_character_t *media_information_value,
      size_t media_information_value_size,
-     liberror_error_t **error );
-
-int device_handle_set_read_error_values(
-     device_handle_t *device_handle,
-     int8_t read_error_retry,
-     uint32_t byte_error_granularity,
-     uint8_t wipe_block_on_read_error,
      liberror_error_t **error );
 
 int device_handle_media_information_fprint(

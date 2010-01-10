@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100109],
+ [20100110],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100109])
+ [20100110])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -148,24 +148,31 @@ dnl Headers included in libsystem/libsystem_signal.h
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([sys/signal.h])
 
-dnl Headers included in ewftools/device_handle.c
-dnl and ewftools/io_*.[ch]
+dnl Headers included in libsmdev/libsmdev_metadata.c
+AC_CHECK_HEADERS([sys/disk.h])
+AC_CHECK_HEADERS([sys/disklabel.h])
+AC_CHECK_HEADERS([sys/ioctl.h])
+
 AC_CHECK_HEADERS([cygwin/fs.h])
+
+AC_CHECK_HEADERS([linux/fs.h])
+
+dnl Headers included in libsmdev/libsmdev_ata.c
 AC_CHECK_HEADERS([cygwin/hdreg.h])
 
-AC_CHECK_HEADERS([linux/cdrom.h])
-AC_CHECK_HEADERS([linux/fs.h])
 AC_CHECK_HEADERS([linux/hdreg.h])
-AC_CHECK_HEADERS([linux/usbdevice_fs.h])
-AC_CHECK_HEADERS([linux/usb/ch9.h])
 
+dnl Headers included in libsmdev/libsmdev_scsi.c
 AC_CHECK_HEADERS([scsi/scsi.h])
 AC_CHECK_HEADERS([scsi/scsi_ioctl.h])
 AC_CHECK_HEADERS([scsi/sg.h])
 
-AC_CHECK_HEADERS([sys/disk.h])
-AC_CHECK_HEADERS([sys/disklabel.h])
-AC_CHECK_HEADERS([sys/ioctl.h])
+dnl Headers included in libsmdev/libsmdev_optical_disk.c
+AC_CHECK_HEADERS([linux/cdrom.h])
+
+dnl Headers included in libsmdev/libsmdev_usb.c
+AC_CHECK_HEADERS([linux/usbdevice_fs.h])
+AC_CHECK_HEADERS([linux/usb/ch9.h])
 
 dnl Headers included in ewftools/platform.c
 AC_CHECK_HEADERS([sys/utsname.h])
@@ -1120,7 +1127,109 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBBFIO],
  [test "x$ac_libewf_have_libbfio" = xlocal])
 
-dnl Check for enabling libsmraw for basic file IO support
+dnl Check for enabling libsmdev for storage media device support
+AC_CHECK_HEADERS(
+ [libsmdev.h],
+ [],
+ [ac_libewf_have_libsmdev=no])
+
+AS_IF(
+	[test "x$ac_libewf_have_libsmdev" != xno],
+	[ac_libewf_have_libsmdev=yes
+	AC_CHECK_LIB(
+	 smdev,
+	 libsmdev_get_version,
+	 [],
+	 [ac_libewf_have_libsmdev=no])
+
+	dnl Handle functions
+	AC_CHECK_LIB(
+	 smdev,
+	 libsmdev_handle_initialize,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmdev=no])
+	AC_CHECK_LIB(
+	 smdev,
+	 libsmdev_handle_free,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmdev=no])
+	AC_CHECK_LIB(
+	 smdev,
+	 libsmdev_handle_open,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmdev=no])
+	AC_CHECK_LIB(
+	 smdev,
+	 libsmdev_handle_close,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmdev=no])
+	AC_CHECK_LIB(
+	 smdev,
+	 libsmdev_handle_read_buffer,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmdev=no])
+	AC_CHECK_LIB(
+	 smdev,
+	 libsmdev_handle_write_buffer,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libsmdev=no])
+
+	AS_IF(
+		[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
+		[AC_CHECK_LIB(
+		 smdev,
+		 libsmdev_handle_open_wide,
+		 [ac_libewf_dummy=yes],
+		 [ac_libewf_have_libsmdev=no]) ])
+	])
+
+AS_IF(
+	[test "x$ac_libewf_have_libsmdev" = xyes],
+	[AC_SUBST(
+	 [libewf_spec_requires_libsmdev],
+	 [libsmdev])
+	AC_SUBST(
+	 [libewf_spec_build_requires_libsmdev],
+	 [libsmdev-devel])
+	AC_SUBST(
+	 [LIBSMDEV_CPPFLAGS],
+	 [])
+	AC_SUBST(
+	 [LIBSMDEV_LIBADD],
+	 [])
+	AC_SUBST(
+	 [HAVE_LIBSMDEV],
+	 [1]) ],
+	[dnl If libsmdev is not available use the (local) version that came with libewf
+	AC_DEFINE(
+	 [HAVE_LOCAL_LIBSMDEV],
+	 [1],
+	 [Define to 1 if the local version of libsmdev is used.])
+	AC_SUBST(
+	 [HAVE_LOCAL_LIBSMDEV],
+	 [1])
+	AC_SUBST(
+	 [libewf_spec_requires_libsmdev],
+	 [])
+	AC_SUBST(
+	 [libewf_spec_build_requires_libsmdev],
+	 [])
+	AC_SUBST(
+	 [LIBSMDEV_CPPFLAGS],
+	 [-I../libsmdev])
+	AC_SUBST(
+	 [LIBSMDEV_LIBADD],
+	 [../libsmdev/libsmdev.la])
+	AC_SUBST(
+	 [HAVE_LIBSMDEV],
+	 [0])
+	ac_libewf_have_libsmdev=local])
+
+AM_CONDITIONAL(
+ [HAVE_LOCAL_LIBSMDEV],
+ [test "x$ac_libewf_have_libsmdev" = xlocal])
+
+dnl Check for enabling libsmraw for storage media (split) RAW support
 AC_CHECK_HEADERS(
  [libsmraw.h],
  [],
@@ -1721,6 +1830,7 @@ AC_CONFIG_FILES([libnotify/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
+AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])
 AC_CONFIG_FILES([libsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
@@ -1753,6 +1863,7 @@ AC_MSG_NOTICE([
 Building:
    libuna support:                                  $ac_libewf_have_libuna
    libbfio support:                                 $ac_libewf_have_libbfio
+   libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw
    libcrypto EVP support:                           $ac_libewf_have_libcrypto_evp
    libcrypto MD5 support:                           $ac_libewf_have_libcrypto_md5

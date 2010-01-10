@@ -1168,8 +1168,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 			return( -1 );
 		}
 	}
-	if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 ) )
+	if( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
 	{
 		base_offset = chunks_section_offset;
 	}
@@ -1955,7 +1954,8 @@ ssize_t libewf_segment_file_write_close(
 			}
 			total_write_count += write_count;
 		}
-		if( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 ) )
 		{
 			/* Write the digest section if required
 			 */

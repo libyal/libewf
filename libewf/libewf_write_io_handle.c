@@ -290,7 +290,6 @@ int libewf_write_io_handle_initialize_values(
 	if( media_values->media_size > LIBEWF_2_TIB )
 	{
 		if( ( io_handle->format != LIBEWF_FORMAT_ENCASE6 )
-		 && ( io_handle->format != LIBEWF_FORMAT_LINEN6 )
 		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
 			liberror_error_set(
@@ -717,11 +716,6 @@ int libewf_write_io_handle_initialize_resume(
 		                                             - write_io_handle->resume_segment_file_offset;
 		write_io_handle->segment_amount_of_chunks    = segment_file_handle->amount_of_chunks; 
 
-		/* TODO set the following write io handle values to the correct value
-		 * currently only required for ENCASE1/SMART
-		 */
-		write_io_handle->chunks_section_number       = 0;
-
 		if( libbfio_pool_reopen(
 		     io_handle->file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
@@ -909,14 +903,13 @@ int libewf_write_io_handle_calculate_chunks_per_segment(
 int libewf_write_io_handle_calculate_chunks_per_chunks_section(
      uint32_t *chunks_per_chunks_section,
      uint32_t maximum_section_amount_of_chunks,
+     uint32_t segment_amount_of_chunks,
      uint32_t chunks_per_segment,
-     uint32_t chunks_section_number,
      uint8_t unrestrict_offset_amount,
      liberror_error_t **error )
 {
-	static char *function              = "libewf_write_io_handle_calculate_chunks_per_chunks_section";
-	int64_t maximum_amount_of_chunks   = 0;
-	int64_t remaining_amount_of_chunks = 0;
+	static char *function               = "libewf_write_io_handle_calculate_chunks_per_chunks_section";
+	uint32_t remaining_amount_of_chunks = 0;
 
 	if( chunks_per_chunks_section == NULL )
 	{
@@ -940,41 +933,19 @@ int libewf_write_io_handle_calculate_chunks_per_chunks_section(
 
 		return( -1 );
 	}
-	if( chunks_section_number == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported section number: %" PRIu8 ".",
-		 function,
-		 chunks_section_number );
-
-		return( -1 );
-	}
-	remaining_amount_of_chunks = (int64_t) chunks_per_segment;
-
-	if( chunks_section_number > 1 )
-	{
-		maximum_amount_of_chunks = ( chunks_section_number - 1 )
-		                         * maximum_section_amount_of_chunks;
-
-		if( remaining_amount_of_chunks > maximum_amount_of_chunks )
-		{
-			remaining_amount_of_chunks -= maximum_amount_of_chunks;
-		}
-	}
-	if( remaining_amount_of_chunks <= 0 )
+	if( segment_amount_of_chunks > chunks_per_segment )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: remaining amount of chunks out of range.",
+		 "%s: segment amount of chunks exceeds chunk per segment.",
 		 function );
 
 		return( -1 );
 	}
+        remaining_amount_of_chunks = chunks_per_segment - segment_amount_of_chunks;
+
 	if( ( unrestrict_offset_amount == 0 )
 	 && ( remaining_amount_of_chunks > (int64_t) maximum_section_amount_of_chunks ) )
 	{
@@ -1960,7 +1931,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			}
 		}
 		write_io_handle->create_chunks_section     = 1;
-		write_io_handle->chunks_section_number     = 0;
 		write_io_handle->chunks_per_chunks_section = 0;
 		write_io_handle->segment_amount_of_chunks  = 0;
 
@@ -2143,10 +2113,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			return( -1 );
 		}
-		/* Start with chunks section number number 1, value is initialized with 0
-		 */
-		write_io_handle->chunks_section_number += 1;
-
 		/* Recalculate the amount of chunks per segment for a better segment file fill when compression is used
 		 */
 		if( segment_table->segment_file_handle[ segment_number ]->amount_of_chunks == 0 )
@@ -2189,8 +2155,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( libewf_write_io_handle_calculate_chunks_per_chunks_section(
 		     &( write_io_handle->chunks_per_chunks_section ),
 		     write_io_handle->maximum_section_amount_of_chunks,
+		     write_io_handle->segment_amount_of_chunks,
 		     write_io_handle->chunks_per_segment,
-		     write_io_handle->chunks_section_number,
 		     write_io_handle->unrestrict_offset_amount,
 		     error ) != 1 )
 		{
@@ -2420,9 +2386,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			return( -1 );
 		}
-		total_write_count                      += write_count;
-		write_io_handle->create_chunks_section  = 1;
-		write_io_handle->chunks_section_offset  = 0;
+		total_write_count                     += write_count;
+		write_io_handle->create_chunks_section = 1;
+		write_io_handle->chunks_section_offset = 0;
 
 		/* Check if the current segment file is full, if so close the current segment file
 		 */

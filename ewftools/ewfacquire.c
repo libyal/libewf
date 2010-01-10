@@ -2378,6 +2378,10 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	/* TODO test if argument is file or device
+	 * move test into imaging handle ?
+	 */
+
 	/* Open the input file or device size
 	 */
 	if( device_handle_open_input(
@@ -2424,53 +2428,50 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( ( argument_set_bytes_per_sector == 0 )
-	 && ( device_handle_get_bytes_per_sector(
-	       device_handle,
-	       &bytes_per_sector,
-	       &error ) != 1 ) )
+	if( argument_set_bytes_per_sector == 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve bytes per sector.\n" );
+		if( device_handle_get_bytes_per_sector(
+		     device_handle,
+		     &bytes_per_sector,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to retrieve bytes per sector.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 
-		device_handle_close(
-		 device_handle,
-		 NULL );
-		device_handle_free(
-		 &device_handle,
-		 NULL );
+			device_handle_close(
+			 device_handle,
+			 NULL );
+			device_handle_free(
+			 &device_handle,
+			 NULL );
 
-		return( EXIT_FAILURE );
+			return( EXIT_FAILURE );
+		}
 	}
-	if( ( argument_set_media_type == 0 )
-	 && ( device_handle_get_media_type(
-	       device_handle,
-	       &media_type,
-	       &error ) != 1 ) )
+	if( argument_set_media_type == 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve media type.\n" );
+		 if( device_handle_get_media_type(
+		      device_handle,
+		      &media_type,
+		      &error ) != 1 )
+		{
+			media_type = LIBEWF_MEDIA_TYPE_FIXED;
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
+			fprintf(
+			 stderr,
+			 "Unable to retrieve media type defaulting to: fixed.\n" );
 
-		device_handle_close(
-		 device_handle,
-		 NULL );
-		device_handle_free(
-		 &device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
 	if( device_handle_media_information_fprint(
 	     device_handle,
@@ -2485,15 +2486,6 @@ int main( int argc, char * const argv[] )
 		 error );
 		liberror_error_free(
 		 &error );
-
-		device_handle_close(
-		 device_handle,
-		 NULL );
-		device_handle_free(
-		 &device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
 	}
 	if( ( acquiry_size == 0 )
 	 || ( acquiry_size > ( media_size - acquiry_offset ) ) )
@@ -3749,7 +3741,6 @@ int main( int argc, char * const argv[] )
 		else if( acquiry_size > EWFACQUIRE_2_TIB )
 		{
 			if( ( ewf_format != LIBEWF_FORMAT_ENCASE6 )
-			 && ( ewf_format != LIBEWF_FORMAT_LINEN6 )
 			 && ( ewf_format != LIBEWF_FORMAT_EWFX ) )
 			{
 				fprintf(
@@ -4267,10 +4258,6 @@ int main( int argc, char * const argv[] )
 		 NULL );
 		imaging_handle_free(
 		 &ewfacquire_imaging_handle,
-		 NULL );
-
-		device_handle_free(
-		 &device_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );

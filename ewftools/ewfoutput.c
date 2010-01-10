@@ -68,18 +68,24 @@
 
 #include <libewf.h>
 
-#if defined( HAVE_OPENSSL_OPENSSLV_H )
-#include <openssl/opensslv.h>
-#endif
-
-#if defined( HAVE_UUID_UUID_H )
-#include <uuid/uuid.h>
+#if defined( HAVE_LOCAL_LIBDEVAW )
+#include <libsmraw_definitions.h>
+#elif defined( HAVE_LIBDEVAW )
+#include <libsmraw.h>
 #endif
 
 #if defined( HAVE_LOCAL_LIBSMRAW )
 #include <libsmraw_definitions.h>
 #elif defined( HAVE_LIBSMRAW )
 #include <libsmraw.h>
+#endif
+
+#if defined( HAVE_OPENSSL_OPENSSLV_H )
+#include <openssl/opensslv.h>
+#endif
+
+#if defined( HAVE_UUID_UUID_H )
+#include <uuid/uuid.h>
 #endif
 
 #include <libsystem.h>
@@ -134,10 +140,19 @@ void ewfoutput_version_fprint(
 	 ZLIB_VERSION );
 #endif
 
+#if defined( HAVE_LIBDEVAW ) || defined( HAVE_LOCAL_LIBDEVAW )
+	fprintf(
+	 stream,
+	 ", libsmdev %s",
+	 LIBDEVAW_VERSION_STRING );
+#endif
+
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 	fprintf(
 	 stream,
 	 ", libsmraw %s",
 	 LIBSMRAW_VERSION_STRING );
+#endif
 
 #if defined( HAVE_LIBCRYPTO )
 	fprintf(

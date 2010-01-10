@@ -71,10 +71,7 @@ typedef __int32			ssize_t;
 #endif
 
 #elif defined( __BORLANDC__ )
-/* The freely available Borland C++ 5.5 compiler from
- * CodeGear has version 0x0610
- */
-#if __BORLANDC__ <= 0x0610
+#if __BORLANDC__ <= 0x0560
 
 /* Define LIBEWF_DEFINITION_INTEGER_TYPES to avoid conflict
  */
@@ -114,7 +111,7 @@ typedef unsigned __int32	intptr_t;
 
 #else
 #include <stdint.h>
-#endif /* __BORLANDC__ <= 0x0610 */
+#endif /* __BORLANDC__ <= 0x0560 */
 
 /* Type definitions for compilers that have access to
  * <inttypes.h> or <stdint.h>

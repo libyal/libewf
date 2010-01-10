@@ -93,7 +93,11 @@ extern "C" {
 
 /* FILE stream seek
  */
-#if defined( HAVE_FSEEKO ) || defined( WINAPI )
+#if defined( WINAPI )
+#define file_stream_seek_offset( stream, offset, whence ) \
+	fseek( stream, offset, whence )
+
+#elif defined( HAVE_FSEEKO )
 #define file_stream_seek_offset( stream, offset, whence ) \
 	fseeko( stream, offset, whence )
 #endif
