@@ -45,6 +45,15 @@
 #include <libsmdev.h>
 #endif
 
+#if defined( HAVE_LOCAL_LIBSMRAW )
+#include <libsmraw_definitions.h>
+#include <libsmraw_handle.h>
+#include <libsmraw_metadata.h>
+#include <libsmraw_types.h>
+#elif defined( HAVE_LIBSMRAW_H )
+#include <libsmraw.h>
+#endif
+
 #include <libsystem.h>
 
 #include "byte_size_string.h"
@@ -111,11 +120,13 @@ int device_handle_initialize(
 
 			return( -1 );
 		}
+#if !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW )
 #if defined( WINAPI )
 		( *device_handle )->file_handle     = INVALID_HANDLE_VALUE;
 #else
 		( *device_handle )->file_descriptor = -1;
 #endif
+#endif /* !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( 1 );
 }
@@ -145,23 +156,44 @@ int device_handle_free(
 	{
 		if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_DEVICE )
 		{
-			if( ( *device_handle )->device_handle == NULL )
+			if( ( *device_handle )->dev_input_handle != NULL )
 			{
 				if( libsmdev_handle_free(
-				     &( ( *device_handle )->device_handle ),
+				     &( ( *device_handle )->dev_input_handle ),
 				     error ) != 1 )
 				{
 					liberror_error_set(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free device handle.",
+					 "%s: unable to free device input handle.",
 					 function );
 
 					result = -1;
 				}
 			}
 		}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE )
+		{
+			if( ( *device_handle )->raw_input_handle != NULL )
+			{
+				if( libsmraw_handle_free(
+				     &( ( *device_handle )->raw_input_handle ),
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free raw input handle.",
+					 function );
+
+					result = -1;
+				}
+			}
+		}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 		memory_free(
 		 *device_handle );
 
@@ -175,11 +207,11 @@ int device_handle_free(
  */
 int device_handle_open_input(
      device_handle_t *device_handle,
-     const libsystem_character_t *filename,
+     libsystem_character_t * const * filenames,
+     int amount_of_filenames,
      liberror_error_t **error )
 {
-	libsystem_character_t *filenames[ 1 ] = { NULL };
-
+#if !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW )
 #if defined( WINAPI )
 	BY_HANDLE_FILE_INFORMATION file_information;
 
@@ -192,9 +224,10 @@ int device_handle_open_input(
 #else
 	struct stat file_stat;
 #endif
+	size64_t file_size                    = 0;
+#endif /* !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) */
 
 	static char *function                 = "device_handle_open_input";
-	size64_t file_size                    = 0;
 	int result                            = 0;
 
 	if( device_handle == NULL )
@@ -208,74 +241,82 @@ int device_handle_open_input(
 
 		return( -1 );
 	}
-	if( filename == NULL )
+	if( filenames == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
+		 "%s: invalid filenames.",
 		 function );
 
 		return( -1 );
 	}
-	result = libsmdev_check_device(
-	          filename,
-                  error );
-
-	if( result == -1 )
+	if( amount_of_filenames == 1 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if filename is a device.",
-		 function );
+		result = libsmdev_check_device(
+		          filenames[ 0 ],
+	                  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if filename is a device.",
+			 function );
+
+			return( -1 );
+		}
 	}
-	else if( result != 0 )
+	if( result != 0 )
 	{
-		if( device_handle->device_handle != NULL )
+		device_handle->type = DEVICE_HANDLE_TYPE_DEVICE;
+	}
+	else
+	{
+		device_handle->type = DEVICE_HANDLE_TYPE_FILE;
+
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( device_handle->dev_input_handle != NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid device handle - device handle already set.",
+			 "%s: invalid device handle - device input handle already set.",
 			 function );
 
 			return( -1 );
 		}
-		device_handle->type = DEVICE_HANDLE_TYPE_DEVICE;
-
-		filenames[ 0 ] = (libsystem_character_t *) filename;
-
 		if( libsmdev_handle_initialize(
-		     &( device_handle->device_handle ),
+		     &( device_handle->dev_input_handle ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create device handle.",
+			 "%s: unable to create device input handle.",
 			 function );
 
 			return( -1 );
 		}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 		if( libsmdev_handle_open_wide(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     (wchar_t * const *) filenames,
-		     1,
+		     amount_of_filenames,
 		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
 #else
 		if( libsmdev_handle_open(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     (char * const *) filenames,
-		     1,
+		     amount_of_filenames,
 		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
 #endif
@@ -284,14 +325,84 @@ int device_handle_open_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open device handle.",
+			 "%s: unable to open device input handle.",
 			 function );
+
+			libsmdev_handle_free(
+			 &( device_handle->dev_input_handle ),
+			 NULL );
 
 			return( -1 );
 		}
 	}
-	else
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+		if( device_handle->raw_input_handle != NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 "%s: invalid device handle - raw input handle already set.",
+			 function );
+
+			return( -1 );
+		}
+		if( libsmraw_handle_initialize(
+		     &( device_handle->raw_input_handle ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+		if( libsmraw_handle_open_wide(
+		     device_handle->raw_input_handle,
+		     (wchar_t * const *) filenames,
+		     amount_of_filenames,
+		     LIBSMDEV_OPEN_READ,
+		     error ) != 1 )
+#else
+		if( libsmraw_handle_open(
+		     device_handle->raw_input_handle,
+		     (char * const *) filenames,
+		     amount_of_filenames,
+		     LIBSMDEV_OPEN_READ,
+		     error ) != 1 )
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open raw input handle.",
+			 function );
+
+			libsmraw_handle_free(
+			 &( device_handle->raw_input_handle ),
+			 NULL );
+
+			return( -1 );
+		}
+#else
+		if( amount_of_filenames != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsuppored amount of filenames.",
+			 function );
+
+			return( -1 );
+		}
 #if defined( WINAPI )
 		if( device_handle->file_handle != INVALID_HANDLE_VALUE )
 		{
@@ -305,7 +416,7 @@ int device_handle_open_input(
 			return( -1 );
 		}
 		device_handle->file_handle = CreateFile(
-					      (LPCTSTR) filename,
+					      (LPCTSTR) filenames[ 0 ],
 					      GENERIC_READ,
 					      FILE_SHARE_READ,
 					      NULL,
@@ -334,7 +445,7 @@ int device_handle_open_input(
 				 LIBERROR_IO_ERROR_OPEN_FAILED,
 				 "%s: unable to open file: %" PRIs_LIBSYSTEM " with error: %" PRIs_LIBSYSTEM "",
 				 function,
-				 filename,
+				 filenames[ 0 ],
 				 error_string );
 
 				LocalFree(
@@ -348,7 +459,7 @@ int device_handle_open_input(
 				 LIBERROR_IO_ERROR_OPEN_FAILED,
 				 "%s: unable to open file: %" PRIs_LIBSYSTEM ".",
 				 function,
-				 filename );
+				 filenames[ 0 ] );
 			}
 			return( -1 );
 		}
@@ -369,10 +480,10 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
-		if( ( filename[ 0 ] == '\\' )
-		 && ( filename[ 1 ] == '\\' )
-		 && ( filename[ 2 ] == '.' )
-		 && ( filename[ 3 ] == '\\' ) )
+		if( ( ( filenames[ 0 ] )[ 0 ] == '\\' )
+		 && ( ( filenames[ 0 ] )[ 1 ] == '\\' )
+		 && ( ( filenames[ 0 ] )[ 2 ] == '.' )
+		 && ( ( filenames[ 0 ] )[ 3 ] == '\\' ) )
 		{
 			liberror_error_set(
 			 error,
@@ -474,7 +585,7 @@ int device_handle_open_input(
 			return( -1 );
 		}
 		device_handle->file_descriptor = open(
-						  filename,
+						  filenames[ 0 ],
 						  O_RDONLY );
 
 		if( device_handle->file_descriptor == -1 )
@@ -485,7 +596,7 @@ int device_handle_open_input(
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to open file: %" PRIs_LIBSYSTEM ".",
 			 function,
-			 filename );
+			 filenames[ 0 ] );
 
 			return( -1 );
 		}
@@ -549,7 +660,6 @@ int device_handle_open_input(
 		}
 		file_size = file_stat.st_size;
 #endif
-
 		if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 		{
 			device_handle->media_size           = file_size;
@@ -557,6 +667,7 @@ int device_handle_open_input(
 			device_handle->bytes_per_sector     = 512;
 			device_handle->bytes_per_sector_set = 1;
 		}
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( 1 );
 }
@@ -584,14 +695,14 @@ int device_handle_close(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_close(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     error ) != 0 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close device handle.",
+			 "%s: unable to close device input handle.",
 			 function );
 
 			return( -1 );
@@ -599,6 +710,21 @@ int device_handle_close(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+		if( libsmraw_handle_close(
+		     device_handle->raw_input_handle,
+		     error ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+#else
 #if defined( WINAPI )
 		if( device_handle->file_handle == INVALID_HANDLE_VALUE )
 		{
@@ -648,6 +774,7 @@ int device_handle_close(
 			return( -1 );
 		}
 #endif
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( 0 );
 }
@@ -689,7 +816,7 @@ ssize_t device_handle_read_buffer(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		read_count = libsmdev_handle_read_buffer(
-			      device_handle->device_handle,
+			      device_handle->dev_input_handle,
 			      buffer,
 			      read_size,
 		              error );
@@ -700,7 +827,7 @@ ssize_t device_handle_read_buffer(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read buffer.",
+			 "%s: unable to read buffer from device input handle.",
 			 function );
 
 			return( -1 );
@@ -708,6 +835,25 @@ ssize_t device_handle_read_buffer(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+		read_count = libsmraw_handle_read_buffer(
+			      device_handle->raw_input_handle,
+			      buffer,
+			      read_size,
+		              error );
+
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read buffer from raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+#else
 #if defined( WINAPI )
 		if( device_handle->file_handle == INVALID_HANDLE_VALUE )
 		{
@@ -741,6 +887,16 @@ ssize_t device_handle_read_buffer(
 		     read_size,
 		     (LPDWORD) &read_count,
 		     NULL ) == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read buffer from file handle.",
+			 function );
+
+			return( -1 );
+		}
 #else
 		read_count = read(
 			      device_handle->file_descriptor,
@@ -748,17 +904,18 @@ ssize_t device_handle_read_buffer(
 			      read_size );
 
 		if( read_count < 0 )
-#endif
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read buffer.",
+			 "%s: unable to read buffer from file descriptor.",
 			 function );
 
 			return( -1 );
 		}
+#endif
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( read_count );
 }
@@ -793,7 +950,7 @@ off64_t device_handle_seek_offset(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		offset = libsmdev_handle_seek_offset(
-		          device_handle->device_handle,
+		          device_handle->dev_input_handle,
 		          offset,
 		          whence,
 		          error );
@@ -804,7 +961,7 @@ off64_t device_handle_seek_offset(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset in device handle.",
+			 "%s: unable to seek offset in device input handle.",
 			 function );
 
 			return( -1 );
@@ -812,6 +969,25 @@ off64_t device_handle_seek_offset(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+		offset = libsmraw_handle_seek_offset(
+		          device_handle->raw_input_handle,
+		          offset,
+		          whence,
+		          error );
+
+		if( offset < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset in raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+#else
 #if defined( WINAPI )
 		if( device_handle->file_handle == INVALID_HANDLE_VALUE )
 		{
@@ -876,7 +1052,7 @@ off64_t device_handle_seek_offset(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset: %" PRIi64 " in input handle.",
+			 "%s: unable to seek offset: %" PRIi64 " in file handle.",
 			 function,
 			 offset );
 
@@ -908,12 +1084,13 @@ off64_t device_handle_seek_offset(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset in input handle.",
+			 "%s: unable to seek offset in file descriptor.",
 			 function );
 
 			return( -1 );
 		}
 #endif
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( offset );
 }
@@ -942,7 +1119,7 @@ int device_handle_get_media_size(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_media_size(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     media_size,
 		     error ) != 1 )
 		{
@@ -950,7 +1127,7 @@ int device_handle_get_media_size(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media size.",
+			 "%s: unable to retrieve media size from device input handle.",
 			 function );
 
 			return( -1 );
@@ -958,6 +1135,22 @@ int device_handle_get_media_size(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+		if( libsmraw_handle_get_media_size(
+		     device_handle->raw_input_handle,
+		     media_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve media size from raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+#else
 		if( media_size == NULL )
 		{
 			liberror_error_set(
@@ -970,6 +1163,7 @@ int device_handle_get_media_size(
 			return( -1 );
 		}
 		*media_size = device_handle->media_size;
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( 1 );
 }
@@ -998,7 +1192,7 @@ int device_handle_get_media_type(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_media_type(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     media_type,
 		     error ) != 1 )
 		{
@@ -1054,7 +1248,7 @@ int device_handle_get_bytes_per_sector(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     bytes_per_sector,
 		     error ) != 1 )
 		{
@@ -1081,23 +1275,24 @@ int device_handle_get_bytes_per_sector(
 
 			return( -1 );
 		}
-		*bytes_per_sector = device_handle->bytes_per_sector;
+		*bytes_per_sector = 512;
 	}
 	return( 1 );
 }
 
-/* Retrieves the media information value
+/* Retrieves the information value by identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int device_handle_get_media_information_value(
+int device_handle_get_information_value(
      device_handle_t *device_handle,
-     char *media_information_value_identifier,
-     size_t media_information_value_identifier_length,
-     libsystem_character_t *media_information_value,
-     size_t media_information_value_size,
+     const uint8_t *information_value_identifier,
+     size_t information_value_identifier_length,
+     libsystem_character_t *information_value,
+     size_t information_value_size,
      liberror_error_t **error )
 {
-	static char *function = "device_handle_get_media_information_value";
+	static char *function = "device_handle_get_information_value";
+	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1110,31 +1305,54 @@ int device_handle_get_media_information_value(
 
 		return( -1 );
 	}
+	/* TODO handle wide character strings */
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_media_information_value(
-		     device_handle->device_handle,
-		     (uint8_t *) media_information_value_identifier,
-		     media_information_value_identifier_length,
-		     media_information_value,
-		     media_information_value_size,
-		     error ) != 1 )
+		result = libsmdev_handle_get_information_value(
+		          device_handle->dev_input_handle,
+		          information_value_identifier,
+		          information_value_identifier_length,
+		          information_value,
+		          information_value_size,
+		          error );
+
+		if( result == -1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media information value.",
+			 "%s: unable to retrieve information value from device input handle.",
 			 function );
 
 			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		return( 0 );
+		result = libsmraw_handle_get_information_value(
+		          device_handle->raw_input_handle,
+		          information_value_identifier,
+		          information_value_identifier_length,
+		          information_value,
+		          information_value_size,
+		          error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve information value from raw input handle.",
+			 function );
+
+			return( -1 );
+		}
 	}
-	return( 1 );
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
+	return( result );
 }
 
 /* Print the media information to a stream
@@ -1181,11 +1399,11 @@ int device_handle_media_information_fprint(
 	{
 		fprintf(
 		 stream,
-		 "Media information:\n" );
+		 "Device information:\n" );
 
 #ifdef TODO
 		if( libsmdev_handle_get_device_type(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     device_type,
 		     error ) != 1 )
 		{
@@ -1347,7 +1565,7 @@ int device_handle_media_information_fprint(
 		 "\n" );
 
 		if( libsmdev_handle_get_bus_type(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     &bus_type,
 		     error ) != 1 )
 		{
@@ -1403,8 +1621,8 @@ int device_handle_media_information_fprint(
 			 "Removable:\t\tyes\n" );
 		}
 #endif
-		result = libsmdev_handle_get_media_information_value(
-		          device_handle->device_handle,
+		result = libsmdev_handle_get_information_value(
+		          device_handle->dev_input_handle,
 		          (uint8_t *) "vendor",
 		          6,
 		          media_information_value,
@@ -1431,8 +1649,8 @@ int device_handle_media_information_fprint(
 		 "Vendor:\t\t\t%s\n",
 		 (char *) media_information_value );
 
-		result = libsmdev_handle_get_media_information_value(
-		          device_handle->device_handle,
+		result = libsmdev_handle_get_information_value(
+		          device_handle->dev_input_handle,
 		          (uint8_t *) "model",
 		          5,
 		          media_information_value,
@@ -1459,8 +1677,8 @@ int device_handle_media_information_fprint(
 		 "Model:\t\t\t%s\n",
 		 (char *) media_information_value );
 
-		result = libsmdev_handle_get_media_information_value(
-		          device_handle->device_handle,
+		result = libsmdev_handle_get_information_value(
+		          device_handle->dev_input_handle,
 		          (uint8_t *) "serial_number",
 		          13,
 		          media_information_value,
@@ -1487,8 +1705,18 @@ int device_handle_media_information_fprint(
 		 "Serial:\t\t\t%s\n",
 		 (char *) media_information_value );
 
+		fprintf(
+		 stream,
+		 "\n" );
+	}
+	fprintf(
+	 stream,
+	 "Storage media information:\n" );
+
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
 		if( libsmdev_handle_get_media_size(
-		     device_handle->device_handle,
+		     device_handle->dev_input_handle,
 		     &media_size,
 		     error ) != 1 )
 		{
@@ -1496,7 +1724,7 @@ int device_handle_media_information_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media size.",
+			 "%s: unable to retrieve media size from device input handle.",
 			 function );
 
 			return( -1 );
@@ -1504,7 +1732,24 @@ int device_handle_media_information_fprint(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+		if( libsmraw_handle_get_media_size(
+		     device_handle->raw_input_handle,
+		     &media_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve media size from raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+#else
 		media_size = device_handle->media_size;
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	result = byte_size_string_create(
 		  media_size_string,

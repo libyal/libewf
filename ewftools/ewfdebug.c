@@ -268,7 +268,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( libsystem_glob_resolve(
 	     glob,
-	     &argv[ optind ],
+	     &( argv[ optind ] ),
 	     argc - optind,
 	     &error ) != 1 )
 	{
@@ -290,7 +290,7 @@ int main( int argc, char * const argv[] )
 	argv_filenames      = glob->result;
 	amount_of_filenames = glob->amount_of_results;
 #else
-	argv_filenames      = &argv[ optind ];
+	argv_filenames      = &( argv[ optind ] );
 	amount_of_filenames = argc - optind;
 #endif
 

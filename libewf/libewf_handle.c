@@ -825,6 +825,13 @@ int libewf_handle_open(
 		                 "%s: unable to set track offsets read in file io handle.",
 		                 function );
 
+				libbfio_handle_free(
+				 &file_io_handle,
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
+
 		                return( -1 );
 			}
 #endif
@@ -1187,6 +1194,13 @@ int libewf_handle_open_wide(
 		                 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		                 "%s: unable to set track offsets read in file io handle.",
 		                 function );
+
+				libbfio_handle_free(
+				 &file_io_handle,
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
 
 		                return( -1 );
 			}

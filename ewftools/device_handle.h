@@ -34,6 +34,12 @@
 #include <libsmdev.h>
 #endif
 
+#if defined( HAVE_LOCAL_LIBSMRAW )
+#include <libsmraw_types.h>
+#elif defined( HAVE_LIBSMRAW_H )
+#include <libsmraw.h>
+#endif
+
 #include <libsystem.h>
 
 #include "storage_media_buffer.h"
@@ -62,13 +68,15 @@ struct device_handle
 	 */
 	int type;
 
-#if defined( HAVE_LIBSMDEV ) || defined( HAVE_LOCAL_LIBSMDEV )
-	/* Device handle
+	/* libsmdev input handle
 	 */
-	libsmdev_handle_t *device_handle;
+	libsmdev_handle_t *dev_input_handle;
 
-#endif /* defined( HAVE_LIBSMDEV ) || defined( HAVE_LOCAL_LIBSMDEV ) */
-
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+	/* libsmraw input handle
+	 */
+	libsmdev_handle_t *raw_input_handle;
+#else
 #if defined( WINAPI )
 	/* File handle
 	 */
@@ -78,6 +86,7 @@ struct device_handle
 	 */
 	int file_descriptor;
 #endif
+#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 
 	/* The amount of bytes per sector
 	 */
@@ -87,9 +96,12 @@ struct device_handle
 	 */
 	uint8_t bytes_per_sector_set;
 
+#if !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW )
 	/* The media size
 	 */
 	size64_t media_size;
+
+#endif /* !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) */
 
 	/* Value to indicate the media size value was set
 	 */
@@ -119,7 +131,8 @@ int device_handle_free(
 
 int device_handle_open_input(
      device_handle_t *device_handle,
-     const libsystem_character_t *filename,
+     libsystem_character_t * const * filenames,
+     int amount_of_filenames,
      liberror_error_t **error );
 
 int device_handle_close(
@@ -153,12 +166,12 @@ int device_handle_get_bytes_per_sector(
      uint32_t *bytes_per_sector,
      liberror_error_t **error );
 
-int device_handle_get_media_information_value(
+int device_handle_get_information_value(
      device_handle_t *device_handle,
-     char *media_information_value_identifier,
-     size_t media_information_value_identifier_length,
-     libsystem_character_t *media_information_value,
-     size_t media_information_value_size,
+     const uint8_t *information_value_identifier,
+     size_t information_value_identifier_length,
+     libsystem_character_t *information_value,
+     size_t information_value_size,
      liberror_error_t **error );
 
 int device_handle_media_information_fprint(

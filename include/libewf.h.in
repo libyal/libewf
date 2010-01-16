@@ -142,12 +142,12 @@ LIBEWF_EXTERN int libewf_glob_free(
  * Notify functions
  * ------------------------------------------------------------------------- */
 
-/* Set the verbose notification
+/* Sets the verbose notification
  */
 LIBEWF_EXTERN void libewf_notify_set_verbose(
                     int verbose );
 
-/* Set the notification stream
+/* Sets the notification stream
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_notify_set_stream(
@@ -1376,7 +1376,7 @@ LIBEWF_EXTERN off64_t libewf_file_entry_seek_offset(
  * Notify functions
  * ------------------------------------------------------------------------- */
 
-/* Set the notify values
+/* Sets the notify values
  *
  * This function is deprecated use libewf_notify_set_value instead
  */

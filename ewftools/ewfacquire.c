@@ -2386,7 +2386,8 @@ int main( int argc, char * const argv[] )
 	 */
 	if( device_handle_open_input(
 	     device_handle,
-	     argv[ optind ],
+	     &( argv[ optind ] ),
+	     argc - optind,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -3786,9 +3787,9 @@ int main( int argc, char * const argv[] )
 			}
 			acquiry_software_version = _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
-			if( device_handle_get_media_information_value(
+			if( device_handle_get_information_value(
 			     device_handle,
-			     "model",
+			     (uint8_t *) "model",
 			     5,
 			     media_information_model,
 			     64,
@@ -3805,9 +3806,9 @@ int main( int argc, char * const argv[] )
 
 				media_information_model[ 0 ] = 0;
 			}
-			if( device_handle_get_media_information_value(
+			if( device_handle_get_information_value(
 			     device_handle,
-			     "serial_number",
+			     (uint8_t *) "serial_number",
 			     13,
 			     media_information_serial_number,
 			     64,

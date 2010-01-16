@@ -128,7 +128,8 @@ device handle
 * detect bus type
 * determine USB serial number
 
-ewftools:
+Tools:
+* rename wipe/clean buffer to zero buffer
 * add getoptlong support
 * make compilation resilient for missing crypto library
   - compile on system without libcrypto
@@ -213,6 +214,10 @@ Deprecated functions
 Next stable release:
 * full test
 * disable ewfalter, ewfdebug
+
+20100116
+* worked on split RAW support for ewfacquire
+* updated libsmdev, libsmraw
 
 20100110
 * worked fix for restriction on large segment file and chunk
