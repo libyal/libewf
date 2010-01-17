@@ -1428,6 +1428,7 @@ ssize64_t ewfacquire_read_input(
 		}
 		if( acquiry_count >= resume_acquiry_offset )
 		{
+#ifdef OLD
 			read_count = ewfacquire_read_buffer(
 				      imaging_handle,
 				      device_handle,
@@ -1439,6 +1440,13 @@ ssize64_t ewfacquire_read_input(
 				      byte_error_granularity,
 				      wipe_block_on_read_error,
 				      error );
+#else
+			read_count = device_handle_read_buffer(
+				      device_handle,
+				      storage_media_buffer->raw_buffer,
+				      read_size,
+				      error );
+#endif
 
 			if( read_count < 0 )
 			{

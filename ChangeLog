@@ -1,7 +1,11 @@
 TODO
-* check borlanc build
-* refactor file io pool out of io handle?
-* make libewf_convert_date_header_value more strict
+* check borlandc build
+* libewf: refactor file io pool out of io handle?
+* libewf: make libewf_convert_date_header_value more strict
+* ewfacquire: move ewfacquire_read_buffer to device_handle, list read errors
+* device handle:
+  - set error values (retries, granularity and zero flag) in smdev handle
+  - get read errors
 
 Roadmap:
 * improve python bindings
@@ -117,17 +121,6 @@ API changes
   - libewf_add/remove_file for LVF
 * file structure API extension (idea)
 
-device handle
-* add Windows support for accessing memory device
-* detect removable disk
-* detect optical disk
-* determine optical disk sessions
-* detect floppy
-* move fstat to file_io ?
-* improve error detection and output (refactor error string like libbfio)
-* detect bus type
-* determine USB serial number
-
 Tools:
 * rename wipe/clean buffer to zero buffer
 * add getoptlong support
@@ -140,7 +133,6 @@ Tools:
     no, although not set in EWF file, the granualarity is still used in handling read errors
   - warn if values exceed maximum segment count
   - adjust error granularity if error granularity < process buffer size
-  - move ewfacquire_read_buffer to device_handle, list read errors
   - warn if media does not fit using chunk size or APIv1
     a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
   - for EnCase 6 format request serial number and model if not set ?
@@ -215,8 +207,13 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100117
+* worked on moving read error handling into libsmdev
+* updated libsmdev
+
 20100116
 * worked on split RAW support for ewfacquire
+* worked on moving read error handling into libsmdev
 * updated libsmdev, libsmraw
 
 20100110

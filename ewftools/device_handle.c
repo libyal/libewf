@@ -1355,6 +1355,118 @@ int device_handle_get_information_value(
 	return( result );
 }
 
+/* Retrieves the amount of read errors
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_amount_of_read_errors(
+     device_handle_t *device_handle,
+     int *amount_of_errors,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_amount_of_read_errors";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_get_amount_of_errors(
+		     device_handle->dev_input_handle,
+		     amount_of_errors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of read errors.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		if( amount_of_errors == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid amount of read errors.",
+			 function );
+
+			return( -1 );
+		}
+		*amount_of_errors = 0;
+	}
+	return( 1 );
+}
+
+/* Retrieves the information of a read error
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_read_error(
+     device_handle_t *device_handle,
+     int index,
+     off64_t *offset,
+     size64_t *size,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_amount_of_read_errors";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_get_error(
+		     device_handle->dev_input_handle,
+		     index,
+		     offset,
+		     size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of read errors.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid index value out of range.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Print the media information to a stream
  * Returns 1 if successful or -1 on error
  */
