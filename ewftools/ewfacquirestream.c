@@ -118,7 +118,7 @@ void usage_fprint(
 	                 "                        [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
 	                 "                        [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                        [ -S segment_file_size ] [ -t target ]\n"
-	                 "                        [ -2 secondary_target ] [ -hqsvVw ]\n\n" );
+	                 "                        [ -2 secondary_target ] [ -hqsvV ]\n\n" );
 
 	fprintf( stream, "\tReads data from stdin\n\n" );
 
@@ -171,7 +171,6 @@ void usage_fprint(
 	fprintf( stream, "\t-t: specify the target file (without extension) to write to (default is image)\n" );
 	fprintf( stream, "\t-v: verbose output to stderr\n" );
 	fprintf( stream, "\t-V: print version\n" );
-	fprintf( stream, "\t-w: wipe sectors on read error (mimic EnCase like behavior)\n" );
 	fprintf( stream, "\t-2: specify the secondary target file (without extension) to write to\n" );
 }
 
@@ -199,7 +198,6 @@ int ewfacquirestream_acquiry_parameters_fprint(
      uint32_t sectors_per_chunk,
      uint32_t sector_error_granularity,
      uint8_t read_error_retry,
-     uint8_t wipe_block_on_read_error,
      liberror_error_t **error )
 {
 	libsystem_character_t acquiry_size_string[ 16 ];
@@ -599,18 +597,6 @@ int ewfacquirestream_acquiry_parameters_fprint(
 	 stream,
 	 "Wipe sectors on read error:\t" );
 
-	if( wipe_block_on_read_error == 0 )
-	{
-		fprintf(
-		 stream,
-		 "no\n" );
-	}
-	else
-	{
-		fprintf(
-		 stream,
-		 "yes\n" );
-	}
 	fprintf(
 	 stream,
 	 "\n" );
@@ -875,7 +861,6 @@ ssize64_t ewfacquirestream_read_input(
            uint32_t bytes_per_sector,
            uint8_t swap_byte_pairs,
            uint8_t read_error_retry,
-           uint8_t wipe_block_on_read_error,
            size_t process_buffer_size,
            libsystem_character_t *calculated_md5_hash_string,
            size_t calculated_md5_hash_string_size,
@@ -1292,7 +1277,6 @@ int main( int argc, char * const argv[] )
 	uint8_t resume_acquiry                             = 0;
 	uint8_t swap_byte_pairs                            = 0;
 	uint8_t verbose                                    = 0;
-	uint8_t wipe_block_on_read_error                   = 0;
 	int error_abort                                    = 0;
 	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
 	int result                                         = 0;
@@ -1349,7 +1333,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:qsS:t:vVw2:" ) ) ) != (libsystem_integer_t) -1 )
+	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:qsS:t:vV2:" ) ) ) != (libsystem_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1675,11 +1659,6 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'w':
-				wipe_block_on_read_error = 1;
-
-				break;
-
 			case (libsystem_integer_t) '2':
 				secondary_target_filename = optarg;
 
@@ -1936,7 +1915,6 @@ int main( int argc, char * const argv[] )
 		     sectors_per_chunk,
 		     sector_error_granularity,
 		     read_error_retry,
-		     wipe_block_on_read_error,
 		     &error ) != 1 )
 		{
 			fprintf(
@@ -2224,7 +2202,6 @@ int main( int argc, char * const argv[] )
 		               bytes_per_sector,
 		               swap_byte_pairs,
 		               read_error_retry,
-		               wipe_block_on_read_error,
 		               (size_t) process_buffer_size,
 		               calculated_md5_hash_string,
 		               DIGEST_HASH_STRING_SIZE_MD5,
@@ -2356,37 +2333,6 @@ int main( int argc, char * const argv[] )
 				log_handle_free(
 				 &log_handle,
 				 NULL );
-			}
-		}
-		if( imaging_handle_acquiry_errors_fprint(
-		     ewfacquirestream_imaging_handle,
-		     stdout,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to print acquiry errors.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		if( log_handle != NULL )
-		{
-			if( imaging_handle_acquiry_errors_fprint(
-			    ewfacquirestream_imaging_handle,
-			    log_handle->log_stream,
-			    &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to write acquiry errors in log file.\n" );
-
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
 			}
 		}
 	}

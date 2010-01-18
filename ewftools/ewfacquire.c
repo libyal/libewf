@@ -56,6 +56,7 @@
 #define EWFACQUIRE_2_TIB		0x20000000000ULL
 #define EWFACQUIRE_INPUT_BUFFER_SIZE	64
 
+device_handle_t *ewfacquire_device_handle   = NULL;
 imaging_handle_t *ewfacquire_imaging_handle = NULL;
 int ewfacquire_abort                        = 0;
 
@@ -212,7 +213,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         uint32_t bytes_per_sector,
         uint32_t sectors_per_chunk,
         uint32_t sector_error_granularity,
-        uint8_t read_error_retry,
+        uint8_t read_error_retries,
         uint8_t wipe_block_on_read_error,
         liberror_error_t **error )
 {
@@ -625,7 +626,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	fprintf(
 	 stream,
 	 "Retries on read error:\t\t%" PRIu8 "\n",
-	 read_error_retry );
+	 read_error_retries );
 
 	fprintf(
 	 stream,
@@ -703,508 +704,6 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	return( input_confirmed );
 }
 
-/* Reads a chunk of data from the file descriptor into the buffer
- * Returns the amount of bytes read, 0 if at end of input or -1 on error
- */
-ssize_t ewfacquire_read_buffer(
-         imaging_handle_t *imaging_handle,
-         device_handle_t *device_handle,
-         uint8_t *buffer,
-         size_t read_size,
-         off64_t current_offset,
-         size64_t total_input_size,
-         uint8_t read_error_retry,
-         uint32_t byte_error_granularity,
-         uint8_t wipe_block_on_read_error,
-         liberror_error_t **error )
-{
-	libsystem_character_t error_string[ 128 ];
-
-	static char *function               = "ewfacquire_read_buffer";
-	off64_t current_read_offset         = 0;
-	off64_t current_calculated_offset   = 0;
-	off64_t read_error_offset           = 0;
-	ssize_t read_count                  = 0;
-	ssize_t read_error_buffer_offset    = 0;
-	size_t remaining_read_size          = 0;
-	size_t read_remaining_bytes         = 0;
-	size_t error_remaining_bytes        = 0;
-	size_t read_error_amount_of_bytes   = 0;
-	uint32_t error_skip_bytes           = 0;
-	uint32_t error_granularity_offset   = 0;
-	int16_t read_amount_of_errors       = 0;
-
-	if( imaging_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid imaging handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( device_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid device handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( buffer == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( read_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid read size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( current_offset < 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid current offset less than zero.",
-		 function );
-
-		return( -1 );
-	}
-	if( byte_error_granularity == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid byte error granularity zero or less.",
-		 function );
-
-		return( -1 );
-	}
-	remaining_read_size = read_size;
-
-	while( read_amount_of_errors <= (int16_t) read_error_retry )
-	{
-		if( ewfacquire_abort != 0 )
-		{
-			break;
-		}
-		read_count = device_handle_read_buffer(
-			      device_handle,
-			      &( buffer[ read_error_buffer_offset ] ),
-			      remaining_read_size,
-			      error );
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-		if( libsystem_notify_verbose != 0 )
-		{
-			libsystem_notify_printf(
-			 "%s: read buffer at offset: %" PRIu64 " of size: %" PRIzd ".\n",
-			 function,
-			 current_offset + (off64_t) read_error_buffer_offset,
-			 read_count );
-		}
-#endif
-
-		if( read_count < 0 )
-		{
-			if( ( errno == ESPIPE )
-			 || ( errno == EPERM )
-			 || ( errno == ENXIO )
-			 || ( errno == ENODEV ) )
-			{
-				if( libsystem_error_copy_to_string(
-				     errno,
-				     error_string,
-				     128,
-				     error ) == 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_READ_FAILED,
-					 "%s: error reading data: " PRIs_LIBSYSTEM ".",
-					 function,
-					 error_string );
-				}
-				else if( errno == ESPIPE )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_READ_FAILED,
-					 "%s: error reading data: invalid seek.",
-					 function );
-				}
-				else if( errno == EPERM )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_READ_FAILED,
-					 "%s: error reading data: operation not permitted.",
-					 function );
-				}
-				else if( errno == ENXIO )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_READ_FAILED,
-					 "%s: error reading data: no such device or address.",
-					 function );
-				}
-				else if( errno == ENODEV )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_READ_FAILED,
-					 "%s: error reading data: no such device.",
-					 function );
-				}
-				return( -1 );
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libsystem_error_copy_to_string(
-			     errno,
-			     error_string,
-			     128,
-			     error ) == 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: error reading data: %" PRIs_LIBSYSTEM ".",
-				 function,
-				 error_string );
-			}
-			else
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: error reading data.",
-				 function );
-			}
-#endif
-			if( ( error != NULL )
-			 && ( *error != NULL ) )
-			{
-				libsystem_notify_print_error_backtrace(
-				 *error );
-			}
-			liberror_error_free(
-			 error );
-
-			current_calculated_offset = current_offset + (off64_t) read_error_buffer_offset;
-
-			current_read_offset = device_handle_seek_offset(
-					       device_handle,
-					       0,
-					       SEEK_CUR,
-			                       error );
-
-			if( current_read_offset != current_calculated_offset )
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( libsystem_notify_verbose != 0 )
-				{
-					libsystem_notify_printf(
-					 "%s: correcting offset drift calculated: %" PRIjd ", current: %" PRIjd ".\n",
-					 function,
-					 current_calculated_offset,
-					 current_read_offset );
-				}
-#endif
-
-				if( current_read_offset < current_calculated_offset )
-				{
-					libsystem_notify_printf(
-					 "%s: unable to correct offset drift.\n",
-					 function );
-
-					return( -1 );
-				}
-				read_count = (ssize_t) ( current_read_offset - current_calculated_offset );
-			}
-		}
-		else
-		{
-			/* The last read is OK, correct read_count
-			 */
-			if( read_count == (ssize_t) remaining_read_size )
-			{
-				read_count = read_error_buffer_offset + remaining_read_size;
-			}
-			/* The entire read is OK
-			 */
-			if( read_count == (ssize_t) read_size )
-			{
-				break;
-			}
-			/* Check if the end of the input was reached
-			 */
-			if( ( current_offset + (off64_t) read_count ) >= (off64_t) total_input_size )
-			{
-				break;
-			}
-			/* No bytes were read
-			 */
-			if( read_count == 0 )
-			{
-				return( 0 );
-			}
-		}
-		/* Make sure read count is not negative
-		 */
-		if( read_count > 0 )
-		{
-			read_error_buffer_offset += read_count;
-			remaining_read_size      -= (size_t) read_count;
-		}
-		/* There was a read error
-		 */
-		read_amount_of_errors++;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-		if( libsystem_notify_verbose != 0 )
-		{
-			libsystem_notify_printf(
-			 "%s: read error: %" PRIi16 " at offset %" PRIjd ".\n",
-			 function,
-			 read_amount_of_errors,
-			 current_offset + (off64_t) read_error_buffer_offset );
-		}
-#endif
-
-		if( read_amount_of_errors > (int16_t) read_error_retry )
-		{
-			/* Check if last chunk is smaller than the chunk size and take corrective measures
-			 */
-			if( ( current_offset + (off64_t) read_size ) > (off64_t) total_input_size )
-			{
-				read_remaining_bytes = (size_t) ( total_input_size - current_offset );
-			}
-			else
-			{
-				read_remaining_bytes = read_size;
-			}
-			if( read_remaining_bytes > (size_t) SSIZE_MAX )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-				 "%s: invalid remaining bytes value exceeds maximum.",
-				 function );
-
-				return( -1 );
-			}
-			error_remaining_bytes    = read_remaining_bytes - read_error_buffer_offset;
-			read_error_offset        = current_offset;
-			error_granularity_offset = ( read_error_buffer_offset / byte_error_granularity ) * byte_error_granularity;
-			error_skip_bytes         = ( error_granularity_offset + byte_error_granularity ) - read_error_buffer_offset;
-
-			if( wipe_block_on_read_error == 1 )
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( libsystem_notify_verbose != 0 )
-				{
-					libsystem_notify_printf(
-					 "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
-					 function,
-					 byte_error_granularity,
-					 error_granularity_offset );
-				}
-#endif
-
-				if( memory_set(
-				     &( buffer[ error_granularity_offset ] ),
-				     0,
-				     byte_error_granularity ) == NULL )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to wipe data in chunk on error.",
-					 function );
-
-					return( -1 );
-				}
-				read_error_offset         += error_granularity_offset;
-				read_error_amount_of_bytes = byte_error_granularity;
-			}
-			else
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( libsystem_notify_verbose != 0 )
-				{
-					libsystem_notify_printf(
-					 "%s: wiping remainder of block: %" PRIu32 " at offset %" PRIzd ".\n",
-					 function,
-					 error_skip_bytes,
-					 read_error_buffer_offset );
-				}
-#endif
-
-				if( memory_set(
-				     &( buffer[ read_error_buffer_offset ] ),
-				     0,
-				     error_skip_bytes ) == NULL )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to wipe data in chunk on error.",
-					 function );
-
-					return( -1 );
-				}
-				read_error_offset         += read_error_buffer_offset;
-				read_error_amount_of_bytes = error_skip_bytes;
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libsystem_notify_verbose != 0 )
-			{
-				libsystem_notify_printf(
-				 "%s: adding read error at offset: %" PRIu64 ", amount of bytes: %" PRIu32 ".\n",
-				 function,
-				 read_error_offset,
-				 read_error_amount_of_bytes );
-			}
-#endif
-
-			if( imaging_handle_add_read_error(
-			     imaging_handle,
-			     read_error_offset,
-			     read_error_amount_of_bytes,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add read errror.",
-				 function );
-
-				return( -1 );
-			}
-			/* At the end of the input
-			 */
-			if( ( current_offset + (off64_t) read_remaining_bytes ) >= (off64_t) total_input_size )
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( libsystem_notify_verbose != 0 )
-				{
-					libsystem_notify_printf(
-					 "%s: at end of input no remaining bytes to read from chunk.\n",
-					 function );
-				}
-#endif
-
-				read_count = (ssize_t) read_remaining_bytes;
-
-				break;
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libsystem_notify_verbose != 0 )
-			{
-				libsystem_notify_printf(
-				 "%s: skipping %" PRIu32 " bytes.\n",
-				 function,
-				 error_skip_bytes );
-			}
-#endif
-
-			if( device_handle_seek_offset(
-			     device_handle,
-			     error_skip_bytes,
-			     SEEK_CUR,
-			     error ) == -1 )
-			{
-				if( libsystem_error_copy_to_string(
-				     errno,
-				     error_string,
-				     128,
-				     error ) == 1 )
-				{
-					libsystem_notify_printf(
-					 "%s: unable skip %" PRIu32 " bytes after sector with error: %" PRIs_LIBSYSTEM ".",
-					 function,
-					 error_skip_bytes,
-					 error_string );
-				}
-				else
-				{
-					libsystem_notify_printf(
-					 "%s: unable to skip %" PRIu32 " bytes after sector.",
-					 function,
-					 error_skip_bytes );
-				}
-				return( -1 );
-			}
-			/* If error granularity skip is still within the chunk
-			 */
-			if( error_remaining_bytes > byte_error_granularity )
-			{
-				remaining_read_size       = error_remaining_bytes - error_skip_bytes;
-				read_error_buffer_offset += error_skip_bytes;
-				read_amount_of_errors     = 0;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( libsystem_notify_verbose != 0 )
-				{
-					libsystem_notify_printf(
-					 "%s: %" PRIzd " bytes remaining to read from chunk.\n",
-					 function,
-					 remaining_read_size );
-				}
-#endif
-			}
-			else
-			{
-				read_count = (ssize_t) read_remaining_bytes;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( libsystem_notify_verbose != 0 )
-				{
-					libsystem_notify_printf(
-					 "%s: no bytes remaining to read from chunk.\n",
-					 function );
-				}
-#endif
-
-				break;
-			}
-		}
-	}
-	return( read_count );
-}
-
 /* Reads data from a file descriptor and writes it in EWF format
  * Returns the amount of bytes written or -1 on error
  */
@@ -1218,8 +717,6 @@ ssize64_t ewfacquire_read_input(
            uint32_t bytes_per_sector,
            uint8_t swap_byte_pairs,
            uint32_t sector_error_granularity,
-           uint8_t read_error_retry,
-           uint8_t wipe_block_on_read_error,
            size_t process_buffer_size,
            libsystem_character_t *calculated_md5_hash_string,
            size_t calculated_md5_hash_string_size,
@@ -1230,6 +727,8 @@ ssize64_t ewfacquire_read_input(
 {
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	static char *function                        = "ewfacquire_read_input";
+	off64_t read_error_offset                    = 0;
+	size64_t read_error_size                     = 0;
 	ssize64_t acquiry_count                      = 0;
 	size_t read_size                             = 0;
 	ssize_t read_count                           = 0;
@@ -1237,6 +736,8 @@ ssize64_t ewfacquire_read_input(
 	ssize_t write_count                          = 0;
 	uint32_t byte_error_granularity              = 0;
 	uint32_t chunk_size                          = 0;
+	int amount_of_read_errors                    = 0;
+	int read_error_iterator                      = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -1428,25 +929,11 @@ ssize64_t ewfacquire_read_input(
 		}
 		if( acquiry_count >= resume_acquiry_offset )
 		{
-#ifdef OLD
-			read_count = ewfacquire_read_buffer(
-				      imaging_handle,
-				      device_handle,
-				      storage_media_buffer->raw_buffer,
-				      storage_media_buffer->raw_buffer_size,
-				      acquiry_offset + acquiry_count,
-				      acquiry_size,
-				      read_error_retry,
-				      byte_error_granularity,
-				      wipe_block_on_read_error,
-				      error );
-#else
 			read_count = device_handle_read_buffer(
 				      device_handle,
 				      storage_media_buffer->raw_buffer,
 				      read_size,
 				      error );
-#endif
 
 			if( read_count < 0 )
 			{
@@ -1702,6 +1189,58 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( acquiry_count >= resume_acquiry_offset )
 	{
+		if( device_handle_get_amount_of_read_errors(
+		     device_handle,
+		     &amount_of_read_errors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of read errors.",
+			 function );
+
+			return( -1 );
+		}
+		for( read_error_iterator = 0;
+		     read_error_iterator < amount_of_read_errors;
+		     read_error_iterator++ )
+		{
+			if( device_handle_get_read_error(
+			     device_handle,
+			     read_error_iterator,
+			     &read_error_offset,
+			     &read_error_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve read error: %d.",
+				 function,
+				 read_error_iterator );
+
+				return( -1 );
+			}
+			if( imaging_handle_add_read_error(
+			     imaging_handle,
+			     read_error_offset,
+			     read_error_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to add read errror: %d to imaging handle.",
+				 function,
+				 read_error_iterator );
+
+				return( -1 );
+			}
+		}
 		write_count = imaging_handle_finalize(
 			       imaging_handle,
 			       calculated_md5_hash_string,
@@ -1736,21 +1275,37 @@ void ewfacquire_signal_handler(
 
 	ewfacquire_abort = 1;
 
-	if( ( ewfacquire_imaging_handle != NULL )
-	 && ( imaging_handle_signal_abort(
-	       ewfacquire_imaging_handle,
-	       &error ) != 1 ) )
+	if( ewfacquire_device_handle != NULL )
 	{
-		libsystem_notify_printf(
-		 "%s: unable to signal imaging handle to abort.\n",
-		 function );
+		if( device_handle_signal_abort(
+		     ewfacquire_device_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal device handle to abort.\n",
+			 function );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+	}
+	if( ewfacquire_imaging_handle != NULL )
+	{
+		if( imaging_handle_signal_abort(
+		     ewfacquire_imaging_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal imaging handle to abort.\n",
+			 function );
 
-		return;
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
@@ -1775,8 +1330,6 @@ int main( int argc, char * const argv[] )
 	libsystem_character_t input_buffer[ EWFACQUIRE_INPUT_BUFFER_SIZE ];
 	libsystem_character_t media_information_model[ 64 ];
 	libsystem_character_t media_information_serial_number[ 64 ];
-
-	device_handle_t *device_handle                          = NULL;
 
 	liberror_error_t *error                                 = NULL;
 
@@ -1828,7 +1381,7 @@ int main( int argc, char * const argv[] )
 	uint8_t media_flags                                     = LIBEWF_MEDIA_FLAG_PHYSICAL;
 	uint8_t media_type                                      = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                        = 1;
-	uint8_t read_error_retry                                = 2;
+	uint8_t read_error_retries                              = 2;
 	uint8_t resume_acquiry                                  = 0;
 	uint8_t swap_byte_pairs                                 = 0;
 	uint8_t verbose                                         = 0;
@@ -1840,7 +1393,7 @@ int main( int argc, char * const argv[] )
 	int argument_set_format                                 = 0;
 	int argument_set_media_type                             = 0;
 	int argument_set_offset                                 = 0;
-	int argument_set_read_error_retry                       = 0;
+	int argument_set_read_error_retries                     = 0;
 	int argument_set_sector_error_granularity               = 0;
 	int argument_set_sectors_per_chunk                      = 0;
 	int argument_set_segment_file_size                      = 0;
@@ -2255,9 +1808,9 @@ int main( int argc, char * const argv[] )
 					 "Unsupported amount of read error retries defaulting to: %" PRIu64 ".\n",
 					 input_size_variable );
 				}
-				read_error_retry = (uint8_t) input_size_variable;
+				read_error_retries = (uint8_t) input_size_variable;
 
-				argument_set_read_error_retry = 1;
+				argument_set_read_error_retries = 1;
 
 				break;
 
@@ -2372,7 +1925,7 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	if( device_handle_initialize(
-	     &device_handle,
+	     &ewfacquire_device_handle,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -2393,7 +1946,7 @@ int main( int argc, char * const argv[] )
 	/* Open the input file or device size
 	 */
 	if( device_handle_open_input(
-	     device_handle,
+	     ewfacquire_device_handle,
 	     &( argv[ optind ] ),
 	     argc - optind,
 	     &error ) != 1 )
@@ -2409,13 +1962,13 @@ int main( int argc, char * const argv[] )
 		 &error );
 
 		device_handle_free(
-		 &device_handle,
+		 &ewfacquire_device_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
 	}
 	if( device_handle_get_media_size(
-	     device_handle,
+	     ewfacquire_device_handle,
 	     &media_size,
 	     &error ) != 1 )
 	{
@@ -2429,10 +1982,10 @@ int main( int argc, char * const argv[] )
 		 &error );
 
 		device_handle_close(
-		 device_handle,
+		 ewfacquire_device_handle,
 		 NULL );
 		device_handle_free(
-		 &device_handle,
+		 &ewfacquire_device_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -2440,7 +1993,7 @@ int main( int argc, char * const argv[] )
 	if( argument_set_bytes_per_sector == 0 )
 	{
 		if( device_handle_get_bytes_per_sector(
-		     device_handle,
+		     ewfacquire_device_handle,
 		     &bytes_per_sector,
 		     &error ) != 1 )
 		{
@@ -2454,10 +2007,10 @@ int main( int argc, char * const argv[] )
 			 &error );
 
 			device_handle_close(
-			 device_handle,
+			 ewfacquire_device_handle,
 			 NULL );
 			device_handle_free(
-			 &device_handle,
+			 &ewfacquire_device_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -2466,7 +2019,7 @@ int main( int argc, char * const argv[] )
 	if( argument_set_media_type == 0 )
 	{
 		 if( device_handle_get_media_type(
-		      device_handle,
+		      ewfacquire_device_handle,
 		      &media_type,
 		      &error ) != 1 )
 		{
@@ -2483,7 +2036,7 @@ int main( int argc, char * const argv[] )
 		}
 	}
 	if( device_handle_media_information_fprint(
-	     device_handle,
+	     ewfacquire_device_handle,
 	     stdout,
 	     &error ) != 1 )
 	{
@@ -2913,10 +2466,10 @@ int main( int argc, char * const argv[] )
 			 target_filename );
 		}
 		device_handle_close(
-		 device_handle,
+		 ewfacquire_device_handle,
 		 NULL );
 		device_handle_free(
-		 &device_handle,
+		 &ewfacquire_device_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -3599,9 +3152,9 @@ int main( int argc, char * const argv[] )
 				sector_error_granularity = (uint32_t) input_size_variable;
 			}
 		}
-		/* The amount of read error retry
+		/* The amount of read error retries
 		 */
-		if( argument_set_read_error_retry == 0 )
+		if( argument_set_read_error_retries == 0 )
 		{
 			if( ewfinput_get_size_variable(
 			     stdout,
@@ -3626,7 +3179,7 @@ int main( int argc, char * const argv[] )
 				 "Unable to determine read error retry defaulting to: %" PRIu64 ".\n",
 				 input_size_variable );
 			}
-			read_error_retry = (uint8_t) input_size_variable;
+			read_error_retries = (uint8_t) input_size_variable;
 		}
 		/* Wipe the sector on error
 		 */
@@ -3701,7 +3254,7 @@ int main( int argc, char * const argv[] )
 		                                bytes_per_sector,
 		                                sectors_per_chunk,
 		                                sector_error_granularity,
-		                                read_error_retry,
+		                                read_error_retries,
 		                                wipe_block_on_read_error,
 		                                &error );
 
@@ -3723,7 +3276,7 @@ int main( int argc, char * const argv[] )
 			argument_set_format                   = 0;
 			argument_set_media_type               = 0;
 			argument_set_offset                   = 0;
-			argument_set_read_error_retry         = 0;
+			argument_set_read_error_retries       = 0;
 			argument_set_sector_error_granularity = 0;
 			argument_set_sectors_per_chunk        = 0;
 			argument_set_segment_file_size        = 0;
@@ -3796,7 +3349,7 @@ int main( int argc, char * const argv[] )
 			acquiry_software_version = _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
 			if( device_handle_get_information_value(
-			     device_handle,
+			     ewfacquire_device_handle,
 			     (uint8_t *) "model",
 			     5,
 			     media_information_model,
@@ -3815,7 +3368,7 @@ int main( int argc, char * const argv[] )
 				media_information_model[ 0 ] = 0;
 			}
 			if( device_handle_get_information_value(
-			     device_handle,
+			     ewfacquire_device_handle,
 			     (uint8_t *) "serial_number",
 			     13,
 			     media_information_serial_number,
@@ -3833,6 +3386,10 @@ int main( int argc, char * const argv[] )
 
 				media_information_serial_number[ 0 ] = 0;
 			}
+		}
+		if( ( ewfacquire_abort == 0 )
+		 && ( error_abort == 0 ) )
+		{
 			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
 			     target_filename,
@@ -3842,10 +3399,6 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Unable to open output file(s).\n" );
-
-				imaging_handle_free(
-				 &ewfacquire_imaging_handle,
-				 NULL );
 
 				error_abort = 1;
 			}
@@ -3865,12 +3418,33 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to open secondary output file(s).\n" );
 
-					imaging_handle_free(
-					 &ewfacquire_imaging_handle,
+					imaging_handle_close(
+					 ewfacquire_imaging_handle,
 					 NULL );
 
 					error_abort = 1;
 				}
+			}
+		}
+		if( ( ewfacquire_abort == 0 )
+		 && ( error_abort == 0 ) )
+		{
+			if( device_handle_set_error_values(
+			     ewfacquire_device_handle,
+			     read_error_retries,
+			     sector_error_granularity * bytes_per_sector,
+			     wipe_block_on_read_error,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to initialize output settings.\n" );
+
+				imaging_handle_close(
+				 ewfacquire_imaging_handle,
+				 NULL );
+
+				error_abort = 1;
 			}
 		}
 		if( ( ewfacquire_abort == 0 )
@@ -4001,10 +3575,10 @@ int main( int argc, char * const argv[] )
 		 NULL );
 
 		device_handle_close(
-		 device_handle,
+		 ewfacquire_device_handle,
 		 NULL );
 		device_handle_free(
-		 &device_handle,
+		 &ewfacquire_device_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -4028,10 +3602,10 @@ int main( int argc, char * const argv[] )
 			 NULL );
 
 			device_handle_close(
-			 device_handle,
+			 ewfacquire_device_handle,
 			 NULL );
 			device_handle_free(
-			 &device_handle,
+			 &ewfacquire_device_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -4059,10 +3633,10 @@ int main( int argc, char * const argv[] )
 			 NULL );
 
 			device_handle_close(
-			 device_handle,
+			 ewfacquire_device_handle,
 			 NULL );
 			device_handle_free(
-			 &device_handle,
+			 &ewfacquire_device_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -4106,10 +3680,10 @@ int main( int argc, char * const argv[] )
 			 NULL );
 
 			device_handle_close(
-			 device_handle,
+			 ewfacquire_device_handle,
 			 NULL );
 			device_handle_free(
-			 &device_handle,
+			 &ewfacquire_device_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -4149,10 +3723,10 @@ int main( int argc, char * const argv[] )
 			 NULL );
 
 			device_handle_close(
-			 device_handle,
+			 ewfacquire_device_handle,
 			 NULL );
 			device_handle_free(
-			 &device_handle,
+			 &ewfacquire_device_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -4161,7 +3735,7 @@ int main( int argc, char * const argv[] )
 		 */
 		read_count = ewfacquire_read_input(
 		              ewfacquire_imaging_handle,
-		              device_handle,
+		              ewfacquire_device_handle,
 		              media_size,
 		              (size64_t) acquiry_size,
 		              (off64_t) acquiry_offset,
@@ -4169,8 +3743,6 @@ int main( int argc, char * const argv[] )
 		              bytes_per_sector,
 		              swap_byte_pairs,
 		              sector_error_granularity,
-		              read_error_retry,
-		              wipe_block_on_read_error,
 		              (size_t) process_buffer_size,
 		              calculated_md5_hash_string,
 		              DIGEST_HASH_STRING_SIZE_MD5,
@@ -4193,88 +3765,12 @@ int main( int argc, char * const argv[] )
 			status = PROCESS_STATUS_COMPLETED;
 		}
 	}
-	/* Done acquiring data
-	 */
-	if( device_handle_close(
-	     device_handle,
-	     &error ) != 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to close input file or device.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		process_status_free(
-		 &process_status,
-		 NULL );
-
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		imaging_handle_close(
-		 ewfacquire_imaging_handle,
-		 NULL );
-		imaging_handle_free(
-		 &ewfacquire_imaging_handle,
-		 NULL );
-
-		device_handle_free(
-		 &device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( device_handle_free(
-	     &device_handle,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free device handle.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		process_status_free(
-		 &process_status,
-		 NULL );
-
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		imaging_handle_close(
-		 ewfacquire_imaging_handle,
-		 NULL );
-		imaging_handle_free(
-		 &ewfacquire_imaging_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
 	if( ewfacquire_abort != 0 )
 	{
 		status = PROCESS_STATUS_ABORTED;
 	}
+	/* Done acquiring data
+	 */
 	if( process_status_stop(
 	     process_status,
 	     (size64_t) read_count,
@@ -4311,6 +3807,13 @@ int main( int argc, char * const argv[] )
 		 &ewfacquire_imaging_handle,
 		 NULL );
 
+		device_handle_close(
+		 ewfacquire_device_handle,
+		 NULL );
+		device_handle_free(
+		 &ewfacquire_device_handle,
+		 NULL );
+
 		return( EXIT_FAILURE );
 	}
 	if( process_status_free(
@@ -4341,6 +3844,13 @@ int main( int argc, char * const argv[] )
 		 NULL );
 		imaging_handle_free(
 		 &ewfacquire_imaging_handle,
+		 NULL );
+
+		device_handle_close(
+		 ewfacquire_device_handle,
+		 NULL );
+		device_handle_free(
+		 &ewfacquire_device_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -4382,14 +3892,14 @@ int main( int argc, char * const argv[] )
 				 NULL );
 			}
 		}
-		if( imaging_handle_acquiry_errors_fprint(
-		     ewfacquire_imaging_handle,
+		if( device_handle_read_errors_fprint(
+		     ewfacquire_device_handle,
 		     stdout,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to print acquiry errors.\n" );
+			 "Unable to print device read errors.\n" );
 
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -4398,14 +3908,14 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_handle != NULL )
 		{
-			if( imaging_handle_acquiry_errors_fprint(
-			    ewfacquire_imaging_handle,
+			if( device_handle_read_errors_fprint(
+			    ewfacquire_device_handle,
 			    log_handle->log_stream,
 			    &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to write acquiry errors in log file.\n" );
+				 "Unable to write device read errors in log file.\n" );
 
 				libsystem_notify_print_error_backtrace(
 				 error );
@@ -4450,6 +3960,13 @@ int main( int argc, char * const argv[] )
 		 &ewfacquire_imaging_handle,
 		 NULL );
 
+		device_handle_close(
+		 ewfacquire_device_handle,
+		 NULL );
+		device_handle_free(
+		 &ewfacquire_device_handle,
+		 NULL );
+
 		return( EXIT_FAILURE );
 	}
 	if( imaging_handle_free(
@@ -4474,6 +3991,75 @@ int main( int argc, char * const argv[] )
 			 &log_handle,
 			 NULL );
 		}
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		device_handle_close(
+		 ewfacquire_device_handle,
+		 NULL );
+		device_handle_free(
+		 &ewfacquire_device_handle,
+		 NULL );
+
+		return( EXIT_FAILURE );
+	}
+	if( device_handle_close(
+	     ewfacquire_device_handle,
+	     &error ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to close input file or device.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		process_status_free(
+		 &process_status,
+		 NULL );
+
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		device_handle_free(
+		 &ewfacquire_device_handle,
+		 NULL );
+
+		return( EXIT_FAILURE );
+	}
+	if( device_handle_free(
+	     &ewfacquire_device_handle,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free device handle.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		process_status_free(
+		 &process_status,
+		 NULL );
+
 		if( calculate_sha1 == 1 )
 		{
 			memory_free(

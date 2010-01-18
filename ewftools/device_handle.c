@@ -202,6 +202,63 @@ int device_handle_free(
 	return( result );
 }
 
+/* Signals the device handle to abort
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_signal_abort(
+     device_handle_t *device_handle,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_signal_abort";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_signal_abort(
+		     device_handle->dev_input_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to signal device input handle to abort.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		if( libsmraw_handle_signal_abort(
+		     device_handle->raw_input_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to signal raw input handle to abort.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#endif
+	return( 1 );
+}
+
 /* Opens the input of the device handle
  * Returns 1 if successful or -1 on error
  */
@@ -494,83 +551,80 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
+		/* This function fails on a device
+		 */
+		if( GetFileInformationByHandle(
+		     device_handle->file_handle,
+		     &file_information ) == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_GENERIC,
+			 "%s: unable to retrieve file information.",
+			 function );
+
+			return( -1 );
+		}
+		if( file_information.dwFileAttributes == INVALID_FILE_ATTRIBUTES )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file attributes returned.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( file_information.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) == FILE_ATTRIBUTE_DIRECTORY )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: filename is a directory.",
+			 function );
+
+			return( -1 );
+		}
+		device_handle->type = DEVICE_HANDLE_TYPE_FILE;
+
+		windows_version = GetVersion();
+
+		if( windows_version >= 0x80000000 )
+		{
+			if( GetFileSize(
+			     device_handle->file_handle,
+			     &dword_size ) == 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine file size.",
+				 function );
+
+				return( -1 );
+			}
+			file_size = (size64_t) dword_size;
+		}
 		else
 		{
-			/* This function fails on a device
-			 */
-			if( GetFileInformationByHandle(
+			if( GetFileSizeEx(
 			     device_handle->file_handle,
-			     &file_information ) == 0 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_GENERIC,
-				 "%s: unable to retrieve file information.",
-				 function );
-
-				return( -1 );
-			}
-			if( file_information.dwFileAttributes == INVALID_FILE_ATTRIBUTES )
+			     &large_integer_size ) == 0 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid file attributes returned.",
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine file size.",
 				 function );
 
 				return( -1 );
 			}
-			if( ( file_information.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) == FILE_ATTRIBUTE_DIRECTORY )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-				 "%s: filename is a directory.",
-				 function );
-
-				return( -1 );
-			}
-			device_handle->type = DEVICE_HANDLE_TYPE_FILE;
-
-			windows_version = GetVersion();
-
-			if( windows_version >= 0x80000000 )
-			{
-				if( GetFileSize(
-				     device_handle->file_handle,
-				     &dword_size ) == 0 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to determine file size.",
-					 function );
-
-					return( -1 );
-				}
-				file_size = (size64_t) dword_size;
-			}
-			else
-			{
-				if( GetFileSizeEx(
-				     device_handle->file_handle,
-				     &large_integer_size ) == 0 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to determine file size.",
-					 function );
-
-					return( -1 );
-				}
-				file_size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
-			}
+			file_size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
 		}
 #else
 		if( device_handle->file_descriptor != -1 )
@@ -660,13 +714,7 @@ int device_handle_open_input(
 		}
 		file_size = file_stat.st_size;
 #endif
-		if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
-		{
-			device_handle->media_size           = file_size;
-			device_handle->media_size_set       = 1;
-			device_handle->bytes_per_sector     = 512;
-			device_handle->bytes_per_sector_set = 1;
-		}
+		device_handle->file_size = file_size;
 #endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( 1 );
@@ -1162,7 +1210,7 @@ int device_handle_get_media_size(
 
 			return( -1 );
 		}
-		*media_size = device_handle->media_size;
+		*media_size = device_handle->file_size;
 #endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	return( 1 );
@@ -1355,12 +1403,88 @@ int device_handle_get_information_value(
 	return( result );
 }
 
+/* Sets the error values
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_set_error_values(
+     device_handle_t *device_handle,
+     uint8_t amount_of_error_retries,
+     size_t error_granularity,
+     uint8_t zero_buffer_on_error,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_information_value";
+	uint8_t error_flags   = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_set_amount_of_error_retries(
+		     device_handle->dev_input_handle,
+		     amount_of_error_retries,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set amount of error retries in device input handle.",
+			 function );
+
+			return( -1 );
+		}
+		if( libsmdev_handle_set_error_granularity(
+		     device_handle->dev_input_handle,
+		     error_granularity,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set error granularity in device input handle.",
+			 function );
+
+			return( -1 );
+		}
+		if( zero_buffer_on_error != 0 )
+		{
+			error_flags = LIBSMDEV_ERROR_FLAG_ZERO_ON_ERROR;
+		}
+		if( libsmdev_handle_set_error_flags(
+		     device_handle->dev_input_handle,
+		     error_flags,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set error flags in device input handle.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
 /* Retrieves the amount of read errors
  * Returns 1 if successful or -1 on error
  */
 int device_handle_get_amount_of_read_errors(
      device_handle_t *device_handle,
-     int *amount_of_errors,
+     int *amount_of_read_errors,
      liberror_error_t **error )
 {
 	static char *function = "device_handle_get_amount_of_read_errors";
@@ -1380,7 +1504,7 @@ int device_handle_get_amount_of_read_errors(
 	{
 		if( libsmdev_handle_get_amount_of_errors(
 		     device_handle->dev_input_handle,
-		     amount_of_errors,
+		     amount_of_read_errors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1395,7 +1519,7 @@ int device_handle_get_amount_of_read_errors(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( amount_of_errors == NULL )
+		if( amount_of_read_errors == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -1406,7 +1530,7 @@ int device_handle_get_amount_of_read_errors(
 
 			return( -1 );
 		}
-		*amount_of_errors = 0;
+		*amount_of_read_errors = 0;
 	}
 	return( 1 );
 }
@@ -1860,7 +1984,7 @@ int device_handle_media_information_fprint(
 			return( -1 );
 		}
 #else
-		media_size = device_handle->media_size;
+		media_size = device_handle->file_size;
 #endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	}
 	result = byte_size_string_create(
@@ -1890,5 +2014,135 @@ int device_handle_media_information_fprint(
 	 "\n" );
 
 	return( 1 );
+}
+
+/* Print the read errors to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_read_errors_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
+     liberror_error_t **error )
+{
+	static char *function     = "device_handle_read_errors_fprint";
+	off64_t read_error_offset = 0;
+	size64_t read_error_size  = 0;
+	uint32_t bytes_per_sector = 0;
+	int amount_of_read_errors = 0;
+	int read_error_iterator   = 0;
+	int result                = 1;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_get_bytes_per_sector(
+		     device_handle->dev_input_handle,
+		     &bytes_per_sector,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
+
+			return( -1 );
+		}
+		if( bytes_per_sector == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid bytes per sector returned.",
+			 function );
+
+			return( -1 );
+		}
+		if( libsmdev_handle_get_amount_of_errors(
+		     device_handle->dev_input_handle,
+		     &amount_of_read_errors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of read errors.",
+			 function );
+
+			return( -1 );
+		}
+		if( amount_of_read_errors > 0 )
+		{
+			fprintf(
+			 stream,
+			 "Errors reading device:\n" );
+			fprintf(
+			 stream,
+			 "\ttotal amount: %d\n",
+			 amount_of_read_errors );
+			
+			for( read_error_iterator = 0;
+			     read_error_iterator < amount_of_read_errors;
+			     read_error_iterator++ )
+			{
+				if( libsmdev_handle_get_error(
+				     device_handle->dev_input_handle,
+				     read_error_iterator,
+				     &read_error_offset,
+				     &read_error_size,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve read error: %d.",
+					 function,
+					 read_error_iterator );
+
+					result = -1;
+				}
+				else
+				{
+					fprintf(
+					 stream,
+					 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 " (offset: 0x%08" PRIx64 " of size: %" PRIu64 ")\n",
+					 read_error_offset / bytes_per_sector,
+					 ( read_error_offset + read_error_size ) / bytes_per_sector,
+					 read_error_size / bytes_per_sector,
+					 read_error_offset,
+					 read_error_size );
+				}
+			}
+			fprintf(
+			 stream,
+			 "\n" );
+		}
+	}
+	return( result );
 }
 

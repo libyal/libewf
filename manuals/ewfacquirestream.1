@@ -1,4 +1,4 @@
-.Dd January 2, 2010
+.Dd January 18, 2010
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -25,7 +25,7 @@
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
 .Op Fl 2 Ar secondary_target
-.Op Fl hqsvVw
+.Op Fl hqsvV
 .Sh DESCRIPTION
 .Nm ewfacquirestream
 is a utility to acquire media data from stdin and store it in EWF format (Expert Witness Format).
@@ -95,8 +95,6 @@ the target file (without extension) to write to (default is image)
 verbose output to stderr
 .It Fl V
 print version
-.It Fl w
-wipe sectors on read error (mimic EnCase like behavior)
 .It Fl 2 Ar secondary_target
 the secondary target file (without extension) to write to
 .El
@@ -112,7 +110,7 @@ None
 None
 .Sh EXAMPLES
 .Bd -literal
-# ewfacquirestream \-C 1 \-D Floppy \-E 1.1 \-e 'John D.' \-N 'Just a floppy in my system' \-m removable \-M physical \-t floppy </dev/fd0
+# ewfacquirestream \-C 1 \-D Floppy \-E 1.1 \-e 'John D.' \-N 'Just a floppy in my system' \-m removable \-M logical \-t floppy </dev/fd0
 ewfacquirestream 20090229 (libewf 20090229, libuna 20090124, zlib 1.2.3, libcrypto 0.9.8g, libuuid)
 
 Using the following acquiry parameters:
@@ -123,7 +121,7 @@ Evidence number:                1.1
 Examiner name:                  John D.
 Notes:                          Just a floppy in my system
 Media type:                     removable
-Volume type:                    physical
+Volume type:                    logical
 Compression used:               none
 EWF file format:                EnCase 5
 Acquiry start offet:            0
@@ -132,7 +130,6 @@ Evidence segment file size:     1.4 GiB (1572864000 bytes)
 Block size:                     64 sectors
 Error granularity:              64 sectors
 Retries on read error:          2
-Wipe sectors on read error:     no
 
 Acquiry started at: Sat Feb 28 11:32:41 2009
 

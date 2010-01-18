@@ -264,11 +264,6 @@ ssize_t imaging_handle_finalize(
          size_t calculated_sha1_hash_string_size,
          liberror_error_t **error );
 
-int imaging_handle_acquiry_errors_fprint(
-     imaging_handle_t *imaging_handle,
-     FILE *stream,
-     liberror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

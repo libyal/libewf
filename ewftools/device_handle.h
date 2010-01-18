@@ -86,26 +86,12 @@ struct device_handle
 	 */
 	int file_descriptor;
 #endif
+
+	/* The file size
+	 */
+	size64_t file_size;
+
 #endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
-
-	/* The amount of bytes per sector
-	 */
-	uint32_t bytes_per_sector;
-
-	/* Value to indicate the bytes per sector value was set
-	 */
-	uint8_t bytes_per_sector_set;
-
-#if !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW )
-	/* The media size
-	 */
-	size64_t media_size;
-
-#endif /* !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) */
-
-	/* Value to indicate the media size value was set
-	 */
-	uint8_t media_size_set;
 };
 
 int device_handle_initialize(
@@ -114,6 +100,10 @@ int device_handle_initialize(
 
 int device_handle_free(
      device_handle_t **device_handle,
+     liberror_error_t **error );
+
+int device_handle_signal_abort(
+     device_handle_t *device_handle,
      liberror_error_t **error );
 
 int device_handle_open_input(
@@ -161,6 +151,13 @@ int device_handle_get_information_value(
      size_t information_value_size,
      liberror_error_t **error );
 
+int device_handle_set_error_values(
+     device_handle_t *device_handle,
+     uint8_t amount_of_error_retries,
+     size_t error_granularity,
+     uint8_t zero_buffer_on_error,
+     liberror_error_t **error );
+
 int device_handle_get_amount_of_read_errors(
      device_handle_t *device_handle,
      int *amount_of_errors,
@@ -174,6 +171,11 @@ int device_handle_get_read_error(
      liberror_error_t **error );
 
 int device_handle_media_information_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
+     liberror_error_t **error );
+
+int device_handle_read_errors_fprint(
      device_handle_t *device_handle,
      FILE *stream,
      liberror_error_t **error );
