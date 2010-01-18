@@ -151,6 +151,7 @@ int libewf_write_io_handle_initialize_values(
 int libewf_write_io_handle_initialize_resume(
      libewf_write_io_handle_t *write_io_handle,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
      libewf_segment_table_t *segment_table,
@@ -226,6 +227,7 @@ ssize_t libewf_write_io_handle_process_chunk(
 ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
@@ -248,6 +250,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 ssize_t libewf_write_io_handle_write_existing_chunk(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
@@ -265,6 +268,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 ssize_t libewf_write_io_handle_write_new_chunk_data(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
@@ -286,6 +290,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
          libewf_write_io_handle_t *write_io_handle,
          libewf_read_io_handle_t *read_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *delta_segment_table,
@@ -301,6 +306,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 ssize_t libewf_write_io_handle_finalize(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,

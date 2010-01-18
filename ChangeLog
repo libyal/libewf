@@ -1,6 +1,5 @@
 TODO
 * check borlandc build
-* libewf: refactor file io pool out of io handle?
 * libewf: make libewf_convert_date_header_value more strict
 
 Roadmap:
@@ -104,7 +103,6 @@ API changes
 * add wide character functions definitions by default?
 * add both UTF-8 and UTF-16 header and hash values, file entry name functions
 * libbfio API extension
-  - add means to set pools open handle limit in libewf (partial completed)
   - add means to obtain libbfio handle of media data in ewf
   - add means to set narrow string codepage
   - export libewf_glob_file_io_handle
@@ -209,6 +207,8 @@ Next stable release:
 * removed acquiry error print from ewfacquirestream
 * moved acquiry error print from imaging handle to device handle
 * ewfacquirestream removed wipe on error
+* worked on  means to set pools open handle limit in libewf
+* refactor file io pool from io handle to handle
 
 20100117
 * worked on moving read error handling into libsmdev

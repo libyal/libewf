@@ -42,14 +42,6 @@ struct libewf_io_handle
 	 */
 	uint8_t flags;
 
-	/* The file io pool
-	 */
-	libbfio_pool_t *file_io_pool;
-
-	/* Value to indicate if the pool was created inside the library
-	 */
-	uint8_t pool_created_in_library;
-
 	/* The current chunk
 	 */
 	uint32_t current_chunk;

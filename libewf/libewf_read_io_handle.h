@@ -75,6 +75,7 @@ ssize_t libewf_read_io_handle_process_chunk(
 
 ssize_t libewf_read_io_handle_read_chunk(
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_buffer,
@@ -88,6 +89,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 ssize_t libewf_read_io_handle_read_chunk_data(
          libewf_read_io_handle_t *read_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_chunk_cache_t *chunk_cache,

@@ -102,7 +102,6 @@ int libewf_io_handle_free(
      liberror_error_t **error )
 {
 	static char *function = "libewf_io_handle_free";
-	int result            = 1;
 
 	if( io_handle == NULL )
 	{
@@ -117,30 +116,11 @@ int libewf_io_handle_free(
 	}
 	if( *io_handle != NULL )
 	{
-		if( ( *io_handle )->pool_created_in_library != 0 )
-		{
-			if( ( *io_handle )->file_io_pool != NULL )
-			{
-				if( libbfio_pool_free(
-				     &( ( *io_handle )->file_io_pool ),
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free file io pool.",
-					 function );
-
-					result = -1;
-				}
-			}
-		}
 		memory_free(
 		 *io_handle );
 
 		*io_handle = NULL;
 	}
-	return( result );
+	return( 1 );
 }
 

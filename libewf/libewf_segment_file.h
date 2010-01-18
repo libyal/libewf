@@ -60,6 +60,7 @@ ssize_t libewf_segment_file_read_file_header(
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      int *last_segment_file,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
@@ -73,18 +74,21 @@ int libewf_segment_file_read_sections(
 ssize_t libewf_segment_file_write_headers(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_header_sections_t *header_sections,
          liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_last_section(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          int last_segment_file,
          liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_start(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          uint16_t segment_number,
          uint8_t segment_file_type,
          libewf_media_values_t *media_values,
@@ -95,6 +99,7 @@ ssize_t libewf_segment_file_write_start(
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          ewf_table_offset_t *table_offsets,
          uint32_t amount_of_table_offsets,
@@ -106,6 +111,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 ssize_t libewf_segment_file_write_chunks_section_correction(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          ewf_table_offset_t *table_offsets,
          uint32_t amount_of_table_offsets,
@@ -118,6 +124,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 ssize_t libewf_segment_file_write_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_buffer,
@@ -131,6 +138,7 @@ ssize_t libewf_segment_file_write_chunk(
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_buffer,
@@ -144,6 +152,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          uint16_t segment_number,
          uint32_t segment_amount_of_chunks,
          int last_segment_file,
@@ -158,6 +167,7 @@ ssize_t libewf_segment_file_write_close(
 int libewf_segment_file_write_sections_correction(
      libewf_segment_file_handle_t *segment_file_handle,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      uint16_t segment_number,
      uint32_t segment_amount_of_chunks,
      int last_segment_file,

@@ -87,6 +87,7 @@ int libewf_segment_table_resize(
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
@@ -137,6 +138,7 @@ int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
      uint16_t segment_number,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      liberror_error_t **error );
@@ -144,6 +146,7 @@ int libewf_segment_table_create_segment_file(
 int libewf_segment_table_write_sections_corrections(
      libewf_segment_table_t *segment_table,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      uint32_t last_segment_amount_of_chunks,
      libewf_media_values_t *media_values,
      libewf_values_table_t *hash_values,

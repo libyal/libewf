@@ -409,6 +409,14 @@ LIBEWF_EXTERN int libewf_handle_get_offset(
                    off64_t *offset,
                    libewf_error_t **error );
 
+/* Sets the maximum amount of (concurrent) open file handles
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
+                   libewf_handle_t *handle,
+                   int maximum_amount_of_open_handles,
+                   libewf_error_t **error );
+
 /* Retrieves the segment filename size
  * The filename size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error

@@ -190,7 +190,9 @@ int libewf_segment_table_free(
 	}
 	if( *segment_table != NULL )
 	{
-		for( segment_table_iterator = 0; segment_table_iterator < ( *segment_table )->amount; segment_table_iterator++ )
+		for( segment_table_iterator = 0;
+		     segment_table_iterator < ( *segment_table )->amount;
+		     segment_table_iterator++ )
 		{
 			if( libewf_segment_file_handle_free(
 			     &( ( *segment_table )->segment_file_handle[ segment_table_iterator ] ),
@@ -303,6 +305,7 @@ int libewf_segment_table_resize(
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
@@ -357,7 +360,7 @@ int libewf_segment_table_build(
 	if( segment_table->amount > 2 )
 	{
 		if( libbfio_pool_get_size(
-		     io_handle->file_io_pool,
+		     file_io_pool,
 		     segment_table->segment_file_handle[ 1 ]->file_io_pool_entry,
 		     &( segment_table->maximum_segment_size ),
 		     error ) != 1 )
@@ -394,6 +397,7 @@ int libewf_segment_table_build(
 		result = libewf_segment_file_read_sections(
 		          segment_table->segment_file_handle[ segment_number ],
 		          io_handle,
+		          file_io_pool,
 		          &last_segment_file,
 		          header_sections,
 		          hash_sections,
@@ -1034,6 +1038,7 @@ int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
      uint16_t segment_number,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      liberror_error_t **error )
@@ -1234,7 +1239,7 @@ int libewf_segment_table_create_segment_file(
 		flags = LIBBFIO_OPEN_WRITE_TRUNCATE;
 	}
 	if( libbfio_pool_add_handle(
-	     io_handle->file_io_pool,
+	     file_io_pool,
 	     &file_io_pool_entry,
 	     file_io_handle,
 	     flags,
@@ -1254,7 +1259,7 @@ int libewf_segment_table_create_segment_file(
 		return( -1 );
 	}
 	if( libbfio_pool_open(
-	     io_handle->file_io_pool,
+	     file_io_pool,
 	     file_io_pool_entry,
 	     flags,
 	     error ) != 1 )
@@ -1294,6 +1299,7 @@ int libewf_segment_table_create_segment_file(
 int libewf_segment_table_write_sections_corrections(
      libewf_segment_table_t *segment_table,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      uint32_t last_segment_amount_of_chunks,
      libewf_media_values_t *media_values,
      libewf_values_table_t *hash_values,
@@ -1329,7 +1335,9 @@ int libewf_segment_table_write_sections_corrections(
 
 		return( -1 );
 	}
-	for( segment_table_iterator = 1; segment_table_iterator < segment_table->amount; segment_table_iterator++ )
+	for( segment_table_iterator = 1;
+	     segment_table_iterator < segment_table->amount;
+	     segment_table_iterator++ )
 	{
 		if( segment_table_iterator == ( segment_table->amount - 1 ) )
 		{
@@ -1338,6 +1346,7 @@ int libewf_segment_table_write_sections_corrections(
 		if( libewf_segment_file_write_sections_correction(
 		     segment_table->segment_file_handle[ segment_table_iterator ],
 		     io_handle,
+		     file_io_pool,
 		     segment_table_iterator,
 		     last_segment_amount_of_chunks,
 		     last_segment_file,

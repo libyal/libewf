@@ -316,6 +316,7 @@ int libewf_write_io_handle_initialize_values(
 int libewf_write_io_handle_initialize_resume(
      libewf_write_io_handle_t *write_io_handle,
      libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
      libewf_segment_table_t *segment_table,
@@ -717,7 +718,7 @@ int libewf_write_io_handle_initialize_resume(
 		write_io_handle->segment_amount_of_chunks    = segment_file_handle->amount_of_chunks; 
 
 		if( libbfio_pool_reopen(
-		     io_handle->file_io_pool,
+		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
 		     LIBBFIO_OPEN_READ_WRITE,
 		     error ) != 1 )
@@ -1665,6 +1666,7 @@ ssize_t libewf_write_io_handle_process_chunk(
 ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
@@ -1952,6 +1954,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     segment_table,
 		     segment_number,
 		     io_handle,
+		     file_io_pool,
 		     write_io_handle->maximum_amount_of_segments,
 		     LIBEWF_SEGMENT_FILE_TYPE_EWF,
 		     error ) != 1 )
@@ -1978,6 +1981,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		write_count = libewf_segment_file_write_start(
 		               segment_table->segment_file_handle[ segment_number ],
 		               io_handle,
+		               file_io_pool,
 		               segment_number,
 		               LIBEWF_SEGMENT_FILE_TYPE_EWF,
 		               media_values,
@@ -2044,7 +2048,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	if( write_io_handle->resume_segment_file_offset > 0 )
 	{
 		if( libbfio_pool_seek_offset(
-		     io_handle->file_io_pool,
+		     file_io_pool,
 		     segment_table->segment_file_handle[ segment_number ]->file_io_pool_entry,
 		     write_io_handle->resume_segment_file_offset,
 		     SEEK_SET,
@@ -2099,7 +2103,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_t ) ) + ( 2 * sizeof( ewf_crc_t ) );
 		}
 		if( libbfio_pool_get_offset(
-		     io_handle->file_io_pool,
+		     file_io_pool,
 		     segment_table->segment_file_handle[ segment_number ]->file_io_pool_entry,
 		     &( write_io_handle->chunks_section_offset ),
 		     error ) != 1 )
@@ -2204,6 +2208,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		write_count = libewf_segment_file_write_chunks_section_start(
 		               segment_table->segment_file_handle[ segment_number ],
 		               io_handle,
+		               file_io_pool,
 		               offset_table,
 		               write_io_handle->table_offsets,
 		               write_io_handle->amount_of_table_offsets,
@@ -2244,6 +2249,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	write_count = libewf_segment_file_write_chunk(
 		       segment_table->segment_file_handle[ segment_number ],
 		       io_handle,
+		       file_io_pool,
 		       offset_table,
 		       chunk,
 		       chunk_buffer,
@@ -2287,7 +2293,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_offset_t );
 	}
 	if( libbfio_pool_get_offset(
-	     io_handle->file_io_pool,
+	     file_io_pool,
 	     segment_table->segment_file_handle[ segment_number ]->file_io_pool_entry,
 	     &segment_file_offset,
 	     error ) != 1 )
@@ -2366,6 +2372,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		write_count = libewf_segment_file_write_chunks_section_correction(
 		               segment_table->segment_file_handle[ segment_number ],
 		               io_handle,
+		               file_io_pool,
 		               offset_table,
 		               write_io_handle->table_offsets,
 		               write_io_handle->amount_of_table_offsets,
@@ -2436,6 +2443,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 				write_count = libewf_segment_file_write_close(
 					       segment_table->segment_file_handle[ segment_number ],
 					       io_handle,
+					       file_io_pool,
 					       segment_number,
 					       write_io_handle->segment_amount_of_chunks,
 					       0,
@@ -2472,6 +2480,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 ssize_t libewf_write_io_handle_write_existing_chunk(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *delta_segment_table,
@@ -2746,7 +2755,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			last_section_start_offset = ( (libewf_section_list_values_t * ) last_list_element->value )->start_offset;
 
 			if( libbfio_pool_get_offset(
-			     io_handle->file_io_pool,
+			     file_io_pool,
 			     segment_file_handle->file_io_pool_entry,
 			     &segment_file_offset,
 			     error ) != 1 )
@@ -2764,7 +2773,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			 */
 			if( ( segment_file_offset != last_section_start_offset )
 			 && ( libbfio_pool_seek_offset(
-			       io_handle->file_io_pool,
+			       file_io_pool,
 			       segment_file_handle->file_io_pool_entry,
 			       last_section_start_offset,
 			       SEEK_SET,
@@ -2795,6 +2804,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				write_count = libewf_segment_file_write_last_section(
 					       segment_file_handle,
 					       io_handle,
+					       file_io_pool,
 					       0,
 				               error );
 
@@ -2864,6 +2874,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     delta_segment_table,
 			     segment_number,
 			     io_handle,
+			     file_io_pool,
 			     write_io_handle->maximum_amount_of_segments,
 			     LIBEWF_SEGMENT_FILE_TYPE_DWF,
 			     error ) != 1 )
@@ -2886,6 +2897,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			write_count = libewf_segment_file_write_start(
 				       segment_file_handle,
 				       io_handle,
+				       file_io_pool,
 				       segment_number,
 				       LIBEWF_SEGMENT_FILE_TYPE_DWF,
 				       media_values,
@@ -2914,7 +2926,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		                    - sizeof( ewf_section_t );
 
 		if( libbfio_pool_seek_offset(
-		     io_handle->file_io_pool,
+		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
 		     segment_file_offset,
 		     SEEK_SET,
@@ -2933,7 +2945,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( libbfio_pool_get_offset(
-	     io_handle->file_io_pool,
+	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &segment_file_offset,
 	     error ) != 1 )
@@ -2961,6 +2973,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	write_count = libewf_segment_file_write_delta_chunk(
 		       segment_file_handle,
 		       io_handle,
+		       file_io_pool,
 		       offset_table,
 		       chunk,
 		       chunk_buffer,
@@ -2992,6 +3005,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		write_count = libewf_segment_file_write_last_section(
 			       segment_file_handle,
 			       io_handle,
+			       file_io_pool,
 			       1,
 		               error );
 
@@ -3018,6 +3032,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 ssize_t libewf_write_io_handle_write_new_chunk_data(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
@@ -3296,6 +3311,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		write_count = libewf_write_io_handle_write_new_chunk(
 		               write_io_handle,
 		               io_handle,
+		               file_io_pool,
 		               media_values,
 		               offset_table,
 		               segment_table,
@@ -3340,6 +3356,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
          libewf_write_io_handle_t *write_io_handle,
          libewf_read_io_handle_t *read_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *delta_segment_table,
@@ -3495,6 +3512,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		read_count = libewf_read_io_handle_read_chunk_data(
 		              read_io_handle,
 		              io_handle,
+		              file_io_pool,
 		              media_values,
 		              offset_table,
 		              chunk_cache,
@@ -3576,6 +3594,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 	write_count = libewf_write_io_handle_write_existing_chunk(
 	               write_io_handle,
 	               io_handle,
+	               file_io_pool,
 	               media_values,
 	               offset_table,
 	               delta_segment_table,
@@ -3613,6 +3632,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 ssize_t libewf_write_io_handle_finalize(
          libewf_write_io_handle_t *write_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
@@ -3742,6 +3762,7 @@ ssize_t libewf_write_io_handle_finalize(
 		write_count = libewf_write_io_handle_write_new_chunk_data(
 		               write_io_handle,
 		               io_handle,
+		               file_io_pool,
 		               media_values,
 		               offset_table,
 		               segment_table,
@@ -3808,7 +3829,7 @@ ssize_t libewf_write_io_handle_finalize(
 	if( write_io_handle->resume_segment_file_offset > 0 )
 	{
 		if( libbfio_pool_seek_offset(
-		     io_handle->file_io_pool,
+		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
 		     write_io_handle->resume_segment_file_offset,
 		     SEEK_SET,
@@ -3869,6 +3890,7 @@ ssize_t libewf_write_io_handle_finalize(
 			write_count = libewf_segment_file_write_chunks_section_correction(
 				       segment_file_handle,
 				       io_handle,
+				       file_io_pool,
 				       offset_table,
 			               write_io_handle->table_offsets,
 			               write_io_handle->amount_of_table_offsets,
@@ -3905,6 +3927,7 @@ ssize_t libewf_write_io_handle_finalize(
 		write_count = libewf_segment_file_write_close(
 		               segment_file_handle,
 		               io_handle,
+		               file_io_pool,
 		               segment_number,
 		               write_io_handle->segment_amount_of_chunks,
 		               1,
@@ -3951,6 +3974,7 @@ ssize_t libewf_write_io_handle_finalize(
 		if( libewf_segment_table_write_sections_corrections(
 		     segment_table,
 		     io_handle,
+		     file_io_pool,
 		     write_io_handle->segment_amount_of_chunks,
 		     media_values,
 		     hash_values,

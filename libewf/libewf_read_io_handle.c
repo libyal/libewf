@@ -320,6 +320,7 @@ ssize_t libewf_read_io_handle_process_chunk(
  */
 ssize_t libewf_read_io_handle_read_chunk(
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_buffer,
@@ -479,7 +480,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	/* Make sure the segment file offset is in the right place
 	 */
 	if( libbfio_pool_seek_offset(
-	     io_handle->file_io_pool,
+	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     offset_table->chunk_offset[ chunk ].file_offset,
 	     SEEK_SET,
@@ -532,7 +533,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	/* Read the chunk data
 	 */
 	read_count = libbfio_pool_read(
-	              io_handle->file_io_pool,
+	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              chunk_buffer,
 	              chunk_size,
@@ -572,7 +573,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 				return( -1 );
 			}
 			read_count = libbfio_pool_read(
-			              io_handle->file_io_pool,
+			              file_io_pool,
 			              segment_file_handle->file_io_pool_entry,
 			              crc_buffer,
 			              sizeof( ewf_crc_t ),
@@ -606,6 +607,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 ssize_t libewf_read_io_handle_read_chunk_data(
          libewf_read_io_handle_t *read_io_handle,
          libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_chunk_cache_t *chunk_cache,
@@ -809,6 +811,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		 */
 		read_count = libewf_read_io_handle_read_chunk(
 		              io_handle,
+		              file_io_pool,
 		              offset_table,
 		              chunk,
 		              chunk_read_buffer,

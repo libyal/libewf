@@ -72,6 +72,18 @@ struct libewf_internal_handle
 	 */
 	libewf_write_io_handle_t *write_io_handle;
 
+	/* The file io pool
+	 */
+	libbfio_pool_t *file_io_pool;
+
+	/* Value to indicate if the pool was created inside the library
+	 */
+	uint8_t file_io_pool_created_in_library;
+
+	/* The maximum amount of open handles in the pool
+	 */
+	int maximum_amount_of_open_handles;
+
 	/* The list of segment files
 	 */
 	libewf_segment_table_t *segment_table;
@@ -258,6 +270,11 @@ LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
 LIBEWF_EXTERN int libewf_handle_get_offset(
                    libewf_handle_t *handle,
                    off64_t *offset,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
+                   libewf_handle_t *handle,
+                   int maximum_amount_of_open_handles,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_segment_filename_size(
