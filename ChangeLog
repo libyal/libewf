@@ -201,6 +201,9 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100119
+* updated libbfio
+
 20100118
 * worked on moving read error handling into libsmdev
 * updated libsmdev

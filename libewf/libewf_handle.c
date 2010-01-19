@@ -3278,10 +3278,10 @@ int libewf_handle_set_maximum_amount_of_open_handles(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->file_io_pool == NULL )
+	if( internal_handle->file_io_pool != NULL )
 	{
-		if( libbfio_handle_set_maximum_amount_of_open_handles(
-		     internal_handle->file_io_handle,
+		if( libbfio_pool_set_maximum_amount_of_open_handles(
+		     internal_handle->file_io_pool,
 		     maximum_amount_of_open_handles,
 		     error ) != 1 )
 		{

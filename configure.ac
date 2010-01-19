@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100118],
+ [20100119],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100118])
+ [20100119])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -1071,6 +1071,11 @@ AS_IF(
 	AC_CHECK_LIB(
 	 bfio,
 	 libbfio_pool_get_size,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libbfio=no])
+	AC_CHECK_LIB(
+	 bfio,
+	 libbfio_pool_get_maximum_amount_of_open_handles,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libbfio=no])
 	])

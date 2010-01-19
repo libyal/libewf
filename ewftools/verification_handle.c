@@ -126,6 +126,20 @@ int verification_handle_initialize(
 
 			return( -1 );
 		}
+		if( libewf_handle_set_maximum_amount_of_open_handles(
+		     ( *verification_handle )->input_handle,
+		     1000,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set maximum amount of open handles.",
+			 function );
+
+			return( -1 );
+		}
 		( *verification_handle )->calculate_md5  = calculate_md5;
 		( *verification_handle )->calculate_sha1 = calculate_sha1;
 
