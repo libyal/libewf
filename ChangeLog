@@ -201,8 +201,13 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100120
+* updated libbfio, libsmraw
+* worked on maximum amount of open handles
+
 20100119
 * updated libbfio
+* worked on maximum amount of open handles
 
 20100118
 * worked on moving read error handling into libsmdev

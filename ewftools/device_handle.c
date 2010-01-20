@@ -65,6 +65,8 @@
 #include "io_usb.h"
 #include "storage_media_buffer.h"
 
+#define DEVICE_HANDLE_VALUE_SIZE		512
+
 /* Initializes the device handle
  * Returns 1 if successful or -1 on error
  */
@@ -394,6 +396,7 @@ int device_handle_open_input(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 		if( device_handle->raw_input_handle != NULL )
 		{
 			liberror_error_set(
@@ -418,7 +421,6 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 		if( libsmraw_handle_open_wide(
 		     device_handle->raw_input_handle,
@@ -1339,8 +1341,12 @@ int device_handle_get_information_value(
      size_t information_value_size,
      liberror_error_t **error )
 {
-	static char *function = "device_handle_get_information_value";
-	int result            = 0;
+	uint8_t utf8_information_value[ DEVICE_HANDLE_VALUE_SIZE ];
+
+	static char *function                    = "device_handle_get_information_value";
+	size_t calculated_information_value_size = 0;
+	size_t utf8_information_value_size       = DEVICE_HANDLE_VALUE_SIZE;
+	int result                               = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1353,15 +1359,14 @@ int device_handle_get_information_value(
 
 		return( -1 );
 	}
-	/* TODO handle wide character strings */
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		result = libsmdev_handle_get_information_value(
 		          device_handle->dev_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
-		          information_value,
-		          information_value_size,
+		          utf8_information_value,
+		          utf8_information_value_size,
 		          error );
 
 		if( result == -1 )
@@ -1370,8 +1375,9 @@ int device_handle_get_information_value(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve information value from device input handle.",
-			 function );
+			 "%s: unable to retrieve information value: %s from device input handle.",
+			 function,
+			 information_value_identifier );
 
 			return( -1 );
 		}
@@ -1383,8 +1389,8 @@ int device_handle_get_information_value(
 		          device_handle->raw_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
-		          information_value,
-		          information_value_size,
+		          utf8_information_value,
+		          utf8_information_value_size,
 		          error );
 
 		if( result == -1 )
@@ -1393,13 +1399,64 @@ int device_handle_get_information_value(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve information value from raw input handle.",
-			 function );
+			 "%s: unable to retrieve information value: %s from raw input handle.",
+			 function,
+			 information_value_identifier );
 
 			return( -1 );
 		}
 	}
 #endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
+	if( result == 1 )
+	{
+		/* Determine the header value size
+		 */
+		utf8_information_value_size = 1 + narrow_string_length(
+		                                   (char *) utf8_information_value );
+
+		if( libsystem_string_size_from_utf8_string(
+		     utf8_information_value,
+		     utf8_information_value_size,
+		     &calculated_information_value_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to determine header value size.",
+			 function );
+
+			return( -1 );
+		}
+		if( information_value_size < calculated_information_value_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: header value too small.",
+			 function );
+
+			return( -1 );
+		}
+		if( libsystem_string_copy_from_utf8_string(
+		     information_value,
+		     information_value_size,
+		     utf8_information_value,
+		     utf8_information_value_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to set header value.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	return( result );
 }
 
@@ -1605,9 +1662,12 @@ int device_handle_media_information_fprint(
 
 	static char *function = "device_handle_media_information_fprint";
 	size64_t media_size   = 0;
-	uint8_t device_type   = 0;
 	uint8_t bus_type      = 0;
 	int result            = 0;
+
+#ifdef TODO
+	uint8_t device_type   = 0;
+#endif
 
 	if( device_handle == NULL )
 	{
