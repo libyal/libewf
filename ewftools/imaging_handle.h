@@ -247,7 +247,7 @@ int imaging_handle_set_hash_value(
 int imaging_handle_add_read_error(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
-      size_t amount_of_bytes,
+      size64_t amount_of_bytes,
       liberror_error_t **error );
 
 int imaging_handle_add_session(

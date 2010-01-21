@@ -41,8 +41,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsystem;..\zlib\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsmdev;..\..\libsmraw;..\..\libsystem;..\zlib\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV;HAVE_LOCAL_LIBSMRAW;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"

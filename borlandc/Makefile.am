@@ -10,6 +10,8 @@ CODEGEAR_FILES = \
 	codegear/libewf/libewf.cbproj \
 	codegear/libuna/libuna.cbproj \
 	codegear/libewf.groupproj \
+	codegear/libsmdev/libsmdev.cbproj \
+	codegear/libsmraw/libsmraw.cbproj \
 	codegear/libsystem/libsystem.cbproj \
 	codegear/zlib/zlib.cbproj
 

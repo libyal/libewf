@@ -275,7 +275,7 @@ int device_handle_open_input(
 	BY_HANDLE_FILE_INFORMATION file_information;
 
 	PVOID error_string                    = NULL;
-	LARGE_INTEGER large_integer_size      = DEVICE_HANDLE_LARGE_INTEGER_ZERO;
+	LARGE_INTEGER large_integer_size      = LIBSYSTEM_FILE_LARGE_INTEGER_ZERO;
 	DWORD dword_size                      = 0;
 	DWORD error_code                      = 0;
 	DWORD file_type                       = 0;
@@ -313,9 +313,15 @@ int device_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
+#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+		result = libsmdev_check_device_wide(
+		          filenames[ 0 ],
+	                  error );
+#else
 		result = libsmdev_check_device(
 		          filenames[ 0 ],
 	                  error );
+#endif
 
 		if( result == -1 )
 		{
@@ -982,7 +988,7 @@ off64_t device_handle_seek_offset(
 	static char *function              = "device_handle_seek_offset";
 
 #if defined( WINAPI )
-	LARGE_INTEGER large_integer_offset = DEVICE_HANDLE_LARGE_INTEGER_ZERO;
+	LARGE_INTEGER large_integer_offset = LIBSYSTEM_FILE_LARGE_INTEGER_ZERO;
 	DWORD move_method                  = 0;
 #endif
 
