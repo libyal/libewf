@@ -13,6 +13,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
 			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<FinalOutputDir>..\Release</FinalOutputDir>
@@ -37,12 +38,12 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libnotify\libnotify.h">
-				<BuildOrder>0</BuildOrder>
-			</None>
 			<CppCompile Include="..\..\..\libnotify\libnotify.c">
 				<BuildOrder>1</BuildOrder>
 			</CppCompile>
+			<None Include="..\..\..\libnotify\libnotify.h">
+				<BuildOrder>0</BuildOrder>
+			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

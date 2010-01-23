@@ -1,4 +1,4 @@
-.Dd January 9, 2010
+.Dd January 23, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -94,6 +94,8 @@ File/Handle functions
 .Fn libewf_handle_seek_offset "libewf_handle_t *handle, off64_t offset, int whence, libewf_error_t **error"
 .Ft off64_t
 .Fn libewf_handle_get_offset "libewf_handle_t *handle, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_set_maximum_amount_of_open_handles "libewf_handle_t *handle, int maximum_amount_of_open_handles, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_segment_filename_size "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int

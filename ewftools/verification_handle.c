@@ -126,6 +126,8 @@ int verification_handle_initialize(
 
 			return( -1 );
 		}
+#ifdef TODO
+/* TODO: have application determine limit value and set to value - 4 */
 		if( libewf_handle_set_maximum_amount_of_open_handles(
 		     ( *verification_handle )->input_handle,
 		     1000,
@@ -140,6 +142,7 @@ int verification_handle_initialize(
 
 			return( -1 );
 		}
+#endif
 		( *verification_handle )->calculate_md5  = calculate_md5;
 		( *verification_handle )->calculate_sha1 = calculate_sha1;
 

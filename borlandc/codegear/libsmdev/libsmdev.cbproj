@@ -1,6 +1,6 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{589FD6BC-22CA-4B86-A6D8-C9F54F74BD21}</ProjectGuid>
+			<ProjectGuid>{6741322D-5F25-4210-9464-CEAB2F119D1C}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Release</Config>
 		</PropertyGroup>
@@ -13,19 +13,20 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
 			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libnotify;..\..\..\libuna;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;HAVE_LOCAL_LIBUNA;$(Defines)</Defines>
-			<IncludePath>..\..\..\libuna;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBSMDEV;$(Defines)</Defines>
+			<IncludePath>..\..\..\libsmdev;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
 			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
@@ -37,177 +38,104 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<CppCompile Include="..\..\..\libuna\libuna_base16_stream.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_usb.c">
+				<BuildOrder>0</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_base16_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_base64_stream.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_ata.c">
+				<BuildOrder>1</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_base64_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_base64url_stream.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_error.c">
+				<BuildOrder>2</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_base64url_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_byte_stream.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_error_string.c">
+				<BuildOrder>3</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_byte_stream.h">
-			</None>
-			<None Include="..\..\..\libuna\libuna_codepage_ascii.h">
-			</None>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_1.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_2.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_handle.c">
+				<BuildOrder>4</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_2.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_3.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_list_type.c">
+				<BuildOrder>5</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_3.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_4.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_metadata.c">
+				<BuildOrder>6</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_4.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_5.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_notify.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_5.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_6.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_offset_list.c">
+				<BuildOrder>8</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_6.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_7.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_optical_disk.c">
+				<BuildOrder>9</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_7.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_8.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_scsi.c">
+				<BuildOrder>10</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_8.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_9.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_string.c">
+				<BuildOrder>11</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_9.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_10.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_support.c">
+				<BuildOrder>12</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_10.h">
-			</None>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_11.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_13.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_system_string.c">
+				<BuildOrder>13</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_13.h">
+			<None Include="..\..\..\libsmdev\libsmdev_ata.h">
+				<BuildOrder>14</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_14.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_14.h">
+			<None Include="..\..\..\libsmdev\libsmdev_usb.h">
+				<BuildOrder>15</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_15.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_15.h">
+			<None Include="..\..\..\libsmdev\libsmdev_types.h">
+				<BuildOrder>16</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_16.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_16.h">
+			<None Include="..\..\..\libsmdev\libsmdev_system_string.h">
+				<BuildOrder>17</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_koi8_r.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_koi8_r.h">
+			<None Include="..\..\..\libsmdev\libsmdev_support.h">
+				<BuildOrder>18</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_koi8_u.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_koi8_u.h">
+			<None Include="..\..\..\libsmdev\libsmdev_string.h">
+				<BuildOrder>19</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_874.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_874.h">
+			<None Include="..\..\..\libsmdev\libsmdev_scsi.h">
+				<BuildOrder>20</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1250.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1250.h">
+			<None Include="..\..\..\libsmdev\libsmdev_optical_disk.h">
+				<BuildOrder>21</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1251.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1251.h">
+			<None Include="..\..\..\libsmdev\libsmdev_offset_list.h">
+				<BuildOrder>22</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1252.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1252.h">
+			<None Include="..\..\..\libsmdev\libsmdev_notify.h">
+				<BuildOrder>23</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1253.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1253.h">
+			<None Include="..\..\..\libsmdev\libsmdev_metadata.h">
+				<BuildOrder>24</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1254.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1254.h">
+			<None Include="..\..\..\libsmdev\libsmdev_list_type.h">
+				<BuildOrder>25</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1255.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1255.h">
+			<None Include="..\..\..\libsmdev\libsmdev_libuna.h">
+				<BuildOrder>26</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1256.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1256.h">
+			<None Include="..\..\..\libsmdev\libsmdev_handle.h">
+				<BuildOrder>27</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1257.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1257.h">
+			<None Include="..\..\..\libsmdev\libsmdev_extern.h">
+				<BuildOrder>28</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1258.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_codepage_windows_1258.h">
+			<None Include="..\..\..\libsmdev\libsmdev_error_string.h">
+				<BuildOrder>29</BuildOrder>
 			</None>
-			<None Include="..\..\..\libuna\libuna_definitions.h">
+			<None Include="..\..\..\libsmdev\libsmdev_error.h">
+				<BuildOrder>30</BuildOrder>
 			</None>
-			<None Include="..\..\..\libuna\libuna_error.h">
+			<None Include="..\..\..\libsmdev\libsmdev_definitions.h">
+				<BuildOrder>31</BuildOrder>
 			</None>
-			<None Include="..\..\..\libuna\libuna_extern.h">
-			</None>
-			<None Include="..\..\..\libuna\libuna_inline.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_support.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_support.h">
-			</None>
-			<None Include="..\..\..\libuna\libuna_types.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_unicode_character.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_unicode_character.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_url_stream.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_url_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf16_stream.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf16_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf16_string.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf16_string.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf32_stream.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf32_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf32_string.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf32_string.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf7_stream.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf7_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf8_stream.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf8_stream.h">
-			</None>
-			<CppCompile Include="..\..\..\libuna\libuna_utf8_string.c">
-			</CppCompile>
-			<None Include="..\..\..\libuna\libuna_utf8_string.h">
+			<None Include="..\..\..\libsmdev\libsmdev_codepage.h">
+				<BuildOrder>32</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

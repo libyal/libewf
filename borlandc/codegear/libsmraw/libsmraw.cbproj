@@ -1,6 +1,6 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{58C8DCD3-9FBC-457E-B124-07AA111AAFB4}</ProjectGuid>
+			<ProjectGuid>{360EA13F-E23A-4735-8C3E-72FDFA6F5D17}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Release</Config>
 		</PropertyGroup>
@@ -13,19 +13,20 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
 			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libuna;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libnotify;..\..\..\libuna;..\..\..\libbfio;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;$(Defines)</Defines>
-			<IncludePath>..\..\..\libbfio;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW;$(Defines)</Defines>
+			<IncludePath>..\..\..\libsmraw;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
 			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
@@ -37,51 +38,80 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libbfio\libbfio_types.h">
-			</None>
-			<None Include="..\..\..\libbfio\libbfio_definitions.h">
-			</None>
-			<None Include="..\..\..\libbfio\libbfio_error.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_error_string.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_values_table.c">
+				<BuildOrder>0</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_error_string.h">
-			</None>
-			<None Include="..\..\..\libbfio\libbfio_extern.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_file.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_error.c">
+				<BuildOrder>1</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_file.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_handle.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_filename.c">
+				<BuildOrder>2</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_handle.h">
-			</None>
-			<None Include="..\..\..\libbfio\libbfio_libuna.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_list_type.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_handle.c">
+				<BuildOrder>3</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_list_type.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_memory_range.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_information_file.c">
+				<BuildOrder>4</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_memory_range.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_offset_list.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_metadata.c">
+				<BuildOrder>5</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_offset_list.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_pool.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_notify.c">
+				<BuildOrder>6</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_pool.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_support.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_support.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_support.h">
-			</None>
-			<CppCompile Include="..\..\..\libbfio\libbfio_system_string.c">
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_system_string.c">
+				<BuildOrder>8</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libbfio\libbfio_system_string.h">
+			<None Include="..\..\..\libsmraw\libsmraw_values_table.h">
+				<BuildOrder>9</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_codepage.h">
+				<BuildOrder>10</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_definitions.h">
+				<BuildOrder>11</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_error.h">
+				<BuildOrder>12</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_extern.h">
+				<BuildOrder>13</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_filename.h">
+				<BuildOrder>14</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_handle.h">
+				<BuildOrder>15</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_information_file.h">
+				<BuildOrder>16</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_libbfio.h">
+				<BuildOrder>17</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_libuna.h">
+				<BuildOrder>18</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_metadata.h">
+				<BuildOrder>19</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_notify.h">
+				<BuildOrder>20</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_string.h">
+				<BuildOrder>21</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_support.h">
+				<BuildOrder>22</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_system_string.h">
+				<BuildOrder>23</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_types.h">
+				<BuildOrder>24</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

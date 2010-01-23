@@ -987,7 +987,7 @@ off64_t device_handle_seek_offset(
 {
 	static char *function              = "device_handle_seek_offset";
 
-#if defined( WINAPI )
+#if !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) && defined( WINAPI )
 	LARGE_INTEGER large_integer_offset = LIBSYSTEM_FILE_LARGE_INTEGER_ZERO;
 	DWORD move_method                  = 0;
 #endif
