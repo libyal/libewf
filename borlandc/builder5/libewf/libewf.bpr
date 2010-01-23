@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.05.03"/>
+    <PROJECT value="..\Release\libewf.dll"/>
+    <OBJFILES value="..\..\..\libewf\libewf.obj ..\..\..\libewf\libewf_chunk_cache.obj 
+      ..\..\..\libewf\libewf_compression.obj 
+      ..\..\..\libewf\libewf_date_time.obj ..\..\..\libewf\libewf_date_time_values.obj 
+      ..\..\..\libewf\libewf_debug.obj ..\..\..\libewf\libewf_empty_block.obj 
+      ..\..\..\libewf\libewf_error.obj ..\..\..\libewf\libewf_file_entry.obj 
+      ..\..\..\libewf\libewf_filename.obj ..\..\..\libewf\libewf_handle.obj 
+      ..\..\..\libewf\libewf_hash_sections.obj 
+      ..\..\..\libewf\libewf_hash_values.obj 
+      ..\..\..\libewf\libewf_header_sections.obj 
+      ..\..\..\libewf\libewf_header_values.obj 
+      ..\..\..\libewf\libewf_io_handle.obj ..\..\..\libewf\libewf_legacy.obj 
+      ..\..\..\libewf\libewf_list_type.obj 
+      ..\..\..\libewf\libewf_media_values.obj 
+      ..\..\..\libewf\libewf_metadata.obj ..\..\..\libewf\libewf_notify.obj 
+      ..\..\..\libewf\libewf_offset_table.obj 
+      ..\..\..\libewf\libewf_read_io_handle.obj 
+      ..\..\..\libewf\libewf_section.obj ..\..\..\libewf\libewf_section_list.obj 
+      ..\..\..\libewf\libewf_sector_table.obj 
+      ..\..\..\libewf\libewf_segment_file.obj 
+      ..\..\..\libewf\libewf_segment_file_handle.obj 
+      ..\..\..\libewf\libewf_segment_table.obj 
+      ..\..\..\libewf\libewf_single_file_entry.obj 
+      ..\..\..\libewf\libewf_single_files.obj 
+      ..\..\..\libewf\libewf_split_values.obj ..\..\..\libewf\libewf_string.obj 
+      ..\..\..\libewf\libewf_support.obj ..\..\..\libewf\libewf_tree_type.obj 
+      ..\..\..\libewf\libewf_values_table.obj 
+      ..\..\..\libewf\libewf_write_io_handle.obj"/>
+    <RESFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <PACKAGES value="Vcl50.bpi Vclx50.bpi bcbsmp50.bpi Qrpt50.bpi Vcldb50.bpi Vclbde50.bpi 
+      ibsmp50.bpi vcldbx50.bpi TeeUI50.bpi TeeDB50.bpi Tee50.bpi TeeQR50.bpi 
+      VCLIB50.bpi bcbie50.bpi"/>
+    <PATHCPP value=".;..\..\..\libewf"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <LINKER value="tlink32"/>
+    <USERDEFINES value="UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;"/>
+    <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
+    <MAINSOURCE value="libewf.bpf"/>
+    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK"/>
+    <WARNINGS value="-w-par -w-aus"/>
+    <LISTFILE value=""/>
+  </MACROS>
+  <OPTIONS>
+    <CFLAG1 value="-WD -O2 -Vx -Ve -X- -a8 -b- -k- -vi -tWD -tWM -c"/>
+    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value="-D&quot;&quot; -aa -Tpd -x -Gi"/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="$(OBJFILES)"/>
+    <ALLLIB value="liberror.lib libnotify.lib libuna.lib libbfio.lib zlib.lib kernel32.lib 
+      cw32mti.lib"/>
+  </LINKER>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=2057
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=5
+Item0=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item3=..\..\..\libewf;$(BCB)\include;$(BCB)\include\vcl
+Item4=$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=14
+Item0=..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
+Item1=..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib
+Item2=..\..\..\libewf;..\Release;$(BCB)\lib\PSDK;$(BCB)\lib\obj;$(BCB)\lib
+Item3=..\..\..\libewf;..\Release;$(BCB)\PSDK;$(BCB)\lib\obj;$(BCB)\lib
+Item4=..\..\..\libewf;$(BCB)\lib\obj;$(BCB)\lib
+Item5=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib
+Item6=..\..\..\libewf;..\zlib;..\libbfio;..\libuna;..\libnotify;..\liberror;$(BCB)\lib\obj;$(BCB)\lib
+Item7=..\libewf;..\zlib;..\libbfio;..\libuna;..\libnotify;..\liberror;$(BCB)\lib\obj;$(BCB)\lib
+Item8=..\..\..\libewf;..\Release;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib
+Item9=.;..\..\..\libewf;$(BCB)\lib\obj;$(BCB)\lib
+Item10=..\Release;..\..\..\libewf;$(BCB)\lib\obj;$(BCB)\lib
+Item11=..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib
+Item12=..\..\..\libewf;..\Release\;$(BCB)\lib\obj;$(BCB)\lib
+Item13=$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=5
+Item0=UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
+Item1=WINVER=0x0400;_WIN32_WINNT=0x0400;UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
+Item2=WINNT;UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
+Item3=ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
+Item4=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO
+
+[HistoryLists\hlIntOutputDir]
+Count=1
+Item0=..\libewf
+
+[HistoryLists\hlFinalOutputDir]
+Count=2
+Item0=..\Release\
+Item1=..\Release
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+  </IDEOPTIONS>
+</PROJECT>

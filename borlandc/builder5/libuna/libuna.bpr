@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.05.03"/>
+    <PROJECT value="..\Release\libuna.lib"/>
+    <OBJFILES value="..\..\..\libuna\libuna_base16_stream.obj 
+      ..\..\..\libuna\libuna_base64_stream.obj 
+      ..\..\..\libuna\libuna_base64url_stream.obj 
+      ..\..\..\libuna\libuna_byte_stream.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_2.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_3.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_4.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_5.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_6.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_7.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_8.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_9.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_10.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_13.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_14.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_15.obj 
+      ..\..\..\libuna\libuna_codepage_iso_8859_16.obj 
+      ..\..\..\libuna\libuna_codepage_koi8_r.obj 
+      ..\..\..\libuna\libuna_codepage_koi8_u.obj 
+      ..\..\..\libuna\libuna_codepage_windows_874.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1250.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1251.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1252.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1253.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1254.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1255.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1256.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1257.obj 
+      ..\..\..\libuna\libuna_codepage_windows_1258.obj 
+      ..\..\..\libuna\libuna_support.obj 
+      ..\..\..\libuna\libuna_unicode_character.obj 
+      ..\..\..\libuna\libuna_url_stream.obj 
+      ..\..\..\libuna\libuna_utf7_stream.obj 
+      ..\..\..\libuna\libuna_utf8_stream.obj 
+      ..\..\..\libuna\libuna_utf8_string.obj 
+      ..\..\..\libuna\libuna_utf16_stream.obj 
+      ..\..\..\libuna\libuna_utf16_string.obj 
+      ..\..\..\libuna\libuna_utf32_stream.obj 
+      ..\..\..\libuna\libuna_utf32_string.obj"/>
+    <RESFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <PACKAGES value=""/>
+    <PATHCPP value=".;..\..\..\libuna"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <LINKER value="TLib"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA"/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
+    <MAINSOURCE value="libuna.bpf"/>
+    <INCLUDEPATH value="..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\..\libuna;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK"/>
+    <WARNINGS value="-w-par -w-aus"/>
+    <LISTFILE value=""/>
+  </MACROS>
+  <OPTIONS>
+    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -b- -k- -vi -c -tW -tWM"/>
+    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="$(OBJFILES)"/>
+    <ALLLIB value=""/>
+  </LINKER>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=2057
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=3
+Item0=..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libuna;..\..\..\liberror;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libuna;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=3
+Item0=..\..\..\libuna;$(BCB)\lib\obj;$(BCB)\lib;;$(BCB)\lib\PSDK
+Item1=..\..\..\libuna;$(BCB)\lib\obj;$(BCB)\lib
+Item2=$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=6
+Item0=UNICODE;HAVE_LOCAL_LIBUNA
+Item1=WINVER=0x0400;_WIN32_WINNT=0x0400;UNICODE;HAVE_LOCAL_LIBUNA
+Item2=WINNT;UNICODE;HAVE_LOCAL_LIBUNA
+Item3=HAVE_LOCAL_LIBUNA
+Item4=_DEBUG;HAVE_LOCAL_LIBUNA
+Item5=_DEBUG
+
+[HistoryLists\hlIntOutputDir]
+Count=1
+Item0=..\libuna
+
+[HistoryLists\hlFinalOutputDir]
+Count=2
+Item0=..\Release\
+Item1=..\Release
+
+[HistoryLists\hlTlibPageSize]
+Count=1
+Item0=0x0010
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+  </IDEOPTIONS>
+</PROJECT>

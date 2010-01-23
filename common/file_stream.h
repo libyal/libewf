@@ -129,6 +129,10 @@ extern "C" {
 #define file_stream_vfprintf( stream, format, ... ) \
 	g_vfprintf( stream, format, __VA_ARGS__ )
 
+#elif defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+#define file_stream_vfprintf \
+	vfprintf
+
 #elif defined( HAVE_VFPRINTF ) || defined( WINAPI )
 #define file_stream_vfprintf( stream, format, ... ) \
 	vfprintf( stream, format, __VA_ARGS__ )

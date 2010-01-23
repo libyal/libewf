@@ -206,6 +206,8 @@ Next stable release:
 * worked on windows support
 * updated libbfio, libsmdev, libsmraw
 * updates msvscpp and codegear files
+* ewftools: removed io_.[ch] file, no longer required
+* updated for missing varadic macro support in Borland C++ Builder 5.5
 
 20100121
 * worked on maximum amount of open handles

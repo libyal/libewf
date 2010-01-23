@@ -25,11 +25,6 @@ ewfacquire_SOURCES = \
 	ewfoutput.c ewfoutput.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
-	io_ata.c io_ata.h \
-	io_bus.h \
-	io_optical_disk.c io_optical_disk.h \
-	io_scsi.c io_scsi.h \
-	io_usb.c io_usb.h \
 	log_handle.c log_handle.h \
 	md5.h \
 	platform.c platform.h \

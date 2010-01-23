@@ -134,6 +134,10 @@ extern "C" {
 #define narrow_string_snprintf( target, size, ... ) \
 	sprintf_s( target, size, __VA_ARGS__ )
 
+#elif defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+#define narrow_string_snprintf \
+	snprintf
+
 #elif defined( HAVE_SNPRINTF ) || defined( WINAPI )
 #define narrow_string_snprintf( target, size, ... ) \
 	snprintf( target, size, __VA_ARGS__ )
@@ -141,7 +145,11 @@ extern "C" {
 
 /* String input conversion (sscanf)
  */
-#if defined( HAVE_SSCANF ) || defined( WINAPI )
+#if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+#define narrow_string_sscanf \
+	sscanf
+
+#elif defined( HAVE_SSCANF ) || defined( WINAPI )
 #define narrow_string_sscanf( string, format, ... ) \
 	sscanf( string, format, __VA_ARGS__ )
 #endif
@@ -189,6 +197,10 @@ extern "C" {
 #if defined( HAVE_GLIB_H )
 #define narrow_string_vsnprintf( string, size, format, ... ) \
 	g_vsnprintf( string, size, format, __VA_ARGS__ )
+
+#elif defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+#define narrow_string_vsnprintf \
+	vsnprintf
 
 #elif defined( HAVE_VSNPRINTF ) || defined( WINAPI )
 #define narrow_string_vsnprintf( string, size, format, ... ) \

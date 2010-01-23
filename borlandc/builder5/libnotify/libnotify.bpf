@@ -1,0 +1,12 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+USE("..\..\..\libnotify\libnotify.h", File);
+USEUNIT("..\..\..\libnotify\libnotify.c");
+//---------------------------------------------------------------------------
+#define Library
+
+// To add a file to the library use the Project menu 'Add to Project'.
+
+ 

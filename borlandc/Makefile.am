@@ -1,3 +1,18 @@
+BUILDER5_FILES = \
+	builder5/libbfio/libbfio.bpf \
+	builder5/libbfio/libbfio.bpr \
+	builder5/liberror/liberror.bpf \
+	builder5/liberror/liberror.bpr \
+	builder5/libewf/libewf.bpf \
+	builder5/libewf/libewf.bpr \
+	builder5/libewf.bpg \
+	builder5/libnotify/libnotify.bpf \
+	builder5/libnotify/libnotify.bpr \
+	builder5/libsmdev/libsmdev.bpf \
+	builder5/libsmdev/libsmdev.bpr \
+	builder5/libuna/libuna.bpf \
+	builder5/libuna/libuna.bpr
+
 CODEGEAR_FILES = \
 	codegear/ewfacquire/ewfacquire.cbproj \
 	codegear/ewfacquirestream/ewfacquirestream.cbproj \
@@ -6,21 +21,18 @@ CODEGEAR_FILES = \
 	codegear/ewfverify/ewfverify.cbproj \
 	codegear/libbfio/libbfio.cbproj \
 	codegear/liberror/liberror.cbproj \
-	codegear/libnotify/libnotify.cbproj \
 	codegear/libewf/libewf.cbproj \
-	codegear/libuna/libuna.cbproj \
 	codegear/libewf.groupproj \
+	codegear/libnotify/libnotify.cbproj \
 	codegear/libsmdev/libsmdev.cbproj \
 	codegear/libsmraw/libsmraw.cbproj \
 	codegear/libsystem/libsystem.cbproj \
+	codegear/libuna/libuna.cbproj \
 	codegear/zlib/zlib.cbproj
 
-BUILDER5_FILES = \
-	builder5/libewf.mak
-
 EXTRA_DIST = \
-	$(CODEGEAR_FILES) \
-	$(BUILDER5_FILES)
+	$(BUILDER5_FILES) \
+	$(CODEGEAR_FILES)
 
 distclean: clean
 	/bin/rm -f Makefile

@@ -58,11 +58,6 @@
 
 #include "byte_size_string.h"
 #include "device_handle.h"
-#include "io_ata.h"
-#include "io_bus.h"
-#include "io_optical_disk.h"
-#include "io_scsi.h"
-#include "io_usb.h"
 #include "storage_media_buffer.h"
 
 #define DEVICE_HANDLE_VALUE_SIZE		512

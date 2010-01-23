@@ -61,8 +61,14 @@ typedef libuna_utf8_character_t libewf_character_t;
 #define libewf_string_search_reverse( string, character, size ) \
 	(libewf_character_t *) narrow_string_search_reverse( (char *) string, (int) character, size )
 
+#if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+#define libewf_string_snprintf \
+	narrow_string_snprintf
+
+#else
 #define libewf_string_snprintf( target, size, format, ... ) \
 	narrow_string_snprintf( (char *) target, size, format, __VA_ARGS__ )
+#endif
 
 /* Byte stream functions
  */
