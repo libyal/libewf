@@ -202,12 +202,18 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100124
+* worked on Borland C++ Builder 5.5 support
+* updated common, liberror (snwprintf fix)
+* updated libsmdev, libsmraw
+* updated codegear and msvscpp files (io_*.[ch] removal)
+
 20100123
 * worked on windows support
 * updated libbfio, libsmdev, libsmraw
 * updates msvscpp and codegear files
 * ewftools: removed io_.[ch] file, no longer required
-* updated for missing varadic macro support in Borland C++ Builder 5.5
+* update for missing varadic macro support in Borland C++ Builder 5.5
 
 20100121
 * worked on maximum amount of open handles

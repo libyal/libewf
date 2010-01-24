@@ -140,22 +140,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\io_ata.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_optical_disk.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_scsi.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_usb.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\log_handle.c"
 				>
 			</File>
@@ -211,26 +195,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\imaging_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_ata.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_bus.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_optical_disk.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_scsi.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\io_usb.h"
 				>
 			</File>
 			<File

@@ -3,28 +3,26 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\Release\libsmdev.lib"/>
-    <OBJFILES value="libsmdev_ata.obj libsmdev_error.obj libsmdev_error_string.obj 
-      libsmdev_handle.obj libsmdev_list_type.obj libsmdev_metadata.obj 
-      libsmdev_notify.obj libsmdev_offset_list.obj libsmdev_optical_disk.obj 
-      libsmdev_scsi.obj libsmdev_string.obj libsmdev_support.obj 
-      libsmdev_system_string.obj libsmdev_usb.obj"/>
+    <PROJECT value="..\Release\libsmraw.lib"/>
+    <OBJFILES value="libsmraw_error.obj libsmraw_filename.obj libsmraw_handle.obj 
+      libsmraw_information_file.obj libsmraw_metadata.obj libsmraw_notify.obj 
+      libsmraw_support.obj libsmraw_system_string.obj libsmraw_values_table.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;..\..\..\libsmdev"/>
+    <PATHCPP value=".;..\..\..\libsmraw"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
-    <MAINSOURCE value="libsmdev.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <MAINSOURCE value="libsmraw.bpf"/>
+    <INCLUDEPATH value="..\..\..\libsmraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
@@ -67,16 +65,14 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=3
-Item0=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libsmdev;$(BCB)\include;$(BCB)\include\vcl
-Item2=$(BCB)\include;$(BCB)\include\vcl
+Count=2
+Item0=..\..\..\libsmraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libsmraw;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
-Count=3
-Item0=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
-Item1=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib
-Item2=$(BCB)\lib\obj;$(BCB)\lib
+Count=2
+Item0=..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
+Item1=..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
 Count=1
@@ -84,8 +80,8 @@ Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
 Count=3
-Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV
-Item1=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO
+Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW
+Item1=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW
 Item2=_DEBUG
 
 [HistoryLists\hlIntOutputDir]

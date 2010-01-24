@@ -3,22 +3,24 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\Release\zlib.lib"/>
+    <PROJECT value="..\Release\zlib.dll"/>
     <OBJFILES value="adler32.obj compress.obj crc32.obj deflate.obj gzio.obj infback.obj 
       inffast.obj inflate.obj inftrees.obj trees.obj uncompr.obj zutil.obj"/>
-    <RESFILES value=""/>
+    <RESFILES value="zlib.res"/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
-    <PACKAGES value=""/>
+    <PACKAGES value="Vcl50.bpi Vclx50.bpi bcbsmp50.bpi Qrpt50.bpi Vcldb50.bpi Vclbde50.bpi 
+      ibsmp50.bpi vcldbx50.bpi TeeUI50.bpi TeeDB50.bpi Tee50.bpi TeeQR50.bpi 
+      VCLIB50.bpi bcbie50.bpi"/>
     <PATHCPP value=".;..\..\zlib-1.2.3"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
-    <LINKER value="TLib"/>
-    <USERDEFINES value=""/>
-    <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
+    <LINKER value="tlink32"/>
+    <USERDEFINES value="ZLIB_DLL"/>
+    <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="zlib.bpf"/>
     <INCLUDEPATH value="..\..\zlib-1.2.3;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\zlib-1.2.3;$(BCB)\lib\obj;$(BCB)\lib"/>
@@ -26,71 +28,62 @@
     <LISTFILE value=""/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -b- -k- -vi -c -tW -tWM"/>
+    <CFLAG1 value="-WD -O2 -Vx -Ve -X- -a8 -b- -k- -vi -c"/>
     <PFLAGS value="-N2. -N0. -$Y- -$L- -$D- -v -JPHNE -M"/>
     <AFLAGS value="/mx /w2 /zn"/>
-    <LFLAGS value=""/>
+    <LFLAGS value="-I. -D&quot;&quot; -aa -Tpd -x -Gi"/>
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="$(OBJFILES)"/>
-    <ALLLIB value=""/>
+    <ALLLIB value="cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]
 IncludeVerInfo=0
 AutoIncBuild=0
 MajorVer=1
-MinorVer=0
-Release=0
+MinorVer=2
+Release=3
 Build=0
 Debug=0
 PreRelease=0
 Special=0
 Private=0
-DLL=0
-Locale=2057
+DLL=1
+Locale=1033
 CodePage=1252
 
 [Version Info Keys]
 CompanyName=
-FileDescription=
-FileVersion=1.0.0.0
-InternalName=
+FileDescription=zlib
+FileVersion=1.2.3.0
+InternalName=zlib
 LegalCopyright=
 LegalTrademarks=
 OriginalFilename=
-ProductName=
-ProductVersion=1.0.0.0
+ProductName=zlib
+ProductVersion=1.2.3
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=1
+Count=2
 Item0=..\..\zlib-1.2.3;$(BCB)\include;$(BCB)\include\vcl
+Item1=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
-Count=1
-Item0=..\..\zlib-1.2.3;$(BCB)\lib\obj;$(BCB)\lib
+Count=0
 
 [HistoryLists\hlDebugSourcePath]
-Count=1
-Item0=$(BCB)\source\vcl
+Count=0
 
 [HistoryLists\hlConditionals]
-Count=1
-Item0=_DEBUG
+Count=0
 
 [HistoryLists\hlIntOutputDir]
-Count=1
-Item0=.
+Count=0
 
 [HistoryLists\hlFinalOutputDir]
-Count=2
-Item0=..\Release\
-Item1=..\Release
-
-[HistoryLists\hlTlibPageSize]
-Count=1
-Item0=0x0010
+Count=0
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

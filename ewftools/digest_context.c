@@ -27,6 +27,14 @@
 
 #include "digest_context.h"
 
+#if defined( WINAPI )
+
+#if !defined( PROV_RSA_AES )
+#define PROV_RSA_AES		24
+#endif
+
+#endif /* defined( WINAPI ) */
+
 /* Initializes the digest context
  * Returns 1 if successful, 0 on failure or -1 on error
  */

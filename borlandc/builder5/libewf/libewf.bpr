@@ -4,33 +4,19 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libewf.dll"/>
-    <OBJFILES value="..\..\..\libewf\libewf.obj ..\..\..\libewf\libewf_chunk_cache.obj 
-      ..\..\..\libewf\libewf_compression.obj 
-      ..\..\..\libewf\libewf_date_time.obj ..\..\..\libewf\libewf_date_time_values.obj 
-      ..\..\..\libewf\libewf_debug.obj ..\..\..\libewf\libewf_empty_block.obj 
-      ..\..\..\libewf\libewf_error.obj ..\..\..\libewf\libewf_file_entry.obj 
-      ..\..\..\libewf\libewf_filename.obj ..\..\..\libewf\libewf_handle.obj 
-      ..\..\..\libewf\libewf_hash_sections.obj 
-      ..\..\..\libewf\libewf_hash_values.obj 
-      ..\..\..\libewf\libewf_header_sections.obj 
-      ..\..\..\libewf\libewf_header_values.obj 
-      ..\..\..\libewf\libewf_io_handle.obj ..\..\..\libewf\libewf_legacy.obj 
-      ..\..\..\libewf\libewf_list_type.obj 
-      ..\..\..\libewf\libewf_media_values.obj 
-      ..\..\..\libewf\libewf_metadata.obj ..\..\..\libewf\libewf_notify.obj 
-      ..\..\..\libewf\libewf_offset_table.obj 
-      ..\..\..\libewf\libewf_read_io_handle.obj 
-      ..\..\..\libewf\libewf_section.obj ..\..\..\libewf\libewf_section_list.obj 
-      ..\..\..\libewf\libewf_sector_table.obj 
-      ..\..\..\libewf\libewf_segment_file.obj 
-      ..\..\..\libewf\libewf_segment_file_handle.obj 
-      ..\..\..\libewf\libewf_segment_table.obj 
-      ..\..\..\libewf\libewf_single_file_entry.obj 
-      ..\..\..\libewf\libewf_single_files.obj 
-      ..\..\..\libewf\libewf_split_values.obj ..\..\..\libewf\libewf_string.obj 
-      ..\..\..\libewf\libewf_support.obj ..\..\..\libewf\libewf_tree_type.obj 
-      ..\..\..\libewf\libewf_values_table.obj 
-      ..\..\..\libewf\libewf_write_io_handle.obj"/>
+    <OBJFILES value="libewf.obj libewf_chunk_cache.obj libewf_compression.obj 
+      libewf_date_time.obj libewf_date_time_values.obj libewf_debug.obj 
+      libewf_empty_block.obj libewf_error.obj libewf_file_entry.obj 
+      libewf_filename.obj libewf_handle.obj libewf_hash_sections.obj 
+      libewf_hash_values.obj libewf_header_sections.obj libewf_header_values.obj 
+      libewf_io_handle.obj libewf_legacy.obj libewf_list_type.obj 
+      libewf_media_values.obj libewf_metadata.obj libewf_notify.obj 
+      libewf_offset_table.obj libewf_read_io_handle.obj libewf_section.obj 
+      libewf_section_list.obj libewf_sector_table.obj libewf_segment_file.obj 
+      libewf_segment_file_handle.obj libewf_segment_table.obj 
+      libewf_single_file_entry.obj libewf_single_files.obj 
+      libewf_split_values.obj libewf_string.obj libewf_support.obj 
+      libewf_tree_type.obj libewf_values_table.obj libewf_write_io_handle.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -44,24 +30,24 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;"/>
+    <USERDEFINES value="UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="libewf.bpf"/>
     <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK"/>
+    <LIBPATH value="..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-WD -O2 -Vx -Ve -X- -a8 -b- -k- -vi -tWD -tWM -c"/>
-    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
+    <CFLAG1 value="-WD -O2 -Vx -Ve -X- -a8 -b- -k- -vi -c"/>
+    <PFLAGS value="-N2. -N0. -$Y- -$L- -$D- -v -JPHNE -M"/>
     <AFLAGS value="/mx /w2 /zn"/>
-    <LFLAGS value="-D&quot;&quot; -aa -Tpd -x -Gi"/>
+    <LFLAGS value="-I. -D&quot;&quot; -aa -Tpd -x -Gi"/>
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="$(OBJFILES)"/>
-    <ALLLIB value="liberror.lib libnotify.lib libuna.lib libbfio.lib zlib.lib kernel32.lib 
-      cw32mti.lib"/>
+    <ALLLIB value="liberror.lib libnotify.lib libuna.lib libbfio.lib zlib.lib import32.lib 
+      cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]
@@ -117,25 +103,16 @@ Item12=..\..\..\libewf;..\Release\;$(BCB)\lib\obj;$(BCB)\lib
 Item13=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
-Count=1
-Item0=$(BCB)\source\vcl
+Count=0
 
 [HistoryLists\hlConditionals]
-Count=5
-Item0=UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
-Item1=WINVER=0x0400;_WIN32_WINNT=0x0400;UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
-Item2=WINNT;UNICODE;ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
-Item3=ZLIB_DLL;ZLIB_WINAPI;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
-Item4=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO
+Count=0
 
 [HistoryLists\hlIntOutputDir]
-Count=1
-Item0=..\libewf
+Count=0
 
 [HistoryLists\hlFinalOutputDir]
-Count=2
-Item0=..\Release\
-Item1=..\Release
+Count=0
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

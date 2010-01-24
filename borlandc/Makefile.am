@@ -1,4 +1,14 @@
 BUILDER5_FILES = \
+	builder5/ewfacquire/ewfacquire.bpf \
+	builder5/ewfacquire/ewfacquire.bpr \
+	builder5/ewfacquirestream/ewfacquirestream.bpf \
+	builder5/ewfacquirestream/ewfacquirestream.bpr \
+	builder5/ewfexport/ewfexport.bpf \
+	builder5/ewfexport/ewfexport.bpr \
+	builder5/ewfinfo/ewfinfo.bpf \
+	builder5/ewfinfo/ewfinfo.bpr \
+	builder5/ewfverify/ewfverify.bpf \
+	builder5/ewfverify/ewfverify.bpr \
 	builder5/libbfio/libbfio.bpf \
 	builder5/libbfio/libbfio.bpr \
 	builder5/liberror/liberror.bpf \
@@ -10,8 +20,15 @@ BUILDER5_FILES = \
 	builder5/libnotify/libnotify.bpr \
 	builder5/libsmdev/libsmdev.bpf \
 	builder5/libsmdev/libsmdev.bpr \
+	builder5/libsmraw/libsmraw.bpf \
+	builder5/libsmraw/libsmraw.bpr \
+	builder5/libsystem/libsystem.bpf \
+	builder5/libsystem/libsystem.bpr \
 	builder5/libuna/libuna.bpf \
-	builder5/libuna/libuna.bpr
+	builder5/libuna/libuna.bpr \
+	builder5/Release \
+	builder5/zlib/zlib.bpf \
+	builder5/zlib/zlib.bpr
 
 CODEGEAR_FILES = \
 	codegear/ewfacquire/ewfacquire.cbproj \

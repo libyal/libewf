@@ -4,13 +4,9 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libbfio.lib"/>
-    <OBJFILES value="..\..\..\libbfio\libbfio_error_string.obj 
-      ..\..\..\libbfio\libbfio_file.obj ..\..\..\libbfio\libbfio_handle.obj 
-      ..\..\..\libbfio\libbfio_list_type.obj 
-      ..\..\..\libbfio\libbfio_memory_range.obj 
-      ..\..\..\libbfio\libbfio_offset_list.obj ..\..\..\libbfio\libbfio_pool.obj 
-      ..\..\..\libbfio\libbfio_support.obj 
-      ..\..\..\libbfio\libbfio_system_string.obj"/>
+    <OBJFILES value="libbfio_error_string.obj libbfio_file.obj libbfio_handle.obj 
+      libbfio_list_type.obj libbfio_memory_range.obj libbfio_offset_list.obj 
+      libbfio_pool.obj libbfio_support.obj libbfio_system_string.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -26,13 +22,13 @@
     <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
     <MAINSOURCE value="libbfio.bpf"/>
     <INCLUDEPATH value="..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\libbfio;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK"/>
+    <LIBPATH value="..\..\..\libbfio;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -b- -k- -vi -c -tW -tWM"/>
-    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
+    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -b- -k- -vi -c"/>
+    <PFLAGS value="-N2. -N0. -$Y- -$L- -$D- -v -JPHNE -M"/>
     <AFLAGS value="/mx /w2 /zn"/>
     <LFLAGS value=""/>
   </OPTIONS>
@@ -92,8 +88,9 @@ Item2=WINNT;UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO
 Item3=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO
 
 [HistoryLists\hlIntOutputDir]
-Count=1
-Item0=..\libbfio
+Count=2
+Item0=.
+Item1=..\libbfio
 
 [HistoryLists\hlFinalOutputDir]
 Count=2

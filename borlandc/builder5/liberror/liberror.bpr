@@ -4,7 +4,7 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\liberror.lib"/>
-    <OBJFILES value="..\..\..\liberror\liberror_error.obj"/>
+    <OBJFILES value="liberror_error.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -20,13 +20,13 @@
     <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
     <MAINSOURCE value="liberror.bpf"/>
     <INCLUDEPATH value="..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK"/>
+    <LIBPATH value="..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -b- -k- -vi -c -tW -tWM"/>
-    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
+    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -b- -k- -vi -c"/>
+    <PFLAGS value="-N2. -N0. -$Y- -$L- -$D- -v -JPHNE -M"/>
     <AFLAGS value="/mx /w2 /zn"/>
     <LFLAGS value=""/>
   </OPTIONS>
@@ -85,8 +85,9 @@ Item2=UNICODE
 Item3=_DEBUG
 
 [HistoryLists\hlIntOutputDir]
-Count=1
-Item0=..\liberror
+Count=2
+Item0=.
+Item1=..\liberror
 
 [HistoryLists\hlFinalOutputDir]
 Count=2

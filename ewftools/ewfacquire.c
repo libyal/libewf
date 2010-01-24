@@ -53,7 +53,12 @@
 #include "process_status.h"
 #include "storage_media_buffer.h"
 
+#if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+#define EWFACQUIRE_2_TIB		0x20000000000UL
+#else
 #define EWFACQUIRE_2_TIB		0x20000000000ULL
+#endif
+
 #define EWFACQUIRE_INPUT_BUFFER_SIZE	64
 
 device_handle_t *ewfacquire_device_handle   = NULL;

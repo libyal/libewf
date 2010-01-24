@@ -154,7 +154,7 @@ extern "C" {
 	sscanf( string, format, __VA_ARGS__ )
 #endif
 
-/* String to singed long long (int64)
+/* String to signed long long (int64)
  */
 #if defined( HAVE_GLIB_H )
 #define narrow_string_to_signed_long_long( string, end_of_string, base ) \
