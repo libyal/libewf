@@ -202,6 +202,9 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100125
+* updated libsmraw
+
 20100124
 * worked on Borland C++ Builder 5.5 support
 * updated common, liberror (snwprintf fix)
