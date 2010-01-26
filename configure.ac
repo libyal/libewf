@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100125],
+ [20100126],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100125])
+ [20100126])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -573,8 +573,9 @@ AC_CHECK_FUNCS(
   [Missing function: fstat],
   [1]) ])
 
-AC_CHECK_FUNCS([posix_fadvise])
 AC_CHECK_FUNCS([uname])
+
+LIBEWF_CHECK_FUNC_POSIX_FADVISE
 
 dnl Check for printf conversion specifier support
 LIBEWF_CHECK_PRINTF_JD

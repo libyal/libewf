@@ -124,7 +124,7 @@ if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
 	CFLAGS="$SAVE_CFLAGS"])
 
 dnl Function to detect if ctime_r or ctime is available
-dnl Also checks if ctime_t is defined according to the POSIX standard
+dnl Also checks if ctime_r is defined according to the POSIX standard
 AC_DEFUN([LIBEWF_CHECK_FUNC_CTIME],
 	[AC_CHECK_FUNC(
 	 [ctime_r],
@@ -183,6 +183,31 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_CTIME],
 	 [AC_MSG_FAILURE(
 	  [Missing function: ctime_r and ctime],
 	  [1]) ]) ])
+])
+
+dnl Function to detect if posix_fadvise is available
+AC_DEFUN([LIBEWF_CHECK_FUNC_POSIX_FADVISE],
+	[AC_CHECK_FUNCS(
+	 [posix_fadvise],
+	 [AC_LANG_PUSH(C)
+	 AC_MSG_CHECKING(
+	  [if posix_fadvise can be linked])
+	 AC_LINK_IFELSE(
+		AC_LANG_PROGRAM(
+		 [[#include <fcntl.h>]],
+		 [[#if !defined( POSIX_FADV_SEQUENTIAL )
+#define POSIX_FADV_SEQUENTIAL 2
+#endif
+posix_fadvise(0,0,0,POSIX_FADV_SEQUENTIAL)]]),
+		[AC_MSG_RESULT(
+		 [yes])
+	 	AC_DEFINE(
+		 [HAVE_POSIX_FADVISE],
+		 [1],
+		 [Define to 1 if you have the posix_fadvise unction.] )],
+		[AC_MSG_RESULT(
+		 [no]) ])
+	 AC_LANG_POP(C) ])
 ])
 
 dnl Function to determine the operating system
