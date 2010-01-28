@@ -202,6 +202,9 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100128
+* updated libsmraw
+
 20100126
 * worked on solution for Debian 4.0 posix_fadvise break
 * updated libsmdev

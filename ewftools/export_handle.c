@@ -2423,7 +2423,7 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( libsmraw_handle_set_segment_file_size(
+		if( libsmraw_handle_set_maximum_segment_size(
 		     export_handle->raw_output_handle,
 		     segment_file_size,
 		     error ) != 1 )
