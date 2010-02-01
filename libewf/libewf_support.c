@@ -1143,12 +1143,12 @@ int libewf_glob_wide(
 /* Frees the globbed wide filenames
  * Returns 1 if successful or -1 on error
  */
-int libewf_glob_free_wide(
+int libewf_glob_wide_free(
      wchar_t *filenames[],
      int amount_of_filenames,
      liberror_error_t **error )
 {
-	static char *function = "libewf_glob_free_wide";
+	static char *function = "libewf_glob_wide_free";
 	int filename_iterator = 0;
 
 	if( filenames == NULL )

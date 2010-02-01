@@ -1,4 +1,4 @@
-.Dd January 23, 2010
+.Dd February 1, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -33,7 +33,7 @@ Available when compiled with wide character string support:
 .Ft int
 .Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t **filenames[], int *amount_of_filenames, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob_free_wide "wchar_t *filenames[], int amount_of_filenames, libewf_error_t **error"
+.Fn libewf_glob_wide_free "wchar_t *filenames[], int amount_of_filenames, libewf_error_t **error"
 .Pp
 Available when compiled with libbfio support:
 .Ft int
@@ -349,10 +349,6 @@ functions are used to test if the EWF file signature is present within a certain
 .Ar filename.
 .Pp
 The
-.Fn libewf_signal_abort
-function signals the handle to aborts it current activity.
-.Pp
-The
 .Fn libewf_glob
 and
 .Fn libewf_glob_wide
@@ -368,72 +364,77 @@ If the
 is known the filename should contain the base of the filename otherwise the function will try to determine the format based on the extension.
 .Pp
 The
-.Fn libewf_open ,
-.Fn libewf_open_wide ,
-.Fn libewf_seek_offset ,
-.Fn libewf_read_buffer ,
-.Fn libewf_read_random ,
-.Fn libewf_write_buffer ,
-.Fn libewf_write_random ,
-.Fn libewf_close
+.Fn libewf_handle_signal_abort
+function signals the handle to aborts it current activity.
+.Pp
+The
+.Fn libewf_handle_open ,
+.Fn libewf_handle_open_wide ,
+.Fn libewf_handle_close ,
+.Fn libewf_handle_read_buffer ,
+.Fn libewf_handle_read_random ,
+.Fn libewf_handle_write_buffer ,
+.Fn libewf_handle_write_random ,
+.Fn libewf_handle_seek_offset
 functions can be used to open, seek in, read from, write to and close a set of EWF files.
 .Pp
 The
-.Fn libewf_write_finalize
+.Fn libewf_handle_write_finalize
 function needs to be called after writing a set of EWF files without knowing the input size upfront, e.g. reading from a pipe.
-.Fn libewf_write_finalize
+.Fn libewf_handle_write_finalize
 will the necessary correction to the set of EWF files.
 .Pp
 The
-.Fn libewf_raw_read_prepare_buffer ,
-.Fn libewf_raw_read_buffer
-functions can be used to read 'raw' chunks to a set of EWF files.
+.Fn libewf_handle_prepare_read_chunk ,
+.Fn libewf_handle_read_chunk
+functions can be used to read chunks to a set of EWF files.
 .Pp
 The
-.Fn libewf_raw_write_prepare_buffer ,
-.Fn libewf_raw_write_buffer
-functions can be used to write 'raw' chunks to a set of EWF files.
+.Fn libewf_handle_prepare_write_chunk ,
+.Fn libewf_handle_write_chunk
+functions can be used to write chunks to a set of EWF files.
 .Pp
 The
-.Fn libewf_get_*
+.Fn libewf_handle_get_*
 functions can be used to retrieve information from the
 .Ar handle.
 This information is read from a set of EWF files when
-.Fn libewf_open
+.Fn libewf_handle_open
 or
-.Fn libewf_open_wide
+.Fn libewf_handle_open_wide
 is used.
 .Pp
 The
-.Fn libewf_set_*
+.Fn libewf_handle_set_*
 functions can be used to set information in the
 .Ar handle.
 This information is written to a set of EWF files when
-.Fn libewf_write_buffer
+.Fn libewf_handle_write_buffer
 is used.
 .Pp
 The
-.Fn libewf_add_acquiry_error
+.Fn libewf_handle_add_acquiry_error
 function can be used to add an acquiry error (a read error during acquiry) to be written into a set of EWF files.
 .Pp
 The
-.Fn libewf_add_crc_error
+.Fn libewf_handle_add_crc_error
 function can be used to add a CRC error (a validation error in a chunk in a set of EWF files) to be set in the handle.
 .Pp
 The
-.Fn libewf_add_session
+.Fn libewf_handle_add_session
 function can be used to add a sesssion to be written into a set of EWF files. Note that the only the start offset is stored in a set of EWF files. Libewf ignores the session amount of sectors on write and determines the session sizes using the available session and media information on read.
 .Pp
 The
-.Fn libewf_copy_*
+.Fn libewf_handle_copy_*
 functions copy information from the
 .Ar source_handle
 to the 
 .Ar destination_handle.
 .Pp
 The
-.Fn libewf_set_notify_values
-function can be used to direct the warning, verbose and debug output from the library.
+.Fn libewf_notify_set_verbose ,
+.Fn libewf_notify_set_stream
+functions can be used to direct the warning, verbose and debug output from the library.
 .Sh RETURN VALUES
 Most of the functions return NULL or \-1 on error, dependent on the return type. For the actual return values refer to libewf.h
 .Sh ENVIRONMENT
@@ -459,7 +460,7 @@ As of version 20090328 libewf detects the UNICODE or _UNICODE directives to comp
 The directive HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS is no longer used.
 
 The header in a set of EWF files contains an extended ASCII string using the codepage of the system it was created on. The function 
-.Ar libewf_set_header_codepage
+.Ar libewf_handle_set_header_codepage
  allows to set the required codepage for reading and writing. The default codepage is ASCII and replaces all extended characters to the Unicode replacement character (U+fffd) when reading and the ASCII substitude character (0x1a) when writing. 
 
 The header2 contains UTF-16 little endian stream and the xheader and xhash contain a UTF-8 stream without or with byte order mark (as of version 20080903).

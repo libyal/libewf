@@ -1793,16 +1793,49 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
 		if( libewf_handle_get_media_flags(
 		     info_handle->input_handle,
 		     &media_flags,
 		     error ) == 1 )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			fprintf(
 			 stream,
 			 "\tMedia flags:\t\t0x%02" PRIx8 "\n",
 			 media_flags );
+#endif
+			fprintf(
+			 stream,
+			 "\tIs physical:\t\t" );
+
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) == LIBEWF_MEDIA_FLAG_PHYSICAL )
+			{
+				fprintf(
+				 stream,
+				 "yes" );
+			}
+			else
+			{
+				fprintf(
+				 stream,
+				 "no" );
+			}
+			fprintf(
+			 stream,
+			 "\n" );
+
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_FASTBLOC ) == LIBEWF_MEDIA_FLAG_FASTBLOC )
+			{
+				fprintf(
+				 stream,
+				 "\tWrite blocked:\t\tFastbloc\n" );
+			}
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_TABLEAU ) == LIBEWF_MEDIA_FLAG_TABLEAU )
+			{
+				fprintf(
+				 stream,
+				 "\tWrite blocked:\t\tTableau\n" );
+			}
 		}
 		else
 		{
@@ -1814,39 +1847,6 @@ int info_handle_media_information_fprint(
 			 function );
 
 			result = -1;
-		}
-#endif
-		fprintf(
-		 stream,
-		 "\tIs physical:\t\t" );
-
-		if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) == LIBEWF_MEDIA_FLAG_PHYSICAL )
-		{
-			fprintf(
-			 stream,
-			 "yes" );
-		}
-		else
-		{
-			fprintf(
-			 stream,
-			 "no" );
-		}
-		fprintf(
-		 stream,
-		 "\n" );
-
-		if( ( media_flags & LIBEWF_MEDIA_FLAG_FASTBLOC ) == LIBEWF_MEDIA_FLAG_FASTBLOC )
-		{
-			fprintf(
-			 stream,
-			 "\tWrite blocked:\t\tFastbloc\n" );
-		}
-		if( ( media_flags & LIBEWF_MEDIA_FLAG_TABLEAU ) == LIBEWF_MEDIA_FLAG_TABLEAU )
-		{
-			fprintf(
-			 stream,
-			 "\tWrite blocked:\t\tTableau\n" );
 		}
 	}
 	if( format != LIBEWF_FORMAT_LVF )

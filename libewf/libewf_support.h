@@ -90,7 +90,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    int *amount_of_filenames,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_glob_free_wide(
+LIBEWF_EXTERN int libewf_glob_wide_free(
                    wchar_t *filenames[],
                    int amount_of_filenames,
                    liberror_error_t **error );

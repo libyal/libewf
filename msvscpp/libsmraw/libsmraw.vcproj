@@ -110,6 +110,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmraw\libsmraw_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmraw\libsmraw_support.c"
 				>
 			</File>

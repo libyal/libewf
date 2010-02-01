@@ -202,6 +202,12 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100201
+* updated libsmdev, libsmraw
+* info_handle fix for media flags
+* updated libewf.3 manual
+* fixed missing libewf_glob_free_wide in include header
+
 20100128
 * updated libsmraw
 

@@ -129,11 +129,11 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    int *amount_of_filenames,
                    libewf_error_t **error );
 
-/* Frees the globbed filenames
+/* Frees the globbed wide filenames
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_glob_free(
-                   char *filenames[],
+LIBEWF_EXTERN int libewf_glob_wide_free(
+                   wchar_t *filenames[],
                    int amount_of_filenames,
                    libewf_error_t **error );
 #endif

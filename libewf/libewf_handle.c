@@ -803,8 +803,6 @@ int libewf_handle_open(
 
 				return( -1 );
 			}
-			file_io_handle = NULL;
-
 			if( libbfio_file_initialize(
 			     &file_io_handle,
 			     error ) != 1 )
@@ -890,6 +888,8 @@ int libewf_handle_open(
 
 				return( -1 );
 			}
+			file_io_handle = NULL;
+
 #if defined( HAVE_VERBOSE_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
@@ -1162,8 +1162,6 @@ int libewf_handle_open_wide(
 
 				return( -1 );
 			}
-			file_io_handle = NULL;
-
 			if( libbfio_file_initialize(
 			     &file_io_handle,
 			     error ) != 1 )
@@ -1249,6 +1247,8 @@ int libewf_handle_open_wide(
 
 				return( -1 );
 			}
+			file_io_handle = NULL;
+
 #if defined( HAVE_VERBOSE_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
