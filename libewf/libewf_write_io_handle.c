@@ -108,6 +108,7 @@ int libewf_write_io_handle_initialize(
 		( *write_io_handle )->maximum_segment_file_size        = INT32_MAX;
 		( *write_io_handle )->remaining_segment_file_size      = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 		( *write_io_handle )->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
+		( *write_io_handle )->maximum_amount_of_segments       = (uint16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
 	}
 	return( 1 );
 }

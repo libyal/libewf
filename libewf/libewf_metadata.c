@@ -3181,7 +3181,6 @@ int libewf_handle_set_header_value(
 
 			return( -1 );
 		}
-		internal_handle->header_values_parsed = 1;
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,

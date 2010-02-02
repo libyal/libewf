@@ -87,9 +87,9 @@ int libewf_io_handle_initialize(
 
 			return( -1 );
 		}
-		( *io_handle )->format            = LIBEWF_FORMAT_UNKNOWN;
-		( *io_handle )->ewf_format        = EWF_FORMAT_UNKNOWN;
-		( *io_handle )->compression_level = EWF_COMPRESSION_UNKNOWN;
+		( *io_handle )->format            = LIBEWF_FORMAT_ENCASE5;
+		( *io_handle )->ewf_format        = EWF_FORMAT_E01;
+		( *io_handle )->compression_level = EWF_COMPRESSION_NONE;
 	}
 	return( 1 );
 }
