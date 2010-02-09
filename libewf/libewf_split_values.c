@@ -350,12 +350,6 @@ int libewf_split_values_parse_string(
 
 		return( -1 );
 	}
-	/* Include the last character if not the end of string character
-	 */
-	if( string[ string_size - 1 ] != 0 )
-	{
-		string_size += 1;
-	}
 	/* Determine the amount of split values
 	 */
 	remaining_string_size = string_size;

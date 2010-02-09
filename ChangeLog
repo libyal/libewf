@@ -203,6 +203,12 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100209
+* fix for error parsing date time value in EWFX
+* worked on direct IO support
+  - updated libsmdev
+  - configure added detection of posix_memalign
+
 20100202
 * updated libsmdev
 * worked on smio handle support

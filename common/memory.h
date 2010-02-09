@@ -56,6 +56,13 @@ extern "C" {
 	malloc( size )
 #endif
 
+/* Aligned memory allocation
+ */
+#if defined( HAVE_POSIX_MEMALIGN )
+#define memory_allocate_aligned( buffer, buffer_size, alignment_size ) \
+	posix_memalign( buffer, alignment_size, buffer_size )
+#endif
+
 /* Memory reallocation
  */
 #if defined( HAVE_GLIB_H )
