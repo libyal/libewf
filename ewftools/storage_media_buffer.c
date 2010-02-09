@@ -36,8 +36,7 @@ int storage_media_buffer_initialize(
      size_t size,
      liberror_error_t **error )
 {
-	static char *function  = "storage_media_buffer_initialize";
-	size_t raw_buffer_size = 0;
+	static char *function = "storage_media_buffer_initialize";
 
 	if( buffer == NULL )
 	{
@@ -98,39 +97,15 @@ int storage_media_buffer_initialize(
 		}
 		if( size > 0 )
 		{
-			raw_buffer_size = size;
-
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 			/* Add 4 bytes to allow for write CRC buffer alignment
 			 */
-			raw_buffer_size += 4;
-#endif
-
-/* TODO can low level functions and direct IO be combined ? */
-#if defined( memory_allocate_aligned )
-			if( memory_allocate_aligned(
-			     (void **) &( ( *buffer )->raw_buffer ),
-			     raw_buffer_size,
-			     512 ) != 0 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create aligned raw buffer.",
-				 function );
-
-				memory_free(
-				 *buffer );
-
-				*buffer = NULL;
-
-				return( -1 );
-			}
-
+			( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
+			                                       sizeof( uint8_t ) * ( size + 4 ) );
 #else
 			( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
-			                                       sizeof( uint8_t ) * raw_buffer_size );
+			                                       sizeof( uint8_t ) * size );
+#endif
 			
 			if( ( *buffer )->raw_buffer == NULL )
 			{
@@ -148,7 +123,6 @@ int storage_media_buffer_initialize(
 
 				return( -1 );
 			}
-#endif /* defined( memory_allocate_aligned ) */
 			( *buffer )->raw_buffer_size = size;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )

@@ -336,13 +336,6 @@ AC_CHECK_FUNCS(
   [1]) ])
 
 AC_CHECK_FUNCS(
- [posix_memalign],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: posix_memalign],
-  [1]) ])
-
-AC_CHECK_FUNCS(
  [realloc],
  [],
  [AC_MSG_FAILURE(

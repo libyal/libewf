@@ -204,10 +204,8 @@ Next stable release:
 * disable ewfalter, ewfdebug
 
 20100209
-* fix for error parsing date time value in EWFX
-* worked on direct IO support
-  - updated libsmdev
-  - configure added detection of posix_memalign
+* worked on xheader parsing error
+  - removed inclusion of last character in libewf_split_values_parse_string
 
 20100202
 * updated libsmdev

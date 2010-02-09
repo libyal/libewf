@@ -282,7 +282,6 @@ int device_handle_open_input(
 #endif /* !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) */
 
 	static char *function                 = "device_handle_open_input";
-	uint8_t libsmdev_flags                = 0;
 	int result                            = 0;
 
 	if( device_handle == NULL )
@@ -366,27 +365,19 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
-		libsmdev_flags = LIBSMDEV_OPEN_READ;
-
-/* TODO
-#if defined( memory_allocate_aligned )
-		libsmdev_flags |= LIBSMDEV_FLAG_DIRECT_IO;
-#endif
-*/
-
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 		if( libsmdev_handle_open_wide(
 		     device_handle->dev_input_handle,
 		     (wchar_t * const *) filenames,
 		     amount_of_filenames,
-		     libsmdev_flags,
+		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
 #else
 		if( libsmdev_handle_open(
 		     device_handle->dev_input_handle,
 		     (char * const *) filenames,
 		     amount_of_filenames,
-		     libsmdev_flags,
+		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
 #endif
 		{
