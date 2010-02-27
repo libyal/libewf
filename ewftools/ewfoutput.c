@@ -68,10 +68,10 @@
 
 #include <libewf.h>
 
-#if defined( HAVE_LOCAL_LIBDEVAW )
-#include <libsmraw_definitions.h>
-#elif defined( HAVE_LIBDEVAW )
-#include <libsmraw.h>
+#if defined( HAVE_LOCAL_LIBSMDEV )
+#include <libsmdev_definitions.h>
+#elif defined( HAVE_LIBSMDEV )
+#include <libsmdev.h>
 #endif
 
 #if defined( HAVE_LOCAL_LIBSMRAW )
@@ -123,15 +123,19 @@ void ewfoutput_version_fprint(
 	 LIBEWF_VERSION_STRING,
 	 LIBEWF_VERSION_STRING );
 
+#if defined( HAVE_LIBUNA ) || defined( HAVE_LOCAL_LIBUNA )
 	fprintf(
 	 stream,
 	 ", libuna %s",
 	 LIBUNA_VERSION_STRING );
+#endif
 
+#if defined( HAVE_LIBBFIO ) || defined( HAVE_LOCAL_LIBBFIO )
 	fprintf(
 	 stream,
 	 ", libbfio %s",
 	 LIBBFIO_VERSION_STRING );
+#endif
 
 #if defined( HAVE_LIBZ )
 	fprintf(
@@ -140,11 +144,11 @@ void ewfoutput_version_fprint(
 	 ZLIB_VERSION );
 #endif
 
-#if defined( HAVE_LIBDEVAW ) || defined( HAVE_LOCAL_LIBDEVAW )
+#if defined( HAVE_LIBSMDEV ) || defined( HAVE_LOCAL_LIBSMDEV )
 	fprintf(
 	 stream,
 	 ", libsmdev %s",
-	 LIBDEVAW_VERSION_STRING );
+	 LIBSMDEV_VERSION_STRING );
 #endif
 
 #if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )

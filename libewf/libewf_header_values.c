@@ -5734,8 +5734,6 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
-fprintf( stderr, "Z: %d, %zd, %zd, %zd\n", date_time_elements->amount_of_values, *date_time_values_string_size, timezone_string_length, timezone_name_length );
-
 	if( ( date_time_elements->amount_of_values - empty_date_element_correction ) > 5 )
 	{
 		( *date_time_values_string )[ 19 ] = (libewf_character_t) ' ';
@@ -5749,7 +5747,7 @@ fprintf( stderr, "Z: %d, %zd, %zd, %zd\n", date_time_elements->amount_of_values,
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set timezone string in date time values string.",
+			 "%s: unable to set timezone string in data time values string.",
 			 function );
 
 			libewf_split_values_free(

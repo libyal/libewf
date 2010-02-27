@@ -1478,7 +1478,7 @@ int main( int argc, char * const argv[] )
 			case (libsystem_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
-				     &sector_error_granularity,
+				     &sectors_per_chunk,
 				     &error ) != 1 )
 				{
 					libsystem_notify_print_error_backtrace(
@@ -1486,15 +1486,15 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
-					sector_error_granularity = 64;
+					sectors_per_chunk = 64;
 
 					fprintf(
 					 stderr,
-					 "Unsuported amount of sector error granularity defaulting to: 64.\n" );
+					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
 				}
 				else
 				{
-					argument_set_sector_error_granularity = 1;
+					argument_set_sectors_per_chunk = 1;
 				}
 				break;
 
@@ -1610,7 +1610,7 @@ int main( int argc, char * const argv[] )
 			case (libsystem_integer_t) 'g':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
-				     &sectors_per_chunk,
+				     &sector_error_granularity,
 				     &error ) != 1 )
 				{
 					libsystem_notify_print_error_backtrace(
@@ -1618,15 +1618,15 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
-					sectors_per_chunk = 64;
+					sector_error_granularity = 64;
 
 					fprintf(
 					 stderr,
-					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
+					 "Unsuported amount of sector error granularity defaulting to: 64.\n" );
 				}
 				else
 				{
-					argument_set_sectors_per_chunk = 1;
+					argument_set_sector_error_granularity = 1;
 				}
 				break;
 

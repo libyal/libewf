@@ -72,26 +72,9 @@ struct device_handle
 	 */
 	libsmdev_handle_t *dev_input_handle;
 
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 	/* libsmraw input handle
 	 */
 	libsmdev_handle_t *raw_input_handle;
-#else
-#if defined( WINAPI )
-	/* File handle
-	 */
-	HANDLE file_handle;
-#else
-	/* File descriptor
-	 */
-	int file_descriptor;
-#endif
-
-	/* The file size
-	 */
-	size64_t file_size;
-
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 };
 
 int device_handle_initialize(

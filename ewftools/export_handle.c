@@ -140,10 +140,6 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
-#if !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW )
-		( *export_handle )->raw_output_file_descriptor = -1;
-#endif /* !defined( HAVE_LIBSMRAW ) && !defined( HAVE_LOCAL_LIBSMRAW ) */
-
 		if( md5_initialize(
 		     &( ( *export_handle )->md5_context ),
 		     error ) != 1 )
@@ -239,7 +235,6 @@ int export_handle_free(
 				result = -1;
 			}
 		}
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 		if( ( *export_handle )->raw_output_handle != NULL )
 		{
 			if( libsmraw_handle_free(
@@ -256,8 +251,6 @@ int export_handle_free(
 				result = -1;
 			}
 		}
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
-
 		if( ( *export_handle )->calculated_md5_hash_string != NULL )
 		{
 			memory_free(
@@ -328,7 +321,6 @@ int export_handle_signal_abort(
 			return( -1 );
 		}
 	}
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	      && ( export_handle->use_stdout == 0 ) )
 	{
@@ -346,7 +338,6 @@ int export_handle_signal_abort(
 			return( -1 );
 		}
 	}
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	return( 1 );
 }
 
@@ -947,7 +938,6 @@ int export_handle_open_output(
 		}
 		else
 		{
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 			if( export_handle->raw_output_handle != NULL )
 			{
 				liberror_error_set(
@@ -1004,30 +994,6 @@ int export_handle_open_output(
 
 				return( 1 );
 			}
-#else
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
-			export_handle->raw_output_file_descriptor = libsystem_file_io_wopen(
-			                                             filename,
-			                                             LIBSYSTEM_FILE_IO_O_CREAT | LIBSYSTEM_FILE_IO_O_WRONLY | LIBSYSTEM_FILE_IO_O_TRUNC );
-#else
-			export_handle->raw_output_file_descriptor = libsystem_file_io_open(
-			                                             filename,
-			                                             LIBSYSTEM_FILE_IO_O_CREAT | LIBSYSTEM_FILE_IO_O_WRONLY | LIBSYSTEM_FILE_IO_O_TRUNC );
-#endif /* defined( LIBSYSTEM_HAVE_WIDE_CHARACTER ) */
-
-			if( export_handle->raw_output_file_descriptor == -1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_OPEN_FAILED,
-				 "%s: unable to open file: %" PRIs_LIBSYSTEM ".",
-				 function,
-				 filename );
-
-				return( -1 );
-			}
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 		}
 	}
 	return( 1 );
@@ -1093,7 +1059,6 @@ int export_handle_close(
 			return( -1 );
 		}
 	}
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 	if( export_handle->raw_output_handle != NULL )
 	{
 		if( libsmraw_handle_close(
@@ -1110,24 +1075,6 @@ int export_handle_close(
 			return( -1 );
 		}
 	}
-#else
-	if( export_handle->raw_output_file_descriptor != -1 )
-	{
-		if( libsystem_file_io_close(
-		     export_handle->raw_output_file_descriptor ) != 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close raw output file descriptor.",
-			 function );
-
-			return( 1 );
-		}
-		export_handle->raw_output_file_descriptor = -1;
-	}
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	return( 0 );
 }
 
@@ -1547,29 +1494,11 @@ ssize_t export_handle_write_buffer(
 		}
 		else
 		{
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 			write_count = libsmraw_handle_write_buffer(
 				       export_handle->raw_output_handle,
 				       storage_media_buffer->raw_buffer,
 				       write_size,
 				       error );
-#else
-			if( export_handle->raw_output_file_descriptor == -1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid export handle - invalid raw output file descriptor.",
-				 function );
-
-				return( -1 );
-			}
-			write_count = libsystem_file_io_write(
-				       export_handle->raw_output_file_descriptor,
-				       storage_media_buffer->raw_buffer,
-				       write_size );
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 		}
 		if( write_count == -1 )
 		{
@@ -2405,7 +2334,6 @@ int export_handle_set_output_values(
 		}
 #endif
 	}
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	      && ( export_handle->use_stdout == 0 ) )
 	{
@@ -2438,7 +2366,6 @@ int export_handle_set_output_values(
 			return( -1 );
 		}
 	}
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	return( 1 );
 }
 
@@ -2652,7 +2579,6 @@ int export_handle_set_hash_value(
 			return( -1 );
 		}
 	}
-#if defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW )
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	      && ( export_handle->use_stdout == 0 ) )
 	{
@@ -2678,7 +2604,6 @@ int export_handle_set_hash_value(
 			return( -1 );
 		}
 	}
-#endif /* defined( HAVE_LIBSMRAW ) || defined( HAVE_LOCAL_LIBSMRAW ) */
 	memory_free(
 	 utf8_hash_value );
 

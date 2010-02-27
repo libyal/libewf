@@ -79,7 +79,9 @@ int libewf_list_element_initialize(
 
 int libewf_list_element_free(
      libewf_list_element_t **list_element,
-     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
+     int (*value_free_function)(
+            intptr_t *value,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_initialize(
@@ -88,18 +90,25 @@ int libewf_list_initialize(
 
 int libewf_list_free(
      libewf_list_t **list,
-     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
+     int (*value_free_function)(
+            intptr_t *value,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_empty(
      libewf_list_t *list,
-     int (*value_free_function)( intptr_t *value, liberror_error_t **error ),
+     int (*value_free_function)(
+            intptr_t *value,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_clone(
      libewf_list_t **destination,
      libewf_list_t *source,
-     int (*value_clone_function)( intptr_t **destination, intptr_t *source, liberror_error_t **error ),
+     int (*value_clone_function)(
+            intptr_t **destination,
+            intptr_t *source,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_get_amount_of_elements(
@@ -142,13 +151,19 @@ int libewf_list_append_value(
 int libewf_list_insert_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     int (*value_compare_function)( intptr_t *first, intptr_t *second, liberror_error_t **error ),
+     int (*value_compare_function)(
+            intptr_t *first,
+            intptr_t *second,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_insert_value(
      libewf_list_t *list,
      intptr_t *value,
-     int (*value_compare_function)( intptr_t *first, intptr_t *second, liberror_error_t **error ),
+     int (*value_compare_function)(
+            intptr_t *first,
+            intptr_t *second,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_list_remove_element(
