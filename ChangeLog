@@ -203,6 +203,9 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20100314
+* small changes to configure.ac
+
 20100227
 * applied ewfacquire argument swap patch
 * updated libsmraw and libsmdev

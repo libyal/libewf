@@ -177,10 +177,6 @@ AC_CHECK_HEADERS([linux/usb/ch9.h])
 dnl Headers included in ewftools/platform.c
 AC_CHECK_HEADERS([sys/utsname.h])
 
-dnl Headers included in ewftools/ewfoutput.c
-AC_CHECK_HEADERS([openssl/opensslv.h])
-AC_CHECK_HEADERS([zlib.h])
-
 dnl Other headers
 
 dnl Check for type definitions
@@ -590,6 +586,10 @@ LIBEWF_CHECK_PRINTF_ZD
 
 dnl Checks for libraries and library functions
 dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
+
+dnl Check for zlib compression support
+AC_CHECK_HEADERS([zlib.h])
+
 AC_CHECK_LIB(
  z,
  adler32,
@@ -1502,7 +1502,9 @@ AS_IF(
 	 [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support.])
 	])
 
-dnl Check for enabling guid support
+AC_CHECK_HEADERS([openssl/opensslv.h])
+
+dnl Check for enabling GUID/UUID support
 AC_CHECK_HEADERS(
  [uuid/uuid.h],
  [],
