@@ -26,6 +26,7 @@ libewf_la_SOURCES = \
 	ewf_volume_smart.h \
 	ewfx_delta_chunk.h \
 	libewf.c \
+	libewf_array_type.c libewf_array_type.h \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
 	libewf_chunk_offset.h \
 	libewf_codepage.h \

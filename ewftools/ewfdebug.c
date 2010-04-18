@@ -128,8 +128,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t * const *argv_filenames = NULL;
 	libcstring_system_character_t **ewf_filenames         = NULL;
 
-	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfdebug" );
-
+	char *program                                         = "ewfdebug";
 	libcstring_system_integer_t option                    = 0;
 	size_t first_filename_length                          = 0;
 	uint8_t verbose                                       = 0;

@@ -1435,6 +1435,7 @@ int libewf_handle_open_file_io_pool(
 	static char *function                     = "libewf_handle_open_file_io_pool";
 	uint16_t segment_number                   = 0;
 	int amount_of_handles                     = 0;
+	int amount_of_segment_file_handles        = 0;
 	int file_io_handle_iterator               = 0;
 	int result                                = 0;
 	uint8_t segment_file_type                 = 0;
@@ -1574,15 +1575,13 @@ int libewf_handle_open_file_io_pool(
 			}
 #endif
 
-			result = libewf_internal_handle_add_segment_file(
-			          internal_handle,
-			          file_io_handle_iterator,
-			          flags,
-			          &segment_number,
-			          &segment_file_type,
-			          error );
-
-			if( result == -1 )
+			if( libewf_internal_handle_add_segment_file(
+			     internal_handle,
+			     file_io_handle_iterator,
+			     flags,
+			     &segment_number,
+			     &segment_file_type,
+			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
@@ -1592,18 +1591,6 @@ int libewf_handle_open_file_io_pool(
 				 function );
 
 				internal_handle->file_io_pool = NULL;
-
-				return( -1 );
-			}
-			else if( result == 0 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: segment file: %" PRIu16 " already exists.",
-				 function,
-				 segment_number );
 
 				return( -1 );
 			}
@@ -1661,31 +1648,49 @@ int libewf_handle_open_file_io_pool(
 		}
 		if( ( flags & LIBEWF_FLAG_RESUME ) == 0 )
 		{
-			if( ( internal_handle->delta_segment_table->amount > 1 )
-			 && ( libewf_segment_table_read(
-			       internal_handle->delta_segment_table,
-			       internal_handle->io_handle,
-			       internal_handle->file_io_pool,
-			       internal_handle->header_sections,
-			       internal_handle->hash_sections,
-			       internal_handle->media_values,
-			       internal_handle->offset_table,
-			       internal_handle->sessions,
-			       internal_handle->acquiry_errors,
-			       internal_handle->single_files,
-			       &( internal_handle->abort ),
-			       error ) != 1 ) )
+			if( libewf_segment_table_get_amount_of_handles(
+			     internal_handle->delta_segment_table,
+			     &amount_of_segment_file_handles,
+			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read delta segment table.",
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve amount of handles in delta segment table.",
 				 function );
 
 				internal_handle->file_io_pool = NULL;
 
 				return( -1 );
+			}
+			if( amount_of_segment_file_handles > 1 )
+			{
+				if( libewf_segment_table_read(
+				     internal_handle->delta_segment_table,
+				     internal_handle->io_handle,
+				     internal_handle->file_io_pool,
+				     internal_handle->header_sections,
+				     internal_handle->hash_sections,
+				     internal_handle->media_values,
+				     internal_handle->offset_table,
+				     internal_handle->sessions,
+				     internal_handle->acquiry_errors,
+				     internal_handle->single_files,
+				     &( internal_handle->abort ),
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read delta segment table.",
+					 function );
+
+					internal_handle->file_io_pool = NULL;
+
+					return( -1 );
+				}
 			}
 		}
 		/* Determine the EWF format
@@ -4619,18 +4624,19 @@ int libewf_handle_get_file_io_handle(
 }
 
 /* Appends a segment file
- * Returns 1 if successful, 0 if the segment file already exists or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_internal_handle_add_segment_file(
      libewf_internal_handle_t *internal_handle,
      int file_io_pool_entry,
      int flags,
-     int *segment_number,
+     uint16_t *segment_number,
      uint8_t *segment_file_type,
      liberror_error_t **error )
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_internal_handle_add_segment_file";
+	int amount_of_segment_file_handles                = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -4715,7 +4721,7 @@ int libewf_internal_handle_add_segment_file(
 		 function );
 
 		libewf_segment_file_handle_free(
-		 &segment_file_handle,
+		 (intptr_t *) segment_file_handle,
 		 NULL );
 
 		return( -1 );
@@ -4730,7 +4736,7 @@ int libewf_internal_handle_add_segment_file(
 		 function );
 
 		libewf_segment_file_handle_free(
-		 &segment_file_handle,
+		 (intptr_t *) segment_file_handle,
 		 NULL );
 
 		return( -1 );
@@ -4738,82 +4744,127 @@ int libewf_internal_handle_add_segment_file(
 	if( ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
 	 || ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
 	{
-		if( ( *segment_number >= internal_handle->segment_table->amount )
-		 && ( libewf_segment_table_resize(
-		       internal_handle->segment_table,
-		       *segment_number + 1,
-		       error ) != 1 ) )
+		if( libewf_segment_table_get_amount_of_handles(
+		     internal_handle->segment_table,
+		     &amount_of_segment_file_handles,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize the segment table.",
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of handles in segment table.",
 			 function );
 
 			libewf_segment_file_handle_free(
-			 &segment_file_handle,
+			 (intptr_t *) segment_file_handle,
 			 NULL );
 
 			return( -1 );
 		}
-		if( internal_handle->segment_table->segment_file_handle[ *segment_number ] != NULL )
+		if( (int) *segment_number >= amount_of_segment_file_handles )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libewf_segment_table_resize(
+			     internal_handle->segment_table,
+			     (int) *segment_number + 1,
+			     error ) != 1 )
 			{
-				libnotify_printf(
-				 "%s: segment file: %" PRIu16 " already exists.\n",
-				 function,
-				 *segment_number );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+				 "%s: unable to resize the segment table.",
+				 function );
+
+				libewf_segment_file_handle_free(
+				 (intptr_t *) segment_file_handle,
+				 NULL );
+
+				return( -1 );
 			}
-#endif
+		}
+		if( libewf_segment_table_set_handle(
+		     internal_handle->segment_table,
+		     (int) *segment_number,
+		     segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set handle: %" PRIu16 " in segment table.",
+			 function,
+			 *segment_number );
 
 			libewf_segment_file_handle_free(
-			 &segment_file_handle,
+			 (intptr_t *) segment_file_handle,
 			 NULL );
 
-			return( 0 );
+			return( -1 );
 		}
-		internal_handle->segment_table->segment_file_handle[ *segment_number ] = segment_file_handle;
 	}
 	else if( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
-		if( ( *segment_number >= internal_handle->delta_segment_table->amount )
-		 && ( libewf_segment_table_resize(
-		       internal_handle->delta_segment_table,
-		       *segment_number + 1,
-		       error ) != 1 ) )
+		if( libewf_segment_table_get_amount_of_handles(
+		     internal_handle->delta_segment_table,
+		     &amount_of_segment_file_handles,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize the delta segment table.",
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve amount of handles in delta segment table.",
 			 function );
+
+			libewf_segment_file_handle_free(
+			 (intptr_t *) segment_file_handle,
+			 NULL );
 
 			return( -1 );
 		}
-		if( internal_handle->delta_segment_table->segment_file_handle[ *segment_number ] != NULL )
+		if( (int) *segment_number >= amount_of_segment_file_handles )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libewf_segment_table_resize(
+			     internal_handle->delta_segment_table,
+			     (int) *segment_number + 1,
+			     error ) != 1 )
 			{
-				libnotify_printf(
-				 "%s: delta segment file: %" PRIu16 " already exists.\n",
-				 function,
-				 *segment_number );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+				 "%s: unable to resize the delta segment table.",
+				 function );
+
+				libewf_segment_file_handle_free(
+				 (intptr_t *) segment_file_handle,
+				 NULL );
+
+				return( -1 );
 			}
-#endif
+		}
+		if( libewf_segment_table_set_handle(
+		     internal_handle->delta_segment_table,
+		     (int) *segment_number,
+		     segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set handle: %" PRIu16 " in delta segment table.",
+			 function,
+			 *segment_number );
 
 			libewf_segment_file_handle_free(
-			 &segment_file_handle,
+			 (intptr_t *) segment_file_handle,
 			 NULL );
 
-			return( 0 );
+			return( -1 );
 		}
-		internal_handle->delta_segment_table->segment_file_handle[ *segment_number ] = segment_file_handle;
-
 		/* Re-open the delta segment file with write access
 		 */
 		if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
@@ -4846,7 +4897,7 @@ int libewf_internal_handle_add_segment_file(
 		 function );
 
 		libewf_segment_file_handle_free(
-		 &segment_file_handle,
+		 (intptr_t *) segment_file_handle,
 		 NULL );
 
 		return( -1 );

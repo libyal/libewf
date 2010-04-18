@@ -135,7 +135,7 @@ int main( int argc, char * const argv[] )
 	info_handle_t *info_handle                            = NULL;
 	liberror_error_t *error                               = NULL;
 
-	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfinfo" );
+	char *program                                         = "ewfinfo";
 	libcstring_system_integer_t option                    = 0;
 	uint8_t verbose                                       = 0;
 	uint8_t date_format                                   = LIBEWF_DATE_FORMAT_CTIME;

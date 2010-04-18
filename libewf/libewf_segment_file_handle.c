@@ -136,7 +136,7 @@ int libewf_segment_file_handle_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_free(
-     libewf_segment_file_handle_t **segment_file_handle,
+     intptr_t *segment_file_handle,
      liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_free";
@@ -153,30 +153,26 @@ int libewf_segment_file_handle_free(
 
 		return( -1 );
 	}
-	if( *segment_file_handle != NULL )
+	if( ( (libewf_segment_file_handle_t *) segment_file_handle )->section_list != NULL )
 	{
-		if( ( *segment_file_handle )->section_list != NULL )
+		if( libewf_list_free(
+		     &( ( (libewf_segment_file_handle_t *) segment_file_handle )->section_list ),
+		     &libewf_section_list_values_free,
+		     error ) != 1 )
 		{
-			if( libewf_list_free(
-			     &( ( *segment_file_handle )->section_list ),
-			     &libewf_section_list_values_free,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free section list.",
-				 function );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free section list.",
+			 function );
 
-				result = -1;
-			}
+			result = -1;
 		}
-		memory_free(
-		 *segment_file_handle );
-
-		*segment_file_handle = NULL;
 	}
+	memory_free(
+	 segment_file_handle );
+
 	return( result );
 }
 

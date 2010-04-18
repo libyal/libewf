@@ -30,6 +30,7 @@
 #include <libcstring.h>
 #include <liberror.h>
 
+#include "libewf_array_type.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
@@ -51,14 +52,6 @@ typedef struct libewf_segment_table libewf_segment_table_t;
 
 struct libewf_segment_table
 {
-	/* The amount of segments in the table
-	 */
-	uint16_t amount;
-
-	/* A dynamic array containting references to segment file handles
-	 */
-	libewf_segment_file_handle_t **segment_file_handle;
-
 	/* The basename
 	 */
 	libcstring_system_character_t *basename;
@@ -67,6 +60,10 @@ struct libewf_segment_table
 	 */
 	size_t basename_size;
 
+	/* The segment file handle array
+	 */
+	libewf_array_t *segment_file_handle_array;
+
 	/* The maximum segment size
 	 */
 	size64_t maximum_segment_size;
@@ -74,7 +71,7 @@ struct libewf_segment_table
 
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
-     uint16_t amount,
+     int amount,
      size64_t maximum_segment_size,
      liberror_error_t **error );
 
@@ -84,7 +81,7 @@ int libewf_segment_table_free(
 
 int libewf_segment_table_resize(
      libewf_segment_table_t *segment_table,
-     uint16_t amount,
+     int amount,
      liberror_error_t **error );
 
 int libewf_segment_table_get_basename_size(
@@ -123,6 +120,23 @@ int libewf_segment_table_set_basename_wide(
      liberror_error_t **error );
 #endif
 
+int libewf_segment_table_get_amount_of_handles(
+     libewf_segment_table_t *segment_table,
+     int *amount_of_handles,
+     liberror_error_t **error );
+
+int libewf_segment_table_get_handle(
+     libewf_segment_table_t *segment_table,
+     int handle_index,
+     libewf_segment_file_handle_t **handle,
+     liberror_error_t **error );
+
+int libewf_segment_table_set_handle(
+     libewf_segment_table_t *segment_table,
+     int handle_index,
+     libewf_segment_file_handle_t *handle,
+     liberror_error_t **error );
+
 int libewf_segment_table_read(
      libewf_segment_table_t *segment_table,
      libewf_io_handle_t *io_handle,
@@ -144,6 +158,7 @@ int libewf_segment_table_create_segment_file(
      libbfio_pool_t *file_io_pool,
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
+     libewf_segment_file_handle_t **segment_file_handle,
      liberror_error_t **error );
 
 int libewf_segment_table_write_sections_corrections(

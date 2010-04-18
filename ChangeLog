@@ -211,6 +211,8 @@ Next stable release:
 * updated common, liberror, libnotify, libuna, libbfio, libsystem, libsmdev,
   libsmraw
 * email change
+* refactored segment table
+  - added array type
 
 20100314
 * small changes to configure.ac

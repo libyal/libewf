@@ -492,9 +492,9 @@ int main( int argc, char * const argv[] )
 
 	libcstring_system_character_t * const *argv_filenames = NULL;
 
-	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfalter" );
 	libcstring_system_character_t *target_filename        = NULL;
 
+	char *program                                         = "ewfalter";
 	libcstring_system_integer_t option                    = 0;
 	size64_t media_size                                   = 0;
 	ssize64_t alter_count                                 = 0;

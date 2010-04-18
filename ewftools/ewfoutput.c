@@ -25,10 +25,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-
-#include <errno.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
@@ -39,14 +35,6 @@
 
 #if defined( HAVE_SYS_UTSNAME_H )
 #include <sys/utsname.h>
-#endif
-
-#if defined( HAVE_STDARG_H ) || defined( WINAPI )
-#include <stdarg.h>
-#elif defined( HAVE_VARARGS_H )
-#include <varargs.h>
-#else
-#error No variable argument support available
 #endif
 
 #include <libewf/features.h>
@@ -97,7 +85,7 @@
  */
 void ewfoutput_version_fprint(
       FILE *stream,
-      const libcstring_system_character_t *program )
+      const char *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
@@ -119,7 +107,7 @@ void ewfoutput_version_fprint(
 	}
 	fprintf(
 	 stream,
-	 "%" PRIs_LIBCSTRING_SYSTEM " %s (libewf %s",
+	 "%s %s (libewf %s",
 	 program,
 	 LIBEWF_VERSION_STRING,
 	 LIBEWF_VERSION_STRING );

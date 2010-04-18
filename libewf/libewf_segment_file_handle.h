@@ -66,7 +66,7 @@ int libewf_segment_file_handle_initialize(
      liberror_error_t **error );
 
 int libewf_segment_file_handle_free(
-     libewf_segment_file_handle_t **segment_file_handle,
+     intptr_t *segment_file_handle,
      liberror_error_t **error );
 
 #if defined( __cplusplus )
