@@ -33,13 +33,15 @@
 #include "libewf_filename.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libuna.h"
 #include "libewf_segment_file.h"
+#include "libewf_segment_file_handle.h"
 #include "libewf_segment_table.h"
 #include "libewf_single_files.h"
 
 #include "ewf_data.h"
 
-/* Initialize the hash sections
+/* Initialize the segment table
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_initialize(
@@ -167,7 +169,7 @@ int libewf_segment_table_initialize(
 	return( 1 );
 }
 
-/* Frees the hash sections including elements
+/* Frees the segment table including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_free(
@@ -249,6 +251,17 @@ int libewf_segment_table_resize(
 
 		return( -1 );
 	}
+	if( amount == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 "%s: invalid amount value cannot be zero.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_table->amount < amount )
 	{
 		segment_table_size = sizeof( libewf_segment_file_handle_t * ) * amount;
@@ -300,10 +313,966 @@ int libewf_segment_table_resize(
 	return( 1 );
 }
 
-/* Builds the segment table from all segment files
+/* Retrieves the size of the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename_size(
+     libewf_segment_table_t *segment_table,
+     size_t *basename_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_get_basename_size";
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	int result            = 0;A
+#endif
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename size.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_size_from_utf32(
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_size_from_utf16(
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_size_from_utf32(
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_size_from_utf16(
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	*basename_size = segment_table->basename_size;
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+
+	return( 1 );
+}
+
+/* Retrieves the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename(
+     libewf_segment_table_t *segment_table,
+     char *basename,
+     size_t basename_size,
+     liberror_error_t **error )
+{
+	static char *function       = "libewf_segment_table_get_basename";
+	size_t narrow_basename_size = 0;
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	int result                  = 0;
+#endif
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_size_from_utf32(
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          narrow_basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_size_from_utf16(
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          narrow_basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_size_from_utf32(
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          narrow_basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_size_from_utf16(
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          narrow_basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine narrow basename size.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	narrow_basename_size = segment_table->basename_size;
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+
+	if( basename_size < narrow_basename_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: basename too small.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_copy_from_utf32(
+		          (libuna_utf8_character_t *) basename,
+		          basename_size,
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_copy_from_utf16(
+		          (libuna_utf8_character_t *) basename,
+		          basename_size,
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_copy_from_utf32(
+		          (uint8_t *) basename,
+		          basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_copy_from_utf16(
+		          (uint8_t *) basename,
+		          basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( libcstring_system_string_copy(
+	     basename,
+	     segment_table->basename,
+	     segment_table->basename_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set basename.",
+		 function );
+
+		return( -1 );
+	}
+	basename[ segment_table->basename_size - 1 ] = 0;
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+
+	return( 1 );
+}
+
+/* Sets the basename in the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_set_basename(
+     libewf_segment_table_t *segment_table,
+     const char *basename,
+     size_t basename_length,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_set_basename";
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	int result            = 0;
+#endif
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename != NULL )
+	{
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_size_from_utf8(
+		          (libuna_utf8_character_t *) basename,
+		          basename_length + 1,
+		          &( segment_table->basename_size ),
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_size_from_utf8(
+		          (libuna_utf8_character_t *) basename,
+		          basename_length + 1,
+		          &( segment_table->basename_size ),
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_size_from_byte_stream(
+		          (uint8_t *) basename,
+		          basename_length + 1,
+		          libcstring_narrow_system_string_codepage,
+		          &( segment_table->basename_size ),
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_size_from_byte_stream(
+		          (uint8_t *) basename,
+		          basename_length + 1,
+		          libcstring_narrow_system_string_codepage,
+		          &( segment_table->basename_size ),
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	segment_table->basename_size = basename_length + 1;
+#endif
+	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
+	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
+
+	if( segment_table->basename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create basename.",
+		 function );
+
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_copy_from_utf8(
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          (libuna_utf8_character_t *) basename,
+		          basename_length + 1,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_copy_from_utf8(
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          (libuna_utf8_character_t *) basename,
+		          basename_length + 1,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_copy_from_byte_stream(
+		          (libuna_utf32_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          (uint8_t *) basename,
+		          basename_length + 1,
+		          libcstring_narrow_system_string_codepage,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_copy_from_byte_stream(
+		          (libuna_utf16_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          (uint8_t *) basename,
+		          basename_length + 1,
+		          libcstring_narrow_system_string_codepage,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.",
+		 function );
+
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+#else
+	if( libcstring_system_string_copy(
+	     segment_table->basename,
+	     basename,
+	     basename_length ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set basename.",
+		 function );
+
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+	segment_table->basename[ basename_length ] = 0;
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+
+	return( 1 );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+/* Retrieves the size of the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename_size_wide(
+     libewf_segment_table_t *segment_table,
+     size_t *basename_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_get_basename_size_wide";
+
+#if !defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	int result            = 0;
+#endif
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename size.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+	*basename_size = segment_table->basename_size;
+#else
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_size_from_utf8(
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_size_from_utf8(
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_size_from_byte_stream(
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_size_from_byte_stream(
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.",
+		 function );
+
+		return( -1 );
+	}
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+	return( 1 );
+}
+
+/* Retrieves the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename_wide(
+     libewf_segment_table_t *segment_table,
+     wchar_t *basename,
+     size_t basename_size,
+     liberror_error_t **error )
+{
+	static char *function     = "libewf_segment_table_get_basename_wide";
+	size_t wide_basename_size = 0;
+
+#if !defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	int result                = 0;
+#endif
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+	wide_basename_size = segment_table->basename_size;
+#else
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_size_from_utf8(
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          &wide_basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_size_from_utf8(
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          &wide_basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_size_from_byte_stream(
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          &wide_basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_size_from_byte_stream(
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          &wide_basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.",
+		 function );
+
+		return( -1 );
+	}
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+	if( basename_size < wide_basename_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: basename too small.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libcstring_system_string_copy(
+	     basename,
+	     segment_table->basename,
+	     segment_table->basename_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set basename.",
+		 function );
+
+		return( -1 );
+	}
+	basename[ segment_table->basename_size - 1 ] = 0;
+#else
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_copy_from_utf8(
+		          (libuna_utf32_character_t *) basename,
+		          basename_size,
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_copy_from_utf8(
+		          (libuna_utf16_character_t *) basename,
+		          basename_size,
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf32_string_copy_from_byte_stream(
+		          (libuna_utf32_character_t *) basename,
+		          basename_size,
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf16_string_copy_from_byte_stream(
+		          (libuna_utf16_character_t *) basename,
+		          basename_size,
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.",
+		 function );
+
+		return( -1 );
+	}
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+	return( 1 );
+}
+
+/* Sets the basename in the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_set_basename_wide(
+     libewf_segment_table_t *segment_table,
+     const wchar_t *basename,
+     size_t basename_length,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_set_basename_wide";
+
+#if !defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	int result            = 0;
+#endif
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename != NULL )
+	{
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+	}
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+	segment_table->basename_size = basename_length + 1;
+#else
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_size_from_utf32(
+		          (libuna_utf32_character_t *) basename,
+		          basename_length + 1,
+		          &( segment_table->basename_size ),
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_size_from_utf16(
+		          (libuna_utf16_character_t *) basename,
+		          basename_length + 1,
+		          &( segment_table->basename_size ),
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_size_from_utf32(
+		          (libuna_utf32_character_t *) basename,
+		          basename_length + 1,
+		          libcstring_narrow_system_string_codepage,
+		          &( segment_table->basename_size ),
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_size_from_utf16(
+		          (libuna_utf16_character_t *) basename,
+		          basename_length + 1,
+		          libcstring_narrow_system_string_codepage,
+		          &( segment_table->basename_size ),
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.",
+		 function );
+
+		return( -1 );
+	}
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
+	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
+
+	if( segment_table->basename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create basename.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libcstring_system_string_copy(
+	     segment_table->basename,
+	     basename,
+	     basename_length ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set basename.",
+		 function );
+
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+	segment_table->basename[ basename_length ] = 0;
+#else
+	if( libcstring_narrow_system_string_codepage == 0 )
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_utf8_string_copy_from_utf32(
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          (libuna_utf32_character_t *) basename,
+		          basename_length + 1,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_utf8_string_copy_from_utf16(
+		          (libuna_utf8_character_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          (libuna_utf16_character_t *) basename,
+		          basename_length + 1,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	else
+	{
+#if SIZEOF_WCHAR_T == 4
+		result = libuna_byte_stream_copy_from_utf32(
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf32_character_t *) basename,
+		          basename_length + 1,
+		          error );
+#elif SIZEOF_WCHAR_T == 2
+		result = libuna_byte_stream_copy_from_utf16(
+		          (uint8_t *) segment_table->basename,
+		          segment_table->basename_size,
+		          libcstring_narrow_system_string_codepage,
+		          (libuna_utf16_character_t *) basename,
+		          basename_length + 1,
+		          error );
+#else
+#error Unsupported size of wchar_t
+#endif /* SIZEOF_WCHAR_T */
+	}
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.",
+		 function );
+
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+	return( 1 );
+}
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+/* Reads the segment table from all segment files
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int libewf_segment_table_build(
+int libewf_segment_table_read(
      libewf_segment_table_t *segment_table,
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
@@ -317,7 +1286,7 @@ int libewf_segment_table_build(
      int *abort,
      liberror_error_t **error )
 {
-	static char *function   = "libewf_segment_table_build";
+	static char *function   = "libewf_segment_table_read";
 	uint16_t segment_number = 0;
 	int last_segment_file   = 0;
 	int result              = 0;
@@ -451,585 +1420,6 @@ int libewf_segment_table_build(
 	}
 	return( 1 );
 }
-
-/* Retrieves the size of the basename in the segment table
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_segment_table_get_basename_size(
-     libewf_segment_table_t *segment_table,
-     size_t *basename_size,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_segment_table_get_basename_size";
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename size.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->basename == NULL )
-	{
-		return( 0 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( narrow_string_size_from_libewf_system_string(
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	*basename_size = segment_table->basename_size;
-#endif
-
-	return( 1 );
-}
-
-/* Retrieves the basename in the segment table
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_segment_table_get_basename(
-     libewf_segment_table_t *segment_table,
-     char *basename,
-     size_t basename_size,
-     liberror_error_t **error )
-{
-	static char *function       = "libewf_segment_table_get_basename";
-	size_t narrow_basename_size = 0;
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->basename == NULL )
-	{
-		return( 0 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( narrow_string_size_from_libewf_system_string(
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     &narrow_basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	narrow_basename_size = segment_table->basename_size;
-#endif
-	if( basename_size < narrow_basename_size )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: basename too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( narrow_string_copy_from_libewf_system_string(
-	     basename,
-	     basename_size,
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	if( libcstring_system_string_copy(
-	     basename,
-	     segment_table->basename,
-	     segment_table->basename_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.",
-		 function );
-
-		return( -1 );
-	}
-	basename[ segment_table->basename_size - 1 ] = 0;
-#endif
-	return( 1 );
-}
-
-/* Sets the basename in the segment table
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_set_basename(
-     libewf_segment_table_t *segment_table,
-     const char *basename,
-     size_t basename_size,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_segment_table_set_basename";
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->basename != NULL )
-	{
-		memory_free(
-		 segment_table->basename );
-
-		segment_table->basename      = NULL;
-		segment_table->basename_size = 0;
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( libewf_system_string_size_from_narrow_string(
-	     basename,
-	     basename_size,
-	     &( segment_table->basename_size ),
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	segment_table->basename_size = basename_size;
-#endif
-	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
-	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
-
-	if( segment_table->basename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create basename.",
-		 function );
-
-		segment_table->basename_size = 0;
-
-		return( -1 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( libewf_system_string_copy_from_narrow_string(
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     basename,
-	     basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.",
-		 function );
-
-		memory_free(
-		 segment_table->basename );
-
-		segment_table->basename      = NULL;
-		segment_table->basename_size = 0;
-
-		return( -1 );
-	}
-#else
-	if( libcstring_system_string_copy(
-	     segment_table->basename,
-	     basename,
-	     basename_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.",
-		 function );
-
-		memory_free(
-		 segment_table->basename );
-
-		segment_table->basename      = NULL;
-		segment_table->basename_size = 0;
-
-		return( -1 );
-	}
-	segment_table->basename[ basename_size - 1 ] = 0;
-#endif
-	return( 1 );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-/* Retrieves the size of the basename in the segment table
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_segment_table_get_basename_size_wide(
-     libewf_segment_table_t *segment_table,
-     size_t *basename_size,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_segment_table_get_basename_size_wide";
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename size.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->basename == NULL )
-	{
-		return( 0 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	*basename_size = segment_table->basename_size;
-#else
-	if( wide_string_size_from_libewf_system_string(
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-
-	return( 1 );
-}
-
-/* Retrieves the basename in the segment table
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_segment_table_get_basename_wide(
-     libewf_segment_table_t *segment_table,
-     wchar_t *basename,
-     size_t basename_size,
-     liberror_error_t **error )
-{
-	static char *function     = "libewf_segment_table_get_basename_wide";
-	size_t wide_basename_size = 0;
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->basename == NULL )
-	{
-		return( 0 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	wide_basename_size = segment_table->basename_size;
-#else
-	if( wide_string_size_from_libewf_system_string(
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     &wide_basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( basename_size < wide_basename_size )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: basename too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( libcstring_system_string_copy(
-	     basename,
-	     segment_table->basename,
-	     segment_table->basename_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.",
-		 function );
-
-		return( -1 );
-	}
-	basename[ segment_table->basename_size - 1 ] = 0;
-#else
-	if( wide_string_copy_from_libewf_system_string(
-	     basename,
-	     basename_size,
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( 1 );
-}
-
-/* Sets the basename in the segment table
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_set_basename_wide(
-     libewf_segment_table_t *segment_table,
-     const wchar_t *basename,
-     size_t basename_size,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_segment_table_set_basename_wide";
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->basename != NULL )
-	{
-		memory_free(
-		 segment_table->basename );
-
-		segment_table->basename      = NULL;
-		segment_table->basename_size = 0;
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	segment_table->basename_size = basename_size;
-#else
-	if( libewf_system_string_size_from_wide_string(
-	     basename,
-	     basename_size,
-	     &( segment_table->basename_size ),
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
-	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
-
-
-	if( segment_table->basename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create basename.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( libcstring_system_string_copy(
-	     segment_table->basename,
-	     basename,
-	     basename_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.",
-		 function );
-
-		memory_free(
-		 segment_table->basename );
-
-		segment_table->basename      = NULL;
-		segment_table->basename_size = 0;
-
-		return( -1 );
-	}
-	segment_table->basename[ basename_size - 1 ] = 0;
-#else
-	if( libewf_system_string_copy_from_wide_string(
-	     segment_table->basename,
-	     segment_table->basename_size,
-	     basename,
-	     basename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.",
-		 function );
-
-		memory_free(
-		 segment_table->basename );
-
-		segment_table->basename      = NULL;
-		segment_table->basename_size = 0;
-
-		return( -1 );
-	}
-#endif
-	return( 1 );
-}
-#endif
 
 /* Creates a new segment file and opens it for writing
  * The necessary sections at the start of the segment file are written
@@ -1199,7 +1589,7 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,

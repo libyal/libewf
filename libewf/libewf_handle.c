@@ -945,7 +945,7 @@ int libewf_handle_open(
 			if( libewf_segment_table_set_basename(
 			     internal_handle->segment_table,
 			     first_segment_filename,
-			     filename_length - 4 + 1,
+			     filename_length - 4,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -970,7 +970,7 @@ int libewf_handle_open(
 			if( libewf_segment_table_set_basename(
 			     internal_handle->delta_segment_table,
 			     first_delta_segment_filename,
-			     filename_length - 4 + 1,
+			     filename_length - 4,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -998,7 +998,7 @@ int libewf_handle_open(
 			if( libewf_segment_table_set_basename(
 			     internal_handle->segment_table,
 			     first_segment_filename,
-			     filename_length - 4 + 1,
+			     filename_length - 4,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1024,7 +1024,7 @@ int libewf_handle_open(
 		if( libewf_segment_table_set_basename(
 		     internal_handle->segment_table,
 		     filenames[ 0 ],
-		     filename_length + 1,
+		     filename_length,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1304,7 +1304,7 @@ int libewf_handle_open_wide(
 			if( libewf_segment_table_set_basename_wide(
 			     internal_handle->segment_table,
 			     first_segment_filename,
-			     filename_length - 4 + 1,
+			     filename_length - 4,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1329,7 +1329,7 @@ int libewf_handle_open_wide(
 			if( libewf_segment_table_set_basename_wide(
 			     internal_handle->delta_segment_table,
 			     first_delta_segment_filename,
-			     filename_length - 4 + 1,
+			     filename_length - 4,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1357,7 +1357,7 @@ int libewf_handle_open_wide(
 			if( libewf_segment_table_set_basename_wide(
 			     internal_handle->segment_table,
 			     first_segment_filename,
-			     filename_length - 4 + 1,
+			     filename_length - 4,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1383,7 +1383,7 @@ int libewf_handle_open_wide(
 		if( libewf_segment_table_set_basename_wide(
 		     internal_handle->segment_table,
 		     filenames[ 0 ],
-		     filename_length + 1,
+		     filename_length,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1622,7 +1622,7 @@ int libewf_handle_open_file_io_pool(
 				return( -1 );
 			}
 		}
-		result = libewf_segment_table_build(
+		result = libewf_segment_table_read(
 		          internal_handle->segment_table,
 		          internal_handle->io_handle,
 		          internal_handle->file_io_pool,
@@ -1640,9 +1640,9 @@ int libewf_handle_open_file_io_pool(
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to build segment table.",
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read segment table.",
 			 function );
 
 			if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
@@ -1662,7 +1662,7 @@ int libewf_handle_open_file_io_pool(
 		if( ( flags & LIBEWF_FLAG_RESUME ) == 0 )
 		{
 			if( ( internal_handle->delta_segment_table->amount > 1 )
-			 && ( libewf_segment_table_build(
+			 && ( libewf_segment_table_read(
 			       internal_handle->delta_segment_table,
 			       internal_handle->io_handle,
 			       internal_handle->file_io_pool,
@@ -1678,9 +1678,9 @@ int libewf_handle_open_file_io_pool(
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to build delta segment table.",
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read delta segment table.",
 				 function );
 
 				internal_handle->file_io_pool = NULL;
@@ -3462,10 +3462,6 @@ int libewf_handle_set_segment_filename(
 
 		return( -1 );
 	}
-	if( filename[ filename_length - 1 ] != 0 )
-	{
-		filename_length += 1;
-	}
 	if( libewf_segment_table_set_basename(
 	     internal_handle->segment_table,
 	     filename,
@@ -3646,10 +3642,6 @@ int libewf_handle_set_segment_filename_wide(
 		 function );
 
 		return( -1 );
-	}
-	if( filename[ filename_length - 1 ] != 0 )
-	{
-		filename_length += 1;
 	}
 	if( libewf_segment_table_set_basename_wide(
 	     internal_handle->segment_table,
@@ -3959,10 +3951,6 @@ int libewf_handle_set_delta_segment_filename(
 
 		return( -1 );
 	}
-	if( filename[ filename_length - 1 ] != 0 )
-	{
-		filename_length += 1;
-	}
 	if( libewf_segment_table_set_basename(
 	     internal_handle->delta_segment_table,
 	     filename,
@@ -4143,10 +4131,6 @@ int libewf_handle_set_delta_segment_filename_wide(
 		 function );
 
 		return( -1 );
-	}
-	if( filename[ filename_length - 1 ] != 0 )
-	{
-		filename_length += 1;
 	}
 	if( libewf_segment_table_set_basename_wide(
 	     internal_handle->delta_segment_table,
@@ -4641,7 +4625,7 @@ int libewf_internal_handle_add_segment_file(
      libewf_internal_handle_t *internal_handle,
      int file_io_pool_entry,
      int flags,
-     uint16_t *segment_number,
+     int *segment_number,
      uint8_t *segment_file_type,
      liberror_error_t **error )
 {

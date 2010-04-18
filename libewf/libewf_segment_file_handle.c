@@ -27,7 +27,6 @@
 
 #include <liberror.h>
 
-#include "libewf_filename.h"
 #include "libewf_list_type.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_file_handle.h"

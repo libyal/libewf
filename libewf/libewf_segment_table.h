@@ -87,20 +87,6 @@ int libewf_segment_table_resize(
      uint16_t amount,
      liberror_error_t **error );
 
-int libewf_segment_table_build(
-     libewf_segment_table_t *segment_table,
-     libewf_io_handle_t *io_handle,
-     libbfio_pool_t *file_io_pool,
-     libewf_header_sections_t *header_sections,
-     libewf_hash_sections_t *hash_sections,
-     libewf_media_values_t *media_values,
-     libewf_offset_table_t *offset_table,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
-     libewf_single_files_t *single_files,
-     int *abort,
-     liberror_error_t **error );
-
 int libewf_segment_table_get_basename_size(
      libewf_segment_table_t *segment_table,
      size_t *basename_size,
@@ -115,7 +101,7 @@ int libewf_segment_table_get_basename(
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      const char *basename,
-     size_t basename_size,
+     size_t basename_length,
      liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -133,9 +119,23 @@ int libewf_segment_table_get_basename_wide(
 int libewf_segment_table_set_basename_wide(
      libewf_segment_table_t *segment_table,
      const wchar_t *basename,
-     size_t basename_size,
+     size_t basename_length,
      liberror_error_t **error );
 #endif
+
+int libewf_segment_table_read(
+     libewf_segment_table_t *segment_table,
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_header_sections_t *header_sections,
+     libewf_hash_sections_t *hash_sections,
+     libewf_media_values_t *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_sector_table_t *sessions,
+     libewf_sector_table_t *acquiry_errors,
+     libewf_single_files_t *single_files,
+     int *abort,
+     liberror_error_t **error );
 
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,

@@ -284,7 +284,7 @@ int device_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libsmdev_check_device_wide(
 		          filenames[ 0 ],
 	                  error );
@@ -349,7 +349,7 @@ int device_handle_open_input(
 #endif
 */
 
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libsmdev_handle_open_wide(
 		     device_handle->dev_input_handle,
 		     (wchar_t * const *) filenames,
@@ -405,7 +405,7 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libsmraw_handle_open_wide(
 		     device_handle->raw_input_handle,
 		     (wchar_t * const *) filenames,

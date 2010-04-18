@@ -359,7 +359,7 @@ int imaging_handle_open_output(
 		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -393,7 +393,7 @@ int imaging_handle_open_output(
 		libewf_filenames = filenames;
 		flags            = LIBEWF_OPEN_WRITE;
 	}
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     imaging_handle->output_handle,
 	     libewf_filenames,
@@ -489,7 +489,7 @@ int imaging_handle_open_secondary_output(
 		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -536,7 +536,7 @@ int imaging_handle_open_secondary_output(
 
 		return( -1 );
 	}
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     imaging_handle->secondary_output_handle,
 	     libewf_filenames,

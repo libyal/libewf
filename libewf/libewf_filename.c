@@ -394,7 +394,7 @@ int libewf_filename_create(
 	}
 	new_filename[ basename_length ] = (libcstring_system_character_t) '.';
 
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
 	if( libewf_filename_set_extension_wide(
 	     &( new_filename[ basename_length + 1 ] ),
 	     segment_number,

@@ -736,7 +736,7 @@ int export_handle_open_input(
 		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -765,7 +765,7 @@ int export_handle_open_input(
 		}
 		filenames = (libcstring_system_character_t * const *) libewf_filenames;
 	}
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     export_handle->input_handle,
 	     filenames,
@@ -894,7 +894,7 @@ int export_handle_open_output(
 		}
 		filenames[ 0 ] = (libcstring_system_character_t *) filename;
 
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_handle_open_wide(
 		     export_handle->ewf_output_handle,
 		     filenames,
@@ -966,7 +966,7 @@ int export_handle_open_output(
 			}
 			filenames[ 0 ] = (libcstring_system_character_t *) filename;
 
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 			if( libsmraw_handle_open_wide(
 			     export_handle->raw_output_handle,
 			     filenames,
@@ -980,7 +980,7 @@ int export_handle_open_output(
 			     1,
 			     LIBEWF_OPEN_WRITE,
 			     error ) != 1 )
-#endif /* defined( LIBSYSTEM_HAVE_WIDE_CHARACTER ) */
+#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
 			{
 				liberror_error_set(
 				 error,
@@ -3675,7 +3675,7 @@ int export_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 				if( libewf_handle_get_filename_size_wide(
 				     export_handle->input_handle,
 				     &filename_size,
@@ -3721,7 +3721,7 @@ int export_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-#if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 				if( libewf_handle_get_filename_wide(
 				     export_handle->input_handle,
 				     filename,
