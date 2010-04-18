@@ -189,6 +189,11 @@ LIBEWF_EXTERN int libewf_handle_close(
                    libewf_handle_t *handle,
                    liberror_error_t **error );
 
+int libewf_handle_open_read(
+     libewf_internal_handle_t *internal_handle,
+     libewf_segment_table_t *segment_table,
+     liberror_error_t **error );
+
 LIBEWF_EXTERN ssize_t libewf_handle_prepare_read_chunk(
                        libewf_handle_t *handle,
                        void *chunk_buffer,

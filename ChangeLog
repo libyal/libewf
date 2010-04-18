@@ -1,5 +1,4 @@
 TODO
-* update libsmdev, libsmraw
 * update msvscpp and borlandc build files
 
 * check borlandc build
@@ -213,6 +212,8 @@ Next stable release:
 * email change
 * refactored segment table
   - added array type
+  - added functions for low coupling
+  - moved read and write function to handle and write io handle
 
 20100314
 * small changes to configure.ac

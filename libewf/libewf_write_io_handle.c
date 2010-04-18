@@ -33,6 +33,7 @@
 #include "libewf_compression.h"
 #include "libewf_definitions.h"
 #include "libewf_empty_block.h"
+#include "libewf_filename.h"
 #include "libewf_header_values.h"
 #include "libewf_libbfio.h"
 #include "libewf_media_values.h"
@@ -1269,6 +1270,305 @@ int libewf_write_io_handle_test_chunks_section_full(
 	return( 0 );
 }
 
+/* Creates a new segment file and opens it for writing
+ * The necessary sections at the start of the segment file are written
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_write_io_handle_create_segment_file(
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_segment_table_t *segment_table,
+     int segment_number,
+     int16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     libewf_segment_file_handle_t **segment_file_handle,
+     liberror_error_t **error )
+{
+	libbfio_handle_t *file_io_handle        = NULL;
+	libcstring_system_character_t *filename = NULL;
+	static char *function                   = "libewf_write_io_handle_create_segment_file";
+	size_t filename_size                    = 0;
+	int amount_of_segment_file_handles      = 0;
+	int file_io_pool_entry                  = 0;
+	int flags                               = 0;
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number <= 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 "%s: invalid segment number zero or less.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( *segment_file_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid segment file handle - value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_array_get_amount_of_entries(
+	     segment_table->segment_file_handle_array,
+	     &amount_of_segment_file_handles,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve amount of entries in segment file handle array.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number > amount_of_segment_file_handles )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
+		 "%s: invalid segment number value out of range.",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if one additional entry in the segment table is needed
+	 */
+	if( segment_number == amount_of_segment_file_handles )
+	{
+		/* Add one additional entry because the 0 entry is used for the basename
+		 */
+		if( libewf_segment_table_resize(
+		     segment_table,
+		     segment_number + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize segment table.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( libewf_filename_create(
+	     &filename,
+	     &filename_size,
+	     segment_table->basename,
+	     segment_table->basename_size - 1,
+	     (uint16_t) segment_number,
+	     maximum_amount_of_segments,
+	     segment_file_type,
+	     io_handle->format,
+	     io_handle->ewf_format,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment file filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: filename is empty.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: creating segment file: %d with filename: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+		 function,
+		 segment_number,
+		 filename );
+	}
+#endif
+
+	if( libbfio_file_initialize(
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file io handle.",
+		 function );
+
+		memory_free(
+		 filename );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libbfio_file_set_name_wide(
+	     file_io_handle,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+#else
+	if( libbfio_file_set_name(
+	     file_io_handle,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file io handle.",
+		 function );
+
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+		memory_free(
+		 filename );
+
+		return( -1 );
+	}
+	memory_free(
+	 filename );
+
+	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	{
+		flags = LIBBFIO_OPEN_READ_WRITE_TRUNCATE;
+	}
+	else
+	{
+		flags = LIBBFIO_OPEN_WRITE_TRUNCATE;
+	}
+	if( libbfio_pool_add_handle(
+	     file_io_pool,
+	     &file_io_pool_entry,
+	     file_io_handle,
+	     flags,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to add file io handle to pool.",
+		 function );
+
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+
+		return( -1 );
+	}
+	if( libbfio_pool_open(
+	     file_io_pool,
+	     file_io_pool_entry,
+	     flags,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open segment file: %d.",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	if( libewf_segment_file_handle_initialize(
+	     segment_file_handle,
+	     file_io_pool_entry,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	( *segment_file_handle )->write_open = 1;
+
+	if( libewf_array_set_entry(
+	     segment_table->segment_file_handle_array,
+	     segment_number,
+	     (intptr_t *) *segment_file_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set entry: %d in segment file handle array.",
+		 function,
+		 segment_number );
+
+		libewf_segment_file_handle_free(
+		 (intptr_t *) *segment_file_handle,
+		 NULL );
+
+		*segment_file_handle = NULL;
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Processes the chunk data, applies compression if necessary and calculates the CRC
  * Returns the amount of bytes of the processed chunk data or -1 on error
  */
@@ -1995,11 +2295,11 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 */
 		segment_file_handle = NULL;
 
-		if( libewf_segment_table_create_segment_file(
-		     segment_table,
-		     (uint16_t) segment_number,
+		if( libewf_write_io_handle_create_segment_file(
 		     io_handle,
 		     file_io_pool,
+		     segment_table,
+		     segment_number,
 		     write_io_handle->maximum_amount_of_segments,
 		     LIBEWF_SEGMENT_FILE_TYPE_EWF,
 		     &segment_file_handle,
@@ -2947,11 +3247,11 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			 */
 			segment_file_handle = NULL;
 
-			if( libewf_segment_table_create_segment_file(
-			     delta_segment_table,
-			     (uint16_t) segment_number,
+			if( libewf_write_io_handle_create_segment_file(
 			     io_handle,
 			     file_io_pool,
+			     delta_segment_table,
+			     segment_number,
 			     write_io_handle->maximum_amount_of_segments,
 			     LIBEWF_SEGMENT_FILE_TYPE_DWF,
 			     &segment_file_handle,
@@ -3713,6 +4013,108 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 	return( (ssize_t) data_size );
 }
 
+/* Corrects sections after streamed write
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_write_io_handle_finalize_write_sections_corrections(
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     uint32_t last_segment_amount_of_chunks,
+     libewf_media_values_t *media_values,
+     libewf_segment_table_t *segment_table,
+     libewf_values_table_t *hash_values,
+     libewf_hash_sections_t *hash_sections,
+     libewf_sector_table_t *sessions,
+     libewf_sector_table_t *acquiry_errors,
+     ewf_data_t **cached_data_section,
+     liberror_error_t **error )
+{
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_write_io_handle_finalize_write_sections_corrections";
+	int amount_of_segment_file_handles                = 0;
+	int last_segment_file                             = 0;
+	int segment_number                                = 0;
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_array_get_amount_of_entries(
+	     segment_table->segment_file_handle_array,
+	     &amount_of_segment_file_handles,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve amount of entries in segment file handle array.",
+		 function );
+
+		return( -1 );
+	}
+	for( segment_number = 1;
+	     segment_number < amount_of_segment_file_handles;
+	     segment_number++ )
+	{
+		if( segment_number == ( amount_of_segment_file_handles - 1 ) )
+		{
+			last_segment_file = 1;
+		}
+		segment_file_handle = NULL;
+
+		if( libewf_array_get_entry(
+		     segment_table->segment_file_handle_array,
+		     segment_number,
+		     (intptr_t **) &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry: %d from segment file handle array.",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+		if( libewf_segment_file_write_sections_correction(
+		     segment_file_handle,
+		     io_handle,
+		     file_io_pool,
+		     (uint16_t) segment_number,
+		     last_segment_amount_of_chunks,
+		     last_segment_file,
+		     media_values,
+		     hash_values,
+		     hash_sections,
+		     sessions,
+		     acquiry_errors,
+		     cached_data_section,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write sections correction to segment file: %d.",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
 /* Finalizes the write by correcting the EWF the meta data in the segment files
  * This function is required after write from stream
  * Returns the amount of bytes written or -1 on error
@@ -4088,12 +4490,12 @@ ssize_t libewf_write_io_handle_finalize(
 
 		/* Correct the sections in the segment files
 		 */
-		if( libewf_segment_table_write_sections_corrections(
-		     segment_table,
+		if( libewf_write_io_handle_finalize_write_sections_corrections(
 		     io_handle,
 		     file_io_pool,
 		     write_io_handle->segment_amount_of_chunks,
 		     media_values,
+		     segment_table,
 		     hash_values,
 		     hash_sections,
 		     sessions,

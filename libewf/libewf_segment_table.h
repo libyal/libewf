@@ -31,18 +31,7 @@
 #include <liberror.h>
 
 #include "libewf_array_type.h"
-#include "libewf_hash_sections.h"
-#include "libewf_header_sections.h"
-#include "libewf_io_handle.h"
-#include "libewf_libbfio.h"
-#include "libewf_media_values.h"
-#include "libewf_offset_table.h"
-#include "libewf_section_list.h"
-#include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
-#include "libewf_single_files.h"
-
-#include "ewf_data.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -137,41 +126,9 @@ int libewf_segment_table_set_handle(
      libewf_segment_file_handle_t *handle,
      liberror_error_t **error );
 
-int libewf_segment_table_read(
+int libewf_segment_table_set_maximum_segment_size(
      libewf_segment_table_t *segment_table,
-     libewf_io_handle_t *io_handle,
-     libbfio_pool_t *file_io_pool,
-     libewf_header_sections_t *header_sections,
-     libewf_hash_sections_t *hash_sections,
-     libewf_media_values_t *media_values,
-     libewf_offset_table_t *offset_table,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
-     libewf_single_files_t *single_files,
-     int *abort,
-     liberror_error_t **error );
-
-int libewf_segment_table_create_segment_file(
-     libewf_segment_table_t *segment_table,
-     uint16_t segment_number,
-     libewf_io_handle_t *io_handle,
-     libbfio_pool_t *file_io_pool,
-     int16_t maximum_amount_of_segments,
-     uint8_t segment_file_type,
-     libewf_segment_file_handle_t **segment_file_handle,
-     liberror_error_t **error );
-
-int libewf_segment_table_write_sections_corrections(
-     libewf_segment_table_t *segment_table,
-     libewf_io_handle_t *io_handle,
-     libbfio_pool_t *file_io_pool,
-     uint32_t last_segment_amount_of_chunks,
-     libewf_media_values_t *media_values,
-     libewf_values_table_t *hash_values,
-     libewf_hash_sections_t *hash_sections,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
-     ewf_data_t **cached_data_section,
+     size64_t maximum_segment_size,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

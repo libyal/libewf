@@ -1609,21 +1609,10 @@ int libewf_handle_open_file_io_pool(
 				return( -1 );
 			}
 		}
-		result = libewf_segment_table_read(
-		          internal_handle->segment_table,
-		          internal_handle->io_handle,
-		          internal_handle->file_io_pool,
-		          internal_handle->header_sections,
-		          internal_handle->hash_sections,
-		          internal_handle->media_values,
-		          internal_handle->offset_table,
-		          internal_handle->sessions,
-		          internal_handle->acquiry_errors,
-		          internal_handle->single_files,
-		          &( internal_handle->abort ),
-		          error );
-
-		if( result != 1 )
+		if( libewf_handle_open_read(
+		     internal_handle,
+		     internal_handle->segment_table,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1666,18 +1655,9 @@ int libewf_handle_open_file_io_pool(
 			}
 			if( amount_of_segment_file_handles > 1 )
 			{
-				if( libewf_segment_table_read(
+				if( libewf_handle_open_read(
+				     internal_handle,
 				     internal_handle->delta_segment_table,
-				     internal_handle->io_handle,
-				     internal_handle->file_io_pool,
-				     internal_handle->header_sections,
-				     internal_handle->hash_sections,
-				     internal_handle->media_values,
-				     internal_handle->offset_table,
-				     internal_handle->sessions,
-				     internal_handle->acquiry_errors,
-				     internal_handle->single_files,
-				     &( internal_handle->abort ),
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1867,6 +1847,199 @@ int libewf_handle_close(
 		}
 	}
 	return( 0 );
+}
+
+/* Opens the EWF handle for reading
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_open_read(
+     libewf_internal_handle_t *internal_handle,
+     libewf_segment_table_t *segment_table,
+     liberror_error_t **error )
+{
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_handle_open_read";
+	int amount_of_segment_file_handles                = 0;
+	int last_segment_file                             = 0;
+	int result                                        = 0;
+	int segment_number                                = 0;
+
+	if( internal_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_segment_table_get_amount_of_handles(
+	     segment_table,
+	     &amount_of_segment_file_handles,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve amount of handles in segment table.",
+		 function );
+
+		return( -1 );
+	}
+	/* If there is more than one segment file, use the size of the first as the maximum segment size
+	 */
+	if( amount_of_segment_file_handles > 2 )
+	{
+		if( libewf_segment_table_get_handle(
+		     segment_table,
+		     1,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve handle: 1 from segment table.",
+			 function );
+
+			return( -1 );
+		}
+		if( segment_file_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid segment file handle - value missing.",
+			 function );
+
+			return( -1 );
+		}
+		if( libbfio_pool_get_size(
+		     internal_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     &( segment_table->maximum_segment_size ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file size.",
+			 function );
+
+			return( -1 );
+		}
+		/* Round the maximum segment size to nearest amount in KiB
+		 */
+		if( libewf_segment_table_set_maximum_segment_size(
+		     segment_table,
+		     ( segment_table->maximum_segment_size / 1024 ) * 1024,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set maximum segment size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	/* Read the segment and offset table from the segment file(s)
+	 */
+	for( segment_number = 1;
+	     segment_number < amount_of_segment_file_handles;
+	     segment_number++ )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: reading section list for segment number: %d.\n",
+			 function,
+			 segment_number );
+		}
+#endif
+
+		segment_file_handle = NULL;
+
+		if( libewf_segment_table_get_handle(
+		     segment_table,
+		     segment_number,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve handle: %d from segment table.",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+		result = libewf_segment_file_read_sections(
+		          segment_file_handle,
+		          internal_handle->io_handle,
+		          internal_handle->file_io_pool,
+		          &last_segment_file,
+		          internal_handle->header_sections,
+		          internal_handle->hash_sections,
+		          internal_handle->media_values,
+		          internal_handle->offset_table,
+		          internal_handle->sessions,
+		          internal_handle->acquiry_errors,
+		          internal_handle->single_files,
+		          error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read sections.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing next or done section.",
+			 function );
+
+			return( 0 );
+		}
+		if( internal_handle->abort == 1 )
+		{
+			return( -1 );
+		}
+	}
+	/* Check to see if the done section has been found in the last segment file
+	 */
+	if( last_segment_file != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: unable to find the last segment file.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Prepares chunk of (media) data after reading it according to the handle settings
