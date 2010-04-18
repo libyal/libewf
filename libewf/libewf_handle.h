@@ -404,14 +404,6 @@ LIBEWF_EXTERN int libewf_handle_get_file_io_handle(
                    libbfio_handle_t **file_io_handle,
                    liberror_error_t **error );
 
-int libewf_internal_handle_add_segment_file(
-     libewf_internal_handle_t *internal_handle,
-     int file_io_pool_entry,
-     int flags,
-     uint16_t *segment_number,
-     uint8_t *segment_file_type,
-     liberror_error_t **error );
-
 int libewf_internal_handle_get_write_maximum_amount_of_segments(
      uint8_t ewf_format,
      uint16_t *maximum_amount_of_segments,

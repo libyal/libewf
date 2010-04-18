@@ -1272,6 +1272,7 @@ int libewf_segment_table_set_handle(
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_segment_table_set_handle";
+	int amount_of_handles                             = 0;
 
 	if( segment_table == NULL )
 	{
@@ -1284,33 +1285,67 @@ int libewf_segment_table_set_handle(
 
 		return( -1 );
 	}
-	if( libewf_array_get_entry(
+	if( libewf_array_get_amount_of_entries(
 	     segment_table->segment_file_handle_array,
-	     handle_index,
-	     (intptr_t **) &segment_file_handle,
+	     &amount_of_handles,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry: %d from segment file handle array.",
-		 function,
-		 handle_index );
+		 "%s: unable to retrieve amount of entries in segment file handle array.",
+		 function );
 
 		return( -1 );
 	}
-	if( segment_file_handle != NULL )
+	if( handle_index >= amount_of_handles )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: segment file handle entry: %d value already set.",
-		 function,
-		 handle_index );
+		if( libewf_segment_table_resize(
+		     segment_table,
+		     handle_index + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize the segment table.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( libewf_array_get_entry(
+		     segment_table->segment_file_handle_array,
+		     handle_index,
+		     (intptr_t **) &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry: %d from segment file handle array.",
+			 function,
+			 handle_index );
+
+			return( -1 );
+		}
+		if( segment_file_handle != NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 "%s: segment file handle entry: %d value already set.",
+			 function,
+			 handle_index );
+
+			return( -1 );
+		}
 	}
 	if( libewf_array_set_entry(
 	     segment_table->segment_file_handle_array,

@@ -214,6 +214,7 @@ Next stable release:
   - added array type
   - added functions for low coupling
   - moved read and write function to handle and write io handle
+  - removed libewf_internal_handle_add_segment_file
 
 20100314
 * small changes to configure.ac

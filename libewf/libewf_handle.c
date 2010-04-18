@@ -1430,15 +1430,14 @@ int libewf_handle_open_file_io_pool(
      uint8_t flags,
      liberror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle          = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_open_file_io_pool";
-	uint16_t segment_number                   = 0;
-	int amount_of_handles                     = 0;
-	int amount_of_segment_file_handles        = 0;
-	int file_io_handle_iterator               = 0;
-	int result                                = 0;
-	uint8_t segment_file_type                 = 0;
+	libbfio_handle_t *file_io_handle                  = NULL;
+	libewf_internal_handle_t *internal_handle         = NULL;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_handle_open_file_io_pool";
+	uint16_t segment_number                           = 0;
+	int amount_of_handles                             = 0;
+	int amount_of_segment_file_handles                = 0;
+	int file_io_handle_iterator                       = 0;
 
 	if( handle == NULL )
 	{
@@ -1574,21 +1573,149 @@ int libewf_handle_open_file_io_pool(
 				 file_io_handle_iterator );
 			}
 #endif
-
-			if( libewf_internal_handle_add_segment_file(
-			     internal_handle,
+			if( libewf_segment_file_handle_initialize(
+			     &segment_file_handle,
 			     file_io_handle_iterator,
-			     flags,
-			     &segment_number,
-			     &segment_file_type,
 			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add segment file.",
+				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create segment file handle.",
 				 function );
+
+				internal_handle->file_io_pool = NULL;
+
+				return( -1 );
+			}
+			if( libewf_segment_file_read_file_header(
+			     segment_file_handle,
+			     &segment_number,
+			     file_io_pool,
+			     error ) <= -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read segment file header.",
+				 function );
+
+				libewf_segment_file_handle_free(
+				 (intptr_t *) segment_file_handle,
+				 NULL );
+
+				internal_handle->file_io_pool = NULL;
+
+				return( -1 );
+			}
+			if( segment_number == 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_INPUT,
+				 LIBERROR_INPUT_ERROR_INVALID_DATA,
+				 "%s: invalid segment number: 0.",
+				 function );
+
+				libewf_segment_file_handle_free(
+				 (intptr_t *) segment_file_handle,
+				 NULL );
+
+				internal_handle->file_io_pool = NULL;
+
+				return( -1 );
+			}
+			if( ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+			 || ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
+			{
+				if( libewf_segment_table_set_handle(
+				     internal_handle->segment_table,
+				     (int) segment_number,
+				     segment_file_handle,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set handle: %" PRIu16 " in segment table.",
+					 function,
+					 segment_number );
+
+					libewf_segment_file_handle_free(
+					 (intptr_t *) segment_file_handle,
+					 NULL );
+
+					internal_handle->file_io_pool = NULL;
+
+					return( -1 );
+				}
+				segment_file_handle = NULL;
+			}
+			else if( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+			{
+				if( libewf_segment_table_set_handle(
+				     internal_handle->delta_segment_table,
+				     (int) segment_number,
+				     segment_file_handle,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set handle: %" PRIu16 " in delta segment table.",
+					 function,
+					 segment_number );
+
+					libewf_segment_file_handle_free(
+					 (intptr_t *) segment_file_handle,
+					 NULL );
+
+					internal_handle->file_io_pool = NULL;
+
+					return( -1 );
+				}
+				segment_file_handle = NULL;
+
+				/* Re-open the delta segment file with write access
+				 */
+				if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+				{
+					if( libbfio_pool_reopen(
+					     internal_handle->file_io_pool,
+					     segment_file_handle->file_io_pool_entry,
+					     LIBBFIO_OPEN_READ_WRITE,
+					     error ) != 1 )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_IO,
+						 LIBERROR_IO_ERROR_OPEN_FAILED,
+						 "%s: unable to reopen delta segment file: %" PRIu16 ".",
+						 function,
+						 segment_number );
+
+						internal_handle->file_io_pool = NULL;
+
+						return( -1 );
+					}
+				}
+			}
+			else
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported segment file type.",
+				 function );
+
+				libewf_segment_file_handle_free(
+				 (intptr_t *) segment_file_handle,
+				 NULL );
 
 				internal_handle->file_io_pool = NULL;
 
@@ -4793,290 +4920,6 @@ int libewf_handle_get_file_io_handle(
 
 		return( -1 );
 	}
-	return( 1 );
-}
-
-/* Appends a segment file
- * Returns 1 if successful or -1 on error
- */
-int libewf_internal_handle_add_segment_file(
-     libewf_internal_handle_t *internal_handle,
-     int file_io_pool_entry,
-     int flags,
-     uint16_t *segment_number,
-     uint8_t *segment_file_type,
-     liberror_error_t **error )
-{
-	libewf_segment_file_handle_t *segment_file_handle = NULL;
-	static char *function                             = "libewf_internal_handle_add_segment_file";
-	int amount_of_segment_file_handles                = 0;
-
-	if( internal_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->io_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( file_io_pool_entry < 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid file io pool entry value is less than zero.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment number.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_type == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file type.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_segment_file_handle_initialize(
-	     &segment_file_handle,
-	     file_io_pool_entry,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment file handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_segment_file_read_file_header(
-	     segment_file_handle,
-	     segment_number,
-	     internal_handle->file_io_pool,
-	     error ) <= -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read segment file header.",
-		 function );
-
-		libewf_segment_file_handle_free(
-		 (intptr_t *) segment_file_handle,
-		 NULL );
-
-		return( -1 );
-	}
-	if( segment_number == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_INVALID_DATA,
-		 "%s: invalid segment number: 0.",
-		 function );
-
-		libewf_segment_file_handle_free(
-		 (intptr_t *) segment_file_handle,
-		 NULL );
-
-		return( -1 );
-	}
-	if( ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
-	 || ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
-	{
-		if( libewf_segment_table_get_amount_of_handles(
-		     internal_handle->segment_table,
-		     &amount_of_segment_file_handles,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of handles in segment table.",
-			 function );
-
-			libewf_segment_file_handle_free(
-			 (intptr_t *) segment_file_handle,
-			 NULL );
-
-			return( -1 );
-		}
-		if( (int) *segment_number >= amount_of_segment_file_handles )
-		{
-			if( libewf_segment_table_resize(
-			     internal_handle->segment_table,
-			     (int) *segment_number + 1,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-				 "%s: unable to resize the segment table.",
-				 function );
-
-				libewf_segment_file_handle_free(
-				 (intptr_t *) segment_file_handle,
-				 NULL );
-
-				return( -1 );
-			}
-		}
-		if( libewf_segment_table_set_handle(
-		     internal_handle->segment_table,
-		     (int) *segment_number,
-		     segment_file_handle,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set handle: %" PRIu16 " in segment table.",
-			 function,
-			 *segment_number );
-
-			libewf_segment_file_handle_free(
-			 (intptr_t *) segment_file_handle,
-			 NULL );
-
-			return( -1 );
-		}
-	}
-	else if( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
-	{
-		if( libewf_segment_table_get_amount_of_handles(
-		     internal_handle->delta_segment_table,
-		     &amount_of_segment_file_handles,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of handles in delta segment table.",
-			 function );
-
-			libewf_segment_file_handle_free(
-			 (intptr_t *) segment_file_handle,
-			 NULL );
-
-			return( -1 );
-		}
-		if( (int) *segment_number >= amount_of_segment_file_handles )
-		{
-			if( libewf_segment_table_resize(
-			     internal_handle->delta_segment_table,
-			     (int) *segment_number + 1,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-				 "%s: unable to resize the delta segment table.",
-				 function );
-
-				libewf_segment_file_handle_free(
-				 (intptr_t *) segment_file_handle,
-				 NULL );
-
-				return( -1 );
-			}
-		}
-		if( libewf_segment_table_set_handle(
-		     internal_handle->delta_segment_table,
-		     (int) *segment_number,
-		     segment_file_handle,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set handle: %" PRIu16 " in delta segment table.",
-			 function,
-			 *segment_number );
-
-			libewf_segment_file_handle_free(
-			 (intptr_t *) segment_file_handle,
-			 NULL );
-
-			return( -1 );
-		}
-		/* Re-open the delta segment file with write access
-		 */
-		if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-		{
-			if( libbfio_pool_reopen(
-			     internal_handle->file_io_pool,
-			     file_io_pool_entry,
-			     LIBBFIO_OPEN_READ_WRITE,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_OPEN_FAILED,
-				 "%s: unable to reopen delta segment file: %" PRIu16 ".",
-				 function,
-				 *segment_number );
-
-				return( -1 );
-			}
-		}
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported segment file type.",
-		 function );
-
-		libewf_segment_file_handle_free(
-		 (intptr_t *) segment_file_handle,
-		 NULL );
-
-		return( -1 );
-	}
-	*segment_file_type = segment_file_handle->file_type;
-
 	return( 1 );
 }
 
