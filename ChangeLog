@@ -1,4 +1,7 @@
 TODO
+* update libsmdev, libsmraw
+* update msvscpp and borlandc build files
+
 * check borlandc build
 * libewf: make libewf_convert_date_header_value more strict
 * improve output when encoutering a read error
@@ -202,6 +205,12 @@ Deprecated functions
 Next stable release:
 * full test
 * disable ewfalter, ewfdebug
+
+20100418
+* added libcstring
+* updated common, liberror, libnotify, libuna, libbfio, libsystem, libsmdev,
+  libsmraw
+* email change
 
 20100314
 * small changes to configure.ac

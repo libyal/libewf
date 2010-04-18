@@ -1,6 +1,7 @@
 /*
  * Support functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -23,6 +24,7 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
@@ -104,7 +106,7 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	filename_length = narrow_string_length(
+	filename_length = libcstring_narrow_string_length(
 	                   filename );
 
 	if( filename_length == 0 )
@@ -209,7 +211,7 @@ int libewf_check_file_signature_wide(
 
 		return( -1 );
 	}
-	filename_length = wide_string_length(
+	filename_length = libcstring_wide_string_length(
 	                   filename );
 
 	if( filename_length == 0 )
@@ -619,7 +621,7 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		if( narrow_string_copy(
+		if( libcstring_narrow_string_copy(
 		     segment_filename,
 		     filename,
 		     filename_length ) == NULL )
@@ -998,7 +1000,7 @@ int libewf_glob_wide(
 
 			return( -1 );
 		}
-		if( wide_string_copy(
+		if( libcstring_wide_string_copy(
 		     segment_filename,
 		     filename,
 		     filename_length ) == NULL )

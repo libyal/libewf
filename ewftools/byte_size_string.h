@@ -1,6 +1,7 @@
 /*
  * Byte size string functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,9 +27,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -41,14 +41,14 @@ enum BYTE_SIZE_STRING_UNITS
 };
 
 int byte_size_string_create(
-     libsystem_character_t *byte_size_string,
+     libcstring_system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
      int units,
      liberror_error_t **error );
 
 int byte_size_string_convert(
-     const libsystem_character_t *byte_size_string,
+     const libcstring_system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size,
      liberror_error_t **error );

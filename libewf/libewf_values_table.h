@@ -1,6 +1,7 @@
 /*
  * Values table functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,11 +25,10 @@
 #define _LIBEWF_VALUES_TABLE_H
 
 #include <common.h>
-#include <narrow_string.h>
 #include <types.h>
-#include <wide_string.h>
 
-#include "libewf_string.h"
+#include <libcstring.h>
+#include <liberror.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -44,7 +44,7 @@ struct libewf_values_table
 
 	/* The value identifiers
 	 */
-	uint8_t **identifier;
+	libcstring_character_t **identifier;
 
 	/* The value identifier lengths
 	 */
@@ -52,7 +52,7 @@ struct libewf_values_table
 
 	/* The values
 	 */
-	uint8_t **value;
+	libcstring_character_t **value;
 
 	/* The value lengths
 	 */
@@ -80,7 +80,7 @@ int libewf_values_table_get_amount_of_values(
 
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
-     const uint8_t *identifier,
+     const libcstring_character_t *identifier,
      size_t identifier_length,
      int *index,
      liberror_error_t **error );
@@ -94,37 +94,37 @@ int libewf_values_table_get_identifier_size(
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
-     uint8_t *identifier,
+     libcstring_character_t *identifier,
      size_t identifier_size,
      liberror_error_t **error );
 
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
-     const uint8_t *identifier,
+     const libcstring_character_t *identifier,
      size_t indentifier_length,
      liberror_error_t **error );
 
 int libewf_values_table_get_value_size(
      libewf_values_table_t *values_table,
-     const uint8_t *identifier,
+     const libcstring_character_t *identifier,
      size_t identifier_length,
      size_t *value_size,
      liberror_error_t **error );
 
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     const uint8_t *identifier,
+     const libcstring_character_t *identifier,
      size_t identifier_length,
-     uint8_t *value,
+     libcstring_character_t *value,
      size_t value_size,
      liberror_error_t **error );
 
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     const uint8_t *identifier,
+     const libcstring_character_t *identifier,
      size_t identifier_length,
-     const uint8_t *value,
+     const libcstring_character_t *value,
      size_t value_length,
      liberror_error_t **error );
 

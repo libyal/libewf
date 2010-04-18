@@ -1,6 +1,7 @@
 /*
  * Date and time values functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -21,11 +22,10 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <memory.h>
-#include <wide_string.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( TIME_WITH_SYS_TIME )
@@ -41,22 +41,21 @@
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
 #include "libewf_split_values.h"
-#include "libewf_string.h"
 
 /* Copies date and time values string from a timestamp
  * The string must be at least 20 characters + the length of the timezone string and/or timezone name of size including the end of string character
  * Returns 1 if successful or -1 on error
  */
 int libewf_date_time_values_copy_from_timestamp(
-     libewf_character_t *date_time_values_string,
+     libcstring_character_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t timestamp,
      liberror_error_t **error )
 {
 	struct tm time_elements;
 
-	static char *function    = "libewf_date_time_values_copy_from_timestamp";
-	int print_count          = 0;
+	static char *function = "libewf_date_time_values_copy_from_timestamp";
+	int print_count       = 0;
 
 	if( date_time_values_string == NULL )
 	{
@@ -105,7 +104,7 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	print_count = libewf_string_snprintf(
+	print_count = libcstring_string_snprintf(
 		       date_time_values_string,
 		       date_time_values_string_size,
 		       "%04d %02d %02d %02d %02d %02d",
@@ -135,7 +134,7 @@ int libewf_date_time_values_copy_from_timestamp(
  * Returns 1 if successful or -1 on error
  */
 int libewf_date_time_values_copy_to_timestamp(
-     libewf_character_t *date_time_values_string,
+     libcstring_character_t *date_time_values_string,
      size_t date_time_values_string_length,
      time_t *timestamp,
      liberror_error_t **error )
@@ -182,7 +181,7 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_elements,
 	     date_time_values_string,
 	     date_time_values_string_length + 1,
-	     (libewf_character_t) ' ',
+	     (libcstring_character_t) ' ',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -211,37 +210,37 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	/* Set the year
 	 */
-	time_elements.tm_year = (int) ( ( ( ( date_time_elements->values[ 0 ] )[ 0 ] - (libewf_character_t) '0' ) * 1000 )
-	                      + ( ( ( date_time_elements->values[ 0 ] )[ 1 ] - (libewf_character_t) '0' ) * 100 )
-	                      + ( ( ( date_time_elements->values[ 0 ] )[ 2 ] - (libewf_character_t) '0' ) * 10 )
-	                      + ( ( date_time_elements->values[ 0 ] )[ 3 ] - (libewf_character_t) '0' )
+	time_elements.tm_year = (int) ( ( ( ( date_time_elements->values[ 0 ] )[ 0 ] - (libcstring_character_t) '0' ) * 1000 )
+	                      + ( ( ( date_time_elements->values[ 0 ] )[ 1 ] - (libcstring_character_t) '0' ) * 100 )
+	                      + ( ( ( date_time_elements->values[ 0 ] )[ 2 ] - (libcstring_character_t) '0' ) * 10 )
+	                      + ( ( date_time_elements->values[ 0 ] )[ 3 ] - (libcstring_character_t) '0' )
 	                      - 1900 );
 
 	/* Set the month
 	 */
-	time_elements.tm_mon = (int) ( ( ( ( date_time_elements->values[ 1 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                     + ( ( date_time_elements->values[ 1 ] )[ 1 ] - (libewf_character_t) '0' )
+	time_elements.tm_mon = (int) ( ( ( ( date_time_elements->values[ 1 ] )[ 0 ] - (libcstring_character_t) '0' ) * 10 )
+	                     + ( ( date_time_elements->values[ 1 ] )[ 1 ] - (libcstring_character_t) '0' )
 	                     - 1 );
 
 	/* Set the day of the month
 	 */
-	time_elements.tm_mday = (int) ( ( ( ( date_time_elements->values[ 2 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                      + ( ( date_time_elements->values[ 2 ] )[ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_mday = (int) ( ( ( ( date_time_elements->values[ 2 ] )[ 0 ] - (libcstring_character_t) '0' ) * 10 )
+	                      + ( ( date_time_elements->values[ 2 ] )[ 1 ] - (libcstring_character_t) '0' ) );
 
 	/* Set the hour
 	 */
-	time_elements.tm_hour = (int) ( ( ( ( date_time_elements->values[ 3 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                      + ( ( date_time_elements->values[ 3 ] )[ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_hour = (int) ( ( ( ( date_time_elements->values[ 3 ] )[ 0 ] - (libcstring_character_t) '0' ) * 10 )
+	                      + ( ( date_time_elements->values[ 3 ] )[ 1 ] - (libcstring_character_t) '0' ) );
 
 	/* Set the minutes
 	 */
-	time_elements.tm_min = (int) ( ( ( ( date_time_elements->values[ 4 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                     + ( ( date_time_elements->values[ 4 ] )[ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_min = (int) ( ( ( ( date_time_elements->values[ 4 ] )[ 0 ] - (libcstring_character_t) '0' ) * 10 )
+	                     + ( ( date_time_elements->values[ 4 ] )[ 1 ] - (libcstring_character_t) '0' ) );
 
 	/* Set the seconds
 	 */
-	time_elements.tm_sec = (int) ( ( ( ( date_time_elements->values[ 5 ] )[ 0 ] - (libewf_character_t) '0' ) * 10 )
-	                     + ( ( date_time_elements->values[ 5 ] )[ 1 ] - (libewf_character_t) '0' ) );
+	time_elements.tm_sec = (int) ( ( ( ( date_time_elements->values[ 5 ] )[ 0 ] - (libcstring_character_t) '0' ) * 10 )
+	                     + ( ( date_time_elements->values[ 5 ] )[ 1 ] - (libcstring_character_t) '0' ) );
 
 	/* Set to ignore the daylight saving time
 	 */
@@ -284,20 +283,20 @@ int libewf_date_time_values_copy_to_timestamp(
  * Returns 1 if successful or -1 on error
  */
 int libewf_date_time_values_copy_to_string(
-     libewf_character_t *date_time_values_string,
+     libcstring_character_t *date_time_values_string,
      size_t date_time_values_string_length,
      int date_format,
-     libewf_character_t *string,
+     libcstring_character_t *string,
      size_t string_size,
      liberror_error_t **error )
 {
 	struct tm time_elements;
 
-	libewf_character_t *day_of_week = NULL;
-	libewf_character_t *month       = NULL;
-	static char *function           = "libewf_date_time_values_copy_to_string";
-	time_t timestamp                = 0;
-	int print_count                 = 0;
+	libcstring_character_t *day_of_week = NULL;
+	libcstring_character_t *month       = NULL;
+	static char *function               = "libewf_date_time_values_copy_to_string";
+	time_t timestamp                    = 0;
+	int print_count                     = 0;
 
 	if( date_time_values_string == NULL )
 	{
@@ -413,25 +412,25 @@ int libewf_date_time_values_copy_to_string(
 		switch( time_elements.tm_wday )
 		{
 			case 0:
-				day_of_week = _LIBEWF_STRING( "Sun" );
+				day_of_week = _LIBCSTRING_STRING( "Sun" );
 				break;
 			case 1:
-				day_of_week = _LIBEWF_STRING( "Mon" );
+				day_of_week = _LIBCSTRING_STRING( "Mon" );
 				break;
 			case 2:
-				day_of_week = _LIBEWF_STRING( "Tue" );
+				day_of_week = _LIBCSTRING_STRING( "Tue" );
 				break;
 			case 3:
-				day_of_week = _LIBEWF_STRING( "Wed" );
+				day_of_week = _LIBCSTRING_STRING( "Wed" );
 				break;
 			case 4:
-				day_of_week = _LIBEWF_STRING( "Thu" );
+				day_of_week = _LIBCSTRING_STRING( "Thu" );
 				break;
 			case 5:
-				day_of_week = _LIBEWF_STRING( "Fri" );
+				day_of_week = _LIBCSTRING_STRING( "Fri" );
 				break;
 			case 6:
-				day_of_week = _LIBEWF_STRING( "Sat" );
+				day_of_week = _LIBCSTRING_STRING( "Sat" );
 				break;
 
 			default:
@@ -447,40 +446,40 @@ int libewf_date_time_values_copy_to_string(
 		switch( time_elements.tm_mon )
 		{
 			case 0:
-				month = _LIBEWF_STRING( "Jan" );
+				month = _LIBCSTRING_STRING( "Jan" );
 				break;
 			case 1:
-				month = _LIBEWF_STRING( "Feb" );
+				month = _LIBCSTRING_STRING( "Feb" );
 				break;
 			case 2:
-				month = _LIBEWF_STRING( "Mar" );
+				month = _LIBCSTRING_STRING( "Mar" );
 				break;
 			case 3:
-				month = _LIBEWF_STRING( "Apr" );
+				month = _LIBCSTRING_STRING( "Apr" );
 				break;
 			case 4:
-				month = _LIBEWF_STRING( "May" );
+				month = _LIBCSTRING_STRING( "May" );
 				break;
 			case 5:
-				month = _LIBEWF_STRING( "Jun" );
+				month = _LIBCSTRING_STRING( "Jun" );
 				break;
 			case 6:
-				month = _LIBEWF_STRING( "Jul" );
+				month = _LIBCSTRING_STRING( "Jul" );
 				break;
 			case 7:
-				month = _LIBEWF_STRING( "Aug" );
+				month = _LIBCSTRING_STRING( "Aug" );
 				break;
 			case 8:
-				month = _LIBEWF_STRING( "Sep" );
+				month = _LIBCSTRING_STRING( "Sep" );
 				break;
 			case 9:
-				month = _LIBEWF_STRING( "Oct" );
+				month = _LIBCSTRING_STRING( "Oct" );
 				break;
 			case 10:
-				month = _LIBEWF_STRING( "Nov" );
+				month = _LIBCSTRING_STRING( "Nov" );
 				break;
 			case 11:
-				month = _LIBEWF_STRING( "Dec" );
+				month = _LIBCSTRING_STRING( "Dec" );
 				break;
 
 			default:
@@ -493,7 +492,7 @@ int libewf_date_time_values_copy_to_string(
 
 				return( -1 );
 		}
-		print_count = libewf_string_snprintf(
+		print_count = libcstring_string_snprintf(
 			       string,
 			       string_size,
 			       "%s %s %2d %02d:%02d:%02d %04d",
@@ -507,7 +506,7 @@ int libewf_date_time_values_copy_to_string(
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	{
-		print_count = libewf_string_snprintf(
+		print_count = libcstring_string_snprintf(
 			       string,
 			       string_size,
 			       "%02d/%02d/%04d %02d:%02d:%02d",
@@ -520,7 +519,7 @@ int libewf_date_time_values_copy_to_string(
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 	{
-		print_count = libewf_string_snprintf(
+		print_count = libcstring_string_snprintf(
 			       string,
 			       string_size,
 			       "%02d/%02d/%04d %02d:%02d:%02d",
@@ -533,7 +532,7 @@ int libewf_date_time_values_copy_to_string(
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 	{
-		print_count = libewf_string_snprintf(
+		print_count = libcstring_string_snprintf(
 			       string,
 			       string_size,
 			       "%04d-%02d-%02dT%02d:%02d:%02d",
@@ -560,22 +559,22 @@ int libewf_date_time_values_copy_to_string(
 	{
 		if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 		{
-			if( ( date_time_values_string[ 20 ] == (libewf_character_t ) '+' )
-			 || ( date_time_values_string[ 20 ] == (libewf_character_t ) '-' ) )
+			if( ( date_time_values_string[ 20 ] == (libcstring_character_t ) '+' )
+			 || ( date_time_values_string[ 20 ] == (libcstring_character_t ) '-' ) )
 			{
-				print_count = libewf_string_snprintf(
+				print_count = libcstring_string_snprintf(
 					       &( string[ 19 ] ),
 					       7,
-					       "%" PRIs_LIBEWF "",
+					       "%" PRIs_LIBCSTRING "",
 					       &( date_time_values_string[ 20 ] ) );
 			}
 		}
 		else
 		{
-			print_count = libewf_string_snprintf(
+			print_count = libcstring_string_snprintf(
 				       &( string[ print_count ] ),
 				       string_size - print_count,
-				       "%" PRIs_LIBEWF "",
+				       "%" PRIs_LIBCSTRING "",
 				       &( date_time_values_string[ 19 ] ) );
 		}
 		if( ( print_count <= -1 )

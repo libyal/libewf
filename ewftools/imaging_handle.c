@@ -1,6 +1,7 @@
 /* 
  * Imaging handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2007-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,6 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( WINAPI )
@@ -304,12 +306,12 @@ int imaging_handle_signal_abort(
  */
 int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
-     const libsystem_character_t *filename,
+     const libcstring_system_character_t *filename,
      uint8_t resume,
      liberror_error_t **error )
 {
-	libsystem_character_t **libewf_filenames = NULL;
-	libsystem_character_t *filenames[ 1 ]    = { NULL };
+	libcstring_system_character_t **libewf_filenames = NULL;
+	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
 	static char *function                    = "imaging_handle_open_output";
 	size_t first_filename_length             = 0;
 	int amount_of_filenames                  = 0;
@@ -349,12 +351,12 @@ int imaging_handle_open_output(
 
 		return( -1 );
 	}
-	filenames[ 0 ]      = (libsystem_character_t *) filename;
+	filenames[ 0 ]      = (libcstring_system_character_t *) filename;
 	amount_of_filenames = 1;
 
 	if( resume != 0 )
 	{
-		first_filename_length = libsystem_string_length(
+		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
@@ -434,12 +436,12 @@ int imaging_handle_open_output(
  */
 int imaging_handle_open_secondary_output(
      imaging_handle_t *imaging_handle,
-     const libsystem_character_t *filename,
+     const libcstring_system_character_t *filename,
      uint8_t resume,
      liberror_error_t **error )
 {
-	libsystem_character_t **libewf_filenames = NULL;
-	libsystem_character_t *filenames[ 1 ]    = { NULL };
+	libcstring_system_character_t **libewf_filenames = NULL;
+	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
 	static char *function                    = "imaging_handle_open_secondary_output";
 	size_t first_filename_length             = 0;
 	int amount_of_filenames                  = 0;
@@ -479,12 +481,12 @@ int imaging_handle_open_secondary_output(
 
 		return( -1 );
 	}
-	filenames[ 0 ]      = (libsystem_character_t *) filename;
+	filenames[ 0 ]      = (libcstring_system_character_t *) filename;
 	amount_of_filenames = 1;
 
 	if( resume != 0 )
 	{
-		first_filename_length = libsystem_string_length(
+		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
@@ -1456,15 +1458,15 @@ int imaging_handle_get_chunk_size(
  */
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     libsystem_character_t *case_number,
+     libcstring_system_character_t *case_number,
      size_t case_number_size,
-     libsystem_character_t *description,
+     libcstring_system_character_t *description,
      size_t description_size,
-     libsystem_character_t *evidence_number,
+     libcstring_system_character_t *evidence_number,
      size_t evidence_number_size,
-     libsystem_character_t *examiner_name,
+     libcstring_system_character_t *examiner_name,
      size_t examiner_name_size,
-     libsystem_character_t *notes,
+     libcstring_system_character_t *notes,
      size_t notes_size,
      uint32_t *bytes_per_sector,
      size64_t *media_size,
@@ -1732,25 +1734,25 @@ int imaging_handle_get_output_values(
  */
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
-     libsystem_character_t *case_number,
+     libcstring_system_character_t *case_number,
      size_t case_number_length,
-     libsystem_character_t *description,
+     libcstring_system_character_t *description,
      size_t description_length,
-     libsystem_character_t *evidence_number,
+     libcstring_system_character_t *evidence_number,
      size_t evidence_number_length,
-     libsystem_character_t *examiner_name,
+     libcstring_system_character_t *examiner_name,
      size_t examiner_name_length,
-     libsystem_character_t *notes,
+     libcstring_system_character_t *notes,
      size_t notes_length,
-     libsystem_character_t *acquiry_operating_system,
+     libcstring_system_character_t *acquiry_operating_system,
      size_t acquiry_operating_system_length,
-     libsystem_character_t *acquiry_software,
+     libcstring_system_character_t *acquiry_software,
      size_t acquiry_software_length,
-     libsystem_character_t *acquiry_software_version,
+     libcstring_system_character_t *acquiry_software_version,
      size_t acquiry_software_version_length,
-     libsystem_character_t *model,
+     libcstring_system_character_t *model,
      size_t model_length,
-     libsystem_character_t *serial_number,
+     libcstring_system_character_t *serial_number,
      size_t serial_number_length,
      int header_codepage,
      uint32_t bytes_per_sector,
@@ -2373,7 +2375,7 @@ int imaging_handle_get_header_value(
      imaging_handle_t *imaging_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     libsystem_character_t *header_value,
+     libcstring_system_character_t *header_value,
      size_t header_value_size,
      liberror_error_t **error )
 {
@@ -2430,7 +2432,7 @@ int imaging_handle_get_header_value(
 	{
 		/* Determine the header value size
 		 */
-		utf8_header_value_size = 1 + narrow_string_length(
+		utf8_header_value_size = 1 + libcstring_narrow_string_length(
 		                              (char *) utf8_header_value );
 
 		if( libsystem_string_size_from_utf8_string(
@@ -2486,7 +2488,7 @@ int imaging_handle_set_header_value(
      imaging_handle_t *imaging_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     libsystem_character_t *header_value,
+     libcstring_system_character_t *header_value,
      size_t header_value_length,
      liberror_error_t **error )
 {
@@ -2622,7 +2624,7 @@ int imaging_handle_set_hash_value(
      imaging_handle_t *imaging_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libsystem_character_t *hash_value,
+     libcstring_system_character_t *hash_value,
      size_t hash_value_length,
      liberror_error_t **error )
 {
@@ -2926,9 +2928,9 @@ int imaging_handle_add_session(
  */
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
-         libsystem_character_t *calculated_md5_hash_string,
+         libcstring_system_character_t *calculated_md5_hash_string,
          size_t calculated_md5_hash_string_size,
-         libsystem_character_t *calculated_sha1_hash_string,
+         libcstring_system_character_t *calculated_sha1_hash_string,
          size_t calculated_sha1_hash_string_size,
          liberror_error_t **error )
 {

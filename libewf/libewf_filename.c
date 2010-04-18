@@ -1,6 +1,7 @@
 /*
  * Filename functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -22,15 +23,13 @@
 
 #include <common.h>
 #include <memory.h>
-#include <narrow_string.h>
 #include <types.h>
-#include <wide_string.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #include "libewf_definitions.h"
 #include "libewf_filename.h"
-#include "libewf_system_string.h"
 
 #include "ewf_definitions.h"
 
@@ -300,9 +299,9 @@ int libewf_filename_set_extension_wide(
  * Returns 1 if successful or -1 on error
  */
 int libewf_filename_create(
-     libewf_system_character_t **filename,
+     libcstring_system_character_t **filename,
      size_t *filename_size,
-     libewf_system_character_t *basename,
+     libcstring_system_character_t *basename,
      size_t basename_length,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
@@ -311,8 +310,8 @@ int libewf_filename_create(
      uint8_t ewf_format,
      liberror_error_t **error )
 {
-	libewf_system_character_t *new_filename = NULL;
-	static char *function                   = "libewf_filename_create";
+	libcstring_system_character_t *new_filename = NULL;
+	static char *function                       = "libewf_filename_create";
 
 	if( filename == NULL )
 	{
@@ -361,7 +360,7 @@ int libewf_filename_create(
 	/* The actual filename also contains a '.', 3 character extension and a end of string byte
 	 */
 	new_filename = memory_allocate(
-	                sizeof( libewf_system_character_t ) * ( basename_length + 5 ) );
+	                sizeof( libcstring_system_character_t ) * ( basename_length + 5 ) );
 
 	if( new_filename == NULL )
 	{
@@ -376,7 +375,7 @@ int libewf_filename_create(
 	}
 	/* Add one additional character for the end of line
 	 */
-	if( libewf_system_string_copy(
+	if( libcstring_system_string_copy(
 	     new_filename,
 	     basename,
 	     ( basename_length + 1 ) ) == NULL )
@@ -393,7 +392,7 @@ int libewf_filename_create(
 
 		return( -1 );
 	}
-	new_filename[ basename_length ] = (libewf_system_character_t) '.';
+	new_filename[ basename_length ] = (libcstring_system_character_t) '.';
 
 #if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
 	if( libewf_filename_set_extension_wide(

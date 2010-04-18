@@ -1,6 +1,7 @@
 /*
  * Debugging functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,11 +27,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include <stdio.h>
-
-#include "libewf_string.h"
 
 #include "ewf_section.h"
 
@@ -39,7 +37,7 @@ extern "C" {
 #endif
 
 int libewf_debug_dump_data(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *data,
      size_t data_size,
      liberror_error_t **error );
@@ -49,19 +47,19 @@ int libewf_debug_section_print(
      liberror_error_t **error );
 
 int libewf_debug_byte_stream_print(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *byte_stream,
      size_t byte_stream_size,
      liberror_error_t **error );
 
 int libewf_debug_utf8_stream_print(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *utf8_stream,
      size_t utf8_stream_size,
      liberror_error_t **error );
 
 int libewf_debug_utf16_stream_print(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *utf16_stream,
      size_t utf16_stream_size,
      liberror_error_t **error );

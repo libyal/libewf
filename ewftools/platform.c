@@ -1,6 +1,7 @@
 /*
  * Platform functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -21,10 +22,9 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <types.h>
-#include <wide_string.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_SYS_UTSNAME_H )
@@ -43,7 +43,7 @@
  * Return 1 if successful or -1 on error
  */
 int platform_get_operating_system(
-     libsystem_character_t *operating_system_string,
+     libcstring_system_character_t *operating_system_string,
      size_t operating_system_string_size,
      liberror_error_t **error )
 {
@@ -175,7 +175,7 @@ int platform_get_operating_system(
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
 
-	operating_system_length = narrow_string_length(
+	operating_system_length = libcstring_narrow_string_length(
 	                           operating_system );
 
 	if( operating_system_string_size < ( operating_system_length + 1 ) )

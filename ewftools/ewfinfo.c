@@ -2,6 +2,7 @@
  * ewfinfo
  * Shows information stored in an EWF file
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,6 +26,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -125,22 +127,22 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libsystem_character_t * const *argv_filenames = NULL;
+	libcstring_system_character_t * const *argv_filenames = NULL;
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                        = NULL;
+	libsystem_glob_t *glob                                = NULL;
 #endif
-	info_handle_t *info_handle                    = NULL;
-	liberror_error_t *error                       = NULL;
+	info_handle_t *info_handle                            = NULL;
+	liberror_error_t *error                               = NULL;
 
-	libsystem_character_t *program                = _LIBSYSTEM_CHARACTER_T_STRING( "ewfinfo" );
-	libsystem_integer_t option                    = 0;
-	uint8_t verbose                               = 0;
-	uint8_t date_format                           = LIBEWF_DATE_FORMAT_CTIME;
-	char info_option                              = 'a';
-	int amount_of_filenames                       = 0;
-	int header_codepage                           = LIBEWF_CODEPAGE_ASCII;
-	int result                                    = 0;
+	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfinfo" );
+	libcstring_system_integer_t option                    = 0;
+	uint8_t verbose                                       = 0;
+	uint8_t date_format                                   = LIBEWF_DATE_FORMAT_CTIME;
+	char info_option                                      = 'a';
+	int amount_of_filenames                               = 0;
+	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
+	int result                                            = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -169,15 +171,15 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:d:ehimvV" ) ) ) != (libsystem_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:d:ehimvV" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libsystem_integer_t) '?':
+			case (libcstring_system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBSYSTEM "\n",
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -185,7 +187,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libsystem_integer_t) 'A':
+			case (libcstring_system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
@@ -204,46 +206,46 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'd':
-				if( libsystem_string_compare(
+			case (libcstring_system_integer_t) 'd':
+				if( libcstring_system_string_compare(
 				     optarg,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "dm" ),
+				     _LIBCSTRING_SYSTEM_STRING( "dm" ),
 				     3 ) == 0 )
 				{
 					date_format = LIBEWF_DATE_FORMAT_DAYMONTH;
 				}
-				else if( libsystem_string_compare(
+				else if( libcstring_system_string_compare(
 				          optarg,
-				          _LIBSYSTEM_CHARACTER_T_STRING( "md" ),
+				          _LIBCSTRING_SYSTEM_STRING( "md" ),
 				          3 ) == 0 )
 				{
 					date_format = LIBEWF_DATE_FORMAT_MONTHDAY;
 				}
-				else if( libsystem_string_compare(
+				else if( libcstring_system_string_compare(
 				          optarg,
-				          _LIBSYSTEM_CHARACTER_T_STRING( "iso8601" ),
+				          _LIBCSTRING_SYSTEM_STRING( "iso8601" ),
 				          8 ) == 0 )
 				{
 					date_format = LIBEWF_DATE_FORMAT_ISO8601;
 				}
-				else if( libsystem_string_compare(
+				else if( libcstring_system_string_compare(
 				          optarg,
-				          _LIBSYSTEM_CHARACTER_T_STRING( "ctime" ),
+				          _LIBCSTRING_SYSTEM_STRING( "ctime" ),
 				          3 ) != 0 )
 				{
 					fprintf(
 					 stderr,
-					 "Unsupported date format: %" PRIs_LIBSYSTEM " using default ctime.\n",
+					 "Unsupported date format: %" PRIs_LIBCSTRING_SYSTEM " using default ctime.\n",
 					 optarg );
 				}
 				break;
 
-			case (libsystem_integer_t) 'e':
+			case (libcstring_system_integer_t) 'e':
 				if( info_option != 'a' )
 				{
 					fprintf(
 					 stderr,
-					 "Conflicting options: %" PRIc_LIBSYSTEM " and %c\n",
+					 "Conflicting options: %" PRIc_LIBCSTRING_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -255,18 +257,18 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (libsystem_integer_t) 'h':
+			case (libcstring_system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'i':
+			case (libcstring_system_integer_t) 'i':
 				if( info_option != 'a' )
 				{
 					fprintf(
 					 stderr,
-					 "Conflicting options: %" PRIc_LIBSYSTEM " and %c\n",
+					 "Conflicting options: %" PRIc_LIBCSTRING_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -278,12 +280,12 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (libsystem_integer_t) 'm':
+			case (libcstring_system_integer_t) 'm':
 				if( info_option != 'a' )
 				{
 					fprintf(
 					 stderr,
-					 "Conflicting options: %" PRIc_LIBSYSTEM " and %c\n",
+					 "Conflicting options: %" PRIc_LIBCSTRING_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -295,12 +297,12 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (libsystem_integer_t) 'v':
+			case (libcstring_system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libsystem_integer_t) 'V':
+			case (libcstring_system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -618,7 +620,7 @@ int main( int argc, char * const argv[] )
 	if( ewfinfo_abort != 0 )
 	{
 		fprintf(
-		 stdout, "%" PRIs_LIBSYSTEM ": ABORTED\n",
+		 stdout, "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

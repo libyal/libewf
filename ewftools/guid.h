@@ -1,6 +1,7 @@
 /*
  * GUID functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,9 +27,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -55,7 +55,7 @@ int guid_to_string(
      uint8_t *guid,
      size_t guid_size,
      int byte_order,
-     libsystem_character_t *string,
+     libcstring_system_character_t *string,
      size_t string_size,
      liberror_error_t **error );
 

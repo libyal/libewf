@@ -1,6 +1,7 @@
 /*
  * Split string values functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,17 +25,17 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #include "libewf_split_values.h"
-#include "libewf_string.h"
 
 /* Initializes the split values
  * Returns 1 if successful or -1 on error
  */
 int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
-     const libewf_character_t *string,
+     const libcstring_character_t *string,
      size_t string_size,
      int amount_of_values,
      liberror_error_t **error )
@@ -101,8 +102,8 @@ int libewf_split_values_initialize(
 		if( ( string != NULL )
 		 && ( string_size > 0 ) )
 		{
-			( *split_values )->string = (libewf_character_t *) memory_allocate(
-			                                                    sizeof( libewf_character_t ) * string_size );
+			( *split_values )->string = (libcstring_character_t *) memory_allocate(
+			                                                    sizeof( libcstring_character_t ) * string_size );
 
 			if( ( *split_values )->string == NULL )
 			{
@@ -123,7 +124,7 @@ int libewf_split_values_initialize(
 			if( memory_copy(
 			     ( *split_values )->string,
 			     string,
-			     sizeof( libewf_character_t ) * string_size ) == NULL )
+			     sizeof( libcstring_character_t ) * string_size ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -144,8 +145,8 @@ int libewf_split_values_initialize(
 		}
 		if( amount_of_values > 0 )
 		{
-			( *split_values )->values = (libewf_character_t **) memory_allocate(
-			                                                     sizeof( libewf_character_t * ) * amount_of_values );
+			( *split_values )->values = (libcstring_character_t **) memory_allocate(
+			                                                     sizeof( libcstring_character_t * ) * amount_of_values );
 
 			if( ( *split_values )->values == NULL )
 			{
@@ -168,7 +169,7 @@ int libewf_split_values_initialize(
 			if( memory_set(
 			     ( *split_values )->values,
 			     0,
-			     sizeof( libewf_character_t * ) * amount_of_values ) == NULL )
+			     sizeof( libcstring_character_t * ) * amount_of_values ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -292,14 +293,14 @@ int libewf_split_values_free(
  */
 int libewf_split_values_parse_string(
      libewf_split_values_t **split_values,
-     const libewf_character_t *string,
+     const libcstring_character_t *string,
      size_t string_size,
-     libewf_character_t delimiter,
+     libcstring_character_t delimiter,
      liberror_error_t **error )
 {
-	libewf_character_t *split_value_start = NULL;
-	libewf_character_t *split_value_end   = NULL;
-	libewf_character_t *string_end        = NULL;
+	libcstring_character_t *split_value_start = NULL;
+	libcstring_character_t *split_value_end   = NULL;
+	libcstring_character_t *string_end        = NULL;
 	static char *function                 = "libewf_split_values_parse_string";
 	size_t remaining_string_size          = 0;
 	ssize_t split_value_size              = 0;
@@ -353,13 +354,13 @@ int libewf_split_values_parse_string(
 	/* Determine the amount of split values
 	 */
 	remaining_string_size = string_size;
-	split_value_start     = (libewf_character_t *) string;
-	split_value_end       = (libewf_character_t *) string;
-	string_end            = (libewf_character_t *) &( string[ string_size - 1 ] );
+	split_value_start     = (libcstring_character_t *) string;
+	split_value_end       = (libcstring_character_t *) string;
+	string_end            = (libcstring_character_t *) &( string[ string_size - 1 ] );
 
 	do
 	{
-		split_value_end = libewf_string_search(
+		split_value_end = libcstring_string_search(
 				   split_value_start,
 				   delimiter,
 				   remaining_string_size );
@@ -430,7 +431,7 @@ int libewf_split_values_parse_string(
 		{
 			split_value_start = split_value_end + 1;
 		}
-		split_value_end = libewf_string_search(
+		split_value_end = libcstring_string_search(
 		                   split_value_start,
 		                   delimiter,
 		                   remaining_string_size );

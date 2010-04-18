@@ -1,6 +1,7 @@
 /* 
  * Device handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2007-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,6 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
@@ -250,7 +252,7 @@ int device_handle_signal_abort(
  */
 int device_handle_open_input(
      device_handle_t *device_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error )
 {
@@ -810,7 +812,7 @@ int device_handle_get_information_value(
      device_handle_t *device_handle,
      const uint8_t *information_value_identifier,
      size_t information_value_identifier_length,
-     libsystem_character_t *information_value,
+     libcstring_system_character_t *information_value,
      size_t information_value_size,
      liberror_error_t **error )
 {
@@ -882,7 +884,7 @@ int device_handle_get_information_value(
 	{
 		/* Determine the header value size
 		 */
-		utf8_information_value_size = 1 + narrow_string_length(
+		utf8_information_value_size = 1 + libcstring_narrow_string_length(
 		                                   (char *) utf8_information_value );
 
 		if( libsystem_string_size_from_utf8_string(
@@ -1129,7 +1131,7 @@ int device_handle_media_information_fprint(
 {
 	uint8_t media_information_value[ 64 ];
 
-        libsystem_character_t media_size_string[ 16 ];
+        libcstring_system_character_t media_size_string[ 16 ];
 
 	static char *function = "device_handle_media_information_fprint";
 	size64_t media_size   = 0;
@@ -1525,7 +1527,7 @@ int device_handle_media_information_fprint(
 	{
 		fprintf(
 		 stream,
-		 "Media size:\t\t%" PRIs_LIBSYSTEM " (%" PRIu64 " bytes)\n",
+		 "Media size:\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
 		 media_size_string,
 		 media_size );
 	}

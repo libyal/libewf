@@ -1,6 +1,7 @@
 /* 
  * Alteration handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,6 +27,7 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
@@ -36,8 +38,6 @@
 #endif
 
 #include <libewf.h>
-
-#include <libsystem.h>
 
 #include "storage_media_buffer.h"
 
@@ -68,7 +68,7 @@ int alteration_handle_signal_abort(
 
 int alteration_handle_open_input(
      alteration_handle_t *alteration_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
@@ -122,7 +122,7 @@ int alteration_handle_set_header_codepage(
 
 int alteration_handle_set_output_values(
      alteration_handle_t *alteration_handle,
-     libsystem_character_t *delta_segment_filename,
+     libcstring_system_character_t *delta_segment_filename,
      size_t delta_segment_filename_length,
      liberror_error_t **error );
 

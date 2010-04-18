@@ -2,6 +2,7 @@
  * ewfalter
  * Alters media data in EWF files
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -479,36 +480,36 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libsystem_character_t input_buffer[ EWFALTER_INPUT_BUFFER_SIZE ];
+	libcstring_system_character_t input_buffer[ EWFALTER_INPUT_BUFFER_SIZE ];
 
-	alteration_handle_t *alteration_handle        = NULL;
+	alteration_handle_t *alteration_handle                = NULL;
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                        = NULL;
+	libsystem_glob_t *glob                                = NULL;
 #endif
 
-	liberror_error_t *error                       = NULL;
+	liberror_error_t *error                               = NULL;
 
-	libsystem_character_t * const *argv_filenames = NULL;
+	libcstring_system_character_t * const *argv_filenames = NULL;
 
-	libsystem_character_t *program                = _LIBSYSTEM_CHARACTER_T_STRING( "ewfalter" );
-	libsystem_character_t *target_filename        = NULL;
+	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfalter" );
+	libcstring_system_character_t *target_filename        = NULL;
 
-	libsystem_integer_t option                    = 0;
-	size64_t media_size                           = 0;
-	ssize64_t alter_count                         = 0;
-	size_t string_length                          = 0;
-	uint64_t alter_offset                         = 0;
-	uint64_t alter_size                           = 0;
-	uint64_t process_buffer_size                  = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint8_t verbose                               = 0;
-	int alteration_run                            = 0;
-	int alteration_runs                           = 1;
-	int amount_of_filenames                       = 0;
-	int argument_set_offset                       = 0;
-	int argument_set_size                         = 0;
-	int header_codepage                           = LIBEWF_CODEPAGE_ASCII;
-	int result                                    = 0;
+	libcstring_system_integer_t option                    = 0;
+	size64_t media_size                                   = 0;
+	ssize64_t alter_count                                 = 0;
+	size_t string_length                                  = 0;
+	uint64_t alter_offset                                 = 0;
+	uint64_t alter_size                                   = 0;
+	uint64_t process_buffer_size                          = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint8_t verbose                                       = 0;
+	int alteration_run                                    = 0;
+	int alteration_runs                                   = 1;
+	int amount_of_filenames                               = 0;
+	int argument_set_offset                               = 0;
+	int argument_set_size                                 = 0;
+	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
+	int result                                            = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -536,21 +537,21 @@ int main( int argc, char * const argv[] )
 
 	fprintf(
 	 stdout,
-	 "%" PRIs_LIBSYSTEM " is for testing purposes only.\n",
+	 "%" PRIs_LIBCSTRING_SYSTEM " is for testing purposes only.\n",
 	 program );
 
 	while( ( option = libsystem_getopt(
 			   argc,
 			   argv,
-			   _LIBSYSTEM_CHARACTER_T_STRING( "A:B:ho:p:qt:vV" ) ) ) != (libsystem_integer_t) -1 )
+			   _LIBCSTRING_SYSTEM_STRING( "A:B:ho:p:qt:vV" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libsystem_integer_t) '?':
+			case (libcstring_system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBSYSTEM ".\n",
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -558,7 +559,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libsystem_integer_t) 'A':
+			case (libcstring_system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
@@ -577,8 +578,8 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'B':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'B':
+				string_length = libcstring_system_string_length(
 				                 optarg );
 
 				if( libsystem_string_to_uint64(
@@ -602,14 +603,14 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (libsystem_integer_t) 'h':
+			case (libcstring_system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'o':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'o':
+				string_length = libcstring_system_string_length(
 				                 optarg );
 
 				if( libsystem_string_to_uint64(
@@ -634,8 +635,8 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (libsystem_integer_t) 'p':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'p':
+				string_length = libcstring_system_string_length(
 						 optarg );
 
 				result = byte_size_string_convert(
@@ -662,20 +663,20 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'q':
+			case (libcstring_system_integer_t) 'q':
 				break;
 
-			case (libsystem_integer_t) 't':
+			case (libcstring_system_integer_t) 't':
 				target_filename = optarg;
 
 				break;
 
-			case (libsystem_integer_t) 'v':
+			case (libcstring_system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libsystem_integer_t) 'V':
+			case (libcstring_system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -896,7 +897,7 @@ int main( int argc, char * const argv[] )
 		       stdout,
 		       input_buffer,
 		       EWFALTER_INPUT_BUFFER_SIZE,
-		       _LIBSYSTEM_CHARACTER_T_STRING( "Start altering at offset" ),
+		       _LIBCSTRING_SYSTEM_STRING( "Start altering at offset" ),
 		       0,
 		       media_size,
 		       0,
@@ -920,7 +921,7 @@ int main( int argc, char * const argv[] )
 		       stdout,
 		       input_buffer,
 		       EWFALTER_INPUT_BUFFER_SIZE,
-		       _LIBSYSTEM_CHARACTER_T_STRING( "Amount of bytes to alter" ),
+		       _LIBCSTRING_SYSTEM_STRING( "Amount of bytes to alter" ),
 		       0,
 		       media_size - alter_offset,
 		       media_size - alter_offset,
@@ -945,7 +946,7 @@ int main( int argc, char * const argv[] )
 			     stdout,
 			     input_buffer,
 			     EWFALTER_INPUT_BUFFER_SIZE,
-			     _LIBSYSTEM_CHARACTER_T_STRING( "Alteration buffer size" ),
+			     _LIBCSTRING_SYSTEM_STRING( "Alteration buffer size" ),
 			     1,
 			     SSIZE_MAX,
 			     ( 64 * 512 ),
@@ -979,7 +980,7 @@ int main( int argc, char * const argv[] )
 			if( alteration_handle_set_output_values(
 			     alteration_handle,
 			     target_filename,
-			     libsystem_string_length(
+			     libcstring_system_string_length(
 			      target_filename ),
 			     &error ) != 1 )
 			{
@@ -1114,7 +1115,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBSYSTEM ": ABORTED\n",
+		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

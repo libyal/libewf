@@ -1,6 +1,7 @@
 /* 
  * Alteration handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2007-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -206,14 +207,14 @@ int alteration_handle_signal_abort(
  */
 int alteration_handle_open_input(
      alteration_handle_t *alteration_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error )
 {
-	libsystem_character_t **libewf_filenames = NULL;
-	static char *function                    = "alteration_handle_open_input";
-	size_t first_filename_length             = 0;
-	int result                               = 1;
+	libcstring_system_character_t **libewf_filenames = NULL;
+	static char *function                            = "alteration_handle_open_input";
+	size_t first_filename_length                     = 0;
+	int result                                       = 1;
 
 	if( alteration_handle == NULL )
 	{
@@ -261,7 +262,7 @@ int alteration_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
-		first_filename_length = libsystem_string_length(
+		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ]);
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
@@ -291,7 +292,7 @@ int alteration_handle_open_input(
 
 			return( -1 );
 		}
-		filenames = (libsystem_character_t * const *) libewf_filenames;
+		filenames = (libcstring_system_character_t * const *) libewf_filenames;
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -942,7 +943,7 @@ int alteration_handle_set_header_codepage(
  */
 int alteration_handle_set_output_values(
      alteration_handle_t *alteration_handle,
-     libsystem_character_t *delta_segment_filename,
+     libcstring_system_character_t *delta_segment_filename,
      size_t delta_segment_filename_length,
      liberror_error_t **error )
 {

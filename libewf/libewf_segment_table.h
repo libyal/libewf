@@ -1,6 +1,7 @@
 /*
  * Segment table functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,6 +27,9 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
+#include <liberror.h>
+
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
@@ -36,7 +40,6 @@
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
-#include "libewf_system_string.h"
 
 #include "ewf_data.h"
 
@@ -58,7 +61,7 @@ struct libewf_segment_table
 
 	/* The basename
 	 */
-	libewf_system_character_t *basename;
+	libcstring_system_character_t *basename;
 
 	/* The basename size
 	 */

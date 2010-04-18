@@ -2,6 +2,7 @@
  * ewfverify
  * Verifies the integrity of the media data within the EWF file
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,6 +26,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -407,45 +409,45 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error                            = NULL;
+	liberror_error_t *error                                    = NULL;
 
-	libsystem_character_t * const *argv_filenames      = NULL;
+	libcstring_system_character_t * const *argv_filenames      = NULL;
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                             = NULL;
+	libsystem_glob_t *glob                                     = NULL;
 #endif
 
-	libsystem_character_t *calculated_md5_hash_string  = NULL;
-	libsystem_character_t *calculated_sha1_hash_string = NULL;
-	libsystem_character_t *log_filename                = NULL;
-	libsystem_character_t *program                     = _LIBSYSTEM_CHARACTER_T_STRING( "ewfverify" );
-	libsystem_character_t *stored_md5_hash_string      = NULL;
-	libsystem_character_t *stored_sha1_hash_string     = NULL;
+	libcstring_system_character_t *calculated_md5_hash_string  = NULL;
+	libcstring_system_character_t *calculated_sha1_hash_string = NULL;
+	libcstring_system_character_t *log_filename                = NULL;
+	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfverify" );
+	libcstring_system_character_t *stored_md5_hash_string      = NULL;
+	libcstring_system_character_t *stored_sha1_hash_string     = NULL;
 
-	log_handle_t *log_handle                           = NULL;
+	log_handle_t *log_handle                                   = NULL;
 
-	process_status_t *process_status                   = NULL;
+	process_status_t *process_status                           = NULL;
 
-	verification_handle_t *verification_handle         = NULL;
+	verification_handle_t *verification_handle                 = NULL;
 
-	libsystem_integer_t option                         = 0;
-	ssize64_t verify_count                             = 0;
-	size_t string_length                               = 0;
-	uint64_t process_buffer_size                       = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint32_t amount_of_crc_errors                      = 0;
-	uint8_t calculate_md5                              = 1;
-	uint8_t calculate_sha1                             = 0;
-	uint8_t print_status_information                   = 1;
-	uint8_t wipe_chunk_on_error                        = 0;
-	uint8_t verbose                                    = 0;
-	int amount_of_filenames                            = 0;
-	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
-	int match_md5_hash                                 = 0;
-	int match_sha1_hash                                = 0;
-	int result                                         = 0;
-	int status                                         = 0;
-	int stored_md5_hash_available                      = 0;
-	int stored_sha1_hash_available                     = 0;
+	libcstring_system_integer_t option                         = 0;
+	ssize64_t verify_count                                     = 0;
+	size_t string_length                                       = 0;
+	uint64_t process_buffer_size                               = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint32_t amount_of_crc_errors                              = 0;
+	uint8_t calculate_md5                                      = 1;
+	uint8_t calculate_sha1                                     = 0;
+	uint8_t print_status_information                           = 1;
+	uint8_t wipe_chunk_on_error                                = 0;
+	uint8_t verbose                                            = 0;
+	int amount_of_filenames                                    = 0;
+	int header_codepage                                        = LIBEWF_CODEPAGE_ASCII;
+	int match_md5_hash                                         = 0;
+	int match_sha1_hash                                        = 0;
+	int result                                                 = 0;
+	int status                                                 = 0;
+	int stored_md5_hash_available                              = 0;
+	int stored_sha1_hash_available                             = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -474,15 +476,15 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:d:hl:p:qvVw" ) ) ) != (libsystem_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:d:hl:p:qvVw" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libsystem_integer_t) '?':
+			case (libcstring_system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBSYSTEM "\n",
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -490,7 +492,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libsystem_integer_t) 'A':
+			case (libcstring_system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
@@ -509,10 +511,10 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'd':
-				if( libsystem_string_compare(
+			case (libcstring_system_integer_t) 'd':
+				if( libcstring_system_string_compare(
 				     optarg,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "sha1" ),
+				     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
@@ -525,19 +527,19 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'h':
+			case (libcstring_system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'l':
+			case (libcstring_system_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (libsystem_integer_t) 'p':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'p':
+				string_length = libcstring_system_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -564,23 +566,23 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'q':
+			case (libcstring_system_integer_t) 'q':
 				print_status_information = 0;
 
 				break;
 
-			case (libsystem_integer_t) 'v':
+			case (libcstring_system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libsystem_integer_t) 'V':
+			case (libcstring_system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'w':
+			case (libcstring_system_integer_t) 'w':
 				wipe_chunk_on_error = 1;
 
 				break;
@@ -757,9 +759,9 @@ int main( int argc, char * const argv[] )
 	{
 		if( process_status_initialize(
 		     &process_status,
-		     _LIBSYSTEM_CHARACTER_T_STRING( "Verify" ),
-		     _LIBSYSTEM_CHARACTER_T_STRING( "verified" ),
-		     _LIBSYSTEM_CHARACTER_T_STRING( "Read" ),
+		     _LIBCSTRING_SYSTEM_STRING( "Verify" ),
+		     _LIBCSTRING_SYSTEM_STRING( "verified" ),
+		     _LIBCSTRING_SYSTEM_STRING( "Read" ),
 		     stdout,
 		     print_status_information,
 		     &error ) != 1 )
@@ -889,8 +891,8 @@ int main( int argc, char * const argv[] )
 	{
 		if( calculate_md5 == 1 )
 		{
-			stored_md5_hash_string = (libsystem_character_t *) memory_allocate(
-			                                                    sizeof( libsystem_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
+			stored_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
+			                                                            sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( stored_md5_hash_string == NULL )
 			{
@@ -907,8 +909,8 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			calculated_md5_hash_string = (libsystem_character_t *) memory_allocate(
-			                                                        sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
+			calculated_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
+			                                                                sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( calculated_md5_hash_string == NULL )
 			{
@@ -931,8 +933,8 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_string = (libsystem_character_t *) memory_allocate(
-			                                                     sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+			stored_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
+			                                                             sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
 			if( stored_sha1_hash_string == NULL )
 			{
@@ -956,8 +958,8 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			calculated_sha1_hash_string = (libsystem_character_t *) memory_allocate(
-			                                                         sizeof( libsystem_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+			calculated_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
+			                                                                 sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
 			if( calculated_sha1_hash_string == NULL )
 			{
@@ -1090,7 +1092,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to open log file: %" PRIs_LIBSYSTEM ".\n",
+				 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 				 log_filename );
 
 				libsystem_notify_print_error_backtrace(
@@ -1157,30 +1159,30 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stdout,
-				 "MD5 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
+				 "MD5 hash stored in file:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 				 stored_md5_hash_string );
 
 				if( log_handle != NULL )
 				{
 					log_handle_printf(
 					 log_handle,
-					 "MD5 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
+					 "MD5 hash stored in file:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 					 stored_md5_hash_string );
 				}
 			}
 			fprintf(
 			 stdout,
-			 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
+			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 calculated_md5_hash_string );
 
 			if( log_handle != NULL )
 			{
 				log_handle_printf(
 				 log_handle,
-				 "MD5 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
+				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 				 calculated_md5_hash_string );
 			}
-			match_md5_hash = ( libsystem_string_compare(
+			match_md5_hash = ( libcstring_system_string_compare(
 					    stored_md5_hash_string,
 					    calculated_md5_hash_string,
 					    DIGEST_HASH_STRING_SIZE_MD5 ) == 0 );
@@ -1203,30 +1205,30 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stdout,
-				 "SHA1 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
+				 "SHA1 hash stored in file:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 				 stored_sha1_hash_string );
 
 				if( log_handle != NULL )
 				{
 					log_handle_printf(
 					 log_handle,
-					 "SHA1 hash stored in file:\t%" PRIs_LIBSYSTEM "\n",
+					 "SHA1 hash stored in file:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 					 stored_sha1_hash_string );
 				}
 			}
 			fprintf(
 			 stdout,
-			 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
+			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 calculated_sha1_hash_string );
 
 			if( log_handle != NULL )
 			{
 				log_handle_printf(
 				 log_handle,
-				 "SHA1 hash calculated over data:\t%" PRIs_LIBSYSTEM "\n",
+				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 				 calculated_sha1_hash_string );
 			}
-			match_sha1_hash = ( libsystem_string_compare(
+			match_sha1_hash = ( libcstring_system_string_compare(
 					     stored_sha1_hash_string,
 					     calculated_sha1_hash_string,
 					     DIGEST_HASH_STRING_SIZE_SHA1 ) == 0 );
@@ -1362,7 +1364,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to close log file: %" PRIs_LIBSYSTEM ".\n",
+			 "Unable to close log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 			 log_filename );
 
 			libsystem_notify_print_error_backtrace(
@@ -1400,7 +1402,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "\n%" PRIs_LIBSYSTEM ": SUCCESS\n",
+		 "\n%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
 		 program );
 
 		result = EXIT_SUCCESS;
@@ -1409,7 +1411,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "\n%" PRIs_LIBSYSTEM ": FAILURE\n",
+		 "\n%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
 		 program );
 
 		result = EXIT_FAILURE;

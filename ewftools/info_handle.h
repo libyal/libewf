@@ -1,6 +1,7 @@
 /* 
  * Info handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,6 +27,7 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
@@ -36,8 +38,6 @@
 #endif
 
 #include <libewf.h>
-
-#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -66,7 +66,7 @@ int info_handle_signal_abort(
 
 int info_handle_open_input(
      info_handle_t *info_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
@@ -78,7 +78,7 @@ int info_handle_get_header_value(
      info_handle_t *info_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     libsystem_character_t *header_value,
+     libcstring_system_character_t *header_value,
      size_t header_value_size,
      liberror_error_t **error );
 
@@ -86,7 +86,7 @@ int info_handle_get_hash_value(
      info_handle_t *info_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libsystem_character_t *hash_value,
+     libcstring_system_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error );
 
@@ -102,7 +102,7 @@ int info_handle_header_values_fprint(
      liberror_error_t **error );
 
 int info_handle_header_value_extents_fprint(
-     libsystem_character_t *header_value,
+     libcstring_system_character_t *header_value,
      size_t header_value_length,
      FILE *stream,
      liberror_error_t **error );

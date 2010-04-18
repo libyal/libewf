@@ -1,6 +1,7 @@
 /*
  * Section reading/writing functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -23,9 +24,9 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
-#include <narrow_string.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
@@ -933,7 +934,7 @@ ssize_t libewf_section_header_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_byte_stream_print(
-	       _LIBEWF_STRING( "Header" ),
+	       _LIBCSTRING_STRING( "Header" ),
 	       header,
 	       header_size,
 	       error ) != 1 ) )
@@ -1008,7 +1009,7 @@ ssize_t libewf_section_header_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_byte_stream_print(
-	       _LIBEWF_STRING( "Header" ),
+	       _LIBCSTRING_STRING( "Header" ),
 	       header,
 	       header_size,
 	       error ) != 1 ) )
@@ -1141,7 +1142,7 @@ ssize_t libewf_section_header2_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_utf16_stream_print(
-	       _LIBEWF_STRING( "Header2" ),
+	       _LIBCSTRING_STRING( "Header2" ),
 	       header2,
 	       header2_size,
 	       error ) != 1 ) )
@@ -1216,7 +1217,7 @@ ssize_t libewf_section_header2_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_utf16_stream_print(
-	       _LIBEWF_STRING( "Header2" ),
+	       _LIBCSTRING_STRING( "Header2" ),
 	       header2,
 	       header2_size,
 	       error ) != 1 ) )
@@ -3640,7 +3641,7 @@ ssize_t libewf_section_ltree_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_utf16_stream_print(
-	       _LIBEWF_STRING( "ltree data" ),
+	       _LIBCSTRING_STRING( "ltree data" ),
 	       ltree_data,
 	       ltree_data_size,
 	       error ) != 1 ) )
@@ -6196,7 +6197,7 @@ ssize_t libewf_section_xheader_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_STRING( "XHeader" ),
+	       _LIBCSTRING_STRING( "XHeader" ),
 	       xheader,
 	       xheader_size,
 	       error ) != 1 ) )
@@ -6271,7 +6272,7 @@ ssize_t libewf_section_xheader_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_STRING( "XHeader" ),
+	       _LIBCSTRING_STRING( "XHeader" ),
 	       xheader,
 	       xheader_size,
 	       error ) != 1 ) )
@@ -6404,7 +6405,7 @@ ssize_t libewf_section_xhash_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_STRING( "XHash" ),
+	       _LIBCSTRING_STRING( "XHash" ),
 	       xhash,
 	       xhash_size,
 	       error ) != 1 ) )
@@ -6479,7 +6480,7 @@ ssize_t libewf_section_xhash_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libnotify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_STRING( "XHash" ),
+	       _LIBCSTRING_STRING( "XHash" ),
 	       xhash,
 	       xhash_size,
 	       error ) != 1 ) )
@@ -7056,7 +7057,7 @@ ssize_t libewf_section_debug_read(
 	if( result == 0 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBEWF_STRING( "UNCOMPRESSED data" ),
+		          _LIBCSTRING_STRING( "UNCOMPRESSED data" ),
 		          data,
 		          (size_t) section_size,
 	                  error );
@@ -7064,7 +7065,7 @@ ssize_t libewf_section_debug_read(
 	else if( result == 1 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBEWF_STRING( "COMPRESSED data" ),
+		          _LIBCSTRING_STRING( "COMPRESSED data" ),
 		          uncompressed_data,
 		          uncompressed_size,
 	                  error );
@@ -7270,7 +7271,7 @@ int libewf_section_read(
 
 		return( -1 );
 	}
-	section_type_length = narrow_string_length(
+	section_type_length = libcstring_narrow_string_length(
 	                       (char *) section->type );
 
 	if( libewf_section_list_append(

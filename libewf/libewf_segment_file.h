@@ -1,6 +1,7 @@
 /*
  * Segment file reading/writing functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -38,7 +39,6 @@
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
-#include "libewf_system_string.h"
 
 #include "ewf_crc.h"
 #include "ewf_data.h"

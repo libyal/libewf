@@ -1,6 +1,7 @@
 /*
  * Single file entry functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,8 +27,10 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
+#include <liberror.h>
+
 #include "libewf_date_time.h"
-#include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -51,7 +54,7 @@ struct libewf_single_file_entry
 
 	/* The name
 	 */
-	libewf_character_t *name;
+	libcstring_character_t *name;
 
 	/* The name size
 	 */
@@ -83,7 +86,7 @@ struct libewf_single_file_entry
 
 	/* The MD5 digest hash
 	 */
-	libewf_character_t *md5_hash;
+	libcstring_character_t *md5_hash;
 
 	/* The MD5 digest hash size
 	 */

@@ -2,6 +2,7 @@
  * ewfexport
  * Export media data from EWF files to a file
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,6 +26,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -65,10 +67,10 @@ int ewfexport_abort                      = 0;
 void usage_fprint(
       FILE *stream )
 {
-	libsystem_character_t default_segment_file_size_string[ 16 ];
-	libsystem_character_t minimum_segment_file_size_string[ 16 ];
-	libsystem_character_t maximum_32bit_segment_file_size_string[ 16 ];
-	libsystem_character_t maximum_64bit_segment_file_size_string[ 16 ];
+	libcstring_system_character_t default_segment_file_size_string[ 16 ];
+	libcstring_system_character_t minimum_segment_file_size_string[ 16 ];
+	libcstring_system_character_t maximum_32bit_segment_file_size_string[ 16 ];
+	libcstring_system_character_t maximum_64bit_segment_file_size_string[ 16 ];
 
 	int result = 0;
 
@@ -154,9 +156,9 @@ void usage_fprint(
 
 	if( result == 1 )
 	{
-		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBSYSTEM ")\n"
-		                 "\t           (minimum is %" PRIs_LIBSYSTEM ", maximum is %" PRIs_LIBSYSTEM " for raw and encase6 format\n"
-		                 "\t           and %" PRIs_LIBSYSTEM " for other formats)\n"
+		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
+		                 "\t           (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for raw and encase6 format\n"
+		                 "\t           and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n"
 		                 "\t           (not used for files format)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
@@ -776,78 +778,78 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libsystem_character_t acquiry_operating_system[ 32 ];
-	libsystem_character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
+	libcstring_system_character_t acquiry_operating_system[ 32 ];
+	libcstring_system_character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
-	libsystem_character_t * const *argv_filenames      = NULL;
+	libcstring_system_character_t * const *argv_filenames   = NULL;
 
-	export_handle_t *export_handle                     = NULL;
+	export_handle_t *export_handle                          = NULL;
 
-	liberror_error_t *error                            = NULL;
+	liberror_error_t *error                                 = NULL;
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                             = NULL;
+	libsystem_glob_t *glob                                  = NULL;
 #endif
 
-	libsystem_character_t *acquiry_software_version    = NULL;
-	libsystem_character_t *fixed_string_variable       = NULL;
-	libsystem_character_t *log_filename                = NULL;
-	libsystem_character_t *option_target_filename      = NULL;
-	libsystem_character_t *program                     = _LIBSYSTEM_CHARACTER_T_STRING( "ewfexport" );
-	libsystem_character_t *target_filename             = NULL;
+	libcstring_system_character_t *acquiry_software_version = NULL;
+	libcstring_system_character_t *fixed_string_variable    = NULL;
+	libcstring_system_character_t *log_filename             = NULL;
+	libcstring_system_character_t *option_target_filename   = NULL;
+	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfexport" );
+	libcstring_system_character_t *target_filename          = NULL;
 
-	log_handle_t *log_handle                           = NULL;
+	log_handle_t *log_handle                                = NULL;
 
-	process_status_t *process_status                   = NULL;
+	process_status_t *process_status                        = NULL;
 
-	libsystem_integer_t option                         = 0;
-	size64_t media_size                                = 0;
-	ssize64_t export_count                             = 0;
-	size_t string_length                               = 0;
-	uint64_t export_offset                             = 0;
-	uint64_t export_size                               = 0;
-	uint64_t maximum_segment_file_size                 = 0;
-	uint64_t process_buffer_size                       = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint64_t segment_file_size                         = 0;
-	uint32_t sectors_per_chunk                         = 64;
-	uint8_t calculate_md5                              = 1;
-	uint8_t calculate_sha1                             = 0;
-	uint8_t compression_flags                          = 0;
-	uint8_t ewf_format                                 = LIBEWF_FORMAT_ENCASE6;
-	uint8_t print_status_information                   = 1;
-	uint8_t swap_byte_pairs                            = 0;
-	uint8_t wipe_chunk_on_error                        = 0;
-	uint8_t verbose                                    = 0;
-	int8_t compression_level                           = LIBEWF_COMPRESSION_NONE;
-	int amount_of_filenames                            = 0;
-	int argument_set_compression                       = 0;
-	int argument_set_format                            = 0;
-	int argument_set_offset                            = 0;
-	int argument_set_sectors_per_chunk                 = 0;
-	int argument_set_segment_file_size                 = 0;
-	int argument_set_size                              = 0;
-	int error_abort                                    = 0;
-	int header_codepage                                = LIBEWF_CODEPAGE_ASCII;
-	int interactive_mode                               = 1;
-	int result                                         = 1;
-	int status                                         = 0;
-	uint8_t export_handle_output_format                = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+	libcstring_system_integer_t option                      = 0;
+	size64_t media_size                                     = 0;
+	ssize64_t export_count                                  = 0;
+	size_t string_length                                    = 0;
+	uint64_t export_offset                                  = 0;
+	uint64_t export_size                                    = 0;
+	uint64_t maximum_segment_file_size                      = 0;
+	uint64_t process_buffer_size                            = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint64_t segment_file_size                              = 0;
+	uint32_t sectors_per_chunk                              = 64;
+	uint8_t calculate_md5                                   = 1;
+	uint8_t calculate_sha1                                  = 0;
+	uint8_t compression_flags                               = 0;
+	uint8_t ewf_format                                      = LIBEWF_FORMAT_ENCASE6;
+	uint8_t print_status_information                        = 1;
+	uint8_t swap_byte_pairs                                 = 0;
+	uint8_t wipe_chunk_on_error                             = 0;
+	uint8_t verbose                                         = 0;
+	int8_t compression_level                                = LIBEWF_COMPRESSION_NONE;
+	int amount_of_filenames                                 = 0;
+	int argument_set_compression                            = 0;
+	int argument_set_format                                 = 0;
+	int argument_set_offset                                 = 0;
+	int argument_set_sectors_per_chunk                      = 0;
+	int argument_set_segment_file_size                      = 0;
+	int argument_set_size                                   = 0;
+	int error_abort                                         = 0;
+	int header_codepage                                     = LIBEWF_CODEPAGE_ASCII;
+	int interactive_mode                                    = 1;
+	int result                                              = 1;
+	int status                                              = 0;
+	uint8_t export_handle_output_format                     = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 
-	libsystem_character_t *ewfexport_format_types[ 14 ] = \
-	 { _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "files" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "ewf" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "smart" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "ftk" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "encase1" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "encase2" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "encase3" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "encase4" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "encase5" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "encase6" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "linen5" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "linen6" ),
-	   _LIBSYSTEM_CHARACTER_T_STRING( "ewfx" ) };
+	libcstring_system_character_t *ewfexport_format_types[ 14 ] = \
+	 { _LIBCSTRING_SYSTEM_STRING( "raw" ),
+	   _LIBCSTRING_SYSTEM_STRING( "files" ),
+	   _LIBCSTRING_SYSTEM_STRING( "ewf" ),
+	   _LIBCSTRING_SYSTEM_STRING( "smart" ),
+	   _LIBCSTRING_SYSTEM_STRING( "ftk" ),
+	   _LIBCSTRING_SYSTEM_STRING( "encase1" ),
+	   _LIBCSTRING_SYSTEM_STRING( "encase2" ),
+	   _LIBCSTRING_SYSTEM_STRING( "encase3" ),
+	   _LIBCSTRING_SYSTEM_STRING( "encase4" ),
+	   _LIBCSTRING_SYSTEM_STRING( "encase5" ),
+	   _LIBCSTRING_SYSTEM_STRING( "encase6" ),
+	   _LIBCSTRING_SYSTEM_STRING( "linen5" ),
+	   _LIBCSTRING_SYSTEM_STRING( "linen6" ),
+	   _LIBCSTRING_SYSTEM_STRING( "ewfx" ) };
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -901,21 +903,21 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libsystem_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libcstring_system_integer_t) -1 )
 #else
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBSYSTEM_CHARACTER_T_STRING( "A:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libsystem_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libcstring_system_integer_t) -1 )
 #endif
 	{
 		switch( option )
 		{
-			case (libsystem_integer_t) '?':
+			case (libcstring_system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBSYSTEM ".\n",
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -923,7 +925,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libsystem_integer_t) 'A':
+			case (libcstring_system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
@@ -943,7 +945,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 #ifdef DISABLED
-			case (libsystem_integer_t) 'b':
+			case (libcstring_system_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(
 				     optarg,
 				     &sectors_per_chunk,
@@ -967,8 +969,8 @@ int main( int argc, char * const argv[] )
 				break;
 #endif
 
-			case (libsystem_integer_t) 'B':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'B':
+				string_length = libcstring_system_string_length(
 				                 optarg );
 
 				if( libsystem_string_to_uint64(
@@ -987,7 +989,7 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (libsystem_integer_t) 'c':
+			case (libcstring_system_integer_t) 'c':
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
@@ -1012,10 +1014,10 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'd':
-				if( libsystem_string_compare(
+			case (libcstring_system_integer_t) 'd':
+				if( libcstring_system_string_compare(
 				     optarg,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "sha1" ),
+				     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
@@ -1028,18 +1030,18 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'f':
-				if( libsystem_string_compare(
+			case (libcstring_system_integer_t) 'f':
+				if( libcstring_system_string_compare(
 				     optarg,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
+				     _LIBCSTRING_SYSTEM_STRING( "raw" ),
 				     3 ) == 0 )
 				{
 					export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 					argument_set_format         = 1;
 				}
-				else if( libsystem_string_compare(
+				else if( libcstring_system_string_compare(
 				          optarg,
-				          _LIBSYSTEM_CHARACTER_T_STRING( "files" ),
+				          _LIBCSTRING_SYSTEM_STRING( "files" ),
 				          5 ) == 0 )
 				{
 					export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
@@ -1063,19 +1065,19 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'h':
+			case (libcstring_system_integer_t) 'h':
 				usage_fprint(
 				 stderr );
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'l':
+			case (libcstring_system_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (libsystem_integer_t) 'o':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'o':
+				string_length = libcstring_system_string_length(
 				                 optarg );
 
 				if( libsystem_string_to_uint64(
@@ -1095,8 +1097,8 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (libsystem_integer_t) 'p':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'p':
+				string_length = libcstring_system_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -1123,18 +1125,18 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'q':
+			case (libcstring_system_integer_t) 'q':
 				print_status_information = 0;
 
 				break;
 
-			case (libsystem_integer_t) 's':
+			case (libcstring_system_integer_t) 's':
 				swap_byte_pairs = 1;
 
 				break;
 
-			case (libsystem_integer_t) 'S':
-				string_length = libsystem_string_length(
+			case (libcstring_system_integer_t) 'S':
+				string_length = libcstring_system_string_length(
 				                 optarg );
 
 				result = byte_size_string_convert(
@@ -1168,28 +1170,28 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 't':
+			case (libcstring_system_integer_t) 't':
 				option_target_filename = optarg;
 
 				break;
 
-			case (libsystem_integer_t) 'u':
+			case (libcstring_system_integer_t) 'u':
 				interactive_mode = 0;
 
 				break;
 
-			case (libsystem_integer_t) 'v':
+			case (libcstring_system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libsystem_integer_t) 'V':
+			case (libcstring_system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stderr );
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'w':
+			case (libcstring_system_integer_t) 'w':
 				wipe_chunk_on_error = 1;
 
 				break;
@@ -1393,13 +1395,13 @@ int main( int argc, char * const argv[] )
 	 */
 	if( option_target_filename != NULL )
 	{
-		string_length = libsystem_string_length(
+		string_length = libcstring_system_string_length(
 				 option_target_filename );
 
 		if( string_length > 0 )
 		{
-			target_filename = (libsystem_character_t *) memory_allocate(
-			                                             sizeof( libsystem_character_t ) * ( string_length + 1 ) );
+			target_filename = (libcstring_system_character_t *) memory_allocate(
+			                                                     sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
 
 			if( target_filename == NULL )
 			{
@@ -1409,7 +1411,7 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( libsystem_string_copy(
+			else if( libcstring_system_string_copy(
 				  target_filename,
 				  option_target_filename,
 				  string_length ) == NULL )
@@ -1425,8 +1427,8 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		target_filename = (libsystem_character_t *) memory_allocate(
-		                                             sizeof( libsystem_character_t ) * 1024 );
+		target_filename = (libcstring_system_character_t *) memory_allocate(
+		                                                     sizeof( libcstring_system_character_t ) * 1024 );
 
 		if( target_filename == NULL )
 		{
@@ -1440,9 +1442,9 @@ int main( int argc, char * const argv[] )
 		 */
 		else if( interactive_mode == 0 )
 		{
-			if( libsystem_string_copy(
+			if( libcstring_system_string_copy(
 			     target_filename,
-			     _LIBSYSTEM_CHARACTER_T_STRING( "export" ),
+			     _LIBCSTRING_SYSTEM_STRING( "export" ),
 			     7 ) == NULL )
 			{
 				fprintf(
@@ -1497,7 +1499,7 @@ int main( int argc, char * const argv[] )
 			     stderr,
 			     input_buffer,
 			     EWFEXPORT_INPUT_BUFFER_SIZE,
-			     _LIBSYSTEM_CHARACTER_T_STRING( "Export to format" ),
+			     _LIBCSTRING_SYSTEM_STRING( "Export to format" ),
 			     ewfexport_format_types,
 			     14,
 			     0,
@@ -1515,16 +1517,16 @@ int main( int argc, char * const argv[] )
 
 				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 			          fixed_string_variable,
-			          _LIBSYSTEM_CHARACTER_T_STRING( "raw" ),
+			          _LIBCSTRING_SYSTEM_STRING( "raw" ),
 			          3 ) == 0 )
 			{
 				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 			          fixed_string_variable,
-			          _LIBSYSTEM_CHARACTER_T_STRING( "files" ),
+			          _LIBCSTRING_SYSTEM_STRING( "files" ),
 			          4 ) == 0 )
 			{
 				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
@@ -1558,7 +1560,7 @@ int main( int argc, char * const argv[] )
 			{
 				while( ewfinput_get_string_variable(
 					stderr,
-					_LIBSYSTEM_CHARACTER_T_STRING( "Target path and filename without extension" ),
+					_LIBCSTRING_SYSTEM_STRING( "Target path and filename without extension" ),
 				        target_filename,
 				        1024,
 				        &error ) != 1 )
@@ -1581,7 +1583,7 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "Use compression" ),
+				     _LIBCSTRING_SYSTEM_STRING( "Use compression" ),
 				     ewfinput_compression_levels,
 				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
@@ -1635,7 +1637,7 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+				     _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
 				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 				     maximum_segment_file_size,
 				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
@@ -1669,7 +1671,7 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "The amount of sectors to read at once" ),
+				     _LIBCSTRING_SYSTEM_STRING( "The amount of sectors to read at once" ),
 				     ewfinput_sector_per_block_sizes,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
@@ -1713,7 +1715,7 @@ int main( int argc, char * const argv[] )
 			{
 				while( ewfinput_get_string_variable(
 					stderr,
-					_LIBSYSTEM_CHARACTER_T_STRING( "Target path" ),
+					_LIBCSTRING_SYSTEM_STRING( "Target path" ),
 					target_filename,
 					1024,
 					&error ) != 1 )
@@ -1737,7 +1739,7 @@ int main( int argc, char * const argv[] )
 			{
 				while( ewfinput_get_string_variable(
 					stderr,
-					_LIBSYSTEM_CHARACTER_T_STRING( "Target path and filename without extension or - for stdout" ),
+					_LIBCSTRING_SYSTEM_STRING( "Target path and filename without extension or - for stdout" ),
 					target_filename,
 					1024,
 					&error ) != 1 )
@@ -1752,7 +1754,7 @@ int main( int argc, char * const argv[] )
 					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
 				}
 			}
-			if( ( target_filename[ 0 ] == (libsystem_character_t) '-' )
+			if( ( target_filename[ 0 ] == (libcstring_system_character_t) '-' )
 			 && ( target_filename[ 1 ] == 0 ) )
 			{
 				/* No need for segment files when exporting to stdout */
@@ -1767,7 +1769,7 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBSYSTEM_CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+				     _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
 				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 				     maximum_segment_file_size,
 				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
@@ -1804,7 +1806,7 @@ int main( int argc, char * const argv[] )
 			       stderr,
 			       input_buffer,
 			       EWFEXPORT_INPUT_BUFFER_SIZE,
-			       _LIBSYSTEM_CHARACTER_T_STRING( "Start export at offset" ),
+			       _LIBCSTRING_SYSTEM_STRING( "Start export at offset" ),
 			       0,
 			       media_size,
 			       export_offset,
@@ -1830,7 +1832,7 @@ int main( int argc, char * const argv[] )
 			       stderr,
 			       input_buffer,
 			       EWFEXPORT_INPUT_BUFFER_SIZE,
-			       _LIBSYSTEM_CHARACTER_T_STRING( "Amount of bytes to export" ),
+			       _LIBCSTRING_SYSTEM_STRING( "Amount of bytes to export" ),
 			       0,
 			       ( media_size - export_offset ),
 			       export_size,
@@ -1871,7 +1873,7 @@ int main( int argc, char * const argv[] )
 		if( export_handle_export_single_files(
 		     export_handle,
 		     target_filename,
-		     libsystem_string_length(
+		     libcstring_system_string_length(
 		      target_filename ) + 1,
 		     NULL,
 		     &error ) != 1 )
@@ -1927,9 +1929,9 @@ int main( int argc, char * const argv[] )
 
 			if( process_status_initialize(
 			     &process_status,
-			     _LIBSYSTEM_CHARACTER_T_STRING( "Export" ),
-			     _LIBSYSTEM_CHARACTER_T_STRING( "exported" ),
-			     _LIBSYSTEM_CHARACTER_T_STRING( "Written" ),
+			     _LIBCSTRING_SYSTEM_STRING( "Export" ),
+			     _LIBCSTRING_SYSTEM_STRING( "exported" ),
+			     _LIBCSTRING_SYSTEM_STRING( "Written" ),
 			     stderr,
 			     print_status_information,
 			     &error ) != 1 )
@@ -2034,7 +2036,7 @@ int main( int argc, char * const argv[] )
 
 				acquiry_operating_system[ 0 ] = 0;
 			}
-			acquiry_software_version = _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
+			acquiry_software_version = _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING );
 
 			if( export_handle_set_output_values(
 			     export_handle,
@@ -2177,7 +2179,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unable to open log file: %" PRIs_LIBSYSTEM ".\n",
+					 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 					 log_filename );
 
 					libsystem_notify_print_error_backtrace(
@@ -2260,7 +2262,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unable to close log file: %" PRIs_LIBSYSTEM ".\n",
+					 "Unable to close log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 					 log_filename );
 
 					libsystem_notify_print_error_backtrace(

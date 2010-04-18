@@ -1,6 +1,7 @@
 /* 
  * Info handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2007-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,6 +26,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
@@ -216,14 +218,14 @@ int info_handle_signal_abort(
  */
 int info_handle_open_input(
      info_handle_t *info_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error )
 {
-	libsystem_character_t **libewf_filenames = NULL;
-	static char *function                    = "info_handle_open_input";
-	size_t first_filename_length             = 0;
-	int result                               = 1;
+	libcstring_system_character_t **libewf_filenames = NULL;
+	static char *function                            = "info_handle_open_input";
+	size_t first_filename_length                     = 0;
+	int result                                       = 1;
 
 	if( info_handle == NULL )
 	{
@@ -271,7 +273,7 @@ int info_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
-		first_filename_length = libsystem_string_length(
+		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
@@ -301,7 +303,7 @@ int info_handle_open_input(
 
 			return( -1 );
 		}
-		filenames = (libsystem_character_t * const *) libewf_filenames;
+		filenames = (libcstring_system_character_t * const *) libewf_filenames;
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -395,7 +397,7 @@ int info_handle_get_header_value(
      info_handle_t *info_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     libsystem_character_t *header_value,
+     libcstring_system_character_t *header_value,
      size_t header_value_size,
      liberror_error_t **error )
 {
@@ -452,7 +454,7 @@ int info_handle_get_header_value(
 	{
 		/* Determine the header value size
 		 */
-		utf8_header_value_size = 1 + narrow_string_length(
+		utf8_header_value_size = 1 + libcstring_narrow_string_length(
 		                              (char *) utf8_header_value );
 
 		if( libsystem_string_size_from_utf8_string(
@@ -508,7 +510,7 @@ int info_handle_get_hash_value(
      info_handle_t *info_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libsystem_character_t *hash_value,
+     libcstring_system_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error )
 {
@@ -565,7 +567,7 @@ int info_handle_get_hash_value(
 	{
 		/* Determine the hash value size
 		 */
-		utf8_hash_value_size = 1 + narrow_string_length(
+		utf8_hash_value_size = 1 + libcstring_narrow_string_length(
 		                            (char *) utf8_hash_value );
 
 		if( libsystem_string_size_from_utf8_string(
@@ -673,7 +675,7 @@ int info_handle_header_values_fprint(
      liberror_error_t **error )
 {
 	char header_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
-	libsystem_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
+	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
 	static char *function               = "info_handle_header_values_fprint";
 	size_t header_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
@@ -785,7 +787,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tCase number:\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tCase number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -813,7 +815,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tDescription:\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tDescription:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -841,7 +843,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tExaminer name:\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tExaminer name:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -869,7 +871,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tEvidence number:\t%" PRIs_LIBSYSTEM "\n",
+			 "\tEvidence number:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -897,7 +899,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tNotes:\t\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tNotes:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -925,7 +927,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tAcquiry date:\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tAcquiry date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -953,7 +955,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tSystem date:\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tSystem date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -981,7 +983,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tOperating system used:\t%" PRIs_LIBSYSTEM "\n",
+			 "\tOperating system used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -1009,7 +1011,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tSoftware version used:\t%" PRIs_LIBSYSTEM "\n",
+			 "\tSoftware version used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -1037,7 +1039,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tPassword:\t\t(hash: %" PRIs_LIBSYSTEM ")\n",
+			 "\tPassword:\t\t(hash: %" PRIs_LIBCSTRING_SYSTEM ")\n",
 			 header_value );
 		}
 		else if( header_value_result == 0 )
@@ -1073,27 +1075,27 @@ int info_handle_header_values_fprint(
 			 stream,
 			 "\tCompression type:\t" );
 
-			if( libsystem_string_compare(
+			if( libcstring_system_string_compare(
 			     header_value,
-			     _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_COMPRESSION_TYPE_NONE ),
+			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_TYPE_NONE ),
 			     1 ) == 0 )
 			{
 				fprintf(
 				 stream,
 				 "no compression\n" );
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  header_value,
-				  _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_COMPRESSION_TYPE_FAST ),
+				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_TYPE_FAST ),
 				  1 ) == 0 )
 			{
 				fprintf(
 				 stream,
 				 "good (fast) compression\n" );
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  header_value,
-				  _LIBSYSTEM_CHARACTER_T_STRING( LIBEWF_COMPRESSION_TYPE_BEST ),
+				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_TYPE_BEST ),
 				  1 ) == 0 )
 			{
 				fprintf(
@@ -1132,7 +1134,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tModel:\t\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tModel:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -1160,7 +1162,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tSerial number:\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tSerial number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -1188,7 +1190,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tProcess identifier:\t%" PRIs_LIBSYSTEM "\n",
+			 "\tProcess identifier:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -1217,7 +1219,7 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tUnknown value dc:\t%" PRIs_LIBSYSTEM "\n",
+			 "\tUnknown value dc:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
 		else if( header_value_result == -1 )
@@ -1343,7 +1345,7 @@ int info_handle_header_values_fprint(
 				{
 					fprintf(
 					 stream,
-					 "\t%s: %" PRIs_LIBSYSTEM "\n",
+					 "\t%s: %" PRIs_LIBCSTRING_SYSTEM "\n",
 					 header_value_identifier,
 					 header_value );
 				}
@@ -1373,7 +1375,7 @@ int info_handle_header_values_fprint(
  * Returns 1 if successful or -1 on error
  */
 int info_handle_header_value_extents_fprint(
-     libsystem_character_t *header_value,
+     libcstring_system_character_t *header_value,
      size_t header_value_length,
      FILE *stream,
      liberror_error_t **error )
@@ -1397,7 +1399,7 @@ int info_handle_header_value_extents_fprint(
 	     &extents_elements,
 	     header_value,
 	     header_value_length,
-	     (libsystem_character_t) ' ',
+	     (libcstring_system_character_t) ' ',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1426,7 +1428,7 @@ int info_handle_header_value_extents_fprint(
 	}
 	fprintf(
 	 stream,
-	 "\tExtents:\t\t%" PRIs_LIBSYSTEM "\n",
+	 "\tExtents:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 	 extents_elements->values[ 0 ] );
 
 	for( extents_element_iterator = 1;
@@ -1435,7 +1437,7 @@ int info_handle_header_value_extents_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\t\t\t\t%" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM "\n",
+		 "\t\t\t\t%" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM "\n",
 		 extents_elements->values[ extents_element_iterator ],
 		 extents_elements->values[ extents_element_iterator + 1 ],
 		 extents_elements->values[ extents_element_iterator + 2 ],
@@ -1465,8 +1467,8 @@ int info_handle_media_information_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-        libsystem_character_t media_size_string[ 16 ];
-        libsystem_character_t guid_string[ GUID_STRING_SIZE ];
+        libcstring_system_character_t media_size_string[ 16 ];
+        libcstring_system_character_t guid_string[ GUID_STRING_SIZE ];
         uint8_t guid[ GUID_SIZE ];
 
 	char *format_string        = NULL;
@@ -1725,7 +1727,7 @@ int info_handle_media_information_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tGUID:\t\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\tGUID:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 guid_string );
 		}
 	}
@@ -1908,7 +1910,7 @@ int info_handle_media_information_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tMedia size:\t\t%" PRIs_LIBSYSTEM " (%" PRIu64 " bytes)\n",
+			 "\tMedia size:\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
 			 media_size_string,
 			 media_size );
 		}
@@ -1947,7 +1949,7 @@ int info_handle_hash_values_fprint(
      liberror_error_t **error )
 {
 	char hash_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
-	libsystem_character_t hash_value[ INFO_HANDLE_VALUE_SIZE ];
+	libcstring_system_character_t hash_value[ INFO_HANDLE_VALUE_SIZE ];
 
 	static char *function             = "info_handle_hash_values_fprint";
 	size_t hash_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
@@ -1960,7 +1962,7 @@ int info_handle_hash_values_fprint(
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 
-	libsystem_character_t *stored_md5_hash_string = NULL;
+	libcstring_system_character_t *stored_md5_hash_string = NULL;
 #endif
 
 	if( info_handle == NULL )
@@ -2016,8 +2018,8 @@ int info_handle_hash_values_fprint(
 	}
 	else if( result == 1 )
 	{
-		stored_md5_hash_string = (libsystem_character_t *) memory_allocate(
-		                                                    sizeof( libsystem_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
+		stored_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
+		                                                            sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
 
 		if( stored_md5_hash_string == NULL )
 		{
@@ -2059,7 +2061,7 @@ int info_handle_hash_values_fprint(
 		}
 		fprintf(
 		 stream,
-		 "\tMD5:\t\t\t%" PRIs_LIBSYSTEM "\n",
+		 "\tMD5:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 		 stored_md5_hash_string );
 
 		memory_free(
@@ -2174,7 +2176,7 @@ int info_handle_hash_values_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\t%s:\t\t\t%" PRIs_LIBSYSTEM "\n",
+			 "\t%s:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 hash_value_identifier,
 			 hash_value );
 		}

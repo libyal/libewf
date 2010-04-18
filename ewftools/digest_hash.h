@@ -1,6 +1,7 @@
 /*
  * Crypographic digest hash
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,9 +27,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -45,7 +45,7 @@ typedef uint8_t digest_hash_t;
 int digest_hash_copy_to_string(
      digest_hash_t *digest_hash,
      size_t digest_hash_size,
-     libsystem_character_t *string,
+     libcstring_system_character_t *string,
      size_t string_size,
      liberror_error_t **error );
 

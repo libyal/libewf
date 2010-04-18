@@ -2,6 +2,7 @@
  * ewfdebug
  * Debugs EWF files
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,6 +26,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -118,22 +120,22 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                        = NULL;
+	libsystem_glob_t *glob                                = NULL;
 #endif
 
-	liberror_error_t *error                       = NULL;
+	liberror_error_t *error                               = NULL;
 
-	libsystem_character_t * const *argv_filenames = NULL;
-	libsystem_character_t **ewf_filenames         = NULL;
+	libcstring_system_character_t * const *argv_filenames = NULL;
+	libcstring_system_character_t **ewf_filenames         = NULL;
 
-	libsystem_character_t *program                = _LIBSYSTEM_CHARACTER_T_STRING( "ewfdebug" );
+	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfdebug" );
 
-	libsystem_integer_t option                    = 0;
-	size_t first_filename_length                  = 0;
-	uint8_t verbose                               = 0;
-	int amount_of_filenames                       = 0;
-	int header_codepage                           = LIBEWF_CODEPAGE_ASCII;
-	int result                                    = 0;
+	libcstring_system_integer_t option                    = 0;
+	size_t first_filename_length                          = 0;
+	uint8_t verbose                                       = 0;
+	int amount_of_filenames                               = 0;
+	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
+	int result                                            = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -162,15 +164,15 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 			   argc,
 			   argv,
-			   _LIBSYSTEM_CHARACTER_T_STRING( "A:hqvV" ) ) ) != (libsystem_integer_t) -1 )
+			   _LIBCSTRING_SYSTEM_STRING( "A:hqvV" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libsystem_integer_t) '?':
+			case (libcstring_system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBSYSTEM ".\n",
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -178,7 +180,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libsystem_integer_t) 'A':
+			case (libcstring_system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
 				     optarg,
 				     &header_codepage,
@@ -197,21 +199,21 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (libsystem_integer_t) 'h':
+			case (libcstring_system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libsystem_integer_t) 'q':
+			case (libcstring_system_integer_t) 'q':
 				break;
 
-			case (libsystem_integer_t) 'v':
+			case (libcstring_system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libsystem_integer_t) 'V':
+			case (libcstring_system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -296,7 +298,7 @@ int main( int argc, char * const argv[] )
 
 	if( amount_of_filenames == 1 )
 	{
-		first_filename_length = libsystem_string_length(
+		first_filename_length = libcstring_system_string_length(
 		                         argv_filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
@@ -334,7 +336,7 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		argv_filenames = (libsystem_character_t * const *) ewf_filenames;
+		argv_filenames = (libcstring_system_character_t * const *) ewf_filenames;
 	}
 	if( libewf_handle_initialize(
 	     &ewfdebug_input_handle,
@@ -449,7 +451,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBSYSTEM ": ABORTED\n",
+		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

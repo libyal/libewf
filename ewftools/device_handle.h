@@ -1,6 +1,7 @@
 /* 
  * Device handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,6 +27,7 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_LOCAL_LIBSMDEV )
@@ -39,8 +41,6 @@
 #elif defined( HAVE_LIBSMRAW_H )
 #include <libsmraw.h>
 #endif
-
-#include <libsystem.h>
 
 #include "storage_media_buffer.h"
 
@@ -91,7 +91,7 @@ int device_handle_signal_abort(
 
 int device_handle_open_input(
      device_handle_t *device_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
@@ -130,7 +130,7 @@ int device_handle_get_information_value(
      device_handle_t *device_handle,
      const uint8_t *information_value_identifier,
      size_t information_value_identifier_length,
-     libsystem_character_t *information_value,
+     libcstring_system_character_t *information_value,
      size_t information_value_size,
      liberror_error_t **error );
 

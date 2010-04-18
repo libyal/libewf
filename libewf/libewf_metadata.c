@@ -1,6 +1,7 @@
 /*
  * Interface functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -21,10 +22,10 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <memory.h>
-#include <wide_string.h>
+#include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
@@ -2837,7 +2838,7 @@ int libewf_handle_get_header_value_size(
      size_t *value_size,
      liberror_error_t **error )
 {
-	libewf_character_t date_time_values_string[ 64 ];
+	libcstring_character_t date_time_values_string[ 64 ];
 	uint8_t date_time_string[ 64 ];
 
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2892,13 +2893,13 @@ int libewf_handle_get_header_value_size(
 		return( 0 );
 	}
 	if( ( ( identifier_length == 11 )
-	  && ( libewf_string_compare(
-	        _LIBEWF_STRING( "system_date" ),
+	  && ( libcstring_string_compare(
+	        _LIBCSTRING_STRING( "system_date" ),
 	        identifier,
 	        11 ) == 0 ) )
 	 || ( ( identifier_length == 12 )
-	  && ( libewf_string_compare(
-	        _LIBEWF_STRING( "acquiry_date" ),
+	  && ( libcstring_string_compare(
+	        _LIBCSTRING_STRING( "acquiry_date" ),
 	        identifier,
 	        12 ) == 0 ) ) )
 	{
@@ -2924,7 +2925,7 @@ int libewf_handle_get_header_value_size(
 		if( ( result == 1 )
 		 && ( libewf_date_time_values_copy_to_string(
 		       date_time_values_string,
-		       libewf_string_length(
+		       libcstring_string_length(
 		        date_time_values_string ),
 		       internal_handle->date_format,
 		       date_time_string,
@@ -2940,7 +2941,7 @@ int libewf_handle_get_header_value_size(
 
 			return( -1 );
 		}
-		*value_size = 1 + narrow_string_length(
+		*value_size = 1 + libcstring_narrow_string_length(
 		                   (char *) date_time_string );
 	}
 	else
@@ -2977,7 +2978,7 @@ int libewf_handle_get_header_value(
      size_t value_size,
      liberror_error_t **error )
 {
-	libewf_character_t date_time_values_string[ 64 ];
+	libcstring_character_t date_time_values_string[ 64 ];
 
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_header_value";
@@ -3041,13 +3042,13 @@ int libewf_handle_get_header_value(
 		return( 0 );
 	}
 	if( ( ( identifier_length == 11 )
-	  && ( libewf_string_compare(
-	        _LIBEWF_STRING( "system_date" ),
+	  && ( libcstring_string_compare(
+	        _LIBCSTRING_STRING( "system_date" ),
 	        identifier,
 	        11 ) == 0 ) )
 	 || ( ( identifier_length == 12 )
-	  && ( libewf_string_compare(
-	        _LIBEWF_STRING( "acquiry_date" ),
+	  && ( libcstring_string_compare(
+	        _LIBCSTRING_STRING( "acquiry_date" ),
 	        identifier,
 	        12 ) == 0 ) ) )
 	{
@@ -3073,7 +3074,7 @@ int libewf_handle_get_header_value(
 		if( ( result == 1 )
 		 && ( libewf_date_time_values_copy_to_string(
 		       date_time_values_string,
-		       libewf_string_length(
+		       libcstring_string_length(
 		        date_time_values_string ),
 		       internal_handle->date_format,
 		       value,
@@ -3916,7 +3917,7 @@ int libewf_handle_set_hash_value(
 	if( internal_handle->hash_sections != NULL )
 	{
 		if( ( identifier_length == 3 )
-		 && ( narrow_string_compare(
+		 && ( libcstring_narrow_string_compare(
 		       (char *) identifier,
 		       "MD5",
 		       identifier_length ) == 0 ) )
@@ -3955,7 +3956,7 @@ int libewf_handle_set_hash_value(
 			}
 		}
 		else if( ( identifier_length == 4 )
-		      && ( narrow_string_compare(
+		      && ( libcstring_narrow_string_compare(
 		            (char *) identifier,
 		            "SHA1",
 		            identifier_length ) == 0 ) )

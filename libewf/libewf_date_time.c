@@ -1,6 +1,7 @@
 /*
  * Date and time functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -21,9 +22,7 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <memory.h>
-#include <wide_string.h>
 #include <types.h>
 
 #include <liberror.h>

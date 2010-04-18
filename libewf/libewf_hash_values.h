@@ -1,6 +1,7 @@
 /*
  * Hash values functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,9 +27,9 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
-#include "libewf_string.h"
 #include "libewf_values_table.h"
 
 #if defined( __cplusplus )
@@ -60,7 +61,7 @@ int libewf_hash_values_parse_sha1_hash(
 
 int libewf_hash_values_parse_hash_string_xml(
      libewf_values_table_t *hash_values,
-     libewf_character_t *hash_string_xml,
+     libcstring_character_t *hash_string_xml,
      size_t hash_string_xml_size,
      liberror_error_t **error );
 
@@ -71,7 +72,7 @@ int libewf_hash_values_parse_xhash(
      liberror_error_t **error );
 
 int libewf_hash_values_convert_hash_string_to_xhash(
-     libewf_character_t *hash_string,
+     libcstring_character_t *hash_string,
      size_t hash_string_size,
      uint8_t **xhash,
      size_t *xhash_size,
@@ -93,7 +94,7 @@ int libewf_hash_values_generate_sha1_hash(
 
 int libewf_hash_values_generate_hash_string_xml(
      libewf_values_table_t *hash_values,
-     libewf_character_t **hash_string,
+     libcstring_character_t **hash_string,
      size_t *hash_string_size,
      liberror_error_t **error );
 

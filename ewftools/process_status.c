@@ -1,6 +1,7 @@
 /*
  * Process status functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,6 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #include <libsystem.h>
@@ -36,9 +38,9 @@
  */
 int process_status_initialize(
      process_status_t **process_status,
-     const libsystem_character_t *status_process_string,
-     const libsystem_character_t *status_update_string,
-     const libsystem_character_t *status_summary_string,
+     const libcstring_system_character_t *status_process_string,
+     const libcstring_system_character_t *status_update_string,
+     const libcstring_system_character_t *status_summary_string,
      FILE *output_stream,
      uint8_t print_status_information,
      liberror_error_t **error )
@@ -137,7 +139,7 @@ int process_status_start(
      process_status_t *process_status,
      liberror_error_t **error )
 {
-	libsystem_character_t time_string[ 32 ];
+	libcstring_system_character_t time_string[ 32 ];
 
 	static char *function = "process_status_start";
 
@@ -168,7 +170,7 @@ int process_status_start(
 		{
 			fprintf(
 			 stderr,
-			 "%" PRIs_LIBSYSTEM " started at: %" PRIs_LIBSYSTEM "\n",
+			 "%" PRIs_LIBCSTRING_SYSTEM " started at: %" PRIs_LIBCSTRING_SYSTEM "\n",
 			 process_status->status_process_string,
 			 time_string );
 		}
@@ -176,7 +178,7 @@ int process_status_start(
 		{
 			fprintf(
 			 stderr,
-			 "%" PRIs_LIBSYSTEM " started.\n",
+			 "%" PRIs_LIBCSTRING_SYSTEM " started.\n",
 			 process_status->status_process_string );
 		}
 		fprintf(
@@ -238,7 +240,7 @@ int process_status_update(
 
 			fprintf(
 			 process_status->output_stream,
-			 "        %" PRIs_LIBSYSTEM "",
+			 "        %" PRIs_LIBCSTRING_SYSTEM "",
 			 process_status->status_update_string );
 
 			process_status_bytes_fprint(
@@ -342,7 +344,7 @@ int process_status_update_unknown_total(
 
 				fprintf(
 				 process_status->output_stream,
-				 "Status: %" PRIs_LIBSYSTEM "",
+				 "Status: %" PRIs_LIBCSTRING_SYSTEM "",
 				 process_status->status_update_string );
 
 				process_status_bytes_fprint(
@@ -386,10 +388,10 @@ int process_status_stop(
      int status,
      liberror_error_t **error )
 {
-	libsystem_character_t time_string[ 32 ];
+	libcstring_system_character_t time_string[ 32 ];
 
 	static char *function                      = "process_status_start";
-	const libsystem_character_t *status_string = NULL;
+	const libcstring_system_character_t *status_string = NULL;
 	time_t seconds_total                       = 0;
 
 	if( process_status == NULL )
@@ -425,19 +427,19 @@ int process_status_stop(
 	{
 		if( status == PROCESS_STATUS_ABORTED )
 		{
-			status_string = _LIBSYSTEM_CHARACTER_T_STRING( "aborted" );
+			status_string = _LIBCSTRING_SYSTEM_STRING( "aborted" );
 		}
 		else if( status == PROCESS_STATUS_COMPLETED )
 		{
-			status_string = _LIBSYSTEM_CHARACTER_T_STRING( "completed" );
+			status_string = _LIBCSTRING_SYSTEM_STRING( "completed" );
 		}
 		else if( status == PROCESS_STATUS_FAILED )
 		{
-			status_string = _LIBSYSTEM_CHARACTER_T_STRING( "failed" );
+			status_string = _LIBCSTRING_SYSTEM_STRING( "failed" );
 		}
 		fprintf(
 		 process_status->output_stream,
-		 "%" PRIs_LIBSYSTEM " %" PRIs_LIBSYSTEM "",
+		 "%" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM "",
 		 process_status->status_process_string,
 		 status_string );
 
@@ -449,7 +451,7 @@ int process_status_stop(
 		{
 			fprintf(
 			 process_status->output_stream,
-			 " at: %" PRIs_LIBSYSTEM "\n",
+			 " at: %" PRIs_LIBCSTRING_SYSTEM "\n",
 			 time_string );
 		}
 		else
@@ -465,7 +467,7 @@ int process_status_stop(
 
 			fprintf(
 			process_status->output_stream,
-			"%" PRIs_LIBSYSTEM ":",
+			"%" PRIs_LIBCSTRING_SYSTEM ":",
 			process_status->status_summary_string );
 
 			process_status_bytes_fprint(
@@ -553,7 +555,7 @@ void process_status_bytes_per_second_fprint(
       size64_t bytes,
       time_t seconds )
 {
-	libsystem_character_t bytes_per_second_string[ 16 ];
+	libcstring_system_character_t bytes_per_second_string[ 16 ];
 
 	size64_t bytes_per_second = 0;
 	int result                = 0;
@@ -583,7 +585,7 @@ void process_status_bytes_per_second_fprint(
 		{
 			fprintf(
 			 stream,
-			 " %" PRIs_LIBSYSTEM "/s (%" PRIu64 " bytes/second)",
+			 " %" PRIs_LIBCSTRING_SYSTEM "/s (%" PRIu64 " bytes/second)",
 			 bytes_per_second_string,
 			 bytes_per_second );
 		}
@@ -604,7 +606,7 @@ void process_status_bytes_fprint(
       FILE *stream,
       size64_t bytes )
 {
-	libsystem_character_t bytes_string[ 16 ];
+	libcstring_system_character_t bytes_string[ 16 ];
 
 	int result = 0;
 
@@ -625,7 +627,7 @@ void process_status_bytes_fprint(
 	{
 		fprintf(
 		 stream,
-		 " %" PRIs_LIBSYSTEM " (%" PRIi64 " bytes)",
+		 " %" PRIs_LIBCSTRING_SYSTEM " (%" PRIi64 " bytes)",
 		 bytes_string,
 		 bytes );
 	}

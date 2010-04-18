@@ -1,6 +1,7 @@
 /*
  * Segment file reading/writing functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -36,16 +37,14 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_single_files.h"
-#include "libewf_string.h"
-#include "libewf_system_string.h"
 
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
 #include "ewfx_delta_chunk.h"
 
-const uint8_t dvf_file_signature[ 8 ] = { 0x64, 0x76, 0x66, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-const uint8_t evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-const uint8_t lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+const uint8_t dvf_file_signature[ 8 ] = { 0x64, 0x76, 0x66, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
+const uint8_t evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
+const uint8_t lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
 
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror

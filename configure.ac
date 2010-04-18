@@ -2,15 +2,15 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100227],
- [forensics@hoffmannbv.nl])
+ [20100418],
+ [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
  [include/libewf.h.in])
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100227])
+ [20100418])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -116,15 +116,22 @@ AC_CHECK_HEADER(
 dnl Headers included in common/types.h
 AC_CHECK_HEADERS([limits.h])
 
-dnl Headers included in common/narrow_string.h and common/memory.h
-AC_CHECK_HEADERS([string.h])
+dnl Headers included in common/memory.h and libcstring/libcstring_narrow_string.h
 AC_CHECK_HEADERS([stdlib.h])
+AC_CHECK_HEADERS([string.h])
 
-dnl Headers included in libnotify/libnotify.c
-AC_CHECK_HEADERS([stdarg.h])
-AC_CHECK_HEADERS([varargs.h])
+dnl Headers included in liberror/liberror_error.c and libnotify/libnotify_print.c
+AC_CHECK_HEADERS(
+ [stdarg.h],
+ [],
+ [AC_CHECK_HEADERS(
+  [varargs.h],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing headers: stdarg.h and varargs.h],
+   [1]) ]) ])
 
-dnl Headers included in libnotify/libnotify.c, libbfio/libbfio_file.c and libewf/libewf_string.c
+dnl Headers included in libnotify/libnotify_stream.c and libbfio/libbfio_file.c
 AC_CHECK_HEADERS([errno.h])
 
 dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_directory_io.h and libsystem/libsystem_file_io.h
@@ -345,7 +352,67 @@ AC_CHECK_FUNCS(
   [Missing function: realloc],
   [1]) ])
 
-dnl Narrow character string functions used in common/narrow_string.h
+dnl Narrow character string functions used in libcstring/libcstring_narrow_string.h
+AC_CHECK_FUNCS(
+ [fgets],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fgets],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [memchr],
+ [],
+ [AC_CHECK_FUNCS(
+  [strchr],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: memchr and strchr],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [memcmp],
+ [],
+ [AC_CHECK_FUNCS(
+  [strncmp],
+  [],
+  [AC_CHECK_FUNCS(
+   [strcmp],
+   [],
+   [AC_MSG_FAILURE(
+    [Missing functions: memcmp, strncmp and strcmp],
+    [1]) ]) ]) ])
+
+AC_CHECK_FUNCS(
+ [memcpy],
+ [],
+ [AC_CHECK_FUNCS(
+  [strncpy],
+  [],
+  [AC_CHECK_FUNCS(
+   [strcpy],
+   [],
+   [AC_MSG_FAILURE(
+    [Missing functions: memcpy, strncpy and strcpy],
+    [1]) ]) ]) ])
+
+AC_CHECK_FUNCS(
+ [memrchr],
+ [AC_CHECK_DECLS(
+  [memrchr],
+  [ac_libewf_have_memrchr=yes],
+  [ac_libewf_have_memrchr=no]) ],
+ [ac_libewf_have_memrchr=no])
+
+AS_IF(
+	[test "x$ac_libewf_have_memrchr" = xno],
+	[AC_CHECK_FUNCS(
+	 [strrchr],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: strrchr and memrchr],
+	  [1]) ]) ])
+
 AC_CHECK_FUNCS(
  [snprintf],
  [],
@@ -368,16 +435,6 @@ AC_CHECK_FUNCS(
   [1]) ])
 
 AC_CHECK_FUNCS(
- [strchr],
- [],
- [AC_CHECK_FUNCS(
-  [memchr],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strchr and memchr],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
  [strncasecmp],
  [],
  [AC_CHECK_FUNCS(
@@ -385,41 +442,6 @@ AC_CHECK_FUNCS(
   [],
   [AC_MSG_FAILURE(
    [Missing functions: strncasecmp and strcasecmp],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [strncmp],
- [],
- [AC_CHECK_FUNCS(
-  [strcmp],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strncmp and strcmp],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [strncpy],
- [],
- [AC_CHECK_FUNCS(
-  [strcpy],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strncpy and strcpy],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [strrchr],
- [],
- [AC_CHECK_FUNCS(
-  [memrchr],
-  [AC_CHECK_DECLS(
-   [memrchr],
-   [],
-   [AC_MSG_FAILURE(
-    [Missing declaration for function memrchr],
-    [1]) ]) ],
-  [AC_MSG_FAILURE(
-   [Missing functions: strrchr and memrchr],
    [1]) ]) ])
 
 AC_CHECK_FUNCS(
@@ -1624,7 +1646,14 @@ AS_IF(
 	  [Missing function: fgetws],
 	  [1]) ])
 
-	dnl Wide character string functions used in common/wide_string.h
+	dnl Wide character string functions used in libcstring/libcstring_wide_string.h
+	AC_CHECK_FUNCS(
+	 [fgetws],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing function: fgetws],
+	  [1]) ])
+
 	AC_CHECK_FUNCS(
 	 [swprintf],
 	 [],
@@ -1633,57 +1662,50 @@ AS_IF(
 	  [1]) ])
 
 	AC_CHECK_FUNCS(
-	 [vswprintf],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: vswprintf],
-	  [1]) ])
-
-	AC_CHECK_FUNCS(
-	 [wcschr],
+	 [wmemchr],
 	 [],
 	 [AC_CHECK_FUNCS(
-	  [wmemchr],
+	  [wcschr],
 	  [],
 	  [AC_MSG_FAILURE(
-	   [Missing functions: wcschr and wmemchr],
+	   [Missing functions: wmemchr and wcschr],
 	   [1]) ]) ])
 
 	AC_CHECK_FUNCS(
-	 [wcsncasecmp],
+	 [wmemcmp],
 	 [],
 	 [AC_CHECK_FUNCS(
-	  [wcscasecmp],
-	  [],
-	  [AC_MSG_FAILURE(
-	   [Missing functions: wcsncasecmp and wcscasecmp],
-	   [1]) ]) ])
-
-	AC_CHECK_FUNCS(
-	 [wcsncmp],
-	 [],
-	 [AC_CHECK_FUNCS(
-	  [wmemcmp],
+	  [wcsncmp],
 	  [],
 	  [AC_CHECK_FUNCS(
 	   [wcscmp],
 	   [],
 	   [AC_MSG_FAILURE(
-	    [Missing functions: wcsncmp, wmemcmp and wcscmp],
+	    [Missing functions: wmemcmp, wcsncmp and wcscmp],
 	    [1]) ]) ]) ])
 
 	AC_CHECK_FUNCS(
-	 [wcsncpy],
+	 [wmemcpy],
 	 [],
 	 [AC_CHECK_FUNCS(
-	  [wmemcpy],
+	  [wcsncpy],
 	  [],
 	  [AC_CHECK_FUNCS(
 	   [wcscpy],
 	   [],
 	   [AC_MSG_FAILURE(
-	    [Missing functions: wcsncpy, wmemcpy and wcscpy],
+	    [Missing functions: wmemcpy, wcsncpy and wcscpy],
 	    [1]) ]) ]) ])
+
+	AC_CHECK_FUNCS(
+	 [wmemrchr],
+	 [],
+	 [AC_CHECK_FUNCS(
+	  [wcsrchr],
+	  [],
+	  [AC_MSG_FAILURE(
+	   [Missing functions: wmemrchr and wcsrchr],
+	   [1]) ]) ])
 
 	AC_CHECK_FUNCS(
 	 [wcslen],
@@ -1693,14 +1715,17 @@ AS_IF(
 	  [1]) ])
 
 	AC_CHECK_FUNCS(
-	 [wcsrchr],
+	 [wcsncasecmp],
 	 [],
 	 [AC_CHECK_FUNCS(
-	  [wmemrchr],
+	  [wcscasecmp],
 	  [],
-	  [AC_MSG_FAILURE(
-	   [Missing functions: wcsrchr and wmemrchr],
-	   [1]) ]) ])
+	  [AC_CHECK_FUNCS(
+	   [towlower],
+	   [],
+	   [AC_MSG_FAILURE(
+	    [Missing functions: wcsncasecmp, wcscasecmp and towlower],
+	    [1]) ]) ]) ])
 
 	AC_CHECK_FUNCS(
 	 [wcstoll],
@@ -1840,6 +1865,7 @@ dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([common/Makefile])
+AC_CONFIG_FILES([libcstring/Makefile])
 AC_CONFIG_FILES([liberror/Makefile])
 AC_CONFIG_FILES([libnotify/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])

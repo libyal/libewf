@@ -1,6 +1,7 @@
 /* 
  * Log handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -27,9 +28,8 @@
 #include <file_stream.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include <libsystem.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -54,7 +54,7 @@ int log_handle_free(
 
 int log_handle_open(
      log_handle_t *log_handle,
-     const libsystem_character_t *filename,
+     const libcstring_system_character_t *filename,
      liberror_error_t **error );
 
 int log_handle_close(

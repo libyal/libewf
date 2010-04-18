@@ -1,6 +1,7 @@
 /*
  * Split string values functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,9 +27,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -44,11 +44,11 @@ struct libewf_split_values
 
 	/* The string
 	 */
-	libewf_character_t *string;
+	libcstring_character_t *string;
 
 	/* The values
 	 */
-	libewf_character_t **values;
+	libcstring_character_t **values;
 
 	/* The sizes of the values
 	 */
@@ -57,7 +57,7 @@ struct libewf_split_values
 
 int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
-     const libewf_character_t *string,
+     const libcstring_character_t *string,
      size_t string_size,
      int amount_of_values,
      liberror_error_t **error );
@@ -68,9 +68,9 @@ int libewf_split_values_free(
 
 int libewf_split_values_parse_string(
      libewf_split_values_t **split_values,
-     const libewf_character_t *string,
+     const libcstring_character_t *string,
      size_t string_size,
-     libewf_character_t delimiter,
+     libcstring_character_t delimiter,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

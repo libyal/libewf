@@ -1,6 +1,7 @@
 /* 
  * Log handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,6 +26,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDARG_H ) || defined( WINAPI )
@@ -133,7 +135,7 @@ int log_handle_free(
  */
 int log_handle_open(
      log_handle_t *log_handle,
-     const libsystem_character_t *filename,
+     const libcstring_system_character_t *filename,
      liberror_error_t **error )
 {
 	static char *function = "log_handle_open";
@@ -153,7 +155,7 @@ int log_handle_open(
 	{
 		log_handle->log_stream = libsystem_file_stream_open(
 		                          filename,
-		                          _LIBSYSTEM_CHARACTER_T_STRING( FILE_STREAM_OPEN_APPEND ) );
+		                          _LIBCSTRING_SYSTEM_STRING( FILE_STREAM_OPEN_APPEND ) );
 
 		if( log_handle->log_stream == NULL )
 		{

@@ -1,6 +1,7 @@
 /*
  * Legacy functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -21,11 +22,10 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <memory.h>
 #include <types.h>
-#include <wide_string.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
@@ -2872,7 +2872,7 @@ int libewf_get_header_value_size(
 
 		return( -1 );
 	}
-	identifier_length = narrow_string_length(
+	identifier_length = libcstring_narrow_string_length(
 	                     identifier );
 
 	result = libewf_handle_get_header_value_size(
@@ -2932,7 +2932,7 @@ int libewf_get_header_value(
 
 		return( -1 );
 	}
-	identifier_length = narrow_string_length(
+	identifier_length = libcstring_narrow_string_length(
 	                     identifier );
 
 	result = libewf_handle_get_header_value(
@@ -2993,7 +2993,7 @@ int libewf_set_header_value(
 
 		return( -1 );
 	}
-	identifier_length = narrow_string_length(
+	identifier_length = libcstring_narrow_string_length(
 	                     identifier );
 
 	if( libewf_handle_set_header_value(
@@ -3271,7 +3271,7 @@ int libewf_get_hash_value(
 
 		return( -1 );
 	}
-	identifier_length = narrow_string_length(
+	identifier_length = libcstring_narrow_string_length(
 	                     identifier );
 
 	result = libewf_handle_get_hash_value(
@@ -3330,7 +3330,7 @@ int libewf_get_hash_value_size(
 
 		return( -1 );
 	}
-	identifier_length = narrow_string_length(
+	identifier_length = libcstring_narrow_string_length(
 	                     identifier );
 
 	result = libewf_handle_get_hash_value_size(
@@ -3388,7 +3388,7 @@ int libewf_set_hash_value(
 
 		return( -1 );
 	}
-	identifier_length = narrow_string_length(
+	identifier_length = libcstring_narrow_string_length(
 	                     identifier );
 
 	if( libewf_handle_set_hash_value(

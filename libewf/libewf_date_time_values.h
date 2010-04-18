@@ -1,6 +1,7 @@
 /*
  * Date and time values functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,6 +27,7 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( TIME_WITH_SYS_TIME )
@@ -37,29 +39,27 @@
 #include <time.h>
 #endif
 
-#include "libewf_string.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
 int libewf_date_time_values_copy_from_timestamp(
-     libewf_character_t *date_time_values_string,
+     libcstring_character_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t timestamp,
      liberror_error_t **error );
 
 int libewf_date_time_values_copy_to_timestamp(
-     libewf_character_t *date_time_values_string,
+     libcstring_character_t *date_time_values_string,
      size_t date_time_values_string_length,
      time_t *timestamp,
      liberror_error_t **error );
 
 int libewf_date_time_values_copy_to_string(
-     libewf_character_t *date_time_values_string,
+     libcstring_character_t *date_time_values_string,
      size_t date_time_values_string_length,
      int date_format,
-     libewf_character_t *string,
+     libcstring_character_t *string,
      size_t string_size,
      liberror_error_t **error );
 

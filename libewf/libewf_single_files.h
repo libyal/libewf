@@ -1,6 +1,7 @@
 /*
  * Single files functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,9 +27,11 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
+#include <liberror.h>
+
 #include "libewf_extern.h"
 #include "libewf_split_values.h"
-#include "libewf_string.h"
 #include "libewf_tree_type.h"
 #include "libewf_types.h"
 
@@ -69,7 +72,7 @@ int libewf_single_files_parse(
 int libewf_single_files_parse_file_entries(
      libewf_single_files_t *single_files,
      size64_t *media_size,
-     libewf_character_t *file_entries_string,
+     libcstring_character_t *file_entries_string,
      size_t file_entries_string_size,
      liberror_error_t **error );
 

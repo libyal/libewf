@@ -1,6 +1,7 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
+	-I$(top_srcdir)/libcstring \
 	-I$(top_srcdir)/liberror \
 	-I$(top_srcdir)/libnotify \
 	@LIBUNA_CPPFLAGS@ \
@@ -64,13 +65,13 @@ libewf_la_SOURCES = \
 	libewf_split_values.c libewf_split_values.h \
 	libewf_string.c libewf_string.h \
 	libewf_support.c libewf_support.h \
-	libewf_system_string.h \
 	libewf_tree_type.c libewf_tree_type.h \
 	libewf_types.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h
 
 libewf_la_LIBADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libnotify/libnotify.la \
 	@LIBUNA_LIBADD@ \

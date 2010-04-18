@@ -1,6 +1,7 @@
 /*
  * Segment table functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,6 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
@@ -34,7 +36,6 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_single_files.h"
-#include "libewf_system_string.h"
 
 #include "ewf_data.h"
 
@@ -596,7 +597,7 @@ int libewf_segment_table_get_basename(
 		return( -1 );
 	}
 #else
-	if( libewf_system_string_copy(
+	if( libcstring_system_string_copy(
 	     basename,
 	     segment_table->basename,
 	     segment_table->basename_size ) == NULL )
@@ -675,8 +676,8 @@ int libewf_segment_table_set_basename(
 #else
 	segment_table->basename_size = basename_size;
 #endif
-	segment_table->basename = (libewf_system_character_t *) memory_allocate(
-	                                                         sizeof( libewf_system_character_t ) * segment_table->basename_size );
+	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
+	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
 
 	if( segment_table->basename == NULL )
 	{
@@ -715,7 +716,7 @@ int libewf_segment_table_set_basename(
 		return( -1 );
 	}
 #else
-	if( libewf_system_string_copy(
+	if( libcstring_system_string_copy(
 	     segment_table->basename,
 	     basename,
 	     basename_size ) == NULL )
@@ -869,7 +870,7 @@ int libewf_segment_table_get_basename_wide(
 		return( -1 );
 	}
 #if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( libewf_system_string_copy(
+	if( libcstring_system_string_copy(
 	     basename,
 	     segment_table->basename,
 	     segment_table->basename_size ) == NULL )
@@ -965,8 +966,8 @@ int libewf_segment_table_set_basename_wide(
 		return( -1 );
 	}
 #endif
-	segment_table->basename = (libewf_system_character_t *) memory_allocate(
-	                                                         sizeof( libewf_system_character_t ) * segment_table->basename_size );
+	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
+	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
 
 
 	if( segment_table->basename == NULL )
@@ -981,7 +982,7 @@ int libewf_segment_table_set_basename_wide(
 		return( -1 );
 	}
 #if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
-	if( libewf_system_string_copy(
+	if( libcstring_system_string_copy(
 	     segment_table->basename,
 	     basename,
 	     basename_size ) == NULL )
@@ -1043,12 +1044,12 @@ int libewf_segment_table_create_segment_file(
      uint8_t segment_file_type,
      liberror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle    = NULL;
-	libewf_system_character_t *filename = NULL;
-	static char *function               = "libewf_segment_table_create_segment_file";
-	size_t filename_size                = 0;
-	int file_io_pool_entry              = 0;
-	int flags                           = 0;
+	libbfio_handle_t *file_io_handle        = NULL;
+	libcstring_system_character_t *filename = NULL;
+	static char *function                   = "libewf_segment_table_create_segment_file";
+	size_t filename_size                    = 0;
+	int file_io_pool_entry                  = 0;
+	int flags                               = 0;
 
 	if( segment_table == NULL )
 	{
@@ -1175,7 +1176,7 @@ int libewf_segment_table_create_segment_file(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 		 function,
 		 segment_number,
 		 filename );

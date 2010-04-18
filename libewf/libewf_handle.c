@@ -1,6 +1,7 @@
 /*
- * libewf main handle
+ * Handle functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,6 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
@@ -35,7 +37,6 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
-#include "libewf_string.h"
 #include "libewf_types.h"
 #include "libewf_write_io_handle.h"
 
@@ -782,7 +783,7 @@ int libewf_handle_open(
 		     filename_iterator < amount_of_filenames;
 		     filename_iterator++ )
 		{
-			filename_length = narrow_string_length(
+			filename_length = libcstring_narrow_string_length(
 					   filenames[ filename_iterator ] );
 
 			/* Make sure there is more to the filename than the extension
@@ -936,7 +937,7 @@ int libewf_handle_open(
 		 */
 		if( first_segment_filename != NULL )
 		{
-			filename_length = narrow_string_length(
+			filename_length = libcstring_narrow_string_length(
 					   first_segment_filename );
 
 			/* Set segment table basename
@@ -961,7 +962,7 @@ int libewf_handle_open(
 		 */
 		if( first_delta_segment_filename != NULL )
 		{
-			filename_length = narrow_string_length(
+			filename_length = libcstring_narrow_string_length(
 					   first_delta_segment_filename );
 
 			/* Set delta segment table basename
@@ -989,7 +990,7 @@ int libewf_handle_open(
 		 */
 		if( first_segment_filename != NULL )
 		{
-			filename_length = narrow_string_length(
+			filename_length = libcstring_narrow_string_length(
 					   first_segment_filename );
 
 			/* Set segment table basename
@@ -1015,7 +1016,7 @@ int libewf_handle_open(
 	{
 		/* Get the basename and store it in the segment tables
 		 */
-		filename_length = narrow_string_length(
+		filename_length = libcstring_narrow_string_length(
 				   filenames[ 0 ] );
 
 		/* Set segment table basename
@@ -1141,7 +1142,7 @@ int libewf_handle_open_wide(
 		     filename_iterator < amount_of_filenames;
 		     filename_iterator++ )
 		{
-			filename_length = wide_string_length(
+			filename_length = libcstring_wide_string_length(
 					   filenames[ filename_iterator ] );
 
 			/* Make sure there is more to the filename than the extension
@@ -1295,7 +1296,7 @@ int libewf_handle_open_wide(
 		 */
 		if( first_segment_filename != NULL )
 		{
-			filename_length = wide_string_length(
+			filename_length = libcstring_wide_string_length(
 					   first_segment_filename );
 
 			/* Set segment table basename
@@ -1320,7 +1321,7 @@ int libewf_handle_open_wide(
 		 */
 		if( first_delta_segment_filename != NULL )
 		{
-			filename_length = wide_string_length(
+			filename_length = libcstring_wide_string_length(
 					   first_delta_segment_filename );
 
 			/* Set delta segment table basename
@@ -1348,7 +1349,7 @@ int libewf_handle_open_wide(
 		 */
 		if( first_segment_filename != NULL )
 		{
-			filename_length = wide_string_length(
+			filename_length = libcstring_wide_string_length(
 					   first_segment_filename );
 
 			/* Set segment table basename
@@ -1374,7 +1375,7 @@ int libewf_handle_open_wide(
 	{
 		/* Get the basename and store it in the segment tables
 		 */
-		filename_length = wide_string_length(
+		filename_length = libcstring_wide_string_length(
 				   filenames[ 0 ] );
 
 		/* Set segment table basename

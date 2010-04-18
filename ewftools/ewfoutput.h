@@ -1,6 +1,7 @@
 /*
  * Output functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,7 +27,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <libsystem.h>
+#include <libcstring.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -34,7 +35,7 @@ extern "C" {
 
 void ewfoutput_version_fprint(
       FILE *stream,
-      const libsystem_character_t *program );
+      const libcstring_system_character_t *program );
 
 void ewfoutput_copyright_fprint(
       FILE *stream );

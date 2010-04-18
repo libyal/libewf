@@ -1,6 +1,7 @@
 /*
  * Debugging functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,11 +26,12 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
 #include "libewf_debug.h"
-#include "libewf_string.h"
+#include "libewf_libuna.h"
 
 #include "ewf_crc.h"
 
@@ -37,7 +39,7 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_dump_data(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *data,
      size_t data_size,
      liberror_error_t **error )
@@ -92,7 +94,7 @@ int libewf_debug_dump_data(
 	 stored_crc );
 
 	libnotify_printf(
-	 "%" PRIs_LIBEWF ":\n",
+	 "%" PRIs_LIBCSTRING ":\n",
 	 header );
 
 	libnotify_print_data(
@@ -169,14 +171,14 @@ int libewf_debug_section_print(
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_byte_stream_print(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *byte_stream,
      size_t byte_stream_size,
      liberror_error_t **error )
 {
-	libewf_character_t *string = NULL;
-	static char *function      = "libewf_debug_byte_stream_print";
-	size_t string_size         = 0;
+	libcstring_character_t *string = NULL;
+	static char *function          = "libewf_debug_byte_stream_print";
+	size_t string_size             = 0;
 
 	if( header == NULL )
 	{
@@ -200,7 +202,7 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	if( libewf_string_size_from_byte_stream(
+	if( libuna_utf8_string_size_from_byte_stream(
 	     byte_stream,
 	     byte_stream_size,
 	     LIBUNA_CODEPAGE_ASCII,
@@ -216,8 +218,8 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	string = (libewf_character_t *) memory_allocate(
-	                                 sizeof( libewf_character_t ) * string_size );
+	string = (libcstring_character_t *) memory_allocate(
+	                                     sizeof( libcstring_character_t ) * string_size );
 
 	if( string == NULL )
 	{
@@ -230,7 +232,7 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_byte_stream(
+	if( libuna_utf8_string_copy_from_byte_stream(
 	     string,
 	     string_size,
 	     byte_stream,
@@ -251,8 +253,8 @@ int libewf_debug_byte_stream_print(
 		return( -1 );
 	}
 	libnotify_printf(
-	 "%" PRIs_LIBEWF ":\n"
-	 "%" PRIs_LIBEWF "",
+	 "%" PRIs_LIBCSTRING ":\n"
+	 "%" PRIs_LIBCSTRING "",
 	 header,
 	 string );
 
@@ -266,14 +268,14 @@ int libewf_debug_byte_stream_print(
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_utf8_stream_print(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *utf8_stream,
      size_t utf8_stream_size,
      liberror_error_t **error )
 {
-	libewf_character_t *string = NULL;
-	static char *function      = "libewf_debug_utf8_stream_print";
-	size_t string_size         = 0;
+	libcstring_character_t *string = NULL;
+	static char *function          = "libewf_debug_utf8_stream_print";
+	size_t string_size             = 0;
 
 	if( header == NULL )
 	{
@@ -297,7 +299,7 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	if( libewf_string_size_from_utf8_stream(
+	if( libuna_utf8_string_size_from_utf8_stream(
 	     utf8_stream,
 	     utf8_stream_size,
 	     &string_size,
@@ -312,8 +314,8 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	string = (libewf_character_t *) memory_allocate(
-	                                 sizeof( libewf_character_t ) * string_size );
+	string = (libcstring_character_t *) memory_allocate(
+	                                     sizeof( libcstring_character_t ) * string_size );
 
 	if( string == NULL )
 	{
@@ -326,7 +328,7 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_utf8_stream(
+	if( libuna_utf8_string_copy_from_utf8_stream(
 	     string,
 	     string_size,
 	     utf8_stream,
@@ -346,8 +348,8 @@ int libewf_debug_utf8_stream_print(
 		return( -1 );
 	}
 	libnotify_printf(
-	 "%" PRIs_LIBEWF ":\n"
-	 "%" PRIs_LIBEWF "",
+	 "%" PRIs_LIBCSTRING ":\n"
+	 "%" PRIs_LIBCSTRING "",
 	 header,
 	 string );
 
@@ -361,14 +363,14 @@ int libewf_debug_utf8_stream_print(
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_utf16_stream_print(
-     libewf_character_t *header,
+     libcstring_character_t *header,
      uint8_t *utf16_stream,
      size_t utf16_stream_size,
      liberror_error_t **error )
 {
-	libewf_character_t *string = NULL;
-	static char *function      = "libewf_debug_utf16_stream_print";
-	size_t string_size         = 0;
+	libcstring_character_t *string = NULL;
+	static char *function          = "libewf_debug_utf16_stream_print";
+	size_t string_size             = 0;
 
 	if( header == NULL )
 	{
@@ -392,7 +394,7 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	if( libewf_string_size_from_utf16_stream(
+	if( libuna_utf8_string_size_from_utf16_stream(
 	     utf16_stream,
 	     utf16_stream_size,
 	     LIBUNA_ENDIAN_LITTLE,
@@ -408,8 +410,8 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	string = (libewf_character_t *) memory_allocate(
-	                                 sizeof( libewf_character_t ) * string_size );
+	string = (libcstring_character_t *) memory_allocate(
+	                                     sizeof( libcstring_character_t ) * string_size );
 
 	if( string == NULL )
 	{
@@ -422,7 +424,7 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_utf16_stream(
+	if( libuna_utf8_string_copy_from_utf16_stream(
 	     string,
 	     string_size,
 	     utf16_stream,
@@ -443,8 +445,8 @@ int libewf_debug_utf16_stream_print(
 		return( -1 );
 	}
 	libnotify_printf(
-	 "%" PRIs_LIBEWF ":\n"
-	 "%" PRIs_LIBEWF "",
+	 "%" PRIs_LIBCSTRING ":\n"
+	 "%" PRIs_LIBCSTRING "",
 	 header,
 	 string );
 

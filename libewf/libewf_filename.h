@@ -1,6 +1,7 @@
 /*
  * Filename functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -27,9 +28,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include "libewf_system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -56,9 +56,9 @@ int libewf_filename_set_extension_wide(
 #endif
 
 int libewf_filename_create(
-     libewf_system_character_t **filename,
+     libcstring_system_character_t **filename,
      size_t *filename_size,
-     libewf_system_character_t *basename,
+     libcstring_system_character_t *basename,
      size_t basename_length,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,

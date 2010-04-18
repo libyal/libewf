@@ -1,6 +1,7 @@
 /* 
  * Verification handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2007-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,6 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
@@ -283,14 +285,14 @@ int verification_handle_signal_abort(
  */
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error )
 {
-	libsystem_character_t **libewf_filenames = NULL;
-	static char *function                    = "verification_handle_open_input";
-	size_t first_filename_length             = 0;
-	int result                               = 1;
+	libcstring_system_character_t **libewf_filenames = NULL;
+	static char *function                            = "verification_handle_open_input";
+	size_t first_filename_length                     = 0;
+	int result                                       = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -338,7 +340,7 @@ int verification_handle_open_input(
 	}
 	if( amount_of_filenames == 1 )
 	{
-		first_filename_length = libsystem_string_length(
+		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
 
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
@@ -368,7 +370,7 @@ int verification_handle_open_input(
 
 			return( -1 );
 		}
-		filenames = (libsystem_character_t * const *) libewf_filenames;
+		filenames = (libcstring_system_character_t * const *) libewf_filenames;
 	}
 #if defined( LIBSYSTEM_HAVE_WIDE_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -940,7 +942,7 @@ int verification_handle_get_hash_value(
      verification_handle_t *verification_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libsystem_character_t *hash_value,
+     libcstring_system_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error )
 {
@@ -997,7 +999,7 @@ int verification_handle_get_hash_value(
 	{
 		/* Determine the hash value size
 		 */
-		utf8_hash_value_size = 1 + narrow_string_length(
+		utf8_hash_value_size = 1 + libcstring_narrow_string_length(
 		                            (char *) utf8_hash_value );
 
 		if( libsystem_string_size_from_utf8_string(
@@ -1221,14 +1223,14 @@ int verification_handle_add_read_error(
  */
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
-     libsystem_character_t *calculated_md5_hash_string,
+     libcstring_system_character_t *calculated_md5_hash_string,
      size_t calculated_md5_hash_string_size,
-     libsystem_character_t *stored_md5_hash_string,
+     libcstring_system_character_t *stored_md5_hash_string,
      size_t stored_md5_hash_string_size,
      int *stored_md5_hash_available,
-     libsystem_character_t *calculated_sha1_hash_string,
+     libcstring_system_character_t *calculated_sha1_hash_string,
      size_t calculated_sha1_hash_string_size,
-     libsystem_character_t *stored_sha1_hash_string,
+     libcstring_system_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,
      liberror_error_t **error )
@@ -1445,7 +1447,7 @@ int verification_handle_additional_hash_values_fprint(
      liberror_error_t **error )
 {
 	char hash_identifier[ VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE ];
-	libsystem_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
+	libcstring_system_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
 
 	static char *function             = "verification_handle_additional_hash_values_fprint";
 	size_t hash_value_identifier_size = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
@@ -1556,7 +1558,7 @@ int verification_handle_additional_hash_values_fprint(
 			continue;
 		}
 		if( ( verification_handle->calculate_md5 != 0 )
-		 && ( narrow_string_compare(
+		 && ( libcstring_narrow_string_compare(
 		       hash_identifier,
 		       "MD5",
 		       3 ) == 0 ) )
@@ -1564,7 +1566,7 @@ int verification_handle_additional_hash_values_fprint(
 			continue;
 		}
 		if( ( verification_handle->calculate_sha1 != 0 )
-		 && ( narrow_string_compare(
+		 && ( libcstring_narrow_string_compare(
 		       hash_identifier,
 		       "SHA1",
 		       4 ) == 0 ) )
@@ -1601,7 +1603,7 @@ int verification_handle_additional_hash_values_fprint(
 			}
 			fprintf(
 			 stream,
-			 "%s:\t%" PRIs_LIBSYSTEM "\n",
+			 "%s:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 hash_identifier,
 			 hash_value );
 		}
@@ -1617,17 +1619,17 @@ int verification_handle_crc_errors_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	libsystem_character_t *filename      = NULL;
-	libsystem_character_t *last_filename = NULL;
-	static char *function                = "verification_handle_crc_errors_fprint";
-	size_t filename_size                 = 0;
-	size_t last_filename_size            = 0;
-	uint64_t start_sector                = 0;
-	uint64_t last_sector                 = 0;
-	uint64_t amount_of_sectors           = 0;
-	uint32_t amount_of_errors            = 0;
-	uint32_t error_iterator              = 0;
-	int result                           = 1;
+	libcstring_system_character_t *filename      = NULL;
+	libcstring_system_character_t *last_filename = NULL;
+	static char *function                        = "verification_handle_crc_errors_fprint";
+	size_t filename_size                         = 0;
+	size_t last_filename_size                    = 0;
+	uint64_t start_sector                        = 0;
+	uint64_t last_sector                         = 0;
+	uint64_t amount_of_sectors                   = 0;
+	uint32_t amount_of_errors                    = 0;
+	uint32_t error_iterator                      = 0;
+	int result                                   = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -1775,8 +1777,8 @@ int verification_handle_crc_errors_fprint(
 					}
 					return( -1 );
 				}
-				filename = (libsystem_character_t *) memory_allocate(
-				                                      sizeof( libsystem_character_t ) * filename_size ); 
+				filename = (libcstring_system_character_t *) memory_allocate(
+				                                              sizeof( libcstring_system_character_t ) * filename_size ); 
 
 
 				if( filename == NULL )

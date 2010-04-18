@@ -1,6 +1,7 @@
 /*
  * Memory functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -54,13 +55,6 @@ extern "C" {
 #elif defined( HAVE_MALLOC ) || defined( WINAPI )
 #define memory_allocate( size ) \
 	malloc( size )
-#endif
-
-/* Aligned memory allocation
- */
-#if defined( HAVE_POSIX_MEMALIGN )
-#define memory_allocate_aligned( buffer, buffer_size, alignment_size ) \
-	posix_memalign( buffer, alignment_size, buffer_size )
 #endif
 
 /* Memory reallocation

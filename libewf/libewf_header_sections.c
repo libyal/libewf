@@ -1,6 +1,7 @@
 /*
  * Header sections functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -22,6 +23,7 @@
 
 #include <common.h>
 #include <memory.h>
+#include <types.h>
 
 #include <liberror.h>
 #include <libnotify.h>
@@ -30,7 +32,6 @@
 #include "libewf_definitions.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
-#include "libewf_string.h"
 
 #include "ewf_definitions.h"
 

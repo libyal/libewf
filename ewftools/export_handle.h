@@ -1,6 +1,7 @@
 /* 
  * Export handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,6 +27,7 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
@@ -42,8 +44,6 @@
 #elif defined( HAVE_LIBSMRAW_H )
 #include <libsmraw.h>
 #endif
-
-#include <libsystem.h>
 
 #include "digest_context.h"
 #include "digest_hash.h"
@@ -77,7 +77,7 @@ struct export_handle
 
 	/* The calculated MD5 digest hash string
 	 */
-	libsystem_character_t *calculated_md5_hash_string;
+	libcstring_system_character_t *calculated_md5_hash_string;
 
 	/* Value to indicate if the SHA1 digest hash should be calculated
 	 */
@@ -89,7 +89,7 @@ struct export_handle
 
 	/* The calculated SHA1 digest hash string
 	 */
-	libsystem_character_t *calculated_sha1_hash_string;
+	libcstring_system_character_t *calculated_sha1_hash_string;
 
 	/* The libewf input handle
 	 */
@@ -148,36 +148,36 @@ int export_handle_signal_abort(
 
 int export_handle_make_directory(
      export_handle_t *export_handle,
-     libsystem_character_t *directory_name,
+     libcstring_system_character_t *directory_name,
      log_handle_t *log_handle,
      liberror_error_t **error );
 
 int export_handle_sanitize_filename(
      export_handle_t *export_handle,
-     libsystem_character_t *filename,
+     libcstring_system_character_t *filename,
      size_t filename_size,
      liberror_error_t **error );
 
 int export_handle_create_target_path(
      export_handle_t *export_handle,
-     libsystem_character_t *export_path,
+     libcstring_system_character_t *export_path,
      size_t export_path_size,
      uint8_t *utf8_filename,
      size_t utf8_filename_size,
-     libsystem_character_t **target_path,
+     libcstring_system_character_t **target_path,
      size_t *target_path_size,
      liberror_error_t **error );
 
 int export_handle_open_input(
      export_handle_t *export_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
 int export_handle_open_output(
      export_handle_t *export_handle,
      uint8_t output_format,
-     const libsystem_character_t *filename,
+     const libcstring_system_character_t *filename,
      liberror_error_t **error );
 
 int export_handle_close(
@@ -251,9 +251,9 @@ int export_handle_set_processing_values(
 
 int export_handle_set_output_values(
      export_handle_t *export_handle,
-     libsystem_character_t *acquiry_operating_system,
-     libsystem_character_t *acquiry_software,
-     libsystem_character_t *acquiry_software_version,
+     libcstring_system_character_t *acquiry_operating_system,
+     libcstring_system_character_t *acquiry_software,
+     libcstring_system_character_t *acquiry_software_version,
      int header_codepage,
      size64_t media_size,
      int8_t compression_level,
@@ -268,7 +268,7 @@ int export_handle_set_header_value(
      export_handle_t *export_handle,
      char *header_value_identifier,
      size_t header_value_identifier_length,
-     libsystem_character_t *header_value,
+     libcstring_system_character_t *header_value,
      size_t header_value_length,
      liberror_error_t **error );
 
@@ -276,7 +276,7 @@ int export_handle_set_hash_value(
      export_handle_t *export_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libsystem_character_t *hash_value,
+     libcstring_system_character_t *hash_value,
      size_t hash_value_length,
      liberror_error_t **error );
 
@@ -294,7 +294,7 @@ ssize_t export_handle_finalize(
 
 int export_handle_export_single_files(
      export_handle_t *export_handle,
-     libsystem_character_t *export_path,
+     libcstring_system_character_t *export_path,
      size_t export_path_size,
      log_handle_t *log_handle,
      liberror_error_t **error );
@@ -302,7 +302,7 @@ int export_handle_export_single_files(
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
-     libsystem_character_t *export_path,
+     libcstring_system_character_t *export_path,
      size_t export_path_size,
      log_handle_t *log_handle,
      liberror_error_t **error );

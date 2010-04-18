@@ -1,6 +1,7 @@
 /* 
  * Verification handle
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -26,6 +27,7 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
@@ -36,8 +38,6 @@
 #endif
 
 #include <libewf.h>
-
-#include <libsystem.h>
 
 #include "digest_context.h"
 #include "digest_hash.h"
@@ -106,7 +106,7 @@ int verification_handle_signal_abort(
 
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     libsystem_character_t * const * filenames,
+     libcstring_system_character_t * const * filenames,
      int amount_of_filenames,
      liberror_error_t **error );
 
@@ -146,7 +146,7 @@ int verification_handle_get_hash_value(
      verification_handle_t *verification_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libsystem_character_t *hash_value,
+     libcstring_system_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error );
 
@@ -168,14 +168,14 @@ int verification_handle_add_read_error(
 
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
-     libsystem_character_t *calculated_md5_hash_string,
+     libcstring_system_character_t *calculated_md5_hash_string,
      size_t calculated_md5_hash_string_size,
-     libsystem_character_t *stored_md5_hash_string,
+     libcstring_system_character_t *stored_md5_hash_string,
      size_t stored_md5_hash_string_size,
      int *stored_md5_hash_available,
-     libsystem_character_t *calculated_sha1_hash_string,
+     libcstring_system_character_t *calculated_sha1_hash_string,
      size_t calculated_sha1_hash_string_size,
-     libsystem_character_t *stored_sha1_hash_string,
+     libcstring_system_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,
      liberror_error_t **error );

@@ -1,6 +1,7 @@
 /*
  * User input functions for the ewftools
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,6 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -43,57 +45,57 @@
 
 /* Input selection defintions
  */
-libsystem_character_t *ewfinput_compression_levels[ 4 ] = \
-{  _LIBSYSTEM_CHARACTER_T_STRING( "none" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "empty-block" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "fast" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "best" ) };
+libcstring_system_character_t *ewfinput_compression_levels[ 4 ] = \
+{  _LIBCSTRING_SYSTEM_STRING( "none" ),
+   _LIBCSTRING_SYSTEM_STRING( "empty-block" ),
+   _LIBCSTRING_SYSTEM_STRING( "fast" ),
+   _LIBCSTRING_SYSTEM_STRING( "best" ) };
 
-libsystem_character_t *ewfinput_format_types[ 12 ] = \
-{  _LIBSYSTEM_CHARACTER_T_STRING( "ewf" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "smart" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "ftk" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "encase1" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "encase2" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "encase3" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "encase4" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "encase5" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "encase6" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "linen5" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "linen6" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "ewfx" ) };
+libcstring_system_character_t *ewfinput_format_types[ 12 ] = \
+{  _LIBCSTRING_SYSTEM_STRING( "ewf" ),
+   _LIBCSTRING_SYSTEM_STRING( "smart" ),
+   _LIBCSTRING_SYSTEM_STRING( "ftk" ),
+   _LIBCSTRING_SYSTEM_STRING( "encase1" ),
+   _LIBCSTRING_SYSTEM_STRING( "encase2" ),
+   _LIBCSTRING_SYSTEM_STRING( "encase3" ),
+   _LIBCSTRING_SYSTEM_STRING( "encase4" ),
+   _LIBCSTRING_SYSTEM_STRING( "encase5" ),
+   _LIBCSTRING_SYSTEM_STRING( "encase6" ),
+   _LIBCSTRING_SYSTEM_STRING( "linen5" ),
+   _LIBCSTRING_SYSTEM_STRING( "linen6" ),
+   _LIBCSTRING_SYSTEM_STRING( "ewfx" ) };
 
-libsystem_character_t *ewfinput_media_types[ 4 ] = \
-{  _LIBSYSTEM_CHARACTER_T_STRING( "fixed" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "removable" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "optical" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "memory" ) };
+libcstring_system_character_t *ewfinput_media_types[ 4 ] = \
+{  _LIBCSTRING_SYSTEM_STRING( "fixed" ),
+   _LIBCSTRING_SYSTEM_STRING( "removable" ),
+   _LIBCSTRING_SYSTEM_STRING( "optical" ),
+   _LIBCSTRING_SYSTEM_STRING( "memory" ) };
 
-libsystem_character_t *ewfinput_media_flags[ 2 ] = \
-{  _LIBSYSTEM_CHARACTER_T_STRING( "logical" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "physical" ) };
+libcstring_system_character_t *ewfinput_media_flags[ 2 ] = \
+{  _LIBCSTRING_SYSTEM_STRING( "logical" ),
+   _LIBCSTRING_SYSTEM_STRING( "physical" ) };
 
-libsystem_character_t *ewfinput_sector_per_block_sizes[ 10 ] = \
-{  _LIBSYSTEM_CHARACTER_T_STRING( "64" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "128" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "256" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "512" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "1024" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "2048" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "4096" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "8192" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "16384" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "32768" ) };
+libcstring_system_character_t *ewfinput_sector_per_block_sizes[ 10 ] = \
+{  _LIBCSTRING_SYSTEM_STRING( "64" ),
+   _LIBCSTRING_SYSTEM_STRING( "128" ),
+   _LIBCSTRING_SYSTEM_STRING( "256" ),
+   _LIBCSTRING_SYSTEM_STRING( "512" ),
+   _LIBCSTRING_SYSTEM_STRING( "1024" ),
+   _LIBCSTRING_SYSTEM_STRING( "2048" ),
+   _LIBCSTRING_SYSTEM_STRING( "4096" ),
+   _LIBCSTRING_SYSTEM_STRING( "8192" ),
+   _LIBCSTRING_SYSTEM_STRING( "16384" ),
+   _LIBCSTRING_SYSTEM_STRING( "32768" ) };
 
-libsystem_character_t *ewfinput_yes_no[ 2 ] = \
-{  _LIBSYSTEM_CHARACTER_T_STRING( "yes" ),
-   _LIBSYSTEM_CHARACTER_T_STRING( "no" ) };
+libcstring_system_character_t *ewfinput_yes_no[ 2 ] = \
+{  _LIBCSTRING_SYSTEM_STRING( "yes" ),
+   _LIBCSTRING_SYSTEM_STRING( "no" ) };
 
 /* Determines the EWF format from an argument string
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_ewf_format(
-     const libsystem_character_t *argument,
+     const libcstring_system_character_t *argument,
      uint8_t *ewf_format,
      liberror_error_t **error )
 {
@@ -122,81 +124,81 @@ int ewfinput_determine_ewf_format(
 
 		return( -1 );
 	}
-	if( libsystem_string_compare(
+	if( libcstring_system_string_compare(
 	     argument,
-	     _LIBSYSTEM_CHARACTER_T_STRING( "smart" ),
+	     _LIBCSTRING_SYSTEM_STRING( "smart" ),
 	     5 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_SMART;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "ftk" ),
+	          _LIBCSTRING_SYSTEM_STRING( "ftk" ),
 	          3 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_FTK;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "encase1" ),
+	          _LIBCSTRING_SYSTEM_STRING( "encase1" ),
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE1;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "encase2" ),
+	          _LIBCSTRING_SYSTEM_STRING( "encase2" ),
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE2;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "encase3" ),
+	          _LIBCSTRING_SYSTEM_STRING( "encase3" ),
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE3;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "encase4" ),
+	          _LIBCSTRING_SYSTEM_STRING( "encase4" ),
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE4;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "encase5" ),
+	          _LIBCSTRING_SYSTEM_STRING( "encase5" ),
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE5;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "encase6" ),
+	          _LIBCSTRING_SYSTEM_STRING( "encase6" ),
 	          7 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_ENCASE6;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "linen5" ),
+	          _LIBCSTRING_SYSTEM_STRING( "linen5" ),
 	          6 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_LINEN5;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "linen6" ),
+	          _LIBCSTRING_SYSTEM_STRING( "linen6" ),
 	          6 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_LINEN6;
@@ -204,17 +206,17 @@ int ewfinput_determine_ewf_format(
 	}
 	/* This check must before the check for "ewf"
 	 */
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "ewfx" ),
+	          _LIBCSTRING_SYSTEM_STRING( "ewfx" ),
 	          4 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_EWFX;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "ewf" ),
+	          _LIBCSTRING_SYSTEM_STRING( "ewf" ),
 	          3 ) == 0 )
 	{
 		*ewf_format = LIBEWF_FORMAT_EWF;
@@ -227,7 +229,7 @@ int ewfinput_determine_ewf_format(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_sectors_per_chunk(
-     const libsystem_character_t *argument,
+     const libcstring_system_character_t *argument,
      uint32_t *sectors_per_chunk,
      liberror_error_t **error )
 {
@@ -256,81 +258,81 @@ int ewfinput_determine_sectors_per_chunk(
 
 		return( -1 );
 	}
-	if( libsystem_string_compare(
+	if( libcstring_system_string_compare(
 	     argument,
-	     _LIBSYSTEM_CHARACTER_T_STRING( "32768" ),
+	     _LIBCSTRING_SYSTEM_STRING( "32768" ),
 	     5 ) == 0 )
 	{
 		*sectors_per_chunk = 32768;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "16384" ),
+	          _LIBCSTRING_SYSTEM_STRING( "16384" ),
 	          5 ) == 0 )
 	{
 		*sectors_per_chunk = 16384;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "8192" ),
+	          _LIBCSTRING_SYSTEM_STRING( "8192" ),
 	          4 ) == 0 )
 	{
 		*sectors_per_chunk = 8192;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "4096" ),
+	          _LIBCSTRING_SYSTEM_STRING( "4096" ),
 	          4 ) == 0 )
 	{
 		*sectors_per_chunk = 4096;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "2048" ),
+	          _LIBCSTRING_SYSTEM_STRING( "2048" ),
 	          4 ) == 0 )
 	{
 		*sectors_per_chunk = 2048;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "1024" ),
+	          _LIBCSTRING_SYSTEM_STRING( "1024" ),
 	          4 ) == 0 )
 	{
 		*sectors_per_chunk = 1024;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "512" ),
+	          _LIBCSTRING_SYSTEM_STRING( "512" ),
 	          3 ) == 0 )
 	{
 		*sectors_per_chunk = 512;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "256" ),
+	          _LIBCSTRING_SYSTEM_STRING( "256" ),
 	          3 ) == 0 )
 	{
 		*sectors_per_chunk = 256;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "128" ),
+	          _LIBCSTRING_SYSTEM_STRING( "128" ),
 	          3 ) == 0 )
 	{
 		*sectors_per_chunk = 128;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "64" ),
+	          _LIBCSTRING_SYSTEM_STRING( "64" ),
 	          2 ) == 0 )
 	{
 		*sectors_per_chunk = 64;
@@ -343,7 +345,7 @@ int ewfinput_determine_sectors_per_chunk(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_compression_level(
-     const libsystem_character_t *argument,
+     const libcstring_system_character_t *argument,
      int8_t *compression_level,
      uint8_t *compression_flags,
      liberror_error_t **error )
@@ -384,45 +386,45 @@ int ewfinput_determine_compression_level(
 
 		return( -1 );
 	}
-	if( libsystem_string_compare(
+	if( libcstring_system_string_compare(
 	     argument,
-	     _LIBSYSTEM_CHARACTER_T_STRING( "none" ),
+	     _LIBCSTRING_SYSTEM_STRING( "none" ),
 	     4 ) == 0 )
 	{
 		*compression_level = LIBEWF_COMPRESSION_NONE;
 		*compression_flags = 0;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "empty-block" ),
+	          _LIBCSTRING_SYSTEM_STRING( "empty-block" ),
 	          11 ) == 0 )
 	{
 		*compression_level = LIBEWF_COMPRESSION_NONE;
 		*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "empty_block" ),
+	          _LIBCSTRING_SYSTEM_STRING( "empty_block" ),
 	          11 ) == 0 )
 	{
 		*compression_level = LIBEWF_COMPRESSION_NONE;
 		*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "fast" ),
+	          _LIBCSTRING_SYSTEM_STRING( "fast" ),
 	          4 ) == 0 )
 	{
 		*compression_level = LIBEWF_COMPRESSION_FAST;
 		*compression_flags = 0;
 		result             = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "best" ),
+	          _LIBCSTRING_SYSTEM_STRING( "best" ),
 	          4 ) == 0 )
 	{
 		*compression_level = LIBEWF_COMPRESSION_BEST;
@@ -436,7 +438,7 @@ int ewfinput_determine_compression_level(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_media_type(
-     const libsystem_character_t *argument,
+     const libcstring_system_character_t *argument,
      uint8_t *media_type,
      liberror_error_t **error )
 {
@@ -465,33 +467,33 @@ int ewfinput_determine_media_type(
 
 		return( -1 );
 	}
-	if( libsystem_string_compare(
+	if( libcstring_system_string_compare(
 	     argument,
-	     _LIBSYSTEM_CHARACTER_T_STRING( "fixed" ),
+	     _LIBCSTRING_SYSTEM_STRING( "fixed" ),
 	          5 ) == 0 )
 	{
 		*media_type = LIBEWF_MEDIA_TYPE_FIXED;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "removable" ),
+	          _LIBCSTRING_SYSTEM_STRING( "removable" ),
 	          9 ) == 0 )
 	{
 		*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "optical" ),
+	          _LIBCSTRING_SYSTEM_STRING( "optical" ),
 	          7 ) == 0 )
 	{
 		*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
 		result      = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "memory" ),
+	          _LIBCSTRING_SYSTEM_STRING( "memory" ),
 	          6 ) == 0 )
 	{
 		*media_type = LIBEWF_MEDIA_TYPE_MEMORY;
@@ -504,7 +506,7 @@ int ewfinput_determine_media_type(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_media_flags(
-     const libsystem_character_t *argument,
+     const libcstring_system_character_t *argument,
      uint8_t *media_flags,
      liberror_error_t **error )
 {
@@ -533,33 +535,33 @@ int ewfinput_determine_media_flags(
 
 		return( -1 );
 	}
-	if( libsystem_string_compare(
+	if( libcstring_system_string_compare(
 	     argument,
-	     _LIBSYSTEM_CHARACTER_T_STRING( "logical" ),
+	     _LIBCSTRING_SYSTEM_STRING( "logical" ),
 	     7 ) == 0 )
 	{
 		*media_flags &= ~LIBEWF_MEDIA_FLAG_PHYSICAL;
 		result        = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "physical" ),
+	          _LIBCSTRING_SYSTEM_STRING( "physical" ),
 	          8 ) == 0 )
 	{
 		*media_flags |= LIBEWF_MEDIA_FLAG_PHYSICAL;
 		result        = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "fastbloc" ),
+	          _LIBCSTRING_SYSTEM_STRING( "fastbloc" ),
 	          8 ) == 0 )
 	{
 		*media_flags |= LIBEWF_MEDIA_FLAG_FASTBLOC;
 		result        = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "tableau" ),
+	          _LIBCSTRING_SYSTEM_STRING( "tableau" ),
 	          8 ) == 0 )
 	{
 		*media_flags |= LIBEWF_MEDIA_FLAG_TABLEAU;
@@ -572,7 +574,7 @@ int ewfinput_determine_media_flags(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_header_codepage(
-     const libsystem_character_t *argument,
+     const libcstring_system_character_t *argument,
      int *header_codepage,
      liberror_error_t **error )
 {
@@ -601,148 +603,148 @@ int ewfinput_determine_header_codepage(
 
 		return( -1 );
 	}
-	if( libsystem_string_compare(
+	if( libcstring_system_string_compare(
 	     argument,
-	     _LIBSYSTEM_CHARACTER_T_STRING( "ascii" ),
+	     _LIBCSTRING_SYSTEM_STRING( "ascii" ),
 	     5 ) == 0 )
 	{
 		*header_codepage = LIBEWF_CODEPAGE_ASCII;
 		result           = 1;
 	}
 #if defined( HAVE_ISO_CODEPAGES )
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "iso" ),
+	          _LIBCSTRING_SYSTEM_STRING( "iso" ),
 	          3 ) == 0 )
 	{
 		if( ( argument[ 3 ] != '-' )
 		 && ( argument[ 3 ] != '_' ) )
 		{
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 		          &( argument[ 4 ] ),
-		          _LIBSYSTEM_CHARACTER_T_STRING( "8859" ),
+		          _LIBCSTRING_SYSTEM_STRING( "8859" ),
 		          4 ) == 0 )
 		{
 			if( ( argument[ 8 ] != '-' )
 			 && ( argument[ 8 ] != '_' ) )
 			{
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "10" ),
+				  _LIBCSTRING_SYSTEM_STRING( "10" ),
 				  2 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_10;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "11" ),
+				  _LIBCSTRING_SYSTEM_STRING( "11" ),
 				  2 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_11;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "13" ),
+				  _LIBCSTRING_SYSTEM_STRING( "13" ),
 				  2 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_13;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "14" ),
+				  _LIBCSTRING_SYSTEM_STRING( "14" ),
 				  2 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_14;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "15" ),
+				  _LIBCSTRING_SYSTEM_STRING( "15" ),
 				  2 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_15;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "16" ),
+				  _LIBCSTRING_SYSTEM_STRING( "16" ),
 				  2 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_16;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "1" ),
+				  _LIBCSTRING_SYSTEM_STRING( "1" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_1;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "2" ),
+				  _LIBCSTRING_SYSTEM_STRING( "2" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_2;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "3" ),
+				  _LIBCSTRING_SYSTEM_STRING( "3" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_3;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "4" ),
+				  _LIBCSTRING_SYSTEM_STRING( "4" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_4;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "5" ),
+				  _LIBCSTRING_SYSTEM_STRING( "5" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_5;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "6" ),
+				  _LIBCSTRING_SYSTEM_STRING( "6" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_6;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "7" ),
+				  _LIBCSTRING_SYSTEM_STRING( "7" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_7;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "8" ),
+				  _LIBCSTRING_SYSTEM_STRING( "8" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_8;
 				result           = 1;
 			}
-			else if( libsystem_string_compare(
+			else if( libcstring_system_string_compare(
 				  &( argument[ 9 ] ),
-				  _LIBSYSTEM_CHARACTER_T_STRING( "9" ),
+				  _LIBCSTRING_SYSTEM_STRING( "9" ),
 				  1 ) == 0 )
 			{
 				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_9;
@@ -751,98 +753,98 @@ int ewfinput_determine_header_codepage(
 		}
 	}
 #endif
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "windows" ),
+	          _LIBCSTRING_SYSTEM_STRING( "windows" ),
 	          7 ) == 0 )
 	{
 		if( ( argument[ 7 ] != '-' )
 		 && ( argument[ 7 ] != '_' ) )
 		{
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 		          &( argument[ 8 ] ),
-		          _LIBSYSTEM_CHARACTER_T_STRING( "874" ),
+		          _LIBCSTRING_SYSTEM_STRING( "874" ),
 		          3 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_874;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 		          &( argument[ 8 ] ),
-		          _LIBSYSTEM_CHARACTER_T_STRING( "1250" ),
+		          _LIBCSTRING_SYSTEM_STRING( "1250" ),
 		          4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1250;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1251" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1251" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1251;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1252" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1252" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1252;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1253" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1253" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1253;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1253" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1253" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1253;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1254" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1254" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1254;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1255" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1255" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1255;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1256" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1256" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1256;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1257" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1257" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1257;
 			result           = 1;
 		}
-		else if( libsystem_string_compare(
+		else if( libcstring_system_string_compare(
 			  &( argument[ 8 ] ),
-			  _LIBSYSTEM_CHARACTER_T_STRING( "1258" ),
+			  _LIBCSTRING_SYSTEM_STRING( "1258" ),
 			  4 ) == 0 )
 		{
 			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1258;
@@ -856,7 +858,7 @@ int ewfinput_determine_header_codepage(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_yes_no(
-     const libsystem_character_t *argument,
+     const libcstring_system_character_t *argument,
      uint8_t *yes_no_value,
      liberror_error_t **error )
 {
@@ -885,17 +887,17 @@ int ewfinput_determine_yes_no(
 
 		return( -1 );
 	}
-	if( libsystem_string_compare(
+	if( libcstring_system_string_compare(
 	     argument,
-	     _LIBSYSTEM_CHARACTER_T_STRING( "yes" ),
+	     _LIBCSTRING_SYSTEM_STRING( "yes" ),
 	     3 ) == 0 )
 	{
 		*yes_no_value = 1;
 		result        = 1;
 	}
-	else if( libsystem_string_compare(
+	else if( libcstring_system_string_compare(
 	          argument,
-	          _LIBSYSTEM_CHARACTER_T_STRING( "no" ),
+	          _LIBCSTRING_SYSTEM_STRING( "no" ),
 	          2 ) == 0 )
 	{
 		*yes_no_value = 0;
@@ -909,13 +911,13 @@ int ewfinput_determine_yes_no(
  */
 int ewfinput_get_string_variable(
      FILE *stream,
-     libsystem_character_t *request_string,
-     libsystem_character_t *string_variable,
+     libcstring_system_character_t *request_string,
+     libcstring_system_character_t *string_variable,
      size_t string_variable_size,
      liberror_error_t **error )
 {
-	libsystem_character_t *end_of_input  = NULL;
-	libsystem_character_t *result_string = NULL;
+	libcstring_system_character_t *end_of_input  = NULL;
+	libcstring_system_character_t *result_string = NULL;
 	static char *function                = "ewfinput_get_variabl_string";
 	ssize_t input_length                 = 0;
 
@@ -971,7 +973,7 @@ int ewfinput_get_string_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_LIBSYSTEM ": ",
+		 "%" PRIs_LIBCSTRING_SYSTEM ": ",
 		 request_string );
 
 		result_string = libsystem_file_stream_get_string(
@@ -981,9 +983,9 @@ int ewfinput_get_string_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libsystem_string_search(
+			end_of_input = libcstring_system_string_search(
 			                string_variable,
-			                (libsystem_character_t) '\n',
+			                (libcstring_system_character_t) '\n',
 			                string_variable_size );
 
 			/* Input was larger than size of buffer
@@ -999,9 +1001,9 @@ int ewfinput_get_string_variable(
 					                 string_variable,
 					                 string_variable_size - 1 );
 
-					end_of_input = libsystem_string_search(
+					end_of_input = libcstring_system_string_search(
 					                string_variable,
-					                (libsystem_character_t) '\n',
+					                (libcstring_system_character_t) '\n',
 					                string_variable_size );
 
 				}
@@ -1038,17 +1040,17 @@ int ewfinput_get_string_variable(
  */
 int ewfinput_get_size_variable(
      FILE *stream,
-     libsystem_character_t *input_buffer,
+     libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libsystem_character_t *request_string,
+     libcstring_system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
      uint64_t *size_variable,
      liberror_error_t **error )
 {
-	libsystem_character_t *end_of_input  = NULL;
-	libsystem_character_t *result_string = NULL;
+	libcstring_system_character_t *end_of_input  = NULL;
+	libcstring_system_character_t *result_string = NULL;
 	static char *function                = "ewfinput_get_size_variable";
 	ssize_t input_length                 = 0;
 
@@ -1115,7 +1117,7 @@ int ewfinput_get_size_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_LIBSYSTEM " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ",
+		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ",
 		 request_string,
 		 minimum,
 		 maximum,
@@ -1128,9 +1130,9 @@ int ewfinput_get_size_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libsystem_string_search(
+			end_of_input = libcstring_system_string_search(
 			                input_buffer,
-			                (libsystem_character_t) '\n',
+			                (libcstring_system_character_t) '\n',
 			                input_buffer_size );
 
 			/* Input was larger than size of buffer
@@ -1146,9 +1148,9 @@ int ewfinput_get_size_variable(
 					                 input_buffer,
 					                 input_buffer_size - 1 );
 
-					end_of_input = libsystem_string_search(
+					end_of_input = libcstring_system_string_search(
 					                input_buffer,
-					                (libsystem_character_t) '\n',
+					                (libcstring_system_character_t) '\n',
 					                input_buffer_size );
 
 				}
@@ -1203,21 +1205,21 @@ int ewfinput_get_size_variable(
  */
 int ewfinput_get_byte_size_variable(
      FILE *stream,
-     libsystem_character_t *input_buffer,
+     libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libsystem_character_t *request_string,
+     libcstring_system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
      uint64_t *byte_size_variable,
      liberror_error_t **error )
 {
-	libsystem_character_t minimum_size_string[ 16 ];
-	libsystem_character_t maximum_size_string[ 16 ];
-	libsystem_character_t default_size_string[ 16 ];
+	libcstring_system_character_t minimum_size_string[ 16 ];
+	libcstring_system_character_t maximum_size_string[ 16 ];
+	libcstring_system_character_t default_size_string[ 16 ];
 
-	libsystem_character_t *end_of_input  = NULL;
-	libsystem_character_t *result_string = NULL;
+	libcstring_system_character_t *end_of_input  = NULL;
+	libcstring_system_character_t *result_string = NULL;
 	static char *function                = "ewfinput_get_byte_size_variable";
 	ssize_t input_length                 = 0;
 
@@ -1332,7 +1334,7 @@ int ewfinput_get_byte_size_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_LIBSYSTEM " (%" PRIs_LIBSYSTEM " >= value >= %" PRIs_LIBSYSTEM ") [%" PRIs_LIBSYSTEM "]: ",
+		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIs_LIBCSTRING_SYSTEM " >= value >= %" PRIs_LIBCSTRING_SYSTEM ") [%" PRIs_LIBCSTRING_SYSTEM "]: ",
 		 request_string,
 		 minimum_size_string,
 		 maximum_size_string,
@@ -1345,9 +1347,9 @@ int ewfinput_get_byte_size_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libsystem_string_search(
+			end_of_input = libcstring_system_string_search(
 			                input_buffer,
-			                (libsystem_character_t) '\n',
+			                (libcstring_system_character_t) '\n',
 			                input_buffer_size );
 
 			/* Input was larger than size of buffer
@@ -1363,9 +1365,9 @@ int ewfinput_get_byte_size_variable(
 					                 input_buffer,
 					                 input_buffer_size - 1 );
 
-					end_of_input = libsystem_string_search(
+					end_of_input = libcstring_system_string_search(
 					                input_buffer,
-					                (libsystem_character_t) '\n',
+					                (libcstring_system_character_t) '\n',
 					                input_buffer_size );
 
 				}
@@ -1420,18 +1422,18 @@ int ewfinput_get_byte_size_variable(
  */
 int ewfinput_get_fixed_string_variable(
      FILE *stream,
-     libsystem_character_t *input_buffer,
+     libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libsystem_character_t *request_string,
-     libsystem_character_t **values,
+     libcstring_system_character_t *request_string,
+     libcstring_system_character_t **values,
      uint8_t amount_of_values,
      uint8_t default_value,
-     libsystem_character_t **fixed_string_variable,
+     libcstring_system_character_t **fixed_string_variable,
      liberror_error_t **error )
 {
 
-	libsystem_character_t *end_of_input  = NULL;
-	libsystem_character_t *result_string = NULL;
+	libcstring_system_character_t *end_of_input  = NULL;
+	libcstring_system_character_t *result_string = NULL;
 	static char *function                = "ewfinput_get_fixed_value";
 	size_t value_length                  = 0;
 	ssize_t input_length                 = 0;
@@ -1507,7 +1509,7 @@ int ewfinput_get_fixed_string_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_LIBSYSTEM " (",
+		 "%" PRIs_LIBCSTRING_SYSTEM " (",
 		 request_string );
 
 		for( value_iterator = 0;
@@ -1522,12 +1524,12 @@ int ewfinput_get_fixed_string_variable(
 			}
 			fprintf(
 			 stream,
-			 "%" PRIs_LIBSYSTEM "",
+			 "%" PRIs_LIBCSTRING_SYSTEM "",
 			 values[ value_iterator ] );
 		}
 		fprintf(
 		 stream,
-		 ") [%" PRIs_LIBSYSTEM "]: ",
+		 ") [%" PRIs_LIBCSTRING_SYSTEM "]: ",
 		 values[ default_value ] );
 
 		result_string = libsystem_file_stream_get_string(
@@ -1537,9 +1539,9 @@ int ewfinput_get_fixed_string_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libsystem_string_search(
+			end_of_input = libcstring_system_string_search(
 			                input_buffer,
-			                (libsystem_character_t) '\n',
+			                (libcstring_system_character_t) '\n',
 			                input_buffer_size );
 
 			/* Input was larger than size of buffer
@@ -1555,9 +1557,9 @@ int ewfinput_get_fixed_string_variable(
 					                 input_buffer,
 					                 input_buffer_size - 1 );
 
-					end_of_input = libsystem_string_search(
+					end_of_input = libcstring_system_string_search(
 					                input_buffer,
-					                (libsystem_character_t) '\n',
+					                (libcstring_system_character_t) '\n',
 					                input_buffer_size );
 
 				}
@@ -1579,11 +1581,11 @@ int ewfinput_get_fixed_string_variable(
 			     value_iterator < amount_of_values;
 			     value_iterator++ )
 			{
-				value_length = libsystem_string_length(
+				value_length = libcstring_system_string_length(
 						values[ value_iterator ] );
 
 				if( ( value_length == (size_t) input_length )
-				 && ( libsystem_string_compare(
+				 && ( libcstring_system_string_compare(
 				       input_buffer,
 				       values[ value_iterator ],
 				       value_length ) == 0 ) )

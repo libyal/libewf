@@ -1,6 +1,7 @@
 /*
  * Character type string functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,102 +25,23 @@
 #define _LIBEWF_STRING_H
 
 #include <common.h>
-#include <narrow_string.h>
 #include <types.h>
-#include <wide_string.h>
 
+#include <libcstring.h>
 #include <liberror.h>
-
-#include "libewf_libuna.h"
 
 #if defined( _cplusplus )
 extern "C" {
 #endif
 
-/* The internal string type contains UTF-8
- */
-typedef libuna_utf8_character_t libewf_character_t;
-
-#define PRIc_LIBEWF	"c"
-#define PRIs_LIBEWF	"s"
-
-#define _LIBEWF_STRING( string ) \
-	(libewf_character_t *) string
-
-#define libewf_string_compare( string1, string2, size ) \
-	narrow_string_compare( (char *) string1, (char *) string2, size )
-
-#define libewf_string_copy( destination, source, size ) \
-	narrow_string_copy( (char *) destination, (char *) source, size )
-
-#define libewf_string_length( string ) \
-	narrow_string_length( (char *) string )
-
-#define libewf_string_search( string, character, size ) \
-	(libewf_character_t *) narrow_string_search( (char *) string, (int) character, size )
-
-#define libewf_string_search_reverse( string, character, size ) \
-	(libewf_character_t *) narrow_string_search_reverse( (char *) string, (int) character, size )
-
-#if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
-#define libewf_string_snprintf \
-	narrow_string_snprintf
-
-#else
-#define libewf_string_snprintf( target, size, format, ... ) \
-	narrow_string_snprintf( (char *) target, size, format, __VA_ARGS__ )
-#endif
-
-/* Byte stream functions
- */
-#define libewf_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error ) \
-	libuna_utf8_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error )
-
-#define libewf_string_copy_from_byte_stream( string, string_size, stream, stream_size, codepage, error ) \
-	libuna_utf8_string_copy_from_byte_stream( string, string_size, stream, stream_size, codepage, error )
-
-#define byte_stream_size_from_libewf_string( string, string_size, codepage, stream_size, error ) \
-	libuna_byte_stream_size_from_utf8( string, string_size, codepage, stream_size, error )
-
-#define byte_stream_copy_from_libewf_string( stream, stream_size, codepage, string, string_size, error ) \
-	libuna_byte_stream_copy_from_utf8( stream, stream_size, codepage, string, string_size, error )
-
-/* UTF-8 stream functions
- */
-#define libewf_string_size_from_utf8_stream( stream, stream_size, string_size, error ) \
-	libuna_utf8_string_size_from_utf8_stream( stream, stream_size, string_size, error )
-
-#define libewf_string_copy_from_utf8_stream( string, string_size, stream, stream_size, error ) \
-	libuna_utf8_string_copy_from_utf8_stream( string, string_size, stream, stream_size, error )
-
-#define utf8_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
-	libuna_utf8_stream_size_from_utf8( string, string_size, stream_size, error )
-
-#define utf8_stream_copy_from_libewf_string( stream, stream_size, string, string_size, error ) \
-	libuna_utf8_stream_copy_from_utf8( stream, stream_size, string, string_size, error )
-
-/* UTF-16 stream functions
- */
-#define libewf_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error ) \
-	libuna_utf8_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error )
-
-#define libewf_string_copy_from_utf16_stream( string, string_size, stream, stream_size, byte_order, error ) \
-	libuna_utf8_string_copy_from_utf16_stream( string, string_size, stream, stream_size, byte_order, error )
-
-#define utf16_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
-	libuna_utf16_stream_size_from_utf8( string, string_size, stream_size, error )
-
-#define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
-	libuna_utf16_stream_copy_from_utf8( stream, stream_size, byte_order, string, string_size, error )
-
 int libewf_string_copy_to_64bit_decimal(
-     libewf_character_t *string,
+     libcstring_character_t *string,
      size_t string_size,
      uint64_t *value_64bit,
      liberror_error_t **error );
 
 int libewf_string_copy_to_64bit_hexadecimal(
-     libewf_character_t *string,
+     libcstring_character_t *string,
      size_t string_size,
      uint64_t *value_64bit,
      liberror_error_t **error );

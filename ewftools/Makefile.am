@@ -1,6 +1,7 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
+	-I$(top_srcdir)/libcstring \
 	-I$(top_srcdir)/liberror \
 	-I$(top_srcdir)/libsystem \
 	@LIBUNA_CPPFLAGS@ \
@@ -33,6 +34,7 @@ ewfacquire_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfacquire_LDADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
@@ -60,6 +62,7 @@ ewfacquirestream_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfacquirestream_LDADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
@@ -77,6 +80,7 @@ ewfalter_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfalter_LDADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
@@ -89,6 +93,7 @@ ewfdebug_SOURCES = \
 	ewfoutput.c ewfoutput.h
 
 ewfdebug_LDADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
@@ -112,6 +117,7 @@ ewfexport_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfexport_LDADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
@@ -130,6 +136,7 @@ ewfinfo_SOURCES = \
 	info_handle.c info_handle.h
 
 ewfinfo_LDADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
@@ -152,6 +159,7 @@ ewfverify_SOURCES = \
 	verification_handle.c verification_handle.h
 
 ewfverify_LDADD = \
+	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \

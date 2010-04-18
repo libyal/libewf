@@ -1,6 +1,7 @@
 /*
  * Output functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -24,7 +25,7 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
+#include <libcstring.h>
 
 #include <errno.h>
 
@@ -96,7 +97,7 @@
  */
 void ewfoutput_version_fprint(
       FILE *stream,
-      const libsystem_character_t *program )
+      const libcstring_system_character_t *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
@@ -118,7 +119,7 @@ void ewfoutput_version_fprint(
 	}
 	fprintf(
 	 stream,
-	 "%" PRIs_LIBSYSTEM " %s (libewf %s",
+	 "%" PRIs_LIBCSTRING_SYSTEM " %s (libewf %s",
 	 program,
 	 LIBEWF_VERSION_STRING,
 	 LIBEWF_VERSION_STRING );
@@ -193,7 +194,7 @@ void ewfoutput_copyright_fprint(
 	}
 	fprintf(
 	 stream,
-	 "Copyright (c) 2006-2010, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n"
+	 "Copyright (c) 2006-2010, Joachim Metz <%s> and contributors.\n"
 	 "This is free software; see the source for copying conditions. There is NO\n"
 	 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	 PACKAGE_BUGREPORT );

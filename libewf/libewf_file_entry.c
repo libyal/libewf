@@ -1,6 +1,7 @@
 /*
  * File entry functions
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -23,9 +24,9 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
-#include <narrow_string.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 #include <libnotify.h>
 
@@ -474,7 +475,7 @@ int libewf_file_entry_get_name(
 
 		return( -1 );
 	}
-	if( narrow_string_copy(
+	if( libcstring_narrow_string_copy(
 	     (char *) name,
 	     (char *) single_file_entry->name,
 	     single_file_entry->name_size ) == NULL )
