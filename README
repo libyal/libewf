@@ -20,7 +20,7 @@ Currently 2 methods of creating a libewf DLL are supported:
 
 
 Creating a libewf DLL using libtool
-You'll need Cygwin of MingW with a libtool version that supports
+You'll need Cygwin or MingW with a libtool version that supports
 building DLLs.
 
 By building the library:
