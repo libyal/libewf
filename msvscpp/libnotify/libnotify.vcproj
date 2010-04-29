@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				WarningLevel="4"
@@ -90,6 +90,14 @@
 				RelativePath="..\..\libnotify\libnotify.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libnotify\libnotify_print.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libnotify\libnotify_stream.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -98,6 +106,14 @@
 			>
 			<File
 				RelativePath="..\..\libnotify\libnotify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libnotify\libnotify_print.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libnotify\libnotify_stream.h"
 				>
 			</File>
 		</Filter>

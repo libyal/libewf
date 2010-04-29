@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libsmdev"
 	ProjectGUID="{63788C33-8BBE-4754-A43C-6879CFED3255}"
 	RootNamespace="libsmdev"
@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libnotify;..\..\libuna"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify;..\..\libuna"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBSMDEV"
 				RuntimeLibrary="2"
 				WarningLevel="4"
@@ -134,10 +134,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_system_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmdev\libsmdev_usb.c"
 				>
 			</File>
@@ -209,10 +205,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_support.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_system_string.h"
 				>
 			</File>
 			<File

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libewf_dll"
 	ProjectGUID="{B5225323-AC67-411D-8FBA-199E9467FAB5}"
 	RootNamespace="libewf"
@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio;..\..\libewf;..\zlib\include"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio;..\..\libewf;..\zlib\include"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;ZLIB_DLL;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
 				WarningLevel="4"
@@ -96,6 +96,10 @@
 			>
 			<File
 				RelativePath="..\..\libewf\libewf.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_array_type.c"
 				>
 			</File>
 			<File
@@ -305,6 +309,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_array_type.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_chunk_cache.h"
 				>
 			</File>
@@ -461,11 +469,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_system_string.h"
+				RelativePath="..\..\libewf\libewf_tree_type.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_tree_type.h"
+				RelativePath="..\..\libewf\libewf_types.h"
 				>
 			</File>
 			<File

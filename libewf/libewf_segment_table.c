@@ -372,13 +372,13 @@ int libewf_segment_table_get_basename(
 		result = libuna_utf8_string_size_from_utf32(
 		          (libuna_utf32_character_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          narrow_basename_size,
+		          &narrow_basename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_utf8_string_size_from_utf16(
 		          (libuna_utf16_character_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          narrow_basename_size,
+		          &narrow_basename_size,
 		          error );
 #else
 #error Unsupported size of wchar_t
@@ -391,14 +391,14 @@ int libewf_segment_table_get_basename(
 		          (libuna_utf32_character_t *) segment_table->basename,
 		          segment_table->basename_size,
 		          libcstring_narrow_system_string_codepage,
-		          narrow_basename_size,
+		          &narrow_basename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_byte_stream_size_from_utf16(
 		          (libuna_utf16_character_t *) segment_table->basename,
 		          segment_table->basename_size,
 		          libcstring_narrow_system_string_codepage,
-		          narrow_basename_size,
+		          &narrow_basename_size,
 		          error );
 #else
 #error Unsupported size of wchar_t
@@ -747,7 +747,7 @@ int libewf_segment_table_get_basename_size_wide(
 	{
 		return( 0 );
 	}
-#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	*basename_size = segment_table->basename_size;
 #else
 	if( libcstring_narrow_system_string_codepage == 0 )
@@ -845,7 +845,7 @@ int libewf_segment_table_get_basename_wide(
 	{
 		return( 0 );
 	}
-#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	wide_basename_size = segment_table->basename_size;
 #else
 	if( libcstring_narrow_system_string_codepage == 0 )
@@ -909,7 +909,7 @@ int libewf_segment_table_get_basename_wide(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcstring_system_string_copy(
 	     basename,
 	     segment_table->basename,
@@ -1028,7 +1028,7 @@ int libewf_segment_table_set_basename_wide(
 		segment_table->basename      = NULL;
 		segment_table->basename_size = 0;
 	}
-#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	segment_table->basename_size = basename_length + 1;
 #else
 	if( libcstring_narrow_system_string_codepage == 0 )
@@ -1095,7 +1095,7 @@ int libewf_segment_table_set_basename_wide(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcstring_system_string_copy(
 	     segment_table->basename,
 	     basename,

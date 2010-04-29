@@ -1244,6 +1244,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_examiner_name        = NULL;
 	libcstring_system_character_t *option_evidence_number      = NULL;
 	libcstring_system_character_t *option_notes                = NULL;
+	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfacquirestream" );
 	libcstring_system_character_t *secondary_target_filename   = NULL;
 	libcstring_system_character_t *target_filename             = _LIBCSTRING_SYSTEM_STRING( "image" );
 
@@ -1251,7 +1252,6 @@ int main( int argc, char * const argv[] )
 
 	process_status_t *process_status                           = NULL;
 
-	char *program                                              = "ewfacquirestream";
 	libcstring_system_integer_t option                         = 0;
 	size_t case_number_length                                  = 0;
 	size_t description_length                                  = 0;

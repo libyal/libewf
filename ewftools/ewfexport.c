@@ -795,13 +795,13 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *fixed_string_variable    = NULL;
 	libcstring_system_character_t *log_filename             = NULL;
 	libcstring_system_character_t *option_target_filename   = NULL;
+	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfexport" );
 	libcstring_system_character_t *target_filename          = NULL;
 
 	log_handle_t *log_handle                                = NULL;
 
 	process_status_t *process_status                        = NULL;
 
-	char *program                                           = "ewfexport";
 	libcstring_system_integer_t option                      = 0;
 	size64_t media_size                                     = 0;
 	ssize64_t export_count                                  = 0;

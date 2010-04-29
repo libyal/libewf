@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
-	Name="libsmraw"
-	ProjectGUID="{6714BF47-8EA4-464F-B3D1-81B19332AD8A}"
-	RootNamespace="libsmraw"
+	Version="9,00"
+	Name="libcstring"
+	ProjectGUID="{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}"
+	RootNamespace="libcstring"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -39,10 +39,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW"
+				AdditionalIncludeDirectories="..\..\include;..\..\common"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				WarningLevel="4"
+				WarnAsError="false"
 				CompileAs="1"
 			/>
 			<Tool
@@ -56,7 +57,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libsmraw.lib"
+				OutputFile="$(OutDir)\libcstring.lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -86,39 +87,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_error.c"
+				RelativePath="..\..\libcstring\libcstring_system_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_filename.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_information_file.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_metadata.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_notify.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_support.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_values_table.c"
+				RelativePath="..\..\libcstring\libcstring_wide.c"
 				>
 			</File>
 		</Filter>
@@ -128,63 +101,35 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_codepage.h"
+				RelativePath="..\..\libcstring\libcstring.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_definitions.h"
+				RelativePath="..\..\libcstring\libcstring_codepage.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_error.h"
+				RelativePath="..\..\libcstring\libcstring_definitions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_extern.h"
+				RelativePath="..\..\libcstring\libcstring_narrow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_filename.h"
+				RelativePath="..\..\libcstring\libcstring_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_handle.h"
+				RelativePath="..\..\libcstring\libcstring_system_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_information_file.h"
+				RelativePath="..\..\libcstring\libcstring_types.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_libbfio.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_libuna.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_metadata.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_notify.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_support.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_values_table.h"
+				RelativePath="..\..\libcstring\libcstring_wide.h"
 				>
 			</File>
 		</Filter>

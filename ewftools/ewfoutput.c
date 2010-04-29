@@ -25,6 +25,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
+
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
@@ -85,7 +87,7 @@
  */
 void ewfoutput_version_fprint(
       FILE *stream,
-      const char *program )
+      const libcstring_system_character_t *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
@@ -107,7 +109,7 @@ void ewfoutput_version_fprint(
 	}
 	fprintf(
 	 stream,
-	 "%s %s (libewf %s",
+	 "%" PRIs_LIBCSTRING_SYSTEM " %s (libewf %s",
 	 program,
 	 LIBEWF_VERSION_STRING,
 	 LIBEWF_VERSION_STRING );

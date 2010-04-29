@@ -20,6 +20,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -38,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				WarningLevel="4"
@@ -105,10 +106,6 @@
 			</File>
 			<File
 				RelativePath="..\..\liberror\liberror_error.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\liberror\liberror_system_string.h"
 				>
 			</File>
 			<File

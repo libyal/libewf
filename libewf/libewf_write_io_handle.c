@@ -1452,7 +1452,7 @@ int libewf_write_io_handle_create_segment_file(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,

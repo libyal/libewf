@@ -27,13 +27,15 @@
 #include <common.h>
 #include <types.h>
 
+#include <libcstring.h>
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
 void ewfoutput_version_fprint(
       FILE *stream,
-      const char *program );
+      const libcstring_system_character_t *program );
 
 void ewfoutput_copyright_fprint(
       FILE *stream );

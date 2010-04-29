@@ -420,6 +420,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *calculated_md5_hash_string  = NULL;
 	libcstring_system_character_t *calculated_sha1_hash_string = NULL;
 	libcstring_system_character_t *log_filename                = NULL;
+	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfverify" );
 	libcstring_system_character_t *stored_md5_hash_string      = NULL;
 	libcstring_system_character_t *stored_sha1_hash_string     = NULL;
 
@@ -429,7 +430,6 @@ int main( int argc, char * const argv[] )
 
 	verification_handle_t *verification_handle                 = NULL;
 
-	char *program                                              = "ewfverify";
 	libcstring_system_integer_t option                         = 0;
 	ssize64_t verify_count                                     = 0;
 	size_t string_length                                       = 0;

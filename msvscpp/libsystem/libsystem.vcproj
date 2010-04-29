@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libuna"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA"
 				RuntimeLibrary="2"
 				WarningLevel="4"
@@ -153,10 +153,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsystem\libsystem_find.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsystem\libsystem_file.h"
 				>
 			</File>
@@ -166,6 +162,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libsystem\libsystem_file_stream.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsystem\libsystem_find.h"
 				>
 			</File>
 			<File

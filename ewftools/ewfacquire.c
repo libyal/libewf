@@ -1357,6 +1357,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
 	libcstring_system_character_t *option_target_filename           = NULL;
+	libcstring_system_character_t *program                          = _LIBCSTRING_SYSTEM_STRING( "ewfacquire" );
 	libcstring_system_character_t *secondary_target_filename        = NULL;
 	libcstring_system_character_t *target_filename                  = NULL;
 
@@ -1364,7 +1365,6 @@ int main( int argc, char * const argv[] )
 
 	process_status_t *process_status                                = NULL;
 
-	char *program                                                   = "ewfacquire";
 	libcstring_system_integer_t option                              = 0;
 	off64_t resume_acquiry_offset                                   = 0;
 	ssize64_t read_count                                            = 0;
