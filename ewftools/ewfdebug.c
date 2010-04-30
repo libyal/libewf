@@ -254,7 +254,7 @@ int main( int argc, char * const argv[] )
 	}
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 	if( libsystem_glob_initialize(
-	     &glob
+	     &glob,
 	     &error ) != 1 )
 	{
 		fprintf(

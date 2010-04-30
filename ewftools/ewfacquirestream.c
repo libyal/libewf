@@ -735,10 +735,10 @@ ssize_t ewfacquirestream_read_chunk(
 				 || ( errno == ENXIO )
 				 || ( errno == ENODEV ) )
 				{
-					if( libsystem_error_copy_to_string(
-					     errno,
+					if( libsystem_error_string_copy_from_error_number(
 					     error_string,
 					     128,
+					     errno,
 					     error ) == 1 )
 					{
 						liberror_error_set(

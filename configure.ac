@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100429],
+ [20100430],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100429])
+ [20100430])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -113,33 +113,38 @@ AC_CHECK_HEADER(
   [HAVE_STDINT_H],
   [0])])
 
+dnl Headers included in common/common.h
+AC_CHECK_HEADERS([windows.h])
+
 dnl Headers included in common/types.h
 AC_CHECK_HEADERS([limits.h])
 
 dnl Headers included in common/memory.h and libcstring/libcstring_narrow_string.h
-AC_CHECK_HEADERS([stdlib.h])
-AC_CHECK_HEADERS([string.h])
+AC_CHECK_HEADERS([stdlib.h string.h])
 
 dnl Headers included in liberror/liberror_error.c and libnotify/libnotify_print.c
-AC_CHECK_HEADERS(
- [stdarg.h],
- [],
- [AC_CHECK_HEADERS(
-  [varargs.h],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing headers: stdarg.h and varargs.h],
-   [1]) ]) ])
+AC_CHECK_HEADERS([stdarg.h])
+
+AS_IF(
+ [test "x$ac_cv_header_stdarg_h" != xyes],
+ [AC_CHECK_HEADERS([varargs.h]) ])
+
+AS_IF(
+ [test "x$ac_cv_header_stdarg_h" != xyes && test "x$ac_cv_header_varargs_h" != xyes],
+ [AC_MSG_FAILURE(
+  [Missing headers: stdarg.h and varargs.h],
+  [1]) ])
 
 dnl Headers included in libnotify/libnotify_stream.c and libbfio/libbfio_file.c
 AC_CHECK_HEADERS([errno.h])
 
-dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_directory_io.h and libsystem/libsystem_file_io.h
+dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_directory_io.h, libsystem/libsystem_file_io.h
+dnl libsmdev/libsmdev_handle.c and libsmdev/libsmdev_support.c
 AC_CHECK_HEADERS([sys/stat.h])
 
-dnl Headers included in libbfio/libbfio_file.c and libsystem/libsystem_file_io.h
-AC_CHECK_HEADERS([fcntl.h])
-AC_CHECK_HEADERS([unistd.h])
+dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_file_io.h
+dnl libsmdev/libsmdev_handle.c and libsmdev/libsmdev_support.c
+AC_CHECK_HEADERS([fcntl.h unistd.h])
 
 dnl Headers included in libewf/libewf_date_time.h
 AC_HEADER_TIME
@@ -147,39 +152,30 @@ AC_HEADER_TIME
 dnl Headers included in libsystem/libsystem_glob.h
 AC_CHECK_HEADERS([glob.h])
 
+AS_IF(
+ [test "x$ac_cv_header_glob_h" != xyes],
+ [AC_CHECK_HEADERS([io.h]) ])
+
 dnl Headers included in libsytem/libsystem_support.c
-AC_CHECK_HEADERS([langinfo.h])
-AC_CHECK_HEADERS([locale.h])
+AC_CHECK_HEADERS([langinfo.h locale.h])
 
 dnl Headers included in libsystem/libsystem_signal.h
-AC_CHECK_HEADERS([signal.h])
-AC_CHECK_HEADERS([sys/signal.h])
+AC_CHECK_HEADERS([signal.h sys/signal.h])
 
 dnl Headers included in libsmdev/libsmdev_metadata.c
-AC_CHECK_HEADERS([sys/disk.h])
-AC_CHECK_HEADERS([sys/disklabel.h])
-AC_CHECK_HEADERS([sys/ioctl.h])
-
-AC_CHECK_HEADERS([cygwin/fs.h])
-
-AC_CHECK_HEADERS([linux/fs.h])
+AC_CHECK_HEADERS([cygwin/fs.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h winioctl.h])
 
 dnl Headers included in libsmdev/libsmdev_ata.c
-AC_CHECK_HEADERS([cygwin/hdreg.h])
-
-AC_CHECK_HEADERS([linux/hdreg.h])
+AC_CHECK_HEADERS([cygwin/hdreg.h linux/hdreg.h])
 
 dnl Headers included in libsmdev/libsmdev_scsi.c
-AC_CHECK_HEADERS([scsi/scsi.h])
-AC_CHECK_HEADERS([scsi/scsi_ioctl.h])
-AC_CHECK_HEADERS([scsi/sg.h])
+AC_CHECK_HEADERS([scsi/scsi.h scsi/scsi_ioctl.h scsi/sg.h])
 
 dnl Headers included in libsmdev/libsmdev_optical_disk.c
 AC_CHECK_HEADERS([linux/cdrom.h])
 
 dnl Headers included in libsmdev/libsmdev_usb.c
-AC_CHECK_HEADERS([linux/usbdevice_fs.h])
-AC_CHECK_HEADERS([linux/usb/ch9.h])
+AC_CHECK_HEADERS([linux/usbdevice_fs.h linux/usb/ch9.h])
 
 dnl Headers included in ewftools/platform.c
 AC_CHECK_HEADERS([sys/utsname.h])
@@ -284,9 +280,12 @@ AC_CHECK_FUNCS(
 AC_CHECK_FUNCS(
  [fseeko],
  [],
- [AC_MSG_FAILURE(
-  [Missing function: fseeko],
-  [1]) ])
+ [AC_CHECK_FUNCS(
+  [fseeko64],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: fseeko and fseeko64],
+   [1]) ]) ])
 
 AC_CHECK_FUNCS(
  [fwrite],
@@ -338,12 +337,7 @@ AC_CHECK_FUNCS(
   [Missing function: memset],
   [1]) ])
 
-AC_CHECK_FUNCS(
- [posix_memalign],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: posix_memalign],
-  [1]) ])
+AC_CHECK_FUNCS([posix_memalign])
 
 AC_CHECK_FUNCS(
  [realloc],
@@ -567,9 +561,11 @@ AC_CHECK_FUNCS(
   [Missing functions: mkdir],
   [1]) ])
 
-dnl Check for error string functions used in libsystem/libsystem_error.c
-AC_FUNC_STRERROR_R(
- [],
+dnl Check for error string functions used in libbfio/libbfio_error_string.c and libsystem/libsystem_error.c
+AC_FUNC_STRERROR_R()
+
+AS_IF(
+ [test "x$ac_cv_have_decl_strerror_r" = xno],
  [AC_CHECK_FUNCS(
   [strerror],
   [],
@@ -1014,7 +1010,7 @@ AS_IF(
 	 [ac_libewf_have_libbfio=no])
 
 	AS_IF(
-		[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
+		[test "x$ac_cv_libewf_enable_wide_character_type" != xno],
 		[AC_CHECK_LIB(
 		 bfio,
 		 libbfio_file_get_name_size_wide,
@@ -1210,7 +1206,7 @@ AS_IF(
 	 [ac_libewf_have_libsmdev=no])
 
 	AS_IF(
-		[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
+		[test "x$ac_cv_libewf_enable_wide_character_type" != xno],
 		[AC_CHECK_LIB(
 		 smdev,
 		 libsmdev_handle_open_wide,
@@ -1312,7 +1308,7 @@ AS_IF(
 	 [ac_libewf_have_libsmraw=no])
 
 	AS_IF(
-		[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
+		[test "x$ac_cv_libewf_enable_wide_character_type" != xno],
 		[AC_CHECK_LIB(
 		 smraw,
 		 libsmraw_handle_open_wide,
@@ -1366,397 +1362,419 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMRAW],
  [test "x$ac_libewf_have_libsmraw" = xlocal])
 
-dnl Check for enabling libcrypto EVP support
-AC_CHECK_HEADERS(
- [openssl/evp.h],
- [AC_LANG_PUSH(C)
- AC_MSG_CHECKING(
-  [if openssl/evp.h can be used in combination with zlib.h])
- AC_LINK_IFELSE(
-	AC_LANG_PROGRAM(
-	 [[#include <zlib.h>
+dnl Check for enabling crypographic digest hash support
+ac_libewf_have_libcrypto=no
+
+AS_IF(
+ [test "x$ac_cv_header_windows_h" = xyes],
+ [AC_SUBST(
+  [LIBCRYPTO_LIBADD],
+  [-ladvapi32])
+  ac_libewf_have_libcrypto=libadvapi32])
+
+dnl Check for libcrypto openssl EVP support
+AS_IF(
+ [test "x$ac_libewf_have_libcrypto" = xno],
+ [AC_CHECK_HEADERS([openssl/evp.h openssl/opensslv.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_evp_h" = xyes],
+  [AC_LANG_PUSH(C)
+  AC_MSG_CHECKING(
+   [if openssl/evp.h can be used in combination with zlib.h])
+  AC_LINK_IFELSE(
+   AC_LANG_PROGRAM(
+    [[#include <zlib.h>
 #include <openssl/evp.h>]],
-	 [[ ]]),
-	 [AC_MSG_RESULT(
-	  [yes])
-	 AC_DEFINE(
-	  [HAVE_OPENSSL_EVP_H],
-	  [1],
-	  [Define to 1 if you have the <openssl/evp.h> header file.])
-	 AC_SUBST(
-	  [HAVE_OPENSSL_EVP_H],
-	  [1])
-	 ac_libewf_have_libcrypto_evp=yes],
-	[AC_MSG_RESULT(
-	 [no])
-	ac_libewf_have_libcrypto_evp=no])
- AC_LANG_POP(C)],
- [ac_libewf_have_libcrypto_evp=no])
+    [[ ]]),
+    [AC_MSG_RESULT(
+     [yes])
+    AC_DEFINE(
+     [HAVE_OPENSSL_EVP_H],
+     [1],
+     [Define to 1 if you have the <openssl/evp.h> header file.])
+    AC_SUBST(
+     [HAVE_OPENSSL_EVP_H],
+     [1])
+    ac_libewf_have_libcrypto=evp],
+   [AC_MSG_RESULT(
+    [no])
+   ac_libewf_have_libcrypto=no])
+  AC_LANG_POP(C)],
+  [ac_libewf_have_libcrypto=no])
+ ])
+
+dnl Check if all required libcrypto openssl EVP functions are available
+AS_IF(
+ [test "x$ac_libewf_have_libcrypto" = xevp],
+ [AC_CHECK_LIB(
+  crypto,
+  EVP_md5,
+  [AC_SUBST(
+   [LIBCRYPTO_LIBADD],
+   [-lcrypto])
+  AC_DEFINE(
+   [HAVE_LIBCRYPTO],
+   [1],
+   [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
+  [ac_libewf_have_libcrypto=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_sha1,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_libcrypto=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_MD_CTX_init,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_libcrypto=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_MD_CTX_cleanup,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_libcrypto=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_DigestInit_ex,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_libcrypto=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_DigestUpdate,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_libcrypto=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_DigestFinal_ex,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_libcrypto=no])
+ ])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_evp" != xno],
-	[ac_libewf_have_libcrypto_evp=yes
-	AC_CHECK_LIB(
-	 crypto,
-	 EVP_md5,
-	 [AC_SUBST(
-	  [LIBCRYPTO_LIBADD],
-	  [-lcrypto])
-	 AC_DEFINE(
-	  [HAVE_LIBCRYPTO],
-	  [1],
-	  [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
-	 [ac_libewf_have_libcrypto_evp=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 EVP_sha1,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_evp=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 EVP_MD_CTX_init,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_evp=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 EVP_MD_CTX_cleanup,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_evp=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 EVP_DigestInit_ex,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_evp=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 EVP_DigestUpdate,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_evp=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 EVP_DigestFinal_ex,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_evp=no])
-	])
+ [test "x$ac_libewf_have_libcrypto" = xlibadvapi32],
+ [ac_libewf_have_libcrypto_md5=libadvapi32
+ ac_libewf_have_libcrypto_sha1=libadvapi32])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_evp" = xno],
-	[AC_SUBST(
-	 [HAVE_OPENSSL_EVP_H],
-	 [0]) ])
+ [test "x$ac_libewf_have_libcrypto" = xevp],
+ [ac_libewf_have_libcrypto_md5=evp
+ ac_libewf_have_libcrypto_sha1=evp],
+ [AC_SUBST(
+  [HAVE_OPENSSL_EVP_H],
+  [0]) ])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_evp" = xyes],
-	[ac_libewf_have_libcrypto_md5=evp
-	ac_libewf_have_libcrypto_sha1=evp])
+ [test "x$ac_libewf_have_libcrypto" = xno],
+ [ac_libewf_have_libcrypto_md5=no
+ ac_libewf_have_libcrypto_sha1=no])
 
-dnl Check for libcrypto MD5 support
+dnl Check for libcrypto openssl MD5 support
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_md5" != xevp ],
-	[AC_CHECK_HEADERS(
-	 [openssl/md5.h],
-	 [],
-	 [ac_libewf_have_libcrypto_md5=no]) ])
+ [test "x$ac_libewf_have_libcrypto_md5" = xno],
+ [AC_CHECK_HEADERS([openssl/md5.h])
 
-AS_IF(
-	[test "x$ac_libewf_have_libcrypto_md5" != xno && test "x$ac_libewf_have_libcrypto_md5" != xevp ],
-	[ac_libewf_have_libcrypto_md5=yes
-	AC_CHECK_LIB(
-	 crypto,
-	 MD5_Init,
-	 [AC_SUBST(
-	  [LIBCRYPTO_LIBADD],
-	  [-lcrypto])
-	 AC_DEFINE(
-	  [HAVE_LIBCRYPTO],
-	  [1],
-	  [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
-	 [ac_libewf_have_libcrypto_md5=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 MD5_Update,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_md5=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 MD5_Final,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_md5=no])
-	])
+ AS_IF(
+  [test "x$ac_cv_header_openssl_md5_h" = xyes],
+  [ac_libewf_have_libcrypto_md5=yes
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Init,
+   [AC_SUBST(
+    [LIBCRYPTO_LIBADD],
+    [-lcrypto])
+   AC_DEFINE(
+    [HAVE_LIBCRYPTO],
+    [1],
+    [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
+   [ac_libewf_have_libcrypto_md5=no])
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libcrypto_md5=no])
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libcrypto_md5=no])
+  ])
+ ])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_md5" = xno],
-	[AC_MSG_NOTICE(
-	 [No support for calculating MD5 hashes, if required install (openssl) libcrypto with MD5 support.])
-	])
+ [test "x$ac_libewf_have_libcrypto_md5" = xno],
+ [AC_MSG_NOTICE(
+  [No support for calculating MD5 hashes, if required install (openssl) libcrypto with MD5 support or Windows Crypto API.])
+ ])
 
 dnl Check for libcrypto SHA1 support
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_sha1" != xevp ],
-	[AC_CHECK_HEADERS(
-	 [openssl/sha.h],
-	 [],
-	 [ac_libewf_have_libcrypto_sha1=no]) ])
+ [test "x$ac_libewf_have_libcrypto_sha1" = xno],
+ [AC_CHECK_HEADERS([openssl/sha.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_sha1_h" = xyes],
+  [ac_libewf_have_libcrypto_sha1=yes
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Init,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libcrypto_sha1=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libcrypto_sha1=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libcrypto_sha1=no])
+  ])
+ ])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_sha1" != xno && test "x$ac_libewf_have_libcrypto_sha1" != xevp ],
-	[ac_libewf_have_libcrypto_sha1=yes
-	AC_CHECK_LIB(
-	 crypto,
-	 SHA1_Init,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_sha1=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 SHA1_Update,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_sha1=no])
-	AC_CHECK_LIB(
-	 crypto,
-	 SHA1_Final,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libcrypto_sha1=no])
-	])
-
-AS_IF(
-	[test "x$ac_libewf_have_libcrypto_sha1" = xno],
-	[AC_MSG_NOTICE(
-	 [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support.])
-	])
-
-AC_CHECK_HEADERS([openssl/opensslv.h])
+ [test "x$ac_libewf_have_libcrypto_sha1" = xno],
+ [AC_MSG_NOTICE(
+  [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support or Windows Crypto API.])
+ ])
 
 dnl Check for enabling GUID/UUID support
-AC_CHECK_HEADERS(
- [uuid/uuid.h],
- [],
- [ac_libewf_have_guid_support=no])
+AS_IF(
+ [test "x$ac_cv_header_windows_h" = xyes],
+ [AC_SUBST(
+  [LIBUUID_LIBADD],
+  [-lrpcrt4])
+  ac_libewf_have_guid_support=librpcrt4],
+ [AC_CHECK_HEADERS(
+  [uuid/uuid.h],
+  [],
+  [ac_libewf_have_guid_support=no])
+ AS_IF(
+  [test "x$ac_libewf_have_guid_support" != xno],
+  [ac_libewf_have_guid_support=native
+  AC_CHECK_FUNC(
+   [uuid_generate],
+   [],
+   [ac_libewf_have_guid_support=libuuid
+    AC_CHECK_LIB(
+    [uuid],
+    [uuid_generate],
+    [AC_SUBST(
+     [LIBUUID_LIBADD],
+     [-luuid])
+    AC_DEFINE(
+     [HAVE_LIBUUID],
+     [1],
+     [Define to 1 if you have the 'uuid' library (-luuid).]) ],
+    [ac_libewf_have_guid_support=no])
+   ])
+  ])
+ ])
 
 AS_IF(
-	[test "x$ac_libewf_have_guid_support" != xno],
-	[ac_libewf_have_guid_support=native
-	AC_CHECK_FUNC(
-	 [uuid_generate],
-	 [],
-	 [ac_libewf_have_guid_support=libuuid
-	  AC_CHECK_LIB(
-	  [uuid],
-	  [uuid_generate],
-	  [AC_SUBST(
-	   [LIBUUID_LIBADD],
-	   [-luuid])
-	  AC_DEFINE(
-	   [HAVE_LIBUUID],
-	   [1],
-	   [Define to 1 if you have the 'uuid' library (-luuid).]) ],
-	  [ac_libewf_have_guid_support=no])
-	 ])
-	])
+ [test "x$ac_libewf_have_guid_support" != xno],
+ [AC_DEFINE(
+  [HAVE_GUID_SUPPORT],
+  [1],
+  [Define to 1 if GUID support is available.])
+ ])
 
 AS_IF(
-	[test "x$ac_libewf_have_guid_support" != xno],
-	[AC_DEFINE(
-	 [HAVE_GUID_SUPPORT],
-	 [1],
-	 [Define to 1 if GUID support is available.])
-	])
+ [test "x$ac_libewf_have_guid_support" = xnative],
+ [AC_CHECK_FUNC(
+  [uuid_generate_random],
+  [AC_DEFINE(
+   [HAVE_UUID_GENERATE_RANDOM],
+   [1],
+   [Define to 1 if uuid_generate_random funtion is available.])
+  ])
+ AC_CHECK_FUNC(
+  [uuid_generate_time],
+  [AC_DEFINE(
+   [HAVE_UUID_GENERATE_TIME],
+   [1],
+   [Define to 1 if uuid_generate_time funtion is available.])
+  ])
+ ])
 
 AS_IF(
-	[test "x$ac_libewf_have_guid_support" = xlibuuid],
-	[AC_CHECK_LIB(
-	 [uuid],
-	 [uuid_generate_random],
-	 [AC_DEFINE(
-	  [HAVE_UUID_GENERATE_RANDOM],
-	  [1],
-	  [Define to 1 if uuid_generate_random funtion is available in libuuid.])
-	 ])
-	AC_CHECK_LIB(
-	 [uuid],
-	 [uuid_generate_time],
-	 [AC_DEFINE(
-	  [HAVE_UUID_GENERATE_TIME],
-	  [1],
-	  [Define to 1 if uuid_generate_time funtion is available in libuuid.])
-	 ])
-	])
-
-AS_IF(
-	[test "x$ac_libewf_have_guid_support" = xnative],
-	[AC_CHECK_FUNC(
-	 [uuid_generate_random],
-	 [AC_DEFINE(
-	  [HAVE_UUID_GENERATE_RANDOM],
-	  [1],
-	  [Define to 1 if uuid_generate_random funtion is available.])
-	 ])
-	AC_CHECK_FUNC(
-	 [uuid_generate_time],
-	 [AC_DEFINE(
-	  [HAVE_UUID_GENERATE_TIME],
-	  [1],
-	  [Define to 1 if uuid_generate_time funtion is available.])
-	 ])
-	])
-
-AS_IF(
-	[test "x$ac_libewf_have_guid_support" = xlibuuid],
-	[AC_SUBST(
-	 [libewf_spec_requires_libuuid],
-	 [e2fsprogs-devel])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libuuid],
-	 [e2fsprogs-devel]) ],
-	[AC_SUBST(
-	 [libewf_spec_requires_libuuid],
-	 [])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libuuid],
-	 [])
-	ac_libewf_dummy=yes
-	])
+ [test "x$ac_libewf_have_guid_support" = xlibuuid],
+ [AC_CHECK_LIB(
+  [uuid],
+  [uuid_generate_random],
+  [AC_DEFINE(
+   [HAVE_UUID_GENERATE_RANDOM],
+   [1],
+   [Define to 1 if uuid_generate_random funtion is available in libuuid.])
+  ])
+ AC_CHECK_LIB(
+  [uuid],
+  [uuid_generate_time],
+  [AC_DEFINE(
+   [HAVE_UUID_GENERATE_TIME],
+   [1],
+   [Define to 1 if uuid_generate_time funtion is available in libuuid.])
+  ])
+ AC_SUBST(
+  [libewf_spec_requires_libuuid],
+  [e2fsprogs-devel])
+ AC_SUBST(
+  [libewf_spec_build_requires_libuuid],
+  [e2fsprogs-devel]) ],
+ [AC_SUBST(
+  [libewf_spec_requires_libuuid],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libuuid],
+  [])
+ ac_libewf_dummy=yes
+ ])
 
 dnl Check if libewf should be build with wide character type support
 AS_IF(
-	[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
-	[dnl Check for the wide character header
-	AC_CHECK_HEADERS(
-	 [wchar.h],
-	 [AC_DEFINE(
-	  [HAVE_WCHAR_H],
-	  [1],
-	  [Define to 1 if you have the <wchar.h> header file.])
-	 AC_SUBST(
-	  [HAVE_WCHAR_H],
-	  [1]) ],
-	 [AC_MSG_FAILURE(
-	  [Missing header: wchar.h],
-	  [1]) ])
+ [test "x$ac_cv_header_windows_h" = xyes],
+ [ac_cv_libewf_enable_wide_character_type=yes])
 
-	dnl Determine wide character byte size
-	AC_CHECK_SIZEOF([wchar_t])
+AS_IF(
+ [test "x$ac_cv_libewf_enable_wide_character_type" != xno],
+ [dnl Check for the wide character header
+ AC_CHECK_HEADERS(
+  [wchar.h],
+  [AC_DEFINE(
+   [HAVE_WCHAR_H],
+   [1],
+   [Define to 1 if you have the <wchar.h> header file.])
+  AC_SUBST(
+   [HAVE_WCHAR_H],
+   [1]) ],
+  [AC_MSG_FAILURE(
+   [Missing header: wchar.h],
+   [1]) ])
 
-	dnl Check for wide character string functions
+ dnl Determine wide character byte size
+ AC_CHECK_SIZEOF([wchar_t])
 
-	dnl Wide character string functions used in common/file_stream.h
-	AC_CHECK_FUNCS(
-	 [fgetws],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: fgetws],
-	  [1]) ])
+ dnl Check for wide character string functions
 
-	dnl Wide character string functions used in libcstring/libcstring_wide_string.h
-	AC_CHECK_FUNCS(
-	 [fgetws],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: fgetws],
-	  [1]) ])
+ dnl Wide character string functions used in common/file_stream.h
+ AC_CHECK_FUNCS(
+  [fgetws],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: fgetws],
+   [1]) ])
 
-	AC_CHECK_FUNCS(
-	 [swprintf],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: swprintf],
-	  [1]) ])
+ dnl Wide character string functions used in libcstring/libcstring_wide_string.h
+ AC_CHECK_FUNCS(
+  [fgetws],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: fgetws],
+   [1]) ])
 
-	AC_CHECK_FUNCS(
-	 [wmemchr],
-	 [],
-	 [AC_CHECK_FUNCS(
-	  [wcschr],
-	  [],
-	  [AC_MSG_FAILURE(
-	   [Missing functions: wmemchr and wcschr],
-	   [1]) ]) ])
+ AC_CHECK_FUNCS(
+  [swprintf],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: swprintf],
+   [1]) ])
 
-	AC_CHECK_FUNCS(
-	 [wmemcmp],
-	 [],
-	 [AC_CHECK_FUNCS(
-	  [wcsncmp],
-	  [],
-	  [AC_CHECK_FUNCS(
-	   [wcscmp],
-	   [],
-	   [AC_MSG_FAILURE(
-	    [Missing functions: wmemcmp, wcsncmp and wcscmp],
-	    [1]) ]) ]) ])
+ AC_CHECK_FUNCS(
+  [wmemchr],
+  [],
+  [AC_CHECK_FUNCS(
+   [wcschr],
+   [],
+   [AC_MSG_FAILURE(
+    [Missing functions: wmemchr and wcschr],
+    [1]) ]) ])
 
-	AC_CHECK_FUNCS(
-	 [wmemcpy],
-	 [],
-	 [AC_CHECK_FUNCS(
-	  [wcsncpy],
-	  [],
-	  [AC_CHECK_FUNCS(
-	   [wcscpy],
-	   [],
-	   [AC_MSG_FAILURE(
-	    [Missing functions: wmemcpy, wcsncpy and wcscpy],
-	    [1]) ]) ]) ])
+ AC_CHECK_FUNCS(
+  [wmemcmp],
+  [],
+  [AC_CHECK_FUNCS(
+   [wcsncmp],
+   [],
+   [AC_CHECK_FUNCS(
+    [wcscmp],
+    [],
+    [AC_MSG_FAILURE(
+     [Missing functions: wmemcmp, wcsncmp and wcscmp],
+     [1]) ]) ]) ])
 
-	AC_CHECK_FUNCS(
-	 [wmemrchr],
-	 [],
-	 [AC_CHECK_FUNCS(
-	  [wcsrchr],
-	  [],
-	  [AC_MSG_FAILURE(
-	   [Missing functions: wmemrchr and wcsrchr],
-	   [1]) ]) ])
+ AC_CHECK_FUNCS(
+  [wmemcpy],
+  [],
+  [AC_CHECK_FUNCS(
+   [wcsncpy],
+   [],
+   [AC_CHECK_FUNCS(
+    [wcscpy],
+    [],
+    [AC_MSG_FAILURE(
+     [Missing functions: wmemcpy, wcsncpy and wcscpy],
+     [1]) ]) ]) ])
 
-	AC_CHECK_FUNCS(
-	 [wcslen],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: wcslen],
-	  [1]) ])
+ AC_CHECK_FUNCS(
+  [wmemrchr],
+  [],
+  [AC_CHECK_FUNCS(
+   [wcsrchr],
+   [],
+   [AC_MSG_FAILURE(
+    [Missing functions: wmemrchr and wcsrchr],
+    [1]) ]) ])
 
-	AC_CHECK_FUNCS(
-	 [wcsncasecmp],
-	 [],
-	 [AC_CHECK_FUNCS(
-	  [wcscasecmp],
-	  [],
-	  [AC_CHECK_FUNCS(
-	   [towlower],
-	   [],
-	   [AC_MSG_FAILURE(
-	    [Missing functions: wcsncasecmp, wcscasecmp and towlower],
-	    [1]) ]) ]) ])
+ AC_CHECK_FUNCS(
+  [wcslen],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: wcslen],
+   [1]) ])
+ 
+ AC_CHECK_FUNCS(
+  [wcsncasecmp],
+  [],
+  [AC_CHECK_FUNCS(
+   [wcscasecmp],
+   [],
+   [AC_CHECK_FUNCS(
+    [towlower],
+    [],
+    [AC_MSG_FAILURE(
+     [Missing functions: wcsncasecmp, wcscasecmp and towlower],
+     [1]) ]) ]) ])
 
-	AC_CHECK_FUNCS(
-	 [wcstoll],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: wcstoll],
-	  [1]) ])
+ AC_CHECK_FUNCS(
+  [wcstoll],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: wcstoll],
+   [1]) ])
 
-	AC_CHECK_FUNCS(
-	 [wcstoull],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: wcstoull],
-	  [1]) ])
+ AC_CHECK_FUNCS(
+  [wcstoull],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: wcstoull],
+   [1]) ])
 
-	dnl Make the necessary definitions
-	AC_DEFINE(
-	 [HAVE_WIDE_CHARACTER_TYPE],
-	 [1],
-	 [Define to 1 if wide character type should be used.])
-	AC_SUBST(
-	 [HAVE_WIDE_CHARACTER_TYPE],
-	 [1])
-	ac_cv_libewf_enable_wide_character_type=yes],
+ dnl Make the necessary definitions
+ AC_DEFINE(
+  [HAVE_WIDE_CHARACTER_TYPE],
+  [1],
+  [Define to 1 if wide character type should be used.])
+ AC_SUBST(
+  [HAVE_WIDE_CHARACTER_TYPE],
+  [1])
+ ac_cv_libewf_enable_wide_character_type=yes],
 
-	[AC_SUBST(
-	 [HAVE_WIDE_CHARACTER_TYPE],
-	 [0])
-	AC_SUBST(
-	 [HAVE_WCHAR_H],
-	 [0]) ])
+ [AC_SUBST(
+  [HAVE_WIDE_CHARACTER_TYPE],
+  [0])
+ AC_SUBST(
+  [HAVE_WCHAR_H],
+  [0]) ])
 
 dnl Check if ewftools should be build as static executables
 AS_IF(
@@ -1834,7 +1852,7 @@ dnl Set memwatch support
 ac_libewf_have_memwatch=no
 
 AS_IF(
-	[test "x$ac_libewf_have_memwatch" != xno ],
+	[test "x$ac_libewf_have_memwatch" != xno],
 	[AC_SUBST(
 	 [MEMWATCH_CPPFLAGS],
 	 ["-DMEMWATCH -DMEMWATCH_STDIO"])
@@ -1906,7 +1924,6 @@ Building:
    libbfio support:                                 $ac_libewf_have_libbfio
    libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw
-   libcrypto EVP support:                           $ac_libewf_have_libcrypto_evp
    libcrypto MD5 support:                           $ac_libewf_have_libcrypto_md5
    libcrypto SHA1 support:                          $ac_libewf_have_libcrypto_sha1
    guid support:                                    $ac_libewf_have_guid_support

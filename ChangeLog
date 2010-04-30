@@ -1,5 +1,5 @@
 TODO
-* update msvscpp and borlandc build files
+* update borlandc build files
 
 * check borlandc build
 * libewf: make libewf_convert_date_header_value more strict
@@ -160,7 +160,7 @@ Windows build
 * windows port
   - some of the Windows functions are MVC 2005 or later specific
   - figure out a way to warn about the compiler used
-* add WIN32_LEAN_AND_MEAN or VC_EXTRALEAN to msvscpp
+* add VC_EXTRALEAN to msvscpp config
 * locale support
   - print output convert to system string
   - reduce string conversions, use as much as possible the system string type in the tools
@@ -204,6 +204,11 @@ Deprecated functions
 Next stable release:
 * full test
 * disable ewfalter, ewfdebug
+
+20100430
+* worked on mingw support
+* updated libsmraw, libsystem, libbfio, libsmdev
+* added WIN32_LEAN_AND_MEAN to common/common.h
 
 20100429
 * worked on msvscpp build

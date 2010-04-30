@@ -91,7 +91,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsystem\libsystem_error.c"
+				RelativePath="..\..\libsystem\libsystem_error_string.c"
 				>
 			</File>
 			<File
@@ -149,7 +149,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsystem\libsystem_error.h"
+				RelativePath="..\..\libsystem\libsystem_error_string.h"
 				>
 			</File>
 			<File

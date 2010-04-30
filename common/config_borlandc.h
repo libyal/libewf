@@ -1,6 +1,7 @@
 /*
  * Configuration file for Borland/CodeGear C++ Builder compiler
  *
+ * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
  * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
  *
@@ -25,7 +26,7 @@
 
 /* Define to the address where bug reports for this package should be sent.
  */
-#define PACKAGE_BUGREPORT "forensics@hoffmannbv.nl"
+#define PACKAGE_BUGREPORT "jbmetz@users.sourceforge.net"
 
 /* Use the safe size and offset types
  */

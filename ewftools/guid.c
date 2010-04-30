@@ -115,7 +115,7 @@ int guid_generate(
 #if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x0520
 		/* No support for the time type GUID */
 
-#elif defined( WINAPI )
+#elif defined( WINAPI ) && _WIN32_WINNT >= 0x0500
 		UuidCreateSequential(
 		 &uuid );
 

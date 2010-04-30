@@ -42,7 +42,9 @@
 
 /* Make sure WINAPI is defined
  */
-#if defined( _MSC_VER ) || defined( __BORLANDC__ )
+#if defined( HAVE_WINDOWS_H ) || defined( _MSC_VER ) || defined( __BORLANDC__ )
+/* #define WIN32_LEAN_AND_MEAN */
+
 #include <windows.h>
 #endif
 
