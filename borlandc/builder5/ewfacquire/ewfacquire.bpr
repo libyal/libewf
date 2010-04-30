@@ -24,7 +24,7 @@
     <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV;HAVE_LOCAL_LIBSMRAW"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="ewfacquire.bpf"/>
-    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmdev;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmdev;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\ewftools;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -69,8 +69,9 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=1
-Item0=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmdev;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Count=2
+Item0=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmdev;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmdev;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=2

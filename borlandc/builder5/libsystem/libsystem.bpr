@@ -22,7 +22,7 @@
     <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
     <MAINSOURCE value="libsystem.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsystem;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libsystem;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libsystem;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -66,26 +66,31 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=3
-Item0=..\..\..\libsystem;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libsystem;$(BCB)\include;$(BCB)\include\vcl
-Item2=$(BCB)\include;$(BCB)\include\vcl
+Count=4
+Item0=..\..\..\libsystem;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libsystem;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libsystem;$(BCB)\include;$(BCB)\include\vcl
+Item3=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
-Count=0
+Count=1
+Item0=..\..\..\libsystem;$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
-Count=0
+Count=1
+Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=0
+Count=1
+Item0=UNICODE;HAVE_LOCAL_LIBUNA
 
 [HistoryLists\hlIntOutputDir]
 Count=1
 Item0=.
 
 [HistoryLists\hlFinalOutputDir]
-Count=0
+Count=1
+Item0=..\Release\
 
 [HistoryLists\hlTlibPageSize]
 Count=1

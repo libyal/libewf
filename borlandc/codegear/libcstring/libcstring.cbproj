@@ -1,6 +1,6 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{73AD7FDB-FBA9-4FD9-8C6D-8BFD9F291D2F}</ProjectGuid>
+			<ProjectGuid>{49062FB8-FFB3-4A4E-B083-CCB8D3D7D766}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Release</Config>
 		</PropertyGroup>
@@ -13,20 +13,18 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
-			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror;..\..\..\libuna;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;HAVE_LOCAL_LIBUNA;$(Defines)</Defines>
-			<IncludePath>..\..\..\libsystem;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
+			<Defines>NO_STRICT;$(Defines)</Defines>
+			<IncludePath>..\..\..\libcstring;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
 			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
@@ -38,90 +36,36 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libsystem\libsystem_support.h">
-				<BuildOrder>0</BuildOrder>
+			<None Include="..\..\..\libcstring\libcstring.h">
+				<BuildOrder>6</BuildOrder>
 			</None>
-			<None Include="..\..\..\libsystem\libsystem.h">
-				<BuildOrder>1</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_date_time.c">
-				<BuildOrder>2</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_date_time.h">
-				<BuildOrder>3</BuildOrder>
-			</None>
-			<None Include="..\..\..\libsystem\libsystem_directory.h">
-				<BuildOrder>4</BuildOrder>
-			</None>
-			<None Include="..\..\..\libsystem\libsystem_directory_io.h">
+			<None Include="..\..\..\libcstring\libcstring_codepage.h">
 				<BuildOrder>5</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_error_string.c">
-				<BuildOrder>6</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_error_string.h">
+			<None Include="..\..\..\libcstring\libcstring_definitions.h">
 				<BuildOrder>7</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_file.c">
-				<BuildOrder>8</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_file.h">
+			<None Include="..\..\..\libcstring\libcstring_narrow.h">
 				<BuildOrder>9</BuildOrder>
 			</None>
-			<None Include="..\..\..\libsystem\libsystem_file_io.h">
-				<BuildOrder>10</BuildOrder>
+			<None Include="..\..\..\libcstring\libcstring_string.h">
+				<BuildOrder>8</BuildOrder>
 			</None>
-			<None Include="..\..\..\libsystem\libsystem_file_stream.h">
-				<BuildOrder>11</BuildOrder>
-			</None>
-			<None Include="..\..\..\libsystem\libsystem_find.h">
-				<BuildOrder>12</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_getopt.c">
-				<BuildOrder>13</BuildOrder>
+			<CppCompile Include="..\..\..\libcstring\libcstring_system_string.c">
+				<BuildOrder>1</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_getopt.h">
-				<BuildOrder>14</BuildOrder>
+			<None Include="..\..\..\libcstring\libcstring_system_string.h">
+				<BuildOrder>0</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_glob.c">
-				<BuildOrder>15</BuildOrder>
+			<None Include="..\..\..\libcstring\libcstring_types.h">
+				<BuildOrder>2</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcstring\libcstring_wide.c">
+				<BuildOrder>4</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_glob.h">
-				<BuildOrder>16</BuildOrder>
+			<None Include="..\..\..\libcstring\libcstring_wide.h">
+				<BuildOrder>3</BuildOrder>
 			</None>
-			<None Include="..\..\..\libsystem\libsystem_libuna.h">
-				<BuildOrder>17</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_notify.c">
-				<BuildOrder>18</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_notify.h">
-				<BuildOrder>19</BuildOrder>
-			</None>
-			<None Include="..\..\..\libsystem\libsystem_path.h">
-				<BuildOrder>20</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_signal.c">
-				<BuildOrder>21</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_signal.h">
-				<BuildOrder>22</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_split_values.c">
-				<BuildOrder>23</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_split_values.h">
-				<BuildOrder>24</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_string.c">
-				<BuildOrder>25</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_string.h">
-				<BuildOrder>26</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_support.c">
-				<BuildOrder>27</BuildOrder>
-			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

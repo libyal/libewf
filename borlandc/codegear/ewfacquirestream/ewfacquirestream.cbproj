@@ -21,7 +21,7 @@
 			<AllPackageLibs>rtl.lib</AllPackageLibs>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<NoVCL>true</NoVCL>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libuna;..\..\..\libbfio;..\..\..\libewf;..\..\..\libsystem;..\..\zlib-1.2.3;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror;..\..\..\libuna;..\..\..\libbfio;..\..\..\libewf;..\..\..\libsystem;..\..\zlib-1.2.3;$(BCC_IncludePath)</BCC_IncludePath>
 			<ProjectType>CppConsoleApplication</ProjectType>
 			<Multithreaded>true</Multithreaded>
 			<BCC_waus>false</BCC_waus>
@@ -41,70 +41,104 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<CppCompile Include="..\..\..\ewftools\log_handle.c">
+			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
+				<BuildOrder>0</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\ewftools\md5.h">
+			<None Include="..\..\..\ewftools\byte_size_string.h">
+				<BuildOrder>1</BuildOrder>
 			</None>
-			<None Include="..\..\..\ewftools\log_handle.h">
+			<None Include="..\..\..\ewftools\guid.h">
+				<BuildOrder>2</BuildOrder>
 			</None>
-			<None Include="..\..\..\ewftools\storage_media_buffer.h">
-			</None>
-			<CppCompile Include="..\..\..\ewftools\storage_media_buffer.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\ewftools\ewfacquirestream.c">
-			</CppCompile>
-			<LibFiles Include="..\Release\libuna.lib">
+			<LibFiles Include="..\Release\libewf.lib">
 				<IgnorePath>true</IgnorePath>
+				<BuildOrder>3</BuildOrder>
 			</LibFiles>
-			<LibFiles Include="..\Release\liberror.lib">
-				<IgnorePath>true</IgnorePath>
-			</LibFiles>
-			<None Include="..\..\..\ewftools\platform.h">
-			</None>
-			<CppCompile Include="..\..\..\ewftools\platform.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\ewftools\process_status.c">
-			</CppCompile>
-			<None Include="..\..\..\ewftools\sha1.h">
-			</None>
-			<None Include="..\..\..\ewftools\process_status.h">
-			</None>
-			<CppCompile Include="..\..\..\ewftools\digest_context.c">
-			</CppCompile>
-			<None Include="..\..\..\ewftools\digest_context.h">
-			</None>
 			<None Include="..\..\..\ewftools\digest_hash.h">
+				<BuildOrder>4</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\digest_hash.c">
+				<BuildOrder>5</BuildOrder>
 			</CppCompile>
 			<LibFiles Include="..\Release\libsystem.lib">
 				<IgnorePath>true</IgnorePath>
+				<BuildOrder>6</BuildOrder>
 			</LibFiles>
-			<LibFiles Include="..\Release\libewf.lib">
-				<IgnorePath>true</IgnorePath>
-			</LibFiles>
-			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
-			</CppCompile>
-			<None Include="..\..\..\ewftools\byte_size_string.h">
-			</None>
-			<None Include="..\..\..\ewftools\guid.h">
-			</None>
 			<CppCompile Include="..\..\..\ewftools\guid.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\..\ewftools\imaging_handle.c">
-			</CppCompile>
-			<None Include="..\..\..\ewftools\imaging_handle.h">
-			</None>
-			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
-			</CppCompile>
-			<None Include="..\..\..\ewftools\ewfcommon.h">
-			</None>
 			<None Include="..\..\..\ewftools\ewfinput.h">
+				<BuildOrder>8</BuildOrder>
 			</None>
 			<None Include="..\..\..\ewftools\ewfoutput.h">
+				<BuildOrder>9</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
+				<BuildOrder>10</BuildOrder>
 			</CppCompile>
+			<None Include="..\..\..\ewftools\ewfcommon.h">
+				<BuildOrder>11</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\imaging_handle.c">
+				<BuildOrder>12</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\imaging_handle.h">
+				<BuildOrder>13</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
+				<BuildOrder>14</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\storage_media_buffer.c">
+				<BuildOrder>15</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\ewfacquirestream.c">
+				<BuildOrder>16</BuildOrder>
+			</CppCompile>
+			<LibFiles Include="..\Release\libuna.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>17</BuildOrder>
+			</LibFiles>
+			<None Include="..\..\..\ewftools\storage_media_buffer.h">
+				<BuildOrder>18</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\log_handle.c">
+				<BuildOrder>19</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\md5.h">
+				<BuildOrder>20</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\log_handle.h">
+				<BuildOrder>21</BuildOrder>
+			</None>
+			<LibFiles Include="..\Release\liberror.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>22</BuildOrder>
+			</LibFiles>
+			<None Include="..\..\..\ewftools\process_status.h">
+				<BuildOrder>23</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\digest_context.c">
+				<BuildOrder>24</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\digest_context.h">
+				<BuildOrder>25</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\sha1.h">
+				<BuildOrder>26</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\platform.h">
+				<BuildOrder>27</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\platform.c">
+				<BuildOrder>28</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\process_status.c">
+				<BuildOrder>29</BuildOrder>
+			</CppCompile>
+			<LibFiles Include="..\Release\libcstring.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>30</BuildOrder>
+			</LibFiles>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

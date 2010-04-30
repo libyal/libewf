@@ -19,7 +19,7 @@
     <USERDEFINES value=""/>
     <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
     <MAINSOURCE value="liberror.bpf"/>
-    <INCLUDEPATH value="..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -63,14 +63,15 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=2
-Item0=..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\liberror;$(BCB)\include;$(BCB)\include\vcl
+Count=3
+Item0=..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\liberror;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=3
-Item0=..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
-Item1=..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib
+Item0=..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\liberror;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 Item2=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]

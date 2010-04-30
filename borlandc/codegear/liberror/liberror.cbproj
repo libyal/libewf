@@ -13,11 +13,10 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
-			<BCC_PCHUsage>None</BCC_PCHUsage>
+			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
@@ -40,21 +39,18 @@
 			<None Include="..\..\..\liberror\liberror_error.h">
 				<BuildOrder>0</BuildOrder>
 			</None>
-			<None Include="..\..\..\liberror\liberror_system_string.h">
+			<None Include="..\..\..\liberror\liberror_types.h">
 				<BuildOrder>1</BuildOrder>
 			</None>
-			<None Include="..\..\..\liberror\liberror_types.h">
+			<CppCompile Include="..\..\..\liberror\liberror_error.c">
 				<BuildOrder>2</BuildOrder>
-			</None>
+			</CppCompile>
 			<None Include="..\..\..\liberror\liberror.h">
 				<BuildOrder>3</BuildOrder>
 			</None>
 			<None Include="..\..\..\liberror\liberror_definitions.h">
 				<BuildOrder>4</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\liberror\liberror_error.c">
-				<BuildOrder>5</BuildOrder>
-			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

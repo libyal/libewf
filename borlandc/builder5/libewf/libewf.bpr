@@ -33,7 +33,7 @@
     <USERDEFINES value="UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="libewf.bpf"/>
-    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -78,17 +78,18 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=5
-Item0=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item2=..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item3=..\..\..\libewf;$(BCB)\include;$(BCB)\include\vcl
-Item4=$(BCB)\include;$(BCB)\include\vcl
+Count=6
+Item0=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item3=..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item4=..\..\..\libewf;$(BCB)\include;$(BCB)\include\vcl
+Item5=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=14
-Item0=..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
-Item1=..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib
+Item0=..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 Item2=..\..\..\libewf;..\Release;$(BCB)\lib\PSDK;$(BCB)\lib\obj;$(BCB)\lib
 Item3=..\..\..\libewf;..\Release;$(BCB)\PSDK;$(BCB)\lib\obj;$(BCB)\lib
 Item4=..\..\..\libewf;$(BCB)\lib\obj;$(BCB)\lib
@@ -103,16 +104,20 @@ Item12=..\..\..\libewf;..\Release\;$(BCB)\lib\obj;$(BCB)\lib
 Item13=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
-Count=0
+Count=1
+Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=0
+Count=1
+Item0=UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT;
 
 [HistoryLists\hlIntOutputDir]
-Count=0
+Count=1
+Item0=.
 
 [HistoryLists\hlFinalOutputDir]
-Count=0
+Count=1
+Item0=..\Release\
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

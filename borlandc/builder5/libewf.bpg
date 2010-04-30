@@ -9,8 +9,8 @@ MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
 DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
-PROJECTS = liberror.lib libnotify.lib libuna.lib libbfio.lib zlib.lib \
-  libewf.dll libsmdev.lib libsmraw.lib libsystem.lib ewfacquire.exe \
+PROJECTS = libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib \
+  zlib.lib libewf.dll libsmdev.lib libsmraw.lib libsystem.lib ewfacquire.exe \
   ewfacquirestream.exe ewfexport.exe ewfinfo.exe ewfverify.exe
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
@@ -71,3 +71,9 @@ ewfinfo.exe: ewfinfo\ewfinfo.bpr
 ewfverify.exe: ewfverify\ewfverify.bpr
   $(ROOT)\bin\bpr2mak $**
   $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+libcstring.lib: libcstring\libcstring.bpr
+  $(ROOT)\bin\bpr2mak -t$(ROOT)\bin\deflib.bmk $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+

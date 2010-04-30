@@ -23,7 +23,7 @@
     <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
     <MAINSOURCE value="libsmdev.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -67,15 +67,16 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=3
-Item0=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libsmdev;$(BCB)\include;$(BCB)\include\vcl
-Item2=$(BCB)\include;$(BCB)\include\vcl
+Count=4
+Item0=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libsmdev;$(BCB)\include;$(BCB)\include\vcl
+Item3=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=3
-Item0=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
-Item1=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib
+Item0=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 Item2=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]

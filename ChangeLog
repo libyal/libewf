@@ -208,7 +208,9 @@ Next stable release:
 20100430
 * worked on mingw support
 * updated libsmraw, libsystem, libbfio, libsmdev
-* added WIN32_LEAN_AND_MEAN to common/common.h
+* added WIN32_LEAN_AND_MEAN to common/common.h - disable due to use of
+  GUID/UUID functions
+* worked on borlandc and codegear files
 
 20100429
 * worked on msvscpp build

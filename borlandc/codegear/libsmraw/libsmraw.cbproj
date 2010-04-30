@@ -18,7 +18,7 @@
 			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\liberror;..\..\..\libnotify;..\..\..\libuna;..\..\..\libbfio;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror;..\..\..\libnotify;..\..\..\libuna;..\..\..\libbfio;$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
@@ -38,58 +38,78 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_values_table.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_error.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_filename.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_handle.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_information_file.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_metadata.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_notify.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_string.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_support.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_system_string.c">
-			</CppCompile>
-			<None Include="..\..\..\libsmraw\libsmraw_values_table.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_codepage.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_definitions.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_error.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_extern.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_filename.h">
-			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_handle.h">
+				<BuildOrder>0</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_information_file.h">
+				<BuildOrder>1</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_libbfio.h">
+				<BuildOrder>2</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_error.h">
+				<BuildOrder>3</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_extern.h">
+				<BuildOrder>4</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_filename.h">
+				<BuildOrder>5</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_libuna.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_metadata.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_notify.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_string.h">
+				<BuildOrder>6</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_support.h">
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_system_string.h">
+				<BuildOrder>7</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_types.h">
+				<BuildOrder>9</BuildOrder>
 			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_metadata.h">
+				<BuildOrder>10</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_notify.h">
+				<BuildOrder>11</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_string.h">
+				<BuildOrder>12</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_handle.c">
+				<BuildOrder>13</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_information_file.c">
+				<BuildOrder>14</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_metadata.c">
+				<BuildOrder>15</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_values_table.c">
+				<BuildOrder>16</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_error.c">
+				<BuildOrder>17</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_filename.c">
+				<BuildOrder>18</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_notify.c">
+				<BuildOrder>19</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libsmraw\libsmraw_values_table.h">
+				<BuildOrder>20</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_codepage.h">
+				<BuildOrder>21</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsmraw\libsmraw_definitions.h">
+				<BuildOrder>22</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_string.c">
+				<BuildOrder>23</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libsmraw\libsmraw_support.c">
+				<BuildOrder>24</BuildOrder>
+			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

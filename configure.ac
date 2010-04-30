@@ -1396,7 +1396,7 @@ AS_IF(
     AC_SUBST(
      [HAVE_OPENSSL_EVP_H],
      [1])
-    ac_libewf_have_libcrypto=evp],
+    ac_libewf_have_libcrypto=libcrypto_evp],
    [AC_MSG_RESULT(
     [no])
    ac_libewf_have_libcrypto=no])
@@ -1406,7 +1406,7 @@ AS_IF(
 
 dnl Check if all required libcrypto openssl EVP functions are available
 AS_IF(
- [test "x$ac_libewf_have_libcrypto" = xevp],
+ [test "x$ac_libewf_have_libcrypto" = xlibcrypto_evp],
  [AC_CHECK_LIB(
   crypto,
   EVP_md5,
@@ -1456,9 +1456,9 @@ AS_IF(
  ac_libewf_have_libcrypto_sha1=libadvapi32])
 
 AS_IF(
- [test "x$ac_libewf_have_libcrypto" = xevp],
- [ac_libewf_have_libcrypto_md5=evp
- ac_libewf_have_libcrypto_sha1=evp],
+ [test "x$ac_libewf_have_libcrypto" = xlibcrypto_evp],
+ [ac_libewf_have_libcrypto_md5=libcrypto_evp
+ ac_libewf_have_libcrypto_sha1=libcrypto_evp],
  [AC_SUBST(
   [HAVE_OPENSSL_EVP_H],
   [0]) ])
@@ -1475,7 +1475,7 @@ AS_IF(
 
  AS_IF(
   [test "x$ac_cv_header_openssl_md5_h" = xyes],
-  [ac_libewf_have_libcrypto_md5=yes
+  [ac_libewf_have_libcrypto_md5=libcrypto
   AC_CHECK_LIB(
    crypto,
    MD5_Init,
@@ -1513,7 +1513,7 @@ AS_IF(
 
  AS_IF(
   [test "x$ac_cv_header_openssl_sha1_h" = xyes],
-  [ac_libewf_have_libcrypto_sha1=yes
+  [ac_libewf_have_libcrypto_sha1=libcrypto
   AC_CHECK_LIB(
    crypto,
    SHA1_Init,
@@ -1924,9 +1924,9 @@ Building:
    libbfio support:                                 $ac_libewf_have_libbfio
    libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw
-   libcrypto MD5 support:                           $ac_libewf_have_libcrypto_md5
-   libcrypto SHA1 support:                          $ac_libewf_have_libcrypto_sha1
-   guid support:                                    $ac_libewf_have_guid_support
+   MD5 support:                                     $ac_libewf_have_libcrypto_md5
+   SHA1 support:                                    $ac_libewf_have_libcrypto_sha1
+   GUID/UUID support:                               $ac_libewf_have_guid_support
 
 Features:
    Wide character type support:                     $ac_cv_libewf_enable_wide_character_type

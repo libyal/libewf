@@ -25,7 +25,7 @@
     <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="ewfacquirestream.bpf"/>
-    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\ewftools;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -69,9 +69,10 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=2
-Item0=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Count=3
+Item0=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=1

@@ -3,27 +3,24 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\Release\libsmraw.lib"/>
-    <OBJFILES value="libsmraw_error.obj libsmraw_filename.obj libsmraw_handle.obj 
-      libsmraw_information_file.obj libsmraw_metadata.obj libsmraw_notify.obj 
-      libsmraw_string.obj libsmraw_support.obj libsmraw_system_string.obj 
-      libsmraw_values_table.obj"/>
+    <PROJECT value="..\Release\libcstring.lib"/>
+    <OBJFILES value="libcstring_system_string.obj libcstring_wide.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;..\..\..\libsmraw"/>
+    <PATHCPP value=".;..\..\..\libcstring"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW"/>
-    <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
-    <MAINSOURCE value="libsmraw.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsmraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <USERDEFINES value=""/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
+    <MAINSOURCE value="libcstring.bpf"/>
+    <INCLUDEPATH value="..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\..\libcstring;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
@@ -66,29 +63,31 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=3
-Item0=..\..\..\libsmraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libsmraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item2=..\..\..\libsmraw;$(BCB)\include;$(BCB)\include\vcl
+Count=2
+Item0=..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libcstring;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
-Count=2
-Item0=..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib
-Item1=..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
+Count=3
+Item0=..\..\..\libcstring;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
+Item1=..\..\..\libcstring;$(BCB)\lib\obj;$(BCB)\lib
+Item2=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
 Count=1
 Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=3
-Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW
-Item1=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW
-Item2=_DEBUG
+Count=4
+Item0=WINVER=0x0400;_WIN32_WINNT=0x0400
+Item1=WINNT
+Item2=UNICODE
+Item3=_DEBUG
 
 [HistoryLists\hlIntOutputDir]
-Count=1
+Count=2
 Item0=.
+Item1=..\libcstring
 
 [HistoryLists\hlFinalOutputDir]
 Count=2
@@ -98,6 +97,10 @@ Item1=..\Release
 [HistoryLists\hlTlibPageSize]
 Count=1
 Item0=0x0010
+
+[HistoryLists\hlTlibListFile]
+Count=1
+Item0=libcstring
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

@@ -21,7 +21,7 @@
     <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO"/>
     <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
     <MAINSOURCE value="libbfio.bpf"/>
-    <INCLUDEPATH value="..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libbfio;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -65,15 +65,16 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=3
-Item0=..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libbfio;$(BCB)\include;$(BCB)\include\vcl
-Item2=$(BCB)\include;$(BCB)\include\vcl
+Count=4
+Item0=..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libbfio;$(BCB)\include;$(BCB)\include\vcl
+Item3=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=3
-Item0=..\..\..\libbfio;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
-Item1=..\..\..\libbfio;$(BCB)\lib\obj;$(BCB)\lib
+Item0=..\..\..\libbfio;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\libbfio;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 Item2=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]

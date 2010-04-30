@@ -14,6 +14,8 @@ USE("..\..\..\libewf\ewf_volume_smart.h", File);
 USE("..\..\..\libewf\ewfx_delta_chunk.h", File);
 USEUNIT("..\..\..\libewf\libewf.c");
 USE("..\..\..\libewf\libewf_definitions.h", File);
+USEUNIT("..\..\..\libewf\libewf_array_type.c");
+USE("..\..\..\libewf\libewf_array_type.h", File);
 USEUNIT("..\..\..\libewf\libewf_chunk_cache.c");
 USE("..\..\..\libewf\libewf_chunk_cache.h", File);
 USE("..\..\..\libewf\libewf_chunk_offset.h", File);

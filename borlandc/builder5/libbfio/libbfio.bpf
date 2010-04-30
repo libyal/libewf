@@ -24,8 +24,6 @@ USEUNIT("..\..\..\libbfio\libbfio_pool.c");
 USE("..\..\..\libbfio\libbfio_pool.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_support.c");
 USE("..\..\..\libbfio\libbfio_support.h", File);
-USEUNIT("..\..\..\libbfio\libbfio_system_string.c");
-USE("..\..\..\libbfio\libbfio_system_string.h", File);
 //---------------------------------------------------------------------------
 #define Library
 
