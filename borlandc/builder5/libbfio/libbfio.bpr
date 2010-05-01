@@ -6,7 +6,7 @@
     <PROJECT value="..\Release\libbfio.lib"/>
     <OBJFILES value="libbfio_error_string.obj libbfio_file.obj libbfio_handle.obj 
       libbfio_list_type.obj libbfio_memory_range.obj libbfio_offset_list.obj 
-      libbfio_pool.obj libbfio_support.obj libbfio_system_string.obj"/>
+      libbfio_pool.obj libbfio_support.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>

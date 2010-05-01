@@ -16,7 +16,7 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value=""/>
+    <USERDEFINES value="UNICODE"/>
     <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
     <MAINSOURCE value="libcstring.bpf"/>
     <INCLUDEPATH value="..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
@@ -69,8 +69,8 @@ Item1=..\..\..\libcstring;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=3
-Item0=..\..\..\libcstring;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
-Item1=..\..\..\libcstring;$(BCB)\lib\obj;$(BCB)\lib
+Item0=..\..\..\libcstring;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\libcstring;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 Item2=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
@@ -79,9 +79,9 @@ Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
 Count=4
-Item0=WINVER=0x0400;_WIN32_WINNT=0x0400
-Item1=WINNT
-Item2=UNICODE
+Item0=UNICODE
+Item1=WINVER=0x0400;_WIN32_WINNT=0x0400
+Item2=WINNT
 Item3=_DEBUG
 
 [HistoryLists\hlIntOutputDir]

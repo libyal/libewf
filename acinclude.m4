@@ -1,286 +1,958 @@
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
-	[AC_ARG_ENABLE(
-	 [$1],
-	 [AS_HELP_STRING(
-	  [--enable-$1],
-	  [$3 (default is $4)])],
-	 [ac_cv_libewf_enable_$2=$enableval],
-	 [ac_cv_libewf_enable_$2=$4])dnl
-	 AC_CACHE_CHECK(
-	  [whether to enable $3],
-	  [ac_cv_libewf_enable_$2],
-	  [ac_cv_libewf_enable_$2=$4])dnl
-])
+ [AC_ARG_ENABLE(
+  [$1],
+  [AS_HELP_STRING(
+   [--enable-$1],
+   [$3 (default is $4)])],
+  [ac_cv_libewf_enable_$2=$enableval],
+  [ac_cv_libewf_enable_$2=$4])dnl
+  AC_CACHE_CHECK(
+   [whether to enable $3],
+   [ac_cv_libewf_enable_$2],
+   [ac_cv_libewf_enable_$2=$4])dnl
+ ])
 
 dnl Function to detect whether nl_langinfo supports CODESET
-AC_DEFUN([LIBEWF_LANGINFO_CODESET],
-	[AC_CHECK_FUNCS(
-	 [nl_langinfo],
-	 [AC_CACHE_CHECK(
-	  [for nl_langinfo CODESET support],
-	  [ac_cv_libewf_langinfo_codeset],
-	  [AC_LANG_PUSH(C)
-	  AC_LINK_IFELSE(
-	   [AC_LANG_PROGRAM(
-	    [[#include <langinfo.h>]],
-	    [[char* charset = nl_langinfo( CODESET );]] )],
-	   [ac_cv_libewf_langinfo_codeset=yes],
-	   [ac_cv_libewf_langinfo_codeset=no])
-	  AC_LANG_POP(C) ]) ],
-	 [ac_cv_libewf_langinfo_codeset=no] )
-	AS_IF(
-	 [test "x$ac_cv_libewf_langinfo_codeset" = xyes],
-	 [AC_DEFINE(
-	  [HAVE_LANGINFO_CODESET],
-	  [1],
-	  [Define if nl_langinfo has CODESET support.]) ])
-])
+AC_DEFUN([LIBEWF_CHECK_FUNC_LANGINFO_CODESET],
+ [AC_CHECK_FUNCS([nl_langinfo])
+
+ AS_IF(
+  [test "x$ac_cv_func_nl_langinfo" = xyes],
+  [AC_CACHE_CHECK(
+   [for nl_langinfo CODESET support],
+   [ac_cv_libewf_langinfo_codeset],
+   [AC_LANG_PUSH(C)
+   AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM(
+     [[#include <langinfo.h>]],
+     [[char* charset = nl_langinfo( CODESET );]]) ],
+    [ac_cv_libewf_langinfo_codeset=yes],
+    [ac_cv_libewf_langinfo_codeset=no])
+   AC_LANG_POP(C) ]) ],
+  [ac_cv_libewf_langinfo_codeset=no])
+
+ AS_IF(
+  [test "x$ac_cv_libewf_langinfo_codeset" = xyes],
+  [AC_DEFINE(
+   [HAVE_LANGINFO_CODESET],
+   [1],
+   [Define if nl_langinfo has CODESET support.])
+  ])
+ ])
 
 dnl Function to detect whether printf conversion specifier "%jd" is available
-AC_DEFUN([LIBEWF_CHECK_PRINTF_JD],
-	[SAVE_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -Wall -Werror"
-	AC_LANG_PUSH(C)
-	AC_MSG_CHECKING(
-	 [whether printf supports the conversion specifier "%jd"])
-	dnl First try to see if compilation and linkage without a parameter succeeds
-	AC_LINK_IFELSE(
-		[AC_LANG_PROGRAM(
-		 [[#include <stdio.h>]],
-		 [[printf( "%jd" ); ]] )],
-		[AC_MSG_RESULT(
-		 [no])],
-		dnl Second try to see if compilation and linkage with a parameter succeeds
-	 	[AC_LINK_IFELSE(
-			[AC_LANG_PROGRAM(
-			 [[#include <sys/types.h>
+AC_DEFUN([LIBEWF_CHECK_FUNC_PRINTF_JD],
+ [AC_MSG_CHECKING(
+  [whether printf supports the conversion specifier "%jd"])
+
+ SAVE_CFLAGS="$CFLAGS"
+ CFLAGS="$CFLAGS -Wall -Werror"
+ AC_LANG_PUSH(C)
+
+ dnl First try to see if compilation and linkage without a parameter succeeds
+ AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM(
+   [[#include <stdio.h>]],
+   [[printf( "%jd" ); ]] )],
+  [ac_cv_libewf_have_printf_jd=no],
+  [ac_cv_libewf_have_printf_jd=yes])
+
+ dnl Second try to see if compilation and linkage with a parameter succeeds
+ AS_IF(
+  [test "x$ac_cv_libewf_have_printf_jd" = xyes],
+  [AC_LINK_IFELSE(
+   [AC_LANG_PROGRAM(
+    [[#include <sys/types.h>
 #include <stdio.h>]],
-		 	 [[printf( "%jd", (off_t) 10 ); ]] )],
-			dnl Third try to see if the program runs correctly
-	 		 [AC_RUN_IFELSE(
-				[AC_LANG_PROGRAM(
-				 [[#include <sys/types.h>
+    [[printf( "%jd", (off_t) 10 ); ]] )],
+    [ac_cv_libewf_have_printf_jd=yes],
+    [ac_cv_libewf_have_printf_jd=no])
+  ])
+
+ dnl Third try to see if the program runs correctly
+ AS_IF(
+  [test "x$ac_cv_libewf_have_printf_jd" = xyes],
+  [AC_RUN_IFELSE(
+   [AC_LANG_PROGRAM(
+    [[#include <sys/types.h>
 #include <stdio.h>]],
-				 [[char string[ 3 ];
+    [[char string[ 3 ];
 if( snprintf( string, 3, "%jd", (off_t) 10 ) < 0 ) return( 1 );
 if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
-				[AC_MSG_RESULT(
-				 [yes])
-				AC_DEFINE(
-				 [HAVE_PRINTF_JD],
-				 [1],
-				 [Define to 1 whether printf supports the conversion specifier "%jd".] )],
-				[AC_MSG_RESULT(
-				 [no])],
-				[AC_MSG_RESULT(
-				 [undetermined])] )],
-			[AC_MSG_RESULT(
-			 [no])] )] )
-	AC_LANG_POP(C)
-	CFLAGS="$SAVE_CFLAGS"])
+    [ac_cv_libewf_have_printf_jd=yes],
+    [ac_cv_libewf_have_printf_jd=no],
+    [ac_cv_libewf_have_printf_jd=undetermined])
+   ])
+
+ AC_LANG_POP(C)
+ CFLAGS="$SAVE_CFLAGS"
+
+ AS_IF(
+  [test "x$ac_cv_libewf_have_printf_jd" = xyes],
+  [AC_MSG_RESULT(
+   [yes])
+  AC_DEFINE(
+   [HAVE_PRINTF_JD],
+   [1],
+   [Define to 1 whether printf supports the conversion specifier "%jd".]) ],
+  [AC_MSG_RESULT(
+   [$ac_cv_libewf_have_printf_jd]) ])
+ ])
 
 dnl Function to detect whether printf conversion specifier "%zd" is available
-AC_DEFUN([LIBEWF_CHECK_PRINTF_ZD],
-	[SAVE_CFLAGS="$CFLAGS"
-	 CFLAGS="$CFLAGS -Wall -Werror"
-	 AC_LANG_PUSH(C)
-	 AC_MSG_CHECKING(
-	  [whether printf supports the conversion specifier "%zd"])
-	dnl First try to see if compilation and linkage without a parameter succeeds
-	AC_LINK_IFELSE(
-		[AC_LANG_PROGRAM(
-		 [[#include <stdio.h>]],
-		 [[printf( "%zd" ); ]] )],
-		[AC_MSG_RESULT(
-		 [no])],
-		dnl Second try to see if compilation and linkage with a parameter succeeds
-	 	[AC_LINK_IFELSE(
-			[AC_LANG_PROGRAM(
-			 [[#include <sys/types.h>
+AC_DEFUN([LIBEWF_CHECK_FUNC_PRINTF_ZD],
+ [AC_MSG_CHECKING(
+  [whether printf supports the conversion specifier "%zd"])
+
+ SAVE_CFLAGS="$CFLAGS"
+ CFLAGS="$CFLAGS -Wall -Werror"
+ AC_LANG_PUSH(C)
+
+ dnl First try to see if compilation and linkage without a parameter succeeds
+ AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM(
+   [[#include <stdio.h>]],
+   [[printf( "%zd" ); ]] )],
+  [ac_cv_libewf_have_printf_zd=no],
+  [ac_cv_libewf_have_printf_zd=yes])
+
+ dnl Second try to see if compilation and linkage with a parameter succeeds
+ AS_IF(
+  [test "x$ac_cv_libewf_have_printf_zd" = xyes],
+  [AC_LINK_IFELSE(
+   [AC_LANG_PROGRAM(
+    [[#include <sys/types.h>
 #include <stdio.h>]],
-		 	 [[printf( "%zd", (size_t) 10 ); ]] )],
-			dnl Third try to see if the program runs correctly
-	 		 [AC_RUN_IFELSE(
-				[AC_LANG_PROGRAM(
-				 [[#include <sys/types.h>
+    [[printf( "%zd", (size_t) 10 ); ]] )],
+    [ac_cv_libewf_have_printf_zd=yes],
+    [ac_cv_libewf_have_printf_zd=no])
+  ])
+
+ dnl Third try to see if the program runs correctly
+ AS_IF(
+  [test "x$ac_cv_libewf_have_printf_zd" = xyes],
+  [AC_RUN_IFELSE(
+   [AC_LANG_PROGRAM(
+    [[#include <sys/types.h>
 #include <stdio.h>]],
-				 [[char string[ 3 ];
+    [[char string[ 3 ];
 if( snprintf( string, 3, "%zd", (size_t) 10 ) < 0 ) return( 1 );
 if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
-				[AC_MSG_RESULT(
-				 [yes])
-				AC_DEFINE(
-				 [HAVE_PRINTF_ZD],
-				 [1],
-				 [Define to 1 whether printf supports the conversion specifier "%zd".] )],
-				[AC_MSG_RESULT(
-				 [no])],
-				[AC_MSG_RESULT(
-				 [undetermined])] )],
-			[AC_MSG_RESULT(
-			 [no])] )] )
-	AC_LANG_POP(C)
-	CFLAGS="$SAVE_CFLAGS"])
+    [ac_cv_libewf_have_printf_zd=yes],
+    [ac_cv_libewf_have_printf_zd=no],
+    [ac_cv_libewf_have_printf_zd=undetermined])
+   ])
+
+ AC_LANG_POP(C)
+ CFLAGS="$SAVE_CFLAGS"
+
+ AS_IF(
+  [test "x$ac_cv_libewf_have_printf_zd" = xyes],
+  [AC_MSG_RESULT(
+   [yes])
+  AC_DEFINE(
+   [HAVE_PRINTF_ZD],
+   [1],
+   [Define to 1 whether printf supports the conversion specifier "%zd".]) ],
+  [AC_MSG_RESULT(
+   [$ac_cv_libewf_have_printf_zd]) ])
+ ])
 
 dnl Function to detect if ctime_r or ctime is available
-dnl Also checks if ctime_r is defined according to the POSIX standard
+dnl Also checks how to use ctime_r
 AC_DEFUN([LIBEWF_CHECK_FUNC_CTIME],
-	[AC_CHECK_FUNC(
-	 [ctime_r],
-	 [AC_LANG_PUSH(C)
-	 AC_MSG_CHECKING(
-	  [if ctime_r is defined according to the POSIX definition])
-	 AC_LINK_IFELSE(
-		AC_LANG_PROGRAM(
-		 [[#include <time.h>]],
-		 [[ctime_r(NULL,NULL,0)]]),
-		[AC_MSG_RESULT(
-		 [ctime_r with additional size argument detected])
-	 	AC_DEFINE(
-		 [HAVE_CTIME_R],
-		 [1],
-		 [Define to 1 if you have the ctime_r function.] )
-		AC_DEFINE(
-		 [HAVE_CTIME_R_SIZE],
-		 [1],
-		 [Define to 1 if you have the ctime_r function with a third size argument.] )],
-		[AC_LINK_IFELSE(
-			AC_LANG_PROGRAM(
-			 [[#include <time.h>]],
-			 [[ctime_r(NULL,NULL)]]),
-			 [AC_MSG_RESULT(
-			  [yes])
-	 		 AC_DEFINE(
-			  [HAVE_CTIME_R],
-			  [1],
-			  [Define to 1 if you have the ctime_r function.] )],
-			 [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
-			 AC_LINK_IFELSE(
-				AC_LANG_PROGRAM(
-				 [[#include <time.h>]],
-				 [[ctime_r(NULL,NULL)]] ),
-				[AC_MSG_RESULT(
-				 [ctime_r requires additional compile flags])
-		 		 AC_DEFINE(
-				  [HAVE_CTIME_R],
-				  [1],
-				  [Define to 1 if you have the ctime_r function.] )],
-				[AC_MSG_WARN(
-				 [Unable to determine how to compile ctime_r])
-				AC_CHECK_FUNCS(
-				 [ctime],
-				 [],
-				 [AC_MSG_FAILURE(
-				  [Missing function: ctime_r and ctime],
-				  [1]) ]) ])
-			])
-		])
-	AC_LANG_POP(C) ],
-	[AC_CHECK_FUNCS(
-	 [ctime],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing function: ctime_r and ctime],
-	  [1]) ]) ])
+ [AC_CHECK_FUNCS([ctime_r])
+
+ AS_IF(
+  [test "x$ac_cv_func_ctime_r" = xyes],
+  [AC_MSG_CHECKING(
+   [how to use ctime_r])
+
+  AC_LANG_PUSH(C)
+
+  AC_LINK_IFELSE(
+   AC_LANG_PROGRAM(
+    [[#include <time.h>]],
+    [[ctime_r( NULL, NULL, 0 )]]),
+    [AC_MSG_RESULT(
+     [with additional size argument])
+    ac_cv_libewf_ctime_r_size=yes],
+    [ac_cv_libewf_ctime_r_size=no])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_ctime_r_size" = xno],
+   [AC_LINK_IFELSE(
+    AC_LANG_PROGRAM(
+     [[#include <time.h>]],
+     [[ctime_r( NULL, NULL )]]),
+    [AC_MSG_RESULT(
+     [with two arguments])
+    ac_cv_libewf_ctime_r_posix=yes],
+    [ac_cv_libewf_ctime_r_posix=no])
+   ])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_ctime_r_posix" = xno],
+   [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
+   AC_LINK_IFELSE(
+    AC_LANG_PROGRAM(
+     [[#include <time.h>]],
+     [[ctime_r( NULL, NULL )]]),
+    [AC_MSG_RESULT(
+     [with two arguments and definition _POSIX_PTHREAD_SEMANTICS])
+     ac_cv_libewf_ctime_r_posix=yes],
+    [ac_cv_libewf_ctime_r_posix=no])
+   ])
+
+  AC_LANG_POP(C)
+
+  AS_IF(
+   [test "x$ac_cv_libewf_ctime_r_size" = xno && test "x$ac_cv_libewf_ctime_r_posix" = xno],
+   [AC_MSG_WARN(
+    [unknown])
+   ac_cv_func_ctime_r=no])
+
+  AS_IF(
+   [test "x$ac_cv_func_ctime_r" = xyes],
+   [AC_DEFINE(
+    [HAVE_CTIME_R],
+    [1],
+    [Define to 1 if you have the ctime_r function.])
+   ])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_ctime_r_size" = xyes],
+   [AC_DEFINE(
+    [HAVE_CTIME_R_SIZE],
+    [1],
+    [Define to 1 if you have the ctime_r function with a third size argument.])
+   ])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_func_ctime_r" = xno],
+  [AC_CHECK_FUNCS([ctime])
+
+  AS_IF(
+   [test "x$ac_cv_func_ctime" = xno],
+   [AC_MSG_FAILURE(
+    [Missing function: ctime_r and ctime],
+    [1])
+   ])
+ ])
+])
+
+dnl Function to detect if mkdir is available
+dnl Also checks how to use mkdir
+AC_DEFUN([LIBEWF_CHECK_FUNC_MKDIR],
+ [AC_CHECK_FUNCS([mkdir])
+
+ AS_IF(
+  [test "x$ac_cv_func_mkdir" = xyes],
+  [AC_MSG_CHECKING(
+   [how to use mkdir])
+
+  SAVE_CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS -Wall -Werror"
+  AC_LANG_PUSH(C)
+
+  AC_LINK_IFELSE(
+   AC_LANG_PROGRAM(
+    [[#include <sys/stat.h>
+#include <sys/types.h>]],
+    [[mkdir( "", 0 )]]),
+    [AC_MSG_RESULT(
+     [with additional mode argument])
+    ac_cv_libewf_mkdir_mode=yes],
+    [ac_cv_libewf_mkdir_mode=no])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_mkdir_mode" = xno],
+   [AC_LINK_IFELSE(
+    AC_LANG_PROGRAM(
+     [[#include <io.h>]],
+     [[mkdir( "" )]]),
+    [AC_MSG_RESULT(
+     [with single argument])
+    ac_cv_libewf_mkdir=yes],
+    [ac_cv_libewf_mkdir=no])
+   ])
+
+  AC_LANG_POP(C)
+  CFLAGS="$SAVE_CFLAGS"
+
+  AS_IF(
+   [test "x$ac_cv_libewf_mkdir_mode" = xno && test "x$ac_cv_libewf_mkdir" = xno],
+   [AC_MSG_WARN(
+    [unknown])
+   ac_cv_func_mkdir=no])
+
+  AS_IF(
+   [test "x$ac_cv_func_mkdir" = xyes],
+   [AC_DEFINE(
+    [HAVE_MKDIR],
+    [1],
+    [Define to 1 if you have the mkdir function.])
+   ])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_mkdir_mode" = xyes],
+   [AC_DEFINE(
+    [HAVE_MKDIR_MODE],
+    [1],
+    [Define to 1 if you have the mkdir function with a second mode argument.])
+   ])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_func_mkdir" = xno],
+  [AC_MSG_FAILURE(
+   [Missing function: mkdir],
+   [1])
+ ])
 ])
 
 dnl Function to detect if posix_fadvise is available
 AC_DEFUN([LIBEWF_CHECK_FUNC_POSIX_FADVISE],
-	[AC_CHECK_FUNCS(
-	 [posix_fadvise],
-	 [AC_LANG_PUSH(C)
-	 AC_MSG_CHECKING(
-	  [if posix_fadvise can be linked])
-	 AC_LINK_IFELSE(
-		AC_LANG_PROGRAM(
-		 [[#include <fcntl.h>]],
-		 [[#if !defined( POSIX_FADV_SEQUENTIAL )
+ [AC_CHECK_FUNCS([posix_fadvise])
+
+ AS_IF(
+  [test "x$ac_cv_func_posix_fadvise" = xyes],
+  [AC_MSG_CHECKING(
+    [whether posix_fadvise can be linked])
+
+   SAVE_CFLAGS="$CFLAGS"
+   CFLAGS="$CFLAGS -Wall -Werror"
+   AC_LANG_PUSH(C)
+
+   AC_LINK_IFELSE(
+    AC_LANG_PROGRAM(
+     [[#include <fcntl.h>]],
+     [[#if !defined( POSIX_FADV_SEQUENTIAL )
 #define POSIX_FADV_SEQUENTIAL 2
 #endif
-posix_fadvise(0,0,0,POSIX_FADV_SEQUENTIAL)]]),
-		[AC_MSG_RESULT(
-		 [yes])
-	 	AC_DEFINE(
-		 [HAVE_POSIX_FADVISE],
-		 [1],
-		 [Define to 1 if you have the posix_fadvise unction.] )],
-		[AC_MSG_RESULT(
-		 [no]) ])
-	 AC_LANG_POP(C) ])
-])
+posix_fadvise( 0, 0, 0, POSIX_FADV_SEQUENTIAL )]]),
+     [ac_cv_func_posix_fadvise=yes],
+     [ac_cv_func_posix_fadvise=no])
+
+   AC_LANG_POP(C)
+   CFLAGS="$SAVE_CFLAGS"
+
+   AS_IF(
+    [test "x$ac_cv_func_posix_fadvise" = xyes],
+    [AC_MSG_RESULT(
+     [yes])
+    AC_DEFINE(
+     [HAVE_POSIX_FADVISE],
+     [1],
+     [Define to 1 if you have the posix_fadvise function.]) ],
+    [AC_MSG_RESULT(
+     [no]) ])
+  ])
+ ])
+
+dnl Function to detect if libuna available
+AC_DEFUN([LIBEWF_CHECK_LIBUNA],
+ [AC_CHECK_HEADERS([libuna.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libuna_h" = xno],
+  [ac_libewf_have_libuna=no],
+  [ac_libewf_have_libuna=yes
+  AC_CHECK_LIB(
+   una,
+   libuna_get_version,
+   [],
+   [ac_libewf_have_libuna=no])
+ 
+  dnl Byte stream functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_byte_stream_size_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_byte_stream_copy_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_size_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_byte_stream_size_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_byte_stream_copy_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_byte_stream_size_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_byte_stream_copy_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+ 
+  dnl UTF-8 stream functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_stream_size_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_stream_copy_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_size_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+   AC_CHECK_LIB(
+   una,
+   libuna_utf8_stream_size_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_stream_copy_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_stream_size_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_stream_copy_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+
+  dnl UTF-16 stream functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_stream_size_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_stream_copy_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_size_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_stream_size_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_stream_copy_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_stream_size_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_stream_copy_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+
+  dnl UTF-8 string functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+
+  dnl UTF-16 string functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_size_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+
+  dnl UTF-32 string functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  ])
+ ])
+
+dnl Function to detect if libbfio available
+AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
+ [AC_CHECK_HEADERS([libbfio.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libbfio_h" = xno],
+  [ac_libewf_have_libbfio=no],
+  [ac_libewf_have_libbfio=yes
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_get_version,
+   [],
+   [ac_libewf_have_libbfio=no])
+ 
+  dnl Handle functions
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_open,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_close,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_exists,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_read,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_set_track_offsets_read,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+ 
+  dnl File functions
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_file_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_file_get_name_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_file_get_name,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_file_set_name,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+ 
+  AS_IF(
+   [test "x$ac_cv_libewf_enable_wide_character_type" != xno],
+   [AC_CHECK_LIB(
+    bfio,
+    libbfio_file_get_name_size_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libbfio=no])
+   AC_CHECK_LIB(
+    bfio,
+    libbfio_file_get_name_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libbfio=no])
+   AC_CHECK_LIB(
+    bfio,
+    libbfio_file_set_name_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libbfio=no]) ])
+ 
+  dnl Pool functions
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_open,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_reopen,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_close,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_close_all,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_read,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_write,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_seek_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+ 
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_get_amount_of_handles,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_get_handle,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_add_handle,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_get_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_get_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_pool_get_maximum_amount_of_open_handles,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  ])
+ ])
+
+dnl Function to detect if libmdev available
+AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
+ [AC_CHECK_HEADERS([libsmdev.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libsmdev_h" = xno],
+  [ac_libewf_have_libsmdev=no],
+  [ac_libewf_have_libsmdev=yes
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_get_version,
+   [],
+   [ac_libewf_have_libsmdev=no])
+
+  dnl Handle functions
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_open,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_close,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_read_buffer,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_write_buffer,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_enable_wide_character_type" != xno],
+   [AC_CHECK_LIB(
+    smdev,
+    libsmdev_handle_open_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libsmdev=no]) ])
+  ])
+ ])
+
+dnl Function to detect if libmraw available
+AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
+ [AC_CHECK_HEADERS([libsmraw.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libsmraw_h" = xno],
+  [ac_libewf_have_libsmraw=no],
+  [ac_libewf_have_libsmraw=yes
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_get_version,
+   [],
+   [ac_libewf_have_libsmraw=no])
+
+  dnl Handle functions
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_open,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_close,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_read_buffer,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_write_buffer,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_enable_wide_character_type" != xno],
+   [AC_CHECK_LIB(
+    smraw,
+    libsmraw_handle_open_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libsmraw=no]) ])
+  ])
+ ])
 
 dnl Function to determine the operating system
 AC_DEFUN([LIBEWF_DETERMINE_OPERATING_SYSTEM],
-	[ac_libewf_target_string="$target";
-	AS_IF(
-		[test "x$ac_libewf_target_string" = x],
-		[ac_libewf_target_string="$build"])
+ [ac_libewf_target_string="$target";
 
-	AS_CASE(
-		[$ac_libewf_target_string],
-		[*cygwin*], [ac_libewf_operating_system="Cygwin";],
-		[*darwin*], [ac_libewf_operating_system="Darwin";],
-		[*freebsd*], [ac_libewf_operating_system="FreeBSD";],
-		[*netbsd*], [ac_libewf_operating_system="NetBSD";],
-		[*openbsd*], [ac_libewf_operating_system="OpenBSD";],
-		[*linux*], [ac_libewf_operating_system="Linux";],
-		[*mingw*], [ac_libewf_operating_system="MingW";],
-		[*solaris*], [ac_libewf_operating_system="SunOS";],
-		[*], [ac_libewf_operating_system="Unknown";])
+ AS_IF(
+  [test "x$ac_libewf_target_string" = x],
+  [ac_libewf_target_string="$build"])
 
-	AC_DEFINE_UNQUOTED(
-	 LIBEWF_OPERATING_SYSTEM,
-	 "$ac_libewf_operating_system",
-	 [Defines the fallback operating system string.]) ])
+ AS_CASE(
+  [$ac_libewf_target_string],
+  [*cygwin*], [ac_libewf_operating_system="Cygwin";],
+  [*darwin*], [ac_libewf_operating_system="Darwin";],
+  [*freebsd*], [ac_libewf_operating_system="FreeBSD";],
+  [*netbsd*], [ac_libewf_operating_system="NetBSD";],
+  [*openbsd*], [ac_libewf_operating_system="OpenBSD";],
+  [*linux*], [ac_libewf_operating_system="Linux";],
+  [*mingw*], [ac_libewf_operating_system="MingW";],
+  [*solaris*], [ac_libewf_operating_system="SunOS";],
+  [*], [ac_libewf_operating_system="Unknown";])
+
+ AC_DEFINE_UNQUOTED(
+  LIBEWF_OPERATING_SYSTEM,
+  "$ac_libewf_operating_system",
+  [Defines the fallback operating system string.])
+ ])
 
 dnl Function to detect if Python build environment is available
 AC_DEFUN([LIBEWF_CHECK_PYTHON_DEVEL],
-	[AC_REQUIRE([AM_PATH_PYTHON])
+ [AC_REQUIRE([AM_PATH_PYTHON])
 
-	dnl Check for Python include path
-	AC_MSG_CHECKING(
-	 [for Python include path])
+ dnl Check for Python include path
+ AC_MSG_CHECKING(
+  [for Python include path])
 
-	PYTHON_INCLUDE_DIR=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_inc() "`;
-	AC_MSG_RESULT(
-	 [$PYTHON_INCLUDE_DIR])
+ PYTHON_INCLUDE_DIR=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_inc() "`;
+ AC_MSG_RESULT(
+  [$PYTHON_INCLUDE_DIR])
 
-	AC_SUBST(
-	 [PYTHON_CPPFLAGS],
-	 [-I$PYTHON_INCLUDE_DIR])
+ AC_SUBST(
+  [PYTHON_CPPFLAGS],
+  [-I$PYTHON_INCLUDE_DIR])
 
-	AS_IF(
-		[test ! -r $PYTHON_INCLUDE_DIR/Python.h],
-		[AC_MSG_ERROR(
-		 [Missing Python include file])])
+ AS_IF(
+  [test ! -r $PYTHON_INCLUDE_DIR/Python.h],
+  [AC_MSG_ERROR(
+  [Missing Python include file]) ])
 
-	dnl Check for Python library path
-	AC_MSG_CHECKING(
-	 [for Python library path])
+ dnl Check for Python library path
+ AC_MSG_CHECKING(
+  [for Python library path])
 
-	python_path=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() "`;
-	AC_MSG_RESULT(
-	 [$python_path])
+ python_path=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() "`;
+ AC_MSG_RESULT(
+  [$python_path])
 
-	AC_SUBST(
-	 [PYTHON_LDFLAGS],
-	 ["-L$python_path -lpython$PYTHON_VERSION"])
+ AC_SUBST(
+  [PYTHON_LDFLAGS],
+  ["-L$python_path -lpython$PYTHON_VERSION"])
 
-	python_site=`echo $python_path | sed "s/config/site-packages/"`;
+ python_site=`echo $python_path | sed "s/config/site-packages/"`;
 
-	AC_SUBST(
-	 [PYTHON_SITE_PKG],
-	 [$python_site])
+ AC_SUBST(
+  [PYTHON_SITE_PKG],
+  [$python_site])
 
-	dnl Determine the Python libraries which must be linked in when embedding
-	AC_MSG_CHECKING(
-	 [for Python extra libraries])
+ dnl Determine the Python libraries which must be linked in when embedding
+ AC_MSG_CHECKING(
+  [for Python extra libraries])
 
-	PYTHON_EXTRA_LIBS=`$PYTHON -c "import distutils.sysconfig;conf = distutils.sysconfig.get_config_var;print conf('LOCALMODLIBS')+' '+conf('LIBS')"`;
-	AC_MSG_RESULT(
-	 [$PYTHON_EXTRA_LIBS])
+ PYTHON_EXTRA_LIBS=`$PYTHON -c "import distutils.sysconfig;conf = distutils.sysconfig.get_config_var;print conf('LOCALMODLIBS')+' '+conf('LIBS')"`;
+ AC_MSG_RESULT(
+  [$PYTHON_EXTRA_LIBS])
 
-	AC_SUBST(
-	 [PYTHON_EXTRA_LIBS]) ])
+ AC_SUBST(
+ [PYTHON_EXTRA_LIBS])
+ ])
 

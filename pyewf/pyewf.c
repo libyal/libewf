@@ -2,10 +2,7 @@
  * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>
- *
- * Integration into libewf package by Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2009-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,9 +21,9 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -111,7 +108,7 @@ PyObject* pyewf_get_version(
 
 	version_string = libewf_get_version();
 
-	version_string_size = 1 + narrow_string_length(
+	version_string_size = 1 + libcstring_narrow_string_length(
 	                           version_string );
 
 	return( PyUnicode_DecodeUTF8(

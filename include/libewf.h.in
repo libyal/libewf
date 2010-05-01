@@ -236,7 +236,7 @@ LIBEWF_EXTERN int libewf_handle_signal_abort(
 /* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
- * Returns a pointer to the new instance of handle, NULL on error
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_open(
                    libewf_handle_t *handle,
@@ -249,7 +249,7 @@ LIBEWF_EXTERN int libewf_handle_open(
 /* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
- * Returns a pointer to the new instance of handle, NULL on error
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_open_wide(
                    libewf_handle_t *handle,

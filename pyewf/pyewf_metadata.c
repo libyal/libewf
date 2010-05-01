@@ -2,10 +2,7 @@
  *  Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>
- *
- * Integration into libewf package by Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2009-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,10 +21,10 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -104,7 +101,7 @@ PyObject *pyewf_handle_get_header_value(
 	{
 		return( NULL );
 	}
-	header_value_identifier_length = narrow_string_length(
+	header_value_identifier_length = libcstring_narrow_string_length(
 	                                  header_value_identifier );
 
 	result = libewf_handle_get_header_value_size(
@@ -287,7 +284,7 @@ PyObject *pyewf_handle_get_header_values(
 
 			return( NULL );
 		}
-		header_value_identifier_length = narrow_string_length(
+		header_value_identifier_length = libcstring_narrow_string_length(
 						  header_value_identifier );
 
 		if( libewf_handle_get_header_value_size(

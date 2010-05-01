@@ -79,7 +79,7 @@ lib: library
 
 library:
 	(cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcsring && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libcstring && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/liberror && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libnotify && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS))

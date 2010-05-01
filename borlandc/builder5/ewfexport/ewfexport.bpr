@@ -24,7 +24,7 @@
     <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV;HAVE_LOCAL_LIBSMRAW"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="ewfexport.bpf"/>
-    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libsmdev;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\ewftools;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -37,8 +37,8 @@
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0x32w.obj $(OBJFILES)"/>
-    <ALLLIB value="liberror.lib libnotify.lib libuna.lib libbfio.lib libewf.lib libsmraw.lib 
-      libsystem.lib import32.lib cw32i.lib"/>
+    <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib 
+      libewf.lib libsmraw.lib libsystem.lib import32.lib cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]
@@ -69,9 +69,10 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=2
-Item0=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Count=3
+Item0=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libsmdev;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=2

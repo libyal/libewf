@@ -2,10 +2,7 @@
  * Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>
- *
- * Integration into libewf package by Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2009-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,10 +21,10 @@
  */
 
 #include <common.h>
-#include <narrow_string.h>
 #include <memory.h>
 #include <types.h>
 
+#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -432,7 +429,7 @@ PyObject* pyewf_handle_open(
 
 			return( NULL );
 		}
-		if( narrow_string_copy(
+		if( libcstring_narrow_string_copy(
 		     filenames[ filename_iterator ],
 		     PyString_AsString(
 		      string_object ),

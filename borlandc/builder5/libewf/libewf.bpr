@@ -4,19 +4,20 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libewf.dll"/>
-    <OBJFILES value="libewf.obj libewf_chunk_cache.obj libewf_compression.obj 
-      libewf_date_time.obj libewf_date_time_values.obj libewf_debug.obj 
-      libewf_empty_block.obj libewf_error.obj libewf_file_entry.obj 
-      libewf_filename.obj libewf_handle.obj libewf_hash_sections.obj 
-      libewf_hash_values.obj libewf_header_sections.obj libewf_header_values.obj 
-      libewf_io_handle.obj libewf_legacy.obj libewf_list_type.obj 
-      libewf_media_values.obj libewf_metadata.obj libewf_notify.obj 
-      libewf_offset_table.obj libewf_read_io_handle.obj libewf_section.obj 
-      libewf_section_list.obj libewf_sector_table.obj libewf_segment_file.obj 
-      libewf_segment_file_handle.obj libewf_segment_table.obj 
-      libewf_single_file_entry.obj libewf_single_files.obj 
-      libewf_split_values.obj libewf_string.obj libewf_support.obj 
-      libewf_tree_type.obj libewf_values_table.obj libewf_write_io_handle.obj"/>
+    <OBJFILES value="libewf.obj libewf_array_type.obj libewf_chunk_cache.obj 
+      libewf_compression.obj libewf_date_time.obj libewf_date_time_values.obj 
+      libewf_debug.obj libewf_empty_block.obj libewf_error.obj 
+      libewf_file_entry.obj libewf_filename.obj libewf_handle.obj 
+      libewf_hash_sections.obj libewf_hash_values.obj libewf_header_sections.obj 
+      libewf_header_values.obj libewf_io_handle.obj libewf_legacy.obj 
+      libewf_list_type.obj libewf_media_values.obj libewf_metadata.obj 
+      libewf_notify.obj libewf_offset_table.obj libewf_read_io_handle.obj 
+      libewf_section.obj libewf_section_list.obj libewf_sector_table.obj 
+      libewf_segment_file.obj libewf_segment_file_handle.obj 
+      libewf_segment_table.obj libewf_single_file_entry.obj 
+      libewf_single_files.obj libewf_split_values.obj libewf_string.obj 
+      libewf_support.obj libewf_tree_type.obj libewf_values_table.obj 
+      libewf_write_io_handle.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -46,7 +47,7 @@
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="$(OBJFILES)"/>
-    <ALLLIB value="liberror.lib libnotify.lib libuna.lib libbfio.lib zlib.lib import32.lib 
+    <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib zlib.lib import32.lib 
       cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>

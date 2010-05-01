@@ -258,6 +258,7 @@
 #else
 #define INT64_MAX (0x7fffffffffffffffULL)
 #endif
+#endif
 
 /* The maximum signed integer
  */

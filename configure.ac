@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100430],
+ [20100501],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100430])
+ [20100501])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -25,6 +25,11 @@ LIBEWF_TEST_ENABLE(
  [wide-character-type],
  [wide_character_type],
  [enable wide character type support],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [winapi],
+ [winapi],
+ [enable WINAPI support for cross-compilation],
  [no])
 LIBEWF_TEST_ENABLE(
  [static-executables],
@@ -114,7 +119,16 @@ AC_CHECK_HEADER(
   [0])])
 
 dnl Headers included in common/common.h
-AC_CHECK_HEADERS([windows.h])
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xyes],
+ [AC_CHECK_HEADERS([windows.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_windows_h" = xno],
+  [AC_MSG_FAILURE(
+   [Missing header: windows.h header is required to compile with winapi support],
+   [1]) ])
+ ])
 
 dnl Headers included in common/types.h
 AC_CHECK_HEADERS([limits.h])
@@ -153,7 +167,7 @@ dnl Headers included in libsystem/libsystem_glob.h
 AC_CHECK_HEADERS([glob.h])
 
 AS_IF(
- [test "x$ac_cv_header_glob_h" != xyes],
+ [test "x$ac_cv_header_glob_h" = xno],
  [AC_CHECK_HEADERS([io.h]) ])
 
 dnl Headers included in libsytem/libsystem_support.c
@@ -163,19 +177,29 @@ dnl Headers included in libsystem/libsystem_signal.h
 AC_CHECK_HEADERS([signal.h sys/signal.h])
 
 dnl Headers included in libsmdev/libsmdev_metadata.c
-AC_CHECK_HEADERS([cygwin/fs.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h winioctl.h])
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xno],
+ [AC_CHECK_HEADERS([cygwin/fs.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h]) ])
 
 dnl Headers included in libsmdev/libsmdev_ata.c
-AC_CHECK_HEADERS([cygwin/hdreg.h linux/hdreg.h])
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xno],
+ [AC_CHECK_HEADERS([cygwin/hdreg.h linux/hdreg.h]) ])
 
 dnl Headers included in libsmdev/libsmdev_scsi.c
-AC_CHECK_HEADERS([scsi/scsi.h scsi/scsi_ioctl.h scsi/sg.h])
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xno],
+ [AC_CHECK_HEADERS([scsi/scsi.h scsi/scsi_ioctl.h scsi/sg.h]) ])
 
 dnl Headers included in libsmdev/libsmdev_optical_disk.c
-AC_CHECK_HEADERS([linux/cdrom.h])
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xno],
+ [AC_CHECK_HEADERS([linux/cdrom.h]) ])
 
 dnl Headers included in libsmdev/libsmdev_usb.c
-AC_CHECK_HEADERS([linux/usbdevice_fs.h linux/usb/ch9.h])
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xno],
+ [AC_CHECK_HEADERS([linux/usbdevice_fs.h linux/usb/ch9.h]) ])
 
 dnl Headers included in ewftools/platform.c
 AC_CHECK_HEADERS([sys/utsname.h])
@@ -554,12 +578,7 @@ AC_CHECK_FUNCS(
   [Missing functions: chdir],
   [1]) ])
 
-AC_CHECK_FUNCS(
- [mkdir],
- [],
- [AC_MSG_FAILURE(
-  [Missing functions: mkdir],
-  [1]) ])
+LIBEWF_CHECK_FUNC_MKDIR
 
 dnl Check for error string functions used in libbfio/libbfio_error_string.c and libsystem/libsystem_error.c
 AC_FUNC_STRERROR_R()
@@ -584,7 +603,7 @@ AC_CHECK_FUNCS(
   [Missing function: setlocale],
   [1]) ])
 
-LIBEWF_LANGINFO_CODESET
+LIBEWF_CHECK_FUNC_LANGINFO_CODESET
 
 dnl System functions
 AC_CHECK_FUNCS(
@@ -599,8 +618,8 @@ AC_CHECK_FUNCS([uname])
 LIBEWF_CHECK_FUNC_POSIX_FADVISE
 
 dnl Check for printf conversion specifier support
-LIBEWF_CHECK_PRINTF_JD
-LIBEWF_CHECK_PRINTF_ZD
+LIBEWF_CHECK_FUNC_PRINTF_JD
+LIBEWF_CHECK_FUNC_PRINTF_ZD
 
 dnl Checks for libraries and library functions
 dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -641,722 +660,200 @@ AC_CHECK_LIB(
   [1])])
 
 dnl Check for enabling libuna for Unicode string support
-AC_CHECK_HEADERS(
- [libuna.h],
- [],
- [ac_libewf_have_libuna=no])
+LIBEWF_CHECK_LIBUNA
 
 AS_IF(
-	[test "x$ac_libewf_have_libuna" != xno],
-	[ac_libewf_have_libuna=yes
-	AC_CHECK_LIB(
-	 una,
-	 libuna_get_version,
-	 [],
-	 [ac_libewf_have_libuna=no])
-
-	dnl Byte stream functions
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_size_from_byte_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_copy_from_byte_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_byte_stream_size_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_byte_stream_copy_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_size_from_byte_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_copy_from_byte_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_byte_stream_size_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_byte_stream_copy_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_size_from_byte_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_copy_from_byte_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_byte_stream_size_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_byte_stream_copy_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-
-	dnl UTF-8 stream functions
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_size_from_utf8_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_copy_from_utf8_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_stream_size_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_stream_copy_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_size_from_utf8_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_copy_from_utf8_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_stream_size_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_stream_copy_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_size_from_utf8_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_copy_from_utf8_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_stream_size_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_stream_copy_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-
-	dnl UTF-16 stream functions
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_size_from_utf16_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_copy_from_utf16_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_stream_size_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_stream_copy_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_size_from_utf16_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_copy_from_utf16_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_stream_size_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_stream_copy_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_size_from_utf16_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_copy_from_utf16_stream,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_stream_size_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_stream_copy_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-
-	dnl UTF-8 string functions
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_size_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_copy_from_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_size_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf8_string_copy_from_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-
-	dnl UTF-16 string functions
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_size_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf16_string_copy_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-
-	dnl UTF-32 string functions
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_size_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_utf32_string_copy_from_utf8,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-
-	dnl compare string functions
-	AC_CHECK_LIB(
-	 una,
-	 libuna_compare_utf8_with_utf16,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	AC_CHECK_LIB(
-	 una,
-	 libuna_compare_utf8_with_utf32,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuna=no])
-	])
-
-AS_IF(
-	[test "x$ac_libewf_have_libuna" = xyes],
-	[AC_SUBST(
-	 [libewf_pc_libs_private_libuna],
-	 [-luna])
-	AC_SUBST(
-	 [libewf_spec_requires_libuna],
-	 [libuna])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libuna],
-	 [libuna-devel]) ],
-	[dnl If libuna is not available use the (local) version that came with libewf
-	AC_DEFINE(
-	 [HAVE_LOCAL_LIBUNA],
-	 [1],
-	 [Define to 1 if the local version of libuna is used.])
-	AC_SUBST(
-	 [HAVE_LOCAL_LIBUNA],
-	 [1])
-	AC_SUBST(
-	 [libewf_pc_libs_private_libuna],
-	 [])
-	AC_SUBST(
-	 [libewf_spec_requires_libuna],
-	 [])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libuna],
-	 [])
-	AC_SUBST(
-	 [LIBUNA_CPPFLAGS],
-	 [-I../libuna])
-	AC_SUBST(
-	 [LIBUNA_LIBADD],
-	 [../libuna/libuna.la])
-	ac_libewf_have_libuna=local])
+ [test "x$ac_libewf_have_libuna" = xyes],
+ [dnl libuna is available
+ AC_SUBST(
+  [libewf_pc_libs_private_libuna],
+  [-luna])
+ AC_SUBST(
+  [libewf_spec_requires_libuna],
+  [libuna])
+ AC_SUBST(
+  [libewf_spec_build_requires_libuna],
+  [libuna-devel]) ],
+ [dnl libuna is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBUNA],
+  [1],
+  [Define to 1 if the local version of libuna is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBUNA],
+  [1])
+ AC_SUBST(
+  [libewf_pc_libs_private_libuna],
+  [])
+ AC_SUBST(
+  [libewf_spec_requires_libuna],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libuna],
+  [])
+ AC_SUBST(
+  [LIBUNA_CPPFLAGS],
+  [-I../libuna])
+ AC_SUBST(
+  [LIBUNA_LIBADD],
+  [../libuna/libuna.la])
+ ac_libewf_have_libuna=local])
 
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBUNA],
  [test "x$ac_libewf_have_libuna" = xlocal])
 
 dnl Check for enabling libbfio for basic file IO support
-AC_CHECK_HEADERS(
- [libbfio.h],
- [],
- [ac_libewf_have_libbfio=no])
+LIBEWF_CHECK_LIBBFIO
 
 AS_IF(
-	[test "x$ac_libewf_have_libbfio" != xno],
-	[ac_libewf_have_libbfio=yes
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_get_version,
-	 [],
-	 [ac_libewf_have_libbfio=no])
-
-	dnl Handle functions
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_handle_free,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_handle_open,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_handle_close,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_handle_exists,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_handle_read,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_handle_set_track_offsets_read,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-
-	dnl File functions
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_file_initialize,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_file_get_name_size,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_file_get_name,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_file_set_name,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-
-	AS_IF(
-		[test "x$ac_cv_libewf_enable_wide_character_type" != xno],
-		[AC_CHECK_LIB(
-		 bfio,
-		 libbfio_file_get_name_size_wide,
-		 [ac_libewf_dummy=yes],
-		 [ac_libewf_have_libbfio=no])
-		AC_CHECK_LIB(
-		 bfio,
-		 libbfio_file_get_name_wide,
-		 [ac_libewf_dummy=yes],
-		 [ac_libewf_have_libbfio=no])
-		AC_CHECK_LIB(
-		 bfio,
-		 libbfio_file_set_name_wide,
-		 [ac_libewf_dummy=yes],
-		 [ac_libewf_have_libbfio=no]) ])
-
-	dnl Pool functions
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_initialize,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_free,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_open,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_reopen,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_close,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_close_all,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_read,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_write,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_seek_offset,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_get_amount_of_handles,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_get_handle,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_add_handle,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_get_offset,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_get_size,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	AC_CHECK_LIB(
-	 bfio,
-	 libbfio_pool_get_maximum_amount_of_open_handles,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libbfio=no])
-	])
-
-AS_IF(
-	[test "x$ac_libewf_have_libbfio" = xyes],
-	[AC_SUBST(
-	 [libewf_pc_libs_private_libbfio],
-	 [-lbfio])
-	AC_SUBST(
-	 [libewf_spec_requires_libbfio],
-	 [libbfio])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libbfio],
-	 [libbfio-devel])
-	AC_SUBST(
-	 [LIBBFIO_CPPFLAGS],
-	 [])
-	AC_SUBST(
-	 [LIBBFIO_LIBADD],
-	 [])
-	AC_SUBST(
-	 [HAVE_LIBBFIO],
-	 [1]) ],
-	[dnl If libbfio is not available use the (local) version that came with libewf
-	AC_DEFINE(
-	 [HAVE_LOCAL_LIBBFIO],
-	 [1],
-	 [Define to 1 if the local version of libbfio is used.])
-	AC_SUBST(
-	 [HAVE_LOCAL_LIBBFIO],
-	 [1])
-	AC_SUBST(
-	 [libewf_pc_libs_private_libbfio],
-	 [])
-	AC_SUBST(
-	 [libewf_spec_requires_libbfio],
-	 [])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libbfio],
-	 [])
-	AC_SUBST(
-	 [LIBBFIO_CPPFLAGS],
-	 [-I../libbfio])
-	AC_SUBST(
-	 [LIBBFIO_LIBADD],
-	 [../libbfio/libbfio.la])
-	AC_SUBST(
-	 [HAVE_LIBBFIO],
-	 [0])
-	ac_libewf_have_libbfio=local])
+ [test "x$ac_libewf_have_libbfio" = xyes],
+ [dnl libbfio is available
+ AC_SUBST(
+  [libewf_pc_libs_private_libbfio],
+  [-lbfio])
+ AC_SUBST(
+  [libewf_spec_requires_libbfio],
+  [libbfio])
+ AC_SUBST(
+  [libewf_spec_build_requires_libbfio],
+  [libbfio-devel])
+ AC_SUBST(
+  [LIBBFIO_CPPFLAGS],
+  [])
+ AC_SUBST(
+  [LIBBFIO_LIBADD],
+  [])
+ AC_SUBST(
+  [HAVE_LIBBFIO],
+  [1]) ],
+ [dnl libbfio is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBBFIO],
+  [1],
+  [Define to 1 if the local version of libbfio is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBBFIO],
+  [1])
+ AC_SUBST(
+  [libewf_pc_libs_private_libbfio],
+  [])
+ AC_SUBST(
+  [libewf_spec_requires_libbfio],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libbfio],
+  [])
+ AC_SUBST(
+  [LIBBFIO_CPPFLAGS],
+  [-I../libbfio])
+ AC_SUBST(
+  [LIBBFIO_LIBADD],
+  [../libbfio/libbfio.la])
+ AC_SUBST(
+  [HAVE_LIBBFIO],
+  [0])
+ ac_libewf_have_libbfio=local])
 
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBBFIO],
  [test "x$ac_libewf_have_libbfio" = xlocal])
 
 dnl Check for enabling libsmdev for storage media device support
-AC_CHECK_HEADERS(
- [libsmdev.h],
- [],
- [ac_libewf_have_libsmdev=no])
+LIBEWF_CHECK_LIBSMDEV
 
 AS_IF(
-	[test "x$ac_libewf_have_libsmdev" != xno],
-	[ac_libewf_have_libsmdev=yes
-	AC_CHECK_LIB(
-	 smdev,
-	 libsmdev_get_version,
-	 [],
-	 [ac_libewf_have_libsmdev=no])
-
-	dnl Handle functions
-	AC_CHECK_LIB(
-	 smdev,
-	 libsmdev_handle_initialize,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmdev=no])
-	AC_CHECK_LIB(
-	 smdev,
-	 libsmdev_handle_free,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmdev=no])
-	AC_CHECK_LIB(
-	 smdev,
-	 libsmdev_handle_open,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmdev=no])
-	AC_CHECK_LIB(
-	 smdev,
-	 libsmdev_handle_close,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmdev=no])
-	AC_CHECK_LIB(
-	 smdev,
-	 libsmdev_handle_read_buffer,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmdev=no])
-	AC_CHECK_LIB(
-	 smdev,
-	 libsmdev_handle_write_buffer,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmdev=no])
-
-	AS_IF(
-		[test "x$ac_cv_libewf_enable_wide_character_type" != xno],
-		[AC_CHECK_LIB(
-		 smdev,
-		 libsmdev_handle_open_wide,
-		 [ac_libewf_dummy=yes],
-		 [ac_libewf_have_libsmdev=no]) ])
-	])
-
-AS_IF(
-	[test "x$ac_libewf_have_libsmdev" = xyes],
-	[AC_SUBST(
-	 [libewf_spec_requires_libsmdev],
-	 [libsmdev])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libsmdev],
-	 [libsmdev-devel])
-	AC_SUBST(
-	 [LIBSMDEV_CPPFLAGS],
-	 [])
-	AC_SUBST(
-	 [LIBSMDEV_LIBADD],
-	 [])
-	AC_SUBST(
-	 [HAVE_LIBSMDEV],
-	 [1]) ],
-	[dnl If libsmdev is not available use the (local) version that came with libewf
-	AC_DEFINE(
-	 [HAVE_LOCAL_LIBSMDEV],
-	 [1],
-	 [Define to 1 if the local version of libsmdev is used.])
-	AC_SUBST(
-	 [HAVE_LOCAL_LIBSMDEV],
-	 [1])
-	AC_SUBST(
-	 [libewf_spec_requires_libsmdev],
-	 [])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libsmdev],
-	 [])
-	AC_SUBST(
-	 [LIBSMDEV_CPPFLAGS],
-	 [-I../libsmdev])
-	AC_SUBST(
-	 [LIBSMDEV_LIBADD],
-	 [../libsmdev/libsmdev.la])
-	AC_SUBST(
-	 [HAVE_LIBSMDEV],
-	 [0])
-	ac_libewf_have_libsmdev=local])
+ [test "x$ac_libewf_have_libsmdev" = xyes],
+ [dnl libsmdev is available
+ AC_SUBST(
+  [libewf_spec_requires_libsmdev],
+  [libsmdev])
+ AC_SUBST(
+  [libewf_spec_build_requires_libsmdev],
+  [libsmdev-devel])
+ AC_SUBST(
+  [LIBSMDEV_CPPFLAGS],
+  [])
+ AC_SUBST(
+  [LIBSMDEV_LIBADD],
+  [])
+ AC_SUBST(
+  [HAVE_LIBSMDEV],
+  [1]) ],
+ [dnl libsmdev is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBSMDEV],
+  [1],
+  [Define to 1 if the local version of libsmdev is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBSMDEV],
+  [1])
+ AC_SUBST(
+  [libewf_spec_requires_libsmdev],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libsmdev],
+  [])
+ AC_SUBST(
+  [LIBSMDEV_CPPFLAGS],
+  [-I../libsmdev])
+ AC_SUBST(
+  [LIBSMDEV_LIBADD],
+  [../libsmdev/libsmdev.la])
+ AC_SUBST(
+  [HAVE_LIBSMDEV],
+  [0])
+ ac_libewf_have_libsmdev=local])
 
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMDEV],
  [test "x$ac_libewf_have_libsmdev" = xlocal])
 
 dnl Check for enabling libsmraw for storage media (split) RAW support
-AC_CHECK_HEADERS(
- [libsmraw.h],
- [],
- [ac_libewf_have_libsmraw=no])
+LIBEWF_CHECK_LIBSMRAW
 
 AS_IF(
-	[test "x$ac_libewf_have_libsmraw" != xno],
-	[ac_libewf_have_libsmraw=yes
-	AC_CHECK_LIB(
-	 smraw,
-	 libsmraw_get_version,
-	 [],
-	 [ac_libewf_have_libsmraw=no])
-
-	dnl Handle functions
-	AC_CHECK_LIB(
-	 smraw,
-	 libsmraw_handle_initialize,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmraw=no])
-	AC_CHECK_LIB(
-	 smraw,
-	 libsmraw_handle_free,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmraw=no])
-	AC_CHECK_LIB(
-	 smraw,
-	 libsmraw_handle_open,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmraw=no])
-	AC_CHECK_LIB(
-	 smraw,
-	 libsmraw_handle_close,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmraw=no])
-	AC_CHECK_LIB(
-	 smraw,
-	 libsmraw_handle_read_buffer,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmraw=no])
-	AC_CHECK_LIB(
-	 smraw,
-	 libsmraw_handle_write_buffer,
-	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libsmraw=no])
-
-	AS_IF(
-		[test "x$ac_cv_libewf_enable_wide_character_type" != xno],
-		[AC_CHECK_LIB(
-		 smraw,
-		 libsmraw_handle_open_wide,
-		 [ac_libewf_dummy=yes],
-		 [ac_libewf_have_libsmraw=no]) ])
-	])
-
-AS_IF(
-	[test "x$ac_libewf_have_libsmraw" = xyes],
-	[AC_SUBST(
-	 [libewf_spec_requires_libsmraw],
-	 [libsmraw])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libsmraw],
-	 [libsmraw-devel])
-	AC_SUBST(
-	 [LIBSMRAW_CPPFLAGS],
-	 [])
-	AC_SUBST(
-	 [LIBSMRAW_LIBADD],
-	 [])
-	AC_SUBST(
-	 [HAVE_LIBSMRAW],
-	 [1]) ],
-	[dnl If libsmraw is not available use the (local) version that came with libewf
-	AC_DEFINE(
-	 [HAVE_LOCAL_LIBSMRAW],
-	 [1],
-	 [Define to 1 if the local version of libsmraw is used.])
-	AC_SUBST(
-	 [HAVE_LOCAL_LIBSMRAW],
-	 [1])
-	AC_SUBST(
-	 [libewf_spec_requires_libsmraw],
-	 [])
-	AC_SUBST(
-	 [libewf_spec_build_requires_libsmraw],
-	 [])
-	AC_SUBST(
-	 [LIBSMRAW_CPPFLAGS],
-	 [-I../libsmraw])
-	AC_SUBST(
-	 [LIBSMRAW_LIBADD],
-	 [../libsmraw/libsmraw.la])
-	AC_SUBST(
-	 [HAVE_LIBSMRAW],
-	 [0])
-	ac_libewf_have_libsmraw=local])
+ [test "x$ac_libewf_have_libsmraw" = xyes],
+ [dnl libsmraw is available
+ AC_SUBST(
+  [libewf_spec_requires_libsmraw],
+  [libsmraw])
+ AC_SUBST(
+  [libewf_spec_build_requires_libsmraw],
+  [libsmraw-devel])
+ AC_SUBST(
+  [LIBSMRAW_CPPFLAGS],
+  [])
+ AC_SUBST(
+  [LIBSMRAW_LIBADD],
+  [])
+ AC_SUBST(
+  [HAVE_LIBSMRAW],
+  [1]) ],
+ [dnl libsmraw is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBSMRAW],
+  [1],
+  [Define to 1 if the local version of libsmraw is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBSMRAW],
+  [1])
+ AC_SUBST(
+  [libewf_spec_requires_libsmraw],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libsmraw],
+  [])
+ AC_SUBST(
+  [LIBSMRAW_CPPFLAGS],
+  [-I../libsmraw])
+ AC_SUBST(
+  [LIBSMRAW_LIBADD],
+  [../libsmraw/libsmraw.la])
+ AC_SUBST(
+  [HAVE_LIBSMRAW],
+  [0])
+ ac_libewf_have_libsmraw=local])
 
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMRAW],
@@ -1366,7 +863,7 @@ dnl Check for enabling crypographic digest hash support
 ac_libewf_have_libcrypto=no
 
 AS_IF(
- [test "x$ac_cv_header_windows_h" = xyes],
+ [test "x$ac_cv_libewf_enable_winapi" = xyes],
  [AC_SUBST(
   [LIBCRYPTO_LIBADD],
   [-ladvapi32])
@@ -1540,7 +1037,7 @@ AS_IF(
 
 dnl Check for enabling GUID/UUID support
 AS_IF(
- [test "x$ac_cv_header_windows_h" = xyes],
+ [test "x$ac_cv_libewf_enable_winapi" = xyes],
  [AC_SUBST(
   [LIBUUID_LIBADD],
   [-lrpcrt4])
@@ -1627,12 +1124,11 @@ AS_IF(
  AC_SUBST(
   [libewf_spec_build_requires_libuuid],
   [])
- ac_libewf_dummy=yes
- ])
+ ac_libewf_dummy=yes])
 
 dnl Check if libewf should be build with wide character type support
 AS_IF(
- [test "x$ac_cv_header_windows_h" = xyes],
+ [test "x$ac_cv_libewf_enable_winapi" = xyes],
  [ac_cv_libewf_enable_wide_character_type=yes])
 
 AS_IF(
@@ -1665,13 +1161,6 @@ AS_IF(
    [1]) ])
 
  dnl Wide character string functions used in libcstring/libcstring_wide_string.h
- AC_CHECK_FUNCS(
-  [fgetws],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: fgetws],
-   [1]) ])
-
  AC_CHECK_FUNCS(
   [swprintf],
   [],
@@ -1778,49 +1267,49 @@ AS_IF(
 
 dnl Check if ewftools should be build as static executables
 AS_IF(
-	[test "x$ac_cv_libewf_enable_static_executables" != xno],
-	[STATIC_LDFLAGS="-all-static";
-	AC_SUBST(
-	 [STATIC_LDFLAGS])
-	ac_cv_libewf_enable_static_executables=yes])
+ [test "x$ac_cv_libewf_enable_static_executables" != xno],
+ [STATIC_LDFLAGS="-all-static";
+ AC_SUBST(
+  [STATIC_LDFLAGS])
+ ac_cv_libewf_enable_static_executables=yes])
 
 dnl Check if ewftools should be build with low level read and write functions
 AS_IF(
-	[test "x$ac_cv_libewf_enable_low_level_functions" != xno],
-	[AC_DEFINE(
-	 [HAVE_LOW_LEVEL_FUNCTIONS],
-	 [1],
-	 [Define to 1 if libewfs low level read and write functions should be used in the ewf tools.])
-	ac_cv_libewf_enable_low_level_functions=yes])
+ [test "x$ac_cv_libewf_enable_low_level_functions" != xno],
+ [AC_DEFINE(
+  [HAVE_LOW_LEVEL_FUNCTIONS],
+  [1],
+  [Define to 1 if libewfs low level read and write functions should be used in the ewf tools.])
+ ac_cv_libewf_enable_low_level_functions=yes])
 
 dnl Check if libewf should be build with verbose output
 AS_IF(
-	[test "x$ac_cv_libewf_enable_verbose_output" != xno],
-	[AC_DEFINE(
-	 [HAVE_VERBOSE_OUTPUT],
-	 [1],
-	 [Define to 1 if verbose output should be used.])
-	ac_cv_libewf_enable_verbose_output=yes])
+ [test "x$ac_cv_libewf_enable_verbose_output" != xno],
+ [AC_DEFINE(
+  [HAVE_VERBOSE_OUTPUT],
+  [1],
+  [Define to 1 if verbose output should be used.])
+ ac_cv_libewf_enable_verbose_output=yes])
 
 dnl Check if libewf should be build with debug output
 AS_IF(
-	[test "x$ac_cv_libewf_enable_debug_output" != xno],
-	[AC_DEFINE(
-	 [HAVE_DEBUG_OUTPUT],
-	 [1],
-	 [Define to 1 if debug output should be used.])
-	ac_cv_libewf_enable_debug_output=yes])
+ [test "x$ac_cv_libewf_enable_debug_output" != xno],
+ [AC_DEFINE(
+  [HAVE_DEBUG_OUTPUT],
+  [1],
+  [Define to 1 if debug output should be used.])
+ ac_cv_libewf_enable_debug_output=yes])
 
-dnl Check if libewf python bindings (pyewf) should be built
+dnl Check if libewf python bindings (pyewf) should be build
 AS_IF(
-	[test "x$ac_cv_libewf_enable_python" != xno],
-	[AM_PATH_PYTHON([2.5])
-	LIBEWF_CHECK_PYTHON_DEVEL()
-	AC_DEFINE(
-	 [HAVE_PYTHON],
-	 [1],
-	 [Have Python bindings])
-	ac_cv_libewf_enable_python=yes])
+ [test "x$ac_cv_libewf_enable_python" != xno],
+ [AM_PATH_PYTHON([2.5])
+ LIBEWF_CHECK_PYTHON_DEVEL()
+ AC_DEFINE(
+  [HAVE_PYTHON],
+  [1],
+  [Have Python bindings])
+ ac_cv_libewf_enable_python=yes])
 
 AM_CONDITIONAL(
  HAVE_PYTHON,
@@ -1828,18 +1317,18 @@ AM_CONDITIONAL(
 
 dnl Check if libewf should be build with version 1 API
 AS_IF(
-	[test "x$ac_cv_libewf_enable_v1_api" != xno],
-	[AC_DEFINE(
-	 [HAVE_V1_API],
-	 [1],
-	 [Define to 1 if the version 1 API should be available.])
-	AC_SUBST(
-	 [HAVE_V1_API],
-	 [1])
-	ac_cv_libewf_enable_v1_api=yes],
-	[AC_SUBST(
-	 [HAVE_V1_API],
-	 [0]) ])
+ [test "x$ac_cv_libewf_enable_v1_api" != xno],
+ [AC_DEFINE(
+  [HAVE_V1_API],
+  [1],
+  [Define to 1 if the version 1 API should be available.])
+ AC_SUBST(
+  [HAVE_V1_API],
+  [1])
+ ac_cv_libewf_enable_v1_api=yes],
+ [AC_SUBST(
+  [HAVE_V1_API],
+  [0]) ])
 
 AM_CONDITIONAL(
  HAVE_V1_API,
@@ -1852,13 +1341,13 @@ dnl Set memwatch support
 ac_libewf_have_memwatch=no
 
 AS_IF(
-	[test "x$ac_libewf_have_memwatch" != xno],
-	[AC_SUBST(
-	 [MEMWATCH_CPPFLAGS],
-	 ["-DMEMWATCH -DMEMWATCH_STDIO"])
-	AC_SUBST(
-	 [MEMWATCH_LIBADD],
-	 [../common/libmemwatch.la]) ])
+ [test "x$ac_libewf_have_memwatch" != xno],
+ [AC_SUBST(
+  [MEMWATCH_CPPFLAGS],
+  ["-DMEMWATCH -DMEMWATCH_STDIO"])
+ AC_SUBST(
+  [MEMWATCH_LIBADD],
+  [../common/libmemwatch.la]) ])
 
 AM_CONDITIONAL(
  [HAVE_MEMWATCH],
@@ -1869,15 +1358,15 @@ CFLAGS="$CFLAGS -Wall";
 
 dnl Check if DLL support is needed in ewftools
 AS_IF(
-	[test x"$enable_shared" = xyes],
-	[AS_CASE(
-		[$host],
-		[*cygwin* | *mingw*],
-		[AC_SUBST(
-		 [LIBEWF_DLL_IMPORT],
-		 ["-DLIBEWF_DLL_IMPORT"])
-		])
-	])
+ [test x"$enable_shared" = xyes],
+ [AS_CASE(
+  [$host],
+  [*cygwin* | *mingw*],
+  [AC_SUBST(
+   [LIBEWF_DLL_IMPORT],
+   ["-DLIBEWF_DLL_IMPORT"])
+  ])
+ ])
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])

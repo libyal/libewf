@@ -11,6 +11,8 @@ BUILDER5_FILES = \
 	builder5/ewfverify/ewfverify.bpr \
 	builder5/libbfio/libbfio.bpf \
 	builder5/libbfio/libbfio.bpr \
+	builder5/libcstring/libcstring.bpf \
+	builder5/libcstring/libcstring.bpr \
 	builder5/liberror/liberror.bpf \
 	builder5/liberror/liberror.bpr \
 	builder5/libewf/libewf.bpf \

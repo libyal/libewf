@@ -7,8 +7,7 @@
     <OBJFILES value="libsmdev_ata.obj libsmdev_error.obj libsmdev_error_string.obj 
       libsmdev_handle.obj libsmdev_list_type.obj libsmdev_metadata.obj 
       libsmdev_notify.obj libsmdev_offset_list.obj libsmdev_optical_disk.obj 
-      libsmdev_scsi.obj libsmdev_string.obj libsmdev_support.obj 
-      libsmdev_system_string.obj libsmdev_usb.obj"/>
+      libsmdev_scsi.obj libsmdev_string.obj libsmdev_support.obj libsmdev_usb.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>

@@ -36,7 +36,7 @@ Building the library:
 ./configure
 make libewf
 
-You should end up with a DLL something like:
+You should end up with the following DLL:
 libewf-<version>/libewf/.libs/cygewf-0.dll
 
 
@@ -64,16 +64,7 @@ configuration.
 
 
 Creating a DLL using MingW
-You'll need:
-* mingw including libadvapi32 (Windows Crypto API) and librpcrt4 (UUID/GUID support)
-* mingw version of zlib library and headers
-
-Building the library:
-mingw32-configure
-mingw32-make
-
-You should end up with a DLL something like:
-libewf-<version>/libewf/.libs/libewf-1.dll
+See documents/mingw.txt
 
 
 Using a DLL
