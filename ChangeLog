@@ -1,4 +1,5 @@
 TODO
+* document: add that error can be NULL
 * libewf: make libewf_convert_date_header_value more strict
 * improve output when encoutering a read error
 * improve open file io pool (set basename ?)
@@ -201,6 +202,10 @@ Deprecated functions
 Next stable release:
 * full test
 * disable ewfalter, ewfdebug
+
+20100502
+* updated libcstring, liberror, libuna, libbfio, libsmdev, libsmraw
+* changed amount of to number of
 
 20100501
 * updated libbfio, libsmdev

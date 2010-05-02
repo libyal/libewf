@@ -13,6 +13,8 @@ USE("..\..\..\libsmdev\libsmdev_error_string.h", File);
 USE("..\..\..\libsmdev\libsmdev_extern.h", File);
 USEUNIT("..\..\..\libsmdev\libsmdev_handle.c");
 USE("..\..\..\libsmdev\libsmdev_handle.h", File);
+USEUNIT("..\..\..\libsmdev\libsmdev_legacy.c");
+USE("..\..\..\libsmdev\libsmdev_legacy.h", File);
 USE("..\..\..\libsmdev\libsmdev_libuna.h", File);
 USEUNIT("..\..\..\libsmdev\libsmdev_list_type.c");
 USE("..\..\..\libsmdev\libsmdev_list_type.h", File);

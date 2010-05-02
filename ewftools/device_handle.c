@@ -959,7 +959,7 @@ int device_handle_set_error_values(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_set_amount_of_error_retries(
+		if( libsmdev_handle_set_number_of_error_retries(
 		     device_handle->dev_input_handle,
 		     amount_of_error_retries,
 		     error ) != 1 )
@@ -968,7 +968,7 @@ int device_handle_set_error_values(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set amount of error retries in device input handle.",
+			 "%s: unable to set number of error retries in device input handle.",
 			 function );
 
 			return( -1 );
@@ -1032,7 +1032,7 @@ int device_handle_get_amount_of_read_errors(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_amount_of_errors(
+		if( libsmdev_handle_get_number_of_errors(
 		     device_handle->dev_input_handle,
 		     amount_of_read_errors,
 		     error ) != 1 )
@@ -1041,7 +1041,7 @@ int device_handle_get_amount_of_read_errors(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of read errors.",
+			 "%s: unable to retrieve number of read errors.",
 			 function );
 
 			return( -1 );
@@ -1610,7 +1610,7 @@ int device_handle_read_errors_fprint(
 
 			return( -1 );
 		}
-		if( libsmdev_handle_get_amount_of_errors(
+		if( libsmdev_handle_get_number_of_errors(
 		     device_handle->dev_input_handle,
 		     &amount_of_read_errors,
 		     error ) != 1 )
@@ -1619,7 +1619,7 @@ int device_handle_read_errors_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of read errors.",
+			 "%s: unable to retrieve number of read errors.",
 			 function );
 
 			return( -1 );

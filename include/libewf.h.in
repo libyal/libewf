@@ -213,6 +213,7 @@ LIBEWF_EXTERN int libewf_error_backtrace_sprint(
  * ------------------------------------------------------------------------- */
 
 /* Initialize the handle
+ * The handle must point to a NULL pointer to be allocated
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_initialize(

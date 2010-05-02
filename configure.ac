@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100501],
+ [20100502],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20100501])
+ [20100502])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -149,7 +149,8 @@ AS_IF(
   [Missing headers: stdarg.h and varargs.h],
   [1]) ])
 
-dnl Headers included in libnotify/libnotify_stream.c and libbfio/libbfio_file.c
+dnl Headers included in libnotify/libnotify_stream.c, libbfio/libbfio_file.c
+dnl libsystem/libsystem_file.h and libsystem/libsystem_string.h
 AC_CHECK_HEADERS([errno.h])
 
 dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_directory_io.h, libsystem/libsystem_file_io.h
@@ -423,13 +424,13 @@ AC_CHECK_FUNCS(
  [ac_libewf_have_memrchr=no])
 
 AS_IF(
-	[test "x$ac_libewf_have_memrchr" = xno],
-	[AC_CHECK_FUNCS(
-	 [strrchr],
-	 [],
-	 [AC_MSG_FAILURE(
-	  [Missing functions: strrchr and memrchr],
-	  [1]) ]) ])
+ [test "x$ac_libewf_have_memrchr" = xno],
+ [AC_CHECK_FUNCS(
+  [strrchr],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strrchr and memrchr],
+   [1]) ]) ])
 
 AC_CHECK_FUNCS(
  [snprintf],
@@ -489,7 +490,7 @@ AC_CHECK_FUNCS(
   [Missing function: vsnprintf],
   [1]) ])
 
-dnl File input/output functions used in libbfio/libbfio_file.h
+dnl File input/output functions used in libbfio/libbfio_file.h and libsystem/libsystem_file_io.h
 AC_CHECK_FUNCS(
  [close],
  [],
@@ -532,7 +533,7 @@ AC_CHECK_FUNCS(
   [Missing function: fstat],
   [1]) ])
 
-dnl Date and time functions used in libewf/libewf_date_time.h
+dnl Date and time functions used in libewf/libewf_date_time.h and libsystem/libsystem_date_time.c
 AC_CHECK_FUNCS(
  [localtime_r],
  [],

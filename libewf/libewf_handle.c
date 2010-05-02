@@ -46,6 +46,7 @@
 #include "ewf_file_header.h"
 
 /* Initialize the handle
+ * The handle must point to a NULL pointer to be allocated
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_initialize(
@@ -1474,7 +1475,7 @@ int libewf_handle_open_file_io_pool(
 
 		return( -1 );
 	}
-	if( libbfio_pool_get_amount_of_handles(
+	if( libbfio_pool_get_number_of_handles(
 	     file_io_pool,
 	     &amount_of_handles,
 	     error ) != 1 )
@@ -1483,7 +1484,7 @@ int libewf_handle_open_file_io_pool(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of handles in the file io pool.",
+		 "%s: unable to retrieve the number of handles in the file io pool.",
 		 function );
 
 		return( -1 );
@@ -3586,7 +3587,7 @@ int libewf_handle_set_maximum_amount_of_open_handles(
 
 	if( internal_handle->file_io_pool != NULL )
 	{
-		if( libbfio_pool_set_maximum_amount_of_open_handles(
+		if( libbfio_pool_set_maximum_number_of_open_handles(
 		     internal_handle->file_io_pool,
 		     maximum_amount_of_open_handles,
 		     error ) != 1 )
@@ -3595,7 +3596,7 @@ int libewf_handle_set_maximum_amount_of_open_handles(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set maximum amount of open handles in file io handle.",
+			 "%s: unable to set maximum number of open handles in file io handle.",
 			 function );
 
 			return( -1 );

@@ -680,8 +680,8 @@ int info_handle_header_values_fprint(
 	static char *function               = "info_handle_header_values_fprint";
 	size_t header_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
 	size_t header_value_size            = INFO_HANDLE_VALUE_SIZE;
-	uint32_t amount_of_values           = 0;
 	uint32_t header_value_iterator      = 0;
+	uint32_t number_of_values           = 0;
 	int header_value_result             = 0;
 	int result                          = 1;
 
@@ -749,7 +749,7 @@ int info_handle_header_values_fprint(
 	}
 	if( libewf_handle_get_amount_of_header_values(
 	     info_handle->input_handle,
-	     &amount_of_values,
+	     &number_of_values,
 	     error ) == -1 )
 	{
 		liberror_error_set(
@@ -765,7 +765,7 @@ int info_handle_header_values_fprint(
 	 stream,
 	 "Acquiry information\n" );
 
-	if( amount_of_values == 0 )
+	if( number_of_values == 0 )
 	{
 		fprintf(
 		 stream,
@@ -1272,14 +1272,14 @@ int info_handle_header_values_fprint(
 		}
 		/* Currently there are 16 default values
 		 */
-		if( amount_of_values > 16 )
+		if( number_of_values > 16 )
 		{
 			fprintf(
 			 stream,
 			 "\n\tAdditional values:\n" );
 
 			for( header_value_iterator = 16;
-			     header_value_iterator < amount_of_values;
+			     header_value_iterator < number_of_values;
 			     header_value_iterator++ )
 			{
 				if( libewf_handle_get_header_value_identifier_size(
@@ -1411,7 +1411,7 @@ int info_handle_header_value_extents_fprint(
 
 		return( -1 );
 	}
-	if( ( extents_elements->amount_of_values % 4 ) != 1 )
+	if( ( extents_elements->number_of_values % 4 ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1432,7 +1432,7 @@ int info_handle_header_value_extents_fprint(
 	 extents_elements->values[ 0 ] );
 
 	for( extents_element_iterator = 1;
-	     extents_element_iterator < extents_elements->amount_of_values;
+	     extents_element_iterator < extents_elements->number_of_values;
 	     extents_element_iterator += 4 )
 	{
 		fprintf(
@@ -1954,7 +1954,7 @@ int info_handle_hash_values_fprint(
 	static char *function             = "info_handle_hash_values_fprint";
 	size_t hash_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
 	size_t hash_value_size            = INFO_HANDLE_VALUE_SIZE;
-	uint32_t amount_of_values         = 0;
+	uint32_t number_of_values         = 0;
 	uint32_t hash_value_iterator      = 0;
 	uint8_t print_header              = 1;
 	int result                        = 1;
@@ -2070,7 +2070,7 @@ int info_handle_hash_values_fprint(
 #endif
 	if( libewf_handle_get_amount_of_hash_values(
 	     info_handle->input_handle,
-	     &amount_of_values,
+	     &number_of_values,
 	     error ) == -1 )
 	{
 		liberror_error_set(
@@ -2083,7 +2083,7 @@ int info_handle_hash_values_fprint(
 		return( -1 );
 	}
 	for( hash_value_iterator = 0;
-	     hash_value_iterator < amount_of_values;
+	     hash_value_iterator < number_of_values;
 	     hash_value_iterator++ )
 	{
 		if( libewf_handle_get_hash_value_identifier_size(

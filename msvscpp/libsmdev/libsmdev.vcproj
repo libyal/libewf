@@ -102,6 +102,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmdev\libsmdev_legacy.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmdev\libsmdev_list_type.c"
 				>
 			</File>
@@ -169,6 +173,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsmdev\libsmdev_legacy.h"
 				>
 			</File>
 			<File

@@ -13,6 +13,8 @@ USEUNIT("..\..\..\libsmraw\libsmraw_handle.c");
 USE("..\..\..\libsmraw\libsmraw_handle.h", File);
 USEUNIT("..\..\..\libsmraw\libsmraw_information_file.c");
 USE("..\..\..\libsmraw\libsmraw_information_file.h", File);
+USEUNIT("..\..\..\libsmraw\libsmraw_legacy.c");
+USE("..\..\..\libsmraw\libsmraw_legacy.h", File);
 USE("..\..\..\libsmraw\libsmraw_libbfio.h", File);
 USE("..\..\..\libsmraw\libsmraw_libuna.h", File);
 USEUNIT("..\..\..\libsmraw\libsmraw_metadata.c");

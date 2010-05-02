@@ -102,6 +102,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmraw\libsmraw_legacy.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmraw\libsmraw_metadata.c"
 				>
 			</File>
@@ -153,6 +157,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libsmraw\libsmraw_information_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsmraw\libsmraw_legacy.h"
 				>
 			</File>
 			<File

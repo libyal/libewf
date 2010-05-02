@@ -39,97 +39,70 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<None Include="..\..\..\libsmdev\libsmdev_offset_list.h">
-				<BuildOrder>22</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_optical_disk.h">
-				<BuildOrder>21</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_metadata.h">
-				<BuildOrder>24</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_notify.h">
-				<BuildOrder>23</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_support.h">
-				<BuildOrder>18</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_scsi.h">
-				<BuildOrder>20</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_string.h">
-				<BuildOrder>19</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_error.h">
-				<BuildOrder>30</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_error_string.h">
-				<BuildOrder>29</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_codepage.h">
-				<BuildOrder>32</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_definitions.h">
-				<BuildOrder>31</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_libuna.h">
-				<BuildOrder>26</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_list_type.h">
-				<BuildOrder>25</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_extern.h">
-				<BuildOrder>28</BuildOrder>
 			</None>
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_handle.c">
+			</CppCompile>
 			<None Include="..\..\..\libsmdev\libsmdev_handle.h">
-				<BuildOrder>27</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_legacy.c">
+			</CppCompile>
+			<None Include="..\..\..\libsmdev\libsmdev_legacy.h">
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_types.h">
-				<BuildOrder>16</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_list_type.c">
-				<BuildOrder>5</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\..\libsmdev\libsmdev_handle.c">
-				<BuildOrder>4</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_notify.c">
-				<BuildOrder>7</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_metadata.c">
-				<BuildOrder>6</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_ata.c">
-				<BuildOrder>1</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_usb.c">
-				<BuildOrder>0</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_error_string.c">
-				<BuildOrder>3</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_error.c">
-				<BuildOrder>2</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_support.c">
-				<BuildOrder>12</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsmdev\libsmdev_usb.h">
-				<BuildOrder>15</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_ata.h">
-				<BuildOrder>14</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_optical_disk.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_offset_list.c">
-				<BuildOrder>8</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_string.c">
-				<BuildOrder>11</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_scsi.c">
-				<BuildOrder>10</BuildOrder>
 			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

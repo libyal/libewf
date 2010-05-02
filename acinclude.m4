@@ -736,7 +736,7 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
  
   AC_CHECK_LIB(
    bfio,
-   libbfio_pool_get_amount_of_handles,
+   libbfio_pool_get_number_of_handles,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])
   AC_CHECK_LIB(
@@ -761,7 +761,7 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
    [ac_libewf_have_libbfio=no])
   AC_CHECK_LIB(
    bfio,
-   libbfio_pool_get_maximum_amount_of_open_handles,
+   libbfio_pool_get_maximum_number_of_open_handles,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])
   ])

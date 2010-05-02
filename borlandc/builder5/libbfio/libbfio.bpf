@@ -13,6 +13,8 @@ USEUNIT("..\..\..\libbfio\libbfio_file.c");
 USE("..\..\..\libbfio\libbfio_file.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_handle.c");
 USE("..\..\..\libbfio\libbfio_handle.h", File);
+USEUNIT("..\..\..\libbfio\libbfio_legacy.c");
+USE("..\..\..\libbfio\libbfio_legacy.h", File);
 USE("..\..\..\libbfio\libbfio_libuna.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_list_type.c");
 USE("..\..\..\libbfio\libbfio_list_type.h", File);
