@@ -623,7 +623,7 @@ int libewf_header_sections_determine_format(
 						result  = 1;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-						if( header_sections->amount_of_header_sections != 1 )
+						if( header_sections->number_of_header_sections != 1 )
 						{
 							if( libnotify_verbose != 0 )
 							{

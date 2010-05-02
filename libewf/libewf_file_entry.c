@@ -819,16 +819,16 @@ int libewf_file_entry_get_entry_modification_time(
 	return( 1 );
 }
 
-/* Retrieves the amount of sub file entries from a file entry
+/* Retrieves the number of sub file entries from a file entry
  * Returns 1 if successful or -1 on error
  */
-int libewf_file_entry_get_amount_of_sub_file_entries(
+int libewf_file_entry_get_number_of_sub_file_entries(
      libewf_file_entry_t *file_entry,
-     int *amount_of_sub_file_entries,
+     int *number_of_sub_file_entries,
      liberror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                             = "libewf_file_entry_get_amount_of_sub_file_entries";
+	static char *function                             = "libewf_file_entry_get_number_of_sub_file_entries";
 
 	if( file_entry == NULL )
 	{
@@ -843,16 +843,16 @@ int libewf_file_entry_get_amount_of_sub_file_entries(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libewf_tree_node_get_amount_of_child_nodes(
+	if( libewf_tree_node_get_number_of_child_nodes(
 	     internal_file_entry->file_entry_tree_node,
-	     amount_of_sub_file_entries,
+	     number_of_sub_file_entries,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of sub file entries.",
+		 "%s: unable to retrieve number of sub file entries.",
 		 function );
 
 		return( -1 );
@@ -983,7 +983,7 @@ int libewf_file_entry_get_sub_file_entry(
 }
 
 /* Reads data from the curent offset into a buffer
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_file_entry_read_buffer(
          libewf_file_entry_t *file_entry,
@@ -1080,7 +1080,7 @@ ssize_t libewf_file_entry_read_buffer(
 }
 
 /* Reads data from an offset into a buffer
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_file_entry_read_random(
          libewf_file_entry_t *file_entry,

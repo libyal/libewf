@@ -60,7 +60,7 @@ struct libewf_segment_table
 
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
-     int amount,
+     int number_of_handles,
      size64_t maximum_segment_size,
      liberror_error_t **error );
 
@@ -70,7 +70,7 @@ int libewf_segment_table_free(
 
 int libewf_segment_table_resize(
      libewf_segment_table_t *segment_table,
-     int amount,
+     int number_of_handles,
      liberror_error_t **error );
 
 int libewf_segment_table_get_basename_size(
@@ -109,9 +109,9 @@ int libewf_segment_table_set_basename_wide(
      liberror_error_t **error );
 #endif
 
-int libewf_segment_table_get_amount_of_handles(
+int libewf_segment_table_get_number_of_handles(
      libewf_segment_table_t *segment_table,
-     int *amount_of_handles,
+     int *number_of_handles,
      liberror_error_t **error );
 
 int libewf_segment_table_get_handle(

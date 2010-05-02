@@ -52,11 +52,11 @@
 #define EWF_OFFSET_COMPRESSED_READ_MASK 	0x7fffffff
 #define EWF_OFFSET_COMPRESSED_WRITE_MASK 	0x80000000
 
-/* EWF the initial maximum amount of offsets in a table section
+/* EWF the initial maximum number of offsets in a table section
  */
 #define EWF_MAXIMUM_OFFSETS_IN_TABLE		16375
 
-/* EWF maximum amount of offsets in a table section
+/* EWF maximum number of offsets in a table section
  * as of EnCase 6
  */
 #define EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6	65534

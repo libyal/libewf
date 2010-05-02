@@ -1426,7 +1426,7 @@ int ewfinput_get_fixed_string_variable(
      size_t input_buffer_size,
      libcstring_system_character_t *request_string,
      libcstring_system_character_t **values,
-     uint8_t amount_of_values,
+     uint8_t number_of_values,
      uint8_t default_value,
      libcstring_system_character_t **fixed_string_variable,
      liberror_error_t **error )
@@ -1483,13 +1483,13 @@ int ewfinput_get_fixed_string_variable(
 
 		return( -1 );
 	}
-	if( default_value >= amount_of_values )
+	if( default_value >= number_of_values )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: default value exceeds amount.",
+		 "%s: default value exceeds number of values.",
 		 function );
 
 		return( -1 );
@@ -1513,7 +1513,7 @@ int ewfinput_get_fixed_string_variable(
 		 request_string );
 
 		for( value_iterator = 0;
-		     value_iterator < amount_of_values;
+		     value_iterator < number_of_values;
 		     value_iterator++ )
 		{
 			if( value_iterator > 0 )
@@ -1578,7 +1578,7 @@ int ewfinput_get_fixed_string_variable(
 				return( 0 );
 			}
 			for( value_iterator = 0;
-			     value_iterator < amount_of_values;
+			     value_iterator < number_of_values;
 			     value_iterator++ )
 			{
 				value_length = libcstring_system_string_length(
@@ -1593,7 +1593,7 @@ int ewfinput_get_fixed_string_variable(
 					break;
 				}
 			}
-			if( value_iterator < amount_of_values )
+			if( value_iterator < number_of_values )
 			{
 				*fixed_string_variable = values[ value_iterator ];
 

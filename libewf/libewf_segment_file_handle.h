@@ -43,9 +43,9 @@ struct libewf_segment_file_handle
 	 */
 	int file_io_pool_entry;
 
-	/* The amount of chunks
+	/* The number of chunks
 	 */
-	uint32_t amount_of_chunks;
+	uint32_t number_of_chunks;
 
         /* The list of all the sections
          */

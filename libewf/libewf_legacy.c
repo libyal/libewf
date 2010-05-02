@@ -30,10 +30,141 @@
 #include <libnotify.h>
 
 #include "libewf_definitions.h"
+#include "libewf_file_entry.h"
 #include "libewf_handle.h"
 #include "libewf_metadata.h"
 #include "libewf_notify.h"
 #include "libewf_types.h"
+
+#if !defined( HAVE_LOCAL_LIBEWF )
+
+/* Sets the maximum amount of (concurrent) open file handles
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_maximum_amount_of_open_handles(
+     libewf_handle_t *handle,
+     int maximum_amount_of_open_handles,
+     liberror_error_t **error )
+{
+	return( libewf_handle_set_maximum_number_of_open_handles(
+	         handle,
+	         maximum_amount_of_open_handles,
+	         error ) );
+}
+
+/* Retrieves the amount of sectors from the media information
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_amount_of_sectors(
+     libewf_handle_t *handle,
+     uint64_t *amount_of_sectors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_sectors(
+	         handle,
+	         amount_of_sectors,
+	         error ) );
+}
+
+/* Retrieves the amount of chunks written
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_write_amount_of_chunks(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_chunks,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_chunks_written(
+	         handle,
+	         amount_of_chunks,
+	         error ) );
+}
+
+/* Retrieves the amount of acquiry errors
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_amount_of_acquiry_errors(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_errors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_acquiry_errors(
+	         handle,
+	         amount_of_errors,
+	         error ) );
+}
+
+/* Retrieves the amount of CRC errors
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_amount_of_crc_errors(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_errors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_crc_errors(
+	         handle,
+	         amount_of_errors,
+	         error ) );
+}
+
+/* Retrieves the amount of sessions
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_amount_of_sessions(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_sessions,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_sessions(
+	         handle,
+	         amount_of_sessions,
+	         error ) );
+}
+
+/* Retrieves the amount of header values
+ * Returns 1 if successful, 0 if no header values are present or -1 on error
+ */
+int libewf_handle_get_amount_of_header_values(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_values,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_header_values(
+	         handle,
+	         amount_of_values,
+	         error ) );
+}
+
+/* Retrieves the amount of hash values
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ */
+int libewf_handle_get_amount_of_hash_values(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_values,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_hash_values(
+	         handle,
+	         amount_of_values,
+	         error ) );
+}
+
+/* Retrieves the amount of sub file entries from a file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_amount_of_sub_file_entries(
+     libewf_file_entry_t *file_entry,
+     int *amount_of_sub_file_entries,
+     liberror_error_t **error )
+{
+	return( libewf_file_entry_get_number_of_sub_file_entries(
+	         file_entry,
+	         amount_of_sub_file_entries,
+	         error ) );
+}
+
+#endif
 
 #if defined( HAVE_V1_API )
 

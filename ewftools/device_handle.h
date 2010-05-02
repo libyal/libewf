@@ -92,7 +92,7 @@ int device_handle_signal_abort(
 int device_handle_open_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error );
 
 int device_handle_close(
@@ -136,14 +136,14 @@ int device_handle_get_information_value(
 
 int device_handle_set_error_values(
      device_handle_t *device_handle,
-     uint8_t amount_of_error_retries,
+     uint8_t number_of_error_retries,
      size_t error_granularity,
      uint8_t zero_buffer_on_error,
      liberror_error_t **error );
 
-int device_handle_get_amount_of_read_errors(
+int device_handle_get_number_of_read_errors(
      device_handle_t *device_handle,
-     int *amount_of_errors,
+     int *number_of_errors,
      liberror_error_t **error );
 
 int device_handle_get_read_error(

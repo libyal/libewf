@@ -37,9 +37,9 @@ typedef struct libewf_array libewf_array_t;
 
 struct libewf_array
 {
-	/* The amount of entries
+	/* The number of entries
 	 */
-	int amount_of_entries;
+	int number_of_entries;
 
 	/* The entries
 	 */
@@ -48,7 +48,7 @@ struct libewf_array
 
 int libewf_array_initialize(
      libewf_array_t **array,
-     int amount_of_entries,
+     int number_of_entries,
      liberror_error_t **error );
 
 int libewf_array_free(
@@ -60,12 +60,12 @@ int libewf_array_free(
 
 int libewf_array_resize(
      libewf_array_t *array,
-     int amount_of_entries,
+     int number_of_entries,
      liberror_error_t **error );
 
-int libewf_array_get_amount_of_entries(
+int libewf_array_get_number_of_entries(
      libewf_array_t *array,
-     int *amount_of_entries,
+     int *number_of_entries,
      liberror_error_t **error );
 
 int libewf_array_get_entry(

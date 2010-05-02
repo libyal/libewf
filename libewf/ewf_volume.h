@@ -51,25 +51,25 @@ struct ewf_volume
 	 */
 	uint8_t unknown1[ 3 ];
 
-	/* The amount of chunks
+	/* The number of chunks
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t amount_of_chunks[ 4 ];
+	uint8_t number_of_chunks[ 4 ];
 
-	/* The amount of sectors per chunks
+	/* The number of sectors per chunks
 	 * consists of 4 bytes (32 bits)
 	 */
 	uint8_t sectors_per_chunk[ 4 ];
 
-	/* The amount of bytes per chunks
+	/* The number of bytes per chunks
 	 * consists of 4 bytes (32 bits)
 	 */
 	uint8_t bytes_per_sector[ 4 ];
 
-	/* The amount of sectors
+	/* The number of sectors
 	 * consists of 8 bytes (64 bits)
 	 */
-	uint8_t amount_of_sectors[ 8 ];
+	uint8_t number_of_sectors[ 8 ];
 
 	/* C:H:S values
 	 * consists of 12 bytes, 4 bytes per value
@@ -124,7 +124,7 @@ struct ewf_volume
 	 */
 	uint8_t unknown4[ 3 ];
 
-	/* The amount sectors to use for error granularity
+	/* The number of sectors to use for error granularity
 	 * consists of 4 bytes (32 bits)
 	 */
 	uint8_t error_granularity[ 4 ];

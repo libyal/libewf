@@ -115,7 +115,7 @@ struct export_handle
 	 */
 	size32_t input_chunk_size;
 
-	/* The amount of bytes per sector
+	/* The number of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
 
@@ -171,7 +171,7 @@ int export_handle_create_target_path(
 int export_handle_open_input(
      export_handle_t *export_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error );
 
 int export_handle_open_output(
@@ -284,7 +284,7 @@ int export_handle_set_hash_value(
 int export_handle_add_read_error(
       export_handle_t *export_handle,
       off64_t start_offset,
-      size_t amount_of_bytes,
+      size_t number_of_bytes,
       liberror_error_t **error );
 #endif
 

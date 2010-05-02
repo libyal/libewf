@@ -41,18 +41,18 @@ struct libewf_sector_table_entry
 	 */
 	uint64_t first_sector;
 
-	/* The amount of sectors
+	/* The number of sectors
 	 */
-	uint64_t amount_of_sectors;
+	uint64_t number_of_sectors;
 };
 
 typedef struct libewf_sector_table libewf_sector_table_t;
 
 struct libewf_sector_table
 {
-	/* The amount of sectors in the table
+	/* The numner of sectors in the table
 	 */
-	uint32_t amount;
+	uint32_t number_of_sectors;
 
 	/* A dynamic array containting references to the sectors
 	 */
@@ -61,7 +61,7 @@ struct libewf_sector_table
 
 int libewf_sector_table_initialize(
      libewf_sector_table_t **sector_table,
-     uint32_t amount,
+     uint32_t number_of_sectors,
      liberror_error_t **error );
 
 int libewf_sector_table_free(
@@ -70,20 +70,20 @@ int libewf_sector_table_free(
 
 int libewf_sector_table_resize(
      libewf_sector_table_t *sector_table,
-     uint32_t amount,
+     uint32_t number_of_sectors,
      liberror_error_t **error );
 
 int libewf_sector_table_get_sector(
      libewf_sector_table_t *sector_table,
      uint32_t index,
      uint64_t *first_sector,
-     uint64_t *amount_of_sectors,
+     uint64_t *number_of_sectors,
      liberror_error_t **error );
 
 int libewf_sector_table_add_sector(
      libewf_sector_table_t *sector_table,
      uint64_t first_sector,
-     uint64_t amount_of_sectors,
+     uint64_t number_of_sectors,
      int merge_continious_entries,
      liberror_error_t **error );
 

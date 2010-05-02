@@ -77,7 +77,7 @@ struct imaging_handle
 	 */
 	libewf_handle_t *secondary_output_handle;
 
-	/* The amount of bytes per sector
+	/* The number of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
 };
@@ -247,13 +247,13 @@ int imaging_handle_set_hash_value(
 int imaging_handle_add_read_error(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
-      size64_t amount_of_bytes,
+      size64_t number_of_bytes,
       liberror_error_t **error );
 
 int imaging_handle_add_session(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
-      size64_t amount_of_bytes,
+      size64_t number_of_bytes,
       liberror_error_t **error );
 
 ssize_t imaging_handle_finalize(

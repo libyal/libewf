@@ -193,13 +193,13 @@ int libewf_date_time_values_copy_to_timestamp(
 
 		return( -1 );
 	}
-	if( date_time_elements->amount_of_values < 6 )
+	if( date_time_elements->number_of_values < 6 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported amount of elements in date time values string.",
+		 "%s: unsupported number of elements in date time values string.",
 		 function );
 
 		libewf_split_values_free(

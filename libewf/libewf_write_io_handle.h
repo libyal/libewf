@@ -60,11 +60,11 @@ struct libewf_write_io_handle
 	 */
 	ewf_table_offset_t *table_offsets;
 
-	/* The amount of allocated table offsets
+	/* The number of allocated table offsets
 	 */
-	uint32_t amount_of_table_offsets;
+	uint32_t number_of_table_offsets;
 
-	/* The amount of bytes of the input written
+	/* The number of bytes of the input written
 	 */
 	ssize64_t input_write_count;
 
@@ -76,46 +76,46 @@ struct libewf_write_io_handle
 	 */
 	ssize64_t remaining_segment_file_size;
 
-	/* The maximum amount of segments
+	/* The maximum number of segments
 	 */
-	uint16_t maximum_amount_of_segments;
+	uint16_t maximum_number_of_segments;
 
-	/* The amount of bytes written to a section containing chunks
+	/* The number of bytes written to a section containing chunks
 	 */
 	ssize64_t chunks_section_write_count;
 
-        /* The amount of chunks written
+        /* The (total) number of chunks written
          */
-        uint32_t amount_of_chunks;
+        uint32_t number_of_chunks_written;
 
-        /* The determined (estimated) amount of chunks per segment
+        /* The number of chunks written of the current segment file
+         */
+        uint32_t number_of_chunks_written_to_segment;
+
+        /* The number of chunks written of the current (chunks) section
+         */
+        uint32_t number_of_chunks_written_to_section;
+
+        /* The determined (estimated) number of chunks per segment
          */
         uint32_t chunks_per_segment;
 
-        /* The determined (estimated) amount of chunks per chunks section
+        /* The determined (estimated) number of chunks per section
          */
-        uint32_t chunks_per_chunks_section;
+        uint32_t chunks_per_section;
 
-        /* The amount of chunks written of the current segment file
+        /* The maximum number of chunks that can be written to a chunks section
          */
-        uint32_t segment_amount_of_chunks;
-
-        /* The maximum amount of chunks that can be written to a chunks section
-         */
-        uint32_t maximum_section_amount_of_chunks;
-
-        /* The amount of chunks written of the current chunks section
-         */
-        uint32_t section_amount_of_chunks;
+        uint32_t maximum_chunks_per_section;
 
 	/* The offset of the chunks section within the current segment file
 	 */
 	off64_t chunks_section_offset;
 
 	/* Value to indicate if the offset table should not be restricted
-	 * to the maximum amount of offsets
+	 * to the maximum number of offsets
 	 */
-	uint8_t unrestrict_offset_amount;
+	uint8_t unrestrict_offset_table;
 
 	/* Value to indicate the write values were initialized
 	 */
@@ -161,30 +161,30 @@ int libewf_write_io_handle_initialize_resume(
 int libewf_write_io_handle_calculate_chunks_per_segment(
      uint32_t *chunks_per_segment,
      size64_t remaining_segment_file_size,
-     uint32_t maximum_section_amount_of_chunks,
-     uint32_t segment_amount_of_chunks,
-     uint32_t amount_of_chunks,
+     uint32_t maximum_chunks_per_section,
+     uint32_t number_of_chunks_written_to_segment,
+     uint32_t number_of_chunks_written,
      libewf_media_values_t *media_values,
      uint8_t format,
      uint8_t ewf_format,
-     uint8_t unrestrict_offset_amount,
+     uint8_t unrestrict_offset_table,
      liberror_error_t **error );
 
-int libewf_write_io_handle_calculate_chunks_per_chunks_section(
-     uint32_t *chunks_per_chunks_section,
-     uint32_t maximum_section_amount_of_chunks,
-     uint32_t segment_amount_of_chunks,
+int libewf_write_io_handle_calculate_chunks_per_section(
+     uint32_t *chunks_per_section,
+     uint32_t maximum_chunks_per_section,
+     uint32_t number_of_chunks_written_to_segment,
      uint32_t chunks_per_segment,
-     uint8_t unrestrict_offset_amount,
+     uint8_t unrestrict_offset_table,
      liberror_error_t **error );
 
 int libewf_write_io_handle_test_segment_file_full(
      ssize64_t remaining_segment_file_size,
-     uint32_t segment_amount_of_chunks,
+     uint32_t number_of_chunks_written_to_segment,
      libewf_media_values_t *media_values,
      ssize64_t input_write_count,
      uint32_t chunks_per_segment,
-     uint32_t current_amount_of_chunks,
+     uint32_t number_of_chunks_written,
      uint8_t format,
      uint8_t ewf_format,
      liberror_error_t **error );
@@ -195,13 +195,13 @@ int libewf_write_io_handle_test_chunks_section_full(
      libewf_media_values_t *media_values,
      ssize64_t input_write_count,
      off64_t segment_file_offset,
-     uint32_t maximum_section_amount_of_chunks,
-     uint32_t section_amount_of_chunks,
-     uint32_t current_amount_of_chunks,
-     uint32_t chunks_per_chunks_section,
+     uint32_t maximum_chunks_per_section,
+     uint32_t number_of_chunks_written_to_section,
+     uint32_t number_of_chunks_written,
+     uint32_t chunks_per_section,
      uint8_t format,
      uint8_t ewf_format,
-     uint8_t unrestrict_offset_amount,
+     uint8_t unrestrict_offset_table,
      liberror_error_t **error );
 
 int libewf_write_io_handle_create_segment_file(
@@ -209,7 +209,7 @@ int libewf_write_io_handle_create_segment_file(
      libbfio_pool_t *file_io_pool,
      libewf_segment_table_t *segment_table,
      int segment_number,
-     int16_t maximum_amount_of_segments,
+     int16_t maximum_number_of_segments,
      uint8_t segment_file_type,
      libewf_segment_file_handle_t **segment_file_handle,
      liberror_error_t **error );
@@ -312,7 +312,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
-     uint32_t last_segment_amount_of_chunks,
+     uint32_t number_of_chunks_written_to_last_segment,
      libewf_media_values_t *media_values,
      libewf_segment_table_t *segment_table,
      libewf_values_table_t *hash_values,

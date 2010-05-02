@@ -208,7 +208,7 @@ int alteration_handle_signal_abort(
 int alteration_handle_open_input(
      alteration_handle_t *alteration_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
@@ -249,18 +249,18 @@ int alteration_handle_open_input(
 
 		return( -1 );
 	}
-	if( amount_of_filenames <= 0 )
+	if( number_of_filenames <= 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount of filenames.",
+		 "%s: invalid number of filenames.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_filenames == 1 )
+	if( number_of_filenames == 1 )
 	{
 		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ]);
@@ -271,7 +271,7 @@ int alteration_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob(
@@ -279,7 +279,7 @@ int alteration_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #endif
 		{
@@ -298,14 +298,14 @@ int alteration_handle_open_input(
 	if( libewf_handle_open_wide(
 	     alteration_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ_WRITE,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     alteration_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ_WRITE,
 	     error ) != 1 )
 #endif
@@ -321,10 +321,10 @@ int alteration_handle_open_input(
 	}
 	if( libewf_filenames != NULL )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		for( ; number_of_filenames > 0; number_of_filenames-- )
 		{
 			memory_free(
-			 libewf_filenames[ amount_of_filenames - 1 ] );
+			 libewf_filenames[ number_of_filenames - 1 ] );
 		}
 		memory_free(
 		 libewf_filenames );
@@ -425,14 +425,14 @@ ssize_t alteration_handle_prepare_read_buffer(
 
 		return( -1 );
 	}
-	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
+	storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
 
 	process_count = libewf_handle_prepare_read_chunk(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->compression_buffer_data_size,
 	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 (size_t *) &( storage_media_buffer->raw_buffer_data_size ),
 	                 storage_media_buffer->is_compressed,
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
@@ -461,7 +461,7 @@ ssize_t alteration_handle_prepare_read_buffer(
 }
 
 /* Reads a buffer from the input of the alteration handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t alteration_handle_read_buffer(
          alteration_handle_t *alteration_handle,
@@ -526,7 +526,7 @@ ssize_t alteration_handle_read_buffer(
 
 		return( -1 );
 	}
-	storage_media_buffer->compression_buffer_amount = read_count;
+	storage_media_buffer->compression_buffer_data_size = (size_t) read_count;
 
 	return( read_count );
 }
@@ -578,14 +578,14 @@ ssize_t alteration_handle_prepare_write_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
+	storage_media_buffer->compression_buffer_data_size = storage_media_buffer->compression_buffer_size;
 
 	process_count = libewf_handle_prepare_write_chunk(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->raw_buffer,
-	                 storage_media_buffer->raw_buffer_amount,
+	                 storage_media_buffer->raw_buffer_data_size,
 	                 storage_media_buffer->compression_buffer,
-	                 (size_t *) &( storage_media_buffer->compression_buffer_amount ),
+	                 (size_t *) &( storage_media_buffer->compression_buffer_data_size ),
 	                 &( storage_media_buffer->is_compressed ),
 	                 &( storage_media_buffer->crc ),
 	                 &( storage_media_buffer->process_crc ),
@@ -603,14 +603,14 @@ ssize_t alteration_handle_prepare_write_buffer(
 		return( -1 );
 	}
 #else
-	process_count = storage_media_buffer->raw_buffer_amount;
+	process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 #endif
 
 	return( process_count );
 }
 
 /* Writes a buffer to the output of the alteration handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t alteration_handle_write_buffer(
          alteration_handle_t *alteration_handle,
@@ -667,12 +667,12 @@ ssize_t alteration_handle_write_buffer(
 	if( storage_media_buffer->is_compressed == 0 )
 	{
 		raw_write_buffer      = storage_media_buffer->raw_buffer;
-		raw_write_buffer_size = storage_media_buffer->raw_buffer_amount;
+		raw_write_buffer_size = storage_media_buffer->raw_buffer_data_size;
 	}
 	else
 	{
 		raw_write_buffer      = storage_media_buffer->compression_buffer;
-		raw_write_buffer_size = storage_media_buffer->compression_buffer_amount;
+		raw_write_buffer_size = storage_media_buffer->compression_buffer_data_size;
 	}
 	if( write_size != raw_write_buffer_size )
 	{
@@ -680,7 +680,7 @@ ssize_t alteration_handle_write_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: mismatch in write size and amount of bytes in storage media buffer.",
+		 "%s: mismatch in write size and number of bytes in storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -689,7 +689,7 @@ ssize_t alteration_handle_write_buffer(
 	               alteration_handle->input_handle,
 	               raw_write_buffer,
 	               raw_write_buffer_size,
-	               storage_media_buffer->raw_buffer_amount,
+	               storage_media_buffer->raw_buffer_data_size,
 	               storage_media_buffer->is_compressed,
 	               storage_media_buffer->crc_buffer,
 	               storage_media_buffer->crc,

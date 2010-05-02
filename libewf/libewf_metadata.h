@@ -56,9 +56,9 @@ LIBEWF_EXTERN int libewf_handle_set_bytes_per_sector(
                    uint32_t bytes_per_sector,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_amount_of_sectors(
+LIBEWF_EXTERN int libewf_handle_get_number_of_sectors(
                    libewf_handle_t *handle,
-                   uint64_t *amount_of_sectors,
+                   uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_chunk_size(
@@ -164,9 +164,9 @@ LIBEWF_EXTERN int libewf_handle_set_sha1_hash(
                    size_t size,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_write_amount_of_chunks(
+LIBEWF_EXTERN int libewf_handle_get_number_of_chunks_written(
                    libewf_handle_t *handle,
-                   uint32_t *amount_of_chunks,
+                   uint32_t *number_of_chunks,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_set_read_wipe_chunk_on_error(
@@ -179,58 +179,58 @@ LIBEWF_EXTERN int libewf_handle_copy_media_values(
                    libewf_handle_t *source_handle,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
+LIBEWF_EXTERN int libewf_handle_get_number_of_acquiry_errors(
                    libewf_handle_t *handle,
-                   uint32_t *amount_of_errors,
+                   uint32_t *number_of_errors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_acquiry_error(
                    libewf_handle_t *handle,
                    uint32_t index,
                    uint64_t *first_sector,
-                   uint64_t *amount_of_sectors,
+                   uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
-                   uint64_t amount_of_sectors,
+                   uint64_t number_of_sectors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_amount_of_crc_errors(
+LIBEWF_EXTERN int libewf_handle_get_number_of_crc_errors(
                    libewf_handle_t *handle,
-                   uint32_t *amount_of_errors,
+                   uint32_t *number_of_errors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_crc_error(
                    libewf_handle_t *handle,
                    uint32_t index,
                    uint64_t *first_sector,
-                   uint64_t *amount_of_sectors,
+                   uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_add_crc_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
-                   uint64_t amount_of_sectors,
+                   uint64_t number_of_sectors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
+LIBEWF_EXTERN int libewf_handle_get_number_of_sessions(
                    libewf_handle_t *handle,
-                   uint32_t *amount_of_sessions,
+                   uint32_t *number_of_sessions,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_session(
                    libewf_handle_t *handle,
                    uint32_t index,
                    uint64_t *first_sector,
-                   uint64_t *amount_of_sectors,
+                   uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_add_session(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
-                   uint64_t amount_of_sectors,
+                   uint64_t number_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_header_codepage(
@@ -253,9 +253,9 @@ LIBEWF_EXTERN int libewf_handle_set_header_values_date_format(
                    int date_format,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_amount_of_header_values(
+LIBEWF_EXTERN int libewf_handle_get_number_of_header_values(
                    libewf_handle_t *handle,
-                   uint32_t *amount_of_values,
+                   uint32_t *number_of_values,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_header_value_identifier_size(
@@ -303,9 +303,9 @@ LIBEWF_EXTERN int libewf_handle_copy_header_values(
                    libewf_handle_t *source_handle,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_amount_of_hash_values(
+LIBEWF_EXTERN int libewf_handle_get_number_of_hash_values(
                    libewf_handle_t *handle,
-                   uint32_t *amount_of_values,
+                   uint32_t *number_of_values,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_hash_value_identifier_size(

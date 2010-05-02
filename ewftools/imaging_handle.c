@@ -314,7 +314,7 @@ int imaging_handle_open_output(
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
 	static char *function                    = "imaging_handle_open_output";
 	size_t first_filename_length             = 0;
-	int amount_of_filenames                  = 0;
+	int number_of_filenames                  = 0;
 	int result                               = 1;
 	uint8_t flags                            = 0;
 
@@ -352,7 +352,7 @@ int imaging_handle_open_output(
 		return( -1 );
 	}
 	filenames[ 0 ]      = (libcstring_system_character_t *) filename;
-	amount_of_filenames = 1;
+	number_of_filenames = 1;
 
 	if( resume != 0 )
 	{
@@ -365,7 +365,7 @@ int imaging_handle_open_output(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob(
@@ -373,7 +373,7 @@ int imaging_handle_open_output(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #endif
 		{
@@ -397,14 +397,14 @@ int imaging_handle_open_output(
 	if( libewf_handle_open_wide(
 	     imaging_handle->output_handle,
 	     libewf_filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     flags,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     imaging_handle->output_handle,
 	     libewf_filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     flags,
 	     error ) != 1 )
 #endif
@@ -420,10 +420,10 @@ int imaging_handle_open_output(
 	}
 	if( libewf_filenames != filenames )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		for( ; number_of_filenames > 0; number_of_filenames-- )
 		{
 			memory_free(
-			 libewf_filenames[ amount_of_filenames - 1 ] );
+			 libewf_filenames[ number_of_filenames - 1 ] );
 		}
 		memory_free(
 		 libewf_filenames );
@@ -444,7 +444,7 @@ int imaging_handle_open_secondary_output(
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
 	static char *function                    = "imaging_handle_open_secondary_output";
 	size_t first_filename_length             = 0;
-	int amount_of_filenames                  = 0;
+	int number_of_filenames                  = 0;
 	int result                               = 1;
 	uint8_t flags                            = 0;
 
@@ -482,7 +482,7 @@ int imaging_handle_open_secondary_output(
 		return( -1 );
 	}
 	filenames[ 0 ]      = (libcstring_system_character_t *) filename;
-	amount_of_filenames = 1;
+	number_of_filenames = 1;
 
 	if( resume != 0 )
 	{
@@ -495,7 +495,7 @@ int imaging_handle_open_secondary_output(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob(
@@ -503,7 +503,7 @@ int imaging_handle_open_secondary_output(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #endif
 		{
@@ -540,14 +540,14 @@ int imaging_handle_open_secondary_output(
 	if( libewf_handle_open_wide(
 	     imaging_handle->secondary_output_handle,
 	     libewf_filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     flags,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     imaging_handle->secondary_output_handle,
 	     libewf_filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     flags,
 	     error ) != 1 )
 #endif
@@ -563,10 +563,10 @@ int imaging_handle_open_secondary_output(
 	}
 	if( libewf_filenames != filenames )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		for( ; number_of_filenames > 0; number_of_filenames-- )
 		{
 			memory_free(
-			 libewf_filenames[ amount_of_filenames - 1 ] );
+			 libewf_filenames[ number_of_filenames - 1 ] );
 		}
 		memory_free(
 		 libewf_filenames );
@@ -682,14 +682,14 @@ ssize_t imaging_handle_prepare_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
+	storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
 
 	process_count = libewf_handle_prepare_read_chunk(
 	                 imaging_handle->output_handle,
 	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->compression_buffer_data_size,
 	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 &( storage_media_buffer->raw_buffer_data_size ),
 	                 storage_media_buffer->is_compressed,
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
@@ -715,13 +715,13 @@ ssize_t imaging_handle_prepare_read_buffer(
 		storage_media_buffer->data_in_compression_buffer = 0;
 	}
 #else
-	process_count = storage_media_buffer->raw_buffer_amount;
+	process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 #endif
 	return( process_count );
 }
 
 /* Reads a buffer from the input of the imaging handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t imaging_handle_read_buffer(
          imaging_handle_t *imaging_handle,
@@ -828,9 +828,9 @@ ssize_t imaging_handle_read_buffer(
 		}
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_amount = read_count;
+	storage_media_buffer->compression_buffer_data_size = (ssize_t) read_count;
 #else
-	storage_media_buffer->raw_buffer_amount         = read_count;
+	storage_media_buffer->raw_buffer_data_size         = (ssize_t) read_count;
 #endif
 
 	return( read_count );
@@ -881,14 +881,14 @@ ssize_t imaging_handle_prepare_write_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
+	storage_media_buffer->compression_buffer_data_size = storage_media_buffer->compression_buffer_size;
 
 	process_count = libewf_handle_prepare_write_chunk(
 	                 imaging_handle->output_handle,
 	                 storage_media_buffer->raw_buffer,
-	                 storage_media_buffer->raw_buffer_amount,
+	                 storage_media_buffer->raw_buffer_data_size,
 	                 storage_media_buffer->compression_buffer,
-	                 (size_t *) &( storage_media_buffer->compression_buffer_amount ),
+	                 &( storage_media_buffer->compression_buffer_data_size ),
 	                 &( storage_media_buffer->is_compressed ),
 	                 &( storage_media_buffer->crc ),
 	                 &( storage_media_buffer->process_crc ),
@@ -906,14 +906,14 @@ ssize_t imaging_handle_prepare_write_buffer(
 		return( -1 );
 	}
 #else
-	process_count = storage_media_buffer->raw_buffer_amount;
+	process_count = storage_media_buffer->raw_buffer_data_size;
 #endif
 
 	return( process_count );
 }
 
 /* Writes a buffer to the output of the imaging handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t imaging_handle_write_buffer(
          imaging_handle_t *imaging_handle,
@@ -971,12 +971,12 @@ ssize_t imaging_handle_write_buffer(
 	if( storage_media_buffer->is_compressed == 0 )
 	{
 		raw_write_buffer      = storage_media_buffer->raw_buffer;
-		raw_write_buffer_size = storage_media_buffer->raw_buffer_amount;
+		raw_write_buffer_size = storage_media_buffer->raw_buffer_data_size;
 	}
 	else
 	{
 		raw_write_buffer      = storage_media_buffer->compression_buffer;
-		raw_write_buffer_size = storage_media_buffer->compression_buffer_amount;
+		raw_write_buffer_size = storage_media_buffer->compression_buffer_data_size;
 	}
 	if( write_size != raw_write_buffer_size )
 	{
@@ -984,7 +984,7 @@ ssize_t imaging_handle_write_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: mismatch in write size and amount of bytes in storage media buffer.",
+		 "%s: mismatch in write size and number of bytes in storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -993,7 +993,7 @@ ssize_t imaging_handle_write_buffer(
 	               imaging_handle->output_handle,
 	               raw_write_buffer,
 	               raw_write_buffer_size,
-	               storage_media_buffer->raw_buffer_amount,
+	               storage_media_buffer->raw_buffer_data_size,
 	               storage_media_buffer->is_compressed,
 	               storage_media_buffer->crc_buffer,
 	               storage_media_buffer->crc,
@@ -1025,7 +1025,7 @@ ssize_t imaging_handle_write_buffer(
 		                         imaging_handle->secondary_output_handle,
 		                         raw_write_buffer,
 		                         raw_write_buffer_size,
-		                         storage_media_buffer->raw_buffer_amount,
+		                         storage_media_buffer->raw_buffer_data_size,
 		                         storage_media_buffer->is_compressed,
 		                         storage_media_buffer->crc_buffer,
 		                         storage_media_buffer->crc,
@@ -2759,11 +2759,11 @@ int imaging_handle_set_hash_value(
 int imaging_handle_add_read_error(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
-      size64_t amount_of_bytes,
+      size64_t number_of_bytes,
       liberror_error_t **error )
 {
 	static char *function      = "imaging_handle_add_read_error";
-	uint64_t amount_of_sectors = 0;
+	uint64_t number_of_sectors = 0;
 	uint64_t start_sector      = 0;
 
 	if( imaging_handle == NULL )
@@ -2800,12 +2800,12 @@ int imaging_handle_add_read_error(
 		return( -1 );
 	}
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
-	amount_of_sectors = amount_of_bytes / imaging_handle->bytes_per_sector;
+	number_of_sectors = number_of_bytes / imaging_handle->bytes_per_sector;
 
 	if( libewf_handle_add_acquiry_error(
 	     imaging_handle->output_handle,
 	     start_sector,
-	     amount_of_sectors,
+	     number_of_sectors,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2822,7 +2822,7 @@ int imaging_handle_add_read_error(
 		if( libewf_handle_add_acquiry_error(
 		     imaging_handle->secondary_output_handle,
 		     start_sector,
-		     amount_of_sectors,
+		     number_of_sectors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2844,11 +2844,11 @@ int imaging_handle_add_read_error(
 int imaging_handle_add_session(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
-      size64_t amount_of_bytes,
+      size64_t number_of_bytes,
       liberror_error_t **error )
 {
 	static char *function      = "imaging_handle_add_session";
-	uint64_t amount_of_sectors = 0;
+	uint64_t number_of_sectors = 0;
 	uint64_t start_sector      = 0;
 
 	if( imaging_handle == NULL )
@@ -2885,12 +2885,12 @@ int imaging_handle_add_session(
 		return( -1 );
 	}
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
-	amount_of_sectors = amount_of_bytes / imaging_handle->bytes_per_sector;
+	number_of_sectors = number_of_bytes / imaging_handle->bytes_per_sector;
 
 	if( libewf_handle_add_session(
 	     imaging_handle->output_handle,
 	     start_sector,
-	     amount_of_sectors,
+	     number_of_sectors,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2907,7 +2907,7 @@ int imaging_handle_add_session(
 		if( libewf_handle_add_session(
 		     imaging_handle->secondary_output_handle,
 		     start_sector,
-		     amount_of_sectors,
+		     number_of_sectors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2924,7 +2924,7 @@ int imaging_handle_add_session(
 }
  
 /* Finalizes the imaging handle
- * Returns the amount of input bytes written or -1 on error
+ * Returns the number of input bytes written or -1 on error
  */
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,

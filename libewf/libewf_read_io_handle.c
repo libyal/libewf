@@ -166,7 +166,7 @@ int libewf_read_io_handle_free(
 
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
  * Sets the crc_mismatch value to 1 if the chunk CRC did not match the calculated CRC
- * Returns the amount of bytes of the processed chunk data or -1 on error
+ * Returns the number of bytes of the processed chunk data or -1 on error
  */
 ssize_t libewf_read_io_handle_process_chunk(
          uint8_t *chunk_buffer,
@@ -317,7 +317,7 @@ ssize_t libewf_read_io_handle_process_chunk(
  * read_crc is set if the crc has been read into crc_buffer
  * read_crc is used for uncompressed chunks only
  * chunk_crc is set to a runtime version of the value in the crc_buffer
- * Returns the amount of bytes read, 0 if no bytes can be read or -1 on error
+ * Returns the number of bytes read, 0 if no bytes can be read or -1 on error
  */
 ssize_t libewf_read_io_handle_read_chunk(
          libewf_io_handle_t *io_handle,
@@ -442,7 +442,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	}
 	/* Check if the chunk is available
 	 */
-	if( chunk >= offset_table->amount_of_chunk_offsets )
+	if( chunk >= offset_table->number_of_chunk_offsets )
 	{
 		return( 0 );
 	}
@@ -516,7 +516,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 		 function,
 		 chunk_type,
 		 chunk,
-		 offset_table->amount_of_chunk_offsets,
+		 offset_table->number_of_chunk_offsets,
 		 offset_table->chunk_offset[ chunk ].file_offset,
 		 offset_table->chunk_offset[ chunk ].size );
 	}
@@ -603,7 +603,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 /* Reads a certain chunk of data from the segment file(s)
  * Will read until the requested size is filled or the entire chunk is read
- * Returns the amount of bytes read, 0 if no bytes can be read or -1 on error
+ * Returns the number of bytes read, 0 if no bytes can be read or -1 on error
  */
 ssize_t libewf_read_io_handle_read_chunk_data(
          libewf_read_io_handle_t *read_io_handle,
@@ -630,7 +630,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	size_t bytes_available     = 0;
 	ssize_t read_count         = 0;
 	int64_t sector             = 0;
-	uint32_t amount_of_sectors = 0;
+	uint32_t number_of_sectors = 0;
 	int chunk_cache_data_used  = 0;
 	uint8_t crc_mismatch       = 0;
 	int8_t is_compressed       = 0;
@@ -726,7 +726,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		 */
 		chunk_cache_data_used = (int) ( buffer == chunk_cache->data );
 
-		if( chunk_size > chunk_cache->allocated_size )
+		if( chunk_size > chunk_cache->size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			if( libnotify_verbose != 0 )
@@ -773,7 +773,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		/* Directly read to the buffer if
 		 *  the buffer isn't the chunk cache
 		 *  and no data was previously copied into the chunk cache
-		 *  and the buffer contains the necessary amount of bytes to fill a chunk
+		 *  and the buffer contains the necessary number of bytes to fill a chunk
 		 *  and the buffer is not compressed
 		 */
 		if( ( buffer != chunk_cache->data )
@@ -885,16 +885,16 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 			/* Add CRC error
 			 */
 			sector            = (int64_t) chunk * (int64_t) media_values->sectors_per_chunk;
-			amount_of_sectors = media_values->sectors_per_chunk;
+			number_of_sectors = media_values->sectors_per_chunk;
 
-			if( ( sector + amount_of_sectors ) > (int64_t) media_values->amount_of_sectors )
+			if( ( sector + number_of_sectors ) > (int64_t) media_values->number_of_sectors )
 			{
-				amount_of_sectors = (uint32_t) ( (int64_t) media_values->amount_of_sectors - sector );
+				number_of_sectors = (uint32_t) ( (int64_t) media_values->number_of_sectors - sector );
 			}
 			if( libewf_sector_table_add_sector(
 			     read_io_handle->crc_errors,
 			     sector,
-			     amount_of_sectors,
+			     number_of_sectors,
 			     1,
 			     error ) != 1 )
 			{
@@ -907,24 +907,24 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 
 				return( -1 );
 			}
-			chunk_data_size = amount_of_sectors * media_values->bytes_per_sector;
+			chunk_data_size = number_of_sectors * media_values->bytes_per_sector;
 		}
 		/* Flag that the chunk was cached
 		 */
 		if( chunk_buffer == chunk_cache->data )
 		{
-			chunk_cache->chunk  = chunk;
-			chunk_cache->amount = chunk_data_size;
-			chunk_cache->offset = 0;
-			chunk_cache->cached = 1;
+			chunk_cache->chunk       = chunk;
+			chunk_cache->data_size   = chunk_data_size;
+			chunk_cache->data_offset = 0;
+			chunk_cache->cached      = 1;
 		}
 	}
 	else
 	{
 		chunk_buffer    = chunk_cache->data;
-		chunk_data_size = chunk_cache->amount;
+		chunk_data_size = chunk_cache->data_size;
 	}
-	/* Determine the available amount of data within the cached chunk
+	/* Determine the available number of data within the cached chunk
 	 */
 	if( chunk_offset > chunk_data_size )
 	{
@@ -932,14 +932,14 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: chunk offset exceeds amount of bytes available in chunk.",
+		 "%s: chunk offset exceeds number of bytes available in chunk.",
 		 function );
 
 		return( -1 );
 	}
 	bytes_available = chunk_data_size - chunk_offset;
 
-	/* Correct the available amount of bytes is larger than the requested amount of bytes
+	/* Correct the available number of bytes is larger than the requested number of bytes
 	 */
 	if( bytes_available > size )
 	{
@@ -951,7 +951,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid available amount of bytes value exceeds maximum.",
+		 "%s: invalid available number of bytes value exceeds maximum.",
 		 function );
 
 		return( -1 );

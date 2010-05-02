@@ -125,9 +125,9 @@ LIBEWF_EXTERN int libewf_file_entry_get_entry_modification_time(
                    uint64_t *entry_modification_time,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_amount_of_sub_file_entries(
+LIBEWF_EXTERN int libewf_file_entry_get_number_of_sub_file_entries(
                    libewf_file_entry_t *file_entry,
-                   int *amount_of_sub_entries,
+                   int *number_of_sub_entries,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(

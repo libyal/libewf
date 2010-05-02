@@ -1,4 +1,7 @@
 TODO
+* refactor sector table (amount of)
+* refactor ewftools (AMOUNT)
+* implement array type in libewf_offset_table
 * document: add that error can be NULL
 * libewf: make libewf_convert_date_header_value more strict
 * improve output when encoutering a read error
@@ -33,14 +36,14 @@ Roadmap:
 Further analysis of the EWF format:
 * password hash
 * volume/disk section (EWF-E01)
-   - do EnCase 5 or earlier versions support 64-bit amount of sectors?
+   - do EnCase 5 or earlier versions support 64-bit number of sectors?
    - unknowns
 * hash section (EWF-E01)
   - 16 byte unknown
 * values in EnCase5/6 header2 (+/-)
 * values in ltree strings (EWF-L01 LVF)
 * values in session section (+/-)
-* amount of sectors in volume/data section has changed to a 64-bit value
+* number of sectors in volume/data section has changed to a 64-bit value
   but what about error2/sessions ?
 * does newer linen6 has sha1 support?
 
@@ -284,16 +287,16 @@ Next stable release:
 * update for missing varadic macro support in Borland C++ Builder 5.5
 
 20100121
-* worked on maximum amount of open handles
+* worked on maximum number of open handles
 * updated libsmdev, libsmraw
 
 20100120
 * updated libbfio, libsmraw
-* worked on maximum amount of open handles
+* worked on maximum number of open handles
 
 20100119
 * updated libbfio
-* worked on maximum amount of open handles
+* worked on maximum number of open handles
 
 20100118
 * worked on moving read error handling into libsmdev
@@ -367,7 +370,7 @@ Next stable release:
 20091224
 * fixed debug output of file header offset
 * worked on reading LVF files
-* aplied amount of headers patch for v1 api
+* aplied number of headers patch for v1 api
 
 20091223
 * replaced string split by split values
@@ -613,7 +616,7 @@ Next stable release:
   files if the media size was known and not entirely written
 * ewfacquire now adds model and serial to header values
 * ewfacquirestream implemented -B as write size upper boundary
-* ewfacquirestream implemented -o as skip of an amount of bytes
+* ewfacquirestream implemented -o as skip of an number of bytes
 * ewfacquire: added support for acquiry resume offset alignment, for non block boundary offsets
 * fixed crc buffer alignment error in write
 * removed get version and flags for local usage of libewf
@@ -628,7 +631,7 @@ Next stable release:
 * added Darwin uuid/uuid.h support
 * removed check for caseless string compare from configure
 * added error to file_io updated system string accordingly
-* added 32-bit amount of sectors for MacOS-X
+* added 32-bit number of sectors for MacOS-X
 * refactored guid generate from ewfcommon to guid
 * fixes for winapi
 * added Cygwin uuid/uuid.h support
@@ -1220,7 +1223,7 @@ Next stable release:
 * libewf EnCase 6 >2GB segment files not compatible with EnCase 6.8
   offset table overflow is no longer written by libewf
 * added LIBEWF_CD_SUPPORT for testing purposes
-  - no way to detect amount of sessions yet, will default to 1 section with
+  - no way to detect number of sessions yet, will default to 1 section with
   start sector 1
 * changed trailing bytes warning into verbose print
 
@@ -1714,7 +1717,7 @@ Next stable release:
 20070821
 * worked on ewfexport exporting ewf formatted data for delta merge
 * print a more detailed error in ewftools for open errors
-* fixed amount of bytes to acquire in ewfacquire
+* fixed number of bytes to acquire in ewfacquire
 
 20070819
 * worked on restructuring to improve internal structure
@@ -2030,7 +2033,7 @@ Next stable release:
 * updated manuals
 
 20070111
-* fixed issue with unrestricting amount of offsets
+* fixed issue with unrestricting number of offsets
 * media flags are written to volume and data section
 
 20070110
@@ -2095,7 +2098,7 @@ Next stable release:
 20061228
 * added write remaining chunk data for streamed write to libewf_write_finalize
 * worked on read and write mode
-  - added amount_of_chunks to segment table, contains the amount of chunks of a segment file
+  - added amount_of_chunks to segment table, contains the number of chunks of a segment file
   - removed segment_file_offset in handle write, overlap with file_offset in segment table
   - fill offset table while writing - removed handle->write->offset and ->amount_of_offsets
   - removed handle->write->create_segment_file
@@ -2140,7 +2143,7 @@ Next stable release:
 * corrected file rights on source files
 * added libewf.spec to source package to allow rpmbuild -ta <libewf>
 * fixed bug in reading header string 1 byte too little
-* libewf now warns if file exceeds the maximimum amount of offsets in a table section
+* libewf now warns if file exceeds the maximimum number of offsets in a table section
 * worked on read and write correction regarding new insight into table sections
 * added support for the original EWF format
 
@@ -2447,7 +2450,7 @@ Next stable release:
 * created acquiry_error to move error2 and endian conversion in ewfcommon into library
 * fixed missing read error retry reset after sector skip
 * fixed 1024 kb human readable size will now become 1.0 Mb
-* default amount of read error retries is now 2 (will result in 3 read attempts)
+* default number of read error retries is now 2 (will result in 3 read attempts)
 * fixed error regarding read error retry one off
 
 20061023
@@ -2491,7 +2494,7 @@ Next stable release:
   - moved header values set and create to libewf_handle
   - removed set_parameter function
 * Fixed mismatch in segment size and chunks section size calculation for the EWF-S01 format
-* Fixed invalid amount of chunks per segment for 2 GiB segment file for the EWF-S01 and EWF-E01 format
+* Fixed invalid number of chunks per segment for 2 GiB segment file for the EWF-S01 and EWF-E01 format
 * Added maximum input size check
 * Added a generic set function for enabling byte swap
 * Completed redesign write and parameter functions to fallback to a default
@@ -2515,8 +2518,8 @@ Next stable release:
 20061016
 * at last done rewritting libewf_write_from_file_descriptor to use new function libewf_write_buffer
 * changed handle->write->chunks_per_segment and handle->write->maximum_chunks_per_segment
-* progressive method of amount of chunks per section/segment is required for EWF-E01 fill method
-* calculative method of amount of chunks per section/segment is required for EWF-S01 pre-write offset table size determination
+* progressive method of number of chunks per section/segment is required for EWF-E01 fill method
+* calculative method of number of chunks per section/segment is required for EWF-S01 pre-write offset table size determination
 * Worked on rewriting libewf_write
 
 20061015
@@ -2685,7 +2688,7 @@ Next stable release:
 * enhanced error handling - no program exit but a nice return
 * using typedefs instead of defines
 * due to 20060505 fix, gave all value definitions a default value
-* removed a large amount of unrequired includes
+* removed a large number of unrequired includes
 
 20060902
 * worked on code clean up and improved error handling
@@ -2781,7 +2784,7 @@ Next stable release:
 * fixed incorrect order for values in header2 on write - also in documentation
 
 20060812
-* made the amount of read error retries flexible and user adjustable through ewfacquire
+* made the number of read error retries flexible and user adjustable through ewfacquire
 * correction of "int result" in file_write to be C89 code compliant
 * new file size algorithm to fill up closer to max file size when compressing
   write: change algorithm to fill files upto file size - completed
@@ -2892,7 +2895,7 @@ Next stable release:
 * removed memcpy assignments
 * type fixed malloc assignments
 * removed (void *) from memset
-* reduced the amount of int definions
+* reduced the number of int definions
 * changed printf formaters
 * added status indication to ewfexport using callback function in read_from_file_descriptor
 * added quiet option to ewfexport and ewfacquire

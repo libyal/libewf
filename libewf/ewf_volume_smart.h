@@ -41,27 +41,27 @@ struct ewf_volume_smart
 	 */
 	uint8_t unknown1[ 4 ];
 
-	/* The amount of chunks
+	/* The number of chunks
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t amount_of_chunks[ 4 ];
+	uint8_t number_of_chunks[ 4 ];
 
-	/* The amount of sectors per chunks
+	/* The number of sectors per chunks
 	 * consists of 4 bytes (32 bits)
 	 * value should be 64
 	 */
 	uint8_t sectors_per_chunk[ 4 ];
 
-	/* The amount of bytes per chunks
+	/* The number of bytes per chunks
 	 * consists of 4 bytes (32 bits)
 	 * value should be 512
 	 */
 	uint8_t bytes_per_sector[ 4 ];
 
-	/* The amount of sectors
+	/* The number of sectors
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t amount_of_sectors[ 4 ];
+	uint8_t number_of_sectors[ 4 ];
 
 	/* Unknown - reserved
 	 * consists of 20 bytes

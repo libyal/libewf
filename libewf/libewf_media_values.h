@@ -48,23 +48,23 @@ struct libewf_media_values
 	 */
 	size32_t chunk_size;
 
-	/* The amount of sectors per chunk
+	/* The number of sectors per chunk
 	 */
 	uint32_t sectors_per_chunk;
 
-	/* The amount of bytes per sector
+	/* The number of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
 
-        /* The amount of chunks
+        /* The number of chunks
          */
-        uint32_t amount_of_chunks;
+        uint32_t number_of_chunks;
 
-        /* The amount of sectors
+        /* The number of sectors
          */
-        uint64_t amount_of_sectors;
+        uint64_t number_of_sectors;
 
-        /* The amount of sectors to use as error granularity
+        /* The number of sectors to use as error granularity
          */
         uint32_t error_granularity;
 

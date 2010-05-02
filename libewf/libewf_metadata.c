@@ -43,7 +43,7 @@
 
 #include "ewf_definitions.h"
 
-/* Retrieves the amount of sectors per chunk from the media information
+/* Retrieves the number of sectors per chunk from the media information
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_sectors_per_chunk(
@@ -105,7 +105,7 @@ int libewf_handle_get_sectors_per_chunk(
 	return( 1 );
 }
 
-/* Sets the amount of sectors per chunk in the media information
+/* Sets the number of sectors per chunk in the media information
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_sectors_per_chunk(
@@ -172,7 +172,7 @@ int libewf_handle_set_sectors_per_chunk(
 	return( 1 );
 }
 
-/* Retrieves the amount of bytes per sector from the media information
+/* Retrieves the number of bytes per sector from the media information
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_bytes_per_sector(
@@ -234,7 +234,7 @@ int libewf_handle_get_bytes_per_sector(
 	return( 1 );
 }
 
-/* Sets the amount of bytes per sector in the media information
+/* Sets the number of bytes per sector in the media information
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_bytes_per_sector(
@@ -301,16 +301,16 @@ int libewf_handle_set_bytes_per_sector(
 	return( 1 );
 }
 
-/* Retrieves the amount of sectors from the media information
+/* Retrieves the number of sectors from the media information
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_amount_of_sectors(
+int libewf_handle_get_number_of_sectors(
      libewf_handle_t *handle,
-     uint64_t *amount_of_sectors,
+     uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_amount_of_sectors";
+	static char *function                     = "libewf_handle_get_number_of_sectors";
 
 	if( handle == NULL )
 	{
@@ -336,7 +336,7 @@ int libewf_handle_get_amount_of_sectors(
 
 		return( -1 );
 	}
-	if( amount_of_sectors == NULL )
+	if( number_of_sectors == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -347,18 +347,18 @@ int libewf_handle_get_amount_of_sectors(
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->amount_of_sectors > (uint64_t) INT64_MAX )
+	if( internal_handle->media_values->number_of_sectors > (uint64_t) INT64_MAX )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid amount of sectors value exceeds maximum.",
+		 "%s: invalid number of sectors value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	*amount_of_sectors = internal_handle->media_values->amount_of_sectors;
+	*number_of_sectors = internal_handle->media_values->number_of_sectors;
 
 	return( 1 );
 }
@@ -718,7 +718,7 @@ int libewf_handle_get_media_size(
 	}
 	if( internal_handle->media_values->media_size == 0 )
 	{
-		internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->amount_of_sectors
+		internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->number_of_sectors
 		                                          * (size64_t) internal_handle->media_values->bytes_per_sector;
 	}
 	if( internal_handle->media_values->media_size > (size64_t) INT64_MAX )
@@ -1802,16 +1802,16 @@ int libewf_handle_set_sha1_hash(
 	return( 1 );
 }
 
-/* Retrieves the amount of chunks written
+/* Retrieves the number of chunks written
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_write_amount_of_chunks(
+int libewf_handle_get_number_of_chunks_written(
      libewf_handle_t *handle,
-     uint32_t *amount_of_chunks,
+     uint32_t *number_of_chunks,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_write_amount_of_chunks";
+	static char *function                     = "libewf_handle_get_number_of_chunks_written";
 
 	if( handle == NULL )
 	{
@@ -1837,18 +1837,18 @@ int libewf_handle_get_write_amount_of_chunks(
 
 		return( -1 );
 	}
-	if( amount_of_chunks == NULL )
+	if( number_of_chunks == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of chunks.",
+		 "%s: invalid number of chunks.",
 		 function );
 
 		return( -1 );
 	}
-	*amount_of_chunks = internal_handle->write_io_handle->amount_of_chunks;
+	*number_of_chunks = internal_handle->write_io_handle->number_of_chunks_written;
 
 	return( 1 );
 }
@@ -1970,16 +1970,16 @@ int libewf_handle_copy_media_values(
 	return( 1 );
 }
 
-/* Retrieves the amount of acquiry errors
+/* Retrieves the number of acquiry errors
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_amount_of_acquiry_errors(
+int libewf_handle_get_number_of_acquiry_errors(
      libewf_handle_t *handle,
-     uint32_t *amount_of_errors,
+     uint32_t *number_of_errors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_amount_of_acquiry_errors";
+	static char *function                     = "libewf_handle_get_number_of_acquiry_errors";
 
 	if( handle == NULL )
 	{
@@ -2005,18 +2005,18 @@ int libewf_handle_get_amount_of_acquiry_errors(
 
 		return( -1 );
 	}
-	if( amount_of_errors == NULL )
+	if( number_of_errors == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of errors.",
+		 "%s: invalid number of errors.",
 		 function );
 
 		return( -1 );
 	}
-	*amount_of_errors = internal_handle->acquiry_errors->amount;
+	*number_of_errors = internal_handle->acquiry_errors->number_of_sectors;
 
 	return( 1 );
 }
@@ -2028,7 +2028,7 @@ int libewf_handle_get_acquiry_error(
      libewf_handle_t *handle,
      uint32_t index,
      uint64_t *first_sector,
-     uint64_t *amount_of_sectors,
+     uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
 	static char *function = "libewf_handle_get_acquiry_error";
@@ -2049,7 +2049,7 @@ int libewf_handle_get_acquiry_error(
 	          ( (libewf_internal_handle_t *) handle )->acquiry_errors,
 	          index,
 	          first_sector,
-	          amount_of_sectors,
+	          number_of_sectors,
 	          error );
 
 	if( result == -1 )
@@ -2070,7 +2070,7 @@ int libewf_handle_get_acquiry_error(
 int libewf_handle_add_acquiry_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
-     uint64_t amount_of_sectors,
+     uint64_t number_of_sectors,
      liberror_error_t **error )
 {
 	static char *function = "libewf_handle_add_acquiry_error";
@@ -2089,7 +2089,7 @@ int libewf_handle_add_acquiry_error(
 	if( libewf_sector_table_add_sector(
 	     ( (libewf_internal_handle_t *) handle )->acquiry_errors,
 	     first_sector,
-	     amount_of_sectors,
+	     number_of_sectors,
 	     1,
 	     error ) != 1 )
 	{
@@ -2105,16 +2105,16 @@ int libewf_handle_add_acquiry_error(
 	return( 1 );
 }
 
-/* Retrieves the amount of CRC errors
+/* Retrieves the number of CRC errors
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_amount_of_crc_errors(
+int libewf_handle_get_number_of_crc_errors(
      libewf_handle_t *handle,
-     uint32_t *amount_of_errors,
+     uint32_t *number_of_errors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_amount_of_crc_errors";
+	static char *function                     = "libewf_handle_get_number_of_crc_errors";
 
 	if( handle == NULL )
 	{
@@ -2151,18 +2151,18 @@ int libewf_handle_get_amount_of_crc_errors(
 
 		return( -1 );
 	}
-	if( amount_of_errors == NULL )
+	if( number_of_errors == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of errors.",
+		 "%s: invalid number of errors.",
 		 function );
 
 		return( -1 );
 	}
-	*amount_of_errors = internal_handle->read_io_handle->crc_errors->amount;
+	*number_of_errors = internal_handle->read_io_handle->crc_errors->number_of_sectors;
 
 	return( 1 );
 }
@@ -2174,7 +2174,7 @@ int libewf_handle_get_crc_error(
      libewf_handle_t *handle,
      uint32_t index,
      uint64_t *first_sector,
-     uint64_t *amount_of_sectors,
+     uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2209,7 +2209,7 @@ int libewf_handle_get_crc_error(
 	          internal_handle->read_io_handle->crc_errors,
 	          index,
 	          first_sector,
-	          amount_of_sectors,
+	          number_of_sectors,
 	          error );
 
 	if( result == -1 )
@@ -2230,7 +2230,7 @@ int libewf_handle_get_crc_error(
 int libewf_handle_add_crc_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
-     uint64_t amount_of_sectors,
+     uint64_t number_of_sectors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2263,7 +2263,7 @@ int libewf_handle_add_crc_error(
 	if( libewf_sector_table_add_sector(
 	     internal_handle->read_io_handle->crc_errors,
 	     first_sector,
-	     amount_of_sectors,
+	     number_of_sectors,
 	     1,
 	     error ) != 1 )
 	{
@@ -2279,16 +2279,16 @@ int libewf_handle_add_crc_error(
 	return( 1 );
 }
 
-/* Retrieves the amount of sessions
+/* Retrieves the number of sessions
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_amount_of_sessions(
+int libewf_handle_get_number_of_sessions(
      libewf_handle_t *handle,
-     uint32_t *amount_of_sessions,
+     uint32_t *number_of_sessions,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_amount_of_sessions";
+	static char *function                     = "libewf_handle_get_number_of_sessions";
 
 	if( handle == NULL )
 	{
@@ -2314,18 +2314,18 @@ int libewf_handle_get_amount_of_sessions(
 
 		return( -1 );
 	}
-	if( amount_of_sessions == NULL )
+	if( number_of_sessions == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of sessions.",
+		 "%s: invalid number of sessions.",
 		 function );
 
 		return( -1 );
 	}
-	*amount_of_sessions = internal_handle->sessions->amount;
+	*number_of_sessions = internal_handle->sessions->number_of_sectors;
 
 	return( 1 );
 }
@@ -2337,7 +2337,7 @@ int libewf_handle_get_session(
      libewf_handle_t *handle,
      uint32_t index,
      uint64_t *first_sector,
-     uint64_t *amount_of_sectors,
+     uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
 	static char *function = "libewf_handle_get_session";
@@ -2358,7 +2358,7 @@ int libewf_handle_get_session(
 	          ( (libewf_internal_handle_t *) handle )->sessions,
 	          index,
 	          first_sector,
-	          amount_of_sectors,
+	          number_of_sectors,
 	          error );
 
 	if( result == -1 )
@@ -2379,7 +2379,7 @@ int libewf_handle_get_session(
 int libewf_handle_add_session(
      libewf_handle_t *handle,
      uint64_t first_sector,
-     uint64_t amount_of_sectors,
+     uint64_t number_of_sectors,
      liberror_error_t **error )
 {
 	static char *function = "libewf_handle_add_session";
@@ -2398,7 +2398,7 @@ int libewf_handle_add_session(
 	if( libewf_sector_table_add_sector(
 	     ( (libewf_internal_handle_t *) handle )->sessions,
 	     first_sector,
-	     amount_of_sectors,
+	     number_of_sectors,
 	     0,
 	     error ) != 1 )
 	{
@@ -2631,16 +2631,16 @@ int libewf_handle_set_header_values_date_format(
 	return( 1 );
 }
 
-/* Retrieves the amount of header values
+/* Retrieves the number of header values
  * Returns 1 if successful, 0 if no header values are present or -1 on error
  */
-int libewf_handle_get_amount_of_header_values(
+int libewf_handle_get_number_of_header_values(
      libewf_handle_t *handle,
-     uint32_t *amount_of_values,
+     uint32_t *number_of_values,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_amount_of_header_values";
+	static char *function                     = "libewf_handle_get_number_of_header_values";
 
 	if( handle == NULL )
 	{
@@ -2655,13 +2655,13 @@ int libewf_handle_get_amount_of_header_values(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( amount_of_values == NULL )
+	if( number_of_values == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of values.",
+		 "%s: invalid number of values.",
 		 function );
 
 		return( -1 );
@@ -2687,7 +2687,7 @@ int libewf_handle_get_amount_of_header_values(
 	{
 		return( 0 );
 	}
-	*amount_of_values = internal_handle->header_values->amount_of_values;
+	*number_of_values = internal_handle->header_values->number_of_values;
 
 	return( 1 );
 }
@@ -3439,7 +3439,7 @@ int libewf_handle_parse_header_values(
 	 * only the acquiry software version provides insight in which version of EnCase was used
 	 */
 	if( ( internal_handle->io_handle->format == LIBEWF_FORMAT_ENCASE2 )
-	 && ( internal_handle->header_values->amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	 && ( internal_handle->header_values->number_of_values > LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	 && ( internal_handle->header_values->value != NULL )
 	 && ( internal_handle->header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
 	 && ( internal_handle->header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ][ 0 ] == '3' ) )
@@ -3449,16 +3449,16 @@ int libewf_handle_parse_header_values(
 	return( 1 );
 }
 
-/* Retrieves the amount of hash values
- * Returns 1 if successful or -1 on error
+/* Retrieves the number of hash values
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
  */
-int libewf_handle_get_amount_of_hash_values(
+int libewf_handle_get_number_of_hash_values(
      libewf_handle_t *handle,
-     uint32_t *amount_of_values,
+     uint32_t *number_of_values,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_amount_of_hash_values";
+	static char *function                     = "libewf_handle_get_number_of_hash_values";
 
 	if( handle == NULL )
 	{
@@ -3473,13 +3473,13 @@ int libewf_handle_get_amount_of_hash_values(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( amount_of_values == NULL )
+	if( number_of_values == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of values.",
+		 "%s: invalid number of values.",
 		 function );
 
 		return( -1 );
@@ -3505,7 +3505,7 @@ int libewf_handle_get_amount_of_hash_values(
 	{
 		return( 0 );
 	}
-	*amount_of_values = internal_handle->hash_values->amount_of_values;
+	*number_of_values = internal_handle->hash_values->number_of_values;
 
 	return( 1 );
 }

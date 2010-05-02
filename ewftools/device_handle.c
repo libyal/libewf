@@ -253,7 +253,7 @@ int device_handle_signal_abort(
 int device_handle_open_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error )
 {
 	static char *function  = "device_handle_open_input";
@@ -282,7 +282,7 @@ int device_handle_open_input(
 
 		return( -1 );
 	}
-	if( amount_of_filenames == 1 )
+	if( number_of_filenames == 1 )
 	{
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libsmdev_check_device_wide(
@@ -353,14 +353,14 @@ int device_handle_open_input(
 		if( libsmdev_handle_open_wide(
 		     device_handle->dev_input_handle,
 		     (wchar_t * const *) filenames,
-		     amount_of_filenames,
+		     number_of_filenames,
 		     libsmdev_flags,
 		     error ) != 1 )
 #else
 		if( libsmdev_handle_open(
 		     device_handle->dev_input_handle,
 		     (char * const *) filenames,
-		     amount_of_filenames,
+		     number_of_filenames,
 		     libsmdev_flags,
 		     error ) != 1 )
 #endif
@@ -409,14 +409,14 @@ int device_handle_open_input(
 		if( libsmraw_handle_open_wide(
 		     device_handle->raw_input_handle,
 		     (wchar_t * const *) filenames,
-		     amount_of_filenames,
+		     number_of_filenames,
 		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
 #else
 		if( libsmraw_handle_open(
 		     device_handle->raw_input_handle,
 		     (char * const *) filenames,
-		     amount_of_filenames,
+		     number_of_filenames,
 		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
 #endif
@@ -494,7 +494,7 @@ int device_handle_close(
 }
 
 /* Reads a buffer from the input of the device handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t device_handle_read_buffer(
          device_handle_t *device_handle,
@@ -749,7 +749,7 @@ int device_handle_get_media_type(
 	return( 1 );
 }
 
-/* Retrieves the amount of bytes per sector
+/* Retrieves the number of bytes per sector
  * Returns 1 if successful or -1 on error
  */
 int device_handle_get_bytes_per_sector(
@@ -938,7 +938,7 @@ int device_handle_get_information_value(
  */
 int device_handle_set_error_values(
      device_handle_t *device_handle,
-     uint8_t amount_of_error_retries,
+     uint8_t number_of_error_retries,
      size_t error_granularity,
      uint8_t zero_buffer_on_error,
      liberror_error_t **error )
@@ -961,7 +961,7 @@ int device_handle_set_error_values(
 	{
 		if( libsmdev_handle_set_number_of_error_retries(
 		     device_handle->dev_input_handle,
-		     amount_of_error_retries,
+		     number_of_error_retries,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1009,15 +1009,15 @@ int device_handle_set_error_values(
 	return( 1 );
 }
 
-/* Retrieves the amount of read errors
+/* Retrieves the number of read errors
  * Returns 1 if successful or -1 on error
  */
-int device_handle_get_amount_of_read_errors(
+int device_handle_get_number_of_read_errors(
      device_handle_t *device_handle,
-     int *amount_of_read_errors,
+     int *number_of_read_errors,
      liberror_error_t **error )
 {
-	static char *function = "device_handle_get_amount_of_read_errors";
+	static char *function = "device_handle_get_number_of_read_errors";
 
 	if( device_handle == NULL )
 	{
@@ -1034,7 +1034,7 @@ int device_handle_get_amount_of_read_errors(
 	{
 		if( libsmdev_handle_get_number_of_errors(
 		     device_handle->dev_input_handle,
-		     amount_of_read_errors,
+		     number_of_read_errors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1049,18 +1049,18 @@ int device_handle_get_amount_of_read_errors(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( amount_of_read_errors == NULL )
+		if( number_of_read_errors == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid amount of read errors.",
+			 "%s: invalid number of read errors.",
 			 function );
 
 			return( -1 );
 		}
-		*amount_of_read_errors = 0;
+		*number_of_read_errors = 0;
 	}
 	return( 1 );
 }
@@ -1075,7 +1075,7 @@ int device_handle_get_read_error(
      size64_t *size,
      liberror_error_t **error )
 {
-	static char *function = "device_handle_get_amount_of_read_errors";
+	static char *function = "device_handle_get_number_of_read_errors";
 
 	if( device_handle == NULL )
 	{
@@ -1101,7 +1101,7 @@ int device_handle_get_read_error(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of read errors.",
+			 "%s: unable to retrieve number of read errors.",
 			 function );
 
 			return( -1 );
@@ -1557,7 +1557,7 @@ int device_handle_read_errors_fprint(
 	off64_t read_error_offset = 0;
 	size64_t read_error_size  = 0;
 	uint32_t bytes_per_sector = 0;
-	int amount_of_read_errors = 0;
+	int number_of_read_errors = 0;
 	int read_error_iterator   = 0;
 	int result                = 1;
 
@@ -1612,7 +1612,7 @@ int device_handle_read_errors_fprint(
 		}
 		if( libsmdev_handle_get_number_of_errors(
 		     device_handle->dev_input_handle,
-		     &amount_of_read_errors,
+		     &number_of_read_errors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1624,18 +1624,18 @@ int device_handle_read_errors_fprint(
 
 			return( -1 );
 		}
-		if( amount_of_read_errors > 0 )
+		if( number_of_read_errors > 0 )
 		{
 			fprintf(
 			 stream,
 			 "Errors reading device:\n" );
 			fprintf(
 			 stream,
-			 "\ttotal amount: %d\n",
-			 amount_of_read_errors );
+			 "\ttotal number: %d\n",
+			 number_of_read_errors );
 			
 			for( read_error_iterator = 0;
-			     read_error_iterator < amount_of_read_errors;
+			     read_error_iterator < number_of_read_errors;
 			     read_error_iterator++ )
 			{
 				if( libsmdev_handle_get_error(
@@ -1659,7 +1659,7 @@ int device_handle_read_errors_fprint(
 				{
 					fprintf(
 					 stream,
-					 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 " (offset: 0x%08" PRIx64 " of size: %" PRIu64 ")\n",
+					 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 " (offset: 0x%08" PRIx64 " of size: %" PRIu64 ")\n",
 					 read_error_offset / bytes_per_sector,
 					 ( read_error_offset + read_error_size ) / bytes_per_sector,
 					 read_error_size / bytes_per_sector,

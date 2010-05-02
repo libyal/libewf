@@ -219,7 +219,7 @@ int info_handle_signal_abort(
 int info_handle_open_input(
      info_handle_t *info_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
@@ -260,18 +260,18 @@ int info_handle_open_input(
 
 		return( -1 );
 	}
-	if( amount_of_filenames <= 0 )
+	if( number_of_filenames <= 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount of filenames.",
+		 "%s: invalid number of filenames.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_filenames == 1 )
+	if( number_of_filenames == 1 )
 	{
 		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
@@ -282,7 +282,7 @@ int info_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob(
@@ -290,7 +290,7 @@ int info_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #endif
 		{
@@ -309,14 +309,14 @@ int info_handle_open_input(
 	if( libewf_handle_open_wide(
 	     info_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     info_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #endif
@@ -332,10 +332,10 @@ int info_handle_open_input(
 	}
 	if( libewf_filenames != NULL )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		for( ; number_of_filenames > 0; number_of_filenames-- )
 		{
 			memory_free(
-			 libewf_filenames[ amount_of_filenames - 1 ] );
+			 libewf_filenames[ number_of_filenames - 1 ] );
 		}
 		memory_free(
 		 libewf_filenames );
@@ -747,7 +747,7 @@ int info_handle_header_values_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_amount_of_header_values(
+	if( libewf_handle_get_number_of_header_values(
 	     info_handle->input_handle,
 	     &number_of_values,
 	     error ) == -1 )
@@ -756,7 +756,7 @@ int info_handle_header_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of header values.",
+		 "%s: unable to retrieve the number of header values.",
 		 function );
 
 		return( -1 );
@@ -1417,7 +1417,7 @@ int info_handle_header_value_extents_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported amount of extents elements in header value.",
+		 "%s: unsupported number of extents elements in header value.",
 		 function );
 
 		libsystem_split_values_free(
@@ -1474,7 +1474,7 @@ int info_handle_media_information_fprint(
 	char *format_string        = NULL;
 	static char *function      = "info_handle_media_information_fprint";
 	size64_t media_size        = 0;
-	uint64_t amount_of_sectors = 0;
+	uint64_t number_of_sectors = 0;
 	uint32_t bytes_per_sector  = 0;
 	uint32_t error_granularity = 0;
 	uint32_t sectors_per_chunk = 0;
@@ -1874,15 +1874,15 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
-		if( libewf_handle_get_amount_of_sectors(
+		if( libewf_handle_get_number_of_sectors(
 		     info_handle->input_handle,
-		     &amount_of_sectors,
+		     &number_of_sectors,
 		     error ) == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tAmount of sectors:\t%" PRIu64 "\n",
-			 amount_of_sectors );
+			 "\tNumber of sectors:\t%" PRIu64 "\n",
+			 number_of_sectors );
 		}
 		else
 		{
@@ -1890,7 +1890,7 @@ int info_handle_media_information_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of sectors.",
+			 "%s: unable to retrieve number of sectors.",
 			 function );
 
 			result = -1;
@@ -2068,7 +2068,7 @@ int info_handle_hash_values_fprint(
 		 stored_md5_hash_string );
 	}
 #endif
-	if( libewf_handle_get_amount_of_hash_values(
+	if( libewf_handle_get_number_of_hash_values(
 	     info_handle->input_handle,
 	     &number_of_values,
 	     error ) == -1 )
@@ -2077,7 +2077,7 @@ int info_handle_hash_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of hash values.",
+		 "%s: unable to retrieve number of hash values.",
 		 function );
 
 		return( -1 );
@@ -2200,8 +2200,8 @@ int info_handle_acquiry_errors_fprint(
 {
 	static char *function      = "info_handle_acquiry_errors_fprint";
 	uint64_t start_sector      = 0;
-	uint64_t amount_of_sectors = 0;
-	uint32_t amount_of_errors  = 0;
+	uint64_t number_of_sectors = 0;
+	uint32_t number_of_errors  = 0;
 	uint32_t error_iterator    = 0;
 	int result                 = 1;
 
@@ -2238,39 +2238,39 @@ int info_handle_acquiry_errors_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_amount_of_acquiry_errors(
+	if( libewf_handle_get_number_of_acquiry_errors(
 	     info_handle->input_handle,
-	     &amount_of_errors,
+	     &number_of_errors,
 	     error ) == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of acquiry errors.",
+		 "%s: unable to retrieve the number of acquiry errors.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_errors > 0 )
+	if( number_of_errors > 0 )
 	{
 		fprintf(
 		 stream,
 		 "Read errors during acquiry:\n" );
 		fprintf(
 		 stream,
-		 "\ttotal amount: %" PRIu32 "\n",
-		 amount_of_errors );
+		 "\ttotal number: %" PRIu32 "\n",
+		 number_of_errors );
 		
 		for( error_iterator = 0;
-		     error_iterator < amount_of_errors;
+		     error_iterator < number_of_errors;
 		     error_iterator++ )
 		{
 			if( libewf_handle_get_acquiry_error(
 			     info_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
-			     &amount_of_sectors,
+			     &number_of_sectors,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -2282,16 +2282,16 @@ int info_handle_acquiry_errors_fprint(
 				 error_iterator );
 
 				start_sector      = 0;
-				amount_of_sectors = 0;
+				number_of_sectors = 0;
 
 				result = -1;
 			}
 			fprintf(
 			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
 			 start_sector,
-			 start_sector + amount_of_sectors,
-			 amount_of_sectors );
+			 start_sector + number_of_sectors,
+			 number_of_sectors );
 		}
 		fprintf(
 		 stream,
@@ -2310,8 +2310,8 @@ int info_handle_sessions_fprint(
 {
 	static char *function       = "info_handle_sessions_fprint";
 	uint64_t start_sector       = 0;
-	uint64_t amount_of_sectors  = 0;
-	uint32_t amount_of_sessions = 0;
+	uint64_t number_of_sectors  = 0;
+	uint32_t number_of_sessions = 0;
 	uint32_t session_iterator   = 0;
 	int result                  = 1;
 
@@ -2348,39 +2348,39 @@ int info_handle_sessions_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_amount_of_sessions(
+	if( libewf_handle_get_number_of_sessions(
 	     info_handle->input_handle,
-	     &amount_of_sessions,
+	     &number_of_sessions,
 	     error ) == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of sessions.",
+		 "%s: unable to retrieve the number of sessions.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_sessions > 0 )
+	if( number_of_sessions > 0 )
 	{
 		fprintf(
 		 stream,
 		 "Sessions:\n" );
 		fprintf(
 		 stream,
-		 "\ttotal amount: %" PRIu32 "\n",
-		 amount_of_sessions );
+		 "\ttotal number: %" PRIu32 "\n",
+		 number_of_sessions );
 
 		for( session_iterator = 0;
-		     session_iterator < amount_of_sessions;
+		     session_iterator < number_of_sessions;
 		     session_iterator++ )
 		{
 			if( libewf_handle_get_session(
 			     info_handle->input_handle,
 			     session_iterator,
 			     &start_sector,
-			     &amount_of_sectors,
+			     &number_of_sectors,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -2392,16 +2392,16 @@ int info_handle_sessions_fprint(
 				 session_iterator );
 
 				start_sector      = 0;
-				amount_of_sectors = 0;
+				number_of_sectors = 0;
 
 				result = -1;
 			}
 			fprintf(
 			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu64 "\n",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
 			 start_sector,
-			 start_sector + amount_of_sectors,
-			 amount_of_sectors );
+			 start_sector + number_of_sectors,
+			 number_of_sectors );
 		}
 		fprintf(
 		 stream,
@@ -2532,7 +2532,7 @@ int info_handle_file_entry_fprint(
 	uint8_t *name                       = NULL;
 	static char *function               = "info_handle_file_entry_fprint";
 	size_t name_size                    = 0;
-	int amount_of_sub_file_entries      = 0;
+	int number_of_sub_file_entries      = 0;
 	int iterator                        = 0;
 
 	if( info_handle == NULL )
@@ -2636,22 +2636,22 @@ int info_handle_file_entry_fprint(
 		memory_free(
 		 name );
 	}
-	if( libewf_file_entry_get_amount_of_sub_file_entries(
+	if( libewf_file_entry_get_number_of_sub_file_entries(
 	     file_entry,
-	     &amount_of_sub_file_entries,
+	     &number_of_sub_file_entries,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of sub file entries.",
+		 "%s: unable to retrieve number of sub file entries.",
 		 function );
 
 		return( -1 );
 	}
 	for( iterator = 0;
-	     iterator < amount_of_sub_file_entries;
+	     iterator < number_of_sub_file_entries;
 	     iterator++ )
 	{
 		if( libewf_file_entry_get_sub_file_entry(

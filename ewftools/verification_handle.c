@@ -130,7 +130,7 @@ int verification_handle_initialize(
 		}
 #ifdef TODO
 /* TODO: have application determine limit value and set to value - 4 */
-		if( libewf_handle_set_maximum_amount_of_open_handles(
+		if( libewf_handle_set_maximum_number_of_open_handles(
 		     ( *verification_handle )->input_handle,
 		     1000,
 		     error ) != 1 )
@@ -139,7 +139,7 @@ int verification_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set maximum amount of open handles.",
+			 "%s: unable to set maximum number of open handles.",
 			 function );
 
 			return( -1 );
@@ -286,7 +286,7 @@ int verification_handle_signal_abort(
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
@@ -327,18 +327,18 @@ int verification_handle_open_input(
 
 		return( -1 );
 	}
-	if( amount_of_filenames <= 0 )
+	if( number_of_filenames <= 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount of filenames.",
+		 "%s: invalid number of filenames.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_filenames == 1 )
+	if( number_of_filenames == 1 )
 	{
 		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
@@ -349,7 +349,7 @@ int verification_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob(
@@ -357,7 +357,7 @@ int verification_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #endif
 		{
@@ -376,14 +376,14 @@ int verification_handle_open_input(
 	if( libewf_handle_open_wide(
 	     verification_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     verification_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #endif
@@ -399,10 +399,10 @@ int verification_handle_open_input(
 	}
 	if( libewf_filenames != NULL )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		for( ; number_of_filenames > 0; number_of_filenames-- )
 		{
 			memory_free(
-			 libewf_filenames[ amount_of_filenames - 1 ] );
+			 libewf_filenames[ number_of_filenames - 1 ] );
 		}
 		memory_free(
 		 libewf_filenames );
@@ -516,14 +516,14 @@ ssize_t verification_handle_prepare_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
+	storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
 
 	process_count = libewf_handle_prepare_read_chunk(
 	                 verification_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->compression_buffer_data_size,
 	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 &( storage_media_buffer->raw_buffer_data_size ),
 	                 storage_media_buffer->is_compressed,
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
@@ -597,7 +597,7 @@ ssize_t verification_handle_prepare_read_buffer(
 		storage_media_buffer->data_in_compression_buffer = 0;
 	}
 #else
-	process_count = storage_media_buffer->raw_buffer_amount;
+	process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 #endif
 	verification_handle->last_offset_read += process_count;
 
@@ -605,7 +605,7 @@ ssize_t verification_handle_prepare_read_buffer(
 }
 
 /* Reads a buffer from the input of the verification handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t verification_handle_read_buffer(
          verification_handle_t *verification_handle,
@@ -679,9 +679,9 @@ ssize_t verification_handle_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_amount = read_count;
+	storage_media_buffer->compression_buffer_data_size = (size_t) read_count;
 #else
-	storage_media_buffer->raw_buffer_amount         = read_count;
+	storage_media_buffer->raw_buffer_data_size         = (size_t) read_count;
 #endif
 
 	return( read_count );
@@ -875,15 +875,15 @@ int verification_handle_get_values(
 }
 
 
-/* Retrieves the amount of CRC errors
+/* Retrieves the number of CRC errors
  * Returns 1 if successful or -1 on error
  */
-int verification_handle_get_amount_of_crc_errors(
+int verification_handle_get_number_of_crc_errors(
      verification_handle_t *verification_handle,
-     uint32_t *amount_of_errors,
+     uint32_t *number_of_errors,
      liberror_error_t **error )
 {
-	static char *function = "verification_handle_get_amount_of_crc_errors";
+	static char *function = "verification_handle_get_number_of_crc_errors";
 
 	if( verification_handle == NULL )
 	{
@@ -907,27 +907,27 @@ int verification_handle_get_amount_of_crc_errors(
 
 		return( -1 );
 	}
-	if( amount_of_errors == NULL )
+	if( number_of_errors == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of errors.",
+		 "%s: invalid number of errors.",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_handle_get_amount_of_crc_errors(
+	if( libewf_handle_get_number_of_crc_errors(
 	     verification_handle->input_handle,
-	     amount_of_errors,
+	     number_of_errors,
 	     error ) == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of CRC errors.",
+		 "%s: unable to retrieve the number of CRC errors.",
 		 function );
 
 		return( -1 );
@@ -1156,12 +1156,12 @@ int verification_handle_set_error_handling_values(
 int verification_handle_add_read_error(
       verification_handle_t *verification_handle,
       off64_t start_offset,
-      size_t amount_of_bytes,
+      size_t number_of_bytes,
       liberror_error_t **error )
 {
 	static char *function      = "verification_handle_add_read_error";
 	uint64_t start_sector      = 0;
-	uint64_t amount_of_sectors = 0;
+	uint64_t number_of_sectors = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -1197,12 +1197,12 @@ int verification_handle_add_read_error(
 		return( -1 );
 	}
 	start_sector      = start_offset / verification_handle->bytes_per_sector;
-	amount_of_sectors = amount_of_bytes / verification_handle->bytes_per_sector;
+	number_of_sectors = number_of_bytes / verification_handle->bytes_per_sector;
 
 	if( libewf_handle_add_crc_error(
 	     verification_handle->input_handle,
 	     start_sector,
-	     amount_of_sectors,
+	     number_of_sectors,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1452,7 +1452,7 @@ int verification_handle_additional_hash_values_fprint(
 	static char *function             = "verification_handle_additional_hash_values_fprint";
 	size_t hash_value_identifier_size = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
 	size_t hash_value_size            = VERIFICATION_HANDLE_VALUE_SIZE;
-	uint32_t amount_of_values         = 0;
+	uint32_t number_of_values         = 0;
 	uint32_t hash_value_iterator      = 0;
 	uint8_t print_header              = 1;
 	int result                        = 1;
@@ -1490,21 +1490,23 @@ int verification_handle_additional_hash_values_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_amount_of_hash_values(
+	if( libewf_handle_get_number_of_hash_values(
 	     verification_handle->input_handle,
-	     &amount_of_values,
+	     &number_of_values,
 	     error ) == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of hash values.",
+		 "%s: unable to retrieve number of hash values.",
 		 function );
 
 		return( -1 );
 	}
-	for( hash_value_iterator = 0; hash_value_iterator < amount_of_values; hash_value_iterator++ )
+	for( hash_value_iterator = 0;
+	     hash_value_iterator < number_of_values;
+	     hash_value_iterator++ )
 	{
 		if( libewf_handle_get_hash_value_identifier_size(
 		     verification_handle->input_handle,
@@ -1626,8 +1628,8 @@ int verification_handle_crc_errors_fprint(
 	size_t last_filename_size                    = 0;
 	uint64_t start_sector                        = 0;
 	uint64_t last_sector                         = 0;
-	uint64_t amount_of_sectors                   = 0;
-	uint32_t amount_of_errors                    = 0;
+	uint64_t number_of_sectors                   = 0;
+	uint32_t number_of_errors                    = 0;
 	uint32_t error_iterator                      = 0;
 	int result                                   = 1;
 
@@ -1664,37 +1666,39 @@ int verification_handle_crc_errors_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_amount_of_crc_errors(
+	if( libewf_handle_get_number_of_crc_errors(
 	     verification_handle->input_handle,
-	     &amount_of_errors,
+	     &number_of_errors,
 	     error ) == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of CRC errors.",
+		 "%s: unable to retrieve the number of CRC errors.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_errors > 0 )
+	if( number_of_errors > 0 )
 	{
 		fprintf( 
 		stream,
 		 "Sector validation errors:\n" );
 		fprintf(
 		 stream,
-		 "\ttotal amount: %" PRIu32 "\n",
-		 amount_of_errors );
+		 "\ttotal number: %" PRIu32 "\n",
+		 number_of_errors );
 
-		for( error_iterator = 0; error_iterator < amount_of_errors; error_iterator++ )
+		for( error_iterator = 0;
+		     error_iterator < number_of_errors;
+		     error_iterator++ )
 		{
 			if( libewf_handle_get_crc_error(
 			     verification_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
-			     &amount_of_sectors,
+			     &number_of_sectors,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1706,20 +1710,20 @@ int verification_handle_crc_errors_fprint(
 				 error_iterator );
 
 				start_sector      = 0;
-				amount_of_sectors = 0;
+				number_of_sectors = 0;
 
 				result = -1;
 
 				continue;
 			}
-			last_sector = start_sector + amount_of_sectors;
+			last_sector = start_sector + number_of_sectors;
 
 			fprintf(
 			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu64 ")",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (number: %" PRIu64 ")",
 			 start_sector,
 			 last_sector,
-			 amount_of_sectors );
+			 number_of_sectors );
 
 			fprintf(
 			 stream,

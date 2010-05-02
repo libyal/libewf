@@ -33,7 +33,7 @@
  */
 int libewf_sector_table_initialize(
      libewf_sector_table_t **sector_table,
-     uint32_t amount,
+     uint32_t number_of_sectors,
      liberror_error_t **error )
 {
 	static char *function    = "libewf_sector_table_initialize";
@@ -52,7 +52,7 @@ int libewf_sector_table_initialize(
 	}
 	if( *sector_table == NULL )
 	{
-		sector_table_size = sizeof( libewf_sector_table_entry_t ) * amount;
+		sector_table_size = sizeof( libewf_sector_table_entry_t ) * number_of_sectors;
 
 		if( sector_table_size > (size_t) SSIZE_MAX )
 		{
@@ -98,7 +98,7 @@ int libewf_sector_table_initialize(
 
 			return( -1 );
 		}
-		if( amount > 0 )
+		if( number_of_sectors > 0 )
 		{
 			( *sector_table )->sector = (libewf_sector_table_entry_t *) memory_allocate(
 			                                                             sector_table_size );
@@ -141,7 +141,7 @@ int libewf_sector_table_initialize(
 				return( -1 );
 			}
 		}
-		( *sector_table )->amount = amount;
+		( *sector_table )->number_of_sectors = number_of_sectors;
 	}
 	return( 1 );
 }
@@ -184,7 +184,7 @@ int libewf_sector_table_free(
  */
 int libewf_sector_table_resize(
      libewf_sector_table_t *sector_table,
-     uint32_t amount,
+     uint32_t number_of_sectors,
      liberror_error_t **error )
 {
 	void *reallocation       = NULL;
@@ -202,9 +202,9 @@ int libewf_sector_table_resize(
 
 		return( -1 );
 	}
-	if( sector_table->amount < amount )
+	if( sector_table->number_of_sectors < number_of_sectors )
 	{
-		sector_table_size = sizeof( libewf_sector_table_entry_t ) * amount;
+		sector_table_size = sizeof( libewf_sector_table_entry_t ) * number_of_sectors;
 
 		if( sector_table_size > (size_t) SSIZE_MAX )
 		{
@@ -235,9 +235,9 @@ int libewf_sector_table_resize(
 		sector_table->sector = (libewf_sector_table_entry_t *) reallocation;
 
 		if( memory_set(
-		     &( sector_table->sector[ sector_table->amount ] ),
+		     &( sector_table->sector[ sector_table->number_of_sectors ] ),
 		     0,
-		     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )
+		     ( sizeof( libewf_sector_table_entry_t ) * ( number_of_sectors - sector_table->number_of_sectors ) ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -248,7 +248,7 @@ int libewf_sector_table_resize(
 
 			return( 1 );
 		}
-		sector_table->amount = amount;
+		sector_table->number_of_sectors = number_of_sectors;
 	}
 	return( 1 );
 }
@@ -260,7 +260,7 @@ int libewf_sector_table_get_sector(
      libewf_sector_table_t *sector_table,
      uint32_t index,
      uint64_t *first_sector,
-     uint64_t *amount_of_sectors,
+     uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
 	static char *function = "libewf_sector_table_get_sector";
@@ -276,7 +276,7 @@ int libewf_sector_table_get_sector(
 
 		return( -1 );
 	}
-	if( sector_table->amount == 0 )
+	if( sector_table->number_of_sectors == 0 )
 	{
 		return( 0 );
 	}
@@ -302,18 +302,18 @@ int libewf_sector_table_get_sector(
 
 		return( -1 );
 	}
-	if( amount_of_sectors == NULL )
+	if( number_of_sectors == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of sectors.",
+		 "%s: invalid number of sectors.",
 		 function );
 
 		return( -1 );
 	}
-	if( index >= sector_table->amount )
+	if( index >= sector_table->number_of_sectors )
 	{
 		liberror_error_set(
 		 error,
@@ -325,7 +325,7 @@ int libewf_sector_table_get_sector(
 		return( -1 );
 	}
 	*first_sector      = sector_table->sector[ index ].first_sector;
-	*amount_of_sectors = sector_table->sector[ index ].amount_of_sectors;
+	*number_of_sectors = sector_table->sector[ index ].number_of_sectors;
 
 	return( 1 );
 }
@@ -336,7 +336,7 @@ int libewf_sector_table_get_sector(
 int libewf_sector_table_add_sector(
      libewf_sector_table_t *sector_table,
      uint64_t first_sector,
-     uint64_t amount_of_sectors,
+     uint64_t number_of_sectors,
      int merge_continious_entries,
      liberror_error_t **error )
 {
@@ -361,21 +361,23 @@ int libewf_sector_table_add_sector(
 	{
 		/* Check if the sector is already in the table
 		 */
-		for( iterator = 0; iterator < sector_table->amount; iterator++ )
+		for( iterator = 0;
+		     iterator < sector_table->number_of_sectors;
+		     iterator++ )
 		{
 			last_range_sector = sector_table->sector[ iterator ].first_sector
-			                  + sector_table->sector[ iterator ].amount_of_sectors;
+			                  + sector_table->sector[ iterator ].number_of_sectors;
 
 			if( ( first_sector >= sector_table->sector[ iterator ].first_sector )
 			 && ( first_sector <= last_range_sector ) )
 			{
 				/* Merge current sector with existing
 				 */
-				last_sector = first_sector + amount_of_sectors;
+				last_sector = first_sector + number_of_sectors;
 
 				if( last_sector > last_range_sector )
 				{
-					sector_table->sector[ iterator ].amount_of_sectors += last_sector - last_range_sector;
+					sector_table->sector[ iterator ].number_of_sectors += last_sector - last_range_sector;
 				}
 				return( 1 );
 			}
@@ -385,7 +387,7 @@ int libewf_sector_table_add_sector(
 	 */
 	if( libewf_sector_table_resize(
 	     sector_table,
-	     sector_table->amount + 1,
+	     sector_table->number_of_sectors + 1,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -397,8 +399,8 @@ int libewf_sector_table_add_sector(
 
 		return( -1 );
 	}
-	sector_table->sector[ sector_table->amount - 1 ].first_sector      = first_sector;
-	sector_table->sector[ sector_table->amount - 1 ].amount_of_sectors = amount_of_sectors;
+	sector_table->sector[ sector_table->number_of_sectors - 1 ].first_sector      = first_sector;
+	sector_table->sector[ sector_table->number_of_sectors - 1 ].number_of_sectors = number_of_sectors;
 
 	return( 1 );
 }

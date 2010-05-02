@@ -40,7 +40,7 @@
  */
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
-     int amount,
+     int number_of_handles,
      size64_t maximum_segment_size,
      liberror_error_t **error )
 {
@@ -53,17 +53,6 @@ int libewf_segment_table_initialize(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( amount <= 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount value cannot be zero or less.",
 		 function );
 
 		return( -1 );
@@ -105,7 +94,7 @@ int libewf_segment_table_initialize(
 		}
 		if( libewf_array_initialize(
 		     &( ( *segment_table )->segment_file_handle_array ),
-		     (int) amount,
+		     number_of_handles,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -182,7 +171,7 @@ int libewf_segment_table_free(
  */
 int libewf_segment_table_resize(
      libewf_segment_table_t *segment_table,
-     int amount,
+     int number_of_handles,
      liberror_error_t **error )
 {
 	static char *function = "libewf_segment_table_resize";
@@ -198,20 +187,9 @@ int libewf_segment_table_resize(
 
 		return( -1 );
 	}
-	if( amount <= 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount value cannot be zero or less.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_array_resize(
 	     segment_table->segment_file_handle_array,
-	     (int) amount,
+	     number_of_handles,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1182,15 +1160,15 @@ int libewf_segment_table_set_basename_wide(
 }
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-/* Retrieves the amount of handles in the segment table
+/* Retrieves the number of handles in the segment table
  * Returns 1 if successful or -1 on error
  */
-int libewf_segment_table_get_amount_of_handles(
+int libewf_segment_table_get_number_of_handles(
      libewf_segment_table_t *segment_table,
-     int *amount_of_handles,
+     int *number_of_handles,
      liberror_error_t **error )
 {
-	static char *function = "libewf_segment_table_get_amount_of_handles";
+	static char *function = "libewf_segment_table_get_number_of_handles";
 
 	if( segment_table == NULL )
 	{
@@ -1203,16 +1181,16 @@ int libewf_segment_table_get_amount_of_handles(
 
 		return( -1 );
 	}
-	if( libewf_array_get_amount_of_entries(
+	if( libewf_array_get_number_of_entries(
 	     segment_table->segment_file_handle_array,
-	     amount_of_handles,
+	     number_of_handles,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of entries in segment file handle array.",
+		 "%s: unable to retrieve number of entries in segment file handle array.",
 		 function );
 
 		return( -1 );
@@ -1272,7 +1250,7 @@ int libewf_segment_table_set_handle(
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_segment_table_set_handle";
-	int amount_of_handles                             = 0;
+	int number_of_handles                             = 0;
 
 	if( segment_table == NULL )
 	{
@@ -1285,21 +1263,21 @@ int libewf_segment_table_set_handle(
 
 		return( -1 );
 	}
-	if( libewf_array_get_amount_of_entries(
+	if( libewf_array_get_number_of_entries(
 	     segment_table->segment_file_handle_array,
-	     &amount_of_handles,
+	     &number_of_handles,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of entries in segment file handle array.",
+		 "%s: unable to retrieve number of entries in segment file handle array.",
 		 function );
 
 		return( -1 );
 	}
-	if( handle_index >= amount_of_handles )
+	if( handle_index >= number_of_handles )
 	{
 		if( libewf_segment_table_resize(
 		     segment_table,

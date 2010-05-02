@@ -1,4 +1,4 @@
-.Dd April 18, 2010
+.Dd May 2, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -23,17 +23,17 @@ Support functions
 .Ft int
 .Fn libewf_check_file_signature "const char *filename, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob "const char *filename, size_t filename_length, uint8_t format, char **filenames[], int *amount_of_filenames, libewf_error_t **error"
+.Fn libewf_glob "const char *filename, size_t filename_length, uint8_t format, char **filenames[], int *number_of_filenames, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob_free "char *filenames[], int amount_of_filenames, libewf_error_t **error"
+.Fn libewf_glob_free "char *filenames[], int number_of_filenames, libewf_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
 .Fn libewf_check_file_signature_wide "const wchar_t *filename, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t **filenames[], int *amount_of_filenames, libewf_error_t **error"
+.Fn libewf_glob_wide "const wchar_t *filename, size_t filename_length, uint8_t format, wchar_t **filenames[], int *number_of_filenames, libewf_error_t **error"
 .Ft int
-.Fn libewf_glob_wide_free "wchar_t *filenames[], int amount_of_filenames, libewf_error_t **error"
+.Fn libewf_glob_wide_free "wchar_t *filenames[], int number_of_filenames, libewf_error_t **error"
 .Pp
 Available when compiled with libbfio support:
 .Ft int
@@ -69,7 +69,7 @@ File/Handle functions
 .Ft int
 .Fn libewf_handle_free "libewf_handle_t **handle, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_open "libewf_handle_t *handle, char * const filenames[], int amount_of_filenames, uint8_t flags, libewf_error_t **error"
+.Fn libewf_handle_open "libewf_handle_t *handle, char * const filenames[], int number_of_filenames, uint8_t flags, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_close "libewf_handle_t *handle, libewf_error_t **error"
 .Ft ssize_t
@@ -95,7 +95,7 @@ File/Handle functions
 .Ft off64_t
 .Fn libewf_handle_get_offset "libewf_handle_t *handle, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_maximum_amount_of_open_handles "libewf_handle_t *handle, int maximum_amount_of_open_handles, libewf_error_t **error"
+.Fn libewf_handle_set_maximum_number_of_open_handles "libewf_handle_t *handle, int maximum_number_of_open_handles, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_segment_filename_size "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int
@@ -123,7 +123,7 @@ File/Handle functions
 .Pp
 Available when compiled with wide character string support:
 .Ft int
-.Fn libewf_handle_open_wide "libewf_handle_t *handle, wchar_t * const filenames[], int amount_of_filenames, uint8_t flags"
+.Fn libewf_handle_open_wide "libewf_handle_t *handle, wchar_t * const filenames[], int number_of_filenames, uint8_t flags"
 .Ft int
 .Fn libewf_handle_get_segment_filename_size_wide "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int
@@ -157,7 +157,7 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_set_bytes_per_sector "libewf_handle_t *handle, uint32_t bytes_per_sector, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_amount_of_sectors "libewf_handle_t *handle, uint64_t *amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_number_of_sectors "libewf_handle_t *handle, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_chunk_size "libewf_handle_t *handle, size32_t *chunk_size, libewf_error_t **error, libewf_error_t **error"
 .Ft int
@@ -197,29 +197,29 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_set_sha1_hash "libewf_handle_t *handle, uint8_t *sha1_hash, size_t size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_write_amount_of_chunks "libewf_handle_t *handle, uint32_t *amount_of_chunks, libewf_error_t **error"
+.Fn libewf_handle_get_number_of_chunks_written "libewf_handle_t *handle, uint32_t *number_of_chunks, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_read_wipe_chunk_on_error "libewf_handle_t *handle, uint8_t wipe_on_error, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_copy_media_values "libewf_handle_t *destination_handle, libewf_handle_t *source_handle, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_amount_of_acquiry_errors "libewf_handle_t *handle, uint32_t *amount_of_errors, libewf_error_t **error"
+.Fn libewf_handle_get_number_of_acquiry_errors "libewf_handle_t *handle, uint32_t *number_of_errors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_acquiry_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_acquiry_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_add_acquiry_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_add_acquiry_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_amount_of_crc_errors "libewf_handle_t *handle, uint32_t *amount_of_errors, libewf_error_t **error"
+.Fn libewf_handle_get_number_of_crc_errors "libewf_handle_t *handle, uint32_t *number_of_errors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_crc_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_crc_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_add_crc_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_add_crc_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_amount_of_sessions "libewf_handle_t *handle, uint32_t *amount_of_sessions, libewf_error_t **error"
+.Fn libewf_handle_get_number_of_sessions "libewf_handle_t *handle, uint32_t *number_of_sessions, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_session "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_session "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_add_session "libewf_handle_t *handle, uint64_t first_sector, uint64_t amount_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_add_session "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_header_codepage "libewf_handle_t *handle, int *codepage, libewf_error_t **error"
 .Ft int
@@ -229,7 +229,7 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_set_header_values_data_format "libewf_handle_t *handle, int date_format, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_amount_of_header_values "libewf_handle_t *handle, uint32_t *amount_of_values, libewf_error_t **error"
+.Fn libewf_handle_get_number_of_header_values "libewf_handle_t *handle, uint32_t *number_of_values, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_header_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
 .Ft int
@@ -291,7 +291,7 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_copy_header_values "libewf_handle_t *destination_handle, libewf_handle_t *source_handle, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_amount_of_hash_values "libewf_handle_t *handle, uint32_t *amount_of_values, libewf_error_t **error"
+.Fn libewf_handle_get_number_of_hash_values "libewf_handle_t *handle, uint32_t *number_of_values, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_hash_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
 .Ft int
@@ -323,7 +323,7 @@ Single file entry functions
 .Ft int
 .Fn libewf_file_entry_get_size "libewf_file_entry_t *file_entry, size64_t *size, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_amount_of_sub_file_entries "libewf_file_entry_t *file_entry, int *amount_of_sub_file_entries, libewf_error_t **error"
+.Fn libewf_file_entry_get_number_of_sub_file_entries "libewf_file_entry_t *file_entry, int *number_of_sub_file_entries, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_sub_file_entry "libewf_file_entry_t *file_entry, int sub_file_entry_index, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
 .Ft ssize_t
@@ -422,7 +422,7 @@ function can be used to add a CRC error (a validation error in a chunk in a set 
 .Pp
 The
 .Fn libewf_handle_add_session
-function can be used to add a sesssion to be written into a set of EWF files. Note that the only the start offset is stored in a set of EWF files. Libewf ignores the session amount of sectors on write and determines the session sizes using the available session and media information on read.
+function can be used to add a sesssion to be written into a set of EWF files. Note that the only the start offset is stored in a set of EWF files. Libewf ignores the number of sectors on write and determines the session sizes using the available session and media information on read.
 .Pp
 The
 .Fn libewf_handle_copy_*

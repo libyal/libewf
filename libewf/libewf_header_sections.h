@@ -69,9 +69,9 @@ struct libewf_header_sections
 	 */
 	size_t xheader_size;
 
-	/* Value to indicate how much header sections were found
+	/* Value to indicate the number of header sections found
 	 */
-	uint8_t amount_of_header_sections;
+	uint8_t number_of_header_sections;
 };
 
 int libewf_header_sections_initialize(

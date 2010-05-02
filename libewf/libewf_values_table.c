@@ -35,7 +35,7 @@
  */
 int libewf_values_table_initialize(
      libewf_values_table_t **values_table,
-     int amount_of_values,
+     int number_of_values,
      liberror_error_t **error )
 {
 	static char *function           = "libewf_values_table_initialize";
@@ -53,20 +53,20 @@ int libewf_values_table_initialize(
 
 		return( 1 );
 	}
-	if( amount_of_values < 0 )
+	if( number_of_values < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid amount of values less than zero.",
+		 "%s: invalid number of values less than zero.",
 		 function );
 
 		return( -1 );
 	}
 	if( *values_table == NULL )
 	{
-		values_table_string_size = amount_of_values * sizeof( libcstring_character_t * );
+		values_table_string_size = number_of_values * sizeof( libcstring_character_t * );
 
 		if( values_table_string_size > (size_t) SSIZE_MAX )
 		{
@@ -79,7 +79,7 @@ int libewf_values_table_initialize(
 
 			return( -1 );
 		}
-		values_table_size = amount_of_values * sizeof( size_t );
+		values_table_size = number_of_values * sizeof( size_t );
 
 		if( values_table_size > (size_t) SSIZE_MAX )
 		{
@@ -125,7 +125,7 @@ int libewf_values_table_initialize(
 
 			return( -1 );
 		}
-		if( amount_of_values > 0 )
+		if( number_of_values > 0 )
 		{
 			( *values_table )->identifier = (libcstring_character_t **) memory_allocate(
 								                     values_table_string_size );
@@ -312,7 +312,7 @@ int libewf_values_table_initialize(
 				return( -1 );
 			}
 		}
-		( *values_table )->amount_of_values = amount_of_values;
+		( *values_table )->number_of_values = number_of_values;
 	}
 	return( 1 );
 }
@@ -341,7 +341,7 @@ int libewf_values_table_free(
 	if( *values_table != NULL )
 	{
 		for( values_table_iterator = 0;
-		     values_table_iterator < ( *values_table )->amount_of_values;
+		     values_table_iterator < ( *values_table )->number_of_values;
 		     values_table_iterator++ )
 		{
 			if( ( *values_table )->identifier[ values_table_iterator ] != NULL )
@@ -388,7 +388,7 @@ int libewf_values_table_free(
  */
 int libewf_values_table_resize(
      libewf_values_table_t *values_table,
-     int amount_of_values,
+     int number_of_values,
      liberror_error_t **error )
 {
 	static char *function           = "libewf_values_table_resize";
@@ -407,20 +407,20 @@ int libewf_values_table_resize(
 
 		return( -1 );
 	}
-	if( amount_of_values < 0 )
+	if( number_of_values < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid amount of values less than zero.",
+		 "%s: invalid number of values less than zero.",
 		 function );
 
 		return( -1 );
 	}
-	if( values_table->amount_of_values < amount_of_values )
+	if( values_table->number_of_values < number_of_values )
 	{
-		values_table_string_size = amount_of_values * sizeof( libcstring_character_t * );
+		values_table_string_size = number_of_values * sizeof( libcstring_character_t * );
 
 		if( values_table_string_size > (ssize_t) SSIZE_MAX )
 		{
@@ -433,7 +433,7 @@ int libewf_values_table_resize(
 
 			return( -1 );
 		}
-		values_table_size = amount_of_values * sizeof( size_t );
+		values_table_size = number_of_values * sizeof( size_t );
 
 		if( values_table_size > (ssize_t) SSIZE_MAX )
 		{
@@ -464,9 +464,9 @@ int libewf_values_table_resize(
 		values_table->identifier = (libcstring_character_t **) reallocation;
 
 		if( memory_set(
-		     &( values_table->identifier[ values_table->amount_of_values ] ),
+		     &( values_table->identifier[ values_table->number_of_values ] ),
 		     0,
-		     sizeof( libcstring_character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
+		     sizeof( libcstring_character_t * ) * ( number_of_values - values_table->number_of_values ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -495,9 +495,9 @@ int libewf_values_table_resize(
 		values_table->identifier_length = (size_t *) reallocation;
 
 		if( memory_set(
-		     &( values_table->identifier_length[ values_table->amount_of_values ] ),
+		     &( values_table->identifier_length[ values_table->number_of_values ] ),
 		     0,
-		     sizeof( size_t ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
+		     sizeof( size_t ) * ( number_of_values - values_table->number_of_values ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -526,9 +526,9 @@ int libewf_values_table_resize(
 		values_table->value = (libcstring_character_t **) reallocation;
 
 		if( memory_set(
-		     &( values_table->value[ values_table->amount_of_values ] ),
+		     &( values_table->value[ values_table->number_of_values ] ),
 		     0,
-		     sizeof( libcstring_character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
+		     sizeof( libcstring_character_t * ) * ( number_of_values - values_table->number_of_values ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -557,9 +557,9 @@ int libewf_values_table_resize(
 		values_table->value_length = (size_t *) reallocation;
 
 		if( memory_set(
-		     &( values_table->value_length[ values_table->amount_of_values ] ),
+		     &( values_table->value_length[ values_table->number_of_values ] ),
 		     0,
-		     sizeof( size_t ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
+		     sizeof( size_t ) * ( number_of_values - values_table->number_of_values ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -570,20 +570,20 @@ int libewf_values_table_resize(
 
 			return( -1 );
 		}
-		values_table->amount_of_values = amount_of_values;
+		values_table->number_of_values = number_of_values;
 	}
 	return( 1 );
 }
 
-/* Retrieves the amount of values
+/* Retrieves the number of values
  * Returns 1 if successful or -1 on error
  */
-int libewf_values_table_get_amount_of_values(
+int libewf_values_table_get_number_of_values(
      libewf_values_table_t *values_table,
-     int *amount_of_values,
+     int *number_of_values,
      liberror_error_t **error )
 {
-	static char *function = "libewf_values_table_get_amount_of_values";
+	static char *function = "libewf_values_table_get_number_of_values";
 
 	if( values_table == NULL )
 	{
@@ -596,18 +596,18 @@ int libewf_values_table_get_amount_of_values(
 
 		return( -1 );
 	}
-	if( amount_of_values == NULL )
+	if( number_of_values == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of values.",
+		 "%s: invalid number of values.",
 		 function );
 
 		return( -1 );
 	}
-	*amount_of_values = values_table->amount_of_values;
+	*number_of_values = values_table->number_of_values;
 
 	return( 1 );
 }
@@ -636,13 +636,13 @@ int libewf_values_table_get_index(
 
 		return( -1 );
 	}
-	if( values_table->amount_of_values < 0 )
+	if( values_table->number_of_values < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid values table amount value less than zero.",
+		 "%s: invalid values table number value less than zero.",
 		 function );
 
 		return( -1 );
@@ -692,7 +692,7 @@ int libewf_values_table_get_index(
 		return( -1 );
 	}
 	for( values_table_iterator = 0;
-	     values_table_iterator < values_table->amount_of_values;
+	     values_table_iterator < values_table->number_of_values;
 	     values_table_iterator++ )
 	{
 		if( values_table->identifier[ values_table_iterator ] == NULL )
@@ -769,12 +769,12 @@ int libewf_values_table_get_identifier_size(
 
 		return( -1 );
 	}
-	if( values_table->amount_of_values == 0 )
+	if( values_table->number_of_values == 0 )
 	{
 		return( 0 );
 	}
 	if( ( index < 0 )
-	 || ( index >= values_table->amount_of_values ) )
+	 || ( index >= values_table->number_of_values ) )
 	{
 		liberror_error_set(
 		 error,
@@ -859,12 +859,12 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	if( values_table->amount_of_values == 0 )
+	if( values_table->number_of_values == 0 )
 	{
 		return( 0 );
 	}
 	if( ( index < 0 )
-	 || ( index >= values_table->amount_of_values ) )
+	 || ( index >= values_table->number_of_values ) )
 	{
 		liberror_error_set(
 		 error,
@@ -986,9 +986,9 @@ int libewf_values_table_set_identifier(
 
 		return( -1 );
 	}
-	if( ( values_table->amount_of_values == 0 )
+	if( ( values_table->number_of_values == 0 )
 	 || ( index < 0 )
-	 || ( index >= values_table->amount_of_values ) )
+	 || ( index >= values_table->number_of_values ) )
 	{
 		liberror_error_set(
 		 error,
@@ -1245,7 +1245,7 @@ int libewf_values_table_set_value(
 	}
 	else if( result == 0 )
 	{
-		index = values_table->amount_of_values;
+		index = values_table->number_of_values;
 
 		if( libewf_values_table_resize(
 		     values_table,

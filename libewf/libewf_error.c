@@ -42,7 +42,7 @@ void libewf_error_free(
 }
 
 /* Prints a descriptive string of the error to the stream
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 int libewf_error_fprint(
      libewf_error_t *error,
@@ -54,7 +54,7 @@ int libewf_error_fprint(
 }
 
 /* Prints a descriptive string of the error to the string
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 int libewf_error_sprint(
      libewf_error_t *error,
@@ -68,7 +68,7 @@ int libewf_error_sprint(
 }
 
 /* Prints a backtrace of the error to the stream
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 int libewf_error_backtrace_fprint(
      libewf_error_t *error,
@@ -80,7 +80,7 @@ int libewf_error_backtrace_fprint(
 }
 
 /* Prints a backtrace of the error to the string
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 int libewf_error_backtrace_sprint(
      libewf_error_t *error,

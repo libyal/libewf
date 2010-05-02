@@ -90,7 +90,7 @@ void usage_fprint(
 }
 
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
- * Returns the amount of bytes read if successful or -1 on error
+ * Returns the number of bytes read if successful or -1 on error
  */
 ssize64_t ewfverify_read_input(
            verification_handle_t *verification_handle,
@@ -296,11 +296,11 @@ ssize64_t ewfverify_read_input(
 			return( -1 );
 		}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		/* Set the amount of chunk data in the buffer
+		/* Set the chunk data size in the compression buffer
 		 */
 		if( storage_media_buffer->data_in_compression_buffer == 1 )
 		{
-			storage_media_buffer->compression_buffer_amount = process_count;
+			storage_media_buffer->compression_buffer_data_size = (ssize_t) process_count;
 		}
 #endif
 		verify_count += (ssize64_t) process_count;
@@ -434,13 +434,13 @@ int main( int argc, char * const argv[] )
 	ssize64_t verify_count                                     = 0;
 	size_t string_length                                       = 0;
 	uint64_t process_buffer_size                               = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint32_t amount_of_crc_errors                              = 0;
+	uint32_t number_of_crc_errors                              = 0;
 	uint8_t calculate_md5                                      = 1;
 	uint8_t calculate_sha1                                     = 0;
 	uint8_t print_status_information                           = 1;
 	uint8_t wipe_chunk_on_error                                = 0;
 	uint8_t verbose                                            = 0;
-	int amount_of_filenames                                    = 0;
+	int number_of_filenames                                    = 0;
 	int header_codepage                                        = LIBEWF_CODEPAGE_ASCII;
 	int match_md5_hash                                         = 0;
 	int match_sha1_hash                                        = 0;
@@ -658,10 +658,10 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	argv_filenames      = glob->result;
-	amount_of_filenames = glob->amount_of_results;
+	number_of_filenames = glob->number_of_results;
 #else
 	argv_filenames      = &( argv[ optind ] );
-	amount_of_filenames = argc - optind;
+	number_of_filenames = argc - optind;
 #endif
 
 	if( verification_handle_initialize(
@@ -716,7 +716,7 @@ int main( int argc, char * const argv[] )
 	result = verification_handle_open_input(
 	          verification_handle,
 	          argv_filenames,
-	          amount_of_filenames,
+	          number_of_filenames,
 	          &error );
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
@@ -1033,14 +1033,14 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		if( verification_handle_get_amount_of_crc_errors(
+		if( verification_handle_get_number_of_crc_errors(
 		     verification_handle,
-		     &amount_of_crc_errors,
+		     &number_of_crc_errors,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to determine the amount of CRC errors.\n" );
+			 "Unable to determine the number of CRC errors.\n" );
 
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -1392,7 +1392,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* The EWF file can be verified without an integrity hash
 	 */
-	if( ( amount_of_crc_errors == 0 )
+	if( ( number_of_crc_errors == 0 )
 	 && ( ( calculate_md5 == 0 )
 	  || ( stored_md5_hash_available == 0 )
 	  || match_md5_hash )

@@ -112,8 +112,8 @@ void usage_fprint(
 	fprintf( stream, "Use ewfacquirestream to acquire data from a pipe and store it in the EWF format\n"
 	                 "(Expert Witness Compression Format).\n\n" );
 
-	fprintf( stream, "Usage: ewfacquirestream [ -A codepage ] [ -b amount_of_sectors ]\n"
-	                 "                        [ -B amount_of_bytes ] [ -c compression_type ]\n"
+	fprintf( stream, "Usage: ewfacquirestream [ -A codepage ] [ -b number_of_sectors ]\n"
+	                 "                        [ -B number_of_bytes ] [ -c compression_type ]\n"
 	                 "                        [ -C case_number ] [ -d digest_type ]\n"
 	                 "                        [ -D description ] [ -e examiner_name ]\n"
 	                 "                        [ -E evidence_number ] [ -f format ] [ -l log_filename ]\n"
@@ -127,9 +127,9 @@ void usage_fprint(
 	fprintf( stream, "\t-A: codepage of header section, options: ascii (default), windows-874,\n"
 	                 "\t    windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t    windows-1255, windows-1256, windows-1257, windows-1258\n" );
-	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options:\n"
+	fprintf( stream, "\t-b: specify the number of sectors to read at once (per chunk), options:\n"
 	                 "\t    64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t-B: specify the amount of bytes to acquire (default is all bytes)\n" );
+	fprintf( stream, "\t-B: specify the number of bytes to acquire (default is all bytes)\n" );
 	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast\n"
 	                 "\t    or best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
@@ -522,7 +522,7 @@ int ewfacquirestream_acquiry_parameters_fprint(
 
 	fprintf(
 	 stream,
-	 "Amount of bytes to acquire:\t" );
+	 "Number of bytes to acquire:\t" );
 
 	if( acquiry_size == 0 )
 	{
@@ -607,7 +607,7 @@ int ewfacquirestream_acquiry_parameters_fprint(
 }
 
 /* Reads a chunk of data from the file descriptor into the buffer
- * Returns the amount of bytes read, 0 if at end of input or -1 on error
+ * Returns the number of bytes read, 0 if at end of input or -1 on error
  */
 ssize_t ewfacquirestream_read_chunk(
          libewf_handle_t *handle,
@@ -626,7 +626,7 @@ ssize_t ewfacquirestream_read_chunk(
 	ssize_t buffer_offset               = 0;
 	size_t read_size                    = 0;
 	size_t bytes_to_read                = 0;
-	int32_t read_amount_of_errors       = 0;
+	int32_t read_number_of_errors       = 0;
 	uint32_t read_error_offset          = 0;
 
 	if( handle == NULL )
@@ -697,7 +697,7 @@ ssize_t ewfacquirestream_read_chunk(
 	}
 	while( buffer_size > 0 )
 	{
-		/* Determine the amount of bytes to read from the input
+		/* Determine the number of bytes to read from the input
 		 * Read as much as possible in chunk sizes
 		 */
 		if( buffer_size < (size_t) chunk_size )
@@ -710,7 +710,7 @@ ssize_t ewfacquirestream_read_chunk(
 		}
 		bytes_to_read = read_size;
 
-		while( read_amount_of_errors <= read_error_retry )
+		while( read_number_of_errors <= read_error_retry )
 		{
 			read_count = libsystem_file_io_read(
 			              input_file_descriptor,
@@ -832,9 +832,9 @@ ssize_t ewfacquirestream_read_chunk(
 				read_error_offset += read_count;
 				bytes_to_read     -= read_count;
 			}
-			read_amount_of_errors++;
+			read_number_of_errors++;
 
-			if( read_amount_of_errors > read_error_retry )
+			if( read_number_of_errors > read_error_retry )
 			{
 				return( 0 );
 			}
@@ -853,7 +853,7 @@ ssize_t ewfacquirestream_read_chunk(
 }
 
 /* Reads data from a file descriptor and writes it in EWF format
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize64_t ewfacquirestream_read_input(
            imaging_handle_t *imaging_handle,
@@ -1025,9 +1025,9 @@ ssize64_t ewfacquirestream_read_input(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		storage_media_buffer->data_in_compression_buffer = 0;
 #endif
-		storage_media_buffer->raw_buffer_amount = read_count;
+		storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
 
-		/* Skip a certain amount of bytes if necessary
+		/* Skip a certain number of bytes if necessary
 		 */
 		if( acquiry_offset > (off64_t) acquiry_count )
 		{
@@ -1385,7 +1385,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
+					 "Unsuported number of sectors per chunk defaulting to: 64.\n" );
 				}
 				break;
 

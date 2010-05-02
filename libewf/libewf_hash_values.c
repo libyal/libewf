@@ -46,7 +46,7 @@ int libewf_hash_values_initialize(
 
 	if( libewf_values_table_initialize(
 	     hash_values,
-	     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
+	     LIBEWF_HASH_VALUES_DEFAULT_NUMBER,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -349,7 +349,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		return( -1 );
 	}
 	for( line_iterator = 0;
-	     line_iterator < lines->amount_of_values;
+	     line_iterator < lines->number_of_values;
 	     line_iterator++ )
 	{
 		/* Ignore empty lines
@@ -715,13 +715,13 @@ int libewf_hash_values_generate_hash_string_xml(
 
 		return( -1 );
 	}
-	if( hash_values->amount_of_values < 0 )
+	if( hash_values->number_of_values < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid hash values - amount of value less than zero.",
+		 "%s: invalid hash values - number of values less than zero.",
 		 function );
 
 		return( -1 );
@@ -815,7 +815,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	                          xml_close_tag_xhash );
 
 	for( values_table_iterator = 0;
-	     values_table_iterator < hash_values->amount_of_values;
+	     values_table_iterator < hash_values->number_of_values;
 	     values_table_iterator++ )
 	{
 		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
@@ -887,7 +887,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	string_offset = print_count;
 
 	for( values_table_iterator = 0;
-	     values_table_iterator < hash_values->amount_of_values;
+	     values_table_iterator < hash_values->number_of_values;
 	     values_table_iterator++ )
 	{
 		if( ( hash_values->identifier[ values_table_iterator ] == NULL )

@@ -299,7 +299,7 @@ int process_status_update(
 	return( 1 );
 }
 
-/* Updates the process status information when the total amount of bytes is unknown
+/* Updates the process status information when the total number of bytes is unknown
  * Returns 1 if successful or -1 on error
  */
 int process_status_update_unknown_total(
@@ -548,7 +548,7 @@ void process_status_timestamp_fprint(
 	}
 }
 
-/* Prints the amount of bytes per second (with a leading space) to a stream
+/* Prints the number of bytes per second (with a leading space) to a stream
  */
 void process_status_bytes_per_second_fprint(
       FILE *stream,
@@ -599,8 +599,8 @@ void process_status_bytes_per_second_fprint(
 	}
 }
 
-/* Prints the amount of bytes (with a leading space) to a stream
- * Creates a human readable version of the amount of bytes if possible
+/* Prints the number of bytes (with a leading space) to a stream
+ * Creates a human readable version of the number of bytes if possible
  */
 void process_status_bytes_fprint(
       FILE *stream,

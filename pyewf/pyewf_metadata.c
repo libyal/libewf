@@ -205,19 +205,19 @@ PyObject *pyewf_handle_get_header_values(
 	size_t header_value_identifier_length = 0;
 	size_t header_value_identifier_size   = 0;
 	size_t header_value_size              = 0;
-	uint32_t amount_of_header_values      = 0;
+	uint32_t number_of_header_values      = 0;
 	uint32_t header_value_iterator        = 0;
 
-	if( libewf_handle_get_amount_of_header_values(
+	if( libewf_handle_get_number_of_header_values(
 	     pyewf_handle->handle,
-	     &amount_of_header_values,
+	     &number_of_header_values,
 	     &error ) != 1 )
 	{
 		/* TODO something with error */
 
 		PyErr_Format(
 		 PyExc_IOError,
-		 "%s: failed to retrieve amount of header values.",
+		 "%s: failed to retrieve number of header values.",
 		 function );
 
 		liberror_error_free(
@@ -228,7 +228,7 @@ PyObject *pyewf_handle_get_header_values(
 	dictionary_object = PyDict_New();
 
 	for( header_value_iterator = 0;
-	     header_value_iterator < amount_of_header_values;
+	     header_value_iterator < number_of_header_values;
 	     header_value_iterator++ )
 	{
 		if( libewf_handle_get_header_value_identifier_size(

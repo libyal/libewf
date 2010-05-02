@@ -73,7 +73,7 @@ void usage_fprint(
 	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-874,\n"
 	                 "\t           windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
-	fprintf( stream, "\t-B:        specify the amount of bytes to alter (default is all bytes)\n" );
+	fprintf( stream, "\t-B:        specify the number of bytes to alter (default is all bytes)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-q:        quiet shows no status information\n" );
 	fprintf( stream, "\t-o:        specify the offset to start to alter (default is 0)\n" );
@@ -85,7 +85,7 @@ void usage_fprint(
 }
 
 /* Alters a specific size of the input starting from a specific offset 
- * Returns 1 the amount of bytes altered or -1 on error
+ * Returns 1 the number of bytes altered or -1 on error
  */
 ssize64_t ewfalter_alter_input(
            alteration_handle_t *alteration_handle,
@@ -301,7 +301,7 @@ ssize64_t ewfalter_alter_input(
 				return( -1 );
 			}
 			storage_media_buffer->data_in_compression_buffer = 0;
-			storage_media_buffer->raw_buffer_amount          = process_count;
+			storage_media_buffer->raw_buffer_data_size       = (size_t) process_count;
 		}
 		/* Move the file pointer back to the previous chunk
 		 */
@@ -359,9 +359,9 @@ ssize64_t ewfalter_alter_input(
 			return( -1 );
 		}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		storage_media_buffer->raw_buffer_amount = process_buffer_size;
+		storage_media_buffer->raw_buffer_data_size = process_buffer_size;
 #else
-		storage_media_buffer->raw_buffer_amount = write_size;
+		storage_media_buffer->raw_buffer_data_size = write_size;
 #endif
 
 		buffer_offset = 0;
@@ -505,7 +505,7 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                                       = 0;
 	int alteration_run                                    = 0;
 	int alteration_runs                                   = 1;
-	int amount_of_filenames                               = 0;
+	int number_of_filenames                               = 0;
 	int argument_set_offset                               = 0;
 	int argument_set_size                                 = 0;
 	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
@@ -753,10 +753,10 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	argv_filenames      = glob->result;
-	amount_of_filenames = glob->amount_of_results;
+	number_of_filenames = glob->number_of_results;
 #else
 	argv_filenames      = &( argv[ optind ] );
-	amount_of_filenames = argc - optind;
+	number_of_filenames = argc - optind;
 #endif
 
 	if( alteration_handle_initialize(
@@ -809,7 +809,7 @@ int main( int argc, char * const argv[] )
 	result = alteration_handle_open_input(
 	          alteration_handle,
 	          argv_filenames,
-	          amount_of_filenames,
+	          number_of_filenames,
 	          &error );
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
@@ -921,7 +921,7 @@ int main( int argc, char * const argv[] )
 		       stdout,
 		       input_buffer,
 		       EWFALTER_INPUT_BUFFER_SIZE,
-		       _LIBCSTRING_SYSTEM_STRING( "Amount of bytes to alter" ),
+		       _LIBCSTRING_SYSTEM_STRING( "Number of bytes to alter" ),
 		       0,
 		       media_size - alter_offset,
 		       media_size - alter_offset,

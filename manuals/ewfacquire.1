@@ -1,4 +1,4 @@
-.Dd April 18, 2010
+.Dd May 2, 2010
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -7,8 +7,8 @@
 .Sh SYNOPSIS
 .Nm ewfacquire
 .Op Fl A Ar codepage
-.Op Fl b Ar amount_of_sectors
-.Op Fl B Ar amount_of_bytes
+.Op Fl b Ar number_of_sectors
+.Op Fl B Ar number_of_bytes
 .Op Fl c Ar compression_type
 .Op Fl C Ar case_number
 .Op Fl d Ar digest_type
@@ -16,7 +16,7 @@
 .Op Fl e Ar examiner_name
 .Op Fl E Ar evidence_number
 .Op Fl f Ar format
-.Op Fl g Ar amount_of_sectors
+.Op Fl g Ar number_of_sectors
 .Op Fl l Ar log_filename
 .Op Fl m Ar media_type
 .Op Fl M Ar media_flags
@@ -62,10 +62,10 @@ The options are as follows:
 .Bl -tag -width Ds
 .It Fl A Ar codepage
 the codepage of header section, options: ascii (default), windows-874, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
-.It Fl b Ar amount_of_sectors
-the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
-.It Fl B Ar amount_of_bytes
-the amount of bytes to acquire
+.It Fl b Ar number_of_sectors
+the number of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+.It Fl B Ar number_of_bytes
+the number of bytes to acquire
 .It Fl c Ar compression_type
 the compression type, options: none (default), empty-block, fast, best
 .It Fl C Ar case_number
@@ -80,8 +80,8 @@ the examiner name (default is examiner_name)
 the evidence number (default is evidence_number)
 .It Fl f Ar format
 the EWF file format to write to, options: ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6 (default), linen5, linen6, ewfx.
-.It Fl g Ar amount_of_sectors
-the amount of sectors to be used as error granularity, options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+.It Fl g Ar number_of_sectors
+the number of sectors to be used as error granularity, options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl h
 shows this help
 .It Fl l Ar log_filename
@@ -97,11 +97,11 @@ the offset to start to acquire (default is 0)
 .It Fl p Ar process_buffer_size
 the process buffer size (default is the chunk size)
 .It Fl P Ar bytes_per_sector
-the amount of bytes per sector (default is 512) (use this to override the automatic bytes per sector detection)
+the number of bytes per sector (default is 512) (use this to override the automatic bytes per sector detection)
 .It Fl q
 quiet shows no status information
 .It Fl r Ar read_error_retries
-the amount of retries when a read error occurs (default is 2)
+the number of retries when a read error occurs (default is 2)
 .It Fl R
 resume acquiry at a safe point
 .It Fl s
@@ -123,9 +123,9 @@ the secondary target file (without extension) to write to
 .El
 .Pp
 .Nm ewfacquire
-will read from a file or device until it encounters a read error. On read error it will retry the amount of retries specified. If
+will read from a file or device until it encounters a read error. On read error it will retry the number of retries specified. If
 .Nm ewfacquire
-still is unable to read and, if specified, it will zero (wipe) the the remainder of the amount of sectors specified as error granularity. If
+still is unable to read and, if specified, it will zero (wipe) the the remainder of the number of sectors specified as error granularity. If
 .Nm ewfacquire
 should mimic EnCase it will wipe all of sectors specified as error granularity.
 .Pp
@@ -155,12 +155,12 @@ Media characteristics (logical, physical) [logical]:
 Use compression (none, empty-block, fast, best) [none]:
 Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [encase6]:
 Start to acquire at offset (0 >= value >= 1474560) [0]:
-The amount of bytes to acquire (0 >= value >= 1474560) [1474560]:
+The number of bytes to acquire (0 >= value >= 1474560) [1474560]:
 Evidence segment file size in bytes (1.0 MiB >= value >= 1.9 GiB) [1.4 GiB]:
-The amount of bytes per sector (0 >= value >= 4294967295) [512]:
-The amount of sectors to read at once (64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768) [64]: 
-The amount of sectors to be used as error granularity (1 >= value >= 64) [64]: 
-The amount of retries when a read error occurs (0 >= value >= 255) [2]: 
+The number of bytes per sector (0 >= value >= 4294967295) [512]:
+The number of sectors to read at once (64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768) [64]: 
+The number of sectors to be used as error granularity (1 >= value >= 64) [64]: 
+The number of retries when a read error occurs (0 >= value >= 255) [2]: 
 Wipe sectors on read error (mimic EnCase like behavior) (yes, no) [no]:
 
 The following information was provided:
@@ -175,7 +175,7 @@ Is physical:                    no
 Compression used:               none
 EWF file format:                Encase 5
 Acquiry start offset:           0
-Amount of bytes to acquire:     1.4 MiB (1474560 bytes)
+Number of bytes to acquire:     1.4 MiB (1474560 bytes)
 Evidence segment file size:     1.4 GiB (1572864000 bytes)
 Block size:                     64 sectors
 Error granularity:              64 sectors

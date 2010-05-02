@@ -40,7 +40,7 @@
 int libewf_filename_set_extension(
      char *extension,
      uint16_t segment_number,
-     uint16_t maximum_amount_of_segments,
+     uint16_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
@@ -62,7 +62,7 @@ int libewf_filename_set_extension(
 		return( -1 );
 	}
 	if( ( segment_number == 0 )
-	 || ( segment_number > maximum_amount_of_segments ) )
+	 || ( segment_number > maximum_number_of_segments ) )
 	{
 		liberror_error_set(
 		 error,
@@ -171,7 +171,7 @@ int libewf_filename_set_extension(
 int libewf_filename_set_extension_wide(
      wchar_t *extension,
      uint16_t segment_number,
-     uint16_t maximum_amount_of_segments,
+     uint16_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
@@ -193,7 +193,7 @@ int libewf_filename_set_extension_wide(
 		return( -1 );
 	}
 	if( ( segment_number == 0 )
-	 || ( segment_number > maximum_amount_of_segments ) )
+	 || ( segment_number > maximum_number_of_segments ) )
 	{
 		liberror_error_set(
 		 error,
@@ -304,7 +304,7 @@ int libewf_filename_create(
      libcstring_system_character_t *basename,
      size_t basename_length,
      uint16_t segment_number,
-     uint16_t maximum_amount_of_segments,
+     uint16_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
@@ -398,7 +398,7 @@ int libewf_filename_create(
 	if( libewf_filename_set_extension_wide(
 	     &( new_filename[ basename_length + 1 ] ),
 	     segment_number,
-	     maximum_amount_of_segments,
+	     maximum_number_of_segments,
 	     segment_file_type,
 	     format,
 	     ewf_format,
@@ -407,7 +407,7 @@ int libewf_filename_create(
 	if( libewf_filename_set_extension(
 	     &( new_filename[ basename_length + 1 ] ),
 	     segment_number,
-	     maximum_amount_of_segments,
+	     maximum_number_of_segments,
 	     segment_file_type,
 	     format,
 	     ewf_format,

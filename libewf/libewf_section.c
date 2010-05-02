@@ -90,7 +90,9 @@ int libewf_section_test_zero(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < size; iterator++ )
+	for( iterator = 0;
+	     iterator < size;
+	     iterator++ )
 	{
 		if( buffer[ iterator ] != 0 )
 		{
@@ -101,7 +103,7 @@ int libewf_section_test_zero(
 }
 
 /* Reads a section start from a segment file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_start_read(
          libbfio_pool_t *file_io_pool,
@@ -264,7 +266,7 @@ ssize_t libewf_section_start_read(
 }
 
 /* Writes a section start to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_start_write(
          libbfio_pool_t *file_io_pool,
@@ -432,7 +434,7 @@ ssize_t libewf_section_start_write(
 }
 
 /* Reads a compressed string section from a segment file and uncompresses it
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_compressed_string_read(
          libbfio_pool_t *file_io_pool,
@@ -638,7 +640,7 @@ ssize_t libewf_section_compressed_string_read(
 }
 
 /* Writes a compressed string section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_write_compressed_string(
          libbfio_pool_t *file_io_pool,
@@ -842,7 +844,7 @@ ssize_t libewf_section_write_compressed_string(
 }
 
 /* Reads a header section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_header_read(
          libbfio_pool_t *file_io_pool,
@@ -966,7 +968,7 @@ ssize_t libewf_section_header_read(
 }
 
 /* Writes a header section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_header_write(
          libbfio_pool_t *file_io_pool,
@@ -1050,7 +1052,7 @@ ssize_t libewf_section_header_write(
 }
 
 /* Reads a header2 section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_header2_read(
          libbfio_pool_t *file_io_pool,
@@ -1174,7 +1176,7 @@ ssize_t libewf_section_header2_read(
 }
 
 /* Writes a header2 section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_header2_write(
          libbfio_pool_t *file_io_pool,
@@ -1258,7 +1260,7 @@ ssize_t libewf_section_header2_write(
 }
 
 /* Reads an EWF-S01 (SMART) volume section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_s01_read(
          libbfio_pool_t *file_io_pool,
@@ -1388,8 +1390,8 @@ ssize_t libewf_section_volume_s01_read(
 #endif
 
 	byte_stream_copy_to_uint32_little_endian(
-	 volume->amount_of_chunks,
-	 media_values->amount_of_chunks );
+	 volume->number_of_chunks,
+	 media_values->number_of_chunks );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 volume->sectors_per_chunk,
@@ -1400,8 +1402,8 @@ ssize_t libewf_section_volume_s01_read(
 	 media_values->bytes_per_sector );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 volume->amount_of_sectors,
-	 media_values->amount_of_sectors );
+	 volume->number_of_sectors,
+	 media_values->number_of_sectors );
 
 	if( memory_compare(
 	     (void *) volume->signature,
@@ -1421,9 +1423,9 @@ ssize_t libewf_section_volume_s01_read(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: amount of chunks\t: %" PRIu32 "\n",
+		 "%s: number of chunks\t: %" PRIu32 "\n",
 		 function,
-		 media_values->amount_of_chunks );
+		 media_values->number_of_chunks );
 		libnotify_printf(
 		 "%s: sectors per chunk\t: %" PRIu32 "\n",
 		 function,
@@ -1433,9 +1435,9 @@ ssize_t libewf_section_volume_s01_read(
 		 function,
 		 media_values->bytes_per_sector );
 		libnotify_printf(
-		 "%s: amount of sectors\t: %" PRIu32 "\n",
+		 "%s: number of sectors\t: %" PRIu32 "\n",
 		 function,
-		 media_values->amount_of_sectors );
+		 media_values->number_of_sectors );
 		libnotify_printf(
 		 "\n" );
 	}
@@ -1445,7 +1447,7 @@ ssize_t libewf_section_volume_s01_read(
 }
 
 /* Writes an EWF-S01 (SMART) volume section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_volume_s01_write(
          libbfio_pool_t *file_io_pool,
@@ -1535,8 +1537,8 @@ ssize_t libewf_section_volume_s01_write(
 	volume->unknown1[ 0 ] = 1;
 
 	byte_stream_copy_from_uint32_little_endian(
-	 volume->amount_of_chunks,
-	 media_values->amount_of_chunks );
+	 volume->number_of_chunks,
+	 media_values->number_of_chunks );
 
 	byte_stream_copy_from_uint32_little_endian(
 	 volume->sectors_per_chunk,
@@ -1547,8 +1549,8 @@ ssize_t libewf_section_volume_s01_write(
 	 media_values->bytes_per_sector );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 volume->amount_of_sectors,
-	 media_values->amount_of_sectors );
+	 volume->number_of_sectors,
+	 media_values->number_of_sectors );
 
 	if( format == LIBEWF_FORMAT_SMART )
 	{
@@ -1573,14 +1575,14 @@ ssize_t libewf_section_volume_s01_write(
 		libnotify_printf(
 		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 		 function,
-		 media_values->amount_of_chunks,
+		 media_values->number_of_chunks,
 		 media_values->chunk_size,
 		 media_values->sectors_per_chunk );
 
 		libnotify_printf(
 		 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
 		 function,
-		 media_values->amount_of_sectors,
+		 media_values->number_of_sectors,
 		 media_values->bytes_per_sector );
 	}
 #endif
@@ -1654,7 +1656,7 @@ ssize_t libewf_section_volume_s01_write(
 }
 
 /* Reads an EWF-E01 (EnCase) volume section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_e01_read(
          libbfio_pool_t *file_io_pool,
@@ -1823,8 +1825,8 @@ ssize_t libewf_section_volume_e01_read(
 #endif
 
 	byte_stream_copy_to_uint32_little_endian(
-	 volume->amount_of_chunks,
-	 media_values->amount_of_chunks );
+	 volume->number_of_chunks,
+	 media_values->number_of_chunks );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 volume->sectors_per_chunk,
@@ -1835,8 +1837,8 @@ ssize_t libewf_section_volume_e01_read(
 	 media_values->bytes_per_sector );
 
 	byte_stream_copy_to_uint64_little_endian(
-	 volume->amount_of_sectors,
-	 media_values->amount_of_sectors );
+	 volume->number_of_sectors,
+	 media_values->number_of_sectors );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 volume->error_granularity,
@@ -1870,9 +1872,9 @@ ssize_t libewf_section_volume_e01_read(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: amount of chunks\t: %" PRIu32 "\n",
+		 "%s: number of chunks\t: %" PRIu32 "\n",
 		 function,
-		 media_values->amount_of_chunks );
+		 media_values->number_of_chunks );
 		libnotify_printf(
 		 "%s: sectors per chunk\t: %" PRIu32 "\n",
 		 function,
@@ -1882,9 +1884,9 @@ ssize_t libewf_section_volume_e01_read(
 		 function,
 		 media_values->bytes_per_sector );
 		libnotify_printf(
-		 "%s: amount of sectors\t: %" PRIu32 "\n",
+		 "%s: number of sectors\t: %" PRIu32 "\n",
 		 function,
-		 media_values->amount_of_sectors );
+		 media_values->number_of_sectors );
 		libnotify_printf(
 		 "%s: error granularity\t: %" PRIu32 "\n",
 		 function,
@@ -1910,7 +1912,7 @@ ssize_t libewf_section_volume_e01_read(
 }
 
 /* Writes an EWF-E01 (EnCase) volume section to file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_e01_write(
          libbfio_pool_t *file_io_pool,
@@ -2009,8 +2011,8 @@ ssize_t libewf_section_volume_e01_write(
 	volume->media_flags = media_values->media_flags;
 
 	byte_stream_copy_from_uint32_little_endian(
-	 volume->amount_of_chunks,
-	 media_values->amount_of_chunks );
+	 volume->number_of_chunks,
+	 media_values->number_of_chunks );
 
 	byte_stream_copy_from_uint32_little_endian(
 	 volume->sectors_per_chunk,
@@ -2021,8 +2023,8 @@ ssize_t libewf_section_volume_e01_write(
 	 media_values->bytes_per_sector );
 
 	byte_stream_copy_from_uint64_little_endian(
-	 volume->amount_of_sectors,
-	 media_values->amount_of_sectors );
+	 volume->number_of_sectors,
+	 media_values->number_of_sectors );
 
 	if( ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 )
@@ -2068,14 +2070,14 @@ ssize_t libewf_section_volume_e01_write(
 		libnotify_printf(
 		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 		 function,
-		 media_values->amount_of_chunks,
+		 media_values->number_of_chunks,
 		 media_values->chunk_size,
 		 media_values->sectors_per_chunk );
 
 		libnotify_printf(
 		 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
 		 function,
-		 media_values->amount_of_sectors,
+		 media_values->number_of_sectors,
 		 media_values->bytes_per_sector );
 	}
 #endif
@@ -2149,7 +2151,7 @@ ssize_t libewf_section_volume_e01_write(
 }
 
 /* Reads a volume section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_read(
          libbfio_pool_t *file_io_pool,
@@ -2297,19 +2299,19 @@ ssize_t libewf_section_volume_read(
 		libnotify_printf(
 		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 		 function,
-		 media_values->amount_of_chunks,
+		 media_values->number_of_chunks,
 		 media_values->chunk_size,
 		 media_values->sectors_per_chunk );
 
 		libnotify_printf(
 		 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
 		 function,
-		 media_values->amount_of_sectors,
+		 media_values->number_of_sectors,
 		 media_values->bytes_per_sector );
 	}
 #endif
 
-	if( media_values->amount_of_chunks == 0 )
+	if( media_values->number_of_chunks == 0 )
 	{
 		*ewf_format = EWF_FORMAT_L01;
 	}
@@ -2317,13 +2319,13 @@ ssize_t libewf_section_volume_read(
 }
 
 /* Reads a table section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
-         uint32_t media_amount_of_chunks,
+         uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
          uint8_t format,
          uint8_t ewf_format,
@@ -2340,7 +2342,7 @@ ssize_t libewf_section_table_read(
 	ssize_t section_read_count  = 0;
 	ssize_t read_count          = 0;
 	uint64_t base_offset        = 0;
-	uint32_t amount_of_chunks   = 0;
+	uint32_t number_of_chunks   = 0;
 	uint8_t offsets_tainted     = 0;
 
 	if( segment_file_handle == NULL )
@@ -2376,13 +2378,13 @@ ssize_t libewf_section_table_read(
 
 		return( -1 );
 	}
-	/* Allocate the necessary amount of chunk offsets
-	 * this reduces the amount of reallocations
+	/* Allocate the necessary number of chunk offsets
+	 * this reduces the number of reallocations
 	 */
-	if( ( offset_table->amount_of_chunk_offsets < media_amount_of_chunks )
+	if( ( offset_table->number_of_chunk_offsets < media_number_of_chunks )
 	 && ( libewf_offset_table_resize(
 	       offset_table,
-	       media_amount_of_chunks,
+	       media_number_of_chunks,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -2437,8 +2439,8 @@ ssize_t libewf_section_table_read(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table.amount_of_chunks,
-	 amount_of_chunks );
+	 table.number_of_chunks,
+	 number_of_chunks );
 
 	byte_stream_copy_to_uint64_little_endian(
 	 table.base_offset,
@@ -2467,28 +2469,28 @@ ssize_t libewf_section_table_read(
 		libnotify_printf(
 		 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
 		 function,
-		 amount_of_chunks,
+		 number_of_chunks,
 		 stored_crc,
 		 calculated_crc );
 	}
 #endif
 
-	if( amount_of_chunks > 0 )
+	if( number_of_chunks > 0 )
 	{
-		/* Check if the maximum amount of offsets is not exceeded
+		/* Check if the maximum number of offsets is not exceeded
 		 */
-		if( amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
+		if( number_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
 		{
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
+				 "%s: table contains more offsets: %" PRIu32 " than the maximum number: %d.\n",
 				 function,
-				 amount_of_chunks,
+				 number_of_chunks,
 				 EWF_MAXIMUM_OFFSETS_IN_TABLE );
 			}
 		}
-		offsets_size = sizeof( ewf_table_offset_t ) * amount_of_chunks;
+		offsets_size = sizeof( ewf_table_offset_t ) * number_of_chunks;
 
 		if( offsets_size > (size_t) SSIZE_MAX )
 		{
@@ -2595,7 +2597,7 @@ ssize_t libewf_section_table_read(
 		     offset_table,
 		     (off64_t) base_offset,
 		     offsets,
-		     amount_of_chunks,
+		     number_of_chunks,
 		     segment_file_handle,
 		     offsets_tainted,
 		     error ) != 1 )
@@ -2681,19 +2683,19 @@ ssize_t libewf_section_table_read(
 		}
 		section_read_count = (ssize_t) section_size;
 	}
-	segment_file_handle->amount_of_chunks += amount_of_chunks;
+	segment_file_handle->number_of_chunks += number_of_chunks;
 
 	return( section_read_count );
 }
 
 /* Reads a table2 section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_table2_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
-         uint32_t media_amount_of_chunks,
+         uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
          uint8_t format,
          uint8_t ewf_format,
@@ -2710,7 +2712,7 @@ ssize_t libewf_section_table2_read(
 	ssize_t section_read_count  = 0;
 	ssize_t read_count          = 0;
 	uint64_t base_offset        = 0;
-	uint32_t amount_of_chunks   = 0;
+	uint32_t number_of_chunks   = 0;
 	uint8_t offsets_tainted     = 0;
 
 	if( segment_file_handle == NULL )
@@ -2746,13 +2748,13 @@ ssize_t libewf_section_table2_read(
 
 		return( -1 );
 	}
-	/* Allocate the necessary amount of chunk offsets
-	 * this reduces the amount of reallocations
+	/* Allocate the necessary number of chunk offsets
+	 * this reduces the number of reallocations
 	 */
-	if( ( offset_table->amount_of_chunk_offsets < media_amount_of_chunks )
+	if( ( offset_table->number_of_chunk_offsets < media_number_of_chunks )
 	 && ( libewf_offset_table_resize(
 	       offset_table,
-	       media_amount_of_chunks,
+	       media_number_of_chunks,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -2807,8 +2809,8 @@ ssize_t libewf_section_table2_read(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table.amount_of_chunks,
-	 amount_of_chunks );
+	 table.number_of_chunks,
+	 number_of_chunks );
 
 	byte_stream_copy_to_uint64_little_endian(
 	 table.base_offset,
@@ -2837,28 +2839,28 @@ ssize_t libewf_section_table2_read(
 		libnotify_printf(
 		 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
 		 function,
-		 amount_of_chunks,
+		 number_of_chunks,
 		 stored_crc,
 		 calculated_crc );
 	}
 #endif
 
-	if( amount_of_chunks > 0 )
+	if( number_of_chunks > 0 )
 	{
-		/* Check if the maximum amount of offsets is not exceeded
+		/* Check if the maximum number of offsets is not exceeded
 		 */
-		if( amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
+		if( number_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
 		{
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
+				 "%s: table contains more offsets: %" PRIu32 " than the maximum number: %d.\n",
 				 function,
-				 amount_of_chunks,
+				 number_of_chunks,
 				 EWF_MAXIMUM_OFFSETS_IN_TABLE );
 			}
 		}
-		offsets_size = sizeof( ewf_table_offset_t ) * amount_of_chunks;
+		offsets_size = sizeof( ewf_table_offset_t ) * number_of_chunks;
 
 		if( offsets_size > (size_t) SSIZE_MAX )
 		{
@@ -2965,7 +2967,7 @@ ssize_t libewf_section_table2_read(
 		     offset_table,
 		     (off64_t) base_offset,
 		     offsets,
-		     amount_of_chunks,
+		     number_of_chunks,
 		     segment_file_handle,
 		     offsets_tainted,
 		     error ) != 1 )
@@ -3051,20 +3053,20 @@ ssize_t libewf_section_table2_read(
 		}
 		section_read_count = (ssize_t) section_size;
 	}
-	segment_file_handle->amount_of_chunks += amount_of_chunks;
+	segment_file_handle->number_of_chunks += number_of_chunks;
 
 	return( section_read_count );
 }
 
 /* Writes a table or table2 section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_table_write(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          off64_t base_offset,
          ewf_table_offset_t *offsets,
-         uint32_t amount_of_offsets,
+         uint32_t number_of_offsets,
          uint8_t *section_type,
          size_t section_type_length,
          size_t additional_size,
@@ -3133,7 +3135,7 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	offsets_size = sizeof( ewf_table_offset_t ) * amount_of_offsets;
+	offsets_size = sizeof( ewf_table_offset_t ) * number_of_offsets;
 	section_size = sizeof( ewf_table_t ) + offsets_size + additional_size;
 
 	if( ewf_format != EWF_FORMAT_S01 )
@@ -3156,8 +3158,8 @@ ssize_t libewf_section_table_write(
 		return( -1 );
 	}
 	byte_stream_copy_from_uint32_little_endian(
-	 table.amount_of_chunks,
-	 amount_of_offsets );
+	 table.number_of_chunks,
+	 number_of_offsets );
 
 	byte_stream_copy_from_uint64_little_endian(
 	 table.base_offset,
@@ -3289,7 +3291,7 @@ ssize_t libewf_section_table_write(
 }
 
 /* Reads a sectors section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize64_t libewf_section_sectors_read(
            libbfio_pool_t *file_io_pool,
@@ -3356,7 +3358,7 @@ ssize64_t libewf_section_sectors_read(
 
 /* Writes a sectors section to file
  * Does not write the actual data in the sectors section
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_sectors_write(
          libbfio_pool_t *file_io_pool,
@@ -3441,7 +3443,7 @@ ssize_t libewf_section_sectors_write(
 }
 
 /* Reads a ltree section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_ltree_read(
          libbfio_pool_t *file_io_pool,
@@ -3673,7 +3675,7 @@ ssize_t libewf_section_ltree_read(
 }
 
 /* Reads a session section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_session_read(
          libbfio_pool_t *file_io_pool,
@@ -3694,7 +3696,7 @@ ssize_t libewf_section_session_read(
 	ssize_t section_read_count        = 0;
 	ssize_t read_count                = 0;
 	size_t ewf_sessions_size          = 0;
-	uint32_t amount_of_ewf_sessions   = 0;
+	uint32_t number_of_ewf_sessions   = 0;
 	uint32_t iterator                 = 0;
 	uint32_t first_sector             = 0;
 	uint32_t last_first_sector        = 0;
@@ -3805,22 +3807,22 @@ ssize_t libewf_section_session_read(
 #endif
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ewf_session.amount_of_sessions,
-	 amount_of_ewf_sessions );
+	 ewf_session.number_of_sessions,
+	 number_of_ewf_sessions );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: amount of sessions: %" PRIu32 "\n",
+		 "%s: number of sessions: %" PRIu32 "\n",
 		 function,
-		 amount_of_ewf_sessions );
+		 number_of_ewf_sessions );
 	}
 #endif
 
-	if( amount_of_ewf_sessions > 0 )
+	if( number_of_ewf_sessions > 0 )
 	{
-		ewf_sessions_size = sizeof( ewf_session_entry_t ) * amount_of_ewf_sessions;
+		ewf_sessions_size = sizeof( ewf_session_entry_t ) * number_of_ewf_sessions;
 
 		ewf_sessions = (ewf_session_entry_t *) memory_allocate(
 		                                        ewf_sessions_size );
@@ -3929,10 +3931,10 @@ ssize_t libewf_section_session_read(
 			memory_free(
 			 sessions->sector );
 
-			sessions->amount = 0;
+			sessions->number_of_sectors = 0;
 		}
 		sessions->sector = (libewf_sector_table_entry_t *) memory_allocate(
-		                                                    sizeof( libewf_sector_table_entry_t ) * amount_of_ewf_sessions );
+		                                                    sizeof( libewf_sector_table_entry_t ) * number_of_ewf_sessions );
 
 		if( sessions->sector == NULL )
 		{
@@ -3948,9 +3950,11 @@ ssize_t libewf_section_session_read(
 
 			return( -1 );
 		}
-		sessions->amount = amount_of_ewf_sessions;
+		sessions->number_of_sectors = number_of_ewf_sessions;
 
-		for( iterator = 0; iterator < amount_of_ewf_sessions; iterator++ )
+		for( iterator = 0;
+		     iterator < number_of_ewf_sessions;
+		     iterator++ )
 		{
 			byte_stream_copy_to_uint32_little_endian(
 			 ewf_sessions[ iterator ].first_sector,
@@ -3970,17 +3974,17 @@ ssize_t libewf_section_session_read(
 
 			if( iterator > 0 )
 			{
-				sessions->sector[ iterator - 1 ].amount_of_sectors = first_sector - last_first_sector;
+				sessions->sector[ iterator - 1 ].number_of_sectors = first_sector - last_first_sector;
 			}
 			last_first_sector = first_sector;
 		}
-		if( media_values->amount_of_sectors > last_first_sector )
+		if( media_values->number_of_sectors > last_first_sector )
 		{
-			sessions->sector[ iterator - 1 ].amount_of_sectors = media_values->amount_of_sectors - last_first_sector;
+			sessions->sector[ iterator - 1 ].number_of_sectors = media_values->number_of_sectors - last_first_sector;
 		}
 		else
 		{
-			sessions->sector[ iterator - 1 ].amount_of_sectors = 0;
+			sessions->sector[ iterator - 1 ].number_of_sectors = 0;
 		}
 		memory_free(
 		 ewf_sessions );
@@ -3995,7 +3999,7 @@ ssize_t libewf_section_session_read(
 }
 
 /* Writes a session section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_session_write(
          libbfio_pool_t *file_io_pool,
@@ -4055,7 +4059,7 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	ewf_sessions_size = sizeof( ewf_session_entry_t ) * sessions->amount;
+	ewf_sessions_size = sizeof( ewf_session_entry_t ) * sessions->number_of_sectors;
 	section_size      = sizeof( ewf_session_t ) + ewf_sessions_size + sizeof( ewf_crc_t );
 
 	if( memory_set(
@@ -4073,8 +4077,8 @@ ssize_t libewf_section_session_write(
 		return( -1 );
 	}
 	byte_stream_copy_from_uint32_little_endian(
-	 ewf_session.amount_of_sessions,
-	 sessions->amount );
+	 ewf_session.number_of_sessions,
+	 sessions->number_of_sectors );
 
 	calculated_crc = ewf_crc_calculate(
 	                  &ewf_session,
@@ -4099,7 +4103,9 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < sessions->amount; iterator++ )
+	for( iterator = 0;
+	     iterator < sessions->number_of_sectors;
+	     iterator++ )
 	{
 		byte_stream_copy_from_uint32_little_endian(
 		 ewf_sessions[ iterator ].first_sector,
@@ -4226,7 +4232,7 @@ ssize_t libewf_section_session_write(
 }
 
 /* Reads a data section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_data_read(
          libbfio_pool_t *file_io_pool,
@@ -4241,8 +4247,8 @@ ssize_t libewf_section_data_read(
 	ewf_crc_t calculated_crc   = 0;
 	ewf_crc_t stored_crc       = 0;
 	ssize_t read_count         = 0;
-	uint64_t amount_of_sectors = 0;
-	uint32_t amount_of_chunks  = 0;
+	uint64_t number_of_sectors = 0;
+	uint32_t number_of_chunks  = 0;
 	uint32_t sectors_per_chunk = 0;
 	uint32_t bytes_per_sector  = 0;
 	uint32_t error_granularity = 0;
@@ -4421,20 +4427,20 @@ ssize_t libewf_section_data_read(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 data->amount_of_chunks,
-	 amount_of_chunks );
+	 data->number_of_chunks,
+	 number_of_chunks );
 
-	if( ( amount_of_chunks != 0 )
-	 && ( amount_of_chunks != media_values->amount_of_chunks ) )
+	if( ( number_of_chunks != 0 )
+	 && ( number_of_chunks != media_values->number_of_chunks ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
 		 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: amount of chunks: %" PRIu32 " does not match amount in data section: %" PRIu32 ".",
+		 "%s: number of chunks: %" PRIu32 " does not match number in data section: %" PRIu32 ".",
 		 function,
-		 media_values->amount_of_chunks,
-		 amount_of_chunks );
+		 media_values->number_of_chunks,
+		 number_of_chunks );
 
 		memory_free(
 		 data );
@@ -4480,17 +4486,17 @@ ssize_t libewf_section_data_read(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint64_little_endian(
-	 data->amount_of_sectors,
-	 amount_of_sectors );
+	 data->number_of_sectors,
+	 number_of_sectors );
 
-	if( ( amount_of_sectors != 0 )
-	 && ( amount_of_sectors != media_values->amount_of_sectors ) )
+	if( ( number_of_sectors != 0 )
+	 && ( number_of_sectors != media_values->number_of_sectors ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
 		 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: amount of sectors does not match in data section.",
+		 "%s: number of sectors does not match in data section.",
 		 function );
 
 		memory_free(
@@ -4574,7 +4580,7 @@ ssize_t libewf_section_data_read(
 }
 
 /* Writes a data section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_data_write(
          libbfio_pool_t *file_io_pool,
@@ -4685,8 +4691,8 @@ ssize_t libewf_section_data_write(
 		( *cached_data_section )->media_flags = media_values->media_flags;
 
 		byte_stream_copy_from_uint32_little_endian(
-		 ( *cached_data_section )->amount_of_chunks,
-		 media_values->amount_of_chunks );
+		 ( *cached_data_section )->number_of_chunks,
+		 media_values->number_of_chunks );
 
 		byte_stream_copy_from_uint32_little_endian(
 		 ( *cached_data_section )->sectors_per_chunk,
@@ -4697,8 +4703,8 @@ ssize_t libewf_section_data_write(
 		 media_values->bytes_per_sector );
 
 		byte_stream_copy_from_uint64_little_endian(
-		 ( *cached_data_section )->amount_of_sectors,
-		 media_values->amount_of_sectors );
+		 ( *cached_data_section )->number_of_sectors,
+		 media_values->number_of_sectors );
 
 		if( ( format == LIBEWF_FORMAT_ENCASE5 )
 		 || ( format == LIBEWF_FORMAT_ENCASE6 )
@@ -4800,7 +4806,7 @@ ssize_t libewf_section_data_write(
 }
 
 /* Reads a error2 section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_error2_read(
          libbfio_pool_t *file_io_pool,
@@ -4820,7 +4826,7 @@ ssize_t libewf_section_error2_read(
 	ssize_t section_read_count          = 0;
 	ssize_t read_count                  = 0;
 	size_t sectors_size                 = 0;
-	uint32_t amount_of_errors           = 0;
+	uint32_t number_of_errors           = 0;
 	uint32_t iterator                   = 0;
 	uint32_t first_sector               = 0;
 
@@ -4894,8 +4900,8 @@ ssize_t libewf_section_error2_read(
 	 stored_crc );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 error2.amount_of_errors,
-	 amount_of_errors );
+	 error2.number_of_errors,
+	 number_of_errors );
 
 	if( stored_crc != calculated_crc )
 	{
@@ -4922,9 +4928,9 @@ ssize_t libewf_section_error2_read(
 	}
 #endif
 
-	if( amount_of_errors > 0 )
+	if( number_of_errors > 0 )
 	{
-		sectors_size = sizeof( ewf_error2_sector_t ) * amount_of_errors;
+		sectors_size = sizeof( ewf_error2_sector_t ) * number_of_errors;
 
 		error2_sectors = (ewf_error2_sector_t *) memory_allocate(
 		                                          sectors_size );
@@ -5036,10 +5042,10 @@ ssize_t libewf_section_error2_read(
 			memory_free(
 			 acquiry_errors->sector );
 
-			acquiry_errors->amount = 0;
+			acquiry_errors->number_of_sectors = 0;
 		}
 		acquiry_errors->sector = (libewf_sector_table_entry_t *) memory_allocate(
-		                                                          sizeof( libewf_sector_table_entry_t ) * amount_of_errors );
+		                                                          sizeof( libewf_sector_table_entry_t ) * number_of_errors );
 
 		if( acquiry_errors->sector == NULL )
 		{
@@ -5055,9 +5061,11 @@ ssize_t libewf_section_error2_read(
 
 			return( -1 );
 		}
-		acquiry_errors->amount = amount_of_errors;
+		acquiry_errors->number_of_sectors = number_of_errors;
 
-		for( iterator = 0; iterator < amount_of_errors; iterator++ )
+		for( iterator = 0;
+		     iterator < number_of_errors;
+		     iterator++ )
 		{
 			byte_stream_copy_to_uint32_little_endian(
 			 error2_sectors[ iterator ].first_sector,
@@ -5066,8 +5074,8 @@ ssize_t libewf_section_error2_read(
 			acquiry_errors->sector[ iterator ].first_sector = (uint64_t) first_sector;
 
 			byte_stream_copy_to_uint32_little_endian(
-			 error2_sectors[ iterator ].amount_of_sectors,
-			 acquiry_errors->sector[ iterator ].amount_of_sectors );
+			 error2_sectors[ iterator ].number_of_sectors,
+			 acquiry_errors->sector[ iterator ].number_of_sectors );
 		}
 		memory_free(
 		 error2_sectors );
@@ -5082,7 +5090,7 @@ ssize_t libewf_section_error2_read(
 }
 
 /* Writes a error2 section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_error2_write(
          libbfio_pool_t *file_io_pool,
@@ -5142,7 +5150,7 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	sectors_size = sizeof( ewf_error2_sector_t ) * acquiry_errors->amount;
+	sectors_size = sizeof( ewf_error2_sector_t ) * acquiry_errors->number_of_sectors;
 	section_size = sizeof( ewf_error2_t ) + sectors_size + sizeof( ewf_crc_t );
 
 	if( memory_set(
@@ -5160,8 +5168,8 @@ ssize_t libewf_section_error2_write(
 		return( -1 );
 	}
 	byte_stream_copy_from_uint32_little_endian(
-	 error2.amount_of_errors,
-	 acquiry_errors->amount );
+	 error2.number_of_errors,
+	 acquiry_errors->number_of_sectors );
 
 	calculated_crc = ewf_crc_calculate(
 	                  &error2,
@@ -5188,15 +5196,17 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < acquiry_errors->amount; iterator++ )
+	for( iterator = 0;
+	     iterator < acquiry_errors->number_of_sectors;
+	     iterator++ )
 	{
 		byte_stream_copy_from_uint32_little_endian(
 		 error2_sectors[ iterator ].first_sector,
 		 (uint32_t) acquiry_errors->sector[ iterator ].first_sector );
 
 		byte_stream_copy_from_uint32_little_endian(
-		 error2_sectors[ iterator ].amount_of_sectors,
-		 acquiry_errors->sector[ iterator ].amount_of_sectors );
+		 error2_sectors[ iterator ].number_of_sectors,
+		 acquiry_errors->sector[ iterator ].number_of_sectors );
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  error2_sectors,
@@ -5319,7 +5329,7 @@ ssize_t libewf_section_error2_write(
 }
 
 /* Reads a digest section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_digest_read(
          libbfio_pool_t *file_io_pool,
@@ -5464,7 +5474,7 @@ ssize_t libewf_section_digest_read(
 }
 
 /* Writes a digest section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_digest_write(
          libbfio_pool_t *file_io_pool,
@@ -5663,7 +5673,7 @@ ssize_t libewf_section_digest_write(
 
 
 /* Reads a hash section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_hash_read(
          libbfio_pool_t *file_io_pool,
@@ -5776,7 +5786,7 @@ ssize_t libewf_section_hash_read(
 }
 
 /* Writes a hash section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_hash_write(
          libbfio_pool_t *file_io_pool,
@@ -5944,7 +5954,7 @@ ssize_t libewf_section_hash_write(
 /* Writes the last section start to file
  * This is used for the next and done sections,
  * these sections point back towards themselves
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_last_write(
          libbfio_pool_t *file_io_pool,
@@ -6105,7 +6115,7 @@ ssize_t libewf_section_last_write(
 }
 
 /* Reads a xheader section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_xheader_read(
          libbfio_pool_t *file_io_pool,
@@ -6229,7 +6239,7 @@ ssize_t libewf_section_xheader_read(
 }
 
 /* Writes a xheader section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_xheader_write(
          libbfio_pool_t *file_io_pool,
@@ -6313,7 +6323,7 @@ ssize_t libewf_section_xheader_write(
 }
 
 /* Reads a xhash section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_xhash_read(
          libbfio_pool_t *file_io_pool,
@@ -6437,7 +6447,7 @@ ssize_t libewf_section_xhash_read(
 }
 
 /* Writes a xhash section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_xhash_write(
          libbfio_pool_t *file_io_pool,
@@ -6521,7 +6531,7 @@ ssize_t libewf_section_xhash_write(
 }
 
 /* Reads a delta chunk section from file
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_delta_chunk_read(
          libbfio_pool_t *file_io_pool,
@@ -6620,7 +6630,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 	chunk -= 1;
 
-	if( chunk >= offset_table->amount_of_chunk_offsets )
+	if( chunk >= offset_table->number_of_chunk_offsets )
 	{
 		liberror_error_set(
 		 error,
@@ -6691,7 +6701,7 @@ ssize_t libewf_section_delta_chunk_read(
 }
 
 /* Writes a delta chunk section to file
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_delta_chunk_write(
          libbfio_pool_t *file_io_pool,
@@ -6945,7 +6955,7 @@ ssize_t libewf_section_delta_chunk_write(
 #if defined( HAVE_DEBUG_OUTPUT )
 
 /* Reads a section from file for debugging purposes
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_debug_read(
          libbfio_pool_t *file_io_pool,
@@ -7340,7 +7350,7 @@ int libewf_section_read(
 		              &( header_sections->header2_size ),
 		              error );
 
-		header_sections->amount_of_header_sections++;
+		header_sections->number_of_header_sections++;
 	}
 	/* Read the header section
 	 * The \0 byte is included in the compare
@@ -7358,7 +7368,7 @@ int libewf_section_read(
 		              &( header_sections->header_size ),
 		              error );
 
-		header_sections->amount_of_header_sections++;
+		header_sections->number_of_header_sections++;
 	}
 	/* Read the xheader section
 	 * The \0 byte is included in the compare
@@ -7376,7 +7386,7 @@ int libewf_section_read(
 		              &( header_sections->xheader_size ),
 		              error );
 
-		header_sections->amount_of_header_sections++;
+		header_sections->number_of_header_sections++;
 	}
 	/* Read the volume or disk section
 	 * The \0 byte is included in the compare
@@ -7405,7 +7415,7 @@ int libewf_section_read(
 		 * output of unexpected additional data in table section
 		 */
 		if( ( *ewf_format == EWF_FORMAT_E01 )
-		 && ( header_sections->amount_of_header_sections == 1 ) )
+		 && ( header_sections->number_of_header_sections == 1 ) )
 		{
 			*format = LIBEWF_FORMAT_ENCASE1;
 		}
@@ -7422,7 +7432,7 @@ int libewf_section_read(
 		              file_io_pool,
 		              segment_file_handle,
 		              (size_t) section_size,
-		              media_values->amount_of_chunks,
+		              media_values->number_of_chunks,
 		              offset_table,
 		              *format,
 		              *ewf_format,
@@ -7440,7 +7450,7 @@ int libewf_section_read(
 		              file_io_pool,
 		              segment_file_handle,
 		              (size_t) section_size,
-		              media_values->amount_of_chunks,
+		              media_values->number_of_chunks,
 		              offset_table,
 		              *format,
 		              *ewf_format,

@@ -44,7 +44,7 @@
  */
 int libewf_offset_table_initialize(
      libewf_offset_table_t **offset_table,
-     uint32_t amount_of_chunk_offsets,
+     uint32_t number_of_chunk_offsets,
      liberror_error_t **error )
 {
 	static char *function    = "libewf_offset_table_initialize";
@@ -63,7 +63,7 @@ int libewf_offset_table_initialize(
 	}
 	if( *offset_table == NULL )
 	{
-		chunk_offset_size = sizeof( libewf_chunk_offset_t ) * amount_of_chunk_offsets;
+		chunk_offset_size = sizeof( libewf_chunk_offset_t ) * number_of_chunk_offsets;
 
 		if( chunk_offset_size > (size_t) SSIZE_MAX )
 		{
@@ -109,7 +109,7 @@ int libewf_offset_table_initialize(
 
 			return( -1 );
 		}
-		if( amount_of_chunk_offsets > 0 )
+		if( number_of_chunk_offsets > 0 )
 		{
 			( *offset_table )->chunk_offset = (libewf_chunk_offset_t *) memory_allocate(
 			                                                             chunk_offset_size );
@@ -152,7 +152,7 @@ int libewf_offset_table_initialize(
 				return( -1 );
 			}
 		}
-		( *offset_table )->amount_of_chunk_offsets = amount_of_chunk_offsets;
+		( *offset_table )->number_of_chunk_offsets = number_of_chunk_offsets;
 	}
 	return( 1 );
 }
@@ -199,7 +199,7 @@ int libewf_offset_table_free(
  */
 int libewf_offset_table_resize(
      libewf_offset_table_t *offset_table,
-     uint32_t amount_of_chunk_offsets,
+     uint32_t number_of_chunk_offsets,
      liberror_error_t **error )
 {
 	void *reallocation       = NULL;
@@ -217,9 +217,9 @@ int libewf_offset_table_resize(
 
 		return( -1 );
 	}
-	if( offset_table->amount_of_chunk_offsets < amount_of_chunk_offsets )
+	if( offset_table->number_of_chunk_offsets < number_of_chunk_offsets )
 	{
-		chunk_offset_size = sizeof( libewf_chunk_offset_t ) * amount_of_chunk_offsets;
+		chunk_offset_size = sizeof( libewf_chunk_offset_t ) * number_of_chunk_offsets;
 
 		if( chunk_offset_size > (size_t) SSIZE_MAX )
 		{
@@ -250,9 +250,9 @@ int libewf_offset_table_resize(
 		offset_table->chunk_offset = (libewf_chunk_offset_t *) reallocation;
 
 		if( memory_set(
-		     &( offset_table->chunk_offset[ offset_table->amount_of_chunk_offsets ] ),
+		     &( offset_table->chunk_offset[ offset_table->number_of_chunk_offsets ] ),
 		     0,
-		     ( sizeof( libewf_chunk_offset_t ) * ( amount_of_chunk_offsets - offset_table->amount_of_chunk_offsets ) ) ) == NULL )
+		     ( sizeof( libewf_chunk_offset_t ) * ( number_of_chunk_offsets - offset_table->number_of_chunk_offsets ) ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -263,7 +263,7 @@ int libewf_offset_table_resize(
 
 			return( -1 );
 		}
-		offset_table->amount_of_chunk_offsets = amount_of_chunk_offsets;
+		offset_table->number_of_chunk_offsets = number_of_chunk_offsets;
 	}
 	return( 1 );
 }
@@ -275,7 +275,7 @@ int libewf_offset_table_fill(
      libewf_offset_table_t *offset_table,
      off64_t base_offset,
      ewf_table_offset_t *offsets,
-     uint32_t amount_of_chunks,
+     uint32_t number_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t tainted,
      liberror_error_t **error )
@@ -343,11 +343,11 @@ int libewf_offset_table_fill(
 	/* Allocate additional entries in the offset table if needed
 	 * - a single reallocation saves processing time
 	 */
-	if( offset_table->amount_of_chunk_offsets < ( offset_table->last_chunk_offset_filled + amount_of_chunks ) )
+	if( offset_table->number_of_chunk_offsets < ( offset_table->last_chunk_offset_filled + number_of_chunks ) )
 	{
 		if( libewf_offset_table_resize(
 		     offset_table,
-		     offset_table->last_chunk_offset_filled + amount_of_chunks,
+		     offset_table->last_chunk_offset_filled + number_of_chunks,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -366,7 +366,7 @@ int libewf_offset_table_fill(
 
 	/* The size of the last chunk must be determined differently
 	 */
-	while( offset_iterator < ( amount_of_chunks - 1 ) )
+	while( offset_iterator < ( number_of_chunks - 1 ) )
 	{
 		if( overflow == 0 )
 		{
@@ -763,16 +763,16 @@ int libewf_offset_table_fill_last_offset(
 }
 
 /* Fills the offsets from the offset table
- * amount_of_chunk_offsets contains the amount of chunk offsets to fill
+ * number_of_chunk_offsets contains the number of chunk offsets to fill
  * Returns 1 if successful or -1 on error
  */
 int libewf_offset_table_fill_offsets(
      libewf_offset_table_t *offset_table,
      uint32_t offset_table_index,
-     uint32_t amount_of_chunk_offsets,
+     uint32_t number_of_chunk_offsets,
      off64_t base_offset,
      ewf_table_offset_t *offsets,
-     uint32_t amount_of_offsets,
+     uint32_t number_of_offsets,
      liberror_error_t **error )
 {
 	libewf_chunk_offset_t *chunk_offset = NULL;
@@ -825,19 +825,19 @@ int libewf_offset_table_fill_offsets(
 
 		return( -1 );
 	}
-	if( amount_of_offsets < amount_of_chunk_offsets )
+	if( number_of_offsets < number_of_chunk_offsets )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: amount of offsets too small.",
+		 "%s: number of offsets too small.",
 		 function );
 
 		return( -1 );
 	}
 	for( offset_iterator = 0;
-	     offset_iterator < amount_of_chunk_offsets;
+	     offset_iterator < number_of_chunk_offsets;
 	     offset_iterator++ )
 	{
 		chunk_offset   = &( offset_table->chunk_offset[ offset_table_index + offset_iterator ] );
@@ -875,7 +875,7 @@ int libewf_offset_table_compare(
      libewf_offset_table_t *offset_table,
      off64_t base_offset,
      ewf_table_offset_t *offsets,
-     uint32_t amount_of_chunks,
+     uint32_t number_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t tainted,
      liberror_error_t **error )
@@ -944,10 +944,10 @@ int libewf_offset_table_compare(
 	/* Allocate additional entries in the offset table if needed
 	 * - a single reallocation saves processing time
 	 */
-	if( ( offset_table->amount_of_chunk_offsets < ( offset_table->last_chunk_offset_compared + amount_of_chunks ) )
+	if( ( offset_table->number_of_chunk_offsets < ( offset_table->last_chunk_offset_compared + number_of_chunks ) )
 	 && ( libewf_offset_table_resize(
 	       offset_table,
-	       offset_table->last_chunk_offset_compared + amount_of_chunks,
+	       offset_table->last_chunk_offset_compared + number_of_chunks,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
@@ -965,7 +965,7 @@ int libewf_offset_table_compare(
 
 	/* The size of the last chunk must be determined differently
 	 */
-	while( offset_iterator < ( amount_of_chunks - 1 ) )
+	while( offset_iterator < ( number_of_chunks - 1 ) )
 	{
 		if( overflow == 0 )
 		{
@@ -1494,7 +1494,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 
 		return( -1 );
 	}
-	if( chunk >= offset_table->amount_of_chunk_offsets )
+	if( chunk >= offset_table->number_of_chunk_offsets )
 	{
 		liberror_error_set(
 		 error,
@@ -1503,7 +1503,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].",
 		 function,
 		 chunk,
-		 offset_table->amount_of_chunk_offsets - 1 );
+		 offset_table->number_of_chunk_offsets - 1 );
 
 		return( -1 );
 	}

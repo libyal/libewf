@@ -136,7 +136,7 @@ int libewf_chunk_cache_initialize(
 
 			return( -1 );
 		}
-		( *chunk_cache )->allocated_size = size;
+		( *chunk_cache )->size = size;
 	}
 	return( 1 );
 }
@@ -219,7 +219,7 @@ int libewf_chunk_cache_resize(
 
 		return( -1 );
 	}
-	if( size > chunk_cache->allocated_size )
+	if( size > chunk_cache->size )
 	{
 		reallocation = memory_reallocate(
 				chunk_cache->compressed,
@@ -252,12 +252,12 @@ int libewf_chunk_cache_resize(
 
 			return( -1 );
 		}
-		chunk_cache->data           = (uint8_t *) reallocation;
-		chunk_cache->allocated_size = size;
-		chunk_cache->chunk          = 0;
-		chunk_cache->amount         = 0;
-		chunk_cache->offset         = 0;
-		chunk_cache->cached         = 0;
+		chunk_cache->data        = (uint8_t *) reallocation;
+		chunk_cache->size        = size;
+		chunk_cache->chunk       = 0;
+		chunk_cache->data_size   = 0;
+		chunk_cache->data_offset = 0;
+		chunk_cache->cached      = 0;
 	}
 	return( 1 );
 }

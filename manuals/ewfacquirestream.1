@@ -1,4 +1,4 @@
-.Dd April 18, 2010
+.Dd May 2, 2010
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -7,8 +7,8 @@
 .Sh SYNOPSIS
 .Nm ewfacquirestream
 .Op Fl A Ar codepage
-.Op Fl b Ar amount_of_sectors
-.Op Fl B Ar amount_of_bytes
+.Op Fl b Ar number_of_sectors
+.Op Fl B Ar number_of_bytes
 .Op Fl c Ar compression_type
 .Op Fl C Ar case_number
 .Op Fl d Ar digest_type
@@ -49,10 +49,10 @@ The options are as follows:
 .Bl -tag -width Ds
 .It Fl A Ar codepage
 the codepage of header section, options: ascii (default), windows-874, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
-.It Fl b Ar amount_of_sectors
-the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
-.It Fl B Ar amount_of_bytes
-the amount of bytes to acquire
+.It Fl b Ar number_of_sectors
+the number of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+.It Fl B Ar number_of_bytes
+the number of bytes to acquire
 .It Fl c Ar compression_type
 the compression type, options: none (default), empty-block, fast, best
 .It Fl C Ar case_number
@@ -125,7 +125,7 @@ Volume type:                    logical
 Compression used:               none
 EWF file format:                EnCase 5
 Acquiry start offet:            0
-Amount of bytes to acquire:     0 (until end of input)
+Number of bytes to acquire:     0 (until end of input)
 Evidence segment file size:     1.4 GiB (1572864000 bytes)
 Block size:                     64 sectors
 Error granularity:              64 sectors

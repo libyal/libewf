@@ -133,7 +133,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_integer_t option                    = 0;
 	size_t first_filename_length                          = 0;
 	uint8_t verbose                                       = 0;
-	int amount_of_filenames                               = 0;
+	int number_of_filenames                               = 0;
 	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
 	int result                                            = 0;
 
@@ -290,13 +290,13 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	argv_filenames      = glob->result;
-	amount_of_filenames = glob->amount_of_results;
+	number_of_filenames = glob->number_of_results;
 #else
 	argv_filenames      = &( argv[ optind ] );
-	amount_of_filenames = argc - optind;
+	number_of_filenames = argc - optind;
 #endif
 
-	if( amount_of_filenames == 1 )
+	if( number_of_filenames == 1 )
 	{
 		first_filename_length = libcstring_system_string_length(
 		                         argv_filenames[ 0 ] );
@@ -307,7 +307,7 @@ int main( int argc, char * const argv[] )
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &ewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     &error ) != 1 )
 #else
 		if( libewf_glob(
@@ -315,7 +315,7 @@ int main( int argc, char * const argv[] )
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &ewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     &error ) != 1 )
 #endif
 		{
@@ -362,7 +362,7 @@ int main( int argc, char * const argv[] )
 	result = libewf_handle_open(
 	          ewfdebug_input_handle,
 	          argv_filenames,
-	          amount_of_filenames,
+	          number_of_filenames,
 	          LIBEWF_OPEN_READ_WRITE,
 	          &error );
 
@@ -385,10 +385,10 @@ int main( int argc, char * const argv[] )
 #endif
 	if( ewf_filenames != NULL )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		for( ; number_of_filenames > 0; number_of_filenames-- )
 		{
 			memory_free(
-			 ewf_filenames[ amount_of_filenames - 1 ] );
+			 ewf_filenames[ number_of_filenames - 1 ] );
 		}
 		memory_free(
 		 ewf_filenames );

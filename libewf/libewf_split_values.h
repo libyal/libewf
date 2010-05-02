@@ -38,9 +38,9 @@ typedef struct libewf_split_values libewf_split_values_t;
 
 struct libewf_split_values
 {
-	/* The amount of split values
+	/* The number of split values
 	 */
-	int amount_of_values;
+	int number_of_values;
 
 	/* The string
 	 */
@@ -59,7 +59,7 @@ int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
      const libcstring_character_t *string,
      size_t string_size,
-     int amount_of_values,
+     int number_of_values,
      liberror_error_t **error );
 
 int libewf_split_values_free(

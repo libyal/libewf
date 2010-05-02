@@ -35,10 +35,10 @@ typedef struct ewf_session ewf_session_t;
 
 struct ewf_session
 {
-	/* Amount of sessions
+	/* NUmber of sessions
 	 * consists of 4 bytes
 	 */
-	uint8_t amount_of_sessions[ 4 ];
+	uint8_t number_of_sessions[ 4 ];
 
 	/* Unknown
 	 * consists of 28 bytes

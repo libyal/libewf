@@ -127,7 +127,7 @@ int ewfinput_get_fixed_string_variable(
      size_t input_buffer_size,
      libcstring_system_character_t *request_string,
      libcstring_system_character_t **values,
-     uint8_t amount_of_values,
+     uint8_t number_of_values,
      uint8_t default_value,
      libcstring_system_character_t **fixed_string_variable,
      liberror_error_t **error );

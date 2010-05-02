@@ -36,10 +36,10 @@ typedef struct ewf_error2_sector ewf_error2_sector_t;
 
 struct ewf_error2
 {
-	/* The amount of errors
+	/* The number of errors
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t amount_of_errors[ 4 ];
+	uint8_t number_of_errors[ 4 ];
 
 	/* Unknown
 	 * consists of 512 bytes
@@ -69,10 +69,10 @@ struct ewf_error2_sector
 	 */
 	uint8_t first_sector[ 4 ];
 
-	/* The amount of sectors
+	/* The number of sectors
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t amount_of_sectors[ 4 ];
+	uint8_t number_of_sectors[ 4 ];
 };
 
 #if defined( __cplusplus )

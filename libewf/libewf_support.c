@@ -407,7 +407,7 @@ int libewf_check_file_signature_file_io_handle(
 			return( -1 );
 		}
 	}
-	/* The amount of EWF segment files will be the largest
+	/* The number of EWF segment files will be the largest
 	 */
 	if( memory_compare(
 	     evf_file_signature,
@@ -443,7 +443,7 @@ int libewf_glob(
      size_t filename_length,
      uint8_t format,
      char **filenames[],
-     int *amount_of_filenames,
+     int *number_of_filenames,
      liberror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
@@ -514,13 +514,13 @@ int libewf_glob(
 
 		return( -1 );
 	}
-	if( amount_of_filenames == NULL )
+	if( number_of_filenames == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of filenames.",
+		 "%s: invalid number of filenames.",
 		 function );
 
 		return( -1 );
@@ -597,9 +597,9 @@ int libewf_glob(
 
 		return( -1 );
 	}
-	*amount_of_filenames = 0;
+	*number_of_filenames = 0;
 
-	while( *amount_of_filenames < (int) UINT16_MAX )
+	while( *number_of_filenames < (int) UINT16_MAX )
 	{
 		segment_filename_length = filename_length + additional_length;
 
@@ -647,7 +647,7 @@ int libewf_glob(
 		}
 		if( libewf_filename_set_extension(
 		     &( segment_filename[ segment_filename_length - 3 ] ),
-		     (uint16_t) ( *amount_of_filenames + 1 ),
+		     (uint16_t) ( *number_of_filenames + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
 		     format,
@@ -720,11 +720,11 @@ int libewf_glob(
 
 			break;
 		}
-		*amount_of_filenames += 1;
+		*number_of_filenames += 1;
 
 		reallocation = memory_reallocate(
 		                *filenames,
-		                sizeof( char * ) * *amount_of_filenames );
+		                sizeof( char * ) * *number_of_filenames );
 
 		if( reallocation == NULL )
 		{
@@ -745,7 +745,7 @@ int libewf_glob(
 		}
 		*filenames = (char **) reallocation;
 
-		( *filenames )[ *amount_of_filenames - 1 ] = segment_filename;
+		( *filenames )[ *number_of_filenames - 1 ] = segment_filename;
 	}
 	if( libbfio_handle_free(
 	     &file_io_handle,
@@ -768,7 +768,7 @@ int libewf_glob(
  */
 int libewf_glob_free(
      char *filenames[],
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error )
 {
 	static char *function = "libewf_glob_free";
@@ -785,19 +785,19 @@ int libewf_glob_free(
 
 		return( -1 );
 	}
-	if( amount_of_filenames < 0 )
+	if( number_of_filenames < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid amount of filenames value less than zero.",
+		 "%s: invalid number of filenames value less than zero.",
 		 function );
 
 		return( -1 );
 	}
 	for( filename_iterator = 0;
-	     filename_iterator < amount_of_filenames;
+	     filename_iterator < number_of_filenames;
 	     filename_iterator++ )
 	{
 		memory_free(
@@ -822,7 +822,7 @@ int libewf_glob_wide(
      size_t filename_length,
      uint8_t format,
      wchar_t **filenames[],
-     int *amount_of_filenames,
+     int *number_of_filenames,
      liberror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
@@ -893,13 +893,13 @@ int libewf_glob_wide(
 
 		return( -1 );
 	}
-	if( amount_of_filenames == NULL )
+	if( number_of_filenames == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of filenames.",
+		 "%s: invalid number of filenames.",
 		 function );
 
 		return( -1 );
@@ -976,9 +976,9 @@ int libewf_glob_wide(
 
 		return( -1 );
 	}
-	*amount_of_filenames = 0;
+	*number_of_filenames = 0;
 
-	while( *amount_of_filenames < (int) UINT16_MAX )
+	while( *number_of_filenames < (int) UINT16_MAX )
 	{
 		segment_filename_length = filename_length + additional_length;
 
@@ -1026,7 +1026,7 @@ int libewf_glob_wide(
 		}
 		if( libewf_filename_set_extension_wide(
 		     &( segment_filename[ segment_filename_length - 3 ] ),
-		     (uint16_t) ( *amount_of_filenames + 1 ),
+		     (uint16_t) ( *number_of_filenames + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
 		     format,
@@ -1099,11 +1099,11 @@ int libewf_glob_wide(
 
 			break;
 		}
-		*amount_of_filenames += 1;
+		*number_of_filenames += 1;
 
 		reallocation = memory_reallocate(
 		                *filenames,
-		                sizeof( wchar_t * ) * *amount_of_filenames );
+		                sizeof( wchar_t * ) * *number_of_filenames );
 
 		if( reallocation == NULL )
 		{
@@ -1124,7 +1124,7 @@ int libewf_glob_wide(
 		}
 		*filenames = (wchar_t **) reallocation;
 
-		( *filenames )[ *amount_of_filenames - 1 ] = segment_filename;
+		( *filenames )[ *number_of_filenames - 1 ] = segment_filename;
 	}
 	if( libbfio_handle_free(
 	     &file_io_handle,
@@ -1147,7 +1147,7 @@ int libewf_glob_wide(
  */
 int libewf_glob_wide_free(
      wchar_t *filenames[],
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error )
 {
 	static char *function = "libewf_glob_wide_free";
@@ -1164,19 +1164,19 @@ int libewf_glob_wide_free(
 
 		return( -1 );
 	}
-	if( amount_of_filenames < 0 )
+	if( number_of_filenames < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid amount of filenames value less than zero.",
+		 "%s: invalid number of filenames value less than zero.",
 		 function );
 
 		return( -1 );
 	}
 	for( filename_iterator = 0;
-	     filename_iterator < amount_of_filenames;
+	     filename_iterator < number_of_filenames;
 	     filename_iterator++ )
 	{
 		memory_free(

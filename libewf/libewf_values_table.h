@@ -38,9 +38,9 @@ typedef struct libewf_values_table libewf_values_table_t;
 
 struct libewf_values_table
 {
-	/* The amount of values
+	/* The number of values
 	 */
-	int amount_of_values;
+	int number_of_values;
 
 	/* The value identifiers
 	 */
@@ -61,7 +61,7 @@ struct libewf_values_table
 
 int libewf_values_table_initialize(
      libewf_values_table_t **values_table,
-     int amount_of_values,
+     int number_of_values,
      liberror_error_t **error );
 
 int libewf_values_table_free(
@@ -70,12 +70,12 @@ int libewf_values_table_free(
 
 int libewf_values_table_resize(
      libewf_values_table_t *values_table,
-     int amount_of_values,
+     int number_of_values,
      liberror_error_t **error );
 
-int libewf_values_table_get_amount_of_values(
+int libewf_values_table_get_number_of_values(
      libewf_values_table_t *values_table,
-     int *amount_of_values,
+     int *number_of_values,
      liberror_error_t **error );
 
 int libewf_values_table_get_index(

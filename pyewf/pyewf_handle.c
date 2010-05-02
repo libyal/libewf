@@ -328,7 +328,7 @@ PyObject* pyewf_handle_open(
 	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_handle_open";
 	size_t filename_size        = 0;
-	int amount_of_filenames     = 0;
+	int number_of_filenames     = 0;
 	int filename_iterator       = 0;
 
 	if( pyewf_handle == NULL )
@@ -359,21 +359,21 @@ PyObject* pyewf_handle_open(
 
 		return( NULL );
 	}
-	amount_of_filenames = PySequence_Size(
+	number_of_filenames = PySequence_Size(
 	                       sequence_object );
 
-	if( ( amount_of_filenames <= 0 )
-	 || ( amount_of_filenames > (int) UINT16_MAX ) )
+	if( ( number_of_filenames <= 0 )
+	 || ( number_of_filenames > (int) UINT16_MAX ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid amount of files.",
+		 "%s: invalid number of files.",
 		 function );
 
 		return( NULL );
 	}
 	filenames = (char **) memory_allocate(
-	                       sizeof( char * ) * amount_of_filenames );
+	                       sizeof( char * ) * number_of_filenames );
 
 	if( filenames == NULL )
 	{
@@ -387,7 +387,7 @@ PyObject* pyewf_handle_open(
 	if( memory_set(
 	     filenames,
 	     0,
-	     sizeof( char * ) * amount_of_filenames ) == NULL )
+	     sizeof( char * ) * number_of_filenames ) == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
@@ -399,7 +399,9 @@ PyObject* pyewf_handle_open(
 
 		return( NULL );
 	}
-	for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+	for( filename_iterator = 0;
+	     filename_iterator < number_of_filenames;
+	     filename_iterator++ )
 	{
 		string_object = PySequence_GetItem(
 		                 sequence_object,
@@ -459,7 +461,7 @@ PyObject* pyewf_handle_open(
 	if( libewf_handle_open(
 	     pyewf_handle->handle,
              filenames,
-             amount_of_filenames,
+             number_of_filenames,
              LIBEWF_OPEN_READ,
 	     &error ) != 1 )
 	{
@@ -473,7 +475,9 @@ PyObject* pyewf_handle_open(
 		liberror_error_free(
 		 &error );
 
-		for( filename_iterator = 0; filename_iterator < amount_of_filenames; filename_iterator++ )
+		for( filename_iterator = 0;
+		     filename_iterator < number_of_filenames;
+		     filename_iterator++ )
 		{
 			memory_free(
 			 filenames[ filename_iterator ] );
@@ -484,7 +488,7 @@ PyObject* pyewf_handle_open(
 		return( NULL );
 	}
 	for( filename_iterator = 0;
-	     filename_iterator < amount_of_filenames;
+	     filename_iterator < number_of_filenames;
 	     filename_iterator++ )
 	{
 		memory_free(

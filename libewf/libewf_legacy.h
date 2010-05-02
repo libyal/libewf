@@ -36,6 +36,55 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBEWF )
+
+LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
+                   libewf_handle_t *handle,
+                   int maximum_amount_of_open_handles,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_amount_of_sectors(
+                   libewf_handle_t *handle,
+                   uint64_t *amount_of_sectors,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_write_amount_of_chunks(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_chunks,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_errors,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_amount_of_crc_errors(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_errors,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_sessions,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_amount_of_header_values(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_values,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_amount_of_hash_values(
+                   libewf_handle_t *handle,
+                   uint32_t *amount_of_values,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_file_entry_get_amount_of_sub_file_entries(
+                   libewf_file_entry_t *file_entry,
+                   int *amount_of_sub_file_entries,
+                   liberror_error_t **error );
+
+#endif
+
 #if defined( HAVE_V1_API )
 
 #if !defined( HAVE_LOCAL_LIBEWF )

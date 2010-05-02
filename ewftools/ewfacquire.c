@@ -120,10 +120,10 @@ void usage_fprint(
 	fprintf( stream, "Use ewfacquire to acquire data from a file or device and store it in the EWF\n"
 	                 "format (Expert Witness Compression Format).\n\n" );
 
-	fprintf( stream, "Usage: ewfacquire [ -A codepage ] [ -b amount_of_sectors ] [ -B amount_of_bytes ]\n"
+	fprintf( stream, "Usage: ewfacquire [ -A codepage ] [ -b number_of_sectors ] [ -B number_of_bytes ]\n"
 	                 "                  [ -c compression_type ] [ -C case_number ] [ -d digest_type ]\n"
 	                 "                  [ -D description ] [ -e examiner_name ] [ -E evidence_number ]\n"
-	                 "                  [ -f format ] [ -g amount_of_sectors ] [ -l log_filename ]\n"
+	                 "                  [ -f format ] [ -g number_of_sectors ] [ -l log_filename ]\n"
 	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ] [ -o offset ]\n"
 	                 "                  [ -p process_buffer_size ] [ -P bytes_per_sector ]\n"
 	                 "                  [ -r read_error_retries ] [ -S segment_file_size ]\n"
@@ -134,9 +134,9 @@ void usage_fprint(
 	fprintf( stream, "\t-A:     codepage of header section, options: ascii (default), windows-874,\n"
 	                 "\t        windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t        windows-1255, windows-1256, windows-1257, windows-1258\n" );
-	fprintf( stream, "\t-b:     specify the amount of sectors to read at once (per chunk), options:\n"
+	fprintf( stream, "\t-b:     specify the number of sectors to read at once (per chunk), options:\n"
 	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t-B:     specify the amount of bytes to acquire (default is all bytes)\n" );
+	fprintf( stream, "\t-B:     specify the number of bytes to acquire (default is all bytes)\n" );
 	fprintf( stream, "\t-c:     specify the compression type, options: none (default), empty-block, fast\n"
 	                 "\t        or best\n" );
 	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
@@ -144,7 +144,7 @@ void usage_fprint(
 	fprintf( stream, "\t-D:     specify the description (default is description).\n" );
 	fprintf( stream, "\t-e:     specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );
-	fprintf( stream, "\t-g      specify the amount of sectors to be used as error granularity, options:\n"
+	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity, options:\n"
 	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart, ftk,\n"
 	                 "\t        encase2, encase3, encase4, encase5, encase6 (default), linen5, linen6,\n"
@@ -156,10 +156,10 @@ void usage_fprint(
 	fprintf( stream, "\t-N:     specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-o:     specify the offset to start to acquire (default is 0)\n" );
 	fprintf( stream, "\t-p:     specify the process buffer size (default is the chunk size)\n" );
-	fprintf( stream, "\t-P:     specify the amount of bytes per sector (default is 512)\n"
+	fprintf( stream, "\t-P:     specify the number of bytes per sector (default is 512)\n"
 	                 "\t        (use this to override the automatic bytes per sector detection)\n" );
 	fprintf( stream, "\t-q:     quiet shows no status information\n" );
-	fprintf( stream, "\t-r:     specify the amount of retries when a read error occurs (default is 2)\n" );
+	fprintf( stream, "\t-r:     specify the number of retries when a read error occurs (default is 2)\n" );
 	fprintf( stream, "\t-R:     resume acquiry at a safe point\n" );
 	fprintf( stream, "\t-s:     swap byte pairs of the media data (from AB to BA)\n"
 	                 "\t        (use this for big to little endian conversion and vice versa)\n" );
@@ -562,7 +562,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 
 	fprintf(
 	 stream,
-	 "Amount of bytes to acquire:\t" );
+	 "Number of bytes to acquire:\t" );
 
 	if( acquiry_size == 0 )
 	{
@@ -712,7 +712,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 }
 
 /* Reads data from a file descriptor and writes it in EWF format
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize64_t ewfacquire_read_input(
            imaging_handle_t *imaging_handle,
@@ -743,7 +743,7 @@ ssize64_t ewfacquire_read_input(
 	ssize_t write_count                          = 0;
 	uint32_t byte_error_granularity              = 0;
 	uint32_t chunk_size                          = 0;
-	int amount_of_read_errors                    = 0;
+	int number_of_read_errors                    = 0;
 	int read_error_iterator                      = 0;
 
 	if( imaging_handle == NULL )
@@ -975,7 +975,7 @@ ssize64_t ewfacquire_read_input(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 			storage_media_buffer->data_in_compression_buffer = 0;
 #endif
-			storage_media_buffer->raw_buffer_amount = read_count;
+			storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
 
 			/* Swap byte pairs
 			 * The digest hashes are calcultated after swap
@@ -1084,11 +1084,11 @@ ssize64_t ewfacquire_read_input(
 			read_count = process_count;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			/* Set the amount of chunk data in the buffer
+			/* Set the chunk data size in the compression buffer
 			 */
 			if( storage_media_buffer->data_in_compression_buffer == 1 )
 			{
-				storage_media_buffer->compression_buffer_amount = process_count;
+				storage_media_buffer->compression_buffer_data_size = (size_t) process_count;
 			}
 #endif
 		}
@@ -1196,22 +1196,22 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( acquiry_count >= resume_acquiry_offset )
 	{
-		if( device_handle_get_amount_of_read_errors(
+		if( device_handle_get_number_of_read_errors(
 		     device_handle,
-		     &amount_of_read_errors,
+		     &number_of_read_errors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of read errors.",
+			 "%s: unable to retrieve number of read errors.",
 			 function );
 
 			return( -1 );
 		}
 		for( read_error_iterator = 0;
-		     read_error_iterator < amount_of_read_errors;
+		     read_error_iterator < number_of_read_errors;
 		     read_error_iterator++ )
 		{
 			if( device_handle_get_read_error(
@@ -1492,7 +1492,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
+					 "Unsuported number of sectors per chunk defaulting to: 64.\n" );
 				}
 				else
 				{
@@ -1624,7 +1624,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsuported amount of sector error granularity defaulting to: 64.\n" );
+					 "Unsuported number of sector error granularity defaulting to: 64.\n" );
 				}
 				else
 				{
@@ -1772,7 +1772,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsupported amount of bytes per sector defaulting to: %" PRIu64 ".\n",
+					 "Unsupported number of bytes per sector defaulting to: %" PRIu64 ".\n",
 					 input_size_variable );
 				}
 				else
@@ -1812,7 +1812,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsupported amount of read error retries defaulting to: %" PRIu64 ".\n",
+					 "Unsupported number of read error retries defaulting to: %" PRIu64 ".\n",
 					 input_size_variable );
 				}
 				read_error_retries = (uint8_t) input_size_variable;
@@ -2992,7 +2992,7 @@ int main( int argc, char * const argv[] )
 			       stdout,
 			       input_buffer,
 			       EWFACQUIRE_INPUT_BUFFER_SIZE,
-			       _LIBCSTRING_SYSTEM_STRING( "The amount of bytes to acquire" ),
+			       _LIBCSTRING_SYSTEM_STRING( "The number of bytes to acquire" ),
 			       0,
 			       ( media_size - acquiry_offset ),
 			       ( media_size - acquiry_offset ),
@@ -3065,7 +3065,7 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The amount of bytes per sector" ),
+				     _LIBCSTRING_SYSTEM_STRING( "The number of bytes per sector" ),
 				     0,
 				     UINT32_MAX,
 				     bytes_per_sector,
@@ -3094,7 +3094,7 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The amount of sectors to read at once" ),
+				     _LIBCSTRING_SYSTEM_STRING( "The number of sectors to read at once" ),
 				     ewfinput_sector_per_block_sizes,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
@@ -3137,7 +3137,7 @@ int main( int argc, char * const argv[] )
 				     stdout,
 				     input_buffer,
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The amount of sectors to be used as error granularity" ),
+				     _LIBCSTRING_SYSTEM_STRING( "The number of sectors to be used as error granularity" ),
 				     1,
 				     (uint64_t) sectors_per_chunk,
 				     64,
@@ -3159,7 +3159,7 @@ int main( int argc, char * const argv[] )
 				sector_error_granularity = (uint32_t) input_size_variable;
 			}
 		}
-		/* The amount of read error retries
+		/* The number of read error retries
 		 */
 		if( argument_set_read_error_retries == 0 )
 		{
@@ -3167,7 +3167,7 @@ int main( int argc, char * const argv[] )
 			     stdout,
 			     input_buffer,
 			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _LIBCSTRING_SYSTEM_STRING( "The amount of retries when a read error occurs" ),
+			     _LIBCSTRING_SYSTEM_STRING( "The number of retries when a read error occurs" ),
 			     0,
 			     255,
 			     2,

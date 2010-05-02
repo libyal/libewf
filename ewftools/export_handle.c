@@ -679,7 +679,7 @@ int export_handle_create_target_path(
 int export_handle_open_input(
      export_handle_t *export_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
@@ -720,18 +720,18 @@ int export_handle_open_input(
 
 		return( -1 );
 	}
-	if( amount_of_filenames <= 0 )
+	if( number_of_filenames <= 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount of filenames.",
+		 "%s: invalid number of filenames.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_filenames == 1 )
+	if( number_of_filenames == 1 )
 	{
 		first_filename_length = libcstring_system_string_length(
 		                         filenames[ 0 ] );
@@ -742,7 +742,7 @@ int export_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob(
@@ -750,7 +750,7 @@ int export_handle_open_input(
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &libewf_filenames,
-		     &amount_of_filenames,
+		     &number_of_filenames,
 		     error ) != 1 )
 #endif
 		{
@@ -769,14 +769,14 @@ int export_handle_open_input(
 	if( libewf_handle_open_wide(
 	     export_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     export_handle->input_handle,
 	     filenames,
-	     amount_of_filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #endif
@@ -792,10 +792,10 @@ int export_handle_open_input(
 	}
 	if( libewf_filenames != NULL )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		for( ; number_of_filenames > 0; number_of_filenames-- )
 		{
 			memory_free(
-			 libewf_filenames[ amount_of_filenames - 1 ] );
+			 libewf_filenames[ number_of_filenames - 1 ] );
 		}
 		memory_free(
 		 libewf_filenames );
@@ -1125,14 +1125,14 @@ ssize_t export_handle_prepare_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
+	storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
 
 	process_count = libewf_handle_prepare_read_chunk(
 	                 export_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->compression_buffer_data_size,
 	                 storage_media_buffer->raw_buffer,
-	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 &( storage_media_buffer->raw_buffer_data_size ),
 	                 storage_media_buffer->is_compressed,
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc,
@@ -1207,13 +1207,13 @@ ssize_t export_handle_prepare_read_buffer(
 	}
 	export_handle->input_offset += process_count;
 #else
-	process_count = storage_media_buffer->raw_buffer_amount;
+	process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 #endif
 	return( process_count );
 }
 
 /* Reads a buffer from the input of the export handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t export_handle_read_buffer(
          export_handle_t *export_handle,
@@ -1287,9 +1287,9 @@ ssize_t export_handle_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_amount = read_count;
+	storage_media_buffer->compression_buffer_data_size = (size_t) read_count;
 #else
-	storage_media_buffer->raw_buffer_amount         = read_count;
+	storage_media_buffer->raw_buffer_data_size         = (size_t) read_count;
 #endif
 
 	return( read_count );
@@ -1342,14 +1342,14 @@ ssize_t export_handle_prepare_write_buffer(
 			return( -1 );
 		}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
+		storage_media_buffer->compression_buffer_data_size = storage_media_buffer->compression_buffer_size;
 
 		process_count = libewf_handle_prepare_write_chunk(
 				 export_handle->ewf_output_handle,
 				 storage_media_buffer->raw_buffer,
-				 storage_media_buffer->raw_buffer_amount,
+				 storage_media_buffer->raw_buffer_data_size,
 				 storage_media_buffer->compression_buffer,
-				 (size_t *) &( storage_media_buffer->compression_buffer_amount ),
+				 &( storage_media_buffer->compression_buffer_data_size ),
 				 &( storage_media_buffer->is_compressed ),
 				 &( storage_media_buffer->crc ),
 				 &( storage_media_buffer->process_crc ),
@@ -1367,18 +1367,18 @@ ssize_t export_handle_prepare_write_buffer(
 			return( -1 );
 		}
 #else
-		process_count = storage_media_buffer->raw_buffer_amount;
+		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 #endif
 	}
 	else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	{
-		process_count = storage_media_buffer->raw_buffer_amount;
+		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 	}
 	return( process_count );
 }
 
 /* Writes a buffer to the output of the export handle
- * Returns the amount of bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 ssize_t export_handle_write_buffer(
          export_handle_t *export_handle,
@@ -1437,12 +1437,12 @@ ssize_t export_handle_write_buffer(
 		if( storage_media_buffer->is_compressed == 0 )
 		{
 			raw_write_buffer      = storage_media_buffer->raw_buffer;
-			raw_write_buffer_size = storage_media_buffer->raw_buffer_amount;
+			raw_write_buffer_size = storage_media_buffer->raw_buffer_data_size;
 		}
 		else
 		{
 			raw_write_buffer      = storage_media_buffer->compression_buffer;
-			raw_write_buffer_size = storage_media_buffer->compression_buffer_amount;
+			raw_write_buffer_size = storage_media_buffer->compression_buffer_data_size;
 		}
 		if( write_size != raw_write_buffer_size )
 		{
@@ -1450,7 +1450,7 @@ ssize_t export_handle_write_buffer(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: mismatch in write size and amount of bytes in storage media buffer.",
+			 "%s: mismatch in write size and number of bytes in storage media buffer.",
 			 function );
 
 			return( -1 );
@@ -1459,7 +1459,7 @@ ssize_t export_handle_write_buffer(
 			       export_handle->ewf_output_handle,
 			       raw_write_buffer,
 			       raw_write_buffer_size,
-			       storage_media_buffer->raw_buffer_amount,
+			       storage_media_buffer->raw_buffer_data_size,
 			       storage_media_buffer->is_compressed,
 			       storage_media_buffer->crc_buffer,
 			       storage_media_buffer->crc,
@@ -2618,12 +2618,12 @@ int export_handle_set_hash_value(
 int export_handle_add_read_error(
       export_handle_t *export_handle,
       off64_t start_offset,
-      size_t amount_of_bytes,
+      size_t number_of_bytes,
       liberror_error_t **error )
 {
 	static char *function      = "export_handle_add_read_error";
 	uint64_t start_sector      = 0;
-	uint64_t amount_of_sectors = 0;
+	uint64_t number_of_sectors = 0;
 
 	if( export_handle == NULL )
 	{
@@ -2661,13 +2661,13 @@ int export_handle_add_read_error(
 		return( -1 );
 	}
 	start_sector      = start_offset / export_handle->bytes_per_sector;
-	amount_of_sectors = amount_of_bytes / export_handle->bytes_per_sector;
+	number_of_sectors = number_of_bytes / export_handle->bytes_per_sector;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( libewf_handle_add_crc_error(
 	     export_handle->input_handle,
 	     start_sector,
-	     amount_of_sectors,
+	     number_of_sectors,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2697,7 +2697,7 @@ int export_handle_add_read_error(
 		if( libewf_handle_add_acquiry_error(
 		     export_handle->ewf_output_handle,
 		     start_sector,
-		     amount_of_sectors,
+		     number_of_sectors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2714,7 +2714,7 @@ int export_handle_add_read_error(
 }
  
 /* Finalizes the export handle
- * Returns the amount of input bytes written or -1 on error
+ * Returns the number of input bytes written or -1 on error
  */
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
@@ -3024,7 +3024,7 @@ int export_handle_export_file_entry(
 	size_t target_path_size                    = 0;
 	ssize_t read_count                         = 0;
 	uint32_t file_entry_flags                  = 0;
-	int amount_of_sub_file_entries             = 0;
+	int number_of_sub_file_entries             = 0;
 	int iterator                               = 0;
 	int result                                 = 0;
 
@@ -3382,16 +3382,16 @@ int export_handle_export_file_entry(
 			}
 			return( -1 );
 		}
-		if( libewf_file_entry_get_amount_of_sub_file_entries(
+		if( libewf_file_entry_get_number_of_sub_file_entries(
 		     file_entry,
-		     &amount_of_sub_file_entries,
+		     &number_of_sub_file_entries,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve amount of sub file entries.",
+			 "%s: unable to retrieve number of sub file entries.",
 			 function );
 
 			if( target_path != export_path )
@@ -3402,7 +3402,7 @@ int export_handle_export_file_entry(
 			return( -1 );
 		}
 		for( iterator = 0;
-		     iterator < amount_of_sub_file_entries;
+		     iterator < number_of_sub_file_entries;
 		     iterator++ )
 		{
 			if( libewf_file_entry_get_sub_file_entry(
@@ -3550,8 +3550,8 @@ int export_handle_crc_errors_fprint(
 	size_t last_filename_size                    = 0;
 	uint64_t start_sector                        = 0;
 	uint64_t last_sector                         = 0;
-	uint64_t amount_of_sectors                   = 0;
-	uint32_t amount_of_errors                    = 0;
+	uint64_t number_of_sectors                   = 0;
+	uint32_t number_of_errors                    = 0;
 	uint32_t error_iterator                      = 0;
 	int result                                   = 1;
 
@@ -3588,39 +3588,39 @@ int export_handle_crc_errors_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_amount_of_crc_errors(
+	if( libewf_handle_get_number_of_crc_errors(
 	     export_handle->input_handle,
-	     &amount_of_errors,
+	     &number_of_errors,
 	     error ) == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of crc errors.",
+		 "%s: unable to retrieve the number of crc errors.",
 		 function );
 
 		return( -1 );
 	}
-	if( amount_of_errors > 0 )
+	if( number_of_errors > 0 )
 	{
 		fprintf(
 		 stream,
 		 "Read errors during export:\n" );
 		fprintf(
 		 stream,
-		 "\ttotal amount: %" PRIu32 "\n",
-		 amount_of_errors );
+		 "\ttotal number: %" PRIu32 "\n",
+		 number_of_errors );
 		
 		for( error_iterator = 0;
-		     error_iterator < amount_of_errors;
+		     error_iterator < number_of_errors;
 		     error_iterator++ )
 		{
 			if( libewf_handle_get_crc_error(
 			     export_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
-			     &amount_of_sectors,
+			     &number_of_sectors,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -3632,18 +3632,18 @@ int export_handle_crc_errors_fprint(
 				 error_iterator );
 
 				start_sector      = 0;
-				amount_of_sectors = 0;
+				number_of_sectors = 0;
 
 				result = -1;
 			}
-			last_sector = start_sector + amount_of_sectors;
+			last_sector = start_sector + number_of_sectors;
 
 			fprintf(
 			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (amount: %" PRIu64 ")",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (number: %" PRIu64 ")",
 			 start_sector,
 			 last_sector,
-			 amount_of_sectors );
+			 number_of_sectors );
 
 			fprintf(
 			 stream,

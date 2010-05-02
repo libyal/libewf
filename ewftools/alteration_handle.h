@@ -69,7 +69,7 @@ int alteration_handle_signal_abort(
 int alteration_handle_open_input(
      alteration_handle_t *alteration_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error );
 
 int alteration_handle_close(

@@ -310,7 +310,7 @@ int libewf_single_files_parse_file_entries(
 
 		return( -1 );
 	}
-	if( lines->amount_of_values > 0 )
+	if( lines->number_of_values > 0 )
 	{
 		if( ( ( lines->values[ 0 ] )[ 0 ] < (libcstring_character_t) '0' )
 		 || ( ( lines->values[ 0 ] )[ 0 ] > (libcstring_character_t) '9' ) )
@@ -331,7 +331,7 @@ int libewf_single_files_parse_file_entries(
 		/* Find the line containing: "rec"
 		 */
 		for( line_iterator = 0;
-		     line_iterator < lines->amount_of_values;
+		     line_iterator < lines->number_of_values;
 		     line_iterator++ )
 		{
 			if( lines->sizes[ line_iterator ] == 4 )
@@ -370,7 +370,7 @@ int libewf_single_files_parse_file_entries(
 		/* Find the line containing: "entry"
 		 */
 		for( line_iterator = 0;
-		     line_iterator < lines->amount_of_values;
+		     line_iterator < lines->number_of_values;
 		     line_iterator++ )
 		{
 			if( lines->sizes[ line_iterator ] == 6 )
@@ -386,7 +386,7 @@ int libewf_single_files_parse_file_entries(
 				}
 			}
 		}
-		if( line_iterator < lines->amount_of_values )
+		if( line_iterator < lines->number_of_values )
 		{
 			if( libewf_split_values_parse_string(
 			     &types,
@@ -545,7 +545,7 @@ int libewf_single_files_parse_record_values(
 		return( 1 );
 	}
 	if( ( *line_iterator < 0 )
-	 || ( *line_iterator >= lines->amount_of_values ) )
+	 || ( *line_iterator >= lines->number_of_values ) )
 	{
 		liberror_error_set(
 		 error,
@@ -558,7 +558,7 @@ int libewf_single_files_parse_record_values(
 	}
 	/* Make sure there are at least 2 lines
 	 */
-	if( ( *line_iterator + 1 ) >= lines->amount_of_values )
+	if( ( *line_iterator + 1 ) >= lines->number_of_values )
 	{
 		liberror_error_set(
 		 error,
@@ -607,7 +607,7 @@ int libewf_single_files_parse_record_values(
 
 		return( -1 );
 	}
-	if( types->amount_of_values != values->amount_of_values )
+	if( types->number_of_values != values->number_of_values )
 	{
 		liberror_error_set(
 		 error,
@@ -626,7 +626,7 @@ int libewf_single_files_parse_record_values(
 		return( -1 );
 	}
 	for( value_iterator = 0;
-	     value_iterator < values->amount_of_values;
+	     value_iterator < values->number_of_values;
 	     value_iterator++ )
 	{
 		type_string_length  = types->sizes[ value_iterator ] - 1;
@@ -751,7 +751,7 @@ int libewf_single_files_parse_file_entry(
 	static char *function                         = "libewf_single_files_parse_file_entry";
 	size_t type_string_length                     = 0;
 	size_t value_string_length                    = 0;
-	uint64_t amount_of_child_entries              = 0;
+	uint64_t number_of_child_entries              = 0;
 	uint64_t value_64bit                          = 0;
 	int value_iterator                            = 0;
 
@@ -789,7 +789,7 @@ int libewf_single_files_parse_file_entry(
 		return( 1 );
 	}
 	if( ( *line_iterator < 0 )
-	 || ( *line_iterator >= lines->amount_of_values ) )
+	 || ( *line_iterator >= lines->number_of_values ) )
 	{
 		liberror_error_set(
 		 error,
@@ -802,7 +802,7 @@ int libewf_single_files_parse_file_entry(
 	}
 	/* Make sure there are at least 2 lines
 	 */
-	if( ( *line_iterator + 1 ) >= lines->amount_of_values )
+	if( ( *line_iterator + 1 ) >= lines->number_of_values )
 	{
 		liberror_error_set(
 		 error,
@@ -840,7 +840,7 @@ int libewf_single_files_parse_file_entry(
 
 		return( -1 );
 	}
-	if( ( values->amount_of_values != 2 )
+	if( ( values->number_of_values != 2 )
 	 || ( values->sizes[ 0 ] != 2 )
 	 || ( ( values->values[ 0 ] )[ 0 ] != '0' ) )
 	{
@@ -860,14 +860,14 @@ int libewf_single_files_parse_file_entry(
 	if( libewf_string_copy_to_64bit_decimal(
 	     values->values[ 1 ],
 	     values->sizes[ 1 ],
-	     &amount_of_child_entries,
+	     &number_of_child_entries,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_MEMORY,
 		 LIBERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to set amount fo child entries.",
+		 "%s: unable to set number fo child entries.",
 		 function );
 
 		libewf_single_file_entry_free(
@@ -910,7 +910,7 @@ int libewf_single_files_parse_file_entry(
 
 		return( -1 );
 	}
-	if( types->amount_of_values != values->amount_of_values )
+	if( types->number_of_values != values->number_of_values )
 	{
 		liberror_error_set(
 		 error,
@@ -943,7 +943,7 @@ int libewf_single_files_parse_file_entry(
 		return( -1 );
 	}
 	for( value_iterator = 0;
-	     value_iterator < values->amount_of_values;
+	     value_iterator < values->number_of_values;
 	     value_iterator++ )
 	{
 		type_string_length  = types->sizes[ value_iterator ] - 1;
@@ -1099,7 +1099,7 @@ int libewf_single_files_parse_file_entry(
 
 					return( -1 );
 				}
-				if( offset_values->amount_of_values == 3 )
+				if( offset_values->number_of_values == 3 )
 				{
 					if( libewf_string_copy_to_64bit_hexadecimal(
 					     offset_values->values[ 1 ],
@@ -1494,18 +1494,18 @@ int libewf_single_files_parse_file_entry(
 
 		return( -1 );
 	}
-	if( ( *line_iterator + amount_of_child_entries ) > (uint64_t) lines->amount_of_values )
+	if( ( *line_iterator + number_of_child_entries ) > (uint64_t) lines->number_of_values )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: amount of child entries exceed the amount of available lines.",
+		 "%s: number of child entries exceed the number of available lines.",
 		 function );
 
 		return( -1 );
 	}
-	while( amount_of_child_entries > 0 )
+	while( number_of_child_entries > 0 )
 	{
 		if( libewf_tree_node_initialize(
 		     &file_entry_node,
@@ -1562,7 +1562,7 @@ int libewf_single_files_parse_file_entry(
 		}
 		file_entry_node = NULL;
 
-		amount_of_child_entries--;
+		number_of_child_entries--;
 	}
 	return( 1 );
 }

@@ -116,12 +116,12 @@ void usage_fprint(
 	                 "Format) to raw data or another EWF format.\n\n" );
 
 #ifdef DISABLED
-	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -b amount_of_sectors ] [ -B amount_of_bytes ]\n"
+	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -b number_of_sectors ] [ -B number_of_bytes ]\n"
 	                 "                 [ -c compression_type ] [ -d digest_type ] [ -f format ]\n"
 	                 "                 [ -l log_filename ] [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
 #else
-	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -B amount_of_bytes ] [ -c compression_type ]\n"
+	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -B number_of_bytes ] [ -c compression_type ]\n"
 	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
 	                 "                 [ -o offset ] [ -p process_buffer_size ] [ -S segment_file_size ]\n"
 	                 "                 [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
@@ -133,11 +133,11 @@ void usage_fprint(
 	                 "\t           windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
 #ifdef DISABLED
-	fprintf( stream, "\t-b:        specify the amount of sectors to read at once (per chunk), options:\n"
+	fprintf( stream, "\t-b:        specify the number of sectors to read at once (per chunk), options:\n"
 	                 "\t           64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n"
 	                 "\t           (not used for raw and files formats)\n" );
 #endif
-	fprintf( stream, "\t-B:        specify the amount of bytes to export (default is all bytes)\n" );
+	fprintf( stream, "\t-B:        specify the number of bytes to export (default is all bytes)\n" );
 	fprintf( stream, "\t-c:        specify the compression type, options: none (default), empty-block,\n"
 	                 "\t           fast or best (not used for raw and files format)\n" );
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5, options: sha1\n"
@@ -186,7 +186,7 @@ void usage_fprint(
 }
 
 /* Reads the media data and exports it
- * Returns the amount of bytes read on success or -1 on error
+ * Returns the number of bytes read on success or -1 on error
  */
 ssize64_t ewfexport_export_image(
            export_handle_t *export_handle,
@@ -498,11 +498,11 @@ ssize64_t ewfexport_export_image(
 			return( -1 );
 		}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		/* Set the amount of chunk data in the buffer
+		/* Set the chunk data size in the compression buffer
 		 */
 		if( storage_media_buffer->data_in_compression_buffer == 1 )
 		{
-			storage_media_buffer->compression_buffer_amount = process_count;
+			storage_media_buffer->compression_buffer_data_size = (size_t) process_count;
 		}
 #endif
 		/* Swap byte pairs
@@ -571,19 +571,19 @@ ssize64_t ewfexport_export_image(
 			if( memory_copy(
 			     storage_media_buffer->raw_buffer,
 			     storage_media_buffer->compression_buffer,
-			     storage_media_buffer->compression_buffer_amount ) == NULL )
+			     storage_media_buffer->compression_buffer_data_size ) == NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to data from compression buffer to raw buffer.",
+				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy data from compression buffer to raw buffer.",
 				 function );
 
 				return( -1 );
 			}
 			storage_media_buffer->data_in_compression_buffer = 0;
-			storage_media_buffer->raw_buffer_amount          = storage_media_buffer->compression_buffer_amount;
+			storage_media_buffer->raw_buffer_data_size       = storage_media_buffer->compression_buffer_data_size;
 		}
 		process_count = export_handle_prepare_write_buffer(
 		                 export_handle,
@@ -821,7 +821,7 @@ int main( int argc, char * const argv[] )
 	uint8_t wipe_chunk_on_error                             = 0;
 	uint8_t verbose                                         = 0;
 	int8_t compression_level                                = LIBEWF_COMPRESSION_NONE;
-	int amount_of_filenames                                 = 0;
+	int number_of_filenames                                 = 0;
 	int argument_set_compression                            = 0;
 	int argument_set_format                                 = 0;
 	int argument_set_offset                                 = 0;
@@ -958,7 +958,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsupported amount of sectors per chunk defaulting to: 64.\n" );
+					 "Unsupported number of sectors per chunk defaulting to: 64.\n" );
 
 					sectors_per_chunk = 64;
 				}
@@ -1267,10 +1267,10 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	argv_filenames      = glob->result;
-	amount_of_filenames = glob->amount_of_results;
+	number_of_filenames = glob->number_of_results;
 #else
 	argv_filenames      = &( argv[ optind ] );
-	amount_of_filenames = argc - optind;
+	number_of_filenames = argc - optind;
 #endif
 
 	if( export_handle_initialize(
@@ -1323,7 +1323,7 @@ int main( int argc, char * const argv[] )
 	result = export_handle_open_input(
 	          export_handle,
 	          argv_filenames,
-	          amount_of_filenames,
+	          number_of_filenames,
 	          &error );
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
@@ -1671,7 +1671,7 @@ int main( int argc, char * const argv[] )
 				     stderr,
 				     input_buffer,
 				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The amount of sectors to read at once" ),
+				     _LIBCSTRING_SYSTEM_STRING( "The number of sectors to read at once" ),
 				     ewfinput_sector_per_block_sizes,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
@@ -1832,7 +1832,7 @@ int main( int argc, char * const argv[] )
 			       stderr,
 			       input_buffer,
 			       EWFEXPORT_INPUT_BUFFER_SIZE,
-			       _LIBCSTRING_SYSTEM_STRING( "Amount of bytes to export" ),
+			       _LIBCSTRING_SYSTEM_STRING( "Number of bytes to export" ),
 			       0,
 			       ( media_size - export_offset ),
 			       export_size,

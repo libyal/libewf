@@ -59,7 +59,7 @@ int libewf_header_values_initialize(
 
 	if( libewf_values_table_initialize(
 	     header_values,
-	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
+	     LIBEWF_HEADER_VALUES_DEFAULT_NUMBER,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -396,13 +396,13 @@ int libewf_convert_date_header_value(
 
 		return( -1 );
 	}
-	if( date_time_elements->amount_of_values != 6 )
+	if( date_time_elements->number_of_values != 6 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported amount of date time elements in header value.",
+		 "%s: unsupported number of date time elements in header value.",
 		 function );
 
 		libewf_split_values_free(
@@ -880,13 +880,13 @@ int libewf_header_values_copy(
 
 		return( -1 );
 	}
-	if( source_header_values->amount_of_values < 0 )
+	if( source_header_values->number_of_values < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid source header values - amount is less than zero.",
+		 "%s: invalid source header values - number is less than zero.",
 		 function );
 
 		return( -1 );
@@ -936,7 +936,7 @@ int libewf_header_values_copy(
 		return( -1 );
 	}
 	for( values_table_index = 0;
-	     values_table_index < source_header_values->amount_of_values;
+	     values_table_index < source_header_values->number_of_values;
 	     values_table_index++ )
 	{
 		/* Skip the acquiry and system date
@@ -1060,7 +1060,7 @@ int libewf_header_values_parse_header_string(
 
 		return( -1 );
 	}
-	if( lines->amount_of_values > 0 )
+	if( lines->number_of_values > 0 )
 	{
 		if( ( ( lines->values[ 0 ] )[ 0 ] < (libcstring_character_t) '0' )
 		 || ( ( lines->values[ 0 ] )[ 0 ] > (libcstring_character_t) '9' ) )
@@ -1122,23 +1122,23 @@ int libewf_header_values_parse_header_string(
 			return( -1 );
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
-		if( types->amount_of_values != values->amount_of_values )
+		if( types->number_of_values != values->number_of_values )
 		{
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-			 	"%s: mismatch in amount of types and values.\n",
+			 	"%s: mismatch in number of types and values.\n",
 				 function );
 			}
 		}
 #endif
 		for( iterator = 0;
-		     iterator < types->amount_of_values;
+		     iterator < types->number_of_values;
 		     iterator++ )
 		{
 			type_string_length = types->sizes[ iterator ] - 1;
 
-			if( ( iterator >= values->amount_of_values )
+			if( ( iterator >= values->number_of_values )
 			 || ( values->values[ iterator ] == NULL )
 			 || ( ( values->values[ iterator ] )[ 0 ] == 0 ) )
 			{
@@ -2307,7 +2307,7 @@ int libewf_header_values_generate_header_string_type1(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( header_values->number_of_values < LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	{
 		liberror_error_set(
 		 error,
@@ -2682,7 +2682,7 @@ int libewf_header_values_generate_header_string_type2(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( header_values->number_of_values < LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	{
 		liberror_error_set(
 		 error,
@@ -3071,7 +3071,7 @@ int libewf_header_values_generate_header_string_type3(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( header_values->number_of_values < LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	{
 		liberror_error_set(
 		 error,
@@ -3422,7 +3422,7 @@ int libewf_header_values_generate_header_string_type4(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( header_values->number_of_values < LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	{
 		liberror_error_set(
 		 error,
@@ -3770,7 +3770,7 @@ int libewf_header_values_generate_header_string_type5(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( header_values->number_of_values < LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	{
 		liberror_error_set(
 		 error,
@@ -4136,7 +4136,7 @@ int libewf_header_values_generate_header_string_type6(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( header_values->number_of_values < LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	{
 		liberror_error_set(
 		 error,
@@ -4515,7 +4515,7 @@ int libewf_header_values_generate_header_string_type7(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( header_values->number_of_values < LIBEWF_HEADER_VALUES_DEFAULT_NUMBER )
 	{
 		liberror_error_set(
 		 error,
@@ -5511,13 +5511,13 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
-	if( date_time_elements->amount_of_values < 6 )
+	if( date_time_elements->number_of_values < 6 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported amount of date time elements in header value.",
+		 "%s: unsupported number of date time elements in header value.",
 		 function );
 
 		libewf_split_values_free(
@@ -5679,12 +5679,12 @@ int libewf_convert_date_xheader_value(
 	}
 	*date_time_values_string_size = 20;
 
-	if( ( date_time_elements->amount_of_values - empty_date_element_correction ) > 5 )
+	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 5 )
 	{
 		timezone_string_length         = date_time_elements->sizes[ empty_date_element_correction + 5 ] - 1;
 		*date_time_values_string_size += date_time_elements->sizes[ empty_date_element_correction + 5 ];
 	}
-	if( ( date_time_elements->amount_of_values - empty_date_element_correction ) > 6 )
+	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 6 )
 	{
 		timezone_name_length           = date_time_elements->sizes[ empty_date_element_correction + 6 ] - 1;
 		*date_time_values_string_size += date_time_elements->sizes[ empty_date_element_correction + 6 ];
@@ -5734,7 +5734,7 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
-	if( ( date_time_elements->amount_of_values - empty_date_element_correction ) > 5 )
+	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 5 )
 	{
 		( *date_time_values_string )[ 19 ] = (libcstring_character_t) ' ';
 
@@ -5763,7 +5763,7 @@ int libewf_convert_date_xheader_value(
 			return( -1 );
 		}
 	}
-	if( ( date_time_elements->amount_of_values - empty_date_element_correction ) > 6 )
+	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 6 )
 	{
 		( *date_time_values_string )[ 20 + timezone_string_length ] = (libcstring_character_t) ' ';
 
@@ -6105,7 +6105,7 @@ int libewf_header_values_parse_header_string_xml(
 		return( -1 );
 	}
 	for( line_iterator = 0;
-	     line_iterator < lines->amount_of_values;
+	     line_iterator < lines->number_of_values;
 	     line_iterator++ )
 	{
 		/* Ignore empty lines
@@ -6529,13 +6529,13 @@ int libewf_header_values_generate_header_string_xml(
 
 		return( -1 );
 	}
-	if( header_values->amount_of_values < 0 )
+	if( header_values->number_of_values < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid header values - amount of values less than zero.",
+		 "%s: invalid header values - number of values less than zero.",
 		 function );
 
 		return( -1 );
@@ -6629,7 +6629,7 @@ int libewf_header_values_generate_header_string_xml(
 	                            xml_close_tag_xheader );
 
 	for( values_table_iterator = 0;
-	     values_table_iterator < header_values->amount_of_values;
+	     values_table_iterator < header_values->number_of_values;
 	     values_table_iterator++ )
 	{
 		if( ( header_values->identifier[ values_table_iterator ] == NULL )
@@ -6740,7 +6740,7 @@ int libewf_header_values_generate_header_string_xml(
 	string_offset = print_count;
 
 	for( values_table_iterator = 0;
-	     values_table_iterator < header_values->amount_of_values;
+	     values_table_iterator < header_values->number_of_values;
 	     values_table_iterator++ )
 	{
 		if( ( header_values->identifier[ values_table_iterator ] == NULL )

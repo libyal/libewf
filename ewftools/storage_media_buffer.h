@@ -45,9 +45,9 @@ struct storage_media_buffer
 	 */
 	size_t raw_buffer_size;
 
-	/* The amount used of the raw buffer
+	/* The size of the data in the raw buffer
 	 */
-	ssize_t raw_buffer_amount;
+	size_t raw_buffer_data_size;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
         /* Value to indicate if the compression buffer
@@ -67,9 +67,9 @@ struct storage_media_buffer
 	 */
 	size_t compression_buffer_size;
 
-	/* The amount used of the compression buffer
+	/* The size of the data in the compression buffer
 	 */
-	ssize_t compression_buffer_amount;
+	size_t compression_buffer_data_size;
 
 	/* The CRC buffer
 	 */
@@ -103,7 +103,7 @@ int storage_media_buffer_resize(
 int storage_media_buffer_get_data(
      storage_media_buffer_t *buffer,
      uint8_t **data,
-     size_t *size,
+     size_t *data_size,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

@@ -77,7 +77,7 @@ struct verification_handle
 	 */
 	uint32_t chunk_size;
 
-	/* The amount of bytes per sector
+	/* The number of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
 
@@ -107,7 +107,7 @@ int verification_handle_signal_abort(
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error );
 
 int verification_handle_close(
@@ -137,9 +137,9 @@ int verification_handle_get_values(
      uint32_t *chunk_size,
      liberror_error_t **error );
 
-int verification_handle_get_amount_of_crc_errors(
+int verification_handle_get_number_of_crc_errors(
      verification_handle_t *verification_handle,
-     uint32_t *amount_of_errors,
+     uint32_t *number_of_errors,
      liberror_error_t **error );
 
 int verification_handle_get_hash_value(
@@ -163,7 +163,7 @@ int verification_handle_set_error_handling_values(
 int verification_handle_add_read_error(
       verification_handle_t *verification_handle,
       off64_t start_offset,
-      size_t amount_of_bytes,
+      size_t number_of_bytes,
       liberror_error_t **error );
 
 int verification_handle_finalize(

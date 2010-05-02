@@ -105,7 +105,7 @@ LIBEWF_EXTERN int libewf_glob(
                    size_t filename_length,
                    uint8_t format,
                    char **filenames[],
-                   int *amount_of_filenames,
+                   int *number_of_filenames,
                    libewf_error_t **error );
 
 /* Frees the globbed filenames
@@ -113,7 +113,7 @@ LIBEWF_EXTERN int libewf_glob(
  */
 LIBEWF_EXTERN int libewf_glob_free(
                    char *filenames[],
-                   int amount_of_filenames,
+                   int number_of_filenames,
                    libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
@@ -127,7 +127,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    size_t filename_length,
                    uint8_t format,
                    wchar_t **filenames[],
-                   int *amount_of_filenames,
+                   int *number_of_filenames,
                    libewf_error_t **error );
 
 /* Frees the globbed wide filenames
@@ -135,7 +135,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
  */
 LIBEWF_EXTERN int libewf_glob_wide_free(
                    wchar_t *filenames[],
-                   int amount_of_filenames,
+                   int number_of_filenames,
                    libewf_error_t **error );
 #endif
 
@@ -179,14 +179,14 @@ LIBEWF_EXTERN void libewf_error_free(
                     libewf_error_t **error );
 
 /* Prints a descriptive string of the error to the stream
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_error_fprint(
                    libewf_error_t *error,
                    FILE *stream );
 
 /* Prints a descriptive string of the error to the string
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_error_sprint(
                    libewf_error_t *error,
@@ -194,14 +194,14 @@ LIBEWF_EXTERN int libewf_error_sprint(
                    size_t size );
 
 /* Prints a backtrace of the error to the stream
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_error_backtrace_fprint(
                    libewf_error_t *error,
                    FILE *stream );
 
 /* Prints a backtrace of the error to the string
- * Returns the amount of printed characters if successful or -1 on error
+ * Returns the number of printed characters if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_error_backtrace_sprint(
                    libewf_error_t *error,
@@ -242,7 +242,7 @@ LIBEWF_EXTERN int libewf_handle_signal_abort(
 LIBEWF_EXTERN int libewf_handle_open(
                    libewf_handle_t *handle,
                    char * const filenames[],
-                   int amount_of_filenames,
+                   int number_of_filenames,
                    uint8_t flags,
                    libewf_error_t **error );
 
@@ -255,7 +255,7 @@ LIBEWF_EXTERN int libewf_handle_open(
 LIBEWF_EXTERN int libewf_handle_open_wide(
                    libewf_handle_t *handle,
                    wchar_t * const filenames[],
-                   int amount_of_filenames,
+                   int number_of_filenames,
                    uint8_t flags,
                    libewf_error_t **error );
 #endif
@@ -297,7 +297,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_read_chunk(
 /* Reads a chunk of (media) data from the curent offset into a buffer
  * size contains the size of the chunk buffer
  * The function sets the chunk crc, is compressed and read crc values
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        libewf_handle_t *handle,
@@ -310,7 +310,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        libewf_error_t **error );
 
 /* Reads (media) data from the curent offset into a buffer
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
                        libewf_handle_t *handle,
@@ -319,7 +319,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
                        libewf_error_t **error );
 
 /* Reads (media) data from an offset into a buffer
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_read_random(
                        libewf_handle_t *handle,
@@ -350,7 +350,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_write_chunk(
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
  * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
                        libewf_handle_t *handle,
@@ -366,7 +366,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
 /* Writes (media) data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_write_buffer(
                        libewf_handle_t *handle,
@@ -377,7 +377,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_buffer(
 /* Writes (media) data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_write_random(
                        libewf_handle_t *handle,
@@ -388,7 +388,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_random(
 
 /* Finalizes the write by correcting the EWF the meta data in the segment files
  * This function is required after writing from stream
- * Returns the amount of input bytes written or -1 on error
+ * Returns the number of input bytes written or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_write_finalize(
                        libewf_handle_t *handle,
@@ -411,9 +411,20 @@ LIBEWF_EXTERN int libewf_handle_get_offset(
                    off64_t *offset,
                    libewf_error_t **error );
 
-/* Sets the maximum amount of (concurrent) open file handles
+/* Sets the maximum number of (concurrent) open file handles
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_EXTERN int libewf_handle_set_maximum_number_of_open_handles(
+                   libewf_handle_t *handle,
+                   int maximum_number_of_open_handles,
+                   libewf_error_t **error );
+
+/* Sets the maximum amount of (concurrent) open file handles
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_set_maximum_number_of_open_handles instead
+ */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
                    libewf_handle_t *handle,
                    int maximum_amount_of_open_handles,
@@ -621,7 +632,7 @@ LIBEWF_EXTERN int libewf_handle_get_file_io_handle(
  * Meta data functions
  * ------------------------------------------------------------------------- */
 
-/* Retrieves the amount of sectors per chunk from the media information
+/* Retrieves the number of sectors per chunk from the media information
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_sectors_per_chunk(
@@ -629,7 +640,7 @@ LIBEWF_EXTERN int libewf_handle_get_sectors_per_chunk(
                    uint32_t *sectors_per_chunk,
                    libewf_error_t **error );
 
-/* Sets the amount of sectors per chunk in the media information
+/* Sets the number of sectors per chunk in the media information
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_set_sectors_per_chunk(
@@ -637,7 +648,7 @@ LIBEWF_EXTERN int libewf_handle_set_sectors_per_chunk(
                    uint32_t sectors_per_chunk,
                    libewf_error_t **error );
 
-/* Retrieves the amount of bytes per sector from the media information
+/* Retrieves the number of bytes per sector from the media information
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_bytes_per_sector(
@@ -645,7 +656,7 @@ LIBEWF_EXTERN int libewf_handle_get_bytes_per_sector(
                    uint32_t *bytes_per_sector,
                    libewf_error_t **error );
 
-/* Sets the amount of bytes per sector in the media information
+/* Sets the number of bytes per sector in the media information
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_set_bytes_per_sector(
@@ -653,9 +664,20 @@ LIBEWF_EXTERN int libewf_handle_set_bytes_per_sector(
                    uint32_t bytes_per_sector,
                    libewf_error_t **error );
 
-/* Retrieves the amount of sectors from the media information
+/* Retrieves the number of sectors from the media information
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_EXTERN int libewf_handle_get_number_of_sectors(
+                   libewf_handle_t *handle,
+                   uint64_t *number_of_sectors,
+                   libewf_error_t **error );
+
+/* Retrieves the amount of sectors from the media information
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_number_of_sectors instead
+ */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_amount_of_sectors(
                    libewf_handle_t *handle,
                    uint64_t *amount_of_sectors,
@@ -821,9 +843,20 @@ LIBEWF_EXTERN int libewf_handle_set_sha1_hash(
                    size_t size,
                    libewf_error_t **error );
 
-/* Retrieves the amount of chunks written
+/* Retrieves the number of chunks written
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_EXTERN int libewf_handle_get_number_of_chunks_written(
+                   libewf_handle_t *handle,
+                   uint32_t *number_of_chunks,
+                   libewf_error_t **error );
+
+/* Retrieves the amount of chunks written
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_number_of_chunks_written instead
+ */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_write_amount_of_chunks(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_chunks,
@@ -846,9 +879,20 @@ LIBEWF_EXTERN int libewf_handle_copy_media_values(
                    libewf_handle_t *source_handle,
                    libewf_error_t **error );
 
-/* Retrieves the amount of acquiry errors
+/* Retrieves the number of acquiry errors
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_EXTERN int libewf_handle_get_number_of_acquiry_errors(
+                   libewf_handle_t *handle,
+                   uint32_t *number_of_errors,
+                   libewf_error_t **error );
+
+/* Retrieves the amount of acquiry errors
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_number_of_acquiry_errors instead
+ */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_errors,
@@ -861,7 +905,7 @@ LIBEWF_EXTERN int libewf_handle_get_acquiry_error(
                    libewf_handle_t *handle,
                    uint32_t index,
                    uint64_t *first_sector,
-                   uint64_t *amount_of_sectors,
+                   uint64_t *number_of_sectors,
                    libewf_error_t **error );
 
 /* Add an acquiry error
@@ -870,12 +914,23 @@ LIBEWF_EXTERN int libewf_handle_get_acquiry_error(
 LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
-                   uint64_t amount_of_sectors,
+                   uint64_t number_of_sectors,
+                   libewf_error_t **error );
+
+/* Retrieves the number of CRC errors
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_number_of_crc_errors(
+                   libewf_handle_t *handle,
+                   uint32_t *number_of_errors,
                    libewf_error_t **error );
 
 /* Retrieves the amount of CRC errors
  * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_number_of_crc_errors instead
  */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_amount_of_crc_errors(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_errors,
@@ -888,7 +943,7 @@ LIBEWF_EXTERN int libewf_handle_get_crc_error(
                    libewf_handle_t *handle,
                    uint32_t index,
                    uint64_t *first_sector,
-                   uint64_t *amount_of_sectors,
+                   uint64_t *number_of_sectors,
                    libewf_error_t **error );
 
 /* Add a CRC error
@@ -897,12 +952,23 @@ LIBEWF_EXTERN int libewf_handle_get_crc_error(
 LIBEWF_EXTERN int libewf_handle_add_crc_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
-                   uint64_t amount_of_sectors,
+                   uint64_t number_of_sectors,
+                   libewf_error_t **error );
+
+/* Retrieves the number of sessions
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_number_of_sessions(
+                   libewf_handle_t *handle,
+                   uint32_t *number_of_sessions,
                    libewf_error_t **error );
 
 /* Retrieves the amount of sessions
  * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_number_of_sessions instead
  */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_sessions,
@@ -915,7 +981,7 @@ LIBEWF_EXTERN int libewf_handle_get_session(
                    libewf_handle_t *handle,
                    uint32_t index,
                    uint64_t *first_sector,
-                   uint64_t *amount_of_sectors,
+                   uint64_t *number_of_sectors,
                    libewf_error_t **error );
 
 /* Add a session
@@ -924,7 +990,7 @@ LIBEWF_EXTERN int libewf_handle_get_session(
 LIBEWF_EXTERN int libewf_handle_add_session(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
-                   uint64_t amount_of_sectors,
+                   uint64_t number_of_sectors,
                    libewf_error_t **error );
 
 /* Retrieves the header codepage
@@ -959,9 +1025,20 @@ LIBEWF_EXTERN int libewf_handle_set_header_values_date_format(
                    int date_format,
                    libewf_error_t **error );
 
-/* Retrieves the amount of header values
+/* Retrieves the number of header values
  * Returns 1 if successful, 0 if no header values are present or -1 on error
  */
+LIBEWF_EXTERN int libewf_handle_get_number_of_header_values(
+                   libewf_handle_t *handle,
+                   uint32_t *number_of_values,
+                   libewf_error_t **error );
+
+/* Retrieves the amount of header values
+ * Returns 1 if successful, 0 if no header values are present or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_number_of_header_values instead
+ */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_amount_of_header_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values,
@@ -1188,9 +1265,20 @@ LIBEWF_EXTERN int libewf_handle_copy_header_values(
                    libewf_handle_t *source_handle,
                    libewf_error_t **error );
 
-/* Retrieves the amount of hash values
+/* Retrieves the number of hash values
  * Returns 1 if successful, 0 if no hash values are present or -1 on error
  */
+LIBEWF_EXTERN int libewf_handle_get_number_of_hash_values(
+                   libewf_handle_t *handle,
+                   uint32_t *number_of_values,
+                   libewf_error_t **error );
+
+/* Retrieves the amount of hash values
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_number_of_hash_values instead
+ */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_amount_of_hash_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values,
@@ -1330,9 +1418,20 @@ LIBEWF_EXTERN int libewf_file_entry_get_size(
                    size64_t *size,
                    libewf_error_t **error );
 
-/* Retrieves the amount of sub file entries from a file entry
+/* Retrieves the number of sub file entries from a file entry
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_EXTERN int libewf_file_entry_get_number_of_sub_file_entries(
+                   libewf_file_entry_t *file_entry,
+                   int *number_of_sub_file_entries,
+                   libewf_error_t **error );
+
+/* Retrieves the amount of sub file entries from a file entry
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_file_entry_get_number_of_sub_file_entries instead
+ */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_file_entry_get_amount_of_sub_file_entries(
                    libewf_file_entry_t *file_entry,
                    int *amount_of_sub_file_entries,
@@ -1349,7 +1448,7 @@ LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
                    libewf_error_t **error );
 
 /* Reads data from the curent offset into a buffer
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
                        libewf_file_entry_t *file_entry,
@@ -1358,7 +1457,7 @@ LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
                        libewf_error_t **error );
 
 /* Reads data from an offset into a buffer
- * Returns the amount of bytes read or -1 on error
+ * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_file_entry_read_random(
                        libewf_file_entry_t *file_entry,
@@ -1779,7 +1878,7 @@ LIBEWF_EXTERN int libewf_set_bytes_per_sector(
 /* Retrieves the amount of sectors from the media information
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_get_amount_of_sectors instead
+ * This function is deprecated use libewf_handle_get_number_of_sectors instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_amount_of_sectors(
@@ -2038,7 +2137,7 @@ LIBEWF_EXTERN int libewf_copy_media_values(
 /* Retrieves the amount of acquiry errors
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_get_amount_of_acquiry_errors instead
+ * This function is deprecated use libewf_handle_get_number_of_acquiry_errors instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
@@ -2071,7 +2170,7 @@ LIBEWF_EXTERN int libewf_add_acquiry_error(
 /* Retrieves the amount of CRC errors
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_get_amount_of_crc_errors instead
+ * This function is deprecated use libewf_handle_get_number_of_crc_errors instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_amount_of_crc_errors(
@@ -2104,7 +2203,7 @@ LIBEWF_EXTERN int libewf_add_crc_error(
 /* Retrieves the amount of sessions
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_get_amount_of_sessions instead
+ * This function is deprecated use libewf_handle_get_number_of_sessions instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_amount_of_sessions(
@@ -2157,7 +2256,7 @@ LIBEWF_EXTERN int libewf_set_header_codepage(
 /* Retrieves the amount of header values
  * Returns 1 if successful, 0 if no header values are present or -1 on error
  *
- * This function is deprecated use libewf_handle_get_amount_of_header_values instead
+ * This function is deprecated use libewf_handle_get_number_of_header_values instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_amount_of_header_values(
@@ -2411,7 +2510,7 @@ LIBEWF_EXTERN int libewf_copy_header_values(
 /* Retrieves the amount of hash values
  * Returns 1 if successful, 0 if no hash values are present or -1 on error
  *
- * This function is deprecated use libewf_handle_get_amount_of_hash_values instead
+ * This function is deprecated use libewf_handle_get_number_of_hash_values instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_amount_of_hash_values(

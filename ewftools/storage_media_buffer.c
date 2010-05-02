@@ -265,9 +265,9 @@ int storage_media_buffer_resize(
 
 			return( -1 );
 		}
-		buffer->raw_buffer        = (uint8_t *) reallocation;
-		buffer->raw_buffer_size   = size;
-		buffer->raw_buffer_amount = 0;
+		buffer->raw_buffer       = (uint8_t *) reallocation;
+		buffer->raw_buffer_size  = size;
+		buffer->raw_buffer_data_size = 0;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		/* The compression buffer is cleared
@@ -277,9 +277,9 @@ int storage_media_buffer_resize(
 			memory_free(
 			 buffer->compression_buffer );
 
-			buffer->compression_buffer        = NULL;
-			buffer->compression_buffer_size   = 0;
-			buffer->compression_buffer_amount = 0;
+			buffer->compression_buffer           = NULL;
+			buffer->compression_buffer_size      = 0;
+			buffer->compression_buffer_data_size = 0;
 		}
 #endif
 	}
@@ -292,7 +292,7 @@ int storage_media_buffer_resize(
 int storage_media_buffer_get_data(
      storage_media_buffer_t *buffer,
      uint8_t **data,
-     size_t *size,
+     size_t *data_size,
      liberror_error_t **error )
 {
 	static char *function = "storage_media_buffer_get_data";
@@ -319,13 +319,13 @@ int storage_media_buffer_get_data(
 
 		return( -1 );
 	}
-	if( size == NULL )
+	if( data_size == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid size.",
+		 "%s: invalid data size.",
 		 function );
 
 		return( -1 );
@@ -333,17 +333,17 @@ int storage_media_buffer_get_data(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( buffer->data_in_compression_buffer == 0 )
 	{
-		*data = buffer->raw_buffer;
-		*size = (size_t) buffer->raw_buffer_amount;
+		*data      = buffer->raw_buffer;
+		*data_size = buffer->raw_buffer_data_size;
 	}
 	else
 	{
-		*data = (void *) buffer->compression_buffer;
-		*size = (size_t) buffer->compression_buffer_amount;
+		*data      = buffer->compression_buffer;
+		*data_size = buffer->compression_buffer_data_size;
 	}
 #else
-	*data = (void *) buffer->raw_buffer;
-	*size = (size_t) buffer->raw_buffer_amount;
+	*data      = buffer->raw_buffer;
+	*data_size = buffer->raw_buffer_data_size;
 #endif
 	return( 1 );
 }

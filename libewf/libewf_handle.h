@@ -81,9 +81,9 @@ struct libewf_internal_handle
 	 */
 	uint8_t file_io_pool_created_in_library;
 
-	/* The maximum amount of open handles in the pool
+	/* The maximum number of open handles in the pool
 	 */
-	int maximum_amount_of_open_handles;
+	int maximum_number_of_open_handles;
 
 	/* The list of segment files
 	 */
@@ -166,7 +166,7 @@ LIBEWF_EXTERN int libewf_handle_signal_abort(
 LIBEWF_EXTERN int libewf_handle_open(
                    libewf_handle_t *handle,
                    char * const filenames[],
-                   int amount_of_filenames,
+                   int number_of_filenames,
                    uint8_t flags,
                    liberror_error_t **error );
 
@@ -174,7 +174,7 @@ LIBEWF_EXTERN int libewf_handle_open(
 LIBEWF_EXTERN int libewf_handle_open_wide(
                    libewf_handle_t *handle,
                    wchar_t * const filenames[],
-                   int amount_of_filenames,
+                   int number_of_filenames,
                    uint8_t flags,
                    liberror_error_t **error );
 #endif
@@ -278,9 +278,9 @@ LIBEWF_EXTERN int libewf_handle_get_offset(
                    off64_t *offset,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
+LIBEWF_EXTERN int libewf_handle_set_maximum_number_of_open_handles(
                    libewf_handle_t *handle,
-                   int maximum_amount_of_open_handles,
+                   int maximum_number_of_open_handles,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_segment_filename_size(
@@ -404,9 +404,9 @@ LIBEWF_EXTERN int libewf_handle_get_file_io_handle(
                    libbfio_handle_t **file_io_handle,
                    liberror_error_t **error );
 
-int libewf_internal_handle_get_write_maximum_amount_of_segments(
+int libewf_internal_handle_get_write_maximum_number_of_segments(
      uint8_t ewf_format,
-     uint16_t *maximum_amount_of_segments,
+     uint16_t *maximum_number_of_segments,
      liberror_error_t **error );
 
 int libewf_internal_handle_set_media_values(

@@ -38,9 +38,9 @@ extern "C" {
 
 enum LIBEWF_HASH_VALUES_INDEXES
 {
-	/* Value to indicate the amount of hash values
+	/* Value to indicate the number of hash values
 	 */
-	LIBEWF_HASH_VALUES_DEFAULT_AMOUNT
+	LIBEWF_HASH_VALUES_DEFAULT_NUMBER
 };
 
 int libewf_hash_values_initialize(

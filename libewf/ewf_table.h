@@ -36,10 +36,10 @@ typedef struct ewf_table_offset ewf_table_offset_t;
 
 struct ewf_table
 {
-	/* The amount of chunks in the table
+	/* The number of chunks in the table
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t amount_of_chunks[ 4 ];
+	uint8_t number_of_chunks[ 4 ];
 
 	/* Padding
 	 * consists of 4 bytes

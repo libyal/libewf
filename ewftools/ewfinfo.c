@@ -141,7 +141,7 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                                       = 0;
 	uint8_t date_format                                   = LIBEWF_DATE_FORMAT_CTIME;
 	char info_option                                      = 'a';
-	int amount_of_filenames                               = 0;
+	int number_of_filenames                               = 0;
 	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
 	int result                                            = 0;
 
@@ -380,10 +380,10 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	argv_filenames      = glob->result;
-	amount_of_filenames = glob->amount_of_results;
+	number_of_filenames = glob->number_of_results;
 #else
 	argv_filenames      = &( argv[ optind ] );
-	amount_of_filenames = argc - optind;
+	number_of_filenames = argc - optind;
 
 #endif
 
@@ -437,7 +437,7 @@ int main( int argc, char * const argv[] )
 	result = info_handle_open_input(
 	          info_handle,
 	          argv_filenames,
-	          amount_of_filenames,
+	          number_of_filenames,
 	          &error );
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )

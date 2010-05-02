@@ -37,7 +37,7 @@ int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
      const libcstring_character_t *string,
      size_t string_size,
-     int amount_of_values,
+     int number_of_values,
      liberror_error_t **error )
 {
 	static char *function = "libewf_split_values_initialize";
@@ -53,13 +53,13 @@ int libewf_split_values_initialize(
 
 		return( 1 );
 	}
-	if( amount_of_values < 0 )
+	if( number_of_values < 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid amount of values less than zero.",
+		 "%s: invalid number of values less than zero.",
 		 function );
 
 		return( -1 );
@@ -143,10 +143,10 @@ int libewf_split_values_initialize(
 				return( -1 );
 			}
 		}
-		if( amount_of_values > 0 )
+		if( number_of_values > 0 )
 		{
 			( *split_values )->values = (libcstring_character_t **) memory_allocate(
-			                                                     sizeof( libcstring_character_t * ) * amount_of_values );
+			                                                     sizeof( libcstring_character_t * ) * number_of_values );
 
 			if( ( *split_values )->values == NULL )
 			{
@@ -169,7 +169,7 @@ int libewf_split_values_initialize(
 			if( memory_set(
 			     ( *split_values )->values,
 			     0,
-			     sizeof( libcstring_character_t * ) * amount_of_values ) == NULL )
+			     sizeof( libcstring_character_t * ) * number_of_values ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -190,7 +190,7 @@ int libewf_split_values_initialize(
 				return( -1 );
 			}
 			( *split_values )->sizes = (size_t *) memory_allocate(
-			                                       sizeof( size_t ) * amount_of_values );
+			                                       sizeof( size_t ) * number_of_values );
 
 			if( ( *split_values )->sizes == NULL )
 			{
@@ -215,7 +215,7 @@ int libewf_split_values_initialize(
 			if( memory_set(
 			     ( *split_values )->sizes,
 			     0,
-			     sizeof( size_t ) * amount_of_values ) == NULL )
+			     sizeof( size_t ) * number_of_values ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -238,7 +238,7 @@ int libewf_split_values_initialize(
 				return( -1 );
 			}
 		}
-		( *split_values )->amount_of_values = amount_of_values;
+		( *split_values )->number_of_values = number_of_values;
 	}
 	return( 1 );
 }
@@ -304,7 +304,7 @@ int libewf_split_values_parse_string(
 	static char *function                 = "libewf_split_values_parse_string";
 	size_t remaining_string_size          = 0;
 	ssize_t split_value_size              = 0;
-	int amount_of_split_values            = 0;
+	int number_of_split_values            = 0;
 	int split_value_iterator              = 0;
 
 	if( split_values == NULL )
@@ -351,7 +351,7 @@ int libewf_split_values_parse_string(
 
 		return( -1 );
 	}
-	/* Determine the amount of split values
+	/* Determine the number of split values
 	 */
 	remaining_string_size = string_size;
 	split_value_start     = (libcstring_character_t *) string;
@@ -390,13 +390,13 @@ int libewf_split_values_parse_string(
 	}
 	while( split_value_end != NULL );
 
-	amount_of_split_values = split_value_iterator;
+	number_of_split_values = split_value_iterator;
 
 	if( libewf_split_values_initialize(
 	     split_values,
 	     string,
 	     string_size,
-	     amount_of_split_values,
+	     number_of_split_values,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -410,7 +410,7 @@ int libewf_split_values_parse_string(
 	}
 	/* Do not bother splitting empty strings
 	 */
-	if( amount_of_split_values == 0 )
+	if( number_of_split_values == 0 )
 	{
 		return( 1 );
 	}
@@ -424,7 +424,7 @@ int libewf_split_values_parse_string(
 	/* Empty values are stored as strings only containing the end of character
 	 */
 	for( split_value_iterator = 0;
-	     split_value_iterator < amount_of_split_values;
+	     split_value_iterator < number_of_split_values;
 	     split_value_iterator++ )
 	{
 		if( split_value_end != ( *split_values )->string )

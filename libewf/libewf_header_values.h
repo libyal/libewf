@@ -64,19 +64,13 @@ enum LIBEWF_HEADER_VALUES_INDEXES
 	LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC,
 	LIBEWF_HEADER_VALUES_INDEX_EXTENTS,
 
-	/* Value to indicate the amount of header values
+	/* Value to indicate the number of header values
 	 */
-	LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT
+	LIBEWF_HEADER_VALUES_DEFAULT_NUMBER
 };
 
 int libewf_header_values_initialize(
      libewf_values_table_t **header_values,
-     liberror_error_t **error );
-
-int libewf_header_values_realloc(
-     libewf_values_table_t *header_values,
-     uint32_t previous_amount,
-     uint32_t new_amount,
      liberror_error_t **error );
 
 void libewf_header_values_free(

@@ -67,7 +67,7 @@ int info_handle_signal_abort(
 int info_handle_open_input(
      info_handle_t *info_handle,
      libcstring_system_character_t * const * filenames,
-     int amount_of_filenames,
+     int number_of_filenames,
      liberror_error_t **error );
 
 int info_handle_close(
