@@ -67,6 +67,9 @@ EXTRA_DIST = \
 	libewf.pc \
 	libewf.pc.in
 
+MAINTAINERCLEANFILES = \
+	Makefile.in
+
 pkgconfigdir = $(libdir)/pkgconfig
 
 pkgconfig_DATA = \

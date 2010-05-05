@@ -15,6 +15,9 @@ EXTRA_DIST = \
 	libewf/features.h.in \
 	libewf/types.h.in
 
+MAINTAINERCLEANFILES = \
+	Makefile.in
+
 distclean: clean
 	/bin/rm -f libewf.h
 	/bin/rm -f libewf/definitions.h

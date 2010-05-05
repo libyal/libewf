@@ -4,6 +4,9 @@ EXTRA_DIST = \
 	programming.txt \
 	mingw.txt
 
+MAINTAINERCLEANFILES = \
+	Makefile.in
+
 distclean: clean
 	/bin/rm -f Makefile
 

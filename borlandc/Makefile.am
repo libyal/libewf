@@ -53,6 +53,9 @@ EXTRA_DIST = \
 	$(BUILDER5_FILES) \
 	$(CODEGEAR_FILES)
 
+MAINTAINERCLEANFILES = \
+	Makefile.in
+
 distclean: clean
 	/bin/rm -f Makefile
 

@@ -13,7 +13,14 @@ AM_CPPFLAGS = \
 
 AM_LDFLAGS = @STATIC_LDFLAGS@
 
-bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfdebug ewfexport ewfinfo ewfverify
+bin_PROGRAMS = \
+	ewfacquire \
+	ewfacquirestream \
+	ewfalter \
+	ewfdebug \
+	ewfexport \
+	ewfinfo \
+	ewfverify
 
 ewfacquire_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -165,6 +172,9 @@ ewfverify_LDADD = \
 	../libsystem/libsystem.la \
 	@LIBCRYPTO_LIBADD@ \
 	@MEMWATCH_LIBADD@
+
+MAINTAINERCLEANFILES = \
+	Makefile.in
 
 distclean: clean
 	/bin/rm -f Makefile

@@ -2,15 +2,13 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100502],
+ [20100505],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
  [include/libewf.h.in])
 
-AM_INIT_AUTOMAKE(
- [libewf],
- [20100502])
+AM_INIT_AUTOMAKE([gnu 1.6])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -581,7 +579,7 @@ AC_CHECK_FUNCS(
 
 LIBEWF_CHECK_FUNC_MKDIR
 
-dnl Check for error string functions used in libbfio/libbfio_error_string.c and libsystem/libsystem_error.c
+dnl Check for error string functions used in libbfio/libbfio_error_string.c and libsystem/libsystem_error_string.c
 AC_FUNC_STRERROR_R()
 
 AS_IF(

@@ -24,6 +24,9 @@ pyewf_la_LDFLAGS  = -module $(PYTHON_LDFLAGS)
 
 endif
 
+MAINTAINERCLEANFILES = \
+	Makefile.in
+
 distclean: clean
 	/bin/rm -f Makefile
 
