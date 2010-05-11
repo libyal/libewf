@@ -45,8 +45,8 @@ extern "C" {
 
 enum DIGEST_CONTEXT_TYPES
 {
-	DIGEST_CONTEXT_TYPE_MD5		= (int) 'm',
-	DIGEST_CONTEXT_TYPE_SHA1	= (int) 's'
+	DIGEST_CONTEXT_TYPE_MD5		= (uint8_t) 'm',
+	DIGEST_CONTEXT_TYPE_SHA1	= (uint8_t) 's'
 };
 
 #if defined( WINAPI )

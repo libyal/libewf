@@ -210,6 +210,9 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20100511
+* updated libsmraw
+
 20100505
 * updated configure.ac and Makefile.am files
 * updated libuna, libbfio, libsmdev, libsmraw
