@@ -1,9 +1,7 @@
 /*
  * Tree type functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,11 +33,34 @@
 extern "C" {
 #endif
 
+/* The array comparison definitions
+ */
 enum LIBEWF_TREE_NODE_COMPARE_DEFINITIONS
 {
-	LIBEWF_TREE_NODE_COMPARE_LESS,
-	LIBEWF_TREE_NODE_COMPARE_EQUAL,
-	LIBEWF_TREE_NODE_COMPARE_GREATER
+	/* The first value is less than the second value
+	 */
+        LIBEWF_TREE_NODE_COMPARE_LESS,
+
+	/* The first and second values are equal
+	 */
+        LIBEWF_TREE_NODE_COMPARE_EQUAL,
+
+	/* The first value is greater than the second value
+	 */
+        LIBEWF_TREE_NODE_COMPARE_GREATER
+};
+
+/* The array insert flag definitions
+ */
+enum LIBEWF_TREE_NODE_INSERT_FLAGS
+{
+	/* Allow duplicate entries
+	 */
+	LIBEWF_TREE_NODE_INSERT_FLAG_NON_UNIQUE_ENTRIES		= 0x00,
+
+	/* Only allow unique entries, no duplicates
+	 */
+	LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES		= 0x01,
 };
 
 typedef struct libewf_tree_node libewf_tree_node_t;
@@ -48,27 +69,27 @@ struct libewf_tree_node
 {
 	/* The parent node
 	 */
-	libewf_tree_node_t *parent;
+	libewf_tree_node_t *parent_node;
 
 	/* The previous node list
 	 */
-	libewf_tree_node_t *previous;
+	libewf_tree_node_t *previous_node;
 
 	/* The next node list
 	 */
-	libewf_tree_node_t *next;
+	libewf_tree_node_t *next_node;
 
-	/* The first child node
+	/* The first sub node
 	 */
-	libewf_tree_node_t *first_child;
+	libewf_tree_node_t *first_sub_node;
 
-	/* The last child node
+	/* The last sub node
 	 */
-	libewf_tree_node_t *last_child;
+	libewf_tree_node_t *last_sub_node;
 
-	/* The number of child nodes
+	/* The number of sub nodes
 	 */
-	int number_of_child_nodes;
+	int number_of_sub_nodes;
 
 	/* The node value
 	 */
@@ -87,8 +108,11 @@ int libewf_tree_node_free(
      liberror_error_t **error );
 
 int libewf_tree_node_clone(
-     libewf_tree_node_t **destination_tree_node,
-     libewf_tree_node_t *source_tree_node,
+     libewf_tree_node_t **destination_node,
+     libewf_tree_node_t *source_node,
+     int (*value_free_function)(
+            intptr_t *value,
+            liberror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,
             intptr_t *source,
@@ -122,6 +146,7 @@ int libewf_tree_node_insert_node(
             intptr_t *first_value,
             intptr_t *second_value,
             liberror_error_t **error ),
+     uint8_t insert_flags,
      liberror_error_t **error );
 
 int libewf_tree_node_insert_value(
@@ -131,6 +156,7 @@ int libewf_tree_node_insert_value(
             intptr_t *first_value,
             intptr_t *second_value,
             liberror_error_t **error ),
+     uint8_t insert_flags,
      liberror_error_t **error );
 
 int libewf_tree_node_remove_node(
@@ -138,20 +164,20 @@ int libewf_tree_node_remove_node(
      libewf_tree_node_t *node,
      liberror_error_t **error );
 
+int libewf_tree_node_get_number_of_sub_nodes(
+     libewf_tree_node_t *node,
+     int *number_of_sub_nodes,
+     liberror_error_t **error );
+
+int libewf_tree_node_get_sub_node_by_index(
+     libewf_tree_node_t *node,
+     int sub_node_index,
+     libewf_tree_node_t **sub_node,
+     liberror_error_t **error );
+
 int libewf_tree_node_get_leaf_node_list(
      libewf_tree_node_t *node,
      libewf_list_t **leaf_node_list,
-     liberror_error_t **error );
-
-int libewf_tree_node_get_number_of_child_nodes(
-     libewf_tree_node_t *node,
-     int *number_of_child_nodes,
-     liberror_error_t **error );
-
-int libewf_tree_node_get_child_node(
-     libewf_tree_node_t *node,
-     int child_index,
-     libewf_tree_node_t **child_node,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

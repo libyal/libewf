@@ -1,9 +1,7 @@
 /*
  * Legacy functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -170,7 +168,7 @@ int libewf_file_entry_get_amount_of_sub_file_entries(
 
 #if !defined( HAVE_LOCAL_LIBEWF )
 
-/* Set the notify values
+/* Sets the notify values
  */
 void libewf_set_notify_values(
       FILE *stream,

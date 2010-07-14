@@ -62,6 +62,8 @@
 			</CppCompile>
 			<None Include="..\..\..\libbfio\libbfio_error_string.h">
 			</None>
+			<CppCompile Include="..\..\..\libbfio\libbfio_error.c">
+			</CppCompile>
 			<None Include="..\..\..\libbfio\libbfio_error.h">
 			</None>
 			<None Include="..\..\..\libbfio\libbfio_types.h">

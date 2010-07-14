@@ -1,9 +1,7 @@
 /*
  * Low level reading functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -512,7 +510,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIu64 " with size: %" PRIzd ".\n",
+		 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzd ".\n",
 		 function,
 		 chunk_type,
 		 chunk,
@@ -931,7 +929,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: chunk offset exceeds number of bytes available in chunk.",
 		 function );
 

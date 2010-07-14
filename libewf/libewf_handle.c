@@ -1,9 +1,7 @@
 /*
  * Handle functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1728,7 +1726,7 @@ int libewf_handle_open_file_io_pool(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_INPUT,
 				 LIBERROR_INPUT_ERROR_INVALID_DATA,
-				 "%s: invalid segment number: %" PRIu16 " value out of range or missing segment files.",
+				 "%s: invalid segment number: %" PRIu16 " value out of bounds or missing segment files.",
 				 function,
 				 segment_number );
 
@@ -2552,7 +2550,7 @@ ssize_t libewf_handle_read_buffer(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid current chunk offset.",
 			 function );
 
@@ -2877,7 +2875,7 @@ ssize_t libewf_handle_write_chunk(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: data size cannot be larger than maximum chunk size.",
 		 function );
 
@@ -3225,7 +3223,7 @@ ssize_t libewf_handle_write_buffer(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid current chunk offset: %" PRIu32 " larger than chunk size: %" PRIu32 ".",
 			 function,
 			 internal_handle->io_handle->current_chunk_offset,
@@ -3433,8 +3431,8 @@ off64_t libewf_handle_seek_offset(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid offset value out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid offset value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4085,8 +4083,8 @@ int libewf_handle_set_segment_file_size(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid segment file size value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid segment file size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4572,8 +4570,8 @@ int libewf_handle_set_delta_segment_file_size(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid delta segment file size value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid delta segment file size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4882,8 +4880,8 @@ int libewf_handle_get_file_io_handle(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid current chunk value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid current chunk value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4971,7 +4969,7 @@ int libewf_internal_handle_get_write_maximum_number_of_segments(
 	return( 1 );
 }
 
-/* Set the media values
+/* Sets the media values
  * Returns 1 if successful or -1 on errror
  */
 int libewf_internal_handle_set_media_values(
@@ -5015,7 +5013,7 @@ int libewf_internal_handle_set_media_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid sectors per chunk.",
 		 function );
 
@@ -5027,7 +5025,7 @@ int libewf_internal_handle_set_media_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid bytes per sector.",
 		 function );
 
@@ -5054,7 +5052,7 @@ int libewf_internal_handle_set_media_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid chunk size.",
 		 function );
 
@@ -5070,7 +5068,7 @@ int libewf_internal_handle_set_media_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".",
 		 function,
 		 maximum_input_file_size,

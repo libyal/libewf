@@ -1,9 +1,7 @@
 /*
  * Common include file
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -43,14 +41,14 @@
 /* Make sure WINAPI is defined
  */
 #if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( HAVE_WINDOWS_H )
-/* #define WIN32_LEAN_AND_MEAN */
+#define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
 #endif
 
 /* Make sure the WINAPI version is build with both the narrow and wide character functions
  */
-#if defined( WINAPI ) && !defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( WINAPI) && !defined( HAVE_WIDE_CHARACTER_TYPE )
 #define HAVE_WIDE_CHARACTER_TYPE	1
 #endif
 

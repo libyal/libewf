@@ -1,9 +1,7 @@
 /*
  * Tree type functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -88,7 +86,7 @@ int libewf_tree_node_initialize(
 	return( 1 );
 }
 
-/* Frees a tree node, its child nodes
+/* Frees a tree node, its sub nodes
  * Uses the value_free_function to free the value
  * Returns 1 if successful or -1 on error
  */
@@ -99,11 +97,11 @@ int libewf_tree_node_free(
             liberror_error_t **error ),
      liberror_error_t **error )
 {
-	libewf_tree_node_t *tree_node = NULL;
-	static char *function         = "libewf_tree_node_free";
-	int number_of_child_nodes     = 0;
-	int iterator                  = 0;
-	int result                    = 1;
+	libewf_tree_node_t *sub_node = NULL;
+	static char *function        = "libewf_tree_node_free";
+	int number_of_sub_nodes      = 0;
+	int sub_node_iterator        = 0;
+	int result                   = 1;
 
 	if( node == NULL )
 	{
@@ -118,9 +116,9 @@ int libewf_tree_node_free(
 	}
 	if( *node != NULL )
 	{
-		if( ( ( *node )->parent != NULL )
-		 || ( ( *node )->previous != NULL )
-		 || ( ( *node )->next != NULL ) )
+		if( ( ( *node )->parent_node != NULL )
+		 || ( ( *node )->previous_node != NULL )
+		 || ( ( *node )->next_node != NULL ) )
 		{
 			liberror_error_set(
 			 error,
@@ -131,42 +129,43 @@ int libewf_tree_node_free(
 
 			return( -1 );
 		}
-		number_of_child_nodes = ( *node )->number_of_child_nodes;
+		number_of_sub_nodes = ( *node )->number_of_sub_nodes;
 
-		for( iterator = 0;
-		     iterator < number_of_child_nodes;
-		     iterator++ )
+		for( sub_node_iterator = 0;
+		     sub_node_iterator < number_of_sub_nodes;
+		     sub_node_iterator++ )
 		{
-			tree_node = ( *node )->first_child;
+			sub_node = ( *node )->first_sub_node;
 
-			if( tree_node->previous != NULL )
+			if( sub_node->previous_node != NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-				 "%s: corruption detected.",
-				 function );
+				 "%s: corruption detected in sub node: %d.",
+				 function,
+				 sub_node_iterator );
 
 				return( -1 );
 			}
-			( *node )->first_child = tree_node->next;
+			( *node )->first_sub_node = sub_node->next_node;
 
-			if( ( *node )->last_child == tree_node )
+			if( ( *node )->last_sub_node == sub_node )
 			{
-				( *node )->last_child = tree_node->next;
+				( *node )->last_sub_node = sub_node->next_node;
 			}
-			( *node )->number_of_child_nodes -= 1;
+			( *node )->number_of_sub_nodes -= 1;
 
-			if( tree_node->next != NULL )
+			if( sub_node->next_node != NULL )
 			{
-				tree_node->next->previous = NULL;
+				sub_node->next_node->previous_node = NULL;
 			}
-			tree_node->parent = NULL;
-			tree_node->next   = NULL;
+			sub_node->parent_node = NULL;
+			sub_node->next_node   = NULL;
 
 			if( libewf_tree_node_free(
-			     &tree_node,
+			     &sub_node,
 			     value_free_function,
 			     error ) != 1 )
 			{
@@ -174,8 +173,9 @@ int libewf_tree_node_free(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free child node.",
-				 function );
+				 "%s: unable to free sub node: %d.",
+				 function,
+				 sub_node_iterator );
 
 				result = -1;
 			}
@@ -208,25 +208,32 @@ int libewf_tree_node_free(
 	return( result );
 }
 
-/* Clones the existing tree node and its child nodes
- * This function can return a partially cloned tree node on error
+/* Clones the tree node and its sub nodes
+ *
+ * The values are cloned using the value_clone_function
+ * On error the values are freed using the value_free_function
+ *
  * Returns 1 if successful or -1 on error
  */
 int libewf_tree_node_clone(
-     libewf_tree_node_t **destination_tree_node,
-     libewf_tree_node_t *source_tree_node,
+     libewf_tree_node_t **destination_node,
+     libewf_tree_node_t *source_node,
+     int (*value_free_function)(
+            intptr_t *value,
+            liberror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,
             intptr_t *source,
             liberror_error_t **error ),
      liberror_error_t **error )
 {
-	libewf_tree_node_t *destination_child_node = NULL;
-	libewf_tree_node_t *source_child_node      = NULL;
-	static char *function                      = "libewf_tree_node_clone";
-	int iterator                               = 0;
+	libewf_tree_node_t *destination_sub_node = NULL;
+	libewf_tree_node_t *source_sub_node      = NULL;
+	static char *function                    = "libewf_tree_node_clone";
+	int result                               = 1;
+	int sub_node_iterator                    = 0;
 
-	if( destination_tree_node == NULL )
+	if( destination_node == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -237,13 +244,24 @@ int libewf_tree_node_clone(
 
 		return( -1 );
 	}
-	if( *destination_tree_node != NULL )
+	if( *destination_node != NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination tree node already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_free_function == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value free function.",
 		 function );
 
 		return( -1 );
@@ -259,100 +277,134 @@ int libewf_tree_node_clone(
 
 		return( -1 );
 	}
-	if( source_tree_node == NULL )
+	if( source_node == NULL )
 	{
-		*destination_tree_node = NULL;
+		*destination_node = NULL;
+
+		return( 1 );
 	}
-	else
+	if( libewf_tree_node_initialize(
+	     destination_node,
+	     error ) != 1 )
 	{
-		if( libewf_tree_node_initialize(
-		     destination_tree_node,
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing destination tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_clone_function(
+	     &( ( *destination_node )->value ),
+	     source_node->value,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone tree node value.",
+		 function );
+
+		libewf_tree_node_free(
+		 destination_node,
+		 NULL,
+		 NULL );
+
+		return( -1 );
+	}
+	/* Clone the sub nodes
+	 */
+	source_sub_node = source_node->first_sub_node;
+
+	for( sub_node_iterator = 0;
+	     sub_node_iterator < source_node->number_of_sub_nodes;
+	     sub_node_iterator++ )
+	{
+		if( source_sub_node == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: corruption detected in source sub node: %d.",
+			 function,
+			 sub_node_iterator );
+
+			result = -1;
+
+			break;
+		}
+		result = libewf_tree_node_clone(
+			  &destination_sub_node,
+			  source_sub_node,
+			  value_free_function,
+			  value_clone_function,
+			  error );
+
+		if( result != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to clone sub node: %d.",
+			 function,
+			 sub_node_iterator );
+
+			break;
+		}
+		if( libewf_tree_node_append_node(
+		     *destination_node,
+		     destination_sub_node,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create destination tree node.",
-			 function );
+			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append sub node: %d to destination tree node.",
+			 function,
+			 sub_node_iterator );
 
-			return( -1 );
+			result = -1;
+
+			break;
 		}
-		if( value_clone_function(
-		     &( ( *destination_tree_node )->value ),
-		     source_tree_node->value,
+		destination_sub_node = NULL;
+		source_sub_node      = source_sub_node->next_node;
+	}
+	if( result != 1 )
+	{
+		if( libewf_tree_node_free(
+		     destination_node,
+		     value_free_function,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to clone tree node value.",
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free destination tree node.",
 			 function );
 
-			libewf_tree_node_free(
-			 destination_tree_node,
-			 NULL,
-			 NULL );
-
-			return( -1 );
-		}
-		/* Clone the child nodes
-		 */
-		source_child_node = source_tree_node->first_child;
-
-		for( iterator = 0;
-		     iterator < source_tree_node->number_of_child_nodes;
-		     iterator++ )
-		{
-			if( source_child_node == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: corruption detected in source child node: %d.",
-				 function,
-				 iterator + 1 );
-
-				return( -1 );
-			}
-			if( libewf_tree_node_clone(
-			     &destination_child_node,
-			     source_child_node,
-			     value_clone_function,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to clone child node: %d.",
-				 function,
-				 iterator + 1 );
-
-				return( -1 );
-			}
-			if( libewf_tree_node_append_node(
-			     *destination_tree_node,
-			     destination_child_node,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append child node: %d.",
-				 function,
-				 iterator + 1 );
-
-				return( -1 );
-			}
-			destination_child_node = NULL;
-			source_child_node      = source_child_node->next;
+			result = -1;
 		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the value from the tree node
@@ -450,9 +502,9 @@ int libewf_tree_node_append_node(
 
 		return( -1 );
 	}
-	if( ( node->parent != NULL )
-	 || ( node->previous != NULL )
-	 || ( node->next != NULL ) )
+	if( ( node->parent_node != NULL )
+	 || ( node->previous_node != NULL )
+	 || ( node->next_node != NULL ) )
 	{
 		liberror_error_set(
 		 error,
@@ -463,64 +515,64 @@ int libewf_tree_node_append_node(
 
 		return( -1 );
 	}
-	node->parent = parent_node;
+	node->parent_node = parent_node;
 
-	if( parent_node->number_of_child_nodes == 0 )
+	if( parent_node->number_of_sub_nodes == 0 )
 	{
-		if( parent_node->first_child != NULL )
+		if( parent_node->first_sub_node != NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: corruption detected - first child already set.",
+			 "%s: corruption detected - first sub node already set.",
 			 function );
 
 			return( -1 );
 		}
-		if( parent_node->last_child != NULL )
+		if( parent_node->last_sub_node != NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: corruption detected - last child already set.",
+			 "%s: corruption detected - last sub node already set.",
 			 function );
 
 			return( -1 );
 		}
-		parent_node->first_child = node;
-		parent_node->last_child  = node;
+		parent_node->first_sub_node = node;
+		parent_node->last_sub_node  = node;
 	}
 	else
 	{
-		if( parent_node->first_child == NULL )
+		if( parent_node->first_sub_node == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: corruption detected - missing first child.",
+			 "%s: corruption detected - missing first sub node.",
 			 function );
 
 			return( -1 );
 		}
-		if( parent_node->last_child == NULL )
+		if( parent_node->last_sub_node == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: corruption detected - missing last child.",
+			 "%s: corruption detected - missing last sub node.",
 			 function );
 
 			return( -1 );
 		}
-		node->previous                = parent_node->last_child;
-		parent_node->last_child->next = node;
-		parent_node->last_child       = node;
+		node->previous_node                   = parent_node->last_sub_node;
+		parent_node->last_sub_node->next_node = node;
+		parent_node->last_sub_node            = node;
 	}
-	parent_node->number_of_child_nodes += 1;
+	parent_node->number_of_sub_nodes += 1;
 
 	return( 1 );
 }
@@ -534,67 +586,57 @@ int libewf_tree_node_append_value(
      intptr_t *value,
      liberror_error_t **error )
 {
-	libewf_tree_node_t *node = NULL;
-	static char *function    = "libewf_tree_node_append_value";
+	libewf_tree_node_t *tree_node = NULL;
+	static char *function         = "libewf_tree_node_append_value";
 
-	if( value == NULL )
+	if( libewf_tree_node_initialize(
+	     &tree_node,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create tree node.",
 		 function );
 
 		return( -1 );
 	}
-	node = (libewf_tree_node_t *) memory_allocate(
-	                               sizeof( libewf_tree_node_t ) );
-
-	if( node == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create node.",
-		 function );
-
-		return( -1 );
-	}
-	if( memory_set(
-	     node,
-	     0,
-	     sizeof( libewf_tree_node_t ) ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear node.",
-		 function );
-
-		memory_free(
-		 node );
-
-		return( -1 );
-	}
-	node->value = value;
-
 	if( libewf_tree_node_append_node(
 	     parent_node,
-	     node,
+	     tree_node,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append node.",
+		 "%s: unable to append tree node.",
 		 function );
 
-		memory_free(
-		 node );
+		libewf_tree_node_free(
+		 &tree_node,
+		 NULL,
+		 NULL );
+
+		return( -1 );
+	}
+	if( libewf_tree_node_set_value(
+	     tree_node,
+	     value,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to set value in tree node.",
+		 function );
+
+		libewf_tree_node_free(
+		 &tree_node,
+		 NULL,
+		 NULL );
 
 		return( -1 );
 	}
@@ -602,7 +644,14 @@ int libewf_tree_node_append_value(
 }
 
 /* Inserts a tree node in the parent node
- * Uses the value_compare_function to determine the order of the child nodes
+ *
+ * Uses the entry_compare_function to determine the order of the entries
+ * The entry_compare_function should return LIBEWF_TREE_NODE_COMPARE_LESS,
+ * LIBEWF_TREE_NODE_COMPARE_EQUAL, LIBEWF_TREE_NODE_COMPARE_GREATER if successful or -1 on error
+ *
+ * Duplicate entries are allowed by default and inserted after the last duplicate entry.
+ * Only allowing unique entries can be enforced by setting the flag LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES
+ *
  * Returns 1 if successful, 0 if the node already exists or -1 on error
  */
 int libewf_tree_node_insert_node(
@@ -612,12 +661,13 @@ int libewf_tree_node_insert_node(
             intptr_t *first_value,
             intptr_t *second_value,
             liberror_error_t **error ),
+     uint8_t insert_flags,
      liberror_error_t **error )
 {
-	libewf_tree_node_t *child_node = NULL;
-	static char *function          = "libewf_tree_node_insert_node";
-	int result                     = 0;
-	int iterator                   = 0;
+	libewf_tree_node_t *sub_node = NULL;
+	static char *function        = "libewf_tree_node_insert_node";
+	int result                   = -1;
+	int sub_node_iterator        = 0;
 
 	if( parent_node == NULL )
 	{
@@ -641,9 +691,9 @@ int libewf_tree_node_insert_node(
 
 		return( -1 );
 	}
-	if( ( node->parent != NULL )
-	 || ( node->previous != NULL )
-	 || ( node->next != NULL ) )
+	if( ( node->parent_node != NULL )
+	 || ( node->previous_node != NULL )
+	 || ( node->next_node != NULL ) )
 	{
 		liberror_error_set(
 		 error,
@@ -665,68 +715,78 @@ int libewf_tree_node_insert_node(
 
 		return( -1 );
 	}
-	node->parent = parent_node;
-
-	if( parent_node->number_of_child_nodes == 0 )
+	if( ( insert_flags & ~( LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES ) ) != 0 )
 	{
-		if( parent_node->first_child != NULL )
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported insert flags: 0x%02" PRIx8 ".",
+		 function,
+		 insert_flags );
+
+		return( -1 );
+	}
+	if( parent_node->number_of_sub_nodes == 0 )
+	{
+		if( parent_node->first_sub_node != NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: corruption detected - first child already set.",
+			 "%s: corruption detected - first sub node already set.",
 			 function );
 
 			return( -1 );
 		}
-		if( parent_node->last_child != NULL )
+		if( parent_node->last_sub_node != NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: corruption detected - last child already set.",
+			 "%s: corruption detected - last sub node already set.",
 			 function );
 
 			return( -1 );
 		}
-		parent_node->first_child = node;
-		parent_node->last_child  = node;
+		parent_node->first_sub_node = node;
+		parent_node->last_sub_node  = node;
 	}
 	else
 	{
-		if( parent_node->first_child == NULL )
+		if( parent_node->first_sub_node == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: corruption detected - missing first child.",
+			 "%s: corruption detected - missing first sub node.",
 			 function );
 
 			return( -1 );
 		}
-		if( parent_node->last_child == NULL )
+		if( parent_node->last_sub_node == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: corruption detected - missing last child.",
+			 "%s: corruption detected - missing last sub node.",
 			 function );
 
 			return( -1 );
 		}
-		child_node = parent_node->first_child;
+		sub_node = parent_node->first_sub_node;
 
-		for( iterator = 0;
-		     iterator < parent_node->number_of_child_nodes;
-		     iterator++ )
+		for( sub_node_iterator = 0;
+		     sub_node_iterator < parent_node->number_of_sub_nodes;
+		     sub_node_iterator++ )
 		{
 			result = value_compare_function(
 			          node->value,
-			          child_node->value,
+			          sub_node->value,
 			          error );
 
 			if( result == -1 )
@@ -735,62 +795,89 @@ int libewf_tree_node_insert_node(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to compare child node: %d.",
+				 "%s: unable to compare sub node: %d.",
 				 function,
-				 iterator + 1 );
+				 sub_node_iterator );
 
 				return( -1 );
 			}
 			else if( result == LIBEWF_TREE_NODE_COMPARE_EQUAL )
 			{
-				return( 0 );
+				if( ( insert_flags & LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES ) != 0 )
+				{
+					return( 0 );
+				}
 			}
 			else if( result == LIBEWF_TREE_NODE_COMPARE_LESS )
 			{
-				node->previous = child_node->previous;
-				node->next     = child_node;
-
-				if( child_node == parent_node->first_child )
-				{
-					parent_node->first_child = node;
-				}
-				else if( child_node->previous == NULL )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-					 "%s: corruption detected - missing previous in child node: %d.",
-					 function,
-					 iterator + 1 );
-
-					return( -1 );
-				}
-				else
-				{
-					child_node->previous->next = node;
-				}
-				child_node->previous = node;
-
 				break;
 			}
-			child_node = child_node->next;
+			else if( result != LIBEWF_TREE_NODE_COMPARE_GREATER )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported value compare function return value: %d.",
+				 function,
+				 result );
+
+				return( -1 );
+			}
+			sub_node = sub_node->next_node;
 		}
-		if( result >= 1 )
+		if( result == LIBEWF_TREE_NODE_COMPARE_LESS )
 		{
-			node->previous                = parent_node->last_child;
-			parent_node->last_child->next = node;
-			parent_node->last_child       = node;
+			node->previous_node = sub_node->previous_node;
+			node->next_node     = sub_node;
+
+			if( sub_node == parent_node->first_sub_node )
+			{
+				parent_node->first_sub_node = node;
+			}
+			else if( sub_node->previous_node == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: corruption detected - missing previous node in sub node: %d.",
+				 function,
+				 sub_node_iterator );
+
+				return( -1 );
+			}
+			else
+			{
+				sub_node->previous_node->next_node = node;
+			}
+			sub_node->previous_node = node;
+		}
+		else
+		{
+			node->previous_node                   = parent_node->last_sub_node;
+			parent_node->last_sub_node->next_node = node;
+			parent_node->last_sub_node            = node;
 		}
 	}
-	parent_node->number_of_child_nodes += 1;
+	node->parent_node = parent_node;
+
+	parent_node->number_of_sub_nodes += 1;
 
 	return( 1 );
 }
 
-/* Inserts a tree node in the parent node
+/* Inserts a value in the parent node
+ *
  * Creates a new tree node
- * Uses the value_compare_function to determine the order of the child nodes
+ *
+ * Uses the entry_compare_function to determine the order of the entries
+ * The entry_compare_function should return LIBEWF_TREE_NODE_COMPARE_LESS,
+ * LIBEWF_TREE_NODE_COMPARE_EQUAL, LIBEWF_TREE_NODE_COMPARE_GREATER if successful or -1 on error
+ *
+ * Duplicate entries are allowed by default and inserted after the last duplicate entry.
+ * Only allowing unique entries can be enforced by setting the flag LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES
+ *
  * Returns 1 if successful, 0 if the node already exists or -1 on error
  */
 int libewf_tree_node_insert_value(
@@ -800,66 +887,58 @@ int libewf_tree_node_insert_value(
             intptr_t *first_value,
             intptr_t *second_value,
             liberror_error_t **error ),
+     uint8_t insert_flags,
      liberror_error_t **error )
 {
-	libewf_tree_node_t *node = NULL;
-	static char *function    = "libewf_tree_node_insert_value";
-	int result               = 0;
+	libewf_tree_node_t *tree_node = NULL;
+	static char *function         = "libewf_tree_node_insert_value";
+	int result                    = 0;
 
-	if( value == NULL )
+	if( libewf_tree_node_initialize(
+	     &tree_node,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create tree node.",
 		 function );
 
 		return( -1 );
 	}
-	node = (libewf_tree_node_t *) memory_allocate(
-	                               sizeof( libewf_tree_node_t ) );
-
-	if( node == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create node.",
-		 function );
-
-		return( -1 );
-	}
-	if( memory_set(
-	     node,
-	     0,
-	     sizeof( libewf_tree_node_t ) ) == NULL )
+	if( libewf_tree_node_set_value(
+	     tree_node,
+	     value,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_MEMORY,
 		 LIBERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear node.",
+		 "%s: unable to set value in tree node.",
 		 function );
 
-		memory_free(
-		 node );
+		libewf_tree_node_free(
+		 &tree_node,
+		 NULL,
+		 NULL );
 
 		return( -1 );
 	}
-	node->value = value;
-
 	result = libewf_tree_node_insert_node(
 	          parent_node,
-	          node,
+	          tree_node,
 	          value_compare_function,
+	          insert_flags,
 	          error );
 
 	if( result != 1 )
 	{
-		memory_free(
-		 node );
+		libewf_tree_node_free(
+		 &tree_node,
+		 NULL,
+		 NULL );
 	}
 	if( result == -1 )
 	{
@@ -905,73 +984,221 @@ int libewf_tree_node_remove_node(
 
 		return( -1 );
 	}
-	if( parent_node != node->parent )
+	if( parent_node != node->parent_node )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: parent mismatch node is no child of parent node.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: mismatch in parent node.",
 		 function );
 
 		return( -1 );
 	}
-	if( parent_node->number_of_child_nodes == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: corruption detected - invalid number of child nodes.",
-		 function );
-
-		return( -1 );
-	}
-	if( parent_node->first_child == NULL )
+	if( parent_node->number_of_sub_nodes == 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: corruption detected - missing first child.",
+		 "%s: missing number of sub nodes.",
 		 function );
 
 		return( -1 );
 	}
-	if( parent_node->last_child == NULL )
+	if( parent_node->first_sub_node == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: corruption detected - missing last child.",
+		 "%s: corruption detected - missing first sub node.",
 		 function );
 
 		return( -1 );
 	}
-	if( parent_node->first_child == node )
+	if( parent_node->last_sub_node == NULL )
 	{
-		parent_node->first_child = node->next;
-	}
-	if( parent_node->last_child == node )
-	{
-		parent_node->last_child = node->previous;
-	}
-	if( node->next != NULL )
-	{
-		node->next->previous = node->previous;
-	}
-	if( node->previous != NULL )
-	{
-		node->previous->next = node->next;
-	}
-	node->parent   = NULL;
-	node->previous = NULL;
-	node->next     = NULL;
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: corruption detected - missing last sub node.",
+		 function );
 
-	parent_node->number_of_child_nodes -= 1;
+		return( -1 );
+	}
+	if( parent_node->first_sub_node == node )
+	{
+		parent_node->first_sub_node = node->next_node;
+	}
+	if( parent_node->last_sub_node == node )
+	{
+		parent_node->last_sub_node = node->previous_node;
+	}
+	if( node->next_node != NULL )
+	{
+		node->next_node->previous_node = node->previous_node;
+	}
+	if( node->previous_node != NULL )
+	{
+		node->previous_node->next_node = node->next_node;
+	}
+	node->parent_node   = NULL;
+	node->previous_node = NULL;
+	node->next_node     = NULL;
+
+	parent_node->number_of_sub_nodes -= 1;
 
 	return( 1 );
+}
+
+/* Retrieves the number of sub nodes in the tree node
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_tree_node_get_number_of_sub_nodes(
+     libewf_tree_node_t *node,
+     int *number_of_sub_nodes,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_tree_node_get_number_of_sub_nodes";
+
+	if( node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid node.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_sub_nodes == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of sub nodes.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_sub_nodes = node->number_of_sub_nodes;
+
+	return( 1 );
+}
+
+/* Retrieves a specific sub node from the tree node
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_tree_node_get_sub_node_by_index(
+     libewf_tree_node_t *node,
+     int sub_node_index,
+     libewf_tree_node_t **sub_node,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_tree_node_get_sub_node";
+	int result            = -1;
+	int sub_node_iterator = 0;
+
+	if( node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid node.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( sub_node_index < 0 )
+	 || ( sub_node_index >= node->number_of_sub_nodes ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid sub node index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( sub_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid sub node.",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if the sub nodes should be searched front to back
+	 * or back to front
+	 */
+	if( sub_node_index < ( node->number_of_sub_nodes / 2 ) )
+	{
+		*sub_node = node->first_sub_node;
+
+		for( sub_node_iterator = 0;
+		     sub_node_iterator < node->number_of_sub_nodes;
+		     sub_node_iterator++ )
+		{
+			if( *sub_node == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: corruption detected for sub node: %d.",
+				 function,
+				 sub_node_iterator );
+
+				return( -1 );
+			}
+			if( sub_node_iterator == sub_node_index )
+			{
+				result = 1;
+
+				break;
+			}	
+			*sub_node = ( *sub_node )->next_node;
+		}
+	}
+	else
+	{
+		*sub_node = node->last_sub_node;
+
+		for( sub_node_iterator = ( node->number_of_sub_nodes - 1 );
+		     sub_node_iterator >= 0;
+		     sub_node_iterator-- )
+		{
+			if( *sub_node == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: corruption detected for sub node: %d.",
+				 function,
+				 sub_node_iterator );
+
+				return( -1 );
+			}
+			if( sub_node_iterator == sub_node_index )
+			{
+				result = 1;
+
+				break;
+			}	
+			*sub_node = ( *sub_node )->previous_node;
+		}
+	}
+	return( result );
 }
 
 /* Retrieves a list of all the leaf nodes
@@ -982,9 +1209,9 @@ int libewf_tree_node_get_leaf_node_list(
      libewf_list_t **leaf_node_list,
      liberror_error_t **error )
 {
-	libewf_tree_node_t *child_node = NULL;
-	static char *function          = "libewf_tree_node_get_leaf_node_list";
-	int iterator                   = 0;
+	libewf_tree_node_t *sub_node = NULL;
+	static char *function        = "libewf_tree_node_get_leaf_node_list";
+	int sub_node_iterator        = 0;
 
 	if( node == NULL )
 	{
@@ -1010,10 +1237,9 @@ int libewf_tree_node_get_leaf_node_list(
 	}
 	if( *leaf_node_list == NULL )
 	{
-		*leaf_node_list = (libewf_list_t *) memory_allocate(
-		                                     sizeof( libewf_list_t ) );
-
-		if( *leaf_node_list == NULL )
+		if( libewf_list_initialize(
+		     leaf_node_list,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1024,50 +1250,31 @@ int libewf_tree_node_get_leaf_node_list(
 
 			return( -1 );
 		}
-		if( memory_set(
-		     *leaf_node_list,
-		     0,
-		     sizeof( libewf_list_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear leaf node list.",
-			 function );
-
-			memory_free(
-			 *leaf_node_list );
-
-			*leaf_node_list = NULL;
-
-			return( -1 );
-		}
 	}
-	/* Traverse the child nodes
+	/* Traverse the sub nodes
 	 */
-	if( node->number_of_child_nodes > 0 )
+	if( node->number_of_sub_nodes > 0 )
 	{
-		child_node = node->first_child;
+		sub_node = node->first_sub_node;
 
-		for( iterator = 0;
-		     iterator < node->number_of_child_nodes;
-		     iterator++ )
+		for( sub_node_iterator = 0;
+		     sub_node_iterator < node->number_of_sub_nodes;
+		     sub_node_iterator++ )
 		{
-			if( child_node == NULL )
+			if( sub_node == NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: corruption detected for child node: %d.",
+				 "%s: corruption detected for sub node: %d.",
 				 function,
-				 iterator + 1 );
+				 sub_node_iterator );
 
 				return( -1 );
 			}
 			if( libewf_tree_node_get_leaf_node_list(
-			     child_node,
+			     sub_node,
 			     leaf_node_list,
 			     error ) != 1 )
 			{
@@ -1075,13 +1282,13 @@ int libewf_tree_node_get_leaf_node_list(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: unable to traverse child node: %d.",
+				 "%s: unable to traverse sub node: %d.",
 				 function,
-				 iterator + 1 );
+				 sub_node_iterator );
 
 				return( -1 );
 			}
-			child_node = child_node->next;
+			sub_node = sub_node->next_node;
 		}
 	}
 	else if( node->value == NULL )
@@ -1110,153 +1317,5 @@ int libewf_tree_node_get_leaf_node_list(
 		return( -1 );
 	}
 	return( 1 );
-}
-
-/* Retrieves the number of child nodes in the tree node
- * Returns 1 if successful or -1 on error
- */
-int libewf_tree_node_get_number_of_child_nodes(
-     libewf_tree_node_t *node,
-     int *number_of_child_nodes,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_tree_node_get_number_of_child_nodes";
-
-	if( node == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid node.",
-		 function );
-
-		return( -1 );
-	}
-	if( number_of_child_nodes == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of child nodes.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_child_nodes = node->number_of_child_nodes;
-
-	return( 1 );
-}
-
-/* Retrieves a child node by index
- * Returns 1 if successful or -1 on error
- */
-int libewf_tree_node_get_child_node(
-     libewf_tree_node_t *node,
-     int child_node_index,
-     libewf_tree_node_t **child_node,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_tree_node_get_child_node";
-	int iterator          = 0;
-	int result            = -1;
-
-	if( node == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid node.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( child_node_index < 0 )
-	 || ( child_node_index >= node->number_of_child_nodes ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid child node index.",
-		 function );
-
-		return( -1 );
-	}
-	if( child_node == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid child node.",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if the child nodes should be searched front to back
-	 * or back to front
-	 */
-	if( child_node_index < ( node->number_of_child_nodes / 2 ) )
-	{
-		*child_node = node->first_child;
-
-		for( iterator = 0;
-		     iterator < node->number_of_child_nodes;
-		     iterator++ )
-		{
-			if( *child_node == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: corruption detected for child node: %d.",
-				 function,
-				 iterator + 1 );
-
-				return( -1 );
-			}
-			if( iterator == child_node_index )
-			{
-				result = 1;
-
-				break;
-			}	
-			*child_node = ( *child_node )->next;
-		}
-	}
-	else
-	{
-		*child_node = node->last_child;
-
-		for( iterator = ( node->number_of_child_nodes - 1 );
-		     iterator >= 0;
-		     iterator-- )
-		{
-			if( *child_node == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: corruption detected for child node: %d.",
-				 function,
-				 iterator + 1 );
-
-				return( -1 );
-			}
-			if( iterator == child_node_index )
-			{
-				result = 1;
-
-				break;
-			}	
-			*child_node = ( *child_node )->previous;
-		}
-	}
-	return( result );
 }
 

@@ -1,9 +1,7 @@
 /*
  * List type functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,26 +31,49 @@
 extern "C" {
 #endif
 
+/* The array comparison definitions
+ */
 enum LIBEWF_LIST_COMPARE_DEFINITIONS
 {
-	LIBEWF_LIST_COMPARE_LESS,
-	LIBEWF_LIST_COMPARE_EQUAL,
-	LIBEWF_LIST_COMPARE_GREATER
+	/* The first value is less than the second value
+	 */
+        LIBEWF_LIST_COMPARE_LESS,
+
+	/* The first and second values are equal
+	 */
+        LIBEWF_LIST_COMPARE_EQUAL,
+
+	/* The first value is greater than the second value
+	 */
+        LIBEWF_LIST_COMPARE_GREATER
+};
+
+/* The array insert flag definitions
+ */
+enum LIBEWF_LIST_INSERT_FLAGS
+{
+	/* Allow duplicate entries
+	 */
+	LIBEWF_LIST_INSERT_FLAG_NON_UNIQUE_ENTRIES	= 0x00,
+
+	/* Only allow unique entries, no duplicates
+	 */
+	LIBEWF_LIST_INSERT_FLAG_UNIQUE_ENTRIES		= 0x01,
 };
 
 typedef struct libewf_list_element libewf_list_element_t;
 
 struct libewf_list_element
 {
-	/* The previous element
+	/* The previous list element
 	 */
-	libewf_list_element_t *previous;
+	libewf_list_element_t *previous_element;
 
-	/* The next element
+	/* The next list element
 	 */
-	libewf_list_element_t *next;
+	libewf_list_element_t *next_element;
 
-	/* The list element value
+	/* The value
 	 */
 	intptr_t *value;
 };
@@ -65,24 +86,34 @@ struct libewf_list
 	 */
 	int number_of_elements;
 
-	/* The first list element
+	/* The first element
 	 */
-	libewf_list_element_t *first;
+	libewf_list_element_t *first_element;
 
-	/* The last list element
+	/* The last element
 	 */
-	libewf_list_element_t *last;
+	libewf_list_element_t *last_element;
 };
 
 int libewf_list_element_initialize(
-     libewf_list_element_t **list_element,
+     libewf_list_element_t **element,
      liberror_error_t **error );
 
 int libewf_list_element_free(
-     libewf_list_element_t **list_element,
+     libewf_list_element_t **element,
      int (*value_free_function)(
             intptr_t *value,
             liberror_error_t **error ),
+     liberror_error_t **error );
+
+int libewf_list_element_get_value(
+     libewf_list_element_t *element,
+     intptr_t **value,
+     liberror_error_t **error );
+
+int libewf_list_element_set_value(
+     libewf_list_element_t *element,
+     intptr_t *value,
      liberror_error_t **error );
 
 int libewf_list_initialize(
@@ -104,8 +135,11 @@ int libewf_list_empty(
      liberror_error_t **error );
 
 int libewf_list_clone(
-     libewf_list_t **destination,
-     libewf_list_t *source,
+     libewf_list_t **destination_list,
+     libewf_list_t *source_list,
+     int (*value_free_function)(
+            intptr_t *value,
+            liberror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,
             intptr_t *source,
@@ -117,15 +151,15 @@ int libewf_list_get_number_of_elements(
      int *number_of_elements,
      liberror_error_t **error );
 
-int libewf_list_get_element(
+int libewf_list_get_element_by_index(
      libewf_list_t *list,
-     int element_index,
+     int list_element_index,
      libewf_list_element_t **element,
      liberror_error_t **error );
 
-int libewf_list_get_value(
+int libewf_list_get_value_by_index(
      libewf_list_t *list,
-     int element_index,
+     int list_element_index,
      intptr_t **value,
      liberror_error_t **error );
 
@@ -156,6 +190,7 @@ int libewf_list_insert_element(
             intptr_t *first,
             intptr_t *second,
             liberror_error_t **error ),
+     uint8_t insert_flags,
      liberror_error_t **error );
 
 int libewf_list_insert_value(
@@ -165,6 +200,7 @@ int libewf_list_insert_value(
             intptr_t *first,
             intptr_t *second,
             liberror_error_t **error ),
+     uint8_t insert_flags,
      liberror_error_t **error );
 
 int libewf_list_remove_element(

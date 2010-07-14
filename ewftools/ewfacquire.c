@@ -797,8 +797,8 @@ ssize64_t ewfacquire_read_input(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid write size value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid write size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -811,7 +811,7 @@ ssize64_t ewfacquire_read_input(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: unable to acquire beyond media size.",
 			 function );
 
@@ -840,7 +840,7 @@ ssize64_t ewfacquire_read_input(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: unable to resume acquire beyond media size.",
 			 function );
 
@@ -897,7 +897,7 @@ ssize64_t ewfacquire_read_input(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid chunk size.",
 		 function );
 
@@ -3524,7 +3524,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Invalid media size value out of range to add session.\n" );
+					 "Invalid media size value out of bounds to add session.\n" );
 
 					imaging_handle_close(
 					 ewfacquire_imaging_handle,

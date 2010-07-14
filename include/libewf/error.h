@@ -1,9 +1,7 @@
 /*
  * The error code definitions for libewf
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -32,14 +30,14 @@ typedef intptr_t libewf_error_t;
  */
 enum LIBEWF_ERROR_DOMAINS
 {
-	LIBEWF_ERROR_DOMAIN_ARGUMENTS                = (int) 'a',
-	LIBEWF_ERROR_DOMAIN_CONVERSION               = (int) 'c',
-	LIBEWF_ERROR_DOMAIN_COMPRESSION              = (int) 'C',
-	LIBEWF_ERROR_DOMAIN_IO                       = (int) 'I',
-	LIBEWF_ERROR_DOMAIN_INPUT                    = (int) 'i',
-	LIBEWF_ERROR_DOMAIN_MEMORY                   = (int) 'm',
-	LIBEWF_ERROR_DOMAIN_OUTPUT                   = (int) 'o',
-	LIBEWF_ERROR_DOMAIN_RUNTIME                  = (int) 'r',
+	LIBEWF_ERROR_DOMAIN_ARGUMENTS			= (int) 'a',
+	LIBEWF_ERROR_DOMAIN_CONVERSION			= (int) 'c',
+	LIBEWF_ERROR_DOMAIN_COMPRESSION			= (int) 'C',
+	LIBEWF_ERROR_DOMAIN_IO				= (int) 'I',
+	LIBEWF_ERROR_DOMAIN_INPUT			= (int) 'i',
+	LIBEWF_ERROR_DOMAIN_MEMORY			= (int) 'm',
+	LIBEWF_ERROR_DOMAIN_OUTPUT			= (int) 'o',
+	LIBEWF_ERROR_DOMAIN_RUNTIME			= (int) 'r',
 };
 
 /* The argument error codes
@@ -47,60 +45,63 @@ enum LIBEWF_ERROR_DOMAINS
  */
 enum LIBEWF_ARGUMENT_ERROR
 {
-	LIBEWF_ARGUMENT_ERROR_GENERIC                = 0,
+	LIBEWF_ARGUMENT_ERROR_GENERIC			= 0,
 
 	/* The argument contains an invalid value
 	 */
-	LIBEWF_ARGUMENT_ERROR_INVALID_VALUE          = 1,
+	LIBEWF_ARGUMENT_ERROR_INVALID_VALUE		= 1,
 
 	/* The argument contains a value less than zero
 	 */
-	LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO   = 2,
+	LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO	= 2,
 
 	/* The argument contains a value zero or less
 	 */
-	LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS     = 3,
+	LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS	= 3,
 
 	/* The argument contains a value that exceeds the maximum
 	 * for the specific type
 	 */
-	LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM   = 4,
+	LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM	= 4,
 
 	/* The argument contains a value that is too small
 	 */
-	LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL        = 5,
+	LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL		= 5,
 
 	/* The argument contains a value that is too large
 	 */
-	LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE        = 6,
+	LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE		= 6,
 
-	/* The argument contains a value that is out of range
+	/* The argument contains a value that is out of bounds
 	 */
-	LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE     = 7,
+	LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS	= 7,
 
 	/* The argument contains a value that is not supported
 	 */
-	LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE      = 8,
+	LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE		= 8,
 
 	/* The argument contains a value that conficts with another argument
 	 */
-	LIBEWF_ARGUMENT_ERROR_CONFLICTING_VALUE      = 9
+	LIBEWF_ARGUMENT_ERROR_CONFLICTING_VALUE		= 9
 };
+
+/* TODO deprecated remove after a while */
+#define LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE	LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS
 
 /* The conversion error codes
  * to signify errors regarding conversions
  */
 enum LIBEWF_CONVERSION_ERROR
 {
-	LIBEWF_CONVERSION_ERROR_GENERIC              = 0,
+	LIBEWF_CONVERSION_ERROR_GENERIC			= 0,
 
 	/* The conversion failed on the input
 	 */
-	LIBEWF_CONVERSION_ERROR_INPUT_FAILED         = 1,
+	LIBEWF_CONVERSION_ERROR_INPUT_FAILED		= 1,
 
 	/* The conversion failed on the output
 	 */
-	LIBEWF_CONVERSION_ERROR_OUTPUT_FAILED        = 2
+	LIBEWF_CONVERSION_ERROR_OUTPUT_FAILED		= 2
 };
 
 /* The compression error codes
@@ -108,59 +109,62 @@ enum LIBEWF_CONVERSION_ERROR
  */
 enum LIBEWF_COMPRESSION_ERROR
 {
-	LIBEWF_COMPRESSION_ERROR_GENERIC             = 0,
+	LIBEWF_COMPRESSION_ERROR_GENERIC		= 0,
 
 	/* The compression failed
 	 */
-	LIBEWF_COMPRESSION_ERROR_COMPRESS_FAILED     = 1,
+	LIBEWF_COMPRESSION_ERROR_COMPRESS_FAILED	= 1,
 
-	/* The de/uncompression failed
+	/* The decompression failed
 	 */
-	LIBEWF_COMPRESSION_ERROR_UNCOMPRESS_FAILED   = 2
+	LIBEWF_COMPRESSION_ERROR_DECOMPRESS_FAILED	= 2
 };
+
+/* TODO deprecated remove after a while */
+#define LIBERROR_COMPRESSION_ERROR_UNCOMPRESS_FAILED	LIBERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED
 
 /* The input/output error codes
  * to signify errors regarding input/output
  */
 enum LIBEWF_IO_ERROR
 {
-	LIBEWF_IO_ERROR_GENERIC                      = 0,
+	LIBEWF_IO_ERROR_GENERIC				= 0,
 
 	/* The open failed
 	 */
-	LIBEWF_IO_ERROR_OPEN_FAILED                  = 1,
+	LIBEWF_IO_ERROR_OPEN_FAILED			= 1,
 
 	/* The close failed
 	 */
-	LIBEWF_IO_ERROR_CLOSE_FAILED                 = 2,
+	LIBEWF_IO_ERROR_CLOSE_FAILED			= 2,
 
 	/* The seek failed
 	 */
-	LIBEWF_IO_ERROR_SEEK_FAILED                  = 3,
+	LIBEWF_IO_ERROR_SEEK_FAILED			= 3,
 
 	/* The read failed
 	 */
-	LIBEWF_IO_ERROR_READ_FAILED                  = 4,
+	LIBEWF_IO_ERROR_READ_FAILED			= 4,
 
 	/* The write failed
 	 */
-	LIBEWF_IO_ERROR_WRITE_FAILED                 = 5,
+	LIBEWF_IO_ERROR_WRITE_FAILED			= 5,
 
 	/* Access denied
 	 */
-	LIBEWF_IO_ERROR_ACCESS_DENIED                = 6,
+	LIBEWF_IO_ERROR_ACCESS_DENIED			= 6,
 
 	/* The resource is invalid i.e. a missing file
 	 */
-	LIBEWF_IO_ERROR_INVALID_RESOURCE             = 7,
+	LIBEWF_IO_ERROR_INVALID_RESOURCE		= 7,
 
 	/* The ioctl failed
 	 */
-	LIBEWF_IO_ERROR_IOCTL_FAILED                 = 8,
+	LIBEWF_IO_ERROR_IOCTL_FAILED			= 8,
 
 	/* The unlink failed
 	 */
-	LIBEWF_IO_ERROR_UNLINK_FAILED                = 9
+	LIBEWF_IO_ERROR_UNLINK_FAILED			= 9
 };
 
 /* The input error codes
@@ -168,32 +172,24 @@ enum LIBEWF_IO_ERROR
  */
 enum LIBEWF_INPUT_ERROR
 {
-	LIBEWF_INPUT_ERROR_GENERIC                   = 0,
+	LIBEWF_INPUT_ERROR_GENERIC			= 0,
 
 	/* The input contains invalid data
 	 */
-	LIBEWF_INPUT_ERROR_INVALID_DATA              = 1,
+	LIBEWF_INPUT_ERROR_INVALID_DATA			= 1,
 
 	/* The input contains an unsupported signature
 	 */
-	LIBEWF_INPUT_ERROR_SIGNATURE_MISMATCH        = 2,
+	LIBEWF_INPUT_ERROR_SIGNATURE_MISMATCH		= 2,
 
 	/* A CRC in the input did not match
 	 */
-	LIBEWF_INPUT_ERROR_CRC_MISMATCH              = 3,
+	LIBEWF_INPUT_ERROR_CRC_MISMATCH			= 3,
 
 	/* A value in the input did not match a previously
 	 * read value or calculated value
 	 */
-	LIBEWF_INPUT_ERROR_VALUE_MISMATCH            = 4,
-
-	/* The last segment file is missing from the input
-	 */
-	LIBEWF_INPUT_ERROR_MISSING_LAST_SEGMENT_FILE = 5,
-
-	/* The last section is missing from the input
-	 */
-	LIBEWF_INPUT_ERROR_MISSING_LAST_SECTION      = 6
+	LIBEWF_INPUT_ERROR_VALUE_MISMATCH		= 4
 };
 
 /* The memory error codes
@@ -201,19 +197,19 @@ enum LIBEWF_INPUT_ERROR
  */
 enum LIBEWF_MEMORY_ERROR
 {
-	LIBEWF_MEMORY_ERROR_GENERIC                  = 0,
+	LIBEWF_MEMORY_ERROR_GENERIC			= 0,
 
 	/* There is insufficient memory available
 	 */
-	LIBEWF_MEMORY_ERROR_INSUFFICIENT             = 1,
+	LIBEWF_MEMORY_ERROR_INSUFFICIENT		= 1,
 
 	/* The memory failed to be copied
 	 */
-	LIBEWF_MEMORY_ERROR_COPY_FAILED              = 2,
+	LIBEWF_MEMORY_ERROR_COPY_FAILED			= 2,
 
 	/* The memory failed to be set
 	 */
-	LIBEWF_MEMORY_ERROR_SET_FAILED               = 3
+	LIBEWF_MEMORY_ERROR_SET_FAILED			= 3
 };
 
 /* The runtime error codes
@@ -221,70 +217,73 @@ enum LIBEWF_MEMORY_ERROR
  */
 enum LIBEWF_RUNTIME_ERROR
 {
-	LIBEWF_RUNTIME_ERROR_GENERIC                 = 0,
+	LIBEWF_RUNTIME_ERROR_GENERIC			= 0,
 
 	/* The value is missing
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_MISSING           = 1,
+	LIBEWF_RUNTIME_ERROR_VALUE_MISSING		= 1,
 
 	/* The value was already set
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET       = 2,
+	LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET		= 2,
 
 	/* The creation and/or initialization of an internal structure failed
 	 */
-	LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED       = 3,
+	LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED		= 3,
 
 	/* The resize of an internal structure failed
 	 */
-	LIBEWF_RUNTIME_ERROR_RESIZE_FAILED           = 4,
+	LIBEWF_RUNTIME_ERROR_RESIZE_FAILED		= 4,
 
 	/* The free and/or finalization of an internal structure failed
 	 */
-	LIBEWF_RUNTIME_ERROR_FINALIZE_FAILED         = 5,
+	LIBEWF_RUNTIME_ERROR_FINALIZE_FAILED		= 5,
 
 	/* The value could not be determined
 	 */
-	LIBEWF_RUNTIME_ERROR_GET_FAILED              = 6,
+	LIBEWF_RUNTIME_ERROR_GET_FAILED			= 6,
 
 	/* The value could not be set
 	 */
-	LIBEWF_RUNTIME_ERROR_SET_FAILED              = 7,
+	LIBEWF_RUNTIME_ERROR_SET_FAILED			= 7,
 
 	/* The value could not be appended/prepended
 	 */
-	LIBEWF_RUNTIME_ERROR_APPEND_FAILED           = 8,
+	LIBEWF_RUNTIME_ERROR_APPEND_FAILED		= 8,
 
 	/* The value could not be copied
 	 */
-	LIBEWF_RUNTIME_ERROR_COPY_FAILED             = 9,
+	LIBEWF_RUNTIME_ERROR_COPY_FAILED		= 9,
 
 	/* The value could not be removed
 	 */
-	LIBEWF_RUNTIME_ERROR_REMOVE_FAILED           = 10,
+	LIBEWF_RUNTIME_ERROR_REMOVE_FAILED		= 10,
 
 	/* The value could not be printed
 	 */
-	LIBEWF_RUNTIME_ERROR_PRINT_FAILED            = 11,
+	LIBEWF_RUNTIME_ERROR_PRINT_FAILED		= 11,
 
-	/* The value was out of range
+	/* The value was out of bounds
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE      = 12,
+	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS	= 12,
 
 	/* The value exceeds the maximum for its specific type
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM   = 13,
+	LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM	= 13,
 
 	/* The value is unsupported
 	 */
-	LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE       = 14
+	LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE		= 14
 };
+
+/* TODO deprecated remove after a while */
+#define LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS
 
 /* The output error codes
  */
 enum LIBEWF_OUTPUT_ERROR
 {
-	LIBEWF_OUTPUT_ERROR_GENERIC                  = 0
+	LIBEWF_OUTPUT_ERROR_GENERIC			= 0
 };
 
 #endif

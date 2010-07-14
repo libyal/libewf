@@ -1,9 +1,7 @@
 /*
  * Offset table functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -471,7 +469,7 @@ int libewf_offset_table_fill(
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
-			 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
+			 "%s: %s chunk %" PRIu32 " read with: base %" PRIi64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 			 function,
 			 chunk_type,
 			 offset_table->last_chunk_offset_filled,
@@ -559,7 +557,7 @@ int libewf_offset_table_fill(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
+		 "%s: %s last chunk %" PRIu32 " read with: base %" PRIi64 " and offset %" PRIu32 "%s.\n",
 		 function,
 		 chunk_type,
 		 offset_table->last_chunk_offset_filled,
@@ -644,7 +642,7 @@ int libewf_offset_table_fill_last_offset(
 	 * However it can be determined where the next section starts within the file.
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
-	list_element = section_list->first;
+	list_element = section_list->first_element;
 	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
 	last_offset  = chunk_offset->file_offset;
 
@@ -734,7 +732,7 @@ int libewf_offset_table_fill_last_offset(
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
+				 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIi64 " and size %" PRIzu "%s.\n",
 				 function,
 				 offset_table->last_chunk_offset_filled,
 				 last_offset,
@@ -757,7 +755,7 @@ int libewf_offset_table_fill_last_offset(
 
 			break;
 		}
-		list_element = list_element->next;
+		list_element = list_element->next_element;
 	}
 	return( 1 );
 }
@@ -1130,7 +1128,7 @@ int libewf_offset_table_compare(
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
-			 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
+			 "%s: %s chunk %" PRIu32 " read with: base %" PRIi64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 			 function,
 			 chunk_type,
 			 offset_table->last_chunk_offset_compared,
@@ -1251,7 +1249,7 @@ int libewf_offset_table_compare(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
+		 "%s: %s last chunk %" PRIu32 " read with: base %" PRIi64 " and offset %" PRIu32 "%s.\n",
 		 function,
 		 chunk_type,
 		 offset_table->last_chunk_offset_compared,
@@ -1332,7 +1330,7 @@ int libewf_offset_table_compare_last_offset(
 	 * However it can be determined where the next section starts within the file.
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
-	list_element = section_list->first;
+	list_element = section_list->first_element;
 	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ] );
 	last_offset  = chunk_offset->file_offset;
 
@@ -1436,7 +1434,7 @@ int libewf_offset_table_compare_last_offset(
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
+				 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIi64 " and size %" PRIzu "%s.\n",
 				 function,
 				 offset_table->last_chunk_offset_compared,
 				 last_offset,
@@ -1456,7 +1454,7 @@ int libewf_offset_table_compare_last_offset(
 
 			break;
 		}
-		list_element = list_element->next;
+		list_element = list_element->next_element;
 	}
 	return( 1 );
 }
@@ -1499,8 +1497,8 @@ off64_t libewf_offset_table_seek_chunk_offset(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: chunk: %" PRIu32 " out of bounds [0,%" PRIu32 "].",
 		 function,
 		 chunk,
 		 offset_table->number_of_chunk_offsets - 1 );

@@ -1,9 +1,7 @@
 /* 
  * Array type functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,6 +31,36 @@
 extern "C" {
 #endif
 
+/* The array comparison definitions
+ */
+enum LIBEWF_ARRAY_COMPARE_DEFINITIONS
+{
+	/* The first value is less than the second value
+	 */
+        LIBEWF_ARRAY_COMPARE_LESS,
+
+	/* The first and second values are equal
+	 */
+        LIBEWF_ARRAY_COMPARE_EQUAL,
+
+	/* The first value is greater than the second value
+	 */
+        LIBEWF_ARRAY_COMPARE_GREATER
+};
+
+/* The array insert flag definitions
+ */
+enum LIBEWF_ARRAY_INSERT_FLAGS
+{
+	/* Allow duplicate entries
+	 */
+	LIBEWF_ARRAY_INSERT_FLAG_NON_UNIQUE_ENTRIES	= 0x00,
+
+	/* Only allow unique entries, no duplicates
+	 */
+	LIBEWF_ARRAY_INSERT_FLAG_UNIQUE_ENTRIES		= 0x01,
+};
+
 typedef struct libewf_array libewf_array_t;
 
 struct libewf_array
@@ -43,7 +71,7 @@ struct libewf_array
 
 	/* The entries
 	 */
-	intptr_t **entry;
+	intptr_t **entries;
 };
 
 int libewf_array_initialize(
@@ -58,6 +86,25 @@ int libewf_array_free(
             liberror_error_t **error ),
      liberror_error_t **error );
 
+int libewf_array_empty(
+     libewf_array_t *array,
+     int (*entry_free_function)(
+            intptr_t *entry,
+            liberror_error_t **error ),
+     liberror_error_t **error );
+
+int libewf_array_clone(
+     libewf_array_t **destination_array,
+     libewf_array_t *source_array,
+     int (*entry_free_function)(
+            intptr_t *entry,
+            liberror_error_t **error ),
+     int (*entry_clone_function)(
+            intptr_t **destination,
+            intptr_t *source,
+            liberror_error_t **error ),
+     liberror_error_t **error );
+
 int libewf_array_resize(
      libewf_array_t *array,
      int number_of_entries,
@@ -68,13 +115,13 @@ int libewf_array_get_number_of_entries(
      int *number_of_entries,
      liberror_error_t **error );
 
-int libewf_array_get_entry(
+int libewf_array_get_entry_by_index(
      libewf_array_t *array,
      int entry_index,
      intptr_t **entry,
      liberror_error_t **error );
 
-int libewf_array_set_entry(
+int libewf_array_set_entry_by_index(
      libewf_array_t *array,
      int entry_index,
      intptr_t *entry,
@@ -84,6 +131,17 @@ int libewf_array_append_entry(
      libewf_array_t *array,
      int *entry_index,
      intptr_t *entry,
+     liberror_error_t **error );
+
+int libewf_array_insert_entry(
+     libewf_array_t *array,
+     int *entry_index,
+     intptr_t *entry,
+     int (*entry_compare_function)(
+            intptr_t *first_entry,
+            intptr_t *second_entry,
+            liberror_error_t **error ),
+     uint8_t insert_flags,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

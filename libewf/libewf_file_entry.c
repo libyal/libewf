@@ -1,9 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -42,6 +40,9 @@
  */
 int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
+     libewf_internal_handle_t *internal_handle,
+     libewf_tree_node_t *file_entry_tree_node,
+     uint8_t flags,
      liberror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -91,6 +92,44 @@ int libewf_file_entry_initialize(
 
 			return( -1 );
 		}
+		if( ( flags & ~( LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported flags: 0x%02" PRIx8 ".",
+			 function,
+			 flags );
+
+			return( -1 );
+		}
+		internal_file_entry->internal_handle = internal_handle;
+		internal_file_entry->flags           = flags;
+
+		if( ( flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
+		{
+			internal_file_entry->file_entry_tree_node = file_entry_tree_node;
+		}
+		else
+		{
+			if( libewf_tree_node_clone(
+			     &( internal_file_entry->file_entry_tree_node ),
+			     file_entry_tree_node,
+			     &libewf_single_file_entry_free,
+			     &libewf_single_file_entry_clone,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy file entry tree node.",
+				 function );
+
+				return( -1 );
+			}
+		}
 		*file_entry = (libewf_file_entry_t *) internal_file_entry;
 	}
 	return( 1 );
@@ -128,147 +167,30 @@ int libewf_file_entry_free(
 		 */
 		/* If not managed the file_entry_tree_node reference is freed elsewhere
 		 */
-		if( libewf_file_entry_detach(
-		     internal_file_entry,
-		     error ) != 1 )
+		if( ( internal_file_entry->flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) != 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_REMOVE_FAILED,
-			 "%s: unable to detach internal file entry.",
-			 function );
+			if( internal_file_entry->file_entry_tree_node != NULL )
+			{
+				if( libewf_tree_node_free(
+				     &( internal_file_entry->file_entry_tree_node ),
+				     &libewf_single_file_entry_free,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free file entry tree node.",
+					 function );
 
-			result = -1;
+					return( -1 );
+				}
+			}
 		}
 		memory_free(
 		 internal_file_entry );
 	}
 	return( result );
-}
-
-/* Attaches the file entry to the handle
- * Returns 1 if successful or -1 on error
- */
-int libewf_file_entry_attach(
-     libewf_internal_file_entry_t *internal_file_entry,
-     libewf_internal_handle_t *internal_handle,
-     libewf_tree_node_t *file_entry_tree_node,
-     uint8_t flags,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_file_entry_attach";
-
-	if( internal_file_entry == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file_entry->internal_handle != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid internal file entry - internal handle already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( flags & ~( LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported flags: 0x%02" PRIx8 ".",
-		 function,
-		 flags );
-
-		return( -1 );
-	}
-	internal_file_entry->internal_handle = internal_handle;
-	internal_file_entry->flags           = flags;
-
-	if( ( flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
-	{
-		internal_file_entry->file_entry_tree_node = file_entry_tree_node;
-	}
-	else
-	{
-		if( libewf_tree_node_clone(
-		     &( internal_file_entry->file_entry_tree_node ),
-		     file_entry_tree_node,
-		     &libewf_single_file_entry_clone,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy file entry tree node.",
-			 function );
-
-			/* libewf_tree_node_clone can return a partial tree node
-			 * but is freed by the libewf_file_entry_free function
-			 * because the managed flag has been set
-			 */
-
-			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
-/* Detaches the file entry from the handle
- * Returns 1 if successful or -1 on error
- */
-int libewf_file_entry_detach(
-     libewf_internal_file_entry_t *internal_file_entry,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_file_entry_detach";
-
-	if( internal_file_entry == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ( internal_file_entry->flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE )
-	 && ( internal_file_entry->file_entry_tree_node != NULL ) )
-	{
-		if( libewf_tree_node_free(
-		     &( internal_file_entry->file_entry_tree_node ),
-		     &libewf_single_file_entry_free,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free file entry tree node.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	internal_file_entry->internal_handle      = NULL;
-	internal_file_entry->file_entry_tree_node = NULL;
-	internal_file_entry->flags                = 0;
-
-	return( 1 );
 }
 
 /* Retrieves the flags from the referenced file entry
@@ -843,7 +765,7 @@ int libewf_file_entry_get_number_of_sub_file_entries(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libewf_tree_node_get_number_of_child_nodes(
+	if( libewf_tree_node_get_number_of_sub_nodes(
 	     internal_file_entry->file_entry_tree_node,
 	     number_of_sub_file_entries,
 	     error ) != 1 )
@@ -919,7 +841,7 @@ int libewf_file_entry_get_sub_file_entry(
 
 		return( -1 );
 	}
-	if( libewf_tree_node_get_child_node(
+	if( libewf_tree_node_get_sub_node_by_index(
 	     internal_file_entry->file_entry_tree_node,
              sub_file_entry_index,
              &sub_file_entry_tree_node,
@@ -945,22 +867,9 @@ int libewf_file_entry_get_sub_file_entry(
 
 		return( -1 );
 	}
+	/* TODO pass LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_IO_HANDLE */
 	if( libewf_file_entry_initialize(
 	     sub_file_entry,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize sub file entry.",
-		 function );
-
-		return( -1 );
-	}
-	/* TODO pass LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_IO_HANDLE */
-	if( libewf_file_entry_attach(
-	     (libewf_internal_file_entry_t *) *sub_file_entry,
 	     internal_file_entry->internal_handle,
 	     sub_file_entry_tree_node,
 	     0,
@@ -969,13 +878,9 @@ int libewf_file_entry_get_sub_file_entry(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to attach sub file entry.",
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize sub file entry.",
 		 function );
-
-		libewf_file_entry_free(
-		 sub_file_entry,
-		 NULL );
 
 		return( -1 );
 	}
@@ -1202,20 +1107,19 @@ off64_t libewf_file_entry_seek_offset(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: seeking offset: %" PRIu64 ".\n",
+		 "%s: seeking offset: %" PRIi64 ".\n",
 		 function,
 		 offset );
 	}
 #endif
-
 	if( ( offset < 0 )
 	 || ( offset > (off64_t) single_file_entry->data_size ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: offset out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid offset value out of bounds.",
 		 function );
 
 		return( -1 );

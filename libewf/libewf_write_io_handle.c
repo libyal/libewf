@@ -1,9 +1,7 @@
 /*
  * Low level writing functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -228,8 +226,8 @@ int libewf_write_io_handle_initialize_values(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid segment file size value out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid segment file size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -282,7 +280,7 @@ int libewf_write_io_handle_initialize_values(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: the maximum number of allowed segment files will be exceeded with the segment file size: %" PRIu64 ".",
 			 function,
 			 segment_table->maximum_segment_size );
@@ -399,8 +397,8 @@ int libewf_write_io_handle_initialize_resume(
 		liberror_error_set(
 		 error,
 	 	 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid segment number value out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid segment number value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -444,7 +442,7 @@ int libewf_write_io_handle_initialize_resume(
 
 		return( -1 );
 	}
-	section_list_element = segment_file_handle->section_list->last;
+	section_list_element = segment_file_handle->section_list->last_element;
 
 	if( section_list_element == NULL )
 	{
@@ -515,9 +513,9 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( backtrace_to_last_chunks_sections != 0 )
 	{
-		while( section_list_element->previous != NULL )
+		while( section_list_element->previous_element != NULL )
 		{
-			section_list_element = section_list_element->previous;
+			section_list_element = section_list_element->previous_element;
 
 			if( section_list_element->value == NULL )
 			{
@@ -583,7 +581,7 @@ int libewf_write_io_handle_initialize_resume(
 	{
 		/* Determine if the table section also contains chunks
 		 */
-		if( section_list_element->previous == NULL )
+		if( section_list_element->previous_element == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -594,7 +592,7 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		if( section_list_element->previous->value == NULL )
+		if( section_list_element->previous_element->value == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -606,7 +604,7 @@ int libewf_write_io_handle_initialize_resume(
 			return( -1 );
 		}
 		if( memory_compare(
-		     (void *) ( (libewf_section_list_values_t *) section_list_element->previous->value )->type,
+		     (void *) ( (libewf_section_list_values_t *) section_list_element->previous_element->value )->type,
 		     (void *) "sectors",
 		     8 ) == 0 )
 		{
@@ -615,7 +613,7 @@ int libewf_write_io_handle_initialize_resume(
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: last chunk offset compared cannot be greater than last chunk offset filled.",
 				 function );
 
@@ -623,7 +621,7 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			/* The sections containing the chunks and offsets were read partially
 			 */
-			section_list_element = section_list_element->previous;
+			section_list_element = section_list_element->previous_element;
 			section_list_values  = (libewf_section_list_values_t *) section_list_element->value;
 
 			/* Reset the chunk offsets in the offset table
@@ -654,7 +652,7 @@ int libewf_write_io_handle_initialize_resume(
 			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported previous section: %s.",
 			 function,
-			 ( (libewf_section_list_values_t *) section_list_element->previous->value )->type );
+			 ( (libewf_section_list_values_t *) section_list_element->previous_element->value )->type );
 
 			return( -1 );
 		}
@@ -717,7 +715,7 @@ int libewf_write_io_handle_initialize_resume(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: resume segment file offset cannot be greater than segment file size.",
 			 function );
 
@@ -949,7 +947,7 @@ int libewf_write_io_handle_calculate_chunks_per_section(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: number of chunks written to segment exceeds number of chunks per segment.",
 		 function );
 
@@ -1367,7 +1365,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
-		 "%s: invalid segment number value out of range.",
+		 "%s: invalid segment number value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -2183,8 +2181,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		liberror_error_set(
 		 error,
 	 	 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid segment number value out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid segment number value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -2416,7 +2414,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek resume segment file offset: %" PRIu64 " in segment file: %d.",
+			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
 			 function,
 			 write_io_handle->resume_segment_file_offset,
 			 segment_number );
@@ -2937,8 +2935,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid chunk value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid chunk value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -3054,8 +3052,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			liberror_error_set(
 			 error,
 		 	 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: invalid segment number value out of range.",
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid segment number value out of bounds.",
 			 function );
 
 			return( -1 );
@@ -3107,7 +3105,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 				return( -1 );
 			}
-			last_list_element = segment_file_handle->section_list->last;
+			last_list_element = segment_file_handle->section_list->last_element;
 
 			if( last_list_element == NULL )
 			{
@@ -3624,8 +3622,8 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: invalid chunk cache data size value out of range.",
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid chunk cache data size value out of bounds.",
 			 function );
 
 			return( -1 );
@@ -3828,8 +3826,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid chunk value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid chunk value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4301,8 +4299,8 @@ ssize_t libewf_write_io_handle_finalize(
 		liberror_error_set(
 		 error,
 	 	 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid segment number value out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid segment number value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4358,7 +4356,7 @@ ssize_t libewf_write_io_handle_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek resume segment file offset: %" PRIu64 " in segment file: %d.",
+			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
 			 function,
 			 write_io_handle->resume_segment_file_offset,
 			 segment_number );

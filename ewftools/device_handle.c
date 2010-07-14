@@ -1112,8 +1112,8 @@ int device_handle_get_read_error(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid index value out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid index value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1659,7 +1659,7 @@ int device_handle_read_errors_fprint(
 				{
 					fprintf(
 					 stream,
-					 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 " (offset: 0x%08" PRIx64 " of size: %" PRIu64 ")\n",
+					 "\tat sector(s): %" PRIi64 " - %" PRIi64 " number: %" PRIu64 " (offset: 0x%08" PRIx64 " of size: %" PRIu64 ")\n",
 					 read_error_offset / bytes_per_sector,
 					 ( read_error_offset + read_error_size ) / bytes_per_sector,
 					 read_error_size / bytes_per_sector,

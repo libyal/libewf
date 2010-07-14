@@ -1,9 +1,7 @@
 /* 
  * Array type functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (C) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2009-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -101,10 +99,10 @@ int libewf_array_initialize(
 
 				return( -1 );
 			}
-			( *array )->entry = (intptr_t **) memory_allocate(
-			                                   entries_size );
+			( *array )->entries = (intptr_t **) memory_allocate(
+			                                     entries_size );
 
-			if( ( *array )->entry == NULL )
+			if( ( *array )->entries == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -121,7 +119,7 @@ int libewf_array_initialize(
 				return( -1 );
 			}
 			if( memory_set(
-			     ( *array )->entry,
+			     ( *array )->entries,
 			     0,
 			     entries_size ) == NULL )
 			{
@@ -133,7 +131,7 @@ int libewf_array_initialize(
 				 function );
 
 				memory_free(
-				 ( *array )->entry );
+				 ( *array )->entries );
 				memory_free(
 				 *array );
 
@@ -159,7 +157,6 @@ int libewf_array_free(
      liberror_error_t **error )
 {
 	static char *function = "libewf_array_free";
-	int entry_iterator    = 0;
 	int result            = 1;
 
 	if( array == NULL )
@@ -175,33 +172,24 @@ int libewf_array_free(
 	}
 	if( *array != NULL )
 	{
-		if( ( *array )->entry != NULL )
+		if( ( *array )->entries != NULL )
 		{
-			for( entry_iterator = 0;
-			     entry_iterator < ( *array )->number_of_entries;
-			     entry_iterator++ )
+			if( libewf_array_empty(
+			     *array,
+			     entry_free_function,
+			     error ) != 1 )
 			{
-				if( ( *array )->entry[ entry_iterator ] != NULL )
-				{
-					if( ( entry_free_function != NULL )
-					 && ( entry_free_function(
-					       ( *array )->entry[ entry_iterator ],
-					       error ) != 1 ) )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-						 "%s: unable to free array entry: %" PRIu16 ".",
-						 function,
-						 entry_iterator );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to empty array.",
+				 function );
 
-						result = -1;
-					}
-				}
+				result = -1;
 			}
 			memory_free(
-			 ( *array )->entry );
+			 ( *array )->entries );
 		}
 		memory_free(
 		 *array );
@@ -209,6 +197,211 @@ int libewf_array_free(
 		*array = NULL;
 	}
 	return( 1 );
+}
+
+/* Empties an array and frees its entries
+ * The entries are freed using the entry_free_function
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_array_empty(
+     libewf_array_t *array,
+     int (*entry_free_function)(
+            intptr_t *entry,
+            liberror_error_t **error ),
+     liberror_error_t **error )
+{
+	static char *function = "libewf_array_empty";
+	int entry_iterator    = 0;
+	int result            = 1;
+
+	if( array == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid array.",
+		 function );
+
+		return( -1 );
+	}
+	if( array->entries == NULL )
+	{
+		return( 1 );
+	}
+	for( entry_iterator = 0;
+	     entry_iterator < array->number_of_entries;
+	     entry_iterator++ )
+	{
+		if( array->entries[ entry_iterator ] != NULL )
+		{
+			if( entry_free_function != NULL )
+			{
+				if( entry_free_function(
+				     array->entries[ entry_iterator ],
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free array entry: %d.",
+					 function,
+					 entry_iterator );
+
+					result = -1;
+				}
+			}
+			array->entries[ entry_iterator ] = NULL;
+		}
+	}
+	return( result );
+}
+
+/* Clones the array and its entries
+ *
+ * The entries are cloned using the entry_clone_function
+ * On error the entries are freed using the entry_free_function
+ *
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_array_clone(
+     libewf_array_t **destination_array,
+     libewf_array_t *source_array,
+     int (*entry_free_function)(
+            intptr_t *entry,
+            liberror_error_t **error ),
+     int (*entry_clone_function)(
+            intptr_t **destination,
+            intptr_t *source,
+            liberror_error_t **error ),
+     liberror_error_t **error )
+{
+	static char *function = "libewf_array_clone";
+	int entry_iterator    = 0;
+	int result            = 1;
+
+	if( destination_array == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination array.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_array != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination array already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( entry_free_function == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid entry free function.",
+		 function );
+
+		return( -1 );
+	}
+	if( entry_clone_function == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid entry clone function.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_array == NULL )
+	{
+		*destination_array = NULL;
+
+		return( 1 );
+	}
+	if( libewf_array_initialize(
+	     destination_array,
+	     source_array->number_of_entries,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination array.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_array == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing destination array.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_array->entries != NULL )
+	{
+		for( entry_iterator = 0;
+		     entry_iterator < source_array->number_of_entries;
+		     entry_iterator++ )
+		{
+			if( source_array->entries[ entry_iterator ] != NULL )
+			{
+				result = entry_clone_function(
+					  &( ( *destination_array )->entries[ entry_iterator ] ),
+					  source_array->entries[ entry_iterator ],
+					  error );
+
+				if( result != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to clone array entry: %d.",
+					 function,
+					 entry_iterator );
+
+					break;
+				}
+			}
+		}
+		if( result != 1 )
+		{
+			if( libewf_array_free(
+			     destination_array,
+			     entry_free_function,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free destination array.",
+				 function );
+
+				result = -1;
+			}
+		}
+	}
+	return( result );
 }
 
 /* Resizes an array
@@ -261,7 +454,7 @@ int libewf_array_resize(
 			return( -1 );
 		}
 		reallocation = memory_reallocate(
-		                array->entry,
+		                array->entries,
 		                entries_size );
 
 		if( reallocation == NULL )
@@ -275,10 +468,10 @@ int libewf_array_resize(
 
 			return( -1 );
 		}
-		array->entry = (intptr_t **) reallocation;
+		array->entries = (intptr_t **) reallocation;
 
 		if( memory_set(
-		     &( array->entry[ array->number_of_entries ] ),
+		     &( array->entries[ array->number_of_entries ] ),
 		     0,
 		     sizeof( intptr_t ) * ( number_of_entries - array->number_of_entries ) ) == NULL )
 		{
@@ -333,16 +526,16 @@ int libewf_array_get_number_of_entries(
 	return( 1 );
 }
 
-/* Retrieves an entry
+/* Retrieves a specific entry from the array
  * Returns 1 if successful or -1 on error
  */
-int libewf_array_get_entry(
+int libewf_array_get_entry_by_index(
      libewf_array_t *array,
      int entry_index,
      intptr_t **entry,
      liberror_error_t **error )
 {
-	static char *function = "libewf_array_get_entry";
+	static char *function = "libewf_array_get_entry_by_index";
 
 	if( array == NULL )
 	{
@@ -355,14 +548,25 @@ int libewf_array_get_entry(
 
 		return( -1 );
 	}
+	if( array->entries == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid array - missing entries.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( entry_index < 0 )
 	 || ( entry_index >= array->number_of_entries ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid entry index value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid entry index value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -378,21 +582,21 @@ int libewf_array_get_entry(
 
 		return( -1 );
 	}
-	*entry = array->entry[ entry_index ];
+	*entry = array->entries[ entry_index ];
 
 	return( 1 );
 }
 
-/* Sets an entry
+/* Sets a specific entry in the array
  * Returns 1 if successful or -1 on error
  */
-int libewf_array_set_entry(
+int libewf_array_set_entry_by_index(
      libewf_array_t *array,
      int entry_index,
      intptr_t *entry,
      liberror_error_t **error )
 {
-	static char *function = "libewf_array_set_entry";
+	static char *function = "libewf_array_set_entry_by_index";
 
 	if( array == NULL )
 	{
@@ -405,19 +609,30 @@ int libewf_array_set_entry(
 
 		return( -1 );
 	}
+	if( array->entries == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid array - missing entries.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( entry_index < 0 )
 	 || ( entry_index >= array->number_of_entries ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid entry index value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid entry index value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	array->entry[ entry_index ] = entry;
+	array->entries[ entry_index ] = entry;
 
 	return( 1 );
 }
@@ -472,8 +687,211 @@ int libewf_array_append_entry(
 
 		return( -1 );
 	}
-	array->entry[ *entry_index ] = entry;
+	if( array->entries == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid array - missing entries.",
+		 function );
 
+		return( -1 );
+	}
+	array->entries[ *entry_index ] = entry;
+
+	return( 1 );
+}
+
+/* Inserts an entry in the array
+ *
+ * Uses the entry_compare_function to determine the order of the entries
+ * The entry_compare_function should return LIBEWF_ARRAY_COMPARE_LESS,
+ * LIBEWF_ARRAY_COMPARE_EQUAL, LIBEWF_ARRAY_COMPARE_GREATER if successful or -1 on error
+ *
+ * Duplicate entries are allowed by default and inserted after the last duplicate entry.
+ * Only allowing unique entries can be enforced by setting the flag LIBEWF_ARRAY_INSERT_FLAG_UNIQUE_ENTRIES
+ *
+ * Returns 1 if successful, 0 if the node already exists or -1 on error
+ */
+int libewf_array_insert_entry(
+     libewf_array_t *array,
+     int *entry_index,
+     intptr_t *entry,
+     int (*entry_compare_function)(
+            intptr_t *first_entry,
+            intptr_t *second_entry,
+            liberror_error_t **error ),
+     uint8_t insert_flags,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_tree_node_insert_node";
+	int entry_iterator    = 0;
+	int result            = -1;
+
+	if( array == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid array.",
+		 function );
+
+		return( -1 );
+	}
+	if( entry_index == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid entry index.",
+		 function );
+
+		return( -1 );
+	}
+	if( entry_compare_function == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid entry compare function.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( insert_flags & ~( LIBEWF_ARRAY_INSERT_FLAG_UNIQUE_ENTRIES ) ) != 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported insert flags: 0x%02" PRIx8 ".",
+		 function,
+		 insert_flags );
+
+		return( -1 );
+	}
+	if( array->entries != NULL )
+	{
+		for( entry_iterator = 0;
+		     entry_iterator < array->number_of_entries;
+		     entry_iterator++ )
+		{
+			result = entry_compare_function(
+			          entry,
+			          array->entries[ entry_iterator ],
+			          error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to compare entry: %d.",
+				 function,
+				 entry_iterator );
+
+				return( -1 );
+			}
+			else if( result == LIBEWF_ARRAY_COMPARE_EQUAL )
+			{
+				if( ( insert_flags & LIBEWF_ARRAY_INSERT_FLAG_UNIQUE_ENTRIES ) != 0 )
+				{
+					return( 0 );
+				}
+			}
+			else if( result == LIBEWF_ARRAY_COMPARE_LESS )
+			{
+				break;
+			}
+			else if( result != LIBEWF_ARRAY_COMPARE_GREATER )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported entry compare function return value: %d.",
+				 function,
+				 result );
+
+				return( -1 );
+			}
+		}
+	}
+	if( ( array->entries != NULL )
+	 && ( result == LIBEWF_ARRAY_COMPARE_LESS ) )
+	{
+		*entry_index = entry_iterator;
+
+		if( libewf_array_resize(
+		     array,
+		     array->number_of_entries + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize array.",
+			 function );
+
+			return( -1 );
+		}
+		if( array->entries == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid array - missing entries.",
+			 function );
+
+			return( -1 );
+		}
+		/* TODO can this loop safely be replaced by a memcpy ? */
+		for( entry_iterator = array->number_of_entries - 1;
+		     entry_iterator > *entry_index;
+		     entry_iterator-- )
+		{
+			array->entries[ entry_iterator ] = array->entries[ entry_iterator - 1 ];
+		}
+		array->entries[ *entry_index ] = entry;
+	}
+	else
+	{
+		*entry_index = array->number_of_entries;
+
+		if( libewf_array_resize(
+		     array,
+		     array->number_of_entries + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize array.",
+			 function );
+
+			return( -1 );
+		}
+		if( array->entries == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid array - missing entries.",
+			 function );
+
+			return( -1 );
+		}
+		array->entries[ *entry_index ] = entry;
+	}
 	return( 1 );
 }
 

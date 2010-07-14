@@ -1,9 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -67,22 +65,14 @@ struct libewf_internal_file_entry
 
 int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
-     liberror_error_t **error );
-
-LIBEWF_EXTERN int libewf_file_entry_free(
-                   libewf_file_entry_t **file_entry,
-                   liberror_error_t **error );
-
-int libewf_file_entry_attach(
-     libewf_internal_file_entry_t *internal_file_entry,
      libewf_internal_handle_t *internal_handle,
      libewf_tree_node_t *file_entry_tree_node,
      uint8_t flags,
      liberror_error_t **error );
 
-int libewf_file_entry_detach(
-     libewf_internal_file_entry_t *internal_file_entry,
-     liberror_error_t **error );
+LIBEWF_EXTERN int libewf_file_entry_free(
+                   libewf_file_entry_t **file_entry,
+                   liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_file_entry_get_flags(
                    libewf_file_entry_t *file_entry,

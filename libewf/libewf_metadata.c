@@ -1,9 +1,7 @@
 /*
- * Interface functions
+ * Metadata functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -4174,22 +4172,9 @@ int libewf_handle_get_root_file_entry(
 	{
 		return( 0 );
 	}
+	/* TODO pass LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_IO_HANDLE */
 	if( libewf_file_entry_initialize(
 	     root_file_entry,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize root file entry.",
-		 function );
-
-		return( -1 );
-	}
-	/* TODO pass LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_IO_HANDLE */
-	if( libewf_file_entry_attach(
-	     (libewf_internal_file_entry_t *) *root_file_entry,
 	     internal_handle,
 	     internal_handle->single_files->root_file_entry_node,
 	     0,
@@ -4198,13 +4183,9 @@ int libewf_handle_get_root_file_entry(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to attach root file entry.",
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize root file entry.",
 		 function );
-
-		libewf_file_entry_free(
-		 root_file_entry,
-		 NULL );
 
 		return( -1 );
 	}

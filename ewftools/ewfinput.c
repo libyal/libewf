@@ -1488,7 +1488,7 @@ int ewfinput_get_fixed_string_variable(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: default value exceeds number of values.",
 		 function );
 

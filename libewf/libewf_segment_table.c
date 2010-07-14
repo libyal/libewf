@@ -1,9 +1,7 @@
 /*
  * Segment table functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1220,7 +1218,7 @@ int libewf_segment_table_get_handle(
 
 		return( -1 );
 	}
-	if( libewf_array_get_entry(
+	if( libewf_array_get_entry_by_index(
 	     segment_table->segment_file_handle_array,
 	     handle_index,
 	     (intptr_t **) handle,
@@ -1296,7 +1294,7 @@ int libewf_segment_table_set_handle(
 	}
 	else
 	{
-		if( libewf_array_get_entry(
+		if( libewf_array_get_entry_by_index(
 		     segment_table->segment_file_handle_array,
 		     handle_index,
 		     (intptr_t **) &segment_file_handle,
@@ -1325,7 +1323,7 @@ int libewf_segment_table_set_handle(
 			return( -1 );
 		}
 	}
-	if( libewf_array_set_entry(
+	if( libewf_array_set_entry_by_index(
 	     segment_table->segment_file_handle_array,
 	     handle_index,
 	     (intptr_t *) handle,

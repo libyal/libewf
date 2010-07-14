@@ -1305,8 +1305,8 @@ int info_handle_header_values_fprint(
 					liberror_error_set(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-					 "%s: header identifier size value out of range for index: %" PRIu32 ".",
+					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: header identifier size value out of bounds for index: %" PRIu32 ".",
 					 function,
 					 header_value_iterator );
 
@@ -2109,8 +2109,8 @@ int info_handle_hash_values_fprint(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: hash value identifier size value out of range for index: %" PRIu32 ".",
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: hash value identifier size value out of bounds for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 

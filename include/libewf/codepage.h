@@ -1,9 +1,7 @@
 /*
  * Codepage definitions for libewf
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2008-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,6 +24,10 @@
 
 #include <libewf/types.h>
 
+#if defined( __cplusplus )
+extern "C" {
+#endif
+
 /* The codepage definitions
  */
 enum LIBEWF_CODEPAGE
@@ -47,6 +49,9 @@ enum LIBEWF_CODEPAGE
 	LIBEWF_CODEPAGE_ISO_8859_14			= 28604,
 	LIBEWF_CODEPAGE_ISO_8859_15			= 28605,
 	LIBEWF_CODEPAGE_ISO_8859_16			= 28606,
+
+	LIBEWF_CODEPAGE_KOI8_R				= 20866,
+	LIBEWF_CODEPAGE_KOI8_U				= 21866,
 
 	LIBEWF_CODEPAGE_WINDOWS_874			= 874,
 	LIBEWF_CODEPAGE_WINDOWS_1250			= 1250,
@@ -87,6 +92,9 @@ enum LIBEWF_CODEPAGE
 #define LIBEWF_CODEPAGE_ISO_LATIN_9			LIBEWF_CODEPAGE_ISO_8859_15
 #define LIBEWF_CODEPAGE_ISO_LATIN_10			LIBEWF_CODEPAGE_ISO_8859_16
 
+#define LIBEWF_CODEPAGE_KOI8_RUSSIAN			LIBEWF_CODEPAGE_KOI8_R
+#define LIBEWF_CODEPAGE_KOI8_UKRAINIAN			LIBEWF_CODEPAGE_KOI8_U
+
 #define LIBEWF_CODEPAGE_WINDOWS_THAI			LIBEWF_CODEPAGE_WINDOWS_874
 #define LIBEWF_CODEPAGE_WINDOWS_CENTRAL_EUROPEAN	LIBEWF_CODEPAGE_WINDOWS_1250
 #define LIBEWF_CODEPAGE_WINDOWS_CYRILLIC		LIBEWF_CODEPAGE_WINDOWS_1251
@@ -97,6 +105,10 @@ enum LIBEWF_CODEPAGE
 #define LIBEWF_CODEPAGE_WINDOWS_ARABIC			LIBEWF_CODEPAGE_WINDOWS_1256
 #define LIBEWF_CODEPAGE_WINDOWS_BALTIC			LIBEWF_CODEPAGE_WINDOWS_1257
 #define LIBEWF_CODEPAGE_WINDOWS_VIETNAMESE		LIBEWF_CODEPAGE_WINDOWS_1258
+
+#if defined( __cplusplus )
+}
+#endif
 
 #endif
 

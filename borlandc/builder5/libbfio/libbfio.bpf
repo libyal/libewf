@@ -5,6 +5,7 @@
 USE("..\..\..\libbfio\libbfio_types.h", File);
 USE("..\..\..\libbfio\libbfio_codepage.h", File);
 USE("..\..\..\libbfio\libbfio_definitions.h", File);
+USEUNIT("..\..\..\libbfio\libbfio_error.c");
 USE("..\..\..\libbfio\libbfio_error.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_error_string.c");
 USE("..\..\..\libbfio\libbfio_error_string.h", File);

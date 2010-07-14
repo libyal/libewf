@@ -1,9 +1,7 @@
 /*
  * Segment file reading/writing functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -102,7 +100,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file header offset: %" PRIu64 ".",
+		 "%s: unable to seek file header offset: %" PRIi64 ".",
 		 function,
 		 0 );
 
@@ -1248,13 +1246,12 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
-			 "%s: correcting table section size: %" PRIu64 " offset: %" PRIi64 ".\n",
+			 "%s: correcting table section offset: %" PRIi64 " size: %" PRIu64 ".\n",
 			 function,
-			 chunks_section_size,
-			 chunks_section_offset );
+			 chunks_section_offset,
+			 chunks_section_size );
 		}
 #endif
-
 		/* Rewrite table section start
 		 */
 		write_count = libewf_section_table_write(
@@ -1290,10 +1287,10 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
-		 	"%s: correcting sectors section size: %" PRIu64 " offset: %" PRIi64 ".\n",
+		 	"%s: correcting sectors section offset: %" PRIi64 " size: %" PRIu64 ".\n",
 			 function,
-			 chunks_section_size,
-			 chunks_section_offset );
+			 chunks_section_offset,
+			 chunks_section_size );
 		}
 #endif
 
@@ -1711,8 +1708,8 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: chunk: %" PRIu32 " out of bounds [0,%" PRIu32 "].",
 		 function,
 		 chunk,
 		 offset_table->number_of_chunk_offsets - 1 );
@@ -2166,7 +2163,7 @@ int libewf_segment_file_write_sections_correction(
 
 		return( -1 );
 	}
-	if( segment_file_handle->section_list->first == NULL )
+	if( segment_file_handle->section_list->first_element == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -2178,7 +2175,7 @@ int libewf_segment_file_write_sections_correction(
 
 		return( -1 );
 	}
-	section_list_element = segment_file_handle->section_list->first;
+	section_list_element = segment_file_handle->section_list->first_element;
 
 	if( segment_file_handle->file_io_pool_entry == -1 )
 	{
@@ -2382,7 +2379,7 @@ int libewf_segment_file_write_sections_correction(
 			correct_last_next_section = 1;
 			next_section_start_offset = section_list_values->start_offset;
 		}
-		section_list_element = section_list_element->next;
+		section_list_element = section_list_element->next_element;
 	}
 	if( correct_last_next_section != 0 )
 	{

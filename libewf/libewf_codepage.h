@@ -1,9 +1,7 @@
 /*
  * Codepage functions
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
- * Copyright (c) 2009-2010, Joachim Metz <forensics@hoffmannbv.nl>,
- * Hoffmann Investigations.
+ * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -62,6 +60,9 @@ enum LIBEWF_CODEPAGE
 	LIBEWF_CODEPAGE_ISO_8859_14			= 28604,
 	LIBEWF_CODEPAGE_ISO_8859_15			= 28605,
 	LIBEWF_CODEPAGE_ISO_8859_16			= 28606,
+
+	LIBEWF_CODEPAGE_KOI8_R				= 20866,
+	LIBEWF_CODEPAGE_KOI8_U				= 21866,
 
 	LIBEWF_CODEPAGE_WINDOWS_874			= 874,
 	LIBEWF_CODEPAGE_WINDOWS_1250			= 1250,

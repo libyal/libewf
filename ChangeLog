@@ -210,6 +210,14 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20100713
+* updated configure.ac
+* updated include/error.h and liberror
+* updated include/codepage.h
+* updated array, list and tree type
+* updated common, libcstring, libnotify, libsystem, libuna, libbio, libsmdev,
+  libsmraw
+
 20100511
 * updated libsmraw
 

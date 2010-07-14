@@ -728,8 +728,8 @@ int verification_handle_update_integrity_hash(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid size value out of range.",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1190,8 +1190,8 @@ int verification_handle_add_read_error(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid verification handle - invalid bytes per sector value out of range.",
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid verification handle - invalid bytes per sector value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1531,8 +1531,8 @@ int verification_handle_additional_hash_values_fprint(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: hash value identifier size value out of range for index: %" PRIu32 ".",
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: hash value identifier size value out of bounds for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -1744,7 +1744,7 @@ int verification_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_IO,
 					 LIBERROR_IO_ERROR_SEEK_FAILED,
-					 "%s: unable to seek offset: %" PRIu64 ".",
+					 "%s: unable to seek offset: %" PRIi64 ".",
 					 function,
 					 start_sector );
 
