@@ -99,7 +99,7 @@ PyMethodDef pyewf_module_methods[] = {
 /* Retrieves the pyewf/libewf version
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_get_version(
+PyObject *pyewf_get_version(
            PyObject *self )
 {
 	const char *errors         = NULL;
@@ -120,7 +120,7 @@ PyObject* pyewf_get_version(
 /* Retrieves the pyewf/libewf read open flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_get_flags_read(
+PyObject *pyewf_get_flags_read(
            PyObject *self )
 {
 	return( PyInt_FromLong(
@@ -130,7 +130,7 @@ PyObject* pyewf_get_flags_read(
 /* Retrieves the pyewf/libewf read write open flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_get_flags_read_write(
+PyObject *pyewf_get_flags_read_write(
            PyObject *self )
 {
 	return( PyInt_FromLong(
@@ -140,7 +140,7 @@ PyObject* pyewf_get_flags_read_write(
 /* Retrieves the pyewf/libewf write open flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_get_flags_write(
+PyObject *pyewf_get_flags_write(
            PyObject *self )
 {
 	return( PyInt_FromLong(
@@ -150,7 +150,7 @@ PyObject* pyewf_get_flags_write(
 /* Retrieves the pyewf/libewf resume write open flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_get_flags_write_resume(
+PyObject *pyewf_get_flags_write_resume(
            PyObject *self )
 {
 	return( PyInt_FromLong(
@@ -160,7 +160,7 @@ PyObject* pyewf_get_flags_write_resume(
 /* Checks if the file has an EWF signature
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_check_file_signature(
+PyObject *pyewf_check_file_signature(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords )
@@ -208,7 +208,7 @@ PyObject* pyewf_check_file_signature(
 /* Globs filenames according to the EWF segment file naming schema
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_glob(
+PyObject *pyewf_glob(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords )
@@ -235,7 +235,7 @@ PyObject* pyewf_glob(
 /* Sets the pyewf (libewf) notification values
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_set_notify_values(
+PyObject *pyewf_set_notify_values(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords )
@@ -251,7 +251,7 @@ PyObject* pyewf_set_notify_values(
 /* Creates a new pyewf handle object
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_new_handle(
+PyObject *pyewf_new_handle(
            PyObject *self )
 {
 	static char *function       = "pyewf_new_handle";
@@ -294,7 +294,7 @@ PyObject* pyewf_new_handle(
 PyMODINIT_FUNC initpyewf(
                 void ) 
 {
-	PyObject* module                 = NULL;
+	PyObject *module                 = NULL;
 	PyTypeObject *handle_type_object = NULL;
 
 	/* Create the module

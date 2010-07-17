@@ -36,37 +36,37 @@
 extern "C" {
 #endif
 
-PyObject* pyewf_get_version(
+PyObject *pyewf_get_version(
            PyObject *self );
 
-PyObject* pyewf_get_flags_read(
+PyObject *pyewf_get_flags_read(
            PyObject *self );
 
-PyObject* pyewf_get_flags_read_write(
+PyObject *pyewf_get_flags_read_write(
            PyObject *self );
 
-PyObject* pyewf_get_flags_write(
+PyObject *pyewf_get_flags_write(
            PyObject *self );
 
-PyObject* pyewf_get_flags_write_resume(
+PyObject *pyewf_get_flags_write_resume(
            PyObject *self );
 
-PyObject* pyewf_check_file_signature(
+PyObject *pyewf_check_file_signature(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_glob(
+PyObject *pyewf_glob(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_set_notify_values(
+PyObject *pyewf_set_notify_values(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_new_handle(
+PyObject *pyewf_new_handle(
            PyObject *self );
 
 PyMODINIT_FUNC initpyewf(

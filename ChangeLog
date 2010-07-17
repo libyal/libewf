@@ -210,6 +210,9 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20100714
+* updated libuna, libbfio, libsmdev
+
 20100713
 * updated configure.ac
 * updated include/error.h and liberror

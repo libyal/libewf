@@ -59,7 +59,7 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	{ "close",
 	  (PyCFunction) pyewf_handle_close,
 	  METH_NOARGS,
-	  "Close EWF file(s)" },
+	  "Closes EWF file(s)" },
 
 	{ "read_buffer",
 	  (PyCFunction) pyewf_handle_read_buffer,
@@ -270,7 +270,7 @@ void pyewf_handle_free(
 /* Signals the handle to abort the current activity
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_handle_signal_abort(
+PyObject *pyewf_handle_signal_abort(
            pyewf_handle_t *pyewf_handle )
 {
 	liberror_error_t *error = NULL;
@@ -296,7 +296,7 @@ PyObject* pyewf_handle_signal_abort(
 	}
 	if( libewf_handle_signal_abort(
 	     pyewf_handle->handle,
-	     &error ) != 0 )
+	     &error ) != 1 )
 	{
 		/* TODO something with error */
 
@@ -316,7 +316,7 @@ PyObject* pyewf_handle_signal_abort(
 /* Open EWF file(s)
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_handle_open(
+PyObject *pyewf_handle_open(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords )
@@ -503,7 +503,7 @@ PyObject* pyewf_handle_open(
 /* Closes EWF file(s)
  * Returns a Python object if successful or NULL on error
  */
-PyObject* pyewf_handle_close(
+PyObject *pyewf_handle_close(
            pyewf_handle_t *pyewf_handle )
 {
 	liberror_error_t *error = NULL;
@@ -565,7 +565,7 @@ PyObject* pyewf_handle_close(
 /* Reads a buffer of media data from EWF file(s)
  * Returns a Python object holding the data if successful or NULL on error
  */
-PyObject* pyewf_handle_read_buffer(
+PyObject *pyewf_handle_read_buffer(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords )
@@ -657,7 +657,7 @@ PyObject* pyewf_handle_read_buffer(
 /* Reads a buffer of media data at a specific offset from EWF file(s)
  * Returns a Python object holding the data if successful or NULL on error
  */
-PyObject* pyewf_handle_read_random(
+PyObject *pyewf_handle_read_random(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords )
@@ -752,7 +752,7 @@ PyObject* pyewf_handle_read_random(
 /* Writes a buffer of media data to EWF file(s)
  * Returns a Python object holding the data if successful or NULL on error
  */
-PyObject* pyewf_handle_write_buffer(
+PyObject *pyewf_handle_write_buffer(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords )
@@ -844,7 +844,7 @@ PyObject* pyewf_handle_write_buffer(
 /* Seeks a certain offset in the media data
  * Returns a Python object holding the offset if successful or NULL on error
  */
-PyObject* pyewf_handle_seek_offset(
+PyObject *pyewf_handle_seek_offset(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords )
@@ -874,11 +874,12 @@ PyObject* pyewf_handle_seek_offset(
 		return( NULL );
 	}
 	if( PyArg_ParseTupleAndKeywords(
-	     arguments, keywords,
-	      "L|i",
-	      keyword_list, 
-	      &offset,
-	      &whence ) == 0 )
+	     arguments,
+	     keywords,
+	     "L|i",
+	     keyword_list, 
+	     &offset,
+	     &whence ) == 0 )
 	{
 		return( NULL );
 	}
@@ -906,7 +907,7 @@ PyObject* pyewf_handle_seek_offset(
 /* Retrieves the current offset in the media data
  * Returns a Python object holding the offset if successful or NULL on error
  */
-PyObject* pyewf_handle_get_offset(
+PyObject *pyewf_handle_get_offset(
            pyewf_handle_t *pyewf_handle )
 {
 	liberror_error_t *error = NULL;

@@ -45,7 +45,7 @@
 /* Retrieves the size of the media data
  * Returns a Python object holding the offset if successful or NULL on error
  */
-PyObject* pyewf_handle_get_media_size(
+PyObject *pyewf_handle_get_media_size(
            pyewf_handle_t *pyewf_handle )
 {
 	liberror_error_t *error = NULL;

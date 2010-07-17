@@ -767,7 +767,7 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
   ])
  ])
 
-dnl Function to detect if libmdev available
+dnl Function to detect if libsmdev available
 AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
  [AC_CHECK_HEADERS([libsmdev.h])
 
@@ -823,7 +823,7 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
   ])
  ])
 
-dnl Function to detect if libmraw available
+dnl Function to detect if libsmraw available
 AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
  [AC_CHECK_HEADERS([libsmraw.h])
 

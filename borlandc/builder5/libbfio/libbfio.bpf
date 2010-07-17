@@ -25,6 +25,8 @@ USEUNIT("..\..\..\libbfio\libbfio_offset_list.c");
 USE("..\..\..\libbfio\libbfio_offset_list.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_pool.c");
 USE("..\..\..\libbfio\libbfio_pool.h", File);
+USEUNIT("..\..\..\libbfio\libbfio_file_pool.c");
+USE("..\..\..\libbfio\libbfio_file_pool.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_support.c");
 USE("..\..\..\libbfio\libbfio_support.h", File);
 //---------------------------------------------------------------------------

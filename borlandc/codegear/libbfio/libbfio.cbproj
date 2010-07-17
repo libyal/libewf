@@ -48,11 +48,15 @@
 			</None>
 			<CppCompile Include="..\..\..\libbfio\libbfio_memory_range.c">
 			</CppCompile>
-			<CppCompile Include="..\..\..\libbfio\libbfio_pool.c">
-			</CppCompile>
 			<None Include="..\..\..\libbfio\libbfio_support.h">
 			</None>
+			<CppCompile Include="..\..\..\libbfio\libbfio_pool.c">
+			</CppCompile>
 			<None Include="..\..\..\libbfio\libbfio_pool.h">
+			</None>
+			<CppCompile Include="..\..\..\libbfio\libbfio_file_pool.c">
+			</CppCompile>
+			<None Include="..\..\..\libbfio\libbfio_file_pool.h">
 			</None>
 			<CppCompile Include="..\..\..\libbfio\libbfio_support.c">
 			</CppCompile>

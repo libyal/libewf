@@ -63,43 +63,43 @@ int pyewf_handle_initialize(
 void pyewf_handle_free(
       pyewf_handle_t *pyewf_handle );
 
-PyObject* pyewf_handle_signal_abort(
+PyObject *pyewf_handle_signal_abort(
            pyewf_handle_t *pyewf_handle );
 
-PyObject* pyewf_handle_open(
+PyObject *pyewf_handle_open(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_handle_close(
+PyObject *pyewf_handle_close(
            pyewf_handle_t *pyewf_handle );
 
-PyObject* pyewf_handle_read_buffer(
+PyObject *pyewf_handle_read_buffer(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_handle_read_random(
+PyObject *pyewf_handle_read_random(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_handle_write_buffer(
+PyObject *pyewf_handle_write_buffer(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_handle_write_random(
+PyObject *pyewf_handle_write_random(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_handle_seek_offset(
+PyObject *pyewf_handle_seek_offset(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject* pyewf_handle_get_offset(
+PyObject *pyewf_handle_get_offset(
            pyewf_handle_t *pyewf_handle );
 
 #if defined( __cplusplus )

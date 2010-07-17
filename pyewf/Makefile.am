@@ -6,7 +6,6 @@ AM_CFLAGS = \
 	-I$(top_srcdir)/liberror \
 	@MEMWATCH_CPPFLAGS@
 
-# The libewf python module (pyewf)
 pyexec_LTLIBRARIES = pyewf.la
 
 pyewf_la_SOURCES = \
