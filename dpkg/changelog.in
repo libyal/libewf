@@ -3,5 +3,5 @@ libewf (@VERSION@-1) unstable; urgency=low
   * Initial release
   * First version of libewf debian package based on work by Guy Voncken
 
- -- Joachim Metz <forensics@hoffmannbv.nl>  Sat, 15 Sep 2007 11:44:14 +0200
+ -- Joachim Metz <jbmetz@users.sourceforge.net>  Sat, 15 Sep 2007 11:44:14 +0200
 

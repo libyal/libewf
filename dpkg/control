@@ -1,6 +1,6 @@
 Source: libewf
 Priority: extra
-Maintainer: Joachim Metz <forensics@hoffmannbv.nl>
+Maintainer: Joachim Metz <jbmetz@users.sourceforge.net>
 Build-Depends: debhelper (>= 5), autotools-dev, libc6, libc6-dev, linux-kernel-headers, zlib1g-dev, libssl-dev, uuid-dev
 Standards-Version: 3.7.2
 Section: libs

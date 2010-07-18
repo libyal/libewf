@@ -10,15 +10,15 @@ If no mingw build of zlib is availble, you'll need to build it from the sources.
 For this you can use a script similar to the following:
 
 #!/bin/sh
-export CC=/opt/local/bin/i386-mingw32-gcc
-export CXX=/opt/local/bin/i386-mingw32-g++
-export AR=/opt/local/bin/i386-mingw32-ar
-export OBJDUMP=/opt/local/bin/i386-mingw32-objdump
-export RANLIB=/opt/local/bin/i386-mingw32-ranlib
-export STRIP=/opt/local/bin/i386-mingw32-strip
-export MINGWFLAGS="-mwin32 -mconsole -march=i586 "
-export CFLAGS="$MINGWFLAGS"
-export CXXFLAGS="$MINGWFLAGS"
+CC=/opt/local/bin/i386-mingw32-gcc
+CXX=/opt/local/bin/i386-mingw32-g++
+AR=/opt/local/bin/i386-mingw32-ar
+OBJDUMP=/opt/local/bin/i386-mingw32-objdump
+RANLIB=/opt/local/bin/i386-mingw32-ranlib
+STRIP=/opt/local/bin/i386-mingw32-strip
+MINGWFLAGS="-mwin32 -mconsole -march=i586 "
+CFLAGS="$MINGWFLAGS"
+CXXFLAGS="$MINGWFLAGS"
 
 ./configure --prefix=/opt/local/i386-mingw32
 CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" make
@@ -38,15 +38,15 @@ If mingw32-configure and mingw32-make are not available you'll need to build
 it by hand. For this you can use a script similar to the following:
 
 #!/bin/sh
-export CC=/opt/local/bin/i386-mingw32-gcc
-export CXX=/opt/local/bin/i386-mingw32-g++
-export AR=/opt/local/bin/i386-mingw32-ar
-export OBJDUMP=/opt/local/bin/i386-mingw32-objdump
-export RANLIB=/opt/local/bin/i386-mingw32-ranlib
-export STRIP=/opt/local/bin/i386-mingw32-strip
-export MINGWFLAGS="-mwin32 -mconsole -march=i586 "
-export CFLAGS="$MINGWFLAGS"
-export CXXFLAGS="$MINGWFLAGS"
+CC=/opt/local/bin/i386-mingw32-gcc
+CXX=/opt/local/bin/i386-mingw32-g++
+AR=/opt/local/bin/i386-mingw32-ar
+OBJDUMP=/opt/local/bin/i386-mingw32-objdump
+RANLIB=/opt/local/bin/i386-mingw32-ranlib
+STRIP=/opt/local/bin/i386-mingw32-strip
+MINGWFLAGS="-mwin32 -mconsole -march=i586 "
+CFLAGS="$MINGWFLAGS"
+CXXFLAGS="$MINGWFLAGS"
 
 CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP ./configure --target=i586-mingw32msvc --host=i586 --enable-winapi=yes
 CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" make

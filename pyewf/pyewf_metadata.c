@@ -180,7 +180,7 @@ PyObject *pyewf_handle_get_header_value(
 	}
 	string_object = PyUnicode_DecodeUTF8(
 	                 header_value,
-	                 header_value_size,
+	                 (Py_ssize_t) header_value_size,
 	                 errors );
 
 	memory_free(

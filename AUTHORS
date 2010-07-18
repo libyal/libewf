@@ -1,8 +1,6 @@
 Acknowledgements: libewf
 
-Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
-Copyright (c) 2006-2010, Joachim Metz <forensics@hoffmannbv.nl>,
-Hoffmann Investigations.
+Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
 
 This code is derived from information and software contributed by:
 - Expert Witness Compression Format specification by Andrew Rosen
@@ -16,6 +14,7 @@ This code is derived from information and software contributed by:
 - Wietse Venema for an example of the initial error handling code
 
 Additional credits go to:
+- Kees Mastwijk, Hoffmann Invesigations for writing the initial man pages
 - Robert Jan Mora, Hoffmann Invesigations for testing and other contribution
   (http://www.hoffmannbv.nl/)
 - Rob Meijer, KLPD for providing libtool and header installation,
