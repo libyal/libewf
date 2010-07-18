@@ -65,7 +65,8 @@ EXTRA_DIST = \
 	$(DPKG_FILES) \
 	$(SPEC_FILES) \
 	libewf.pc \
-	libewf.pc.in
+	libewf.pc.in \
+	README_mingw
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

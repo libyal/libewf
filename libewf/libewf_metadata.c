@@ -568,7 +568,7 @@ int libewf_handle_get_compression_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -632,7 +632,7 @@ int libewf_handle_set_compression_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -1066,7 +1066,7 @@ int libewf_handle_get_format(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -1882,7 +1882,7 @@ int libewf_handle_set_read_wipe_chunk_on_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read io handle.",
+		 "%s: invalid handle - missing read IO handle.",
 		 function );
 
 		return( -1 );
@@ -2133,7 +2133,7 @@ int libewf_handle_get_number_of_crc_errors(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read io handle.",
+		 "%s: invalid handle - missing read IO handle.",
 		 function );
 
 		return( -1 );
@@ -2144,7 +2144,7 @@ int libewf_handle_get_number_of_crc_errors(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid read io handle - missing crc errors.",
+		 "%s: invalid handle - invalid read IO handle - missing crc errors.",
 		 function );
 
 		return( -1 );
@@ -2198,7 +2198,7 @@ int libewf_handle_get_crc_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read io handle.",
+		 "%s: invalid handle - missing read IO handle.",
 		 function );
 
 		return( -1 );
@@ -2253,7 +2253,7 @@ int libewf_handle_add_crc_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read io handle.",
+		 "%s: invalid handle - missing read IO handle.",
 		 function );
 
 		return( -1 );
@@ -3331,7 +3331,7 @@ int libewf_handle_parse_header_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -3850,7 +3850,7 @@ int libewf_handle_set_hash_value(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );

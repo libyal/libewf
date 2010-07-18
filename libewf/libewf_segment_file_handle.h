@@ -37,7 +37,7 @@ typedef struct libewf_segment_file_handle libewf_segment_file_handle_t;
 
 struct libewf_segment_file_handle
 {
-	/* The file io pool entry
+	/* The file IO pool entry
 	 */
 	int file_io_pool_entry;
 

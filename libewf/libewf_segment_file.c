@@ -206,7 +206,7 @@ int libewf_segment_file_read_sections(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -313,7 +313,7 @@ ssize_t libewf_segment_file_write_headers(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -659,7 +659,7 @@ ssize_t libewf_segment_file_write_last_section(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -736,7 +736,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -983,7 +983,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -1141,7 +1141,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -1451,7 +1451,7 @@ ssize_t libewf_segment_file_write_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -1685,7 +1685,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -1825,7 +1825,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -2183,7 +2183,7 @@ int libewf_segment_file_write_sections_correction(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io pool entry for segment file: %" PRIu16 ".",
+		 "%s: invalid file IO pool entry for segment file: %" PRIu16 ".",
 		 function,
 		 segment_number );
 
@@ -2195,7 +2195,7 @@ int libewf_segment_file_write_sections_correction(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );

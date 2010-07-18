@@ -39,7 +39,7 @@
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
 
-/* Initialize the read io handle
+/* Initialize the read IO handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_read_io_handle_initialize(
@@ -54,7 +54,7 @@ int libewf_read_io_handle_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid read io handle.",
+		 "%s: invalid read IO handle.",
 		 function );
 
 		return( -1 );
@@ -70,7 +70,7 @@ int libewf_read_io_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create read io handle.",
+			 "%s: unable to create read IO handle.",
 			 function );
 
 			return( -1 );
@@ -84,7 +84,7 @@ int libewf_read_io_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear read io handle.",
+			 "%s: unable to clear read IO handle.",
 			 function );
 
 			memory_free(
@@ -118,7 +118,7 @@ int libewf_read_io_handle_initialize(
 	return( 1 );
 }
 
-/* Frees the read io handle including elements
+/* Frees the read IO handle including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_read_io_handle_free(
@@ -134,7 +134,7 @@ int libewf_read_io_handle_free(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid read io handle.",
+		 "%s: invalid read IO handle.",
 		 function );
 
 		return( 1 );
@@ -345,7 +345,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -640,7 +640,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid read io handle.",
+		 "%s: invalid read IO handle.",
 		 function );
 
 		return( -1 );

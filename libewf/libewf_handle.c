@@ -106,7 +106,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create io handle.",
+			 "%s: unable to create IO handle.",
 			 function );
 
 			memory_free(
@@ -116,66 +116,19 @@ int libewf_handle_initialize(
 		}
 		internal_handle->date_format = LIBEWF_DATE_FORMAT_CTIME;
 
-		/* The segment table is initially filled with a single entry
-		 */
-		if( libewf_segment_table_initialize(
-		     &( internal_handle->segment_table ),
-		     1,
-		     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+		if( libewf_media_values_initialize(
+		     &( internal_handle->media_values ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment table.",
+			 "%s: unable to create media values.",
 			 function );
 
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
-		/* The delta segment table is initially filled with a single entry
-		 */
-		if( libewf_segment_table_initialize(
-		     &( internal_handle->delta_segment_table ),
-		     1,
-		     INT64_MAX,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create delta segment table.",
-			 function );
-
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
-		if( libewf_offset_table_initialize(
-		     &( internal_handle->offset_table ),
-		     0,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create offset table.",
-			 function );
-
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
+			libewf_io_handle_free(
+			 &( internal_handle->io_handle ),
 			 NULL );
 			memory_free(
 			 internal_handle );
@@ -194,107 +147,11 @@ int libewf_handle_initialize(
 			 "%s: unable to create chunk cache.",
 			 function );
 
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
-		if( libewf_media_values_initialize(
-		     &( internal_handle->media_values ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create media values.",
-			 function );
-
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
-		if( libewf_header_sections_initialize(
-		     &( internal_handle->header_sections ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header sections.",
-			 function );
-
 			libewf_media_values_free(
 			 &( internal_handle->media_values ),
 			 NULL );
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
-		if( libewf_hash_sections_initialize(
-		     &( internal_handle->hash_sections ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash sections.",
-			 function );
-
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
-			 NULL );
-			libewf_media_values_free(
-			 &( internal_handle->media_values ),
-			 NULL );
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
+			libewf_io_handle_free(
+			 &( internal_handle->io_handle ),
 			 NULL );
 			memory_free(
 			 internal_handle );
@@ -313,26 +170,14 @@ int libewf_handle_initialize(
 			 "%s: unable to create sessions.",
 			 function );
 
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ),
-			 NULL );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ),
 			 NULL );
 			libewf_media_values_free(
 			 &( internal_handle->media_values ),
 			 NULL );
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
+			libewf_io_handle_free(
+			 &( internal_handle->io_handle ),
 			 NULL );
 			memory_free(
 			 internal_handle );
@@ -354,69 +199,14 @@ int libewf_handle_initialize(
 			libewf_sector_table_free(
 			 &( internal_handle->sessions ),
 			 NULL );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ),
-			 NULL );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ),
 			 NULL );
 			libewf_media_values_free(
 			 &( internal_handle->media_values ),
 			 NULL );
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
-		if( libewf_single_files_initialize(
-		     &( internal_handle->single_files ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create single files.",
-			 function );
-
-			libewf_sector_table_free(
-			 &( internal_handle->acquiry_errors ),
-			 NULL );
-			libewf_sector_table_free(
-			 &( internal_handle->sessions ),
-			 NULL );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ),
-			 NULL );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
-			 NULL );
-			libewf_media_values_free(
-			 &( internal_handle->media_values ),
-			 NULL );
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
+			libewf_io_handle_free(
+			 &( internal_handle->io_handle ),
 			 NULL );
 			memory_free(
 			 internal_handle );
@@ -464,7 +254,7 @@ int libewf_handle_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free io handle.",
+			 "%s: unable to free IO handle.",
 			 function );
 
 			result = -1;
@@ -477,7 +267,7 @@ int libewf_handle_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free read io handle.",
+			 "%s: unable to free read IO handle.",
 			 function );
 
 			result = -1;
@@ -490,78 +280,7 @@ int libewf_handle_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free write io handle.",
-			 function );
-
-			result = -1;
-		}
-		if( internal_handle->file_io_pool_created_in_library != 0 )
-		{
-			if( internal_handle->file_io_pool != NULL )
-			{
-				if( libbfio_pool_free(
-				     &( internal_handle->file_io_pool ),
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free file io pool.",
-					 function );
-
-					result = -1;
-				}
-			}
-		}
-		if( libewf_segment_table_free(
-		     &( internal_handle->segment_table ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free segment table.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_segment_table_free(
-		     &( internal_handle->delta_segment_table ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free delta segment table.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_offset_table_free(
-		     &( internal_handle->offset_table ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free offset table.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_chunk_cache_free(
-		     &( internal_handle->chunk_cache ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunk cache.",
+			 "%s: unable to free write IO handle.",
 			 function );
 
 			result = -1;
@@ -579,93 +298,15 @@ int libewf_handle_free(
 
 			result = -1;
 		}
-		if( libewf_header_sections_free(
-		     &( internal_handle->header_sections ),
+		if( libewf_chunk_cache_free(
+		     &( internal_handle->chunk_cache ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free header sections.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_hash_sections_free(
-		     &( internal_handle->hash_sections ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free hash sections.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_values_table_free(
-		     &( internal_handle->header_values ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free header values.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_values_table_free(
-		     &( internal_handle->hash_values ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free hash values.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_sector_table_free(
-		     &( internal_handle->sessions ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sessions.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_sector_table_free(
-		     &( internal_handle->acquiry_errors ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free acquiry errors.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_single_files_free(
-		     &( internal_handle->single_files ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free single files.",
+			 "%s: unable to free chunk cache.",
 			 function );
 
 			result = -1;
@@ -738,6 +379,28 @@ int libewf_handle_open(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->segment_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - segment table already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - delta segment table already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( filenames == NULL )
 	{
 		liberror_error_set(
@@ -770,7 +433,7 @@ int libewf_handle_open(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file io pool.",
+		 "%s: unable to create file IO pool.",
 		 function );
 
 		return( -1 );
@@ -811,7 +474,7 @@ int libewf_handle_open(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create file io handle.",
+				 "%s: unable to create file IO handle.",
 				 function );
 
 				libbfio_pool_free(
@@ -830,7 +493,7 @@ int libewf_handle_open(
 		                 error,
 		                 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		                 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		                 "%s: unable to set track offsets read in file io handle.",
+		                 "%s: unable to set track offsets read in file IO handle.",
 		                 function );
 
 				libbfio_handle_free(
@@ -853,7 +516,7 @@ int libewf_handle_open(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set name in file io handle.",
+				 "%s: unable to set name in file IO handle.",
 				 function );
 
 				libbfio_handle_free(
@@ -876,7 +539,7 @@ int libewf_handle_open(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add file io handle to pool.",
+				 "%s: unable to add file IO handle to pool.",
 				 function );
 
 				libbfio_handle_free(
@@ -930,6 +593,51 @@ int libewf_handle_open(
 			}
 		}
 	}
+	/* The segment table is initially filled with a single entry
+	 */
+	if( libewf_segment_table_initialize(
+	     &( internal_handle->segment_table ),
+	     1,
+	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment table.",
+		 function );
+
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+
+		return( -1 );
+	}
+	/* The delta segment table is initially filled with a single entry
+	 */
+	if( libewf_segment_table_initialize(
+	     &( internal_handle->delta_segment_table ),
+	     1,
+	     INT64_MAX,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create delta segment table.",
+		 function );
+
+		libewf_segment_table_free(
+		 &( internal_handle->segment_table ),
+		 NULL );
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+
+		return( -1 );
+	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		/* Get the basename of the first segment file
@@ -953,6 +661,16 @@ int libewf_handle_open(
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in segment table.",
 				 function );
+
+				libewf_segment_table_free(
+				 &( internal_handle->delta_segment_table ),
+				 NULL );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ),
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
 
 				return( -1 );
 			}
@@ -978,6 +696,16 @@ int libewf_handle_open(
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in delta segment table.",
 				 function );
+
+				libewf_segment_table_free(
+				 &( internal_handle->delta_segment_table ),
+				 NULL );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ),
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
 
 				return( -1 );
 			}
@@ -1007,6 +735,16 @@ int libewf_handle_open(
 				 "%s: unable to set basename in segment table.",
 				 function );
 
+				libewf_segment_table_free(
+				 &( internal_handle->delta_segment_table ),
+				 NULL );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ),
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
+
 				return( -1 );
 			}
 		}
@@ -1033,6 +771,16 @@ int libewf_handle_open(
 			 "%s: unable to set basename in segment table.",
 			 function );
 
+			libewf_segment_table_free(
+			 &( internal_handle->delta_segment_table ),
+			 NULL );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ),
+			 NULL );
+			libbfio_pool_free(
+			&file_io_pool,
+			NULL );
+
 			return( -1 );
 		}
 	}
@@ -1046,9 +794,15 @@ int libewf_handle_open(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open handle using a file io pool.",
+		 "%s: unable to open handle using a file IO pool.",
 		 function );
 
+		libewf_segment_table_free(
+		 &( internal_handle->delta_segment_table ),
+		 NULL );
+		libewf_segment_table_free(
+		 &( internal_handle->segment_table ),
+		 NULL );
 		libbfio_pool_free(
 		 &file_io_pool,
 		 NULL );
@@ -1097,6 +851,28 @@ int libewf_handle_open_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->segment_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - segment table already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - delta segment table already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( filenames == NULL )
 	{
 		liberror_error_set(
@@ -1129,7 +905,7 @@ int libewf_handle_open_wide(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file io pool.",
+		 "%s: unable to create file IO pool.",
 		 function );
 
 		return( -1 );
@@ -1170,7 +946,7 @@ int libewf_handle_open_wide(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create file io handle.",
+				 "%s: unable to create file IO handle.",
 				 function );
 
 				libbfio_pool_free(
@@ -1189,7 +965,7 @@ int libewf_handle_open_wide(
 		                 error,
 		                 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		                 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		                 "%s: unable to set track offsets read in file io handle.",
+		                 "%s: unable to set track offsets read in file IO handle.",
 		                 function );
 
 				libbfio_handle_free(
@@ -1212,7 +988,7 @@ int libewf_handle_open_wide(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set name in file io handle.",
+				 "%s: unable to set name in file IO handle.",
 				 function );
 
 				libbfio_handle_free(
@@ -1235,7 +1011,7 @@ int libewf_handle_open_wide(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add file io handle to pool.",
+				 "%s: unable to add file IO handle to pool.",
 				 function );
 
 				libbfio_handle_free(
@@ -1289,6 +1065,51 @@ int libewf_handle_open_wide(
 			}
 		}
 	}
+	/* The segment table is initially filled with a single entry
+	 */
+	if( libewf_segment_table_initialize(
+	     &( internal_handle->segment_table ),
+	     1,
+	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment table.",
+		 function );
+
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+
+		return( -1 );
+	}
+	/* The delta segment table is initially filled with a single entry
+	 */
+	if( libewf_segment_table_initialize(
+	     &( internal_handle->delta_segment_table ),
+	     1,
+	     INT64_MAX,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create delta segment table.",
+		 function );
+
+		libewf_segment_table_free(
+		 &( internal_handle->segment_table ),
+		 NULL );
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+
+		return( -1 );
+	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		/* Get the basename of the first segment file
@@ -1312,6 +1133,16 @@ int libewf_handle_open_wide(
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in segment table.",
 				 function );
+
+				libewf_segment_table_free(
+				 &( internal_handle->delta_segment_table ),
+				 NULL );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ),
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
 
 				return( -1 );
 			}
@@ -1337,6 +1168,16 @@ int libewf_handle_open_wide(
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in delta segment table.",
 				 function );
+
+				libewf_segment_table_free(
+				 &( internal_handle->delta_segment_table ),
+				 NULL );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ),
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
 
 				return( -1 );
 			}
@@ -1366,6 +1207,16 @@ int libewf_handle_open_wide(
 				 "%s: unable to set basename in segment table.",
 				 function );
 
+				libewf_segment_table_free(
+				 &( internal_handle->delta_segment_table ),
+				 NULL );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ),
+				 NULL );
+				libbfio_pool_free(
+				 &file_io_pool,
+				 NULL );
+
 				return( -1 );
 			}
 		}
@@ -1392,6 +1243,16 @@ int libewf_handle_open_wide(
 			 "%s: unable to set basename in segment table.",
 			 function );
 
+			libewf_segment_table_free(
+			 &( internal_handle->delta_segment_table ),
+			 NULL );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ),
+			 NULL );
+			libbfio_pool_free(
+			 &file_io_pool,
+			 NULL );
+
 			return( -1 );
 		}
 	}
@@ -1405,9 +1266,15 @@ int libewf_handle_open_wide(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open handle using a file io pool.",
+		 "%s: unable to open handle using a file IO pool.",
 		 function );
 
+		libewf_segment_table_free(
+		 &( internal_handle->delta_segment_table ),
+		 NULL );
+		libewf_segment_table_free(
+		 &( internal_handle->segment_table ),
+		 NULL );
 		libbfio_pool_free(
 		 &file_io_pool,
 		 NULL );
@@ -1457,7 +1324,62 @@ int libewf_handle_open_file_io_pool(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->file_io_pool != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - file IO pool already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - offset table already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->header_sections != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - header sections already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->hash_sections != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - hash sections already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->single_files != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - single files already set.",
 		 function );
 
 		return( -1 );
@@ -1468,7 +1390,7 @@ int libewf_handle_open_file_io_pool(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io pool.",
+		 "%s: invalid file IO pool.",
 		 function );
 
 		return( -1 );
@@ -1482,7 +1404,7 @@ int libewf_handle_open_file_io_pool(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the number of file io handles in the pool.",
+		 "%s: unable to retrieve the number of file IO handles in the pool.",
 		 function );
 
 		return( -1 );
@@ -1511,7 +1433,7 @@ int libewf_handle_open_file_io_pool(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create read io handle.",
+			 "%s: unable to create read IO handle.",
 			 function );
 
 			return( -1 );
@@ -1527,7 +1449,7 @@ int libewf_handle_open_file_io_pool(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create write io handle.",
+			 "%s: unable to create write IO handle.",
 			 function );
 
 			return( -1 );
@@ -1536,6 +1458,88 @@ int libewf_handle_open_file_io_pool(
 	internal_handle->io_handle->flags = flags;
 	internal_handle->file_io_pool     = file_io_pool;
 
+	if( libewf_offset_table_initialize(
+	     &( internal_handle->offset_table ),
+	     0,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create offset table.",
+		 function );
+
+		internal_handle->file_io_pool = NULL;
+
+		return( -1 );
+	}
+	if( libewf_header_sections_initialize(
+	     &( internal_handle->header_sections ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create header sections.",
+		 function );
+
+		libewf_offset_table_free(
+		 &( internal_handle->offset_table ),
+		 NULL );
+
+		internal_handle->file_io_pool = NULL;
+
+		return( -1 );
+	}
+	if( libewf_hash_sections_initialize(
+	     &( internal_handle->hash_sections ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create hash sections.",
+		 function );
+
+		libewf_header_sections_free(
+		 &( internal_handle->header_sections ),
+		 NULL );
+		libewf_offset_table_free(
+		 &( internal_handle->offset_table ),
+		 NULL );
+
+		internal_handle->file_io_pool = NULL;
+
+		return( -1 );
+	}
+	if( libewf_single_files_initialize(
+	     &( internal_handle->single_files ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create single files.",
+		 function );
+
+		libewf_hash_sections_free(
+		 &( internal_handle->hash_sections ),
+		 NULL );
+		libewf_header_sections_free(
+		 &( internal_handle->header_sections ),
+		 NULL );
+		libewf_offset_table_free(
+		 &( internal_handle->offset_table ),
+		 NULL );
+
+		internal_handle->file_io_pool = NULL;
+
+		return( -1 );
+	}
 	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
@@ -1555,9 +1559,22 @@ int libewf_handle_open_file_io_pool(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to retrieve file io handle from pool entry: %d.",
+				 "%s: unable to retrieve file IO handle from pool entry: %d.",
 				 function,
 				 file_io_handle_iterator );
+
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
 
 				internal_handle->file_io_pool = NULL;
 
@@ -1584,6 +1601,19 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to create segment file handle.",
 				 function );
 
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
+
 				internal_handle->file_io_pool = NULL;
 
 				return( -1 );
@@ -1604,6 +1634,18 @@ int libewf_handle_open_file_io_pool(
 				libewf_segment_file_handle_free(
 				 (intptr_t *) segment_file_handle,
 				 NULL );
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
 
 				internal_handle->file_io_pool = NULL;
 
@@ -1620,6 +1662,18 @@ int libewf_handle_open_file_io_pool(
 
 				libewf_segment_file_handle_free(
 				 (intptr_t *) segment_file_handle,
+				 NULL );
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
 				 NULL );
 
 				internal_handle->file_io_pool = NULL;
@@ -1645,6 +1699,18 @@ int libewf_handle_open_file_io_pool(
 
 					libewf_segment_file_handle_free(
 					 (intptr_t *) segment_file_handle,
+					 NULL );
+					libewf_single_files_free(
+					 &( internal_handle->single_files ),
+					 NULL );
+					libewf_hash_sections_free(
+					 &( internal_handle->hash_sections ),
+					 NULL );
+					libewf_header_sections_free(
+					 &( internal_handle->header_sections ),
+					 NULL );
+					libewf_offset_table_free(
+					 &( internal_handle->offset_table ),
 					 NULL );
 
 					internal_handle->file_io_pool = NULL;
@@ -1672,6 +1738,18 @@ int libewf_handle_open_file_io_pool(
 					libewf_segment_file_handle_free(
 					 (intptr_t *) segment_file_handle,
 					 NULL );
+					libewf_single_files_free(
+					 &( internal_handle->single_files ),
+					 NULL );
+					libewf_hash_sections_free(
+					 &( internal_handle->hash_sections ),
+					 NULL );
+					libewf_header_sections_free(
+					 &( internal_handle->header_sections ),
+					 NULL );
+					libewf_offset_table_free(
+					 &( internal_handle->offset_table ),
+					 NULL );
 
 					internal_handle->file_io_pool = NULL;
 
@@ -1697,6 +1775,19 @@ int libewf_handle_open_file_io_pool(
 						 function,
 						 segment_number );
 
+						libewf_single_files_free(
+						 &( internal_handle->single_files ),
+						 NULL );
+						libewf_hash_sections_free(
+						 &( internal_handle->hash_sections ),
+						 NULL );
+						libewf_header_sections_free(
+						 &( internal_handle->header_sections ),
+						 NULL );
+						libewf_offset_table_free(
+						 &( internal_handle->offset_table ),
+						 NULL );
+
 						internal_handle->file_io_pool = NULL;
 
 						return( -1 );
@@ -1715,6 +1806,18 @@ int libewf_handle_open_file_io_pool(
 				libewf_segment_file_handle_free(
 				 (intptr_t *) segment_file_handle,
 				 NULL );
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
 
 				internal_handle->file_io_pool = NULL;
 
@@ -1729,6 +1832,19 @@ int libewf_handle_open_file_io_pool(
 				 "%s: invalid segment number: %" PRIu16 " value out of bounds or missing segment files.",
 				 function,
 				 segment_number );
+
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
 
 				internal_handle->file_io_pool = NULL;
 
@@ -1756,6 +1872,19 @@ int libewf_handle_open_file_io_pool(
 			}
 			else
 			{
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
+
 				internal_handle->file_io_pool = NULL;
 
 				return( -1 );
@@ -1775,6 +1904,19 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to retrieve number of delta segment file handles.",
 				 function );
 
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
+
 				internal_handle->file_io_pool = NULL;
 
 				return( -1 );
@@ -1792,6 +1934,19 @@ int libewf_handle_open_file_io_pool(
 					 LIBERROR_IO_ERROR_READ_FAILED,
 					 "%s: unable to read delta segment table.",
 					 function );
+
+					libewf_single_files_free(
+					 &( internal_handle->single_files ),
+					 NULL );
+					libewf_hash_sections_free(
+					 &( internal_handle->hash_sections ),
+					 NULL );
+					libewf_header_sections_free(
+					 &( internal_handle->header_sections ),
+					 NULL );
+					libewf_offset_table_free(
+					 &( internal_handle->offset_table ),
+					 NULL );
 
 					internal_handle->file_io_pool = NULL;
 
@@ -1814,6 +1969,19 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to determine format.",
 			 function );
 
+			libewf_single_files_free(
+			 &( internal_handle->single_files ),
+			 NULL );
+			libewf_hash_sections_free(
+			 &( internal_handle->hash_sections ),
+			 NULL );
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ),
+			 NULL );
+			libewf_offset_table_free(
+			 &( internal_handle->offset_table ),
+			 NULL );
+
 			internal_handle->file_io_pool = NULL;
 
 			return( -1 );
@@ -1834,6 +2002,21 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to parse single files.",
 				 function );
 
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
+
+				internal_handle->file_io_pool = NULL;
+
 				return( -1 );
 			}
 		}
@@ -1847,22 +2030,37 @@ int libewf_handle_open_file_io_pool(
 	}
 	/* Make sure format specific values are set
 	 */
-	if( ( internal_handle->io_handle->format != 0 )
-	 && ( libewf_internal_handle_set_format(
-	       internal_handle,
-	       internal_handle->io_handle->format,
-	       error ) != 1 ) )
+	if( internal_handle->io_handle->format != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set format.",
-		 function );
+		if( libewf_internal_handle_set_format(
+		     internal_handle,
+		     internal_handle->io_handle->format,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set format.",
+			 function );
 
-		internal_handle->file_io_pool = NULL;
+			libewf_single_files_free(
+			 &( internal_handle->single_files ),
+			 NULL );
+			libewf_hash_sections_free(
+			 &( internal_handle->hash_sections ),
+			 NULL );
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ),
+			 NULL );
+			libewf_offset_table_free(
+			 &( internal_handle->offset_table ),
+			 NULL );
 
-		return( -1 );
+			internal_handle->file_io_pool = NULL;
+
+			return( -1 );
+		}
 	}
 	if( ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	 && ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
@@ -1879,8 +2077,23 @@ int libewf_handle_open_file_io_pool(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize write io handle values.",
+			 "%s: unable to initialize write IO handle values.",
 			 function );
+
+			libewf_single_files_free(
+			 &( internal_handle->single_files ),
+			 NULL );
+			libewf_hash_sections_free(
+			 &( internal_handle->hash_sections ),
+			 NULL );
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ),
+			 NULL );
+			libewf_offset_table_free(
+			 &( internal_handle->offset_table ),
+			 NULL );
+
+			internal_handle->file_io_pool = NULL;
 
 			return( -1 );
 		}
@@ -1897,8 +2110,23 @@ int libewf_handle_open_file_io_pool(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize write io handle to resume.",
+			 "%s: unable to initialize write IO handle to resume.",
 			 function );
+
+			libewf_single_files_free(
+			 &( internal_handle->single_files ),
+			 NULL );
+			libewf_hash_sections_free(
+			 &( internal_handle->hash_sections ),
+			 NULL );
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ),
+			 NULL );
+			libewf_offset_table_free(
+			 &( internal_handle->offset_table ),
+			 NULL );
+
+			internal_handle->file_io_pool = NULL;
 
 			return( -1 );
 		}
@@ -1915,6 +2143,7 @@ int libewf_handle_close(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_close";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1930,31 +2159,33 @@ int libewf_handle_close(
 	internal_handle = (libewf_internal_handle_t *) handle;
 
 	if( ( internal_handle->write_io_handle != NULL )
-	 && ( internal_handle->write_io_handle->write_finalized == 0 )
-	 && ( libewf_write_io_handle_finalize(
-	       internal_handle->write_io_handle,
-	       internal_handle->io_handle,
-	       internal_handle->file_io_pool,
-	       internal_handle->media_values,
-	       internal_handle->offset_table,
-	       internal_handle->segment_table,
-	       &( internal_handle->header_values ),
-	       internal_handle->hash_values,
-	       internal_handle->header_sections,
-	       internal_handle->hash_sections,
-	       internal_handle->sessions,
-	       internal_handle->acquiry_errors,
-	       internal_handle->chunk_cache,
-	       error ) == -1 ) )
+	 && ( internal_handle->write_io_handle->write_finalized == 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to finalize write.",
-		 function );
+		if( libewf_write_io_handle_finalize(
+		     internal_handle->write_io_handle,
+		     internal_handle->io_handle,
+		     internal_handle->file_io_pool,
+		     internal_handle->media_values,
+		     internal_handle->offset_table,
+		     internal_handle->segment_table,
+		     &( internal_handle->header_values ),
+		     internal_handle->hash_values,
+		     internal_handle->header_sections,
+		     internal_handle->hash_sections,
+		     internal_handle->sessions,
+		     internal_handle->acquiry_errors,
+		     internal_handle->chunk_cache,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to finalize write.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( internal_handle->file_io_pool_created_in_library != 0 )
 	{
@@ -1969,10 +2200,185 @@ int libewf_handle_close(
 			 "%s: unable to close all segment files.",
 			 function );
 
-			return( -1 );
+			result = -1;
+		}
+		if( libbfio_pool_free(
+		     &( internal_handle->file_io_pool ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file IO pool.",
+			 function );
+
+			result = -1;
 		}
 	}
-	return( 0 );
+	internal_handle->file_io_pool = NULL;
+
+	if( internal_handle->segment_table != NULL )
+	{
+		if( libewf_segment_table_free(
+		     &( internal_handle->segment_table ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free segment table.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->delta_segment_table != NULL )
+	{
+		if( libewf_segment_table_free(
+		     &( internal_handle->delta_segment_table ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free delta segment table.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->offset_table != NULL )
+	{
+		if( libewf_offset_table_free(
+		     &( internal_handle->offset_table ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free offset table.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->header_sections != NULL )
+	{
+		if( libewf_header_sections_free(
+		     &( internal_handle->header_sections ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free header sections.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->hash_sections != NULL )
+	{
+		if( libewf_hash_sections_free(
+		     &( internal_handle->hash_sections ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free hash sections.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->header_values != NULL )
+	{
+		if( libewf_values_table_free(
+		     &( internal_handle->header_values ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free header values.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->hash_values != NULL )
+	{
+		if( libewf_values_table_free(
+		     &( internal_handle->hash_values ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free hash values.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->sessions != NULL )
+	{
+		if( libewf_sector_table_free(
+		     &( internal_handle->sessions ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sessions.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->acquiry_errors != NULL )
+	{
+		if( libewf_sector_table_free(
+		     &( internal_handle->acquiry_errors ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free acquiry errors.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->single_files != NULL )
+	{
+		if( libewf_single_files_free(
+		     &( internal_handle->single_files ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free single files.",
+			 function );
+
+			result = -1;
+		}
+	}
+	return( result );
 }
 
 /* Opens the EWF handle for reading
@@ -2092,7 +2498,6 @@ int libewf_handle_open_read(
 			 segment_number );
 		}
 #endif
-
 		segment_file_handle = NULL;
 
 		if( libewf_segment_table_get_handle(
@@ -2311,7 +2716,7 @@ ssize_t libewf_handle_read_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2402,7 +2807,7 @@ ssize_t libewf_handle_read_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2654,7 +3059,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2792,7 +3197,7 @@ ssize_t libewf_handle_write_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2831,7 +3236,7 @@ ssize_t libewf_handle_write_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize write io handle values.",
+		 "%s: unable to initialize write IO handle values.",
 		 function );
 
 		return( -1 );
@@ -3011,7 +3416,7 @@ ssize_t libewf_handle_write_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -3039,7 +3444,7 @@ ssize_t libewf_handle_write_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize write io handle values.",
+		 "%s: unable to initialize write IO handle values.",
 		 function );
 
 		return( -1 );
@@ -3377,7 +3782,7 @@ off64_t libewf_handle_seek_offset(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -3526,7 +3931,7 @@ int libewf_handle_get_offset(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -3594,7 +3999,7 @@ int libewf_handle_set_maximum_number_of_open_handles(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set maximum number of open handles in file io handle.",
+			 "%s: unable to set maximum number of open handles in file IO handle.",
 			 function );
 
 			return( -1 );
@@ -4613,7 +5018,7 @@ int libewf_handle_get_filename_size(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file io handle for current chunk.",
+		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
 		return( -1 );
@@ -4668,7 +5073,7 @@ int libewf_handle_get_filename(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file io handle for current chunk.",
+		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
 		return( -1 );
@@ -4725,7 +5130,7 @@ int libewf_handle_get_filename_size_wide(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file io handle for current chunk.",
+		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
 		return( -1 );
@@ -4780,7 +5185,7 @@ int libewf_handle_get_filename_wide(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file io handle for current chunk.",
+		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
 		return( -1 );
@@ -4805,7 +5210,7 @@ int libewf_handle_get_filename_wide(
 
 #endif
 
-/* Retrieves the file io handle of the (delta) segment file of the current chunk
+/* Retrieves the file IO handle of the (delta) segment file of the current chunk
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_file_io_handle(
@@ -4912,7 +5317,7 @@ int libewf_handle_get_file_io_handle(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file io handle for pool entry: %d (chunk: %" PRIu32 ").",
+		 "%s: unable to retrieve file IO handle for pool entry: %d (chunk: %" PRIu32 ").",
 		 function,
 		 file_io_pool_entry,
 		 internal_handle->io_handle->current_chunk );
@@ -5153,7 +5558,7 @@ int libewf_internal_handle_set_format(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing io handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );

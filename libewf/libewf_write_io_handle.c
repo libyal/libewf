@@ -50,7 +50,7 @@
 #include "ewf_table.h"
 #include "ewfx_delta_chunk.h"
 
-/* Initialize the write io handle
+/* Initialize the write IO handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_initialize(
@@ -65,7 +65,7 @@ int libewf_write_io_handle_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -81,7 +81,7 @@ int libewf_write_io_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create write io handle.",
+			 "%s: unable to create write IO handle.",
 			 function );
 
 			return( -1 );
@@ -95,7 +95,7 @@ int libewf_write_io_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear write io handle.",
+			 "%s: unable to clear write IO handle.",
 			 function );
 
 			memory_free(
@@ -113,7 +113,7 @@ int libewf_write_io_handle_initialize(
 	return( 1 );
 }
 
-/* Frees the write io handle including elements
+/* Frees the write IO handle including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_free(
@@ -128,7 +128,7 @@ int libewf_write_io_handle_free(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( 1 );
@@ -153,7 +153,7 @@ int libewf_write_io_handle_free(
 	return( 1 );
 }
 
-/* Initializes the write io handle value to start writing
+/* Initializes the write IO handle value to start writing
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_initialize_values(
@@ -172,7 +172,7 @@ int libewf_write_io_handle_initialize_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -194,7 +194,7 @@ int libewf_write_io_handle_initialize_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -311,7 +311,7 @@ int libewf_write_io_handle_initialize_values(
 	return( 1 );
 }
 
-/* Initializes the write io handle to resume writing
+/* Initializes the write IO handle to resume writing
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_initialize_resume(
@@ -338,7 +338,7 @@ int libewf_write_io_handle_initialize_resume(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -349,7 +349,7 @@ int libewf_write_io_handle_initialize_resume(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -702,7 +702,7 @@ int libewf_write_io_handle_initialize_resume(
 	io_handle->current_chunk        = offset_table->last_chunk_offset_compared;
 	io_handle->current_chunk_offset = 0;
 
-	/* Set write io handle values
+	/* Set write IO handle values
 	 */
 	write_io_handle->input_write_count        = offset_table->last_chunk_offset_compared * media_values->chunk_size;
 	write_io_handle->number_of_chunks_written = offset_table->last_chunk_offset_compared;
@@ -1318,7 +1318,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -1442,7 +1442,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file io handle.",
+		 "%s: unable to create file IO handle.",
 		 function );
 
 		memory_free(
@@ -1468,7 +1468,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set filename in file io handle.",
+		 "%s: unable to set filename in file IO handle.",
 		 function );
 
 		libbfio_handle_free(
@@ -1501,7 +1501,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add file io handle to pool.",
+		 "%s: unable to add file IO handle to pool.",
 		 function );
 
 		libbfio_handle_free(
@@ -2009,7 +2009,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -2020,7 +2020,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -2870,7 +2870,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -2881,7 +2881,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -3458,7 +3458,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -3469,7 +3469,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -3772,7 +3772,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -3783,7 +3783,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -4147,7 +4147,7 @@ ssize_t libewf_write_io_handle_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write io handle.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
@@ -4158,7 +4158,7 @@ ssize_t libewf_write_io_handle_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );

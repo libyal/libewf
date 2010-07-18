@@ -59,19 +59,28 @@ typedef struct libewf_internal_handle libewf_internal_handle_t;
 
 struct libewf_internal_handle
 {
-	/* The io handle
+	/* The IO handle
 	 */
 	libewf_io_handle_t *io_handle;
 
-	/* The read io handle
+	/* The read IO handle
 	 */
 	libewf_read_io_handle_t *read_io_handle;
 
-	/* The write io handle
+	/* The write IO handle
 	 */
 	libewf_write_io_handle_t *write_io_handle;
 
-	/* The file io pool
+	/* A simple cache is implemented here to avoid having to read and decompress the
+	 * same chunk while reading the data.
+	 */
+	libewf_chunk_cache_t *chunk_cache;
+
+	/* The media values
+	 */
+	libewf_media_values_t *media_values;
+
+	/* The file IO pool
 	 */
 	libbfio_pool_t *file_io_pool;
 
@@ -94,15 +103,6 @@ struct libewf_internal_handle
 	/* The list of offsets within the segment files within the table sections
 	 */
 	libewf_offset_table_t *offset_table;
-
-	/* A simple cache is implemented here to avoid having to read and decompress the
-	 * same chunk while reading the data.
-	 */
-	libewf_chunk_cache_t *chunk_cache;
-
-	/* The media values
-	 */
-	libewf_media_values_t *media_values;
 
 	/* The stored header sections
 	 */
