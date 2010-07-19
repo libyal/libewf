@@ -130,6 +130,16 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	  METH_NOARGS,
 	  "Retrieves all header values" },
 
+	{ "get_hash_value",
+	  (PyCFunction) pyewf_handle_get_hash_value,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "Retrieves a hash value by its name" },
+
+	{ "get_hash_values",
+	  (PyCFunction) pyewf_handle_get_hash_values,
+	  METH_NOARGS,
+	  "Retrieves all hash values" },
+
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
@@ -419,7 +429,7 @@ PyObject *pyewf_handle_open(
 			 PyExc_MemoryError,
 			 "%s: unable to create filename: %d.",
 			 function,
-			 filename_iterator + 1 );
+			 filename_iterator );
 
 			for( ; filename_iterator > 0; filename_iterator-- )
 			{
@@ -441,7 +451,7 @@ PyObject *pyewf_handle_open(
 			 PyExc_MemoryError,
 			 "%s: unable to set filename: %d.",
 			 function,
-			 filename_iterator + 1 );
+			 filename_iterator );
 
 			for( ; filename_iterator > 0; filename_iterator-- )
 			{
@@ -828,7 +838,7 @@ PyObject *pyewf_handle_write_buffer(
 
 		PyErr_Format(
 		 PyExc_IOError,
-		 "%s: failed to write data (requested %" PRId32 ", returned %" PRIzd ").",
+		 "%s: failed to write data (requested %d, returned %" PRIzd ").",
 		 function,
 		 write_size,
 		 write_count );

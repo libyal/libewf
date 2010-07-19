@@ -49,6 +49,14 @@ PyObject *pyewf_handle_get_header_value(
 PyObject *pyewf_handle_get_header_values(
            pyewf_handle_t *pyewf_handle );
 
+PyObject *pyewf_handle_get_hash_value(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyewf_handle_get_hash_values(
+           pyewf_handle_t *pyewf_handle );
+
 #if defined( __cplusplus )
 }
 #endif

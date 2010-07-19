@@ -217,8 +217,9 @@ Test:
 * corrected CRC into checksum
 * refactored header and hash values, file entry name functions to UTF-8 variant
 * implemented array type in libewf_offset_table, added encapsulation functions
-* updated libbfio
+* updated libuna, libbfio, libsmdev, libsmraw
 * small improvement to write resume
+* worked on integrating test scripts
 
 20100718
 * update for mingw compilation

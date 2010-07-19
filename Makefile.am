@@ -16,6 +16,7 @@ SUBDIRS = \
 	pyewf \
 	documents \
 	manuals \
+	tests \
 	macosx \
 	borlandc \
 	msvscpp
@@ -115,4 +116,5 @@ splint:
 	(cd $(srcdir)/libsmraw && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/ewftools && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/tests && $(MAKE) splint $(AM_MAKEFLAGS))
 
