@@ -39,10 +39,6 @@ typedef struct libewf_header_sections libewf_header_sections_t;
  */
 struct libewf_header_sections
 {
-	/* The header codepage
-	 */
-	int header_codepage;
-
 	/* The stored header
 	 */
 	uint8_t *header;
@@ -85,6 +81,7 @@ int libewf_header_sections_create(
      libewf_values_table_t *header_values,
      int8_t compression_level,
      uint8_t format,
+     int header_codepage,
      liberror_error_t **error );
 
 int libewf_header_sections_determine_format(

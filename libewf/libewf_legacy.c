@@ -182,6 +182,102 @@ int libewf_handle_get_amount_of_header_values(
 	         error ) );
 }
 
+/* Retrieves the size of the UTF-8 encoded header value identifier of a specific index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_header_value_identifier_size(
+     libewf_handle_t *handle,
+     uint32_t index,
+     size_t *identifier_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_header_value_identifier_size(
+	         handle,
+	         index,
+	         identifier_size,
+	         error ) );
+}
+
+/* Retrieves the UTF-8 encoded header value identifier of a specific index
+ * The identifier size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_header_value_identifier(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint8_t *identifier,
+     size_t identifier_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_header_value_identifier(
+	         handle,
+	         index,
+	         identifier,
+	         identifier_size,
+	         error ) );
+}
+
+/* Retrieves the size of the UTF-8 encoded header value of an UTF-8 encoded identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_header_value_size(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *value_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_header_value_size(
+	         handle,
+	         identifier,
+	         identifier_length,
+	         value_size,
+	         error ) );
+}
+
+/* Retrieves the UTF-8 encoded header value of an UTF-8 encoded identifier
+ * The value size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_header_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint8_t *value,
+     size_t value_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_header_value(
+	         handle,
+	         identifier,
+	         identifier_length,
+	         value,
+	         value_size,
+	         error ) );
+}
+
+/* Sets the UTF-8 encoded header value specified by the UTF-8 encoded identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_header_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *value,
+     size_t value_length,
+     liberror_error_t **error )
+{
+	return( libewf_handle_set_utf8_header_value(
+	         handle,
+	         identifier,
+	         identifier_length,
+	         value,
+	         value_length,
+	         error ) );
+}
+
 /* Retrieves the amount of hash values
  * Returns 1 if successful, 0 if no hash values are present or -1 on error
  */
@@ -196,6 +292,102 @@ int libewf_handle_get_amount_of_hash_values(
 	         error ) );
 }
 
+/* Retrieves the size of the UTF-8 encoded hash value identifier of a specific index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_hash_value_identifier_size(
+     libewf_handle_t *handle,
+     uint32_t index,
+     size_t *identifier_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_hash_value_identifier_size(
+	         handle,
+	         index,
+	         identifier_size,
+	         error ) );
+}
+
+/* Retrieves the UTF-8 encoded hash value identifier of a specific index
+ * The identifier size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_hash_value_identifier(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint8_t *identifier,
+     size_t identifier_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_hash_value_identifier(
+	         handle,
+	         index,
+	         identifier,
+	         identifier_size,
+	         error ) );
+}
+
+/* Retrieves the size of the UTF-8 encoded hash value of an UTF-8 encoded identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_hash_value_size(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *value_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_hash_value_size(
+	         handle,
+	         identifier,
+	         identifier_length,
+	         value_size,
+	         error ) );
+}
+
+/* Retrieves the UTF-8 encoded hash value of an UTF-8 encoded identifier
+ * The value size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint8_t *value,
+     size_t value_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_utf8_hash_value(
+	         handle,
+	         identifier,
+	         identifier_length,
+	         value,
+	         value_size,
+	         error ) );
+}
+
+/* Sets the UTF-8 encoded hash value specified by the UTF-8 encoded identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *value,
+     size_t value_length,
+     liberror_error_t **error )
+{
+	return( libewf_handle_set_utf8_hash_value(
+	         handle,
+	         identifier,
+	         identifier_length,
+	         value,
+	         value_length,
+	         error ) );
+}
+
 /* Retrieves the amount of sub file entries from a file entry
  * Returns 1 if successful or -1 on error
  */
@@ -207,6 +399,38 @@ int libewf_file_entry_get_amount_of_sub_file_entries(
 	return( libewf_file_entry_get_number_of_sub_file_entries(
 	         file_entry,
 	         amount_of_sub_file_entries,
+	         error ) );
+}
+
+/* Retrieves the size of the UTF-8 encoded name from the referenced file entry
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_name_size(
+     libewf_file_entry_t *file_entry,
+     size_t *name_size,
+     liberror_error_t **error )
+{
+	return( libewf_file_entry_get_utf8_name_size(
+	         file_entry,
+	         name_size,
+	         error ) );
+}
+
+/* Retrieves the UTF-8 encoded name value from the referenced file entry
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_name(
+     libewf_file_entry_t *file_entry,
+     uint8_t *name,
+     size_t name_size,
+     liberror_error_t **error )
+{
+	return( libewf_file_entry_get_utf8_name(
+	         file_entry,
+	         name,
+	         name_size,
 	         error ) );
 }
 

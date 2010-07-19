@@ -65,6 +65,10 @@ struct libewf_io_handle
 	 * like empty block compression
 	 */
 	uint8_t compression_flags;
+
+	/* The header codepage
+	 */
+	int header_codepage;
 };
 
 int libewf_io_handle_initialize(

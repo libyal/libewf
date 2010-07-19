@@ -2454,7 +2454,7 @@ int export_handle_set_header_value(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_header_value(
+	if( libewf_handle_set_utf8_header_value(
 	     export_handle->ewf_output_handle,
 	     (uint8_t *) header_value_identifier,
 	     header_value_identifier_length,
@@ -2557,7 +2557,7 @@ int export_handle_set_hash_value(
 	}
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
-		if( libewf_handle_set_hash_value(
+		if( libewf_handle_set_utf8_hash_value(
 		     export_handle->ewf_output_handle,
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_length,
@@ -3048,7 +3048,7 @@ int export_handle_export_file_entry(
 
 		return( -1 );
 	}
-	if( libewf_file_entry_get_name_size(
+	if( libewf_file_entry_get_utf8_name_size(
 	     file_entry,
 	     &name_size,
 	     error ) != 1 )
@@ -3079,7 +3079,7 @@ int export_handle_export_file_entry(
 
 			return( -1 );
 		}
-		if( libewf_file_entry_get_name(
+		if( libewf_file_entry_get_utf8_name(
 		     file_entry,
 		     name,
 		     name_size,

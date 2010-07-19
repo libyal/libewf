@@ -1,11 +1,13 @@
 TODO
+* add UTF-16 header and hash values, file entry name functions
+* update macosx project files
+
 * configure validate libuna and libbfio check
-* check: refactor sector table (amount of)
-* check: refactor ewftools (AMOUNT)
 * implement array type in libewf_offset_table
-* document: add that error can be NULL
+* documentation:
+  - add that error can be NULL
 * libewf: make libewf_convert_date_header_value more strict
-* improve output when encoutering a read error
+* improve output when encountering a read error
 * improve open file io pool (set basename ?)
 
 Roadmap:
@@ -107,7 +109,6 @@ Python bindings
 
 API changes
 * add wide character functions definitions by default?
-* add both UTF-8 and UTF-16 header and hash values, file entry name functions
 * libbfio API extension
   - add means to obtain libbfio handle of media data in ewf
   - add means to set narrow string codepage
@@ -213,6 +214,7 @@ Test:
 20100719
 * code clean up
 * corrected CRC into checksum
+* refactored header and hash values, file entry name functions to UTF-8 variant
 
 20100718
 * update for mingw compilation

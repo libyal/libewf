@@ -25,9 +25,10 @@
 
 #include <liberror.h>
 
+#include "libewf_codepage.h"
 #include "libewf_definitions.h"
-#include "libewf_libbfio.h"
 #include "libewf_io_handle.h"
+#include "libewf_libbfio.h"
 
 #include "ewf_definitions.h"
 
@@ -89,6 +90,7 @@ int libewf_io_handle_initialize(
 		( *io_handle )->format            = LIBEWF_FORMAT_ENCASE5;
 		( *io_handle )->ewf_format        = EWF_FORMAT_E01;
 		( *io_handle )->compression_level = EWF_COMPRESSION_NONE;
+		( *io_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
 	}
 	return( 1 );
 }

@@ -26,7 +26,6 @@
 #include <liberror.h>
 #include <libnotify.h>
 
-#include "libewf_codepage.h"
 #include "libewf_definitions.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
@@ -88,7 +87,6 @@ int libewf_header_sections_initialize(
 
 			return( -1 );
 		}
-		( *header_sections )->header_codepage = LIBEWF_CODEPAGE_ASCII;
 	}
 	return( 1 );
 }
@@ -146,6 +144,7 @@ int libewf_header_sections_create(
      libewf_values_table_t *header_values,
      int8_t compression_level,
      uint8_t format,
+     int header_codepage,
      liberror_error_t **error )
 {
 	static char *function = "libewf_header_sections_create";
@@ -170,7 +169,7 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -191,7 +190,7 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -213,7 +212,7 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -235,7 +234,7 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -255,7 +254,7 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -297,7 +296,7 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -339,7 +338,7 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -381,7 +380,7 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -401,7 +400,7 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -421,7 +420,7 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage,
+		     header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(

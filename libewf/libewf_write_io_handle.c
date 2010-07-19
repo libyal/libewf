@@ -2261,6 +2261,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			     *header_values,
 			     io_handle->compression_level,
 			     io_handle->format,
+			     io_handle->header_codepage,
 			     error ) == -1 )
 			{
 				liberror_error_set(

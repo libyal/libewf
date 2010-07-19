@@ -1918,23 +1918,25 @@ int imaging_handle_set_output_values(
 
 	/* Set acquiry operating system, software and software version
 	 */
-	if( ( acquiry_operating_system != NULL )
-	 && ( imaging_handle_set_header_value(
-	       imaging_handle,
-	       "acquiry_operating_system",
-	       24,
-	       acquiry_operating_system,
-	       acquiry_operating_system_length,
-	       error ) != 1 ) )
+	if( acquiry_operating_system != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: acquiry operating system.",
-		 function );
+		if( imaging_handle_set_header_value(
+		       imaging_handle,
+		       "acquiry_operating_system",
+		       24,
+		       acquiry_operating_system,
+		       acquiry_operating_system_length,
+		       error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: acquiry operating system.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( imaging_handle_set_header_value(
 	     imaging_handle,
@@ -1970,41 +1972,45 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-	if( ( model != NULL )
-	 && ( imaging_handle_set_header_value(
-	       imaging_handle,
-	       "model",
-	       5,
-	       model,
-	       model_length,
-	       error ) != 1 ) )
+	if( model != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: model.",
-		 function );
+		if( imaging_handle_set_header_value(
+		     imaging_handle,
+		     "model",
+		     5,
+		     model,
+		     model_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: model.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	if( ( serial_number != NULL )
-	 && ( imaging_handle_set_header_value(
-	       imaging_handle,
-	       "serial_number",
-	       13,
-	       serial_number,
-	       serial_number_length,
-	       error ) != 1 ) )
+	if( serial_number != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: serial number.",
-		 function );
+		if( imaging_handle_set_header_value(
+		       imaging_handle,
+		       "serial_number",
+		       13,
+		       serial_number,
+		       serial_number_length,
+		       error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: serial number.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( libewf_handle_set_header_codepage(
 	     imaging_handle->output_handle,
@@ -2406,7 +2412,7 @@ int imaging_handle_get_header_value(
 
 		return( -1 );
 	}
-	result = libewf_handle_get_header_value(
+	result = libewf_handle_get_utf8_header_value(
 	          imaging_handle->output_handle,
 	          (uint8_t *) header_value_identifier,
 	          header_value_identifier_length,
@@ -2564,7 +2570,7 @@ int imaging_handle_set_header_value(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_header_value(
+	if( libewf_handle_set_utf8_header_value(
 	     imaging_handle->output_handle,
 	     (uint8_t *) header_value_identifier,
 	     header_value_identifier_length,
@@ -2587,7 +2593,7 @@ int imaging_handle_set_header_value(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-		if( libewf_handle_set_header_value(
+		if( libewf_handle_set_utf8_header_value(
 		     imaging_handle->secondary_output_handle,
 		     (uint8_t *) header_value_identifier,
 		     header_value_identifier_length,
@@ -2700,7 +2706,7 @@ int imaging_handle_set_hash_value(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_hash_value(
+	if( libewf_handle_set_utf8_hash_value(
 	     imaging_handle->output_handle,
 	     (uint8_t *) hash_value_identifier,
 	     hash_value_identifier_length,
@@ -2723,7 +2729,7 @@ int imaging_handle_set_hash_value(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-		if( libewf_handle_set_hash_value(
+		if( libewf_handle_set_utf8_hash_value(
 		     imaging_handle->secondary_output_handle,
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_length,

@@ -1364,22 +1364,24 @@ int libewf_handle_get_md5_hash(
 	}
 	if( ( ( internal_handle->hash_sections->md5_hash_set == 0 )
 	  || ( internal_handle->hash_sections->md5_digest_set == 0 ) )
-	 && ( internal_handle->hash_values != NULL )
-	 && ( libewf_hash_values_generate_md5_hash(
-	       internal_handle->hash_values,
-	       internal_handle->hash_sections->md5_hash,
-	       16,
-	       &( internal_handle->hash_sections->md5_hash_set ),
-	       error ) != 1 ) )
+	 && ( internal_handle->hash_values != NULL ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to parse MD5 hash value for its value.",
-		 function );
+		if( libewf_hash_values_generate_md5_hash(
+		     internal_handle->hash_values,
+		     internal_handle->hash_sections->md5_hash,
+		     16,
+		     &( internal_handle->hash_sections->md5_hash_set ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash value for its value.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( ( internal_handle->hash_sections->md5_hash_set == 0 )
 	 && ( internal_handle->hash_sections->md5_digest_set == 0 ) )
@@ -1619,22 +1621,24 @@ int libewf_handle_get_sha1_hash(
 		return( -1 );
 	}
 	if( ( internal_handle->hash_sections->sha1_digest_set == 0 )
-	 && ( internal_handle->hash_values != NULL )
-	 && ( libewf_hash_values_generate_sha1_hash(
-	       internal_handle->hash_values,
-	       internal_handle->hash_sections->sha1_digest,
-	       20,
-	       &( internal_handle->hash_sections->sha1_digest_set ),
-	       error ) != 1 ) )
+	 && ( internal_handle->hash_values != NULL ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to parse MD5 hash value for its value.",
-		 function );
+		if( libewf_hash_values_generate_sha1_hash(
+		     internal_handle->hash_values,
+		     internal_handle->hash_sections->sha1_digest,
+		     20,
+		     &( internal_handle->hash_sections->sha1_digest_set ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash value for its value.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( internal_handle->hash_sections->sha1_digest_set == 0 )
 	{
@@ -2436,13 +2440,13 @@ int libewf_handle_get_header_codepage(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->header_sections == NULL )
+	if( internal_handle->io_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing header sections.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2458,7 +2462,7 @@ int libewf_handle_get_header_codepage(
 
 		return( -1 );
 	}
-	*header_codepage = internal_handle->header_sections->header_codepage;
+	*header_codepage = internal_handle->io_handle->header_codepage;
 
 	return( 1 );
 }
@@ -2487,13 +2491,13 @@ int libewf_handle_set_header_codepage(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->header_sections == NULL )
+	if( internal_handle->io_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing header sections.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2519,7 +2523,7 @@ int libewf_handle_set_header_codepage(
 
 		return( -1 );
 	}
-	internal_handle->header_sections->header_codepage = header_codepage;
+	internal_handle->io_handle->header_codepage = header_codepage;
 
 	return( 1 );
 }
@@ -2694,14 +2698,14 @@ int libewf_handle_get_number_of_header_values(
  * The identifier size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_header_value_identifier_size(
+int libewf_handle_get_utf8_header_value_identifier_size(
      libewf_handle_t *handle,
      uint32_t index,
      size_t *identifier_size,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_header_value_identifier_size";
+	static char *function                     = "libewf_handle_get_utf8_header_value_identifier_size";
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -2761,7 +2765,7 @@ int libewf_handle_get_header_value_identifier_size(
  * The identifier size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_header_value_identifier(
+int libewf_handle_get_utf8_header_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
      uint8_t *identifier,
@@ -2769,7 +2773,7 @@ int libewf_handle_get_header_value_identifier(
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_header_value_identifier";
+	static char *function                     = "libewf_handle_get_utf8_header_value_identifier";
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -2829,7 +2833,7 @@ int libewf_handle_get_header_value_identifier(
  * The value size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_header_value_size(
+int libewf_handle_get_utf8_header_value_size(
      libewf_handle_t *handle,
      const uint8_t *identifier,
      size_t identifier_length,
@@ -2840,7 +2844,7 @@ int libewf_handle_get_header_value_size(
 	uint8_t date_time_string[ 64 ];
 
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_header_value_size";
+	static char *function                     = "libewf_handle_get_utf8_header_value_size";
 	size_t date_time_string_size              = 64;
 	size_t date_time_values_string_size       = 64;
 	int result                                = 0;
@@ -2968,7 +2972,7 @@ int libewf_handle_get_header_value_size(
  * The value size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_header_value(
+int libewf_handle_get_utf8_header_value(
      libewf_handle_t *handle,
      const uint8_t *identifier,
      size_t identifier_length,
@@ -2979,7 +2983,7 @@ int libewf_handle_get_header_value(
 	libcstring_character_t date_time_values_string[ 64 ];
 
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_header_value";
+	static char *function                     = "libewf_handle_get_utf8_header_value";
 	size_t date_time_values_string_size       = 64;
 	int result                                = 0;
 
@@ -3117,7 +3121,7 @@ int libewf_handle_get_header_value(
 /* Sets the UTF-8 encoded header value specified by the UTF-8 encoded identifier
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_set_header_value(
+int libewf_handle_set_utf8_header_value(
      libewf_handle_t *handle,
      const uint8_t *identifier,
      size_t identifier_length,
@@ -3126,7 +3130,7 @@ int libewf_handle_set_header_value(
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_header_value";
+	static char *function                     = "libewf_handle_set_utf8_header_value";
 
 	if( handle == NULL )
 	{
@@ -3371,54 +3375,60 @@ int libewf_handle_parse_header_values(
 
 		return( -1 );
 	}
-	if( ( internal_handle->header_sections->header != NULL )
-	 && ( libewf_header_values_parse_header(
-	       internal_handle->header_values,
-	       internal_handle->header_sections->header,
-	       internal_handle->header_sections->header_size,
-	       internal_handle->header_sections->header_codepage,
-	       error ) != 1 ) )
+	if( internal_handle->header_sections->header != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to parse header.",
-		 function );
+		if( libewf_header_values_parse_header(
+		     internal_handle->header_values,
+		     internal_handle->header_sections->header,
+		     internal_handle->header_sections->header_size,
+		     internal_handle->io_handle->header_codepage,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header.",
+			 function );
 
-		result_header = -1;
+			result_header = -1;
+		}
 	}
-	if( ( internal_handle->header_sections->header2 != NULL )
-	 && ( libewf_header_values_parse_header2(
-	       internal_handle->header_values,
-	       internal_handle->header_sections->header2,
-	       internal_handle->header_sections->header2_size,
-	       error ) != 1 ) )
+	if( internal_handle->header_sections->header2 != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to parse header2.",
-		 function );
+		if( libewf_header_values_parse_header2(
+		     internal_handle->header_values,
+		     internal_handle->header_sections->header2,
+		     internal_handle->header_sections->header2_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header2.",
+			 function );
 
-		result_header2 = -1;
+			result_header2 = -1;
+		}
 	}
-	if( ( internal_handle->header_sections->xheader != NULL )
-	 && ( libewf_header_values_parse_xheader(
-	       internal_handle->header_values,
-	       internal_handle->header_sections->xheader,
-	       internal_handle->header_sections->xheader_size,
-	       error ) != 1 ) )
+	if( internal_handle->header_sections->xheader != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to parse xheader.",
-		 function );
+		if( libewf_header_values_parse_xheader(
+		     internal_handle->header_values,
+		     internal_handle->header_sections->xheader,
+		     internal_handle->header_sections->xheader_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse xheader.",
+			 function );
 
-		result_xheader = -1;
+			result_xheader = -1;
+		}
 	}
 	if( ( result_header != 1 )
 	 && ( result_header2 != 1 )
@@ -3512,14 +3522,14 @@ int libewf_handle_get_number_of_hash_values(
  * The identifier size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_hash_value_identifier_size(
+int libewf_handle_get_utf8_hash_value_identifier_size(
      libewf_handle_t *handle,
      uint32_t index,
      size_t *identifier_size,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_hash_value_identifier_size";
+	static char *function                     = "libewf_handle_get_utf8_hash_value_identifier_size";
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -3578,7 +3588,7 @@ int libewf_handle_get_hash_value_identifier_size(
  * The identifier size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_hash_value_identifier(
+int libewf_handle_get_utf8_hash_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
      uint8_t *identifier,
@@ -3586,7 +3596,7 @@ int libewf_handle_get_hash_value_identifier(
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_hash_value_identifier";
+	static char *function                     = "libewf_handle_get_utf8_hash_value_identifier";
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -3646,7 +3656,7 @@ int libewf_handle_get_hash_value_identifier(
  * The value size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_hash_value_size(
+int libewf_handle_get_utf8_hash_value_size(
      libewf_handle_t *handle,
      const uint8_t *identifier,
      size_t identifier_length,
@@ -3654,7 +3664,7 @@ int libewf_handle_get_hash_value_size(
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_hash_value_size";
+	static char *function                     = "libewf_handle_get_utf8_hash_value_size";
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -3727,7 +3737,7 @@ int libewf_handle_get_hash_value_size(
  * The value size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-int libewf_handle_get_hash_value(
+int libewf_handle_get_utf8_hash_value(
      libewf_handle_t *handle,
      const uint8_t *identifier,
      size_t identifier_length,
@@ -3736,7 +3746,7 @@ int libewf_handle_get_hash_value(
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_hash_value";
+	static char *function                     = "libewf_handle_get_utf8_hash_value";
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -3820,7 +3830,7 @@ int libewf_handle_get_hash_value(
 /* Sets the UTF-8 encoded hash value specified by the UTF-8 encoded identifier
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_set_hash_value(
+int libewf_handle_set_utf8_hash_value(
      libewf_handle_t *handle,
      const uint8_t *identifier,
      size_t identifier_length,
@@ -3829,7 +3839,7 @@ int libewf_handle_set_hash_value(
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_hash_value";
+	static char *function                     = "libewf_handle_set_utf8_hash_value";
 
 	if( handle == NULL )
 	{

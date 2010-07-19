@@ -231,85 +231,85 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_number_of_header_values "libewf_handle_t *handle, uint32_t *number_of_values, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_size "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, size_t *value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_size "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, size_t *value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_case_number "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_case_number "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_description "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_description "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_examiner_name "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_examiner_name "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_evidence_number "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_evidence_number "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_notes "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_notes "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_acquiry_date "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_acquiry_date "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_system_date "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_system_date "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_acquiry_operating_system "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_acquiry_operating_system "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_acquiry_software_version "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_acquiry_software_version "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_password "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_password "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_header_value_compression_type "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_compression_type "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value "libewf_handle_t *handle, const uint8_t *identifier, const uint8_t *value, size_t value_length"
+.Fn libewf_handle_set_utf8_header_value "libewf_handle_t *handle, const uint8_t *identifier, const uint8_t *value, size_t value_length"
 .Ft int
-.Fn libewf_handle_set_header_value_case_number "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_case_number "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_description "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_description "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_examiner_name "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_examiner_name "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_evidence_number "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_evidence_number "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_notes "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_notes "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_acquiry_date "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_acquiry_date "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_system_date "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_system_date "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_acquiry_operating_system "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_acquiry_operating_system "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_acquiry_software_version "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_acquiry_software_version "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_password "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_password "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_compression_type "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_compression_type "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_model "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_model "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_header_value_serial_number "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_serial_number "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_copy_header_values "libewf_handle_t *destination_handle, libewf_handle_t *source_handle, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_number_of_hash_values "libewf_handle_t *handle, uint32_t *number_of_values, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_hash_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_hash_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_hash_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_hash_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_hash_value_size "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, size_t *value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_hash_value_size "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, size_t *value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_hash_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_hash_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_hash_value_md5 "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_hash_value_md5 "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_hash_value_sha1 "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_hash_value_sha1 "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_hash_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_hash_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_hash_value_md5 "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_hash_value_md5 "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_hash_value_sha1 "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_hash_value_sha1 "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Pp
 Single file entry functions
 .Ft int
@@ -317,9 +317,9 @@ Single file entry functions
 .Ft int
 .Fn libewf_file_entry_get_flags "libewf_file_entry_t *file_entry, uint32_t *flags, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_name_size "libewf_file_entry_t *file_entry, size_t *name_size, libewf_error_t **error"
+.Fn libewf_file_entry_get_utf8_name_size "libewf_file_entry_t *file_entry, size_t *name_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_name "libewf_file_entry_t *file_entry, uint8_t *name, size_t name_size, libewf_error_t **error"
+.Fn libewf_file_entry_get_utf8_name "libewf_file_entry_t *file_entry, uint8_t *name, size_t name_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_size "libewf_file_entry_t *file_entry, size64_t *size, libewf_error_t **error"
 .Ft int
@@ -446,18 +446,16 @@ libewf allows to be compiled with wide character support.
 To compile libewf with wide character support use
 .Ar ./configure --enable-wide-character-type=yes
 or pass the definition
-.Ar HAVE_WIDE_CHARACTER_TYPE
+.Ar _UNICODE
+ or
+.Ar UNICODE
  to the compiler (i.e. in case of Microsoft Visual Studio (MSVS) C++).
 
 To have other code to determine if libewf was compiled with wide character support it defines
 .Ar LIBEWF_HAVE_WIDE_CHARACTER_TYPE
  in libewf/features.h.
 
-As of version 20080903 libewf uses UTF-8 encoded strings except for filenames.
-
-The Windows API has both ASCII and UTF16 functions and some functions have wrapper macros that hide the actual implementation.
-As of version 20090328 libewf detects the UNICODE or _UNICODE directives to compile either with or without wide system character support.
-The directive HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS is no longer used.
+The Windows API has both extended ASCII (ANSI) and UTF16 functions and some functions have wrapper macros that hide the actual implementation.
 
 The header in a set of EWF files contains an extended ASCII string using the codepage of the system it was created on. The function 
 .Ar libewf_handle_set_header_codepage

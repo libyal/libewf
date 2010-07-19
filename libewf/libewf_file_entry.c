@@ -258,18 +258,18 @@ int libewf_file_entry_get_flags(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 formatted name from the referenced file entry
+/* Retrieves the size of the UTF-8 encoded name from the referenced file entry
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_file_entry_get_name_size(
+int libewf_file_entry_get_utf8_name_size(
      libewf_file_entry_t *file_entry,
      size_t *name_size,
      liberror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
-	static char *function                             = "libewf_file_entry_get_name_size";
+	static char *function                             = "libewf_file_entry_get_utf8_name_size";
 
 	if( file_entry == NULL )
 	{
@@ -324,11 +324,11 @@ int libewf_file_entry_get_name_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 formatted name value from the referenced file entry
+/* Retrieves the UTF-8 encoded name value from the referenced file entry
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_file_entry_get_name(
+int libewf_file_entry_get_utf8_name(
      libewf_file_entry_t *file_entry,
      uint8_t *name,
      size_t name_size,
@@ -336,7 +336,7 @@ int libewf_file_entry_get_name(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
-	static char *function                             = "libewf_file_entry_get_name_size";
+	static char *function                             = "libewf_file_entry_get_utf8_name_size";
 
 	if( file_entry == NULL )
 	{

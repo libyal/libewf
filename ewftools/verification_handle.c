@@ -973,7 +973,7 @@ int verification_handle_get_hash_value(
 
 		return( -1 );
 	}
-	result = libewf_handle_get_hash_value(
+	result = libewf_handle_get_utf8_hash_value(
 	          verification_handle->input_handle,
 	          (uint8_t *) hash_value_identifier,
 	          hash_value_identifier_length,
@@ -1506,7 +1506,7 @@ int verification_handle_additional_hash_values_fprint(
 	     hash_value_iterator < number_of_values;
 	     hash_value_iterator++ )
 	{
-		if( libewf_handle_get_hash_value_identifier_size(
+		if( libewf_handle_get_utf8_hash_value_identifier_size(
 		     verification_handle->input_handle,
 		     hash_value_iterator,
 		     &hash_value_identifier_size,
@@ -1538,7 +1538,7 @@ int verification_handle_additional_hash_values_fprint(
 
 			continue;
 		}
-		if( libewf_handle_get_hash_value_identifier(
+		if( libewf_handle_get_utf8_hash_value_identifier(
 		     verification_handle->input_handle,
 		     hash_value_iterator,
 		     (uint8_t *) hash_identifier,

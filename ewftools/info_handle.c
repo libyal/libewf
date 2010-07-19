@@ -428,7 +428,7 @@ int info_handle_get_header_value(
 
 		return( -1 );
 	}
-	result = libewf_handle_get_header_value(
+	result = libewf_handle_get_utf8_header_value(
 	          info_handle->input_handle,
 	          (uint8_t *) header_value_identifier,
 	          header_value_identifier_length,
@@ -541,7 +541,7 @@ int info_handle_get_hash_value(
 
 		return( -1 );
 	}
-	result = libewf_handle_get_hash_value(
+	result = libewf_handle_get_utf8_hash_value(
 	          info_handle->input_handle,
 	          (uint8_t *) hash_value_identifier,
 	          hash_value_identifier_length,
@@ -1280,7 +1280,7 @@ int info_handle_header_values_fprint(
 			     header_value_iterator < number_of_values;
 			     header_value_iterator++ )
 			{
-				if( libewf_handle_get_header_value_identifier_size(
+				if( libewf_handle_get_utf8_header_value_identifier_size(
 				     info_handle->input_handle,
 				     header_value_iterator,
 				     &header_value_identifier_size,
@@ -1312,7 +1312,7 @@ int info_handle_header_values_fprint(
 
 					continue;
 				}
-				if( libewf_handle_get_header_value_identifier(
+				if( libewf_handle_get_utf8_header_value_identifier(
 				     info_handle->input_handle,
 				     header_value_iterator,
 				     (uint8_t *) header_value_identifier,
@@ -2084,7 +2084,7 @@ int info_handle_hash_values_fprint(
 	     hash_value_iterator < number_of_values;
 	     hash_value_iterator++ )
 	{
-		if( libewf_handle_get_hash_value_identifier_size(
+		if( libewf_handle_get_utf8_hash_value_identifier_size(
 		     info_handle->input_handle,
 		     hash_value_iterator,
 		     &hash_value_identifier_size,
@@ -2116,7 +2116,7 @@ int info_handle_hash_values_fprint(
 
 			continue;
 		}
-		if( libewf_handle_get_hash_value_identifier(
+		if( libewf_handle_get_utf8_hash_value_identifier(
 		     info_handle->input_handle,
 		     hash_value_iterator,
 		     (uint8_t *) hash_value_identifier,
@@ -2566,7 +2566,7 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	if( libewf_file_entry_get_name_size(
+	if( libewf_file_entry_get_utf8_name_size(
 	     file_entry,
 	     &name_size,
 	     error ) != 1 )
@@ -2596,7 +2596,7 @@ int info_handle_file_entry_fprint(
 
 			return( -1 );
 		}
-		if( libewf_file_entry_get_name(
+		if( libewf_file_entry_get_utf8_name(
 		     file_entry,
 		     name,
 		     name_size,
