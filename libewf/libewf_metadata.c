@@ -2103,16 +2103,16 @@ int libewf_handle_add_acquiry_error(
 	return( 1 );
 }
 
-/* Retrieves the number of CRC errors
+/* Retrieves the number of checksum errors
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_number_of_crc_errors(
+int libewf_handle_get_number_of_checksum_errors(
      libewf_handle_t *handle,
      uint32_t *number_of_errors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_number_of_crc_errors";
+	static char *function                     = "libewf_handle_get_number_of_checksum_errors";
 
 	if( handle == NULL )
 	{
@@ -2138,13 +2138,13 @@ int libewf_handle_get_number_of_crc_errors(
 
 		return( -1 );
 	}
-	if( internal_handle->read_io_handle->crc_errors == NULL )
+	if( internal_handle->read_io_handle->checksum_errors == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid read IO handle - missing crc errors.",
+		 "%s: invalid handle - invalid read IO handle - missing checksum errors.",
 		 function );
 
 		return( -1 );
@@ -2160,15 +2160,15 @@ int libewf_handle_get_number_of_crc_errors(
 
 		return( -1 );
 	}
-	*number_of_errors = internal_handle->read_io_handle->crc_errors->number_of_sectors;
+	*number_of_errors = internal_handle->read_io_handle->checksum_errors->number_of_sectors;
 
 	return( 1 );
 }
 
-/* Retrieves the information of a CRC error
- * Returns 1 if successful, 0 if no CRC error could be found or -1 on error
+/* Retrieves the information of a checksum error
+ * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
  */
-int libewf_handle_get_crc_error(
+int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
      uint32_t index,
      uint64_t *first_sector,
@@ -2176,7 +2176,7 @@ int libewf_handle_get_crc_error(
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_crc_error";
+	static char *function                     = "libewf_handle_get_checksum_error";
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -2204,7 +2204,7 @@ int libewf_handle_get_crc_error(
 		return( -1 );
 	}
 	result = libewf_sector_table_get_sector(
-	          internal_handle->read_io_handle->crc_errors,
+	          internal_handle->read_io_handle->checksum_errors,
 	          index,
 	          first_sector,
 	          number_of_sectors,
@@ -2216,23 +2216,23 @@ int libewf_handle_get_crc_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve CRC error.",
+		 "%s: unable to retrieve checksum error.",
 		 function );
 	}
 	return( result );
 }
 
-/* Add a CRC error
+/* Add a checksum error
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_add_crc_error(
+int libewf_handle_add_checksum_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_add_crc_error";
+	static char *function                     = "libewf_handle_add_checksum_error";
 
 	if( handle == NULL )
 	{
@@ -2259,7 +2259,7 @@ int libewf_handle_add_crc_error(
 		return( -1 );
 	}
 	if( libewf_sector_table_add_sector(
-	     internal_handle->read_io_handle->crc_errors,
+	     internal_handle->read_io_handle->checksum_errors,
 	     first_sector,
 	     number_of_sectors,
 	     1,
@@ -2269,7 +2269,7 @@ int libewf_handle_add_crc_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add CRC error.",
+		 "%s: unable to add checksum error.",
 		 function );
 
 		return( -1 );

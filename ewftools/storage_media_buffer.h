@@ -69,18 +69,18 @@ struct storage_media_buffer
 	 */
 	size_t compression_buffer_data_size;
 
-	/* The CRC buffer
+	/* The checksum buffer
 	 */
-	uint8_t *crc_buffer;
+	uint8_t *checksum_buffer;
 
-	/* Value to indicate if the crc should be processed
+	/* Value to indicate if the checksum should be processed
 	 * read or written
 	 */
-	int8_t process_crc;
+	int8_t process_checksum;
 
-	/* The crc of the data within the buffer
+	/* The checksum of the data within the buffer
 	 */
-	uint32_t crc;
+	uint32_t checksum;
 #endif
 };
 

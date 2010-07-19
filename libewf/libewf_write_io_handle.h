@@ -37,7 +37,7 @@
 #include "libewf_segment_table.h"
 #include "libewf_values_table.h"
 
-#include "ewf_crc.h"
+#include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
@@ -224,8 +224,8 @@ ssize_t libewf_write_io_handle_process_chunk(
          size_t *compressed_chunk_data_size,
          int8_t *is_compressed,
          uint8_t chunk_exists,
-         ewf_crc_t *chunk_crc,
-         int8_t *write_crc,
+         uint32_t *chunk_checksum,
+         int8_t *write_checksum,
          liberror_error_t **error );
 
 ssize_t libewf_write_io_handle_write_new_chunk(
@@ -246,9 +246,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
-         uint8_t *crc_buffer,
-         ewf_crc_t chunk_crc,
-         int8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
+         int8_t write_checksum,
          liberror_error_t **error );
 
 ssize_t libewf_write_io_handle_write_existing_chunk(
@@ -264,9 +264,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
-         uint8_t *crc_buffer,
-         ewf_crc_t chunk_crc,
-         int8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
+         int8_t write_checksum,
          liberror_error_t **error );
 
 ssize_t libewf_write_io_handle_write_new_chunk_data(

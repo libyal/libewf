@@ -1,5 +1,5 @@
 /*
- * EWF CRC handling
+ * EWF Adler-32 checksum handling
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWF_CRC_H )
-#define _EWF_CRC_H
+#if !defined( _EWF_CHECKSUM_H )
+#define _EWF_CHECKSUM_H
 
 #include <common.h>
 #include <types.h>
@@ -33,13 +33,8 @@
 extern "C" {
 #endif
 
-/* The unsigned crc type defintion
- * consists of 4 bytes (32 bits)
- */
-typedef uint32_t ewf_crc_t;
-
-#define ewf_crc_calculate( buffer, size, previous_key ) \
-	(ewf_crc_t) adler32( (uLong) previous_key, (const Bytef *) buffer, (uInt) size );
+#define ewf_checksum_calculate( buffer, size, previous_key ) \
+	(uint32_t) adler32( (uLong) previous_key, (const Bytef *) buffer, (uInt) size );
 
 #if defined( __cplusplus )
 }

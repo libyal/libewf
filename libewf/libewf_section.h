@@ -37,7 +37,7 @@
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
 
-#include "ewf_crc.h"
+#include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
@@ -344,9 +344,9 @@ ssize_t libewf_section_delta_chunk_write(
          uint32_t chunk,
          uint8_t *chunk_buffer,
          size_t chunk_size,
-         uint8_t *crc_buffer,
-         ewf_crc_t *chunk_crc,
-         uint8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t *chunk_checksum,
+         uint8_t write_checksum,
          uint8_t no_section_append,
          liberror_error_t **error );
 

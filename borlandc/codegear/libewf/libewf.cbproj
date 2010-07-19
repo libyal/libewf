@@ -62,7 +62,7 @@
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>33</BuildOrder>
 			</LibFiles>
-			<None Include="..\..\..\libewf\ewf_crc.h">
+			<None Include="..\..\..\libewf\ewf_checksum.h">
 				<BuildOrder>5</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_data.h">

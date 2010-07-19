@@ -63,14 +63,6 @@ struct libewf_internal_handle
 	 */
 	libewf_io_handle_t *io_handle;
 
-	/* The read IO handle
-	 */
-	libewf_read_io_handle_t *read_io_handle;
-
-	/* The write IO handle
-	 */
-	libewf_write_io_handle_t *write_io_handle;
-
 	/* A simple cache is implemented here to avoid having to read and decompress the
 	 * same chunk while reading the data.
 	 */
@@ -80,6 +72,14 @@ struct libewf_internal_handle
 	 */
 	libewf_media_values_t *media_values;
 
+	/* The stored sessions information
+	 */
+	libewf_sector_table_t *sessions;
+
+	/* The sectors with acquiry read errors
+	 */
+	libewf_sector_table_t *acquiry_errors;
+
 	/* The file IO pool
 	 */
 	libbfio_pool_t *file_io_pool;
@@ -87,6 +87,14 @@ struct libewf_internal_handle
 	/* Value to indicate if the pool was created inside the library
 	 */
 	uint8_t file_io_pool_created_in_library;
+
+	/* The read IO handle
+	 */
+	libewf_read_io_handle_t *read_io_handle;
+
+	/* The write IO handle
+	 */
+	libewf_write_io_handle_t *write_io_handle;
 
 	/* The maximum number of open handles in the pool
 	 */
@@ -131,14 +139,6 @@ struct libewf_internal_handle
 	/* Value to indicate the hash values were parsed
 	 */
 	uint8_t hash_values_parsed;
-
-	/* The stored sessions information
-	 */
-	libewf_sector_table_t *sessions;
-
-	/* The sectors with acquiry read errors
-	 */
-	libewf_sector_table_t *acquiry_errors;
 
 	/* The single files
 	 */
@@ -199,8 +199,8 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_read_chunk(
                        void *uncompressed_buffer,
                        size_t *uncompressed_buffer_size,
                        int8_t is_compressed,
-                       uint32_t chunk_crc,
-                       int8_t read_crc,
+                       uint32_t chunk_checksum,
+                       int8_t read_checksum,
                        liberror_error_t **error );
 
 LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
@@ -208,9 +208,9 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        void *chunk_buffer,
                        size_t chunk_buffer_size,
                        int8_t *is_compressed,
-                       void *crc_buffer,
-                       uint32_t *chunk_crc,
-                       int8_t *read_crc,
+                       void *checksum_buffer,
+                       uint32_t *chunk_checksum,
+                       int8_t *read_checksum,
                        liberror_error_t **error );
 
 LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
@@ -233,8 +233,8 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_write_chunk(
                        void *compressed_buffer,
                        size_t *compressed_buffer_size,
                        int8_t *is_compressed,
-                       uint32_t *chunk_crc,
-                       int8_t *write_crc,
+                       uint32_t *chunk_checksum,
+                       int8_t *write_checksum,
                        liberror_error_t **error );
 
 LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
@@ -243,9 +243,9 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
                        size_t chunk_buffer_size,
                        size_t data_size,
                        int8_t is_compressed,
-                       void *crc_buffer,
-                       uint32_t chunk_crc,
-                       int8_t write_crc,
+                       void *checksum_buffer,
+                       uint32_t chunk_checksum,
+                       int8_t write_checksum,
                        liberror_error_t **error );
 
 LIBEWF_EXTERN ssize_t libewf_handle_write_buffer(

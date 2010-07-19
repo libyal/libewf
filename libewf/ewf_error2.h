@@ -45,18 +45,18 @@ struct ewf_error2
 	 */
 	uint8_t unknown[ 512 ];
 
-	/* The section crc of all (previous) error2 data
+	/* The section checksum of all (previous) error2 data
 	 * consists of 4 bytes
 	 * starts with sector 76
 	 */
-	uint8_t crc[ 4 ];
+	uint8_t checksum[ 4 ];
 
 	/* The sector array
 	 * consists of 8 bytes per sector
 	 * as long as necessary
 	 */
 
-	/* The last sector is followed by a 4 byte CRC
+	/* The last sector is followed by a 4 byte checksum
 	 */
 };
 

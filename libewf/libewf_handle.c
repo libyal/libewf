@@ -38,7 +38,7 @@
 #include "libewf_types.h"
 #include "libewf_write_io_handle.h"
 
-#include "ewf_crc.h"
+#include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
@@ -114,8 +114,6 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
-		internal_handle->date_format = LIBEWF_DATE_FORMAT_CTIME;
-
 		if( libewf_media_values_initialize(
 		     &( internal_handle->media_values ),
 		     error ) != 1 )
@@ -137,7 +135,7 @@ int libewf_handle_initialize(
 		}
 		if( libewf_chunk_cache_initialize(
 		     &( internal_handle->chunk_cache ),
-		     EWF_MINIMUM_CHUNK_SIZE + sizeof( ewf_crc_t ),
+		     EWF_MINIMUM_CHUNK_SIZE + sizeof( uint32_t ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -213,6 +211,7 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
+		internal_handle->date_format                    = LIBEWF_DATE_FORMAT_CTIME;
 		internal_handle->maximum_number_of_open_handles = LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES;
 
 		*handle = (libewf_handle_t *) internal_handle;
@@ -259,32 +258,6 @@ int libewf_handle_free(
 
 			result = -1;
 		}
-		if( libewf_read_io_handle_free(
-		     &( internal_handle->read_io_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free read IO handle.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_write_io_handle_free(
-		     &( internal_handle->write_io_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free write IO handle.",
-			 function );
-
-			result = -1;
-		}
 		if( libewf_media_values_free(
 		     &( internal_handle->media_values ),
 		     error ) != 1 )
@@ -307,6 +280,32 @@ int libewf_handle_free(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunk cache.",
+			 function );
+
+			result = -1;
+		}
+		if( libewf_sector_table_free(
+		     &( internal_handle->sessions ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sessions.",
+			 function );
+
+			result = -1;
+		}
+		if( libewf_sector_table_free(
+		     &( internal_handle->acquiry_errors ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free acquiry errors.",
 			 function );
 
 			result = -1;
@@ -2218,6 +2217,38 @@ int libewf_handle_close(
 	}
 	internal_handle->file_io_pool = NULL;
 
+	if( internal_handle->read_io_handle != NULL )
+	{
+		if( libewf_read_io_handle_free(
+		     &( internal_handle->read_io_handle ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read IO handle.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->write_io_handle != NULL )
+	{
+		if( libewf_write_io_handle_free(
+		     &( internal_handle->write_io_handle ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free write IO handle.",
+			 function );
+
+			result = -1;
+		}
+	}
 	if( internal_handle->segment_table != NULL )
 	{
 		if( libewf_segment_table_free(
@@ -2325,38 +2356,6 @@ int libewf_handle_close(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free hash values.",
-			 function );
-
-			result = -1;
-		}
-	}
-	if( internal_handle->sessions != NULL )
-	{
-		if( libewf_sector_table_free(
-		     &( internal_handle->sessions ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sessions.",
-			 function );
-
-			result = -1;
-		}
-	}
-	if( internal_handle->acquiry_errors != NULL )
-	{
-		if( libewf_sector_table_free(
-		     &( internal_handle->acquiry_errors ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free acquiry errors.",
 			 function );
 
 			result = -1;
@@ -2585,14 +2584,14 @@ ssize_t libewf_handle_prepare_read_chunk(
          void *uncompressed_buffer,
          size_t *uncompressed_buffer_size,
          int8_t is_compressed,
-         uint32_t chunk_crc,
-         int8_t read_crc,
+         uint32_t chunk_checksum,
+         int8_t read_checksum,
          liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_prepare_read_chunk";
 	ssize_t chunk_data_size                   = 0;
-	uint8_t crc_mismatch                      = 0;
+	uint8_t checksum_mismatch                 = 0;
 
 	if( handle == NULL )
 	{
@@ -2648,9 +2647,9 @@ ssize_t libewf_handle_prepare_read_chunk(
 	                   (uint8_t *) uncompressed_buffer,
 	                   uncompressed_buffer_size,
 	                   is_compressed,
-	                   (ewf_crc_t) chunk_crc,
-	                   read_crc,
-	                   &crc_mismatch,
+	                   chunk_checksum,
+	                   read_checksum,
+	                   &checksum_mismatch,
 	                   error );
 
 	if( chunk_data_size <= -1 )
@@ -2664,13 +2663,13 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 		return( -1 );
 	}
-	if( crc_mismatch != 0 )
+	if( checksum_mismatch != 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC mismatch for chunk data.",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum mismatch for chunk data.",
 		 function );
 
 		return( -1 );
@@ -2680,7 +2679,7 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 /* Reads a chunk of (media) data from the curent offset into a buffer
  * size contains the size of the chunk buffer
- * The function sets the chunk crc, is compressed and read crc values
+ * The function sets the chunk checksum, is compressed and read checksum values
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_handle_read_chunk(
@@ -2688,9 +2687,9 @@ ssize_t libewf_handle_read_chunk(
          void *chunk_buffer,
          size_t chunk_buffer_size,
          int8_t *is_compressed,
-         void *crc_buffer,
-         uint32_t *chunk_crc,
-         int8_t *read_crc,
+         void *checksum_buffer,
+         uint32_t *chunk_checksum,
+         int8_t *read_checksum,
          liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2752,9 +2751,9 @@ ssize_t libewf_handle_read_chunk(
 	              (uint8_t *) chunk_buffer,
 	              chunk_buffer_size,
 	              is_compressed,
-	              (uint8_t *) crc_buffer,
-	              (ewf_crc_t *) chunk_crc,
-	              read_crc,
+	              (uint8_t *) checksum_buffer,
+	              chunk_checksum,
+	              read_checksum,
 	              error );
 
 	if( read_count > 0 )
@@ -2881,7 +2880,7 @@ ssize_t libewf_handle_read_buffer(
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents some reallocations of the chunk cache
 	 */
-	chunk_data_size = internal_handle->media_values->chunk_size + sizeof( ewf_crc_t );
+	chunk_data_size = internal_handle->media_values->chunk_size + sizeof( uint32_t );
 
 	if( chunk_data_size > internal_handle->chunk_cache->size )
 	{
@@ -3031,8 +3030,8 @@ ssize_t libewf_handle_prepare_write_chunk(
          void *compressed_buffer,
          size_t *compressed_buffer_size,
          int8_t *is_compressed,
-         uint32_t *chunk_crc,
-         int8_t *write_crc,
+         uint32_t *chunk_checksum,
+         int8_t *write_checksum,
          liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -3138,8 +3137,8 @@ ssize_t libewf_handle_prepare_write_chunk(
 	                   compressed_buffer_size,
 	                   is_compressed,
 	                   chunk_exists,
-	                   (ewf_crc_t *) chunk_crc,
-	                   write_crc,
+	                   chunk_checksum,
+	                   write_checksum,
 	                   error );
 
 	if( chunk_data_size <= -1 )
@@ -3169,9 +3168,9 @@ ssize_t libewf_handle_write_chunk(
          size_t chunk_buffer_size,
          size_t data_size,
          int8_t is_compressed,
-         void *crc_buffer,
-         uint32_t chunk_crc,
-         int8_t write_crc,
+         void *checksum_buffer,
+         uint32_t chunk_checksum,
+         int8_t write_checksum,
          liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -3334,9 +3333,9 @@ ssize_t libewf_handle_write_chunk(
 		               chunk_buffer_size,
 		               data_size,
 		               is_compressed,
-		               (uint8_t *) crc_buffer,
-		               (ewf_crc_t) chunk_crc,
-		               write_crc,
+		               (uint8_t *) checksum_buffer,
+		               chunk_checksum,
+		               write_checksum,
 		               error );
 	}
 	else
@@ -3359,9 +3358,9 @@ ssize_t libewf_handle_write_chunk(
 		               chunk_buffer_size,
 		               data_size,
 		               is_compressed,
-		               (uint8_t *) crc_buffer,
-		               (ewf_crc_t) chunk_crc,
-		               write_crc,
+		               (uint8_t *) checksum_buffer,
+		               chunk_checksum,
+		               write_checksum,
 		               error );
 	}
 	if( write_count <= -1 )
@@ -3497,7 +3496,7 @@ ssize_t libewf_handle_write_buffer(
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents multiple reallocations of the chunk cache
 	 */
-	chunk_data_size = internal_handle->media_values->chunk_size + sizeof( ewf_crc_t );
+	chunk_data_size = internal_handle->media_values->chunk_size + sizeof( uint32_t );
 
 	if( buffer == internal_handle->chunk_cache->compressed )
 	{

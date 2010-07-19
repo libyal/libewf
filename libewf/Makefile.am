@@ -11,7 +11,7 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
-	ewf_crc.h \
+	ewf_checksum.h \
 	ewf_data.h \
 	ewf_definitions.h \
 	ewf_digest.h \

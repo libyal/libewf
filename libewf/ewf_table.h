@@ -56,17 +56,17 @@ struct ewf_table
 	 */
 	uint8_t padding2[ 4 ];
 
-	/* The section crc of all (previous) table data
+	/* The section checksum of all (previous) table data
 	 * consists of 4 bytes
 	 * starts with offset 76
 	 */
-	uint8_t crc[ 4 ];
+	uint8_t checksum[ 4 ];
 
 	/* The offset array
 	 * consists of mulitple 4 byte offsets
 	 */
 
-	/* The last offset is followed by a 4 byte CRC
+	/* The last offset is followed by a 4 byte checksum
 	 */
 };
 

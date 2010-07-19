@@ -1074,7 +1074,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 	else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 	{
 		section_size = chunks_per_section
-		             * ( chunk_size + sizeof( ewf_crc_t ) );
+		             * ( chunk_size + sizeof( uint32_t ) );
 
 		/* Write sectors section start
 		 */
@@ -1408,7 +1408,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 }
 
 /* Write a chunk of data to a segment file and update the offset table
- * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
+ * Set write_checksum to a non 0 value if the checksum is not provided within the chunk data
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_chunk(
@@ -1420,9 +1420,9 @@ ssize_t libewf_segment_file_write_chunk(
          uint8_t *chunk_buffer,
          size_t chunk_size,
          int8_t is_compressed,
-         uint8_t *crc_buffer,
-         ewf_crc_t *chunk_crc,
-         int8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t *chunk_checksum,
+         int8_t write_checksum,
          liberror_error_t **error )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -1467,13 +1467,13 @@ ssize_t libewf_segment_file_write_chunk(
 
 		return( -1 );
 	}
-	if( chunk_crc == NULL )
+	if( chunk_checksum == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk CRC.",
+		 "%s: invalid chunk checksum.",
 		 function );
 
 		return( -1 );
@@ -1529,9 +1529,9 @@ ssize_t libewf_segment_file_write_chunk(
 	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
 
-	if( write_crc != 0 )
+	if( write_checksum != 0 )
 	{
-		offset_table->chunk_offset[ chunk ].size += sizeof( ewf_crc_t );
+		offset_table->chunk_offset[ chunk ].size += sizeof( uint32_t );
 	}
 	if( is_compressed == 0 )
 	{
@@ -1556,44 +1556,44 @@ ssize_t libewf_segment_file_write_chunk(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+		 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with checksum: %" PRIu32 ".\n",
 		 function,
 		 chunk_type,
 		 chunk,
 		 segment_file_offset,
 		 offset_table->chunk_offset[ chunk ].size,
-		 *chunk_crc );
+		 *chunk_checksum );
 	}
 #endif
 
 	write_size = chunk_size;
 
-	/* Write the CRC if necessary
+	/* Write the checksum if necessary
 	 */
-	if( write_crc != 0 )
+	if( write_checksum != 0 )
 	{
-		if( crc_buffer == NULL )
+		if( checksum_buffer == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid CRC buffer.",
+			 "%s: invalid checksum buffer.",
 			 function );
 
 			return( -1 );
 		}
 		byte_stream_copy_from_uint32_little_endian(
-		 crc_buffer,
-		 *chunk_crc );
+		 checksum_buffer,
+		 *chunk_checksum );
 
-		/* Check if the chunk and crc buffers are aligned
-		 * if so write the chunk and crc at the same time
+		/* Check if the chunk and checksum buffers are aligned
+		 * if so write the chunk and checksum at the same time
 		 */
 		if( ( is_compressed == 0 )
-		 && ( &( chunk_buffer[ chunk_size ] ) == crc_buffer ) )
+		 && ( &( chunk_buffer[ chunk_size ] ) == checksum_buffer ) )
 		{
-			write_size += sizeof( ewf_crc_t );
+			write_size += sizeof( uint32_t );
 		}
 	}
 	/* Write the chunk data to the segment file
@@ -1618,26 +1618,26 @@ ssize_t libewf_segment_file_write_chunk(
 	}
 	total_write_count += write_count;
 
-	/* Check if the chunk and crc buffers are aligned
-	 * if not the chunk and crc need to be written separately
+	/* Check if the chunk and checksum buffers are aligned
+	 * if not the chunk and checksum need to be written separately
 	 */
-	if( ( write_crc != 0 )
-	 && ( &( chunk_buffer[ chunk_size ] ) != crc_buffer ) )
+	if( ( write_checksum != 0 )
+	 && ( &( chunk_buffer[ chunk_size ] ) != checksum_buffer ) )
 	{
 		write_count = libbfio_pool_write(
 			       file_io_pool,
 			       segment_file_handle->file_io_pool_entry,
-			       crc_buffer,
-			       sizeof( ewf_crc_t ),
+			       checksum_buffer,
+			       sizeof( uint32_t ),
 			       error );
 
-		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
+		if( write_count != (ssize_t) sizeof( uint32_t ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write CRC.",
+			 "%s: unable to write checksum.",
 			 function );
 
 			return( -1 );
@@ -1658,9 +1658,9 @@ ssize_t libewf_segment_file_write_delta_chunk(
          uint32_t chunk,
          uint8_t *chunk_buffer,
          size_t chunk_size,
-         uint8_t *crc_buffer,
-         ewf_crc_t *chunk_crc,
-         uint8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t *chunk_checksum,
+         uint8_t write_checksum,
 	 uint8_t no_section_append,
          liberror_error_t **error )
 {
@@ -1737,12 +1737,12 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+		 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with checksum: %" PRIu32 ".\n",
 		 function,
 		 chunk,
 		 segment_file_offset,
 		 chunk_size,
-		 *chunk_crc );
+		 *chunk_checksum );
 	}
 #endif
 
@@ -1754,9 +1754,9 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	               chunk,
 	               chunk_buffer,
 	               chunk_size,
-	               crc_buffer,
-	               chunk_crc,
-	               write_crc,
+	               checksum_buffer,
+	               chunk_checksum,
+	               write_checksum,
 	               no_section_append,
 	               error );
 
@@ -1769,7 +1769,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	{
 		offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
-		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( ewf_crc_t );
+		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( uint32_t );
 		offset_table->chunk_offset[ chunk ].flags               = LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK;
 	}
 	else if( write_count < 0 )

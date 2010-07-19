@@ -44,18 +44,18 @@ struct ewf_session
 	 */
 	uint8_t unknown1[ 28 ];
 
-	/* The section crc of all (previous) session data
+	/* The section checksum of all (previous) session data
 	 * consists of 4 bytes (32 bits)
 	 * starts with offset 76
 	 */
-	uint8_t crc[ 4 ];
+	uint8_t checksum[ 4 ];
 
 	/* The session entry array
 	 * consists of 32 bytes per sector
 	 * as long as necessary
 	 */
 
-	/* The last session entry is followed by a 4 byte CRC
+	/* The last session entry is followed by a 4 byte checksum
 	 */
 };
 

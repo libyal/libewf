@@ -1,5 +1,5 @@
 /*
- * Error sector table functions, for CRC and acquiry read errrors
+ * Error sector table functions, for checksum and acquiry read errrors
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *

@@ -56,9 +56,27 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
                    uint32_t *amount_of_errors,
                    liberror_error_t **error );
 
+LIBEWF_EXTERN int libewf_handle_get_number_of_crc_errors(
+                   libewf_handle_t *handle,
+                   uint32_t *number_of_errors,
+                   liberror_error_t **error );
+
 LIBEWF_EXTERN int libewf_handle_get_amount_of_crc_errors(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_errors,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_crc_error(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   uint64_t *first_sector,
+                   uint64_t *number_of_sectors,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_add_crc_error(
+                   libewf_handle_t *handle,
+                   uint64_t first_sector,
+                   uint64_t number_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
@@ -127,16 +145,16 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        void *uncompressed_buffer,
                        size_t *uncompressed_buffer_size,
                        int8_t is_compressed,
-                       uint32_t chunk_crc,
-                       int8_t read_crc );
+                       uint32_t chunk_checksum,
+                       int8_t read_checksum );
 
 LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t buffer_size,
                        int8_t *is_compressed,
-                       uint32_t *chunk_crc,
-                       int8_t *read_crc );
+                       uint32_t *chunk_checksum,
+                       int8_t *read_checksum );
 
 LIBEWF_EXTERN ssize_t libewf_read_buffer(
                        libewf_handle_t *handle,
@@ -156,8 +174,8 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        void *compressed_buffer,
                        size_t *compressed_buffer_size,
                        int8_t *is_compressed,
-                       uint32_t *chunk_crc,
-                       int8_t *write_crc );
+                       uint32_t *chunk_checksum,
+                       int8_t *write_checksum );
 
 LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
                        libewf_handle_t *handle,
@@ -165,8 +183,8 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
                        size_t buffer_size,
                        size_t data_size,
                        int8_t is_compressed,
-                       uint32_t chunk_crc,
-                       int8_t write_crc );
+                       uint32_t chunk_checksum,
+                       int8_t write_checksum );
 
 LIBEWF_EXTERN ssize_t libewf_write_buffer(
                        libewf_handle_t *handle,

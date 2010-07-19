@@ -51,7 +51,7 @@ struct ewf_ltree
 
 	/* Unknown
 	 * consists of 4 bytes
-	 * possible CRC?
+	 * possible checksum?
 	 */
 	uint8_t unknown3[ 4 ];
 

@@ -523,8 +523,8 @@ ssize_t verification_handle_prepare_read_buffer(
 	                 storage_media_buffer->raw_buffer,
 	                 &( storage_media_buffer->raw_buffer_data_size ),
 	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->crc,
-	                 storage_media_buffer->process_crc,
+	                 storage_media_buffer->checksum,
+	                 storage_media_buffer->process_checksum,
 	                 error );
 
 	if( process_count == -1 )
@@ -654,8 +654,8 @@ ssize_t verification_handle_read_buffer(
                       storage_media_buffer->compression_buffer_size,
 	              &( storage_media_buffer->is_compressed ),
 	              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
-	              &( storage_media_buffer->crc ),
-	              &( storage_media_buffer->process_crc ),
+	              &( storage_media_buffer->checksum ),
+	              &( storage_media_buffer->process_checksum ),
 	              error );
 #else
 	read_count = libewf_handle_read_buffer(
@@ -873,15 +873,15 @@ int verification_handle_get_values(
 }
 
 
-/* Retrieves the number of CRC errors
+/* Retrieves the number of checksum errors
  * Returns 1 if successful or -1 on error
  */
-int verification_handle_get_number_of_crc_errors(
+int verification_handle_get_number_of_checksum_errors(
      verification_handle_t *verification_handle,
      uint32_t *number_of_errors,
      liberror_error_t **error )
 {
-	static char *function = "verification_handle_get_number_of_crc_errors";
+	static char *function = "verification_handle_get_number_of_checksum_errors";
 
 	if( verification_handle == NULL )
 	{
@@ -916,7 +916,7 @@ int verification_handle_get_number_of_crc_errors(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_number_of_crc_errors(
+	if( libewf_handle_get_number_of_checksum_errors(
 	     verification_handle->input_handle,
 	     number_of_errors,
 	     error ) == -1 )
@@ -925,7 +925,7 @@ int verification_handle_get_number_of_crc_errors(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the number of CRC errors.",
+		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
 		return( -1 );
@@ -1197,7 +1197,7 @@ int verification_handle_add_read_error(
 	start_sector      = start_offset / verification_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / verification_handle->bytes_per_sector;
 
-	if( libewf_handle_add_crc_error(
+	if( libewf_handle_add_checksum_error(
 	     verification_handle->input_handle,
 	     start_sector,
 	     number_of_sectors,
@@ -1207,7 +1207,7 @@ int verification_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add CRC errror.",
+		 "%s: unable to add checksum errror.",
 		 function );
 
 		return( -1 );
@@ -1611,17 +1611,17 @@ int verification_handle_additional_hash_values_fprint(
 	return( result );
 }
 
-/* Print the CRC errors to a stream
+/* Print the checksum errors to a stream
  * Returns 1 if successful or -1 on error
  */
-int verification_handle_crc_errors_fprint(
+int verification_handle_checksum_errors_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
      liberror_error_t **error )
 {
 	libcstring_system_character_t *filename      = NULL;
 	libcstring_system_character_t *last_filename = NULL;
-	static char *function                        = "verification_handle_crc_errors_fprint";
+	static char *function                        = "verification_handle_checksum_errors_fprint";
 	size_t filename_size                         = 0;
 	size_t last_filename_size                    = 0;
 	uint64_t start_sector                        = 0;
@@ -1664,7 +1664,7 @@ int verification_handle_crc_errors_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_number_of_crc_errors(
+	if( libewf_handle_get_number_of_checksum_errors(
 	     verification_handle->input_handle,
 	     &number_of_errors,
 	     error ) == -1 )
@@ -1673,7 +1673,7 @@ int verification_handle_crc_errors_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the number of CRC errors.",
+		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
 		return( -1 );
@@ -1692,7 +1692,7 @@ int verification_handle_crc_errors_fprint(
 		     error_iterator < number_of_errors;
 		     error_iterator++ )
 		{
-			if( libewf_handle_get_crc_error(
+			if( libewf_handle_get_checksum_error(
 			     verification_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
@@ -1703,7 +1703,7 @@ int verification_handle_crc_errors_fprint(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve the CRC error: %" PRIu32 ".",
+				 "%s: unable to retrieve the checksum error: %" PRIu32 ".",
 				 function,
 				 error_iterator );
 

@@ -31,7 +31,7 @@
 #include "libewf_debug.h"
 #include "libewf_libuna.h"
 
-#include "ewf_crc.h"
+#include "ewf_checksum.h"
 
 /* Prints a dump of data
  * Returns 1 if successful or -1 on error
@@ -42,10 +42,10 @@ int libewf_debug_dump_data(
      size_t data_size,
      liberror_error_t **error )
 {
-	uint8_t *crc_data        = NULL;
-	static char *function    = "libewf_debug_dump_data";
-	ewf_crc_t stored_crc     = 0;
-	ewf_crc_t calculated_crc = 0;
+	uint8_t *checksum_data       = NULL;
+	static char *function        = "libewf_debug_dump_data";
+	uint32_t stored_checksum     = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( header == NULL )
 	{
@@ -80,16 +80,16 @@ int libewf_debug_dump_data(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  data,
-	                  ( data_size - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       data,
+	                       data_size - sizeof( uint32_t ),
+	                       1 );
 
-	crc_data = &data[ data_size - sizeof( ewf_crc_t ) ];
+	checksum_data = &data[ data_size - sizeof( uint32_t ) ];
 
 	byte_stream_copy_to_uint32_little_endian(
-	 crc_data,
-	 stored_crc );
+	 checksum_data,
+	 stored_checksum );
 
 	libnotify_printf(
 	 "%" PRIs_LIBCSTRING ":\n",
@@ -100,10 +100,10 @@ int libewf_debug_dump_data(
 	 data_size );
 
 	libnotify_printf(
-	 "%s: possible CRC (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+	 "%s: possible checksum (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 	 function,	
-	 stored_crc,	
-	 calculated_crc );
+	 stored_checksum,	
+	 calculated_checksum );
 
 	return( 1 );
 }
@@ -115,11 +115,11 @@ int libewf_debug_section_print(
      ewf_section_t *section,
      liberror_error_t **error )
 {
-	static char *function    = "libewf_debug_section_print";
-	ewf_crc_t calculated_crc = 0;
-	ewf_crc_t stored_crc     = 0;
-	uint64_t section_next    = 0;
-	uint64_t section_size    = 0;
+	static char *function        = "libewf_debug_section_print";
+	uint64_t section_next        = 0;
+	uint64_t section_size        = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
 
 	if( section == NULL )
 	{
@@ -132,14 +132,14 @@ int libewf_debug_section_print(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  section,
-	                  sizeof( ewf_section_t ) - sizeof( ewf_crc_t ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       section,
+	                       sizeof( ewf_section_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 section->crc,
-	 stored_crc );
+	 section->checksum,
+	 stored_checksum );
 
 	byte_stream_copy_to_uint64_little_endian(
 	 section->next,
@@ -154,13 +154,13 @@ int libewf_debug_section_print(
 	 "type:\t%s\n"
 	 "next:\t%" PRIu64 "\n"
 	 "size:\t%" PRIu64 "\n"
-	 "crc:\t%" PRIu32 " ( %" PRIu32 " )\n"
+	 "checksum:\t%" PRIu32 " ( %" PRIu32 " )\n"
 	 "\n",
 	 (char *) section->type,
 	 section_next,
 	 section_size,
-	 stored_crc,
-	 calculated_crc );
+	 stored_checksum,
+	 calculated_checksum );
 
 	return( 1 );
 }

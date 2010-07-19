@@ -180,7 +180,7 @@ void usage_fprint(
 	fprintf( stream, "\t-u:        unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
-	fprintf( stream, "\t-w:        wipe sectors on CRC error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-w:        wipe sectors on checksum error (mimic EnCase like behavior)\n" );
 }
 
 /* Reads the media data and exports it
@@ -2221,7 +2221,7 @@ int main( int argc, char * const argv[] )
 					 &error );
 				}
 			}
-			if( export_handle_crc_errors_fprint(
+			if( export_handle_checksum_errors_fprint(
 			     export_handle,
 			     stdout,
 			     &error ) != 1 )
@@ -2237,7 +2237,7 @@ int main( int argc, char * const argv[] )
 			}
 			if( log_handle != NULL )
 			{
-				if( export_handle_crc_errors_fprint(
+				if( export_handle_checksum_errors_fprint(
 				     export_handle,
 				     log_handle->log_stream,
 				     &error ) != 1 )

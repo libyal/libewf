@@ -42,11 +42,11 @@ struct ewf_hash
 	 */
 	uint8_t unknown1[ 16 ];
 
-	/* The section crc of all (previous) hash data
+	/* The section checksum of all (previous) hash data
 	 * consists of 4 bytes (32 bits)
 	 * starts with offset 76
 	 */
-	uint8_t crc[ 4 ];
+	uint8_t checksum[ 4 ];
 };
 
 #if defined( __cplusplus )

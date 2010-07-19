@@ -310,7 +310,7 @@ int export_handle_hash_values_fprint(
      FILE *stream,
      liberror_error_t **error );
 
-int export_handle_crc_errors_fprint(
+int export_handle_checksum_errors_fprint(
      export_handle_t *export_handle,
      FILE *stream,
      liberror_error_t **error );

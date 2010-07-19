@@ -195,19 +195,19 @@ LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
                    uint64_t number_of_sectors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_number_of_crc_errors(
+LIBEWF_EXTERN int libewf_handle_get_number_of_checksum_errors(
                    libewf_handle_t *handle,
                    uint32_t *number_of_errors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_get_crc_error(
+LIBEWF_EXTERN int libewf_handle_get_checksum_error(
                    libewf_handle_t *handle,
                    uint32_t index,
                    uint64_t *first_sector,
                    uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_add_crc_error(
+LIBEWF_EXTERN int libewf_handle_add_checksum_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
                    uint64_t number_of_sectors,

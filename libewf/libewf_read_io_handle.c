@@ -36,7 +36,7 @@
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
 
-#include "ewf_crc.h"
+#include "ewf_checksum.h"
 #include "ewf_file_header.h"
 
 /* Initialize the read IO handle
@@ -95,7 +95,7 @@ int libewf_read_io_handle_initialize(
 			return( -1 );
 		}
 		if( libewf_sector_table_initialize(
-		     &( ( *read_io_handle )->crc_errors ),
+		     &( ( *read_io_handle )->checksum_errors ),
 		     0,
 		     error ) != 1 )
 		{
@@ -103,7 +103,7 @@ int libewf_read_io_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create crc errors.",
+			 "%s: unable to create checksum errors.",
 			 function );
 
 			memory_free(
@@ -142,14 +142,14 @@ int libewf_read_io_handle_free(
 	if( *read_io_handle != NULL )
 	{
 		if( libewf_sector_table_free(
-		     &( ( *read_io_handle )->crc_errors ),
+		     &( ( *read_io_handle )->checksum_errors ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free crc errors.",
+			 "%s: unable to free checksum errors.",
 			 function );
 
 			result = -1;
@@ -162,8 +162,8 @@ int libewf_read_io_handle_free(
 	return( result );
 }
 
-/* Processes the chunk data, applies decompression if necessary and validates the CRC
- * Sets the crc_mismatch value to 1 if the chunk CRC did not match the calculated CRC
+/* Processes the chunk data, applies decompression if necessary and validates the checksum
+ * Sets the checksum_mismatch value to 1 if the chunk checksum did not match the calculated checksum
  * Returns the number of bytes of the processed chunk data or -1 on error
  */
 ssize_t libewf_read_io_handle_process_chunk(
@@ -172,14 +172,14 @@ ssize_t libewf_read_io_handle_process_chunk(
          uint8_t *uncompressed_buffer,
          size_t *uncompressed_buffer_size,
          int8_t is_compressed,
-         ewf_crc_t chunk_crc,
-         int8_t read_crc,
-         uint8_t *crc_mismatch,
+         uint32_t chunk_checksum,
+         int8_t read_checksum,
+         uint8_t *checksum_mismatch,
          liberror_error_t **error )
 {
-	uint8_t *crc_buffer      = NULL;
-	static char *function    = "libewf_read_io_handle_process_chunk";
-	ewf_crc_t calculated_crc = 0;
+	uint8_t *checksum_buffer     = NULL;
+	static char *function        = "libewf_read_io_handle_process_chunk";
+	uint32_t calculated_checksum = 0;
 
 	if( chunk_buffer == NULL )
 	{
@@ -203,18 +203,18 @@ ssize_t libewf_read_io_handle_process_chunk(
 
 		return( -1 );
 	}
-	if( crc_mismatch == NULL )
+	if( checksum_mismatch == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid CRC mismatch.",
+		 "%s: invalid checksum mismatch.",
 		 function );
 
 		return( -1 );
 	}
-	*crc_mismatch = 0;
+	*checksum_mismatch = 0;
 
 	/* Do not bother with an empry chunk
 	 */
@@ -224,34 +224,34 @@ ssize_t libewf_read_io_handle_process_chunk(
 	}
 	if( is_compressed == 0 )
 	{
-		if( read_crc == 0 )
+		if( read_checksum == 0 )
 		{
-			chunk_buffer_size -= sizeof( ewf_crc_t );
-			crc_buffer         = &( chunk_buffer[ chunk_buffer_size ] );
+			chunk_buffer_size -= sizeof( uint32_t );
+			checksum_buffer    = &( chunk_buffer[ chunk_buffer_size ] );
 
 			byte_stream_copy_to_uint32_little_endian(
-			 crc_buffer,
-			 chunk_crc );
+			 checksum_buffer,
+			 chunk_checksum );
 		}
-		calculated_crc = ewf_crc_calculate(
-		                  chunk_buffer,
-		                  chunk_buffer_size,
-		                  1 );
+		calculated_checksum = ewf_checksum_calculate(
+		                       chunk_buffer,
+		                       chunk_buffer_size,
+		                       1 );
 
-		if( chunk_crc != calculated_crc )
+		if( chunk_checksum != calculated_checksum )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+				 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 				 function,
-				 chunk_crc,
-				 calculated_crc );
+				 chunk_checksum,
+				 calculated_checksum );
 			}
 #endif
 
-			*crc_mismatch = 1;
+			*checksum_mismatch = 1;
 		}
 		*uncompressed_buffer_size = chunk_buffer_size;
 	}
@@ -312,9 +312,9 @@ ssize_t libewf_read_io_handle_process_chunk(
 
 /* Reads a certain chunk of data into the chunk buffer
  * Will read until the requested size is filled or the entire chunk is read
- * read_crc is set if the crc has been read into crc_buffer
- * read_crc is used for uncompressed chunks only
- * chunk_crc is set to a runtime version of the value in the crc_buffer
+ * read_checksum is set if the checksum has been read into checksum_buffer
+ * read_checksum is used for uncompressed chunks only
+ * chunk_checksum is set to a runtime version of the value in the checksum_buffer
  * Returns the number of bytes read, 0 if no bytes can be read or -1 on error
  */
 ssize_t libewf_read_io_handle_read_chunk(
@@ -325,9 +325,9 @@ ssize_t libewf_read_io_handle_read_chunk(
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
          int8_t *is_compressed,
-         uint8_t *crc_buffer,
-         ewf_crc_t *chunk_crc,
-         int8_t *read_crc,
+         uint8_t *checksum_buffer,
+         uint32_t *chunk_checksum,
+         int8_t *read_checksum,
          liberror_error_t **error )
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
@@ -416,24 +416,24 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 		return( -1 );
 	}
-	if( chunk_crc == NULL )
+	if( chunk_checksum == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk crc.",
+		 "%s: invalid chunk checksum.",
 		 function );
 
 		return( -1 );
 	}
-	if( read_crc == NULL )
+	if( read_checksum == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid read crc.",
+		 "%s: invalid read checksum.",
 		 function );
 
 		return( -1 );
@@ -444,11 +444,11 @@ ssize_t libewf_read_io_handle_read_chunk(
 	{
 		return( 0 );
 	}
-	*chunk_crc     = 0;
-	*read_crc      = 0;
-	*is_compressed = 0;
+	*chunk_checksum = 0;
+	*read_checksum  = 0;
+	*is_compressed  = 0;
 
-	/* Determine the size of the chunk including the CRC
+	/* Determine the size of the chunk including the checksum
 	 */
 	chunk_size = offset_table->chunk_offset[ chunk ].size;
 
@@ -460,8 +460,8 @@ ssize_t libewf_read_io_handle_read_chunk(
 	}
 	else if( chunk_buffer_size < chunk_size )
 	{
-		chunk_size -= sizeof( ewf_crc_t );
-		*read_crc   = 1;
+		chunk_size    -= sizeof( uint32_t );
+		*read_checksum = 1;
 	}
 	segment_file_handle = offset_table->chunk_offset[ chunk ].segment_file_handle;
 
@@ -520,14 +520,14 @@ ssize_t libewf_read_io_handle_read_chunk(
 	}
 #endif
 
-	/* Check if the chunk and crc buffers are aligned
-	 * if so read the chunk and crc at the same time
+	/* Check if the chunk and checksum buffers are aligned
+	 * if so read the chunk and checksum at the same time
 	 */
 	if( ( *is_compressed == 0 )
-	 && ( *read_crc != 0 )
-	 && ( &( chunk_buffer[ chunk_size ] ) == crc_buffer ) )
+	 && ( *read_checksum != 0 )
+	 && ( &( chunk_buffer[ chunk_size ] ) == checksum_buffer ) )
 	{
-		chunk_size += sizeof( ewf_crc_t );
+		chunk_size += sizeof( uint32_t );
 	}
 	/* Read the chunk data
 	 */
@@ -551,22 +551,22 @@ ssize_t libewf_read_io_handle_read_chunk(
 	}
 	total_read_count += read_count;
 
-	/* Determine if the CRC should be read seperately
+	/* Determine if the checksum should be read seperately
 	 */
-	if( *read_crc != 0 )
+	if( *read_checksum != 0 )
 	{
-		/* Check if the chunk and crc buffers are aligned
-		 * if not the chunk and crc need to be read separately
+		/* Check if the chunk and checksum buffers are aligned
+		 * if not the chunk and checksum need to be read separately
 		 */
-		if( &( chunk_buffer[ chunk_size ] ) != crc_buffer )
+		if( &( chunk_buffer[ chunk_size ] ) != checksum_buffer )
 		{
-			if( crc_buffer == NULL )
+			if( checksum_buffer == NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: invalid crc buffer.",
+				 "%s: invalid checksum buffer.",
 				 function );
 
 				return( -1 );
@@ -574,17 +574,17 @@ ssize_t libewf_read_io_handle_read_chunk(
 			read_count = libbfio_pool_read(
 			              file_io_pool,
 			              segment_file_handle->file_io_pool_entry,
-			              crc_buffer,
-			              sizeof( ewf_crc_t ),
+			              checksum_buffer,
+			              sizeof( uint32_t ),
 			              error );
 
-			if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
+			if( read_count != (ssize_t) sizeof( uint32_t ) )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_IO,
 				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: error reading CRC of chunk: %" PRIu32 " from segment file.",
+				 "%s: error reading checksum of chunk: %" PRIu32 " from segment file.",
 				 function,
 				 chunk );
 
@@ -593,8 +593,8 @@ ssize_t libewf_read_io_handle_read_chunk(
 			total_read_count += read_count;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 crc_buffer,
-		 *chunk_crc );
+		 checksum_buffer,
+		 *chunk_checksum );
 	}
 	return( total_read_count );
 }
@@ -616,23 +616,23 @@ ssize_t libewf_read_io_handle_read_chunk_data(
          size_t size,
          liberror_error_t **error )
 {
-	uint8_t stored_crc_buffer[ 4 ];
+	uint8_t stored_checksum_buffer[ 4 ];
 
-	uint8_t *chunk_buffer      = NULL;
-	uint8_t *chunk_read_buffer = NULL;
-	uint8_t *crc_read_buffer   = NULL;
-	static char *function      = "libewf_read_io_handle_read_chunk_data";
-	ewf_crc_t chunk_crc        = 0;
-	size_t chunk_data_size     = 0;
-	size_t chunk_size          = 0;
-	size_t bytes_available     = 0;
-	ssize_t read_count         = 0;
-	int64_t sector             = 0;
-	uint32_t number_of_sectors = 0;
-	int chunk_cache_data_used  = 0;
-	uint8_t crc_mismatch       = 0;
-	int8_t is_compressed       = 0;
-	int8_t read_crc            = 0;
+	uint8_t *chunk_buffer         = NULL;
+	uint8_t *chunk_read_buffer    = NULL;
+	uint8_t *checksum_read_buffer = NULL;
+	static char *function         = "libewf_read_io_handle_read_chunk_data";
+	size_t chunk_data_size        = 0;
+	size_t chunk_size             = 0;
+	size_t bytes_available        = 0;
+	ssize_t read_count            = 0;
+	int64_t sector                = 0;
+	uint32_t chunk_checksum       = 0;
+	uint32_t number_of_sectors    = 0;
+	uint8_t checksum_mismatch     = 0;
+	int8_t is_compressed          = 0;
+	int8_t read_checksum          = 0;
+	int chunk_cache_data_used     = 0;
 
 	if( read_io_handle == NULL )
 	{
@@ -716,7 +716,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	if( ( chunk_cache->chunk != chunk )
 	 || ( chunk_cache->cached == 0 ) )
 	{
-		/* Determine the size of the chunk including the CRC
+		/* Determine the size of the chunk including the checksum
 		 */
 		chunk_size = offset_table->chunk_offset[ chunk ].size;
 
@@ -781,9 +781,9 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		{
 			chunk_buffer = buffer;
 
-			/* The CRC is read seperately for uncompressed chunks
+			/* The checksum is read seperately for uncompressed chunks
 			 */
-			chunk_size -= sizeof( ewf_crc_t );
+			chunk_size -= sizeof( uint32_t );
 		}
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
@@ -796,15 +796,15 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		{
 			chunk_read_buffer = chunk_buffer;
 		}
-		/* Use chunk and crc buffer alignment when the chunk cache data is directly being passed
+		/* Use chunk and checksum buffer alignment when the chunk cache data is directly being passed
 		 */
 		if( chunk_read_buffer == chunk_cache->data )
 		{
-			crc_read_buffer = &( chunk_read_buffer[ media_values->chunk_size ] );
+			checksum_read_buffer = &( chunk_read_buffer[ media_values->chunk_size ] );
 		}
 		else
 		{
-			crc_read_buffer = stored_crc_buffer;
+			checksum_read_buffer = stored_checksum_buffer;
 		}
 		/* Read the chunk
 		 */
@@ -816,9 +816,9 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		              chunk_read_buffer,
 		              chunk_size,
 		              &is_compressed,
-		              crc_read_buffer,
-		              &chunk_crc,
-		              &read_crc,
+		              checksum_read_buffer,
+		              &chunk_checksum,
+		              &read_checksum,
 		              error );
 
 		if( read_count <= -1 )
@@ -835,7 +835,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		if( is_compressed != 0 )
 		{
 			chunk_data_size = media_values->chunk_size
-			                + sizeof( ewf_crc_t );
+			                + sizeof( uint32_t );
 		}
 		else
 		{
@@ -847,9 +847,9 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		     chunk_buffer,
 		     &chunk_data_size,
 		     is_compressed,
-		     chunk_crc,
-		     read_crc,
-		     &crc_mismatch,
+		     chunk_checksum,
+		     read_checksum,
+		     &checksum_mismatch,
 		     error ) == -1 )
 		{
 			liberror_error_set(
@@ -861,7 +861,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 
 			return( -1 );
 		}
-		if( crc_mismatch != 0 )
+		if( checksum_mismatch != 0 )
 		{
 			/* Wipe the chunk if nescessary
 			 */
@@ -880,7 +880,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 
 				return( -1 );
 			}
-			/* Add CRC error
+			/* Add checksum error
 			 */
 			sector            = (int64_t) chunk * (int64_t) media_values->sectors_per_chunk;
 			number_of_sectors = media_values->sectors_per_chunk;
@@ -890,7 +890,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 				number_of_sectors = (uint32_t) ( (int64_t) media_values->number_of_sectors - sector );
 			}
 			if( libewf_sector_table_add_sector(
-			     read_io_handle->crc_errors,
+			     read_io_handle->checksum_errors,
 			     sector,
 			     number_of_sectors,
 			     1,
@@ -900,7 +900,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set CRC error.",
+				 "%s: unable to set checksum error.",
 				 function );
 
 				return( -1 );

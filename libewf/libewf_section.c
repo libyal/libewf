@@ -111,10 +111,10 @@ ssize_t libewf_section_start_read(
          uint64_t *section_next,
          liberror_error_t **error )
 {
-	static char *function    = "libewf_section_start_read";
-	ewf_crc_t calculated_crc = 0;
-	ewf_crc_t stored_crc     = 0;
-	ssize_t read_count       = 0;
+	static char *function        = "libewf_section_start_read";
+	ssize_t read_count           = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -178,29 +178,29 @@ ssize_t libewf_section_start_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  section,
-	                  sizeof( ewf_section_t ) - sizeof( ewf_crc_t ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       section,
+	                       sizeof( ewf_section_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 section->crc,
-	 stored_crc );
+	 section->checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_section_print(
@@ -229,7 +229,6 @@ ssize_t libewf_section_start_read(
 		 40 );
 	}
 #endif
-
 	byte_stream_copy_to_uint64_little_endian(
 	 section->size,
 	 *section_size );
@@ -277,11 +276,11 @@ ssize_t libewf_section_start_write(
 {
 	ewf_section_t section;
 
-	static char *function    = "libewf_section_start_write";
-	ewf_crc_t calculated_crc = 0;
-	ssize_t write_count      = 0;
-	uint64_t section_size    = 0;
-	uint64_t section_offset  = 0;
+	static char *function        = "libewf_section_start_write";
+	ssize_t write_count          = 0;
+	uint64_t section_size        = 0;
+	uint64_t section_offset      = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -389,27 +388,26 @@ ssize_t libewf_section_start_write(
 	 section.next,
 	 section_offset );
 
-	calculated_crc = ewf_crc_calculate(
-	                  &section,
-	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &section,
+	                       sizeof( ewf_section_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 section.crc,
-	 calculated_crc );
+	 section.checksum,
+	 calculated_checksum );
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: writing section start of type: %s with size: %" PRIu64 " and CRC: %" PRIu32 ".\n",
+		 "%s: writing section start of type: %s with size: %" PRIu64 " and checksum: %" PRIu32 ".\n",
 		 function,
 		 (char *) section_type,
 		 section_size,
-		 calculated_crc );
+		 calculated_checksum );
 	}
 #endif
-
 	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
@@ -633,7 +631,6 @@ ssize_t libewf_section_compressed_string_read(
 		 *uncompressed_string_size );
 	}
 #endif
-
 	return( read_count );
 }
 
@@ -931,25 +928,27 @@ ssize_t libewf_section_header_read(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_byte_stream_print(
-	       _LIBCSTRING_STRING( "Header" ),
-	       header,
-	       header_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print header.",
-		 function );
+		if( libewf_debug_byte_stream_print(
+		     _LIBCSTRING_STRING( "Header" ),
+		     header,
+		     header_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print header.",
+			 function );
 
-		memory_free(
-		 header );
+			memory_free(
+			 header );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	if( *cached_header == NULL )
@@ -1006,22 +1005,24 @@ ssize_t libewf_section_header_write(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_byte_stream_print(
-	       _LIBCSTRING_STRING( "Header" ),
-	       header,
-	       header_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print header.",
-		 function );
+		if( libewf_debug_byte_stream_print(
+		     _LIBCSTRING_STRING( "Header" ),
+		     header,
+		     header_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print header.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	section_write_count = libewf_section_write_compressed_string(
@@ -1139,25 +1140,27 @@ ssize_t libewf_section_header2_read(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_utf16_stream_print(
-	       _LIBCSTRING_STRING( "Header2" ),
-	       header2,
-	       header2_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print header2.",
-		 function );
+		if( libewf_debug_utf16_stream_print(
+		     _LIBCSTRING_STRING( "Header2" ),
+		     header2,
+		     header2_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print header2.",
+			 function );
 
-		memory_free(
-		 header2 );
+			memory_free(
+			 header2 );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	if( *cached_header2 == NULL )
@@ -1214,22 +1217,24 @@ ssize_t libewf_section_header2_write(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_utf16_stream_print(
-	       _LIBCSTRING_STRING( "Header2" ),
-	       header2,
-	       header2_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print header2.",
-		 function );
+		if( libewf_debug_utf16_stream_print(
+		     _LIBCSTRING_STRING( "Header2" ),
+		     header2,
+		     header2_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print header2.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	section_write_count = libewf_section_write_compressed_string(
@@ -1267,11 +1272,11 @@ ssize_t libewf_section_volume_s01_read(
          uint8_t *format,
          liberror_error_t **error )
 {
-	ewf_volume_smart_t *volume = NULL;
-	static char *function      = "libewf_section_volume_s01_read";
-	ewf_crc_t calculated_crc   = 0;
-	ewf_crc_t stored_crc       = 0;
-	ssize_t read_count         = 0;
+	ewf_volume_smart_t *volume   = NULL;
+	static char *function        = "libewf_section_volume_s01_read";
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
+	ssize_t read_count           = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1341,25 +1346,25 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  volume,
-	                  ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       volume,
+	                       sizeof( ewf_volume_smart_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 volume->crc,
-	 stored_crc );
+	 volume->checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -1417,7 +1422,7 @@ ssize_t libewf_section_volume_s01_read(
 	memory_free(
 	 volume );
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1440,7 +1445,6 @@ ssize_t libewf_section_volume_s01_read(
 		 "\n" );
 	}
 #endif
-
 	return( read_count );
 }
 
@@ -1455,14 +1459,14 @@ ssize_t libewf_section_volume_s01_write(
          uint8_t no_section_append,
          liberror_error_t **error )
 {
-	uint8_t *section_type       = (uint8_t *) "volume";
-	ewf_volume_smart_t *volume  = NULL;
-	static char *function       = "libewf_section_volume_s01_write";
-	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
-	size_t section_type_length  = 6;
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
+	uint8_t *section_type        = (uint8_t *) "volume";
+	ewf_volume_smart_t *volume   = NULL;
+	static char *function        = "libewf_section_volume_s01_write";
+	off64_t section_offset       = 0;
+	size_t section_type_length   = 6;
+	ssize_t section_write_count  = 0;
+	ssize_t write_count          = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1558,16 +1562,16 @@ ssize_t libewf_section_volume_s01_write(
 		volume->signature[ 3 ] = (uint8_t) 'R';
 		volume->signature[ 4 ] = (uint8_t) 'T';
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  volume,
-	                  ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       volume,
+	                       sizeof( ewf_volume_smart_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 volume->crc,
-	 calculated_crc );
+	 volume->checksum,
+	 calculated_checksum );
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1584,7 +1588,6 @@ ssize_t libewf_section_volume_s01_write(
 		 media_values->bytes_per_sector );
 	}
 #endif
-
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
 	                       segment_file_handle,
@@ -1663,11 +1666,11 @@ ssize_t libewf_section_volume_e01_read(
          int8_t *compression_level,
          liberror_error_t **error )
 {
-	ewf_volume_t *volume     = NULL;
-	static char *function    = "libewf_section_volume_e01_read";
-	ewf_crc_t calculated_crc = 0;
-	ewf_crc_t stored_crc     = 0;
-	ssize_t read_count       = 0;
+	ewf_volume_t *volume         = NULL;
+	static char *function        = "libewf_section_volume_e01_read";
+	ssize_t read_count           = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1737,25 +1740,25 @@ ssize_t libewf_section_volume_e01_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  volume,
-	                  sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       volume,
+	                       sizeof( ewf_volume_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 volume->crc,
-	 stored_crc );
+	 volume->checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		memory_free(
 		 volume );
@@ -1866,7 +1869,7 @@ ssize_t libewf_section_volume_e01_read(
 	memory_free(
 	 volume );
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1921,14 +1924,14 @@ ssize_t libewf_section_volume_e01_write(
          uint8_t no_section_append,
          liberror_error_t **error )
 {
-	uint8_t *section_type       = (uint8_t *) "volume";
-	ewf_volume_t *volume        = NULL;
-	static char *function       = "libewf_section_volume_e01_write";
-	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
-	size_t section_type_length  = 6;
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
+	uint8_t *section_type        = (uint8_t *) "volume";
+	ewf_volume_t *volume         = NULL;
+	static char *function        = "libewf_section_volume_e01_write";
+	off64_t section_offset       = 0;
+	size_t section_type_length   = 6;
+	ssize_t section_write_count  = 0;
+	ssize_t write_count          = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2053,16 +2056,16 @@ ssize_t libewf_section_volume_e01_write(
 		 volume->error_granularity,
 		 media_values->error_granularity );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  volume,
-	                  sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       volume,
+	                       sizeof( ewf_volume_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 volume->crc,
-	 calculated_crc );
+	 volume->checksum,
+	 calculated_checksum );
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2079,7 +2082,6 @@ ssize_t libewf_section_volume_e01_write(
 		 media_values->bytes_per_sector );
 	}
 #endif
-
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
 	                       segment_file_handle,
@@ -2278,6 +2280,7 @@ ssize_t libewf_section_volume_read(
 
 	if( bytes_per_chunk > (size64_t) INT32_MAX )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2285,13 +2288,14 @@ ssize_t libewf_section_volume_read(
 			 function,
 			 EWF_MINIMUM_CHUNK_SIZE );
 		}
+#endif
 		media_values->chunk_size = EWF_MINIMUM_CHUNK_SIZE;
 	}
 	else
 	{
 		media_values->chunk_size = (uint32_t) bytes_per_chunk;
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2330,18 +2334,18 @@ ssize_t libewf_section_table_read(
          liberror_error_t **error )
 {
 	ewf_table_t table;
-	uint8_t stored_crc_buffer[ 4 ];
+	uint8_t stored_checksum_buffer[ 4 ];
 
-	ewf_table_offset_t *offsets = NULL;
-	static char *function       = "libewf_section_table_read";
-	ewf_crc_t calculated_crc    = 0;
-	ewf_crc_t stored_crc        = 0;
-	size_t offsets_size         = 0;
-	ssize_t section_read_count  = 0;
-	ssize_t read_count          = 0;
-	uint64_t base_offset        = 0;
-	uint32_t number_of_chunks   = 0;
-	uint8_t offsets_tainted     = 0;
+	ewf_table_offset_t *offsets  = NULL;
+	static char *function        = "libewf_section_table_read";
+	size_t offsets_size          = 0;
+	ssize_t section_read_count   = 0;
+	ssize_t read_count           = 0;
+	uint64_t base_offset         = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t number_of_chunks    = 0;
+	uint32_t stored_checksum     = 0;
+	uint8_t offsets_tainted      = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2412,27 +2416,27 @@ ssize_t libewf_section_table_read(
 
 		return( -1 );
 	}
-	/* The table size contains the size of the CRC (4 bytes)
+	/* The table size contains the size of the checksum (4 bytes)
 	 */
-	calculated_crc = ewf_crc_calculate(
-	                  &table,
-	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &table,
+	                       sizeof( ewf_table_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 table.crc,
-	 stored_crc );
+	 table.checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -2461,20 +2465,20 @@ ssize_t libewf_section_table_read(
 		 4 );
 	}
 #endif
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
+		 "%s: table is of size %" PRIu32 " chunks checksum %" PRIu32 " (%" PRIu32 ").\n",
 		 function,
 		 number_of_chunks,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 	}
 #endif
-
 	if( number_of_chunks > 0 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		/* Check if the maximum number of offsets is not exceeded
 		 */
 		if( number_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
@@ -2488,6 +2492,7 @@ ssize_t libewf_section_table_read(
 				 EWF_MAXIMUM_OFFSETS_IN_TABLE );
 			}
 		}
+#endif
 		offsets_size = sizeof( ewf_table_offset_t ) * number_of_chunks;
 
 		if( offsets_size > (size_t) SSIZE_MAX )
@@ -2538,31 +2543,31 @@ ssize_t libewf_section_table_read(
 		}
 		section_read_count += read_count;
 
-		/* The EWF-S01 format does not contain a CRC after the offsets
+		/* The EWF-S01 format does not contain a checksum after the offsets
 		 */
 		if( ewf_format != EWF_FORMAT_S01 )
 		{
-			/* Check if the offset table CRC matches
+			/* Check if the offset table checksum matches
 			 */
-			calculated_crc = ewf_crc_calculate(
-			                  offsets,
-			                  offsets_size,
-			                  1 );
+			calculated_checksum = ewf_checksum_calculate(
+			                       offsets,
+			                       offsets_size,
+			                       1 );
 
 			read_count = libbfio_pool_read(
 			              file_io_pool,
 			              segment_file_handle->file_io_pool_entry,
-			              stored_crc_buffer,
-			              sizeof( ewf_crc_t ),
+			              stored_checksum_buffer,
+			              sizeof( uint32_t ),
 			              error );
 
-			if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
+			if( read_count != (ssize_t) sizeof( uint32_t ) )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_IO,
 				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read CRC from file descriptor.",
+				 "%s: unable to read checksum from file descriptor.",
 				 function );
 
 				memory_free(
@@ -2573,19 +2578,21 @@ ssize_t libewf_section_table_read(
 			section_read_count += read_count;
 
 			byte_stream_copy_to_uint32_little_endian(
-			 stored_crc_buffer,
-			 stored_crc );
+			 stored_checksum_buffer,
+			 stored_checksum );
 
-			if( stored_crc != calculated_crc )
+			if( stored_checksum != calculated_checksum )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
-					 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+					 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 					 function,
-					 stored_crc,
-					 calculated_crc );
+					 stored_checksum,
+					 calculated_checksum );
 				}
+#endif
 				/* The offsets cannot be fully trusted therefore mark them as tainted during fill 
 				 */
 				offsets_tainted = 1;
@@ -2631,6 +2638,7 @@ ssize_t libewf_section_table_read(
 			return( -1 );
 		}
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2648,11 +2656,13 @@ ssize_t libewf_section_table_read(
 			 section_read_count );
 		}
 	}
+#endif
 	/* Skip the chunk data within the section
 	 * for chunks after the table section
 	 */
 	if( section_size != (size_t) section_read_count )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		if( ( ewf_format != EWF_FORMAT_S01 )
 		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
@@ -2663,6 +2673,7 @@ ssize_t libewf_section_table_read(
 				 function );
 			}
 		}
+#endif
 		if( libbfio_pool_seek_offset(
 		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
@@ -2700,18 +2711,18 @@ ssize_t libewf_section_table2_read(
          liberror_error_t **error )
 {
 	ewf_table_t table;
-	uint8_t stored_crc_buffer[ 4 ];
+	uint8_t stored_checksum_buffer[ 4 ];
 
-	ewf_table_offset_t *offsets = NULL;
-	static char *function       = "libewf_section_table2_read";
-	ewf_crc_t calculated_crc    = 0;
-	ewf_crc_t stored_crc        = 0;
-	size_t offsets_size         = 0;
-	ssize_t section_read_count  = 0;
-	ssize_t read_count          = 0;
-	uint64_t base_offset        = 0;
-	uint32_t number_of_chunks   = 0;
-	uint8_t offsets_tainted     = 0;
+	ewf_table_offset_t *offsets  = NULL;
+	static char *function        = "libewf_section_table2_read";
+	size_t offsets_size          = 0;
+	ssize_t section_read_count   = 0;
+	ssize_t read_count           = 0;
+	uint64_t base_offset         = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t number_of_chunks    = 0;
+	uint32_t stored_checksum     = 0;
+	uint8_t offsets_tainted      = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2782,27 +2793,27 @@ ssize_t libewf_section_table2_read(
 
 		return( -1 );
 	}
-	/* The table size contains the size of the CRC (4 bytes)
+	/* The table size contains the size of the checksum (4 bytes)
 	 */
-	calculated_crc = ewf_crc_calculate(
-	                  &table,
-	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &table,
+	                       sizeof( ewf_table_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 table.crc,
-	 stored_crc );
+	 table.checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -2831,20 +2842,20 @@ ssize_t libewf_section_table2_read(
 		 4 );
 	}
 #endif
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
+		 "%s: table is of size %" PRIu32 " chunks checksum %" PRIu32 " (%" PRIu32 ").\n",
 		 function,
 		 number_of_chunks,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 	}
 #endif
-
 	if( number_of_chunks > 0 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		/* Check if the maximum number of offsets is not exceeded
 		 */
 		if( number_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
@@ -2858,6 +2869,7 @@ ssize_t libewf_section_table2_read(
 				 EWF_MAXIMUM_OFFSETS_IN_TABLE );
 			}
 		}
+#endif
 		offsets_size = sizeof( ewf_table_offset_t ) * number_of_chunks;
 
 		if( offsets_size > (size_t) SSIZE_MAX )
@@ -2908,31 +2920,31 @@ ssize_t libewf_section_table2_read(
 		}
 		section_read_count += read_count;
 
-		/* The EWF-S01 format does not contain a CRC after the offsets
+		/* The EWF-S01 format does not contain a checksum after the offsets
 		 */
 		if( ewf_format != EWF_FORMAT_S01 )
 		{
-			/* Check if the offset table CRC matches
+			/* Check if the offset table checksum matches
 			 */
-			calculated_crc = ewf_crc_calculate(
-			                  offsets,
-			                  offsets_size,
-			                  1 );
+			calculated_checksum = ewf_checksum_calculate(
+			                       offsets,
+			                       offsets_size,
+			                       1 );
 
 			read_count = libbfio_pool_read(
 			              file_io_pool,
 			              segment_file_handle->file_io_pool_entry,
-			              stored_crc_buffer,
-			              sizeof( ewf_crc_t ),
+			              stored_checksum_buffer,
+			              sizeof( uint32_t ),
 			              error );
 
-			if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
+			if( read_count != (ssize_t) sizeof( uint32_t ) )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_IO,
 				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read CRC from file descriptor.",
+				 "%s: unable to read checksum from file descriptor.",
 				 function );
 
 				memory_free(
@@ -2943,19 +2955,21 @@ ssize_t libewf_section_table2_read(
 			section_read_count += read_count;
 
 			byte_stream_copy_to_uint32_little_endian(
-			 stored_crc_buffer,
-			 stored_crc );
+			 stored_checksum_buffer,
+			 stored_checksum );
 
-			if( stored_crc != calculated_crc )
+			if( stored_checksum != calculated_checksum )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
-					 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+					 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 					 function,
-					 stored_crc,
-					 calculated_crc );
+					 stored_checksum,
+					 calculated_checksum );
 				}
+#endif
 				/* The offsets cannot be trusted therefore do not try to correct corrupted offsets during compare
 				 */
 				offsets_tainted = 1;
@@ -3001,6 +3015,7 @@ ssize_t libewf_section_table2_read(
 			return( -1 );
 		}
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -3018,21 +3033,24 @@ ssize_t libewf_section_table2_read(
 			 section_read_count );
 		}
 	}
+#endif
 	/* Skip the chunk data within the section
 	 * for chunks after the table section
 	 */
 	else if( section_size != (size_t) section_read_count )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		if( ( ewf_format != EWF_FORMAT_S01 )
 		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: unexpected data found after table offsets.\n",
+				 "%s: data found after table offsets.\n",
 				 function );
 			}
 		}
+#endif
 		if( libbfio_pool_seek_offset(
 		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
@@ -3074,16 +3092,16 @@ ssize_t libewf_section_table_write(
          liberror_error_t **error )
 {
 	ewf_table_t table;
-	uint8_t calculated_crc_buffer[ 4 ];
+	uint8_t calculated_checksum_buffer[ 4 ];
 
-	static char *function       = "libewf_section_table_write";
-	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
-	size_t section_size         = 0;
-	size_t offsets_size         = 0;
-	uint8_t write_crc           = 0;
+	static char *function        = "libewf_section_table_write";
+	off64_t section_offset       = 0;
+	ssize_t section_write_count  = 0;
+	ssize_t write_count          = 0;
+	size_t section_size          = 0;
+	size_t offsets_size          = 0;
+	uint32_t calculated_checksum = 0;
+	uint8_t write_checksum       = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3138,8 +3156,8 @@ ssize_t libewf_section_table_write(
 
 	if( ewf_format != EWF_FORMAT_S01 )
 	{
-		write_crc     = 1;
-		section_size += sizeof( ewf_crc_t );
+		write_checksum = 1;
+		section_size  += sizeof( uint32_t );
 	}
 	if( memory_set(
 	     &table,
@@ -3163,21 +3181,21 @@ ssize_t libewf_section_table_write(
 	 table.base_offset,
 	 base_offset );
 
-	calculated_crc = ewf_crc_calculate(
-	                  &table,
-	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &table,
+	                       sizeof( ewf_table_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 table.crc,
-	 calculated_crc );
+	 table.checksum,
+	 calculated_checksum );
 
-	if( write_crc != 0 )
+	if( write_checksum != 0 )
 	{
-		calculated_crc = ewf_crc_calculate(
-		                  offsets,
-		                  offsets_size,
-		                  1 );
+		calculated_checksum = ewf_checksum_calculate(
+		                       offsets,
+		                       offsets_size,
+		                       1 );
 	}
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -3240,26 +3258,26 @@ ssize_t libewf_section_table_write(
 	}
 	section_write_count += write_count;
 
-	if( write_crc != 0 )
+	if( write_checksum != 0 )
 	{
 		byte_stream_copy_from_uint32_little_endian(
-		 calculated_crc_buffer,
-		 calculated_crc );
+		 calculated_checksum_buffer,
+		 calculated_checksum );
 
 		write_count = libbfio_pool_write(
 		               file_io_pool,
 		               segment_file_handle->file_io_pool_entry,
-	        	       calculated_crc_buffer,
-	        	       sizeof( ewf_crc_t ),
+	        	       calculated_checksum_buffer,
+	        	       sizeof( uint32_t ),
 		               error );
 
-		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
+		if( write_count != (ssize_t) sizeof( uint32_t ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write table offsets CRC to file.",
+			 "%s: unable to write table offsets checksum to file.",
 			 function );
 
 			return( -1 );
@@ -3322,6 +3340,7 @@ ssize64_t libewf_section_sectors_read(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	/* In the EWF-E01 format the sectors section holds the actual data chunks
 	 */
 	if( ewf_format == EWF_FORMAT_S01 )
@@ -3333,6 +3352,7 @@ ssize64_t libewf_section_sectors_read(
 			 function );
 		}
 	}
+#endif
 	/* Skip the chunk data within the section
 	 */
 	if( libbfio_pool_seek_offset(
@@ -3514,6 +3534,7 @@ ssize_t libewf_section_ltree_read(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	if( *ewf_format == EWF_FORMAT_S01 )
 	{
 		if( libnotify_verbose != 0 )
@@ -3523,6 +3544,7 @@ ssize_t libewf_section_ltree_read(
 			 function );
 		}
 	}
+#endif
 	*ewf_format = EWF_FORMAT_L01;
 
 	ltree = (ewf_ltree_t *) memory_allocate(
@@ -3638,25 +3660,27 @@ ssize_t libewf_section_ltree_read(
 	}
 	section_read_count += read_count;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_utf16_stream_print(
-	       _LIBCSTRING_STRING( "ltree data" ),
-	       ltree_data,
-	       ltree_data_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print ltree data.",
-		 function );
+		if( libewf_debug_utf16_stream_print(
+		     _LIBCSTRING_STRING( "ltree data" ),
+		     ltree_data,
+		     ltree_data_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print ltree data.",
+			 function );
 
-		memory_free(
-		 ltree_data );
+			memory_free(
+			 ltree_data );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	if( *cached_ltree_data == NULL )
@@ -3685,19 +3709,19 @@ ssize_t libewf_section_session_read(
          liberror_error_t **error )
 {
 	ewf_session_t ewf_session;
-	uint8_t stored_crc_buffer[ 4 ];
+	uint8_t stored_checksum_buffer[ 4 ];
 
 	ewf_session_entry_t *ewf_sessions = NULL;
 	static char *function             = "libewf_section_session_read";
-	ewf_crc_t calculated_crc          = 0;
-	ewf_crc_t stored_crc              = 0;
 	ssize_t section_read_count        = 0;
 	ssize_t read_count                = 0;
 	size_t ewf_sessions_size          = 0;
-	uint32_t number_of_ewf_sessions   = 0;
+	uint32_t calculated_checksum      = 0;
 	uint32_t iterator                 = 0;
 	uint32_t first_sector             = 0;
+	uint32_t number_of_ewf_sessions   = 0;
 	uint32_t last_first_sector        = 0;
+	uint32_t stored_checksum          = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3743,6 +3767,7 @@ ssize_t libewf_section_session_read(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		if( libnotify_verbose != 0 )
@@ -3752,6 +3777,7 @@ ssize_t libewf_section_session_read(
 			 function );
 		}
 	}
+#endif
 	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
 	                      segment_file_handle->file_io_pool_entry,
@@ -3770,25 +3796,25 @@ ssize_t libewf_section_session_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  &ewf_session,
-	                  ( sizeof( ewf_session_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &ewf_session,
+	                       sizeof( ewf_session_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ewf_session.crc,
-	 stored_crc );
+	 ewf_session.checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -3859,25 +3885,25 @@ ssize_t libewf_section_session_read(
 		}
 		section_read_count += read_count;
 
-		calculated_crc = ewf_crc_calculate(
-		                  ewf_sessions,
-		                  ewf_sessions_size,
-		                  1 );
+		calculated_checksum = ewf_checksum_calculate(
+		                       ewf_sessions,
+		                       ewf_sessions_size,
+		                       1 );
 
 		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
-		              stored_crc_buffer,
-		              sizeof( ewf_crc_t ),
+		              stored_checksum_buffer,
+		              sizeof( uint32_t ),
 		              error );
 
-		if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
+		if( read_count != (ssize_t) sizeof( uint32_t ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read CRC from file descriptor.",
+			 "%s: unable to read checksum from file descriptor.",
 			 function );
 
 			memory_free(
@@ -3888,19 +3914,19 @@ ssize_t libewf_section_session_read(
 		section_read_count += read_count;
 
 		byte_stream_copy_to_uint32_little_endian(
-		 stored_crc_buffer,
-		 stored_crc );
+		 stored_checksum_buffer,
+		 stored_checksum );
 
-		if( stored_crc != calculated_crc )
+		if( stored_checksum != calculated_checksum )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_INPUT,
-			 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-			 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+			 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 			 function,
-			 stored_crc,
-			 calculated_crc );
+			 stored_checksum,
+			 calculated_checksum );
 
 			return( -1 );
 		}
@@ -3917,7 +3943,7 @@ ssize_t libewf_section_session_read(
 #endif
 		if( sessions->sector != NULL )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -3925,7 +3951,6 @@ ssize_t libewf_section_session_read(
 				 function );
 			}
 #endif
-
 			memory_free(
 			 sessions->sector );
 
@@ -3987,12 +4012,14 @@ ssize_t libewf_section_session_read(
 		memory_free(
 		 ewf_sessions );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
 		 "%s: session contains no session data.\n",
 		 function );
 	}
+#endif
 	return( section_read_count );
 }
 
@@ -4006,18 +4033,18 @@ ssize_t libewf_section_session_write(
          liberror_error_t **error )
 {
 	ewf_session_t ewf_session;
-	uint8_t calculated_crc_buffer[ 4 ];
+	uint8_t calculated_checksum_buffer[ 4 ];
 
 	ewf_session_entry_t *ewf_sessions = NULL;
 	uint8_t *section_type             = (uint8_t *) "session";
 	static char *function             = "libewf_section_session_write";
-	ewf_crc_t calculated_crc          = 0;
 	off64_t section_offset            = 0;
 	ssize_t section_write_count       = 0;
 	ssize_t write_count               = 0;
 	size_t section_type_length        = 7;
 	size_t section_size               = 0;
 	size_t ewf_sessions_size          = 0;
+	uint32_t calculated_checksum      = 0;
 	uint32_t iterator                 = 0;
 
 	if( segment_file_handle == NULL )
@@ -4058,7 +4085,7 @@ ssize_t libewf_section_session_write(
 		return( -1 );
 	}
 	ewf_sessions_size = sizeof( ewf_session_entry_t ) * sessions->number_of_sectors;
-	section_size      = sizeof( ewf_session_t ) + ewf_sessions_size + sizeof( ewf_crc_t );
+	section_size      = sizeof( ewf_session_t ) + ewf_sessions_size + sizeof( uint32_t );
 
 	if( memory_set(
 	     &ewf_session,
@@ -4078,14 +4105,14 @@ ssize_t libewf_section_session_write(
 	 ewf_session.number_of_sessions,
 	 sessions->number_of_sectors );
 
-	calculated_crc = ewf_crc_calculate(
-	                  &ewf_session,
-	                  ( sizeof( ewf_session_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &ewf_session,
+	                       sizeof( ewf_session_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 ewf_session.crc,
-	 calculated_crc );
+	 ewf_session.checksum,
+	 calculated_checksum );
 
 	ewf_sessions = (ewf_session_entry_t *) memory_allocate(
 	                                        ewf_sessions_size );
@@ -4109,10 +4136,10 @@ ssize_t libewf_section_session_write(
 		 ewf_sessions[ iterator ].first_sector,
 		 (uint32_t) sessions->sector[ iterator ].first_sector );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  ewf_sessions,
-	                  ewf_sessions_size,
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       ewf_sessions,
+	                       ewf_sessions_size,
+	                       1 );
 
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -4185,23 +4212,23 @@ ssize_t libewf_section_session_write(
 	section_write_count += write_count;
 
 	byte_stream_copy_from_uint32_little_endian(
-	 calculated_crc_buffer,
-	 calculated_crc );
+	 calculated_checksum_buffer,
+	 calculated_checksum );
 
 	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
- 	               calculated_crc_buffer,
- 	               sizeof( ewf_crc_t ),
+ 	               calculated_checksum_buffer,
+ 	               sizeof( uint32_t ),
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
+	if( write_count != (ssize_t) sizeof( uint32_t ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write session entries CRC to file.",
+		 "%s: unable to write session entries checksum to file.",
 		 function );
 
 		return( -1 );
@@ -4240,16 +4267,16 @@ ssize_t libewf_section_data_read(
          uint8_t ewf_format,
          liberror_error_t **error )
 {
-	ewf_data_t *data           = NULL;
-	static char *function      = "libewf_section_data_read";
-	ewf_crc_t calculated_crc   = 0;
-	ewf_crc_t stored_crc       = 0;
-	ssize_t read_count         = 0;
-	uint64_t number_of_sectors = 0;
-	uint32_t number_of_chunks  = 0;
-	uint32_t sectors_per_chunk = 0;
-	uint32_t bytes_per_sector  = 0;
-	uint32_t error_granularity = 0;
+	ewf_data_t *data             = NULL;
+	static char *function        = "libewf_section_data_read";
+	ssize_t read_count           = 0;
+	uint64_t number_of_sectors   = 0;
+	uint32_t bytes_per_sector    = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t error_granularity   = 0;
+	uint32_t number_of_chunks    = 0;
+	uint32_t sectors_per_chunk   = 0;
+	uint32_t stored_checksum     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -4273,6 +4300,7 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		if( libnotify_verbose != 0 )
@@ -4282,6 +4310,7 @@ ssize_t libewf_section_data_read(
 			 function );
 		}
 	}
+#endif
 	if( section_size != sizeof( ewf_data_t ) )
 	{
 		liberror_error_set(
@@ -4328,25 +4357,25 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  data,
-	                  sizeof( ewf_data_t ) - sizeof( ewf_crc_t ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       data,
+	                       sizeof( ewf_data_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 data->crc,
-	 stored_crc );
+	 data->checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -4590,13 +4619,13 @@ ssize_t libewf_section_data_write(
          uint8_t no_section_append,
          liberror_error_t **error )
 {
-	uint8_t *section_type       = (uint8_t *) "data";
-	static char *function       = "libewf_section_data_write";
-	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
-	size_t section_type_length  = 4;
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
+	uint8_t *section_type        = (uint8_t *) "data";
+	static char *function        = "libewf_section_data_write";
+	off64_t section_offset       = 0;
+	size_t section_type_length   = 4;
+	ssize_t section_write_count  = 0;
+	ssize_t write_count          = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -4731,14 +4760,14 @@ ssize_t libewf_section_data_write(
 				return( -1 );
 			}
 		}
-		calculated_crc = ewf_crc_calculate(
-		                  *cached_data_section,
-		                  ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ),
-		                  1 );
+		calculated_checksum = ewf_checksum_calculate(
+		                       *cached_data_section,
+		                       sizeof( ewf_data_t ) - sizeof( uint32_t ),
+		                       1 );
 
 		byte_stream_copy_from_uint32_little_endian(
-		 ( *cached_data_section )->crc,
-		 calculated_crc );
+		 ( *cached_data_section )->checksum,
+		 calculated_checksum );
 	}
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -4815,18 +4844,18 @@ ssize_t libewf_section_error2_read(
          liberror_error_t **error )
 {
 	ewf_error2_t error2;
-	uint8_t stored_crc_buffer[ 4 ];
+	uint8_t stored_checksum_buffer[ 4 ];
 
 	ewf_error2_sector_t *error2_sectors = NULL;
 	static char *function               = "libewf_section_error2_read";
-	ewf_crc_t calculated_crc            = 0;
-	ewf_crc_t stored_crc                = 0;
 	ssize_t section_read_count          = 0;
 	ssize_t read_count                  = 0;
 	size_t sectors_size                 = 0;
-	uint32_t number_of_errors           = 0;
+	uint32_t calculated_checksum        = 0;
 	uint32_t iterator                   = 0;
 	uint32_t first_sector               = 0;
+	uint32_t number_of_errors           = 0;
+	uint32_t stored_checksum            = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -4861,6 +4890,7 @@ ssize_t libewf_section_error2_read(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		if( libnotify_verbose != 0 )
@@ -4870,6 +4900,7 @@ ssize_t libewf_section_error2_read(
 			 function );
 		}
 	}
+#endif
 	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
 	                      segment_file_handle->file_io_pool_entry,
@@ -4888,29 +4919,29 @@ ssize_t libewf_section_error2_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  &error2,
-	                  ( sizeof( ewf_error2_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &error2,
+	                       sizeof( ewf_error2_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 error2.crc,
-	 stored_crc );
+	 error2.checksum,
+	 stored_checksum);
 
 	byte_stream_copy_to_uint32_little_endian(
 	 error2.number_of_errors,
 	 number_of_errors );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum!= calculated_checksum)
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -4967,25 +4998,25 @@ ssize_t libewf_section_error2_read(
 		}
 		section_read_count += read_count;
 
-		calculated_crc = ewf_crc_calculate(
-		                  error2_sectors,
-		                  sectors_size,
-		                  1 );
+		calculated_checksum = ewf_checksum_calculate(
+		                       error2_sectors,
+		                       sectors_size,
+		                       1 );
 
 		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
-		              stored_crc_buffer,
-		              sizeof( ewf_crc_t ),
+		              stored_checksum_buffer,
+		              sizeof( uint32_t ),
 	                      error );
 
-		if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
+		if( read_count != (ssize_t) sizeof( uint32_t ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read CRC from file descriptor.",
+			 "%s: unable to read checksum from file descriptor.",
 			 function );
 
 			memory_free(
@@ -4996,19 +5027,19 @@ ssize_t libewf_section_error2_read(
 		section_read_count += read_count;
 
 		byte_stream_copy_to_uint32_little_endian(
-		 stored_crc_buffer,
-		 stored_crc );
+		 stored_checksum_buffer,
+		 stored_checksum );
 
-		if( stored_crc != calculated_crc )
+		if( stored_checksum != calculated_checksum )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_INPUT,
-			 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-			 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+			 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 			 function,
-			 stored_crc,
-			 calculated_crc );
+			 stored_checksum,
+			 calculated_checksum );
 
 			memory_free(
 			 error2_sectors );
@@ -5028,7 +5059,7 @@ ssize_t libewf_section_error2_read(
 #endif
 		if( acquiry_errors->sector != NULL )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -5036,7 +5067,6 @@ ssize_t libewf_section_error2_read(
 				 function );
 			}
 #endif
-
 			memory_free(
 			 acquiry_errors->sector );
 
@@ -5078,12 +5108,14 @@ ssize_t libewf_section_error2_read(
 		memory_free(
 		 error2_sectors );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: error2 contains no sectors!.\n",
+		 "%s: error2 contains no sectors.\n",
 		 function );
 	}
+#endif
 	return( section_read_count );
 }
 
@@ -5097,18 +5129,18 @@ ssize_t libewf_section_error2_write(
          liberror_error_t **error )
 {
 	ewf_error2_t error2;
-	uint8_t calculated_crc_buffer[ 4 ];
+	uint8_t calculated_checksum_buffer[ 4 ];
 
 	ewf_error2_sector_t *error2_sectors = NULL;
 	uint8_t *section_type               = (uint8_t *) "error2";
 	static char *function               = "libewf_section_error2_write";
-	ewf_crc_t calculated_crc            = 0;
 	off64_t section_offset              = 0;
 	ssize_t section_write_count         = 0;
 	ssize_t write_count                 = 0;
 	size_t section_type_length          = 6;
 	size_t section_size                 = 0;
 	size_t sectors_size                 = 0;
+	uint32_t calculated_checksum        = 0;
 	uint32_t iterator                   = 0;
 
 	if( segment_file_handle == NULL )
@@ -5149,7 +5181,7 @@ ssize_t libewf_section_error2_write(
 		return( -1 );
 	}
 	sectors_size = sizeof( ewf_error2_sector_t ) * acquiry_errors->number_of_sectors;
-	section_size = sizeof( ewf_error2_t ) + sectors_size + sizeof( ewf_crc_t );
+	section_size = sizeof( ewf_error2_t ) + sectors_size + sizeof( uint32_t );
 
 	if( memory_set(
 	     &error2,
@@ -5169,14 +5201,14 @@ ssize_t libewf_section_error2_write(
 	 error2.number_of_errors,
 	 acquiry_errors->number_of_sectors );
 
-	calculated_crc = ewf_crc_calculate(
-	                  &error2,
-	                  ( sizeof( ewf_error2_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &error2,
+	                       sizeof( ewf_error2_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 error2.crc,
-	 calculated_crc );
+	 error2.checksum,
+	 calculated_checksum );
 
 	/* TODO EnCase compatible way to handle > 32-bit sector values
 	 */
@@ -5206,10 +5238,10 @@ ssize_t libewf_section_error2_write(
 		 error2_sectors[ iterator ].number_of_sectors,
 		 acquiry_errors->sector[ iterator ].number_of_sectors );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  error2_sectors,
-	                  sectors_size,
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       error2_sectors,
+	                       sectors_size,
+	                       1 );
 
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -5282,23 +5314,23 @@ ssize_t libewf_section_error2_write(
 	section_write_count += write_count;
 
 	byte_stream_copy_from_uint32_little_endian(
-	 calculated_crc_buffer,
-	 calculated_crc );
+	 calculated_checksum_buffer,
+	 calculated_checksum );
 
 	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
- 	               calculated_crc_buffer,
- 	               sizeof( ewf_crc_t ),
+ 	               calculated_checksum_buffer,
+ 	               sizeof( uint32_t ),
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
+	if( write_count != (ssize_t) sizeof( uint32_t ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write error2 sectors CRC to file.",
+		 "%s: unable to write error2 sectors checksum to file.",
 		 function );
 
 		return( -1 );
@@ -5338,10 +5370,10 @@ ssize_t libewf_section_digest_read(
 {
 	ewf_digest_t digest;
 
-	static char *function    = "libewf_section_digest_read";
-	ewf_crc_t calculated_crc = 0;
-	ewf_crc_t stored_crc     = 0;
-	ssize_t read_count       = 0;
+	static char *function        = "libewf_section_digest_read";
+	ssize_t read_count           = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -5394,25 +5426,25 @@ ssize_t libewf_section_digest_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  &digest,
-	                  ( sizeof( ewf_digest_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &digest,
+	                       sizeof( ewf_digest_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 digest.crc,
-	 stored_crc );
+	 digest.checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -5439,7 +5471,6 @@ ssize_t libewf_section_digest_read(
 		 40 );
 	}
 #endif
-
 	if( memory_copy(
 	     md5_hash,
 	     digest.md5_hash,
@@ -5483,13 +5514,13 @@ ssize_t libewf_section_digest_write(
 {
 	ewf_digest_t digest;
 
-	uint8_t *section_type       = (uint8_t *) "digest";
-	static char *function       = "libewf_section_digest_write";
-	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
-	size_t section_type_length  = 6;
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
+	uint8_t *section_type        = (uint8_t *) "digest";
+	static char *function        = "libewf_section_digest_write";
+	off64_t section_offset       = 0;
+	size_t section_type_length   = 6;
+	ssize_t section_write_count  = 0;
+	ssize_t write_count          = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -5598,14 +5629,14 @@ ssize_t libewf_section_digest_write(
 		 20 );
 	}
 #endif
-	calculated_crc = ewf_crc_calculate(
-	                  &digest,
-	                  ( sizeof( ewf_digest_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &digest,
+	                       sizeof( ewf_digest_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 digest.crc,
-	 calculated_crc );
+	 digest.checksum,
+	 calculated_checksum );
 
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -5681,10 +5712,10 @@ ssize_t libewf_section_hash_read(
 {
 	ewf_hash_t hash;
 
-	static char *function    = "libewf_section_hash_read";
-	ewf_crc_t calculated_crc = 0;
-	ewf_crc_t stored_crc     = 0;
-	ssize_t read_count       = 0;
+	static char *function        = "libewf_section_hash_read";
+	ssize_t read_count           = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -5726,25 +5757,25 @@ ssize_t libewf_section_hash_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  &hash,
-	                  ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &hash,
+	                       sizeof( ewf_hash_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 hash.crc,
-	 stored_crc );
+	 hash.checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -5765,7 +5796,6 @@ ssize_t libewf_section_hash_read(
 		 16 );
 	}
 #endif
-
 	if( memory_copy(
 	     md5_hash,
 	     hash.md5_hash,
@@ -5794,13 +5824,13 @@ ssize_t libewf_section_hash_write(
 {
 	ewf_hash_t hash;
 
-	uint8_t *section_type       = (uint8_t *) "hash";
-	static char *function       = "libewf_section_hash_write";
-	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
-	size_t section_type_length  = 4;
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
+	uint8_t *section_type        = (uint8_t *) "hash";
+	static char *function        = "libewf_section_hash_write";
+	off64_t section_offset       = 0;
+	size_t section_type_length   = 4;
+	ssize_t section_write_count  = 0;
+	ssize_t write_count          = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -5878,14 +5908,14 @@ ssize_t libewf_section_hash_write(
 		 16 );
 	}
 #endif
-	calculated_crc = ewf_crc_calculate(
-	                  &hash,
-	                  ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &hash,
+	                       sizeof( ewf_hash_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 hash.crc,
-	 calculated_crc );
+	 hash.checksum,
+	 calculated_checksum );
 
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -5965,11 +5995,11 @@ ssize_t libewf_section_last_write(
 {
 	ewf_section_t section;
 
-	static char *function       = "libewf_section_last_write";
-	ewf_crc_t calculated_crc    = 0;
-	ssize_t section_write_count = 0;
-	uint64_t section_size       = 0;
-	uint64_t section_offset     = 0;
+	static char *function        = "libewf_section_last_write";
+	ssize_t section_write_count  = 0;
+	uint64_t section_size        = 0;
+	uint64_t section_offset      = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -6063,14 +6093,14 @@ ssize_t libewf_section_last_write(
 	 section.next,
 	 section_offset );
 
-	calculated_crc = ewf_crc_calculate(
-	                  &section,
-	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &section,
+	                       sizeof( ewf_section_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(	
-	 section.crc,
-	 calculated_crc );
+	 section.checksum,
+	 calculated_checksum );
 
 	section_write_count = libbfio_pool_write(
 	                       file_io_pool,
@@ -6202,25 +6232,27 @@ ssize_t libewf_section_xheader_read(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_utf8_stream_print(
-	       _LIBCSTRING_STRING( "XHeader" ),
-	       xheader,
-	       xheader_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print xheader.",
-		 function );
+		 f( libewf_debug_utf8_stream_print(
+		     _LIBCSTRING_STRING( "XHeader" ),
+		     xheader,
+		     xheader_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print xheader.",
+			 function );
 
-		memory_free(
-		 xheader );
+			memory_free(
+			 xheader );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	if( *cached_xheader == NULL )
@@ -6277,22 +6309,24 @@ ssize_t libewf_section_xheader_write(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_utf8_stream_print(
-	       _LIBCSTRING_STRING( "XHeader" ),
-	       xheader,
-	       xheader_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print xheader.",
-		 function );
+		if( libewf_debug_utf8_stream_print(
+		       _LIBCSTRING_STRING( "XHeader" ),
+		       xheader,
+		       xheader_size,
+		       error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print xheader.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	section_write_count = libewf_section_write_compressed_string(
@@ -6410,25 +6444,27 @@ ssize_t libewf_section_xhash_read(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_utf8_stream_print(
-	       _LIBCSTRING_STRING( "XHash" ),
-	       xhash,
-	       xhash_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print xhash.",
-		 function );
+		 if( libewf_debug_utf8_stream_print(
+		      _LIBCSTRING_STRING( "XHash" ),
+		      xhash,
+		      xhash_size,
+		      error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print xhash.",
+			 function );
 
-		memory_free(
-		 xhash );
+			memory_free(
+			 xhash );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	if( *cached_xhash == NULL )
@@ -6485,22 +6521,24 @@ ssize_t libewf_section_xhash_write(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( libnotify_verbose != 0 )
-	 && ( libewf_debug_utf8_stream_print(
-	       _LIBCSTRING_STRING( "XHash" ),
-	       xhash,
-	       xhash_size,
-	       error ) != 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to debug print xhash.",
-		 function );
+		if( libewf_debug_utf8_stream_print(
+		     _LIBCSTRING_STRING( "XHash" ),
+		     xhash,
+		     xhash_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to debug print xhash.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #endif
 	section_write_count = libewf_section_write_compressed_string(
@@ -6540,12 +6578,12 @@ ssize_t libewf_section_delta_chunk_read(
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
 
-	static char *function    = "libewf_section_delta_chunk_read";
-	ewf_crc_t calculated_crc = 0;
-	ewf_crc_t stored_crc     = 0;
-	ssize_t read_count       = 0;
-	uint32_t chunk           = 0;
-	uint32_t chunk_size      = 0;
+	static char *function        = "libewf_section_delta_chunk_read";
+	ssize_t read_count           = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t chunk               = 0;
+	uint32_t chunk_size          = 0;
+	uint32_t stored_checksum     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -6598,25 +6636,25 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate(
-	                  &delta_chunk_header,
-	                  ( sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &delta_chunk_header,
+	                       sizeof( ewfx_delta_chunk_header_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 delta_chunk_header.crc,
-	 stored_crc );
+	 delta_chunk_header.checksum,
+	 stored_checksum );
 
-	if( stored_crc != calculated_crc )
+	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
 		 function,
-		 stored_crc,
-		 calculated_crc );
+		 stored_checksum,
+		 calculated_checksum );
 
 		return( -1 );
 	}
@@ -6646,6 +6684,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 	if( chunk_size != ( section_size - sizeof( ewfx_delta_chunk_header_t ) ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -6654,6 +6693,7 @@ ssize_t libewf_section_delta_chunk_read(
 			 chunk_size,
 			 section_size - sizeof( ewfx_delta_chunk_header_t ) );
 		}
+#endif
 		chunk_size = (uint32_t) ( section_size - sizeof( ewfx_delta_chunk_header_t ) );
 	}
 	/* Update the chunk data in the offset table
@@ -6707,23 +6747,23 @@ ssize_t libewf_section_delta_chunk_write(
          uint32_t chunk,
          uint8_t *chunk_buffer,
          size_t chunk_size,
-         uint8_t *crc_buffer,
-         ewf_crc_t *chunk_crc,
-         uint8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t *chunk_checksum,
+         uint8_t write_checksum,
          uint8_t no_section_append,
          liberror_error_t **error )
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
 
-	uint8_t *section_type       = (uint8_t *) "delta_chunk";
-	static char *function       = "libewf_section_delta_chunk_write";
-	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
-	size_t section_type_length  = 11;
-	size_t section_size         = 0;
-	size_t write_size           = 0;
+	uint8_t *section_type        = (uint8_t *) "delta_chunk";
+	static char *function        = "libewf_section_delta_chunk_write";
+	off64_t section_offset       = 0;
+	ssize_t section_write_count  = 0;
+	ssize_t write_count          = 0;
+	size_t section_type_length   = 11;
+	size_t section_size          = 0;
+	size_t write_size            = 0;
+	uint32_t calculated_checksum = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -6789,9 +6829,9 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	write_size = chunk_size;
 
-	if( write_crc != 0 )
+	if( write_checksum != 0 )
 	{
-		write_size += sizeof( ewf_crc_t );
+		write_size += sizeof( uint32_t );
 	}
 	/* The chunk value is stored + 1 count in the file
 	 */
@@ -6809,14 +6849,14 @@ ssize_t libewf_section_delta_chunk_write(
 	delta_chunk_header.padding[ 3 ] = (uint8_t) 'T';
 	delta_chunk_header.padding[ 4 ] = (uint8_t) 'A';
 
-	calculated_crc = ewf_crc_calculate(
-	                  &delta_chunk_header,
-	                  ( sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
+	calculated_checksum = ewf_checksum_calculate(
+	                       &delta_chunk_header,
+	                       sizeof( ewfx_delta_chunk_header_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 delta_chunk_header.crc,
-	 calculated_crc );
+	 delta_chunk_header.checksum,
+	 calculated_checksum );
 
 	section_size = sizeof( ewfx_delta_chunk_header_t ) + write_size;
 
@@ -6863,26 +6903,26 @@ ssize_t libewf_section_delta_chunk_write(
 
 	write_size = chunk_size;
 
-	if( write_crc != 0 )
+	if( write_checksum != 0 )
 	{
-		if( crc_buffer == NULL )
+		if( checksum_buffer == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid crc buffer.",
+			 "%s: invalid checksum buffer.",
 			 function );
 
 			return( -1 );
 		}
 		byte_stream_copy_from_uint32_little_endian(
-		 crc_buffer,
-		 *chunk_crc );
+		 checksum_buffer,
+		 *chunk_checksum );
 
-		if( &( chunk_buffer[ chunk_size ] ) == crc_buffer )
+		if( &( chunk_buffer[ chunk_size ] ) == checksum_buffer )
 		{
-			write_size += sizeof( ewf_crc_t );
+			write_size += sizeof( uint32_t );
 		}
 	}
 	write_count = libbfio_pool_write(
@@ -6905,23 +6945,23 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	section_write_count += write_count;
 
-	if( ( write_crc != 0 )
-	 && ( &( chunk_buffer[ chunk_size ] ) != crc_buffer ) )
+	if( ( write_checksum != 0 )
+	 && ( &( chunk_buffer[ chunk_size ] ) != checksum_buffer ) )
 	{
 		write_count = libbfio_pool_write(
 		               file_io_pool,
 		               segment_file_handle->file_io_pool_entry,
-			       crc_buffer,
-			       sizeof( ewf_crc_t ),
+			       checksum_buffer,
+			       sizeof( uint32_t ),
 		               error );
 
-		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
+		if( write_count != (ssize_t) sizeof( uint32_t ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write CRC to file.",
+			 "%s: unable to write checksum to file.",
 			 function );
 
 			return( -1 );
@@ -7410,7 +7450,7 @@ int libewf_section_read(
 
 		/* Check if the EWF file format is that of EnCase1
 		 * this allows the table read function to reduce verbose
-		 * output of unexpected additional data in table section
+		 * output of additional data in table section
 		 */
 		if( ( *ewf_format == EWF_FORMAT_E01 )
 		 && ( header_sections->number_of_header_sections == 1 ) )

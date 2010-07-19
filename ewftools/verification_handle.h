@@ -135,7 +135,7 @@ int verification_handle_get_values(
      uint32_t *chunk_size,
      liberror_error_t **error );
 
-int verification_handle_get_number_of_crc_errors(
+int verification_handle_get_number_of_checksum_errors(
      verification_handle_t *verification_handle,
      uint32_t *number_of_errors,
      liberror_error_t **error );
@@ -183,7 +183,7 @@ int verification_handle_additional_hash_values_fprint(
      FILE *stream,
      liberror_error_t **error );
 
-int verification_handle_crc_errors_fprint(
+int verification_handle_checksum_errors_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
      liberror_error_t **error );

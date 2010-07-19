@@ -43,7 +43,7 @@
 #include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
 
-#include "ewf_crc.h"
+#include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_section.h"
@@ -812,7 +812,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment(
 	}
 	else
 	{
-		maximum_chunks_per_segment /= media_values->chunk_size + sizeof( ewf_crc_t );
+		maximum_chunks_per_segment /= media_values->chunk_size + sizeof( uint32_t );
 	}
 	/* Determine the number of required chunk sections
 	 */
@@ -841,10 +841,10 @@ int libewf_write_io_handle_calculate_chunks_per_segment(
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE1 )
 	{
-		/* Leave space for the chunk section starts and the offset table CRC
+		/* Leave space for the chunk section starts and the offset table checksum
 		 */
 		calculated_chunks_per_segment -= required_chunk_sections
-		                               * ( sizeof( ewf_section_t ) + sizeof( ewf_crc_t ) );
+		                               * ( sizeof( ewf_section_t ) + sizeof( uint32_t ) );
 
 		/* Leave space for the table offsets
 		 */
@@ -853,10 +853,10 @@ int libewf_write_io_handle_calculate_chunks_per_segment(
 	}
 	else
 	{
-		/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table CRCs
+		/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 		 */
 		calculated_chunks_per_segment -= required_chunk_sections
-		                               * ( ( 3 * sizeof( ewf_section_t ) ) + ( 2 * sizeof( ewf_crc_t ) ) );
+		                               * ( ( 3 * sizeof( ewf_section_t ) ) + ( 2 * sizeof( uint32_t ) ) );
 
 		/* Leave space for the table and table2 offsets
 		 */
@@ -873,7 +873,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment(
 	}
 	else
 	{
-		calculated_chunks_per_segment /= media_values->chunk_size + sizeof( ewf_crc_t );
+		calculated_chunks_per_segment /= media_values->chunk_size + sizeof( uint32_t );
 	}
 	/* If the input size is known determine the remaining number of chunks
 	 */
@@ -1051,7 +1051,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	}
 	/* Determine if a chunk would fit in the segment file
 	 */
-	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( ewf_crc_t ) ) )
+	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( libnotify_verbose != 0 )
@@ -1243,7 +1243,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	/* Determine if a chunk would fit in the segment file
 	 */
-	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( ewf_crc_t ) ) )
+	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( libnotify_verbose != 0 )
@@ -1567,7 +1567,7 @@ int libewf_write_io_handle_create_segment_file(
 	return( 1 );
 }
 
-/* Processes the chunk data, applies compression if necessary and calculates the CRC
+/* Processes the chunk data, applies compression if necessary and calculates the checksum
  * Returns the number of bytes of the processed chunk data or -1 on error
  */
 ssize_t libewf_write_io_handle_process_chunk(
@@ -1582,11 +1582,11 @@ ssize_t libewf_write_io_handle_process_chunk(
          size_t *compressed_chunk_data_size,
          int8_t *is_compressed,
          uint8_t chunk_exists,
-         ewf_crc_t *chunk_crc,
-         int8_t *write_crc,
+         uint32_t *chunk_checksum,
+         int8_t *write_checksum,
          liberror_error_t **error )
 {
-	uint8_t *chunk_data_crc        = NULL;
+	uint8_t *chunk_data_checksum   = NULL;
 	static char *function          = "libewf_write_io_handle_process_chunk";
 	size_t data_write_size         = 0;
 	int8_t chunk_compression_level = 0;
@@ -1662,13 +1662,13 @@ ssize_t libewf_write_io_handle_process_chunk(
 
 		return( -1 );
 	}
-	if( chunk_crc == NULL )
+	if( chunk_checksum == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk CRC.",
+		 "%s: invalid chunk checksum.",
 		 function );
 
 		return( -1 );
@@ -1684,18 +1684,18 @@ ssize_t libewf_write_io_handle_process_chunk(
 
 		return( -1 );
 	}
-	if( write_crc == NULL )
+	if( write_checksum == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write CRC.",
+		 "%s: invalid write checksum.",
 		 function );
 
 		return( -1 );
 	}
-	*write_crc = 0;
+	*write_checksum = 0;
 
 	/* Determine the compression level
 	 */
@@ -1919,18 +1919,18 @@ ssize_t libewf_write_io_handle_process_chunk(
 		chunk_data      = compressed_chunk_data;
 		*is_compressed  = 1;
 
-		/* Zlib creates its own CRC
+		/* Zlib creates its own checksum
 		 */
 		if( memory_copy(
-		     chunk_crc,
-		     &( chunk_data[ *compressed_chunk_data_size - sizeof( ewf_crc_t ) ] ),
-		     sizeof( ewf_crc_t ) ) == NULL )
+		     chunk_checksum,
+		     &( chunk_data[ *compressed_chunk_data_size - sizeof( uint32_t ) ] ),
+		     sizeof( uint32_t ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set CRC.",
+			 "%s: unable to set checksum.",
 			 function );
 
 			return( -1 );
@@ -1938,29 +1938,29 @@ ssize_t libewf_write_io_handle_process_chunk(
 	}
 	else
 	{
-		*chunk_crc = ewf_crc_calculate(
-		              chunk_data,
-		              chunk_data_size,
-		              1 );
+		*chunk_checksum = ewf_checksum_calculate(
+		                   chunk_data,
+		                   chunk_data_size,
+		                   1 );
 
 		data_write_size = chunk_data_size;
 		*is_compressed  = 0;
 
-		/* If the chunk cache data is used add the CRC
+		/* If the chunk cache data is used add the checksum
 		 */
 		if( chunk_data == chunk_cache->data )
 		{
-			chunk_data_crc = &( chunk_data[ chunk_data_size ] );
+			chunk_data_checksum = &( chunk_data[ chunk_data_size ] );
 
 			byte_stream_copy_from_uint32_little_endian(
-			 chunk_data_crc,
-			 *chunk_crc );
+			 chunk_data_checksum,
+			 *chunk_checksum );
 
-			data_write_size += sizeof( ewf_crc_t );
+			data_write_size += sizeof( uint32_t );
 		}
 		else
 		{
-			*write_crc = 1;
+			*write_checksum = 1;
 		}
 	}
 	return( (ssize_t) data_write_size );
@@ -1988,9 +1988,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
-         uint8_t *crc_buffer,
-         ewf_crc_t chunk_crc,
-         int8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
+         int8_t write_checksum,
          liberror_error_t **error )
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
@@ -2448,15 +2448,15 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		}
 		else if( io_handle->format == LIBEWF_FORMAT_ENCASE1 )
 		{
-			/* Leave space for the chunk section start and the offset table CRC
+			/* Leave space for the chunk section start and the offset table checksum
 			 */
-			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_t ) + sizeof( ewf_crc_t );
+			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_t ) + sizeof( uint32_t );
 		}
 		else
 		{
-			/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table CRCs
+			/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 			 */
-			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_t ) ) + ( 2 * sizeof( ewf_crc_t ) );
+			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_t ) ) + ( 2 * sizeof( uint32_t ) );
 		}
 		if( libbfio_pool_get_offset(
 		     file_io_pool,
@@ -2611,9 +2611,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		       chunk_buffer,
 		       chunk_size,
 		       is_compressed,
-		       crc_buffer,
-		       &chunk_crc,
-		       write_crc,
+		       checksum_buffer,
+		       &chunk_checksum,
+		       write_checksum,
 	               error );
 
 	if( write_count <= -1 )
@@ -2846,9 +2846,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
-         uint8_t *crc_buffer,
-         ewf_crc_t chunk_crc,
-         int8_t write_crc,
+         uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
+         int8_t write_checksum,
          liberror_error_t **error )
 {
 	libewf_list_element_t *last_list_element          = NULL;
@@ -3168,7 +3168,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			}
 			segment_file_offset = last_section_start_offset
 			                    + chunk_size
-			                    + sizeof( ewf_crc_t )
+			                    + sizeof( uint32_t )
 			                    + sizeof( ewf_section_t );
 
 			/* Check if chunk fits in exisiting delta segment file
@@ -3364,9 +3364,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		       chunk,
 		       chunk_buffer,
 		       chunk_size,
-		       crc_buffer,
-		       &chunk_crc,
-	               write_crc,
+		       checksum_buffer,
+		       &chunk_checksum,
+	               write_checksum,
 	               no_section_append,
 	               error );
 
@@ -3436,12 +3436,12 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          int8_t force_write,
          liberror_error_t **error )
 {
-	uint8_t stored_crc_buffer[ 4 ];
+	uint8_t stored_checksum_buffer[ 4 ];
 
 	uint8_t *chunk_buffer             = NULL;
-	uint8_t *crc_buffer               = NULL;
+	uint8_t *checksum_buffer          = NULL;
 	static char *function             = "libewf_write_io_handle_write_new_chunk_data";
-	ewf_crc_t chunk_crc               = 0;
+	uint32_t chunk_checksum           = 0;
 	ssize_t chunk_data_size           = 0;
 	ssize_t write_count               = 0;
 	size_t write_size                 = 0;
@@ -3450,7 +3450,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 	size_t compressed_chunk_data_size = 0;
 	int chunk_cache_data_used         = 0;
 	int8_t is_compressed              = 0;
-	int8_t write_crc                  = 0;
+	int8_t write_checksum             = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -3631,15 +3631,15 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		chunk_buffer = chunk_cache->data;
 		write_size   = chunk_cache->data_size;
 	}
-	/* Use chunk and crc buffer alignment when the chunk cache data is directly being passed
+	/* Use chunk and checksum buffer alignment when the chunk cache data is directly being passed
 	 */
 	if( chunk_buffer == chunk_cache->data )
 	{
-		crc_buffer = &( chunk_buffer[ media_values->chunk_size ] );
+		checksum_buffer = &( chunk_buffer[ media_values->chunk_size ] );
 	}
 	else
 	{
-		crc_buffer = stored_crc_buffer;
+		checksum_buffer = stored_checksum_buffer;
 	}
 	if( ( write_size == media_values->chunk_size )
 	 || ( ( media_values->media_size != 0 )
@@ -3652,7 +3652,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		 */
 		compressed_chunk_data_size = chunk_cache->size;
 
-		/* Compress the chunk if necessary and determine its CRC
+		/* Compress the chunk if necessary and determine its checksum
 		 */
 		chunk_data_size = libewf_write_io_handle_process_chunk(
 				   chunk_cache,
@@ -3666,8 +3666,8 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 				   &compressed_chunk_data_size,
 				   &is_compressed,
 				   0,
-				   &chunk_crc,
-				   &write_crc,
+				   &chunk_checksum,
+				   &write_checksum,
 		                   error );
 
 		if( chunk_data_size <= -1 )
@@ -3712,9 +3712,9 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		               chunk_data_size,
 		               write_size,
 		               is_compressed,
-		               crc_buffer,
-		               chunk_crc,
-		               write_crc,
+		               checksum_buffer,
+		               chunk_checksum,
+		               write_checksum,
 		               error );
 
 		if( write_count <= -1 )
@@ -3755,12 +3755,12 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
          size_t data_size,
          liberror_error_t **error )
 {
-	uint8_t stored_crc_buffer[ 4 ];
+	uint8_t stored_checksum_buffer[ 4 ];
 
 	uint8_t *chunk_buffer       = NULL;
-	uint8_t *crc_buffer         = NULL;
+	uint8_t *checksum_buffer    = NULL;
 	static char *function       = "libewf_write_io_handle_write_existing_chunk_data";
-	ewf_crc_t chunk_crc         = 0;
+	uint32_t chunk_checksum     = 0;
 	size_t remaining_chunk_size = 0;
 	ssize_t read_count          = 0;
 	ssize_t write_count         = 0;
@@ -3960,22 +3960,22 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		chunk_buffer = chunk_cache->data;
 		write_size   = (size_t) read_count;
 	}
-	/* Use chunk and crc buffer alignment when the chunk cache data is directly being passed
+	/* Use chunk and checksum buffer alignment when the chunk cache data is directly being passed
 	 */
 	if( chunk_buffer == chunk_cache->data )
 	{
-		crc_buffer = &( chunk_buffer[ media_values->chunk_size ] );
+		checksum_buffer = &( chunk_buffer[ media_values->chunk_size ] );
 	}
 	else
 	{
-		crc_buffer = stored_crc_buffer;
+		checksum_buffer = stored_checksum_buffer;
 	}
-	/* Calculate the new CRC
+	/* Calculate the new checksum
          */
-        chunk_crc = ewf_crc_calculate(
-	             chunk_buffer,
-	             write_size,
-	             1 );
+        chunk_checksum = ewf_checksum_calculate(
+	                  chunk_buffer,
+	                  write_size,
+	                  1 );
 
 	write_count = libewf_write_io_handle_write_existing_chunk(
 	               write_io_handle,
@@ -3990,8 +3990,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 	               write_size,
 	               write_size,
 	               0,
-	               crc_buffer,
-	               chunk_crc,
+	               checksum_buffer,
+	               chunk_checksum,
 	               1,
 	               error );
 

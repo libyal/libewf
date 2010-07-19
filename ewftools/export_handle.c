@@ -1132,8 +1132,8 @@ ssize_t export_handle_prepare_read_buffer(
 	                 storage_media_buffer->raw_buffer,
 	                 &( storage_media_buffer->raw_buffer_data_size ),
 	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->crc,
-	                 storage_media_buffer->process_crc,
+	                 storage_media_buffer->checksum,
+	                 storage_media_buffer->process_checksum,
 	                 error );
 
 	if( process_count == -1 )
@@ -1262,8 +1262,8 @@ ssize_t export_handle_read_buffer(
                       storage_media_buffer->compression_buffer_size,
 	              &( storage_media_buffer->is_compressed ),
 	              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
-	              &( storage_media_buffer->crc ),
-	              &( storage_media_buffer->process_crc ),
+	              &( storage_media_buffer->checksum ),
+	              &( storage_media_buffer->process_checksum ),
 	              error );
 #else
 	read_count = libewf_handle_read_buffer(
@@ -1349,8 +1349,8 @@ ssize_t export_handle_prepare_write_buffer(
 				 storage_media_buffer->compression_buffer,
 				 &( storage_media_buffer->compression_buffer_data_size ),
 				 &( storage_media_buffer->is_compressed ),
-				 &( storage_media_buffer->crc ),
-				 &( storage_media_buffer->process_crc ),
+				 &( storage_media_buffer->checksum ),
+				 &( storage_media_buffer->process_checksum ),
 				 error );
 
 		if( process_count == -1 )
@@ -1459,9 +1459,9 @@ ssize_t export_handle_write_buffer(
 			       raw_write_buffer_size,
 			       storage_media_buffer->raw_buffer_data_size,
 			       storage_media_buffer->is_compressed,
-			       storage_media_buffer->crc_buffer,
-			       storage_media_buffer->crc,
-			       storage_media_buffer->process_crc,
+			       storage_media_buffer->checksum_buffer,
+			       storage_media_buffer->checksum,
+			       storage_media_buffer->process_checksum,
 			       error );
 #else
 		write_count = libewf_handle_write_buffer(
@@ -2662,7 +2662,7 @@ int export_handle_add_read_error(
 	number_of_sectors = number_of_bytes / export_handle->bytes_per_sector;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( libewf_handle_add_crc_error(
+	if( libewf_handle_add_checksum_error(
 	     export_handle->input_handle,
 	     start_sector,
 	     number_of_sectors,
@@ -2672,7 +2672,7 @@ int export_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add CRC errror.",
+		 "%s: unable to add checksum errror.",
 		 function );
 
 		return( -1 );
@@ -3533,17 +3533,17 @@ int export_handle_hash_values_fprint(
 	return( 1 );
 }
 
-/* Print the CRC errors to a stream
+/* Print the checksum errors to a stream
  * Returns 1 if successful or -1 on error
  */
-int export_handle_crc_errors_fprint(
+int export_handle_checksum_errors_fprint(
      export_handle_t *export_handle,
      FILE *stream,
      liberror_error_t **error )
 {
 	libcstring_system_character_t *filename      = NULL;
 	libcstring_system_character_t *last_filename = NULL;
-	static char *function                        = "export_handle_crc_errors_fprint";
+	static char *function                        = "export_handle_checksum_errors_fprint";
 	size_t filename_size                         = 0;
 	size_t last_filename_size                    = 0;
 	uint64_t start_sector                        = 0;
@@ -3586,7 +3586,7 @@ int export_handle_crc_errors_fprint(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_number_of_crc_errors(
+	if( libewf_handle_get_number_of_checksum_errors(
 	     export_handle->input_handle,
 	     &number_of_errors,
 	     error ) == -1 )
@@ -3595,7 +3595,7 @@ int export_handle_crc_errors_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the number of crc errors.",
+		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
 		return( -1 );
@@ -3614,7 +3614,7 @@ int export_handle_crc_errors_fprint(
 		     error_iterator < number_of_errors;
 		     error_iterator++ )
 		{
-			if( libewf_handle_get_crc_error(
+			if( libewf_handle_get_checksum_error(
 			     export_handle->input_handle,
 			     error_iterator,
 			     &start_sector,
@@ -3625,7 +3625,7 @@ int export_handle_crc_errors_fprint(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve the crc error: %" PRIu32 ".",
+				 "%s: unable to retrieve the checksum error: %" PRIu32 ".",
 				 function,
 				 error_iterator );
 

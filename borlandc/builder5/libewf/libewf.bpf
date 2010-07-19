@@ -1,4 +1,4 @@
-USE("..\..\..\libewf\ewf_crc.h", File);
+USE("..\..\..\libewf\ewf_checksum.h", File);
 USE("..\..\..\libewf\ewf_data.h", File);
 USE("..\..\..\libewf\ewf_definitions.h", File);
 USE("..\..\..\libewf\ewf_digest.h", File);

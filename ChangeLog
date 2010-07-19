@@ -210,6 +210,10 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20100719
+* code clean up
+* corrected CRC into checksum
+
 20100718
 * update for mingw compilation
 * updated libbfio

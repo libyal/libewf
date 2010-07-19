@@ -92,6 +92,20 @@ int libewf_handle_get_amount_of_acquiry_errors(
 	         error ) );
 }
 
+/* Retrieves the number of CRC errors
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_number_of_crc_errors(
+     libewf_handle_t *handle,
+     uint32_t *number_of_errors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_number_of_checksum_errors(
+	         handle,
+	         number_of_errors,
+	         error ) );
+}
+
 /* Retrieves the amount of CRC errors
  * Returns 1 if successful or -1 on error
  */
@@ -100,9 +114,43 @@ int libewf_handle_get_amount_of_crc_errors(
      uint32_t *amount_of_errors,
      liberror_error_t **error )
 {
-	return( libewf_handle_get_number_of_crc_errors(
+	return( libewf_handle_get_number_of_checksum_errors(
 	         handle,
 	         amount_of_errors,
+	         error ) );
+}
+
+/* Retrieves the information of a CRC error
+ * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
+ */
+int libewf_handle_get_crc_error(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint64_t *first_sector,
+     uint64_t *number_of_sectors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_checksum_error(
+	         handle,
+	         index,
+	         first_sector,
+	         number_of_sectors,
+	         error ) );
+}
+
+/* Add a CRC error
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_add_crc_error(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_add_checksum_error(
+	         handle,
+	         first_sector,
+	         number_of_sectors,
 	         error ) );
 }
 
@@ -476,8 +524,8 @@ ssize_t libewf_raw_read_prepare_buffer(
          void *uncompressed_buffer,
          size_t *uncompressed_buffer_size,
          int8_t is_compressed,
-         uint32_t chunk_crc,
-         int8_t read_crc )
+         uint32_t chunk_checksum,
+         int8_t read_checksum )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_raw_read_prepare_buffer";
@@ -490,8 +538,8 @@ ssize_t libewf_raw_read_prepare_buffer(
 	                   uncompressed_buffer,
 	                   uncompressed_buffer_size,
 	                   is_compressed,
-	                   chunk_crc,
-	                   read_crc,
+	                   chunk_checksum,
+	                   read_checksum,
 	                   &error );
 
 	if( chunk_data_size == -1 )
@@ -515,7 +563,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 /* Reads 'raw' data from the curent offset into a buffer
  * size contains the size of the buffer
- * The function sets the chunk crc, is compressed and read crc values
+ * The function sets the chunk checksum, is compressed and read checksum values
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_raw_read_buffer(
@@ -523,10 +571,10 @@ ssize_t libewf_raw_read_buffer(
          void *buffer,
          size_t buffer_size,
          int8_t *is_compressed,
-         uint32_t *chunk_crc,
-         int8_t *read_crc )
+         uint32_t *chunk_checksum,
+         int8_t *read_checksum )
 {
-	uint8_t crc_buffer[ 4 ];
+	uint8_t checksum_buffer[ 4 ];
 
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_raw_read_buffer";
@@ -537,9 +585,9 @@ ssize_t libewf_raw_read_buffer(
 	              buffer,
 	              buffer_size,
 	              is_compressed,
-	              crc_buffer,
-	              chunk_crc,
-	              read_crc,
+	              checksum_buffer,
+	              chunk_checksum,
+	              read_checksum,
 	              &error );
 
 	if( read_count == -1 )
@@ -640,7 +688,7 @@ ssize_t libewf_read_random(
 /* Prepares a buffer with chunk data before writing according to the handle settings
  * intended for raw write
  * The buffer size cannot be larger than the chunk size
- * The function sets the chunk crc, is compressed and write crc values
+ * The function sets the chunk checksum, is compressed and write checksum values
  * Returns the resulting chunk size or -1 on error
  */
 ssize_t libewf_raw_write_prepare_buffer(
@@ -650,8 +698,8 @@ ssize_t libewf_raw_write_prepare_buffer(
          void *compressed_buffer,
          size_t *compressed_buffer_size,
          int8_t *is_compressed,
-         uint32_t *chunk_crc,
-         int8_t *write_crc )
+         uint32_t *chunk_checksum,
+         int8_t *write_checksum )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_raw_write_prepare_buffer";
@@ -664,8 +712,8 @@ ssize_t libewf_raw_write_prepare_buffer(
 	                   compressed_buffer,
 	                   compressed_buffer_size,
 	                   is_compressed,
-	                   chunk_crc,
-	                   write_crc,
+	                   chunk_checksum,
+	                   write_checksum,
 	                   &error );
 
 	if( chunk_data_size == -1 )
@@ -700,10 +748,10 @@ ssize_t libewf_raw_write_buffer(
          size_t buffer_size,
          size_t data_size,
          int8_t is_compressed,
-         uint32_t chunk_crc,
-         int8_t write_crc )
+         uint32_t chunk_checksum,
+         int8_t write_checksum )
 {
-	uint8_t crc_buffer[ 4 ];
+	uint8_t checksum_buffer[ 4 ];
 
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_raw_write_buffer";
@@ -715,9 +763,9 @@ ssize_t libewf_raw_write_buffer(
 	               buffer_size,
 	               data_size,
 	               is_compressed,
-	               crc_buffer,
-	               chunk_crc,
-	               write_crc,
+	               checksum_buffer,
+	               chunk_checksum,
+	               write_checksum,
 	               &error );
 
 	if( write_count == -1 )
@@ -2513,7 +2561,7 @@ int libewf_add_acquiry_error(
 	return( 1 );
 }
 
-/* Retrieves the amount of CRC errors
+/* Retrieves the amount of checksum errors
  * Returns 1 if successful or -1 on error
  */
 int libewf_get_amount_of_crc_errors(
@@ -2523,7 +2571,7 @@ int libewf_get_amount_of_crc_errors(
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_get_amount_of_crc_errors";
 
-	if( libewf_handle_get_amount_of_crc_errors(
+	if( libewf_handle_get_number_of_checksum_errors(
 	     handle,
 	     amount_of_errors,
 	     &error ) != 1 )
@@ -2532,7 +2580,7 @@ int libewf_get_amount_of_crc_errors(
 		 &error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of CRC errors.",
+		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
 		libnotify_print_error_backtrace(
@@ -2545,8 +2593,8 @@ int libewf_get_amount_of_crc_errors(
 	return( 1 );
 }
 
-/* Retrieves the information of a CRC error
- * Returns 1 if successful, 0 if no CRC error could be found or -1 on error
+/* Retrieves the information of a checksum error
+ * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
  */
 int libewf_get_crc_error(
      libewf_handle_t *handle,
@@ -2575,7 +2623,7 @@ int libewf_get_crc_error(
 
 		return( -1 );
 	}
-	result = libewf_handle_get_crc_error(
+	result = libewf_handle_get_checksum_error(
 	          handle,
 	          index,
 	          (uint64_t *) first_sector,
@@ -2588,7 +2636,7 @@ int libewf_get_crc_error(
 		 &error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve CRC error.",
+		 "%s: unable to retrieve checksum error.",
 		 function );
 
 		libnotify_print_error_backtrace(
@@ -2621,7 +2669,7 @@ int libewf_get_crc_error(
 	return( result );
 }
 
-/* Add a CRC error
+/* Add a checksum error
  * Returns 1 if successful or -1 on error
  */
 int libewf_add_crc_error(
@@ -2632,7 +2680,7 @@ int libewf_add_crc_error(
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_add_crc_error";
 
-	if( libewf_handle_add_crc_error(
+	if( libewf_handle_add_checksum_error(
 	     handle,
 	     (uint64_t) first_sector,
 	     (uint64_t) amount_of_sectors,
@@ -2642,7 +2690,7 @@ int libewf_add_crc_error(
 		 &error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add CRC error.",
+		 "%s: unable to add checksum error.",
 		 function );
 
 		libnotify_print_error_backtrace(

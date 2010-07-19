@@ -689,8 +689,8 @@ ssize_t imaging_handle_prepare_read_buffer(
 	                 storage_media_buffer->raw_buffer,
 	                 &( storage_media_buffer->raw_buffer_data_size ),
 	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->crc,
-	                 storage_media_buffer->process_crc,
+	                 storage_media_buffer->checksum,
+	                 storage_media_buffer->process_checksum,
 	                 error );
 
 	if( process_count == -1 )
@@ -771,8 +771,8 @@ ssize_t imaging_handle_read_buffer(
                       storage_media_buffer->compression_buffer_size,
 	              &( storage_media_buffer->is_compressed ),
 	              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
-	              &( storage_media_buffer->crc ),
-	              &( storage_media_buffer->process_crc ),
+	              &( storage_media_buffer->checksum ),
+	              &( storage_media_buffer->process_checksum ),
 	              error );
 #else
 	read_count = libewf_handle_read_buffer(
@@ -802,8 +802,8 @@ ssize_t imaging_handle_read_buffer(
 			                storage_media_buffer->compression_buffer_size,
 			                &( storage_media_buffer->is_compressed ),
 			                &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
-			                &( storage_media_buffer->crc ),
-			                &( storage_media_buffer->process_crc ),
+			                &( storage_media_buffer->checksum ),
+			                &( storage_media_buffer->process_checksum ),
 			                error );
 #else
 		secondary_read_count = libewf_handle_read_buffer(
@@ -888,8 +888,8 @@ ssize_t imaging_handle_prepare_write_buffer(
 	                 storage_media_buffer->compression_buffer,
 	                 &( storage_media_buffer->compression_buffer_data_size ),
 	                 &( storage_media_buffer->is_compressed ),
-	                 &( storage_media_buffer->crc ),
-	                 &( storage_media_buffer->process_crc ),
+	                 &( storage_media_buffer->checksum ),
+	                 &( storage_media_buffer->process_checksum ),
 	                 error );
 
 	if( process_count == -1 )
@@ -993,9 +993,9 @@ ssize_t imaging_handle_write_buffer(
 	               raw_write_buffer_size,
 	               storage_media_buffer->raw_buffer_data_size,
 	               storage_media_buffer->is_compressed,
-	               storage_media_buffer->crc_buffer,
-	               storage_media_buffer->crc,
-	               storage_media_buffer->process_crc,
+	               storage_media_buffer->checksum_buffer,
+	               storage_media_buffer->checksum,
+	               storage_media_buffer->process_checksum,
 	               error );
 #else
 	write_count = libewf_handle_write_buffer(
@@ -1025,9 +1025,9 @@ ssize_t imaging_handle_write_buffer(
 		                         raw_write_buffer_size,
 		                         storage_media_buffer->raw_buffer_data_size,
 		                         storage_media_buffer->is_compressed,
-		                         storage_media_buffer->crc_buffer,
-		                         storage_media_buffer->crc,
-		                         storage_media_buffer->process_crc,
+		                         storage_media_buffer->checksum_buffer,
+		                         storage_media_buffer->checksum,
+		                         storage_media_buffer->process_checksum,
 		                         error );
 #else
 		secondary_write_count = libewf_handle_write_buffer(

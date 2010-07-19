@@ -84,7 +84,7 @@ void usage_fprint(
 	fprintf( stream, "\t-q:        quiet shows no status information\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
-	fprintf( stream, "\t-w:        wipe sectors on CRC error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-w:        wipe sectors on checksum error (mimic EnCase like behavior)\n" );
 }
 
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
@@ -432,7 +432,7 @@ int main( int argc, char * const argv[] )
 	ssize64_t verify_count                                     = 0;
 	size_t string_length                                       = 0;
 	uint64_t process_buffer_size                               = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint32_t number_of_crc_errors                              = 0;
+	uint32_t number_of_checksum_errors                         = 0;
 	uint8_t calculate_md5                                      = 1;
 	uint8_t calculate_sha1                                     = 0;
 	uint8_t print_status_information                           = 1;
@@ -1031,14 +1031,14 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		if( verification_handle_get_number_of_crc_errors(
+		if( verification_handle_get_number_of_checksum_errors(
 		     verification_handle,
-		     &number_of_crc_errors,
+		     &number_of_checksum_errors,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to determine the number of CRC errors.\n" );
+			 "Unable to determine the number of checksum errors.\n" );
 
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -1107,14 +1107,14 @@ int main( int argc, char * const argv[] )
 		 stdout,
 		 "\n" );
 
-		if( verification_handle_crc_errors_fprint(
+		if( verification_handle_checksum_errors_fprint(
 		     verification_handle,
 		     stdout,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to print crc errors.\n" );
+			 "Unable to print checksum errors.\n" );
 
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -1123,14 +1123,14 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_handle != NULL )
 		{
-			if( verification_handle_crc_errors_fprint(
+			if( verification_handle_checksum_errors_fprint(
 			     verification_handle,
 			     log_handle->log_stream,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to write crc errors in log file.\n" );
+				 "Unable to write checksum errors in log file.\n" );
 
 				libsystem_notify_print_error_backtrace(
 				 error );
@@ -1390,7 +1390,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* The EWF file can be verified without an integrity hash
 	 */
-	if( ( number_of_crc_errors == 0 )
+	if( ( number_of_checksum_errors == 0 )
 	 && ( ( calculate_md5 == 0 )
 	  || ( stored_md5_hash_available == 0 )
 	  || match_md5_hash )

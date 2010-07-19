@@ -100,7 +100,7 @@ int storage_media_buffer_initialize(
 			raw_buffer_size = size;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			/* Add 4 bytes to allow for write CRC buffer alignment
+			/* Add 4 bytes to allow for write checksum buffer alignment
 			 */
 			raw_buffer_size += 4;
 #endif
@@ -151,7 +151,7 @@ int storage_media_buffer_initialize(
 			( *buffer )->raw_buffer_size = size;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			( *buffer )->crc_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
+			( *buffer )->checksum_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
 
 			( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
 			                                               sizeof( uint8_t ) * ( size * 2 ) );

@@ -53,10 +53,10 @@ struct ewf_section
 	 */
 	uint8_t padding[ 40 ];
 
-	/* The section crc of all (previous) section data
+	/* The section checksum of all (previous) section data
 	 * consists of 4 bytes
 	 */
-	uint8_t crc[ 4 ];
+	uint8_t checksum[ 4 ];
 };
 
 #if defined( __cplusplus )

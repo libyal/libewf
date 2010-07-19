@@ -34,7 +34,7 @@
 #include "libewf_offset_table.h"
 #include "libewf_sector_table.h"
 
-#include "ewf_crc.h"
+#include "ewf_checksum.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -44,9 +44,9 @@ typedef struct libewf_read_io_handle libewf_read_io_handle_t;
 
 struct libewf_read_io_handle
 {
-	/* The sectors with CRC errors
+	/* The sectors with checksum errors
 	 */
-	libewf_sector_table_t *crc_errors;
+	libewf_sector_table_t *checksum_errors;
 
 	/* A value to indicate if a chunk should be wiped on error
 	 */
@@ -67,9 +67,9 @@ ssize_t libewf_read_io_handle_process_chunk(
          uint8_t *uncompressed_buffer,
          size_t *uncompressed_buffer_size,
          int8_t is_compressed,
-         ewf_crc_t chunk_crc,
-         int8_t read_crc,
-         uint8_t *crc_mismatch,
+         uint32_t chunk_checksum,
+         int8_t read_checksum,
+         uint8_t *checksum_mismatch,
          liberror_error_t **error );
 
 ssize_t libewf_read_io_handle_read_chunk(
@@ -80,9 +80,9 @@ ssize_t libewf_read_io_handle_read_chunk(
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
          int8_t *is_compressed,
-         uint8_t *crc_buffer,
-         ewf_crc_t *chunk_crc,
-         int8_t *read_crc,
+         uint8_t *checksum_buffer,
+         uint32_t *chunk_checksum,
+         int8_t *read_checksum,
          liberror_error_t **error );
 
 ssize_t libewf_read_io_handle_read_chunk_data(
