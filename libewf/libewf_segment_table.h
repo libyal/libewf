@@ -47,9 +47,9 @@ struct libewf_segment_table
 	 */
 	size_t basename_size;
 
-	/* The segment file handle array
+	/* The segment file handles array
 	 */
-	libewf_array_t *segment_file_handle_array;
+	libewf_array_t *segment_file_handles;
 
 	/* The maximum segment size
 	 */

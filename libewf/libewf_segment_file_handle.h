@@ -1,5 +1,5 @@
 /*
- * Segment file handle
+ * Segment file handle functions
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *

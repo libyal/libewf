@@ -562,7 +562,6 @@ int libewf_handle_open(
 				 filenames[ filename_iterator ] );
 			}
 #endif
-
 			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'E' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'l' )
@@ -1034,7 +1033,6 @@ int libewf_handle_open_wide(
 				 filenames[ filename_iterator ] );
 			}
 #endif
-
 			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'E' )
 			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'l' )
@@ -2064,37 +2062,39 @@ int libewf_handle_open_file_io_pool(
 	if( ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	 && ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
-		if( ( internal_handle->write_io_handle->values_initialized == 0 )
-		 && ( libewf_write_io_handle_initialize_values(
-		       internal_handle->write_io_handle,
-		       internal_handle->io_handle,
-		       internal_handle->media_values,
-		       internal_handle->segment_table,
-		       error ) != 1 ) )
+		if( internal_handle->write_io_handle->values_initialized == 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize write IO handle values.",
-			 function );
+			if( libewf_write_io_handle_initialize_values(
+			     internal_handle->write_io_handle,
+			     internal_handle->io_handle,
+			     internal_handle->media_values,
+			     internal_handle->segment_table,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to initialize write IO handle values.",
+				 function );
 
-			libewf_single_files_free(
-			 &( internal_handle->single_files ),
-			 NULL );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ),
-			 NULL );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
+				libewf_single_files_free(
+				 &( internal_handle->single_files ),
+				 NULL );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ),
+				 NULL );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ),
+				 NULL );
+				libewf_offset_table_free(
+				 &( internal_handle->offset_table ),
+				 NULL );
 
-			internal_handle->file_io_pool = NULL;
+				internal_handle->file_io_pool = NULL;
 
-			return( -1 );
+				return( -1 );
+			}
 		}
 		if( libewf_write_io_handle_initialize_resume(
 		     internal_handle->write_io_handle,
@@ -3037,7 +3037,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_prepare_write_chunk";
 	ssize_t chunk_data_size                   = 0;
-	uint8_t chunk_exists                      = 0;
+	int chunk_exists                          = 0;
 
 	if( handle == NULL )
 	{
@@ -3102,9 +3102,24 @@ ssize_t libewf_handle_prepare_write_chunk(
 	{
 		/* Check if chunk has already been created within a segment file
 		 */
-		if( ( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->number_of_chunk_offsets )
-		 || ( internal_handle->offset_table->chunk_offset == NULL )
-		 || ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle == NULL ) )
+		chunk_exists = libewf_offset_table_chunk_exists(
+		                internal_handle->offset_table,
+		                internal_handle->io_handle->current_chunk,
+		                error );
+
+		if( chunk_exists == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if the chunk: %" PRIu32 " exists in the offset table.",
+			 function,
+			 internal_handle->io_handle->current_chunk );
+
+			return( -1 );
+		}
+		else if( chunk_exists == 0 )
 		{
 			if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 			 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
@@ -3113,16 +3128,12 @@ ssize_t libewf_handle_prepare_write_chunk(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: chunk: %d does not exist.",
+				 "%s: chunk: %" PRIu32 " does not exist.",
 				 function,
 				 internal_handle->io_handle->current_chunk );
 
 				return( -1 );
 			}
-		}
-		else
-		{
-			chunk_exists = 1;
 		}
 	}
 	chunk_data_size = libewf_write_io_handle_process_chunk(
@@ -3136,7 +3147,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	                   (uint8_t *) compressed_buffer,
 	                   compressed_buffer_size,
 	                   is_compressed,
-	                   chunk_exists,
+	                   (uint8_t) chunk_exists,
 	                   chunk_checksum,
 	                   write_checksum,
 	                   error );
@@ -3176,6 +3187,11 @@ ssize_t libewf_handle_write_chunk(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_write_chunk";
 	ssize_t write_count                       = 0;
+	int chunk_exists                          = 0;
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+	uint32_t number_of_chunk_values           = 0;
+#endif
 
 	if( handle == NULL )
 	{
@@ -3223,22 +3239,24 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
-	if( ( internal_handle->write_io_handle->values_initialized == 0 )
-	 && ( libewf_write_io_handle_initialize_values(
-	       internal_handle->write_io_handle,
-	       internal_handle->io_handle,
-	       internal_handle->media_values,
-	       internal_handle->segment_table,
-	       error ) != 1 ) )
+	if( internal_handle->write_io_handle->values_initialized == 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize write IO handle values.",
-		 function );
+		if( libewf_write_io_handle_initialize_values(
+		     internal_handle->write_io_handle,
+		     internal_handle->io_handle,
+		     internal_handle->media_values,
+		     internal_handle->segment_table,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize write IO handle values.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	if( chunk_buffer == NULL )
 	{
@@ -3263,17 +3281,6 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.",
-		 function );
-
-		return( -1 );
-	}
 	if( data_size > internal_handle->media_values->chunk_size )
 	{
 		liberror_error_set(
@@ -3288,11 +3295,25 @@ ssize_t libewf_handle_write_chunk(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
+		if( libewf_offset_table_get_number_of_chunk_values(
+		     internal_handle->offset_table,
+		     &number_of_chunk_values,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve the number of chunk values in the offset table.",
+			 function );
+
+			return( -1 );
+		}
 		libnotify_printf(
-		 "%s: writing chunk: %d of total: %d.\n",
+		 "%s: writing chunk: %" PRIu32 " of total: %" PRIu32 ".\n",
 		 function,
 		 internal_handle->io_handle->current_chunk,
-		 internal_handle->offset_table->number_of_chunk_offsets );
+		 number_of_chunk_values );
 		libnotify_printf(
 		 "%s: writing chunk buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
 		 function,
@@ -3300,21 +3321,35 @@ ssize_t libewf_handle_write_chunk(
 		 data_size );
 	}
 #endif
-
 	if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
 	{
 		/* Check if chunk has already been created within a segment file
 		 */
-		if( ( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->number_of_chunk_offsets )
-		 || ( internal_handle->offset_table->chunk_offset == NULL )
-		 || ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle == NULL ) )
+		chunk_exists = libewf_offset_table_chunk_exists(
+		                internal_handle->offset_table,
+		                internal_handle->io_handle->current_chunk,
+		                error );
+
+		if( chunk_exists == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if the chunk: %" PRIu32 " exists in the offset table.",
+			 function,
+			 internal_handle->io_handle->current_chunk );
+
+			return( -1 );
+		}
+		else if( chunk_exists == 0 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: chunk: %d does not exist.",
+			 "%s: chunk: %" PRIu32 " does not exist.",
 			 function,
 			 internal_handle->io_handle->current_chunk );
 
@@ -3395,6 +3430,7 @@ ssize_t libewf_handle_write_buffer(
 	ssize_t total_write_count                 = 0;
 	ssize_t write_count                       = 0;
 	size_t chunk_data_size                    = 0;
+	int chunk_exists                          = 0;
 
 	if( handle == NULL )
 	{
@@ -3444,17 +3480,6 @@ ssize_t libewf_handle_write_buffer(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize write IO handle values.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		return( -1 );
@@ -3520,7 +3545,6 @@ ssize_t libewf_handle_write_buffer(
 			 chunk_data_size );
 		}
 #endif
-
 		if( libewf_chunk_cache_resize(
 		     internal_handle->chunk_cache,
 		     chunk_data_size,
@@ -3543,15 +3567,30 @@ ssize_t libewf_handle_write_buffer(
 		{
 			/* Check if chunk has already been created within a segment file
 			 */
-			if( ( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->number_of_chunk_offsets )
-			 || ( internal_handle->offset_table->chunk_offset == NULL )
-			 || ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle == NULL ) )
+			chunk_exists = libewf_offset_table_chunk_exists(
+					internal_handle->offset_table,
+					internal_handle->io_handle->current_chunk,
+					error );
+
+			if( chunk_exists == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if the chunk: %" PRIu32 " exists in the offset table.",
+				 function,
+				 internal_handle->io_handle->current_chunk );
+
+				return( -1 );
+			}
+			else if( chunk_exists == 0 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: chunk: %d does not exist.",
+				 "%s: chunk: %" PRIu32 " does not exist.",
 				 function,
 				 internal_handle->io_handle->current_chunk );
 
@@ -3894,7 +3933,20 @@ off64_t libewf_handle_seek_offset(
 	}
 	else
 	{
-		internal_handle->io_handle->current_chunk        = internal_handle->offset_table->number_of_chunk_offsets;
+		if( libewf_offset_table_get_number_of_chunk_values(
+		     internal_handle->offset_table,
+		     &( internal_handle->io_handle->current_chunk ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve the number of chunk values in the offset table.",
+			 function );
+
+			return( -1 );
+		}
 		internal_handle->io_handle->current_chunk_offset = 0;
 	}
 	return( offset );
@@ -5257,48 +5309,29 @@ int libewf_handle_get_file_io_handle(
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table == NULL )
+	if( libewf_offset_table_get_segment_file_handle(
+	     internal_handle->offset_table,
+	     internal_handle->io_handle->current_chunk,
+	     &segment_file_handle,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.",
-		 function );
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment file handle of chunk: %" PRIu32 ".",
+		 function,
+		 internal_handle->io_handle->current_chunk );
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->chunk_offset == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid offset table - missing chunk offset.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->number_of_chunk_offsets )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid current chunk value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	segment_file_handle = internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle;
-
 	if( segment_file_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid segment file handle for chunk: %" PRIu32 ".",
+		 "%s: missing segment file handle of chunk: %" PRIu32 ".",
 		 function,
 		 internal_handle->io_handle->current_chunk );
 

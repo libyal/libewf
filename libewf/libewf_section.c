@@ -28,6 +28,7 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_chunk_value.h"
 #include "libewf_definitions.h"
 #include "libewf_compression.h"
 #include "libewf_debug.h"
@@ -2336,16 +2337,17 @@ ssize_t libewf_section_table_read(
 	ewf_table_t table;
 	uint8_t stored_checksum_buffer[ 4 ];
 
-	ewf_table_offset_t *offsets  = NULL;
-	static char *function        = "libewf_section_table_read";
-	size_t offsets_size          = 0;
-	ssize_t section_read_count   = 0;
-	ssize_t read_count           = 0;
-	uint64_t base_offset         = 0;
-	uint32_t calculated_checksum = 0;
-	uint32_t number_of_chunks    = 0;
-	uint32_t stored_checksum     = 0;
-	uint8_t offsets_tainted      = 0;
+	ewf_table_offset_t *offsets     = NULL;
+	static char *function           = "libewf_section_table_read";
+	size_t offsets_size             = 0;
+	ssize_t section_read_count      = 0;
+	ssize_t read_count              = 0;
+	uint64_t base_offset            = 0;
+	uint32_t calculated_checksum    = 0;
+	uint32_t number_of_chunks       = 0;
+	uint32_t number_of_chunk_values = 0;
+	uint32_t stored_checksum        = 0;
+	uint8_t offsets_tainted         = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2369,13 +2371,16 @@ ssize_t libewf_section_table_read(
 
 		return( -1 );
 	}
-	if( offset_table == NULL )
+	if( libewf_offset_table_get_number_of_chunk_values(
+	     offset_table,
+	     &number_of_chunk_values,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of chunk values in the offset table.",
 		 function );
 
 		return( -1 );
@@ -2383,20 +2388,22 @@ ssize_t libewf_section_table_read(
 	/* Allocate the necessary number of chunk offsets
 	 * this reduces the number of reallocations
 	 */
-	if( ( offset_table->number_of_chunk_offsets < media_number_of_chunks )
-	 && ( libewf_offset_table_resize(
-	       offset_table,
-	       media_number_of_chunks,
-	       error ) != 1 ) )
+	if( number_of_chunk_values < media_number_of_chunks )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.",
-		 function );
+		if( libewf_offset_table_resize(
+		     offset_table,
+		     media_number_of_chunks,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize offset table.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
@@ -2713,16 +2720,17 @@ ssize_t libewf_section_table2_read(
 	ewf_table_t table;
 	uint8_t stored_checksum_buffer[ 4 ];
 
-	ewf_table_offset_t *offsets  = NULL;
-	static char *function        = "libewf_section_table2_read";
-	size_t offsets_size          = 0;
-	ssize_t section_read_count   = 0;
-	ssize_t read_count           = 0;
-	uint64_t base_offset         = 0;
-	uint32_t calculated_checksum = 0;
-	uint32_t number_of_chunks    = 0;
-	uint32_t stored_checksum     = 0;
-	uint8_t offsets_tainted      = 0;
+	ewf_table_offset_t *offsets     = NULL;
+	static char *function           = "libewf_section_table2_read";
+	size_t offsets_size             = 0;
+	ssize_t section_read_count      = 0;
+	ssize_t read_count              = 0;
+	uint64_t base_offset            = 0;
+	uint32_t calculated_checksum    = 0;
+	uint32_t number_of_chunks       = 0;
+	uint32_t number_of_chunk_values = 0;
+	uint32_t stored_checksum        = 0;
+	uint8_t offsets_tainted         = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2746,13 +2754,16 @@ ssize_t libewf_section_table2_read(
 
 		return( -1 );
 	}
-	if( offset_table == NULL )
+	if( libewf_offset_table_get_number_of_chunk_values(
+	     offset_table,
+	     &number_of_chunk_values,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of chunk values in the offset table.",
 		 function );
 
 		return( -1 );
@@ -2760,20 +2771,22 @@ ssize_t libewf_section_table2_read(
 	/* Allocate the necessary number of chunk offsets
 	 * this reduces the number of reallocations
 	 */
-	if( ( offset_table->number_of_chunk_offsets < media_number_of_chunks )
-	 && ( libewf_offset_table_resize(
-	       offset_table,
-	       media_number_of_chunks,
-	       error ) != 1 ) )
+	if( number_of_chunk_values < media_number_of_chunks )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.",
-		 function );
+		if( libewf_offset_table_resize(
+		     offset_table,
+		     media_number_of_chunks,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize offset table.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
@@ -6235,7 +6248,7 @@ ssize_t libewf_section_xheader_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
-		 f( libewf_debug_utf8_stream_print(
+		if( libewf_debug_utf8_stream_print(
 		     _LIBCSTRING_STRING( "XHeader" ),
 		     xheader,
 		     xheader_size,
@@ -6578,12 +6591,14 @@ ssize_t libewf_section_delta_chunk_read(
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
 
-	static char *function        = "libewf_section_delta_chunk_read";
-	ssize_t read_count           = 0;
-	uint32_t calculated_checksum = 0;
-	uint32_t chunk               = 0;
-	uint32_t chunk_size          = 0;
-	uint32_t stored_checksum     = 0;
+	libewf_chunk_value_t *chunk_value = NULL;
+	static char *function             = "libewf_section_delta_chunk_read";
+	ssize_t read_count                = 0;
+	uint32_t calculated_checksum      = 0;
+	uint32_t chunk                    = 0;
+	uint32_t chunk_size               = 0;
+	uint32_t number_of_chunk_values   = 0;
+	uint32_t stored_checksum          = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -6603,17 +6618,6 @@ ssize_t libewf_section_delta_chunk_read(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid section size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
@@ -6666,7 +6670,21 @@ ssize_t libewf_section_delta_chunk_read(
 
 	chunk -= 1;
 
-	if( chunk >= offset_table->number_of_chunk_offsets )
+	if( libewf_offset_table_get_number_of_chunk_values(
+	     offset_table,
+	     &number_of_chunk_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of chunk values in the offset table.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk >= number_of_chunk_values )
 	{
 		liberror_error_set(
 		 error,
@@ -6698,10 +6716,38 @@ ssize_t libewf_section_delta_chunk_read(
 	}
 	/* Update the chunk data in the offset table
 	 */
+	if( libewf_offset_table_get_chunk_value(
+	     offset_table,
+	     chunk,
+	     &chunk_value,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk value: %" PRIu32 ".",
+		 function,
+		 chunk );
+
+		return( -1 );
+	}
+	if( chunk_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunk value: %" PRIu32 ".",
+		 function,
+		 chunk );
+
+		return( -1 );
+	}
 	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
-	     &( offset_table->chunk_offset[ chunk ].file_offset ),
+	     &( chunk_value->file_offset ),
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -6713,9 +6759,9 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-	offset_table->chunk_offset[ chunk ].size                = chunk_size;
-	offset_table->chunk_offset[ chunk ].flags               = LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK;
+	chunk_value->segment_file_handle = segment_file_handle;
+	chunk_value->size                = chunk_size;
+	chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK;
 
 	/* Skip the chunk data within the section
 	 */

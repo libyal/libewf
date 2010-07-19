@@ -28,7 +28,7 @@ libewf_la_SOURCES = \
 	libewf.c \
 	libewf_array_type.c libewf_array_type.h \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
-	libewf_chunk_offset.h \
+	libewf_chunk_value.c libewf_chunk_value.h \
 	libewf_codepage.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_date_time.c libewf_date_time.h \

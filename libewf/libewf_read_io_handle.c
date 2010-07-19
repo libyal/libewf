@@ -26,6 +26,7 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_chunk_value.h"
 #include "libewf_definitions.h"
 #include "libewf_compression.h"
 #include "libewf_chunk_cache.h"
@@ -330,15 +331,16 @@ ssize_t libewf_read_io_handle_read_chunk(
          int8_t *read_checksum,
          liberror_error_t **error )
 {
-	libewf_segment_file_handle_t *segment_file_handle = NULL;
-#if defined( HAVE_VERBOSE_OUTPUT )
-        char *chunk_type                                  = NULL;
-#endif
-	static char *function                             = "libewf_read_io_handle_read_chunk";
-	ssize_t read_count                                = 0;
-	ssize_t total_read_count                          = 0;
-	size_t chunk_size                                 = 0;
+	libewf_chunk_value_t *chunk_value = NULL;
+	static char *function             = "libewf_read_io_handle_read_chunk";
+	ssize_t read_count                = 0;
+	ssize_t total_read_count          = 0;
+	size_t chunk_size                 = 0;
+	uint32_t number_of_chunk_values   = 0;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
+        char *chunk_type                  = NULL;
+#endif
 	if( io_handle == NULL )
 	{
 		liberror_error_set(
@@ -346,28 +348,6 @@ ssize_t libewf_read_io_handle_read_chunk(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->chunk_offset == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid offset table - missing chunk offsets.",
 		 function );
 
 		return( -1 );
@@ -438,9 +418,23 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 		return( -1 );
 	}
+	if( libewf_offset_table_get_number_of_chunk_values(
+	     offset_table,
+	     &number_of_chunk_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of chunk values in the offset table.",
+		 function );
+
+		return( -1 );
+	}
 	/* Check if the chunk is available
 	 */
-	if( chunk >= offset_table->number_of_chunk_offsets )
+	if( chunk >= number_of_chunk_values )
 	{
 		return( 0 );
 	}
@@ -448,13 +442,41 @@ ssize_t libewf_read_io_handle_read_chunk(
 	*read_checksum  = 0;
 	*is_compressed  = 0;
 
+	if( libewf_offset_table_get_chunk_value(
+	     offset_table,
+	     chunk,
+	     &chunk_value,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk value: %" PRIu32 ".",
+		 function,
+		 chunk );
+
+		return( -1 );
+	}
+	if( chunk_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunk value: %" PRIu32 ".",
+		 function,
+		 chunk );
+
+		return( -1 );
+	}
 	/* Determine the size of the chunk including the checksum
 	 */
-	chunk_size = offset_table->chunk_offset[ chunk ].size;
+	chunk_size = chunk_value->size;
 
 	/* Determine if the chunk is compressed or not
 	 */
-	if( ( offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) == LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED )
+	if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != 0 )
 	{
 		*is_compressed = 1;
 	}
@@ -463,15 +485,13 @@ ssize_t libewf_read_io_handle_read_chunk(
 		chunk_size    -= sizeof( uint32_t );
 		*read_checksum = 1;
 	}
-	segment_file_handle = offset_table->chunk_offset[ chunk ].segment_file_handle;
-
-	if( segment_file_handle == NULL )
+	if( chunk_value->segment_file_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid chunk value - missing segment file handle.",
 		 function );
 
 		return( -1 );
@@ -480,8 +500,8 @@ ssize_t libewf_read_io_handle_read_chunk(
 	 */
 	if( libbfio_pool_seek_offset(
 	     file_io_pool,
-	     segment_file_handle->file_io_pool_entry,
-	     offset_table->chunk_offset[ chunk ].file_offset,
+	     chunk_value->segment_file_handle->file_io_pool_entry,
+	     chunk_value->file_offset,
 	     SEEK_SET,
 	     error ) <= -1 )
 	{
@@ -495,31 +515,30 @@ ssize_t libewf_read_io_handle_read_chunk(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	if( ( offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK ) == LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK )
-	{
-		chunk_type = "uncompressed delta";
-	}
-	else if( *is_compressed == 0 )
-	{
-		chunk_type = "uncompressed";
-	}
-	else
-	{
-		chunk_type = "compressed";
-	}
 	if( libnotify_verbose != 0 )
 	{
+		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK ) != 0 )
+		{
+			chunk_type = "uncompressed delta";
+		}
+		else if( *is_compressed == 0 )
+		{
+			chunk_type = "uncompressed";
+		}
+		else
+		{
+			chunk_type = "compressed";
+		}
 		libnotify_printf(
 		 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzd ".\n",
 		 function,
 		 chunk_type,
 		 chunk,
-		 offset_table->number_of_chunk_offsets,
-		 offset_table->chunk_offset[ chunk ].file_offset,
-		 offset_table->chunk_offset[ chunk ].size );
+		 number_of_chunk_values,
+		 chunk_value->file_offset,
+		 chunk_value->size );
 	}
 #endif
-
 	/* Check if the chunk and checksum buffers are aligned
 	 * if so read the chunk and checksum at the same time
 	 */
@@ -533,7 +552,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	 */
 	read_count = libbfio_pool_read(
 	              file_io_pool,
-	              segment_file_handle->file_io_pool_entry,
+	              chunk_value->segment_file_handle->file_io_pool_entry,
 	              chunk_buffer,
 	              chunk_size,
 	              error );
@@ -573,7 +592,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 			}
 			read_count = libbfio_pool_read(
 			              file_io_pool,
-			              segment_file_handle->file_io_pool_entry,
+			              chunk_value->segment_file_handle->file_io_pool_entry,
 			              checksum_buffer,
 			              sizeof( uint32_t ),
 			              error );
@@ -618,21 +637,22 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 {
 	uint8_t stored_checksum_buffer[ 4 ];
 
-	uint8_t *chunk_buffer         = NULL;
-	uint8_t *chunk_read_buffer    = NULL;
-	uint8_t *checksum_read_buffer = NULL;
-	static char *function         = "libewf_read_io_handle_read_chunk_data";
-	size_t chunk_data_size        = 0;
-	size_t chunk_size             = 0;
-	size_t bytes_available        = 0;
-	ssize_t read_count            = 0;
-	int64_t sector                = 0;
-	uint32_t chunk_checksum       = 0;
-	uint32_t number_of_sectors    = 0;
-	uint8_t checksum_mismatch     = 0;
-	int8_t is_compressed          = 0;
-	int8_t read_checksum          = 0;
-	int chunk_cache_data_used     = 0;
+	libewf_chunk_value_t *chunk_value = NULL;
+	uint8_t *chunk_buffer             = NULL;
+	uint8_t *chunk_read_buffer        = NULL;
+	uint8_t *checksum_read_buffer     = NULL;
+	static char *function             = "libewf_read_io_handle_read_chunk_data";
+	size_t chunk_data_size            = 0;
+	size_t chunk_size                 = 0;
+	size_t bytes_available            = 0;
+	ssize_t read_count                = 0;
+	int64_t sector                    = 0;
+	uint32_t chunk_checksum           = 0;
+	uint32_t number_of_sectors        = 0;
+	uint8_t checksum_mismatch         = 0;
+	int8_t is_compressed              = 0;
+	int8_t read_checksum              = 0;
+	int chunk_cache_data_used         = 0;
 
 	if( read_io_handle == NULL )
 	{
@@ -652,28 +672,6 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->chunk_offset == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid offset table - missing chunk offsets.",
 		 function );
 
 		return( -1 );
@@ -716,9 +714,37 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	if( ( chunk_cache->chunk != chunk )
 	 || ( chunk_cache->cached == 0 ) )
 	{
+		if( libewf_offset_table_get_chunk_value(
+		     offset_table,
+		     chunk,
+		     &chunk_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve chunk value: %" PRIu32 ".",
+			 function,
+			 chunk );
+
+			return( -1 );
+		}
+		if( chunk_value == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunk value: %" PRIu32 ".",
+			 function,
+			 chunk );
+
+			return( -1 );
+		}
 		/* Determine the size of the chunk including the checksum
 		 */
-		chunk_size = offset_table->chunk_offset[ chunk ].size;
+		chunk_size = chunk_value->size;
 
 		/* Make sure the chunk cache is large enough
 		 */
@@ -758,7 +784,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 				buffer = chunk_cache->data;
 			}
 		}
-		if( ( offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) == 0 )
+		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) == 0 )
 		{
 			is_compressed = 0;
 		}

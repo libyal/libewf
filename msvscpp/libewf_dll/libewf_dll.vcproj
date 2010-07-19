@@ -107,6 +107,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_chunk_value.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_compression.c"
 				>
 			</File>
@@ -317,7 +321,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_chunk_offset.h"
+				RelativePath="..\..\libewf\libewf_chunk_value.h"
 				>
 			</File>
 			<File

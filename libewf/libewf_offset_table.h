@@ -27,7 +27,8 @@
 
 #include <liberror.h>
 
-#include "libewf_chunk_offset.h"
+#include "libewf_array_type.h"
+#include "libewf_chunk_value.h"
 #include "libewf_libbfio.h"
 #include "libewf_list_type.h"
 #include "libewf_segment_file_handle.h"
@@ -42,27 +43,22 @@ typedef struct libewf_offset_table libewf_offset_table_t;
 
 struct libewf_offset_table
 {
-	/* Stores the number of chunks in the table
-	 * There is an offset per chunk in the table
+	/* The last chunk value that was filled
 	 */
-	uint32_t number_of_chunk_offsets;
+	uint32_t last_chunk_value_filled;
 
-	/* The last chunk offset that was filled
+	/* The last chunk value that was compared
 	 */
-	uint32_t last_chunk_offset_filled;
+	uint32_t last_chunk_value_compared;
 
-	/* The last chunk offset that was compared
+	/* Dynamic array of chunk values
 	 */
-	uint32_t last_chunk_offset_compared;
-
-	/* Dynamic array of chunk offsets
-	 */
-	libewf_chunk_offset_t *chunk_offset;
+	libewf_array_t *chunk_values;
 };
 
 int libewf_offset_table_initialize(
      libewf_offset_table_t **offset_table,
-     uint32_t number_of_chunk_offsets,
+     uint32_t number_of_chunk_values,
      liberror_error_t **error );
 
 int libewf_offset_table_free(
@@ -71,14 +67,42 @@ int libewf_offset_table_free(
 
 int libewf_offset_table_resize(
      libewf_offset_table_t *offset_table,
-     uint32_t number_of_chunk_offsets,
+     uint32_t number_of_chunk_values,
+     liberror_error_t **error );
+
+int libewf_offset_table_get_number_of_chunk_values(
+     libewf_offset_table_t *offset_table,
+     uint32_t *number_of_chunk_values,
+     liberror_error_t **error );
+
+int libewf_offset_table_chunk_exists(
+     libewf_offset_table_t *offset_table,
+     uint32_t chunk,
+     liberror_error_t **error );
+
+int libewf_offset_table_get_chunk_value(
+     libewf_offset_table_t *offset_table,
+     uint32_t chunk,
+     libewf_chunk_value_t **chunk_value,
+     liberror_error_t **error );
+
+int libewf_offset_table_get_segment_file_handle(
+     libewf_offset_table_t *offset_table,
+     uint32_t chunk,
+     libewf_segment_file_handle_t **segment_file_handle,
+     liberror_error_t **error );
+
+int libewf_offset_table_set_chunk_value(
+     libewf_offset_table_t *offset_table,
+     uint32_t chunk,
+     libewf_chunk_value_t *chunk_value,
      liberror_error_t **error );
 
 int libewf_offset_table_fill(
      libewf_offset_table_t *offset_table,
      off64_t base_offset,
      ewf_table_offset_t *offsets,
-     uint32_t number_of_chunks,
+     uint32_t number_of_offsets,
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t tainted,
      liberror_error_t **error );
@@ -92,7 +116,7 @@ int libewf_offset_table_fill_last_offset(
 int libewf_offset_table_fill_offsets(
      libewf_offset_table_t *offset_table,
      uint32_t offset_table_index,
-     uint32_t number_of_chunk_offsets,
+     uint32_t number_of_chunk_values,
      off64_t base_offset,
      ewf_table_offset_t *offsets,
      uint32_t number_of_offsets,

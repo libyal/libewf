@@ -1,5 +1,5 @@
 /*
- * Chunk offset functions
+ * Chunk value functions
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_CHUNK_OFFSET_H )
-#define _LIBEWF_CHUNK_OFFSET_H
+#if !defined( _LIBEWF_CHUNK_VALUE_H )
+#define _LIBEWF_CHUNK_VALUE_H
 
 #include <common.h>
 #include <types.h>
@@ -31,15 +31,15 @@
 extern "C" {
 #endif
 
-#define LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED	0x01
-#define LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED 	0x02
-#define LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED 	0x04
-#define LIBEWF_CHUNK_OFFSET_FLAGS_MISSING 	0x08
-#define LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK 	0x80
+#define LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED	0x01
+#define LIBEWF_CHUNK_VALUE_FLAGS_TAINTED 	0x02
+#define LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED 	0x04
+#define LIBEWF_CHUNK_VALUE_FLAGS_MISSING 	0x08
+#define LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK 	0x80
 
-typedef struct libewf_chunk_offset libewf_chunk_offset_t;
+typedef struct libewf_chunk_value libewf_chunk_value_t;
 
-struct libewf_chunk_offset
+struct libewf_chunk_value
 {
 	/* A reference to the segment file handle
 	 */
@@ -62,6 +62,14 @@ struct libewf_chunk_offset
 	 */
 	uint8_t flags;
 };
+
+int libewf_chunk_value_initialize(
+     libewf_chunk_value_t **chunk_value,
+     liberror_error_t **error );
+
+int libewf_chunk_value_free(
+     intptr_t *chunk_value,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

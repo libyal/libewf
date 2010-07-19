@@ -65,6 +65,10 @@ typedef struct libewf_array libewf_array_t;
 
 struct libewf_array
 {
+	/* The number of allocated entries
+	 */
+	int number_of_allocated_entries;
+
 	/* The number of entries
 	 */
 	int number_of_entries;
@@ -108,6 +112,9 @@ int libewf_array_clone(
 int libewf_array_resize(
      libewf_array_t *array,
      int number_of_entries,
+     int (*entry_free_function)(
+            intptr_t *entry,
+            liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_array_get_number_of_entries(

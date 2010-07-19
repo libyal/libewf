@@ -27,6 +27,7 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_chunk_value.h"
 #include "libewf_definitions.h"
 #include "libewf_hash_values.h"
 #include "libewf_io_handle.h"
@@ -88,7 +89,6 @@ ssize_t libewf_segment_file_read_file_header(
 		 function );
 	}
 #endif
-
 	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
@@ -100,9 +100,8 @@ ssize_t libewf_segment_file_read_file_header(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file header offset: %" PRIi64 ".",
-		 function,
-		 0 );
+		 "%s: unable to seek file header offset: 0.",
+		 function );
 
 		return( -1 );
 	}
@@ -962,9 +961,10 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          uint32_t chunks_per_section,
          liberror_error_t **error )
 {
-	static char *function = "libewf_segment_file_write_chunks_section_start";
-	ssize_t write_count   = 0;
-	size_t section_size   = 0;
+	static char *function           = "libewf_segment_file_write_chunks_section_start";
+	ssize_t write_count             = 0;
+	size_t section_size             = 0;
+	uint32_t number_of_chunk_values = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -984,17 +984,6 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
@@ -1021,9 +1010,23 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		return( -1 );
 	}
+	if( libewf_offset_table_get_number_of_chunk_values(
+	     offset_table,
+	     &number_of_chunk_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of chunk values in the offset table.",
+		 function );
+
+		return( -1 );
+	}
 	/* The chunks_per_section contains the estimated number of chunks for this section
 	 */
-	if( offset_table->number_of_chunk_offsets < ( number_of_chunks_written + chunks_per_section ) )
+	if( number_of_chunk_values < ( number_of_chunks_written + chunks_per_section ) )
 	{
 		if( libewf_offset_table_resize(
 		     offset_table,
@@ -1213,7 +1216,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	}
 	/* Seek the start of the data chunks
 	*/
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1222,7 +1225,6 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		 chunks_section_offset );
 	}
 #endif
-
 	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
@@ -1242,7 +1244,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	if( ( io_handle->ewf_format == EWF_FORMAT_S01 )
 	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1283,7 +1285,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	}
 	else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1293,7 +1295,6 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 			 chunks_section_size );
 		}
 #endif
-
 		/* Rewrite sectors section start
 		 */
 		write_count = libewf_section_sectors_write(
@@ -1317,7 +1318,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	}
 	/* Seek the end of the chunks section
 	 */
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1326,7 +1327,6 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		 last_segment_file_offset );
 	}
 #endif
-
 	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
@@ -1425,14 +1425,17 @@ ssize_t libewf_segment_file_write_chunk(
          int8_t write_checksum,
          liberror_error_t **error )
 {
-#if defined( HAVE_VERBOSE_OUTPUT )
-	char *chunk_type            = NULL;
+	libewf_chunk_value_t *chunk_value = NULL;
+	static char *function             = "libewf_segment_file_write_chunk";
+	off64_t segment_file_offset       = 0;
+	size_t write_size                 = 0;
+	ssize_t write_count               = 0;
+	ssize_t total_write_count         = 0;
+	uint32_t number_of_chunk_values   = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	char *chunk_type                  = NULL;
 #endif
-	static char *function       = "libewf_segment_file_write_chunk";
-	off64_t segment_file_offset = 0;
-	size_t write_size           = 0;
-	ssize_t write_count         = 0;
-	ssize_t total_write_count   = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1452,17 +1455,6 @@ ssize_t libewf_segment_file_write_chunk(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
@@ -1489,9 +1481,23 @@ ssize_t libewf_segment_file_write_chunk(
 
 		return( -1 );
 	}
+	if( libewf_offset_table_get_number_of_chunk_values(
+	     offset_table,
+	     &number_of_chunk_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of chunk values in the offset table.",
+		 function );
+
+		return( -1 );
+	}
 	/* Make sure the chunk is available in the offset table
 	 */
-	if( offset_table->number_of_chunk_offsets < ( chunk + 1 ) )
+	if( number_of_chunk_values < ( chunk + 1 ) )
 	{
 		if( libewf_offset_table_resize(
 		     offset_table,
@@ -1523,48 +1529,89 @@ ssize_t libewf_segment_file_write_chunk(
 
 		return( -1 );
 	}
+	if( libewf_chunk_value_initialize(
+	     &chunk_value,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunk value: %" PRIu32 "",
+		 function,
+		 chunk );
+
+		return( -1 );
+	}
+	if( chunk_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunk value: %" PRIu32 ".",
+		 function,
+		 chunk );
+
+		return( -1 );
+	}
 	/* Set the values in the offset table
 	 */
-	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
-	offset_table->chunk_offset[ chunk ].size                = chunk_size;
+	chunk_value->segment_file_handle = segment_file_handle;
+	chunk_value->file_offset         = segment_file_offset;
+	chunk_value->size                = chunk_size;
 
 	if( write_checksum != 0 )
 	{
-		offset_table->chunk_offset[ chunk ].size += sizeof( uint32_t );
+		chunk_value->size += sizeof( uint32_t );
 	}
 	if( is_compressed == 0 )
 	{
-		offset_table->chunk_offset[ chunk ].flags = 0;
+		chunk_value->flags = 0;
 	}
 	else
 	{
-		offset_table->chunk_offset[ chunk ].flags |= LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED;
+		chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED;
 	}
 
-#if defined( HAVE_VERBOSE_OUTPUT )
-	/* Print a verbose notification
-	 */
-	if( is_compressed == 0 )
-	{
-		chunk_type = "uncompressed";
-	}
-	else
-	{
-		chunk_type = "compressed";
-	}
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
+		if( is_compressed == 0 )
+		{
+			chunk_type = "uncompressed";
+		}
+		else
+		{
+			chunk_type = "compressed";
+		}
 		libnotify_printf(
 		 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with checksum: %" PRIu32 ".\n",
 		 function,
 		 chunk_type,
 		 chunk,
 		 segment_file_offset,
-		 offset_table->chunk_offset[ chunk ].size,
+		 chunk_value->size,
 		 *chunk_checksum );
 	}
 #endif
+	if( libewf_offset_table_set_chunk_value(
+	     offset_table,
+	     chunk,
+	     chunk_value,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set chunk value: %" PRIu32 " in offset table.",
+		 function,
+		 chunk );
+
+		return( -1 );
+	}
+	chunk_value = NULL;
 
 	write_size = chunk_size;
 
@@ -1664,9 +1711,11 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	 uint8_t no_section_append,
          liberror_error_t **error )
 {
-	static char *function       = "libewf_segment_file_write_delta_chunk";
-	off64_t segment_file_offset = 0;
-	ssize_t write_count         = 0;
+	libewf_chunk_value_t *chunk_value = NULL;
+	static char *function             = "libewf_segment_file_write_delta_chunk";
+	off64_t segment_file_offset       = 0;
+	ssize_t write_count               = 0;
+	uint32_t number_of_chunk_values   = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1690,29 +1739,32 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		return( -1 );
 	}
-	if( offset_table == NULL )
+	if( libewf_offset_table_get_number_of_chunk_values(
+	     offset_table,
+	     &number_of_chunk_values,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of chunk values in the offset table.",
 		 function );
 
 		return( -1 );
 	}
 	/* Make sure the chunk is available in the offset table
 	 */
-	if( chunk >= offset_table->number_of_chunk_offsets )
+	if( chunk >= number_of_chunk_values )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: chunk: %" PRIu32 " out of bounds [0,%" PRIu32 "].",
+		 "%s: chunk: %" PRIu32 " exceeds maximum %" PRIu32 ".",
 		 function,
 		 chunk,
-		 offset_table->number_of_chunk_offsets - 1 );
+		 number_of_chunk_values );
 
 		return( -1 );
 	}
@@ -1733,7 +1785,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	}
 	segment_file_offset += sizeof( ewfx_delta_chunk_header_t ) + sizeof( ewf_section_t );
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1745,7 +1797,6 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 *chunk_checksum );
 	}
 #endif
-
 	/* Write the chunk in the delta segment file
 	 */
 	write_count = libewf_section_delta_chunk_write(
@@ -1767,10 +1818,38 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	if( ( no_section_append == 0 )
 	 && ( write_count > 0 ) )
 	{
-		offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
-		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( uint32_t );
-		offset_table->chunk_offset[ chunk ].flags               = LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK;
+		if( libewf_offset_table_get_chunk_value(
+		     offset_table,
+		     chunk,
+		     &chunk_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve chunk value: %" PRIu32 ".",
+			 function,
+			 chunk );
+
+			return( -1 );
+		}
+		if( chunk_value == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunk value: %" PRIu32 ".",
+			 function,
+			 chunk );
+
+			return( -1 );
+		}
+		chunk_value->segment_file_handle = segment_file_handle;
+		chunk_value->file_offset         = segment_file_offset;
+		chunk_value->size                = chunk_size + sizeof( uint32_t );
+		chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK;
 	}
 	else if( write_count < 0 )
 	{
@@ -2019,7 +2098,7 @@ ssize_t libewf_segment_file_write_close(
 		{
 			if( hash_sections->xhash != NULL )
 			{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
@@ -2027,7 +2106,6 @@ ssize_t libewf_segment_file_write_close(
 					 function );
 				}
 #endif
-
 				memory_free(
 				 hash_sections->xhash );
 
@@ -2216,7 +2294,7 @@ int libewf_segment_file_write_sections_correction(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2247,7 +2325,7 @@ int libewf_segment_file_write_sections_correction(
 		     "volume",
 		     6 ) == 0 )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -2318,7 +2396,7 @@ int libewf_segment_file_write_sections_correction(
 			  "data",
 			  4 ) == 0 )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -2326,7 +2404,6 @@ int libewf_segment_file_write_sections_correction(
 				 function );
 			}
 #endif
-
 			if( libbfio_pool_seek_offset(
 			     file_io_pool,
 			     segment_file_handle->file_io_pool_entry,
@@ -2383,7 +2460,7 @@ int libewf_segment_file_write_sections_correction(
 	}
 	if( correct_last_next_section != 0 )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2391,7 +2468,6 @@ int libewf_segment_file_write_sections_correction(
 			 function );
 		}
 #endif
-
 		if( libbfio_pool_seek_offset(
 		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,

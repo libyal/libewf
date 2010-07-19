@@ -1,9 +1,10 @@
 TODO
+* revise DEBUG and VERBOSE output
+* rename section_list to section_value
 * add UTF-16 header and hash values, file entry name functions
 * update macosx project files
 
 * configure validate libuna and libbfio check
-* implement array type in libewf_offset_table
 * documentation:
   - add that error can be NULL
 * libewf: make libewf_convert_date_header_value more strict
@@ -215,6 +216,9 @@ Test:
 * code clean up
 * corrected CRC into checksum
 * refactored header and hash values, file entry name functions to UTF-8 variant
+* implemented array type in libewf_offset_table, added encapsulation functions
+* updated libbfio
+* small improvement to write resume
 
 20100718
 * update for mingw compilation

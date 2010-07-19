@@ -1,5 +1,5 @@
 /*
- * Segment file handle functions
+ * Chunk value functions
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -25,21 +25,18 @@
 
 #include <liberror.h>
 
-#include "libewf_list_type.h"
-#include "libewf_section_list.h"
-#include "libewf_segment_file_handle.h"
+#include "libewf_chunk_value.h"
 
 /* Initialize the segment file handle
  * Returns 1 if successful or -1 on error
  */
-int libewf_segment_file_handle_initialize(
-     libewf_segment_file_handle_t **segment_file_handle,
-     int file_io_pool_entry,
+int libewf_chunk_value_initialize(
+     libewf_chunk_value_t **chunk_value,
      liberror_error_t **error )
 {
-	static char *function = "libewf_segment_file_handle_initialize";
+	static char *function = "libewf_chunk_value_initialize";
 
-	if( segment_file_handle == NULL )
+	if( chunk_value == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -50,12 +47,12 @@ int libewf_segment_file_handle_initialize(
 
 		return( -1 );
 	}
-	if( *segment_file_handle == NULL )
+	if( *chunk_value == NULL )
 	{
-		*segment_file_handle = (libewf_segment_file_handle_t *) memory_allocate(
-		                                                         sizeof( libewf_segment_file_handle_t ) );
+		*chunk_value = (libewf_chunk_value_t *) memory_allocate(
+		                                         sizeof( libewf_chunk_value_t ) );
 
-		if( *segment_file_handle == NULL )
+		if( *chunk_value == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -67,9 +64,9 @@ int libewf_segment_file_handle_initialize(
 			return( -1 );
 		}
 		if( memory_set(
-		     *segment_file_handle,
+		     *chunk_value,
 		     0,
-		     sizeof( libewf_segment_file_handle_t ) ) == NULL )
+		     sizeof( libewf_chunk_value_t ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -79,31 +76,12 @@ int libewf_segment_file_handle_initialize(
 			 function );
 
 			memory_free(
-			 *segment_file_handle );
+			 *chunk_value );
 
-			*segment_file_handle = NULL;
-
-			return( -1 );
-		}
-		if( libewf_list_initialize(
-		     &( ( *segment_file_handle )->section_list ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create section list.",
-			 function );
-
-			memory_free(
-			 *segment_file_handle );
-
-			*segment_file_handle = NULL;
+			*chunk_value = NULL;
 
 			return( -1 );
 		}
-		( *segment_file_handle )->file_io_pool_entry = file_io_pool_entry;
 	}
 	return( 1 );
 }
@@ -111,14 +89,13 @@ int libewf_segment_file_handle_initialize(
 /* Frees the segment file handle including elements
  * Returns 1 if successful or -1 on error
  */
-int libewf_segment_file_handle_free(
-     intptr_t *segment_file_handle,
+int libewf_chunk_value_free(
+     intptr_t *chunk_value,
      liberror_error_t **error )
 {
-	static char *function = "libewf_segment_file_handle_free";
-	int result            = 1;
+	static char *function = "libewf_chunk_value_free";
 
-	if( segment_file_handle == NULL )
+	if( chunk_value == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -129,26 +106,9 @@ int libewf_segment_file_handle_free(
 
 		return( -1 );
 	}
-	if( ( (libewf_segment_file_handle_t *) segment_file_handle )->section_list != NULL )
-	{
-		if( libewf_list_free(
-		     &( ( (libewf_segment_file_handle_t *) segment_file_handle )->section_list ),
-		     &libewf_section_list_values_free,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free section list.",
-			 function );
-
-			result = -1;
-		}
-	}
 	memory_free(
-	 segment_file_handle );
+	 chunk_value );
 
-	return( result );
+	return( 1 );
 }
 

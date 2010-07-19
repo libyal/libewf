@@ -35,11 +35,22 @@ int libewf_section_list_values_free(
      intptr_t *value,
      liberror_error_t **error )
 {
-	if( value != NULL )
+	static char *function = "libewf_section_list_values_free";
+
+	if( value == NULL )
 	{
-		memory_free(
-		 value );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section list values.",
+		 function );
+
+		return( -1 );
 	}
+	memory_free(
+	 value );
+
 	return( 1 );
 }
 
