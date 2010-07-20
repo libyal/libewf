@@ -49,6 +49,17 @@ int libewf_array_initialize(
 
 		return( -1 );
 	}
+	if( number_of_entries < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of entries.",
+		 function );
+
+		return( -1 );
+	}
 	if( *array == NULL )
 	{
 		*array = (libewf_array_t *) memory_allocate(
