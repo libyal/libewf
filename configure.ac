@@ -740,6 +740,70 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBBFIO],
  [test "x$ac_libewf_have_libbfio" = xlocal])
 
+dnl Check for enabling libmfdata for multi-file data support
+AC_CHECK_HEADERS(
+ [libmfdata.h],
+ [],
+ [ac_libsmal_have_libmfdata=no])
+
+AS_IF(
+	[test "x$ac_libsmal_have_libmfdata" != xno],
+	[ac_libsmal_have_libmfdata=yes
+	AC_CHECK_LIB(
+	 mfdata,
+	 libmfdata_get_version,
+	 [],
+	 [ac_libsmal_have_libmfdata=no])
+
+	])
+
+AS_IF(
+[test "x$ac_libsmal_have_libmfdata" = xyes],
+ [dnl libmfdata is available
+ AC_SUBST(
+  [libsmal_pc_libs_private_libmfdata],
+  [-lmfdata])
+ AC_SUBST(
+  [libsmal_spec_requires_libmfdata],
+  [libmfdata])
+ AC_SUBST(
+  [libsmal_spec_build_requires_libmfdata],
+  [libmfdata-devel])
+ AC_SUBST(
+  [LIBMFDATA_CPPFLAGS],
+  [])
+ AC_SUBST(
+  [LIBMFDATA_LIBADD],
+  []) ],
+ [dnl libmfdata is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBMFDATA],
+  [1],
+  [Define to 1 if the local version of libmfdata is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBMFDATA],
+  [1])
+ AC_SUBST(
+  [libsmal_pc_libs_private_libmfdata],
+  [])
+ AC_SUBST(
+  [libsmal_spec_requires_libmfdata],
+  [])
+ AC_SUBST(
+  [libsmal_spec_build_requires_libmfdata],
+  [])
+ AC_SUBST(
+  [LIBMFDATA_CPPFLAGS],
+  [-I../libmfdata])
+ AC_SUBST(
+  [LIBMFDATA_LIBADD],
+  [../libmfdata/libmfdata.la])
+ ac_libsmal_have_libmfdata=local])
+
+AM_CONDITIONAL(
+ [HAVE_LOCAL_LIBMFDATA],
+ [test "x$ac_libsmal_have_libmfdata" = xlocal])
+
 dnl Check for enabling libsmdev for storage media device support
 LIBEWF_CHECK_LIBSMDEV
 
@@ -1392,6 +1456,7 @@ AC_CONFIG_FILES([liberror/Makefile])
 AC_CONFIG_FILES([libnotify/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libbfio/Makefile])
+AC_CONFIG_FILES([libmfdata/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])
@@ -1427,6 +1492,7 @@ AC_MSG_NOTICE([
 Building:
    libuna support:                                  $ac_libewf_have_libuna
    libbfio support:                                 $ac_libewf_have_libbfio
+   libmfdata support:                               $ac_libewf_have_libmfdata
    libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw
    MD5 support:                                     $ac_libewf_have_libcrypto_md5
