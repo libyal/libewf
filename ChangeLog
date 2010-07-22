@@ -1,4 +1,6 @@
 TODO
+* update builder5, codegear and msvscpp files
+
 * revise DEBUG and VERBOSE output
 * rename section_list to section_value
 * add UTF-16 header and hash values, file entry name functions
@@ -211,6 +213,11 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20100722
+* worked on libmfdata
+* updated include/error.h and liberror
+* updated libuna, libbfio, libsmraw
 
 20100719
 * code clean up
