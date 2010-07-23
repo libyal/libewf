@@ -328,17 +328,17 @@ int libewf_sector_table_get_sector(
 	return( 1 );
 }
 
-/* Add a sector
+/* Appends a sector
  * Returns 1 if successful or -1 on error
  */
-int libewf_sector_table_add_sector(
+int libewf_sector_table_append_sector(
      libewf_sector_table_t *sector_table,
      uint64_t first_sector,
      uint64_t number_of_sectors,
      int merge_continious_entries,
      liberror_error_t **error )
 {
-	static char *function      = "libewf_sector_table_add_sector";
+	static char *function      = "libewf_sector_table_append_sector";
 	uint64_t last_sector       = 0;
 	uint64_t last_range_sector = 0;
 	uint32_t iterator          = 0;

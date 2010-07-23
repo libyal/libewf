@@ -1531,7 +1531,7 @@ int libewf_write_io_handle_create_segment_file(
 	{
 		flags = LIBBFIO_OPEN_WRITE_TRUNCATE;
 	}
-	if( libbfio_pool_add_handle(
+	if( libbfio_pool_append_handle(
 	     file_io_pool,
 	     &file_io_pool_entry,
 	     file_io_handle,
@@ -1542,7 +1542,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add file IO handle to pool.",
+		 "%s: unable to append file IO handle to pool.",
 		 function );
 
 		libbfio_handle_free(

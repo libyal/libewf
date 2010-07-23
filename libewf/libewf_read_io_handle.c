@@ -915,7 +915,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 			{
 				number_of_sectors = (uint32_t) ( (int64_t) media_values->number_of_sectors - sector );
 			}
-			if( libewf_sector_table_add_sector(
+			if( libewf_sector_table_append_sector(
 			     read_io_handle->checksum_errors,
 			     sector,
 			     number_of_sectors,
@@ -925,8 +925,8 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set checksum error.",
+				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append checksum error.",
 				 function );
 
 				return( -1 );

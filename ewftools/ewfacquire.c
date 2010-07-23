@@ -1229,7 +1229,7 @@ ssize64_t ewfacquire_read_input(
 
 				return( -1 );
 			}
-			if( imaging_handle_add_read_error(
+			if( imaging_handle_append_read_error(
 			     imaging_handle,
 			     read_error_offset,
 			     read_error_size,
@@ -1239,7 +1239,7 @@ ssize64_t ewfacquire_read_input(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add read errror: %d to imaging handle.",
+				 "%s: unable to append read errror: %d to imaging handle.",
 				 function,
 				 read_error_iterator );
 
@@ -3522,7 +3522,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Invalid media size value out of bounds to add session.\n" );
+					 "Invalid media size value out of bounds to append session.\n" );
 
 					imaging_handle_close(
 					 ewfacquire_imaging_handle,
@@ -3530,7 +3530,7 @@ int main( int argc, char * const argv[] )
 
 					error_abort = 1;
 				}
-				if( imaging_handle_add_session(
+				if( imaging_handle_append_session(
 				     ewfacquire_imaging_handle,
 				     bytes_per_sector,
 				     media_size,
@@ -3538,7 +3538,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unable to add session.\n" );
+					 "Unable to append session.\n" );
 
 					imaging_handle_close(
 					 ewfacquire_imaging_handle,

@@ -56,6 +56,12 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
                    uint32_t *amount_of_errors,
                    liberror_error_t **error );
 
+LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
+                   libewf_handle_t *handle,
+                   uint64_t first_sector,
+                   uint64_t number_of_sectors,
+                   liberror_error_t **error );
+
 LIBEWF_EXTERN int libewf_handle_get_number_of_crc_errors(
                    libewf_handle_t *handle,
                    uint32_t *number_of_errors,
@@ -82,6 +88,12 @@ LIBEWF_EXTERN int libewf_handle_add_crc_error(
 LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_sessions,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_add_session(
+                   libewf_handle_t *handle,
+                   uint64_t first_sector,
+                   uint64_t number_of_sectors,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_amount_of_header_values(

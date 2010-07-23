@@ -2315,7 +2315,7 @@ int imaging_handle_set_output_values(
 	}
 	if( guid_type != 0 )
 	{
-		/* Add a GUID if necessary
+		/* Set GUID if necessary
 		 */
 		if( guid_generate(
 		     guid,
@@ -2760,13 +2760,13 @@ int imaging_handle_set_hash_value(
 /* Appends a read error to the output handle
  * Returns 1 if successful or -1 on error
  */
-int imaging_handle_add_read_error(
+int imaging_handle_append_read_error(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
       size64_t number_of_bytes,
       liberror_error_t **error )
 {
-	static char *function      = "imaging_handle_add_read_error";
+	static char *function      = "imaging_handle_append_read_error";
 	uint64_t number_of_sectors = 0;
 	uint64_t start_sector      = 0;
 
@@ -2806,7 +2806,7 @@ int imaging_handle_add_read_error(
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / imaging_handle->bytes_per_sector;
 
-	if( libewf_handle_add_acquiry_error(
+	if( libewf_handle_append_acquiry_error(
 	     imaging_handle->output_handle,
 	     start_sector,
 	     number_of_sectors,
@@ -2816,14 +2816,14 @@ int imaging_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add acquiry errror.",
+		 "%s: unable to append acquiry errror.",
 		 function );
 
 		return( -1 );
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-		if( libewf_handle_add_acquiry_error(
+		if( libewf_handle_append_acquiry_error(
 		     imaging_handle->secondary_output_handle,
 		     start_sector,
 		     number_of_sectors,
@@ -2833,7 +2833,7 @@ int imaging_handle_add_read_error(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add acquiry errror to secondary output handle.",
+			 "%s: unable to append acquiry errror to secondary output handle.",
 			 function );
 
 			return( -1 );
@@ -2845,13 +2845,13 @@ int imaging_handle_add_read_error(
 /* Appends a session to the output handle
  * Returns 1 if successful or -1 on error
  */
-int imaging_handle_add_session(
+int imaging_handle_append_session(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
       size64_t number_of_bytes,
       liberror_error_t **error )
 {
-	static char *function      = "imaging_handle_add_session";
+	static char *function      = "imaging_handle_append_session";
 	uint64_t number_of_sectors = 0;
 	uint64_t start_sector      = 0;
 
@@ -2891,7 +2891,7 @@ int imaging_handle_add_session(
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / imaging_handle->bytes_per_sector;
 
-	if( libewf_handle_add_session(
+	if( libewf_handle_append_session(
 	     imaging_handle->output_handle,
 	     start_sector,
 	     number_of_sectors,
@@ -2901,14 +2901,14 @@ int imaging_handle_add_session(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add session.",
+		 "%s: unable to append session.",
 		 function );
 
 		return( -1 );
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-		if( libewf_handle_add_session(
+		if( libewf_handle_append_session(
 		     imaging_handle->secondary_output_handle,
 		     start_sector,
 		     number_of_sectors,
@@ -2918,7 +2918,7 @@ int imaging_handle_add_session(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add session to secondary output handle.",
+			 "%s: unable to append session to secondary output handle.",
 			 function );
 
 			return( -1 );

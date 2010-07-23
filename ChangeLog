@@ -214,6 +214,9 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20100723
+* updated libbfio, libmfdata, libsmraw
+
 20100722
 * worked on libmfdata
 * updated include/error.h and liberror

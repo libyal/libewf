@@ -158,7 +158,7 @@ int verification_handle_set_error_handling_values(
      int wipe_chunk_on_error,
      liberror_error_t **error );
 
-int verification_handle_add_read_error(
+int verification_handle_append_read_error(
       verification_handle_t *verification_handle,
       off64_t start_offset,
       size_t number_of_bytes,

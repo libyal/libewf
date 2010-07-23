@@ -527,7 +527,7 @@ int libewf_handle_open(
 
 				return( -1 );
 			}
-			if( libbfio_pool_add_handle(
+			if( libbfio_pool_append_handle(
 			     file_io_pool,
 			     &file_io_pool_entry,
 			     file_io_handle,
@@ -538,7 +538,7 @@ int libewf_handle_open(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add file IO handle to pool.",
+				 "%s: unable to append file IO handle to pool.",
 				 function );
 
 				libbfio_handle_free(
@@ -998,7 +998,7 @@ int libewf_handle_open_wide(
 
 				return( -1 );
 			}
-			if( libbfio_pool_add_handle(
+			if( libbfio_pool_append_handle(
 			     file_io_pool,
 			     &file_io_pool_entry,
 			     file_io_handle,
@@ -1009,7 +1009,7 @@ int libewf_handle_open_wide(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add file IO handle to pool.",
+				 "%s: unable to append file IO handle to pool.",
 				 function );
 
 				libbfio_handle_free(

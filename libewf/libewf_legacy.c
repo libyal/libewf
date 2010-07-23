@@ -92,6 +92,22 @@ int libewf_handle_get_amount_of_acquiry_errors(
 	         error ) );
 }
 
+/* Add an acquiry error
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_add_acquiry_error(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_append_acquiry_error(
+	         handle,
+	         first_sector,
+	         number_of_sectors,
+	         error ) );
+}
+
 /* Retrieves the number of CRC errors
  * Returns 1 if successful or -1 on error
  */
@@ -147,7 +163,7 @@ int libewf_handle_add_crc_error(
      uint64_t number_of_sectors,
      liberror_error_t **error )
 {
-	return( libewf_handle_add_checksum_error(
+	return( libewf_handle_append_checksum_error(
 	         handle,
 	         first_sector,
 	         number_of_sectors,
@@ -165,6 +181,22 @@ int libewf_handle_get_amount_of_sessions(
 	return( libewf_handle_get_number_of_sessions(
 	         handle,
 	         amount_of_sessions,
+	         error ) );
+}
+
+/* Add a session
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_add_session(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     liberror_error_t **error )
+{
+	return( libewf_handle_append_session(
+	         handle,
+	         first_sector,
+	         number_of_sectors,
 	         error ) );
 }
 
@@ -2904,7 +2936,7 @@ int libewf_add_crc_error(
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_add_crc_error";
 
-	if( libewf_handle_add_checksum_error(
+	if( libewf_handle_append_checksum_error(
 	     handle,
 	     (uint64_t) first_sector,
 	     (uint64_t) amount_of_sectors,

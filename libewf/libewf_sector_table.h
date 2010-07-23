@@ -78,7 +78,7 @@ int libewf_sector_table_get_sector(
      uint64_t *number_of_sectors,
      liberror_error_t **error );
 
-int libewf_sector_table_add_sector(
+int libewf_sector_table_append_sector(
      libewf_sector_table_t *sector_table,
      uint64_t first_sector,
      uint64_t number_of_sectors,

@@ -189,7 +189,7 @@ LIBEWF_EXTERN int libewf_handle_get_acquiry_error(
                    uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
+LIBEWF_EXTERN int libewf_handle_append_acquiry_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
                    uint64_t number_of_sectors,
@@ -207,7 +207,7 @@ LIBEWF_EXTERN int libewf_handle_get_checksum_error(
                    uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_add_checksum_error(
+LIBEWF_EXTERN int libewf_handle_append_checksum_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
                    uint64_t number_of_sectors,
@@ -225,7 +225,7 @@ LIBEWF_EXTERN int libewf_handle_get_session(
                    uint64_t *number_of_sectors,
                    liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_handle_add_session(
+LIBEWF_EXTERN int libewf_handle_append_session(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
                    uint64_t number_of_sectors,

@@ -1,4 +1,4 @@
-.Dd July 19, 2010
+.Dd July 23, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -207,19 +207,19 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_acquiry_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_add_acquiry_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_append_acquiry_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_number_of_checksum_errors "libewf_handle_t *handle, uint32_t *number_of_errors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_checksum_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_add_checksum_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_append_checksum_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_number_of_sessions "libewf_handle_t *handle, uint32_t *number_of_sessions, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_session "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_add_session "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_append_session "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_header_codepage "libewf_handle_t *handle, int *codepage, libewf_error_t **error"
 .Ft int
@@ -413,16 +413,16 @@ This information is written to a set of EWF files when
 is used.
 .Pp
 The
-.Fn libewf_handle_add_acquiry_error
-function can be used to add an acquiry error (a read error during acquiry) to be written into a set of EWF files.
+.Fn libewf_handle_append_acquiry_error
+function can be used to append an acquiry error (a read error during acquiry) to be written into a set of EWF files.
 .Pp
 The
-.Fn libewf_handle_add_checksum_error
-function can be used to add an Adler-32 checksum error (a validation error in a chunk in a set of EWF files) to be set in the handle.
+.Fn libewf_handle_append_checksum_error
+function can be used to append an Adler-32 checksum error (a validation error in a chunk in a set of EWF files) to be set in the handle.
 .Pp
 The
-.Fn libewf_handle_add_session
-function can be used to add a sesssion to be written into a set of EWF files. Note that the only the start offset is stored in a set of EWF files. Libewf ignores the number of sectors on write and determines the session sizes using the available session and media information on read.
+.Fn libewf_handle_append_session
+function can be used to append a sesssion to be written into a set of EWF files. Note that the only the start offset is stored in a set of EWF files. Libewf ignores the number of sectors on write and determines the session sizes using the available session and media information on read.
 .Pp
 The
 .Fn libewf_handle_copy_*

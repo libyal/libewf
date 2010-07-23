@@ -182,7 +182,7 @@ int storage_media_buffer_initialize(
 	return( 1 );
 }
 
-/* Frees an exisisting buffer
+/* Frees a buffer
  * Returns 1 if successful or -1 on error
  */
 int storage_media_buffer_free(
@@ -224,7 +224,7 @@ int storage_media_buffer_free(
 	return( 1 );
 }
 
-/* Resizes an exisisting buffer
+/* Resizes a buffer
  * Returns 1 if successful or -1 on error
  */
 int storage_media_buffer_resize(

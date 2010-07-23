@@ -568,9 +568,9 @@ ssize_t verification_handle_prepare_read_buffer(
 		}
 		process_count = verification_handle->chunk_size;
 
-		/* Add a read error
+		/* Append a read error
 		 */
-		if( verification_handle_add_read_error(
+		if( verification_handle_append_read_error(
 		     verification_handle,
 		     verification_handle->last_offset_read,
 		     process_count,
@@ -580,7 +580,7 @@ ssize_t verification_handle_prepare_read_buffer(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add read error.",
+			 "%s: unable to append read error.",
 			 function );
 
 			return( -1 );
@@ -1151,13 +1151,13 @@ int verification_handle_set_error_handling_values(
 /* Appends a read error to the output handle
  * Returns 1 if successful or -1 on error
  */
-int verification_handle_add_read_error(
+int verification_handle_append_read_error(
       verification_handle_t *verification_handle,
       off64_t start_offset,
       size_t number_of_bytes,
       liberror_error_t **error )
 {
-	static char *function      = "verification_handle_add_read_error";
+	static char *function      = "verification_handle_append_read_error";
 	uint64_t start_sector      = 0;
 	uint64_t number_of_sectors = 0;
 
@@ -1197,7 +1197,7 @@ int verification_handle_add_read_error(
 	start_sector      = start_offset / verification_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / verification_handle->bytes_per_sector;
 
-	if( libewf_handle_add_checksum_error(
+	if( libewf_handle_append_checksum_error(
 	     verification_handle->input_handle,
 	     start_sector,
 	     number_of_sectors,
@@ -1207,7 +1207,7 @@ int verification_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add checksum errror.",
+		 "%s: unable to append checksum errror.",
 		 function );
 
 		return( -1 );

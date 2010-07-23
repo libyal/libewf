@@ -2066,16 +2066,16 @@ int libewf_handle_get_acquiry_error(
 	return( result );
 }
 
-/* Add an acquiry error
+/* Append an acquiry error
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_add_acquiry_error(
+int libewf_handle_append_acquiry_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
      liberror_error_t **error )
 {
-	static char *function = "libewf_handle_add_acquiry_error";
+	static char *function = "libewf_handle_append_acquiry_error";
 
 	if( handle == NULL )
 	{
@@ -2088,7 +2088,7 @@ int libewf_handle_add_acquiry_error(
 
 		return( -1 );
 	}
-	if( libewf_sector_table_add_sector(
+	if( libewf_sector_table_append_sector(
 	     ( (libewf_internal_handle_t *) handle )->acquiry_errors,
 	     first_sector,
 	     number_of_sectors,
@@ -2099,7 +2099,7 @@ int libewf_handle_add_acquiry_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add acquiry error.",
+		 "%s: unable to append acquiry error.",
 		 function );
 
 		return( -1 );
@@ -2226,17 +2226,17 @@ int libewf_handle_get_checksum_error(
 	return( result );
 }
 
-/* Add a checksum error
+/* Append a checksum error
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_add_checksum_error(
+int libewf_handle_append_checksum_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_add_checksum_error";
+	static char *function                     = "libewf_handle_append_checksum_error";
 
 	if( handle == NULL )
 	{
@@ -2262,7 +2262,7 @@ int libewf_handle_add_checksum_error(
 
 		return( -1 );
 	}
-	if( libewf_sector_table_add_sector(
+	if( libewf_sector_table_append_sector(
 	     internal_handle->read_io_handle->checksum_errors,
 	     first_sector,
 	     number_of_sectors,
@@ -2273,7 +2273,7 @@ int libewf_handle_add_checksum_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add checksum error.",
+		 "%s: unable to append checksum error.",
 		 function );
 
 		return( -1 );
@@ -2375,16 +2375,16 @@ int libewf_handle_get_session(
 	return( result );
 }
 
-/* Add a session
+/* Appends a session
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_add_session(
+int libewf_handle_append_session(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
      liberror_error_t **error )
 {
-	static char *function = "libewf_handle_add_session";
+	static char *function = "libewf_handle_append_session";
 
 	if( handle == NULL )
 	{
@@ -2397,7 +2397,7 @@ int libewf_handle_add_session(
 
 		return( -1 );
 	}
-	if( libewf_sector_table_add_sector(
+	if( libewf_sector_table_append_sector(
 	     ( (libewf_internal_handle_t *) handle )->sessions,
 	     first_sector,
 	     number_of_sectors,
@@ -2408,7 +2408,7 @@ int libewf_handle_add_session(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add session.",
+		 "%s: unable to append session.",
 		 function );
 
 		return( -1 );

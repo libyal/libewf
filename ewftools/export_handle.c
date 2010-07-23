@@ -1177,9 +1177,9 @@ ssize_t export_handle_prepare_read_buffer(
 		}
 		process_count = export_handle->input_chunk_size;
 
-		/* Add a read error
+		/* Appends a read error
 		 */
-		if( export_handle_add_read_error(
+		if( export_handle_append_read_error(
 		     export_handle,
 		     export_handle->input_offset,
 		     process_count,
@@ -1189,7 +1189,7 @@ ssize_t export_handle_prepare_read_buffer(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add read error.",
+			 "%s: unable to append read error.",
 			 function );
 
 			return( -1 );
@@ -2299,7 +2299,7 @@ int export_handle_set_output_values(
 		}
 		if( guid_type != 0 )
 		{
-			/* Add a GUID if necessary
+			/* Sets the GUID if necessary
 			 */
 			if( guid_generate(
 			     guid,
@@ -2613,13 +2613,13 @@ int export_handle_set_hash_value(
 /* Appends a read error to the output handle
  * Returns 1 if successful or -1 on error
  */
-int export_handle_add_read_error(
+int export_handle_append_read_error(
       export_handle_t *export_handle,
       off64_t start_offset,
       size_t number_of_bytes,
       liberror_error_t **error )
 {
-	static char *function      = "export_handle_add_read_error";
+	static char *function      = "export_handle_append_read_error";
 	uint64_t start_sector      = 0;
 	uint64_t number_of_sectors = 0;
 
@@ -2662,7 +2662,7 @@ int export_handle_add_read_error(
 	number_of_sectors = number_of_bytes / export_handle->bytes_per_sector;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( libewf_handle_add_checksum_error(
+	if( libewf_handle_append_checksum_error(
 	     export_handle->input_handle,
 	     start_sector,
 	     number_of_sectors,
@@ -2672,7 +2672,7 @@ int export_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add checksum errror.",
+		 "%s: unable to append checksum errror.",
 		 function );
 
 		return( -1 );
@@ -2692,7 +2692,7 @@ int export_handle_add_read_error(
 			return( -1 );
 		}
 
-		if( libewf_handle_add_acquiry_error(
+		if( libewf_handle_append_acquiry_error(
 		     export_handle->ewf_output_handle,
 		     start_sector,
 		     number_of_sectors,
@@ -2702,7 +2702,7 @@ int export_handle_add_read_error(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add acquiry errror.",
+			 "%s: unable to append acquiry errror.",
 			 function );
 
 			return( -1 );

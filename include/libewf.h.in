@@ -899,10 +899,10 @@ LIBEWF_EXTERN int libewf_handle_get_acquiry_error(
                    uint64_t *number_of_sectors,
                    libewf_error_t **error );
 
-/* Add an acquiry error
+/* Appends an acquiry error
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
+LIBEWF_EXTERN int libewf_handle_append_acquiry_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
                    uint64_t number_of_sectors,
@@ -926,10 +926,10 @@ LIBEWF_EXTERN int libewf_handle_get_checksum_error(
                    uint64_t *number_of_sectors,
                    libewf_error_t **error );
 
-/* Add a checksum error
+/* Appends a checksum error
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_add_checksum_error(
+LIBEWF_EXTERN int libewf_handle_append_checksum_error(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
                    uint64_t number_of_sectors,
@@ -953,10 +953,10 @@ LIBEWF_EXTERN int libewf_handle_get_session(
                    uint64_t *number_of_sectors,
                    libewf_error_t **error );
 
-/* Add a session
+/* Appends a session
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_add_session(
+LIBEWF_EXTERN int libewf_handle_append_session(
                    libewf_handle_t *handle,
                    uint64_t first_sector,
                    uint64_t number_of_sectors,
@@ -1333,6 +1333,18 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
                    uint32_t *amount_of_errors,
                    libewf_error_t **error );
 
+/* Add an acquiry error
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_append_acquiry_error instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
+                   libewf_handle_t *handle,
+                   uint64_t first_sector,
+                   uint64_t number_of_sectors,
+                   libewf_error_t **error );
+
 /* Retrieves the number of checksum errors
  * Returns 1 if successful or -1 on error
  *
@@ -1371,7 +1383,7 @@ LIBEWF_EXTERN int libewf_handle_get_crc_error(
 /* Add a checksum error
  * Returns 1 if successful or -1 on error
  *
- * This function deprecated use libewf_handle_add_checksum_error instead
+ * This function deprecated use libewf_handle_append_checksum_error instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_add_crc_error(
@@ -1389,6 +1401,18 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_sessions,
+                   libewf_error_t **error );
+
+/* Add a session
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_append_session instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN int libewf_handle_add_session(
+                   libewf_handle_t *handle,
+                   uint64_t first_sector,
+                   uint64_t number_of_sectors,
                    libewf_error_t **error );
 
 /* Retrieves the amount of header values
@@ -2552,7 +2576,7 @@ LIBEWF_EXTERN int libewf_get_acquiry_error(
 /* Add an acquiry error
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_add_acquiry_error instead
+ * This function is deprecated use libewf_handle_append_acquiry_error instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_add_acquiry_error(
@@ -2585,7 +2609,7 @@ LIBEWF_EXTERN int libewf_get_crc_error(
 /* Add a checksum error
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_add_checksum_error instead
+ * This function is deprecated use libewf_handle_append_checksum_error instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_add_crc_error(
@@ -2618,7 +2642,7 @@ LIBEWF_EXTERN int libewf_get_session(
 /* Add a session
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_add_session instead
+ * This function is deprecated use libewf_handle_append_session instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_add_session(
