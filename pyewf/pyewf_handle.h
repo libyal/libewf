@@ -28,9 +28,10 @@
 
 #include <liberror.h>
 
-/* Fix HAVE_FSTAT define in pyport.h
+/* Fix HAVE_FSTAT and HAVE_STAT defines in pyport.h
  */
 #undef HAVE_FSTAT
+#undef HAVE_STAT
 
 #include <Python.h>
 

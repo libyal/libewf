@@ -36,6 +36,18 @@ extern "C" {
 
 #if !defined( HAVE_LOCAL_LIBEWF )
 
+LIBEWF_EXTERN uint8_t libewf_get_flags_read(
+                       void );
+
+LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
+                       void );
+
+LIBEWF_EXTERN uint8_t libewf_get_flags_write(
+                       void );
+
+LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
+                       void );
+
 LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
                    libewf_handle_t *handle,
                    int maximum_amount_of_open_handles,

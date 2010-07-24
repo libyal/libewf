@@ -30,9 +30,10 @@
 #include <stdlib.h>
 #endif
 
-/* Fix HAVE_FSTAT define in pyport.h
+/* Fix HAVE_FSTAT and HAVE_STAT defines in pyport.h
  */
 #undef HAVE_FSTAT
+#undef HAVE_STAT
 
 #include <Python.h>
 
@@ -49,25 +50,25 @@ PyMethodDef pyewf_module_methods[] = {
 	  METH_NOARGS,
 	  "Retrieves the pyewf (libewf) version" },
 
-	{ "get_flags_read",
-	  (PyCFunction) pyewf_get_flags_read,
+	{ "get_access_flags_read",
+	  (PyCFunction) pyewf_get_access_flags_read,
 	  METH_NOARGS,
-	  "Retrieves the read open flags" },
+	  "Retrieves the read access flags" },
 
-	{ "get_flags_read_write",
-	  (PyCFunction) pyewf_get_flags_read_write,
+	{ "get_access_flags_read_write",
+	  (PyCFunction) pyewf_get_access_flags_read_write,
 	  METH_NOARGS,
-	  "Retrieves the read write open flags" },
+	  "Retrieves the read and write access flags" },
 
-	{ "get_flags_write",
-	  (PyCFunction) pyewf_get_flags_write,
+	{ "get_access_flags_write",
+	  (PyCFunction) pyewf_get_access_flags_write,
 	  METH_NOARGS,
-	  "Retrieves the write open flags" },
+	  "Retrieves the write access flags" },
 
-	{ "get_flags_write_resume",
-	  (PyCFunction) pyewf_get_flags_write_resume,
+	{ "get_access_flags_write_resume",
+	  (PyCFunction) pyewf_get_access_flags_write_resume,
 	  METH_NOARGS,
-	  "Retrieves the resume write open flags" },
+	  "Retrieves the resume write access flags" },
 
 	{ "check_file_signature",
 	  (PyCFunction) pyewf_check_file_signature,
@@ -88,6 +89,28 @@ PyMethodDef pyewf_module_methods[] = {
 	  (PyCFunction) pyewf_new_handle,
 	  METH_NOARGS,
 	  "Creates a new pyewf handle object" },
+
+	/* TODO these function are deprecated and will be removed after a while */
+
+	{ "get_flags_read",
+	  (PyCFunction) pyewf_get_access_flags_read,
+	  METH_NOARGS,
+	  "Retrieves the read open flags" },
+
+	{ "get_flags_read_write",
+	  (PyCFunction) pyewf_get_access_flags_read_write,
+	  METH_NOARGS,
+	  "Retrieves the read write open flags" },
+
+	{ "get_flags_write",
+	  (PyCFunction) pyewf_get_access_flags_write,
+	  METH_NOARGS,
+	  "Retrieves the write open flags" },
+
+	{ "get_flags_write_resume",
+	  (PyCFunction) pyewf_get_access_flags_write_resume,
+	  METH_NOARGS,
+	  "Retrieves the resume write open flags" },
 
 	/* Sentinel */
 	{ NULL,
@@ -117,44 +140,44 @@ PyObject *pyewf_get_version(
 	         errors ) );
 }
 
-/* Retrieves the pyewf/libewf read open flags
+/* Retrieves the pyewf/libewf read access flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyewf_get_flags_read(
+PyObject *pyewf_get_access_flags_read(
            PyObject *self )
 {
 	return( PyInt_FromLong(
-	         (long) libewf_get_flags_read ) );
+	         (long) libewf_get_access_flags_read() ) );
 }
 
-/* Retrieves the pyewf/libewf read write open flags
+/* Retrieves the pyewf/libewf read write access flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyewf_get_flags_read_write(
+PyObject *pyewf_get_access_flags_read_write(
            PyObject *self )
 {
 	return( PyInt_FromLong(
-	         (long) libewf_get_flags_read_write ) );
+	         (long) libewf_get_access_flags_read_write() ) );
 }
 
-/* Retrieves the pyewf/libewf write open flags
+/* Retrieves the pyewf/libewf write access flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyewf_get_flags_write(
+PyObject *pyewf_get_access_flags_write(
            PyObject *self )
 {
 	return( PyInt_FromLong(
-	         (long) libewf_get_flags_write() ) );
+	         (long) libewf_get_access_flags_write() ) );
 }
 
-/* Retrieves the pyewf/libewf resume write open flags
+/* Retrieves the pyewf/libewf resume write access flags
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyewf_get_flags_write_resume(
+PyObject *pyewf_get_access_flags_write_resume(
            PyObject *self )
 {
 	return( PyInt_FromLong(
-	         (long) libewf_get_flags_write_resume() ) );
+	         (long) libewf_get_access_flags_write_resume() ) );
 }
 
 /* Checks if the file has an EWF signature

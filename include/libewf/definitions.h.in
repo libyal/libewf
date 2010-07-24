@@ -30,23 +30,32 @@
  */
 #define LIBEWF_VERSION_STRING			"@VERSION@"
 
-/* The libewf file access
+/* The access flags definitions
  * bit 1	set to 1 for read access
  * bit 2	set to 1 for write access
  * bit 3-4	not used
  * bit 5        set to 1 to resume write
  * bit 6-8	not used
  */
-#define LIBEWF_FLAG_READ			(uint8_t) 0x01
-#define LIBEWF_FLAG_WRITE			(uint8_t) 0x02
-#define LIBEWF_FLAG_RESUME			(uint8_t) 0x10
+enum LIBEWF_ACCESS_FLAGS
+{
+	LIBEWF_ACCESS_FLAG_READ			= 0x01,
+	LIBEWF_ACCESS_FLAG_WRITE		= 0x02,
+
+	LIBEWF_ACCESS_FLAG_RESUME		= 0x10
+};
 
 /* The libewf file access macros
  */
-#define LIBEWF_OPEN_READ			( LIBEWF_FLAG_READ )
-#define LIBEWF_OPEN_READ_WRITE			( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE )
-#define LIBEWF_OPEN_WRITE			( LIBEWF_FLAG_WRITE )
-#define LIBEWF_OPEN_WRITE_RESUME		( LIBEWF_FLAG_WRITE | LIBEWF_FLAG_RESUME )
+#define LIBEWF_OPEN_READ			( LIBEWF_ACCESS_FLAG_READ )
+#define LIBEWF_OPEN_READ_WRITE			( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE )
+#define LIBEWF_OPEN_WRITE			( LIBEWF_ACCESS_FLAG_WRITE )
+#define LIBEWF_OPEN_WRITE_RESUME		( LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME )
+
+/* TODO deprecated remove after a while */
+#define LIBEWF_FLAG_READ			LIBEWF_ACCESS_FLAG_READ
+#define LIBEWF_FLAG_WRITE			LIBEWF_ACCESS_FLAG_WRITE
+#define LIBEWF_FLAG_RESUME			LIBEWF_ACCESS_FLAG_RESUME
 
 /* The file formats
  */

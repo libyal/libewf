@@ -48,24 +48,24 @@ extern "C" {
 LIBEWF_EXTERN const char *libewf_get_version(
                            void );
 
-/* Returns the flags for reading
+/* Returns the access flags for reading
  */
-LIBEWF_EXTERN uint8_t libewf_get_flags_read(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_read(
                        void );
 
-/* Returns the flags for reading and writing
+/* Returns the access flags for reading and writing
  */
-LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_read_write(
                        void );
 
-/* Returns the flags for writing
+/* Returns the access flags for writing
  */
-LIBEWF_EXTERN uint8_t libewf_get_flags_write(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_write(
                        void );
 
-/* Returns the flags for resume writing
+/* Returns the access flags for resume writing
  */
-LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_write_resume(
                        void );
 
 /* Determines if a file is an EWF file (check for the EWF file signature)
@@ -136,6 +136,42 @@ LIBEWF_EXTERN int libewf_glob_wide_free(
                    int number_of_filenames,
                    libewf_error_t **error );
 #endif
+
+/* -------------------------------------------------------------------------
+ * Support functions - deprecated
+ * ------------------------------------------------------------------------- */
+
+/* Returns the flags for reading
+ *
+ * This function deprecated use libewf_get_access_flags_read instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN uint8_t libewf_get_flags_read(
+                       void );
+
+/* Returns the flags for reading and writing
+ *
+ * This function deprecated use libewf_get_access_flags_read_write instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
+                       void );
+
+/* Returns the flags for writing
+ *
+ * This function deprecated use libewf_get_access_flags_write instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN uint8_t libewf_get_flags_write(
+                       void );
+
+/* Returns the flags for resume writing
+ *
+ * This function deprecated use libewf_get_access_flags_write_resume instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
+                       void );
 
 /* -------------------------------------------------------------------------
  * Notify functions
@@ -241,7 +277,7 @@ LIBEWF_EXTERN int libewf_handle_open(
                    libewf_handle_t *handle,
                    char * const filenames[],
                    int number_of_filenames,
-                   uint8_t flags,
+                   uint8_t access_flags,
                    libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
@@ -254,7 +290,7 @@ LIBEWF_EXTERN int libewf_handle_open_wide(
                    libewf_handle_t *handle,
                    wchar_t * const filenames[],
                    int number_of_filenames,
-                   uint8_t flags,
+                   uint8_t access_flags,
                    libewf_error_t **error );
 #endif
 
@@ -265,7 +301,7 @@ LIBEWF_EXTERN int libewf_handle_open_wide(
 LIBEWF_EXTERN int libewf_handle_open_file_io_pool(
                    libewf_handle_t *handle,
                    libbfio_pool_t *file_io_pool,
-                   uint8_t flags,
+                   uint8_t access_flags,
                    libewf_error_t **error );
 #endif
 

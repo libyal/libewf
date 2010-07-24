@@ -1,4 +1,5 @@
 TODO
+* update pyewf (replace deprecated functions)
 * update builder5, codegear and msvscpp files
 
 * revise DEBUG and VERBOSE output
@@ -213,6 +214,11 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20100724
+* updated libmfdata, libsmraw
+* added support for free without close
+* renamed flags to access flags
 
 20100723
 * updated libbfio, libmfdata, libsmraw

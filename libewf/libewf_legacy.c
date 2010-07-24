@@ -36,6 +36,38 @@
 
 #if !defined( HAVE_LOCAL_LIBEWF )
 
+/* Returns the flags for reading
+ */
+uint8_t libewf_get_flags_read(
+         void )
+{
+	return( (uint8_t) LIBEWF_FLAG_READ );
+}
+
+/* Returns the flags for reading and writing
+ */
+uint8_t libewf_get_flags_read_write(
+         void )
+{
+	return( (uint8_t) ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) );
+}
+
+/* Returns the flags for writing
+ */
+uint8_t libewf_get_flags_write(
+         void )
+{
+	return( (uint8_t) LIBEWF_FLAG_WRITE );
+}
+
+/* Returns the flags for resume writing
+ */
+uint8_t libewf_get_flags_write_resume(
+         void )
+{
+	return( (uint8_t) LIBEWF_FLAG_WRITE | LIBEWF_FLAG_RESUME );
+}
+
 /* Sets the maximum amount of (concurrent) open file handles
  * Returns 1 if successful or -1 on error
  */

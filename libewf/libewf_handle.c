@@ -245,6 +245,22 @@ int libewf_handle_free(
 	{
 		internal_handle = (libewf_internal_handle_t *) *handle;
 
+		if( internal_handle->file_io_pool != NULL )
+		{
+			if( libewf_handle_close(
+			     *handle,
+			     error ) != 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_CLOSE_FAILED,
+				 "%s: unable to close handle.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( libewf_io_handle_free(
 		     &( internal_handle->io_handle ),
 		     error ) != 1 )
@@ -437,8 +453,8 @@ int libewf_handle_open(
 
 		return( -1 );
 	}
-	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
+	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		for( filename_iterator = 0;
 		     filename_iterator < number_of_filenames;
@@ -636,7 +652,7 @@ int libewf_handle_open(
 
 		return( -1 );
 	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	if( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	{
 		/* Get the basename of the first segment file
 		 */
@@ -709,7 +725,7 @@ int libewf_handle_open(
 			}
 		}
 	}
-	else if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
+	else if( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 )
 	{
 		/* Get the basename of the first segment file
 		 */
@@ -747,7 +763,7 @@ int libewf_handle_open(
 			}
 		}
 	}
-	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+	else if( ( flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
 	{
 		/* Get the basename and store it in the segment tables
 		 */
@@ -908,8 +924,8 @@ int libewf_handle_open_wide(
 
 		return( -1 );
 	}
-	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
+	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		for( filename_iterator = 0;
 		     filename_iterator < number_of_filenames;
@@ -1107,7 +1123,7 @@ int libewf_handle_open_wide(
 
 		return( -1 );
 	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	if( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	{
 		/* Get the basename of the first segment file
 		 */
@@ -1180,7 +1196,7 @@ int libewf_handle_open_wide(
 			}
 		}
 	}
-	else if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
+	else if( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 )
 	{
 		/* Get the basename of the first segment file
 		 */
@@ -1218,7 +1234,7 @@ int libewf_handle_open_wide(
 			}
 		}
 	}
-	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+	else if( ( flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
 	{
 		/* Get the basename and store it in the segment tables
 		 */
@@ -1401,14 +1417,12 @@ int libewf_handle_open_file_io_pool(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the number of file IO handles in the pool.",
+		 "%s: unable to retrieve the number of handles in the file IO pool.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( ( flags & LIBEWF_FLAG_READ ) != LIBEWF_FLAG_READ )
-	 && ( ( flags & LIBEWF_FLAG_WRITE ) != LIBEWF_FLAG_WRITE )
-	 && ( ( flags & LIBEWF_FLAG_RESUME ) != LIBEWF_FLAG_RESUME ) )
+	if( ( flags & ~( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME ) ) != 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -1419,8 +1433,8 @@ int libewf_handle_open_file_io_pool(
 
 		return( -1 );
 	}
-	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
+	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		if( libewf_read_io_handle_initialize(
 		     &( internal_handle->read_io_handle ),
@@ -1436,7 +1450,7 @@ int libewf_handle_open_file_io_pool(
 			return( -1 );
 		}
 	}
-	if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+	if( ( flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
 	{
 		if( libewf_write_io_handle_initialize(
 		     &( internal_handle->write_io_handle ),
@@ -1537,8 +1551,8 @@ int libewf_handle_open_file_io_pool(
 
 		return( -1 );
 	}
-	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 || ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
+	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		for( file_io_handle_iterator = 0;
 		     file_io_handle_iterator < number_of_file_io_handles;
@@ -1756,7 +1770,7 @@ int libewf_handle_open_file_io_pool(
 
 				/* Re-open the delta segment file with write access
 				 */
-				if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+				if( ( flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
 				{
 					if( libbfio_pool_reopen(
 					     internal_handle->file_io_pool,
@@ -1860,7 +1874,7 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to read segment table.",
 			 function );
 
-			if( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME )
+			if( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 )
 			{
 				libnotify_print_error_backtrace(
 				 *error );
@@ -1887,7 +1901,7 @@ int libewf_handle_open_file_io_pool(
 				return( -1 );
 			}
 		}
-		if( ( flags & LIBEWF_FLAG_RESUME ) == 0 )
+		if( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 )
 		{
 			if( libewf_segment_table_get_number_of_handles(
 			     internal_handle->delta_segment_table,
@@ -2059,8 +2073,8 @@ int libewf_handle_open_file_io_pool(
 			return( -1 );
 		}
 	}
-	if( ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-	 && ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
+	if( ( ( flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
+	 && ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		if( internal_handle->write_io_handle->values_initialized == 0 )
 		{
@@ -2196,7 +2210,7 @@ int libewf_handle_close(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close all segment files.",
+			 "%s: unable to close all file IO pool handles.",
 			 function );
 
 			result = -1;
@@ -3121,8 +3135,8 @@ ssize_t libewf_handle_prepare_write_chunk(
 		}
 		else if( chunk_exists == 0 )
 		{
-			if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-			 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
+			if( ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+			 && ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 			{
 				liberror_error_set(
 				 error,
@@ -3321,8 +3335,8 @@ ssize_t libewf_handle_write_chunk(
 		 data_size );
 	}
 #endif
-	if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
+	if( ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 	{
 		/* Check if chunk has already been created within a segment file
 		 */
@@ -3562,8 +3576,8 @@ ssize_t libewf_handle_write_buffer(
 	}
 	while( size > 0 )
 	{
-		if( ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-		 && ( ( internal_handle->io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
+		if( ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+		 && ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 		{
 			/* Check if chunk has already been created within a segment file
 			 */

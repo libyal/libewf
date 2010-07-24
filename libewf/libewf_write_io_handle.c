@@ -1744,7 +1744,7 @@ ssize_t libewf_write_io_handle_process_chunk(
 
 	/* Compress empty blocks if necessary
 	 */
-	if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
+	if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
 	{
 		is_empty_block = libewf_empty_block_test(
 		                  chunk_data,
@@ -4242,8 +4242,8 @@ ssize_t libewf_write_io_handle_finalize(
 	}
 	/* No need for finalization in R or RW mode
 	 */
-	if( ( ( io_handle->flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 && ( ( io_handle->flags & LIBEWF_FLAG_RESUME ) == 0 ) )
+	if( ( ( io_handle->flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( io_handle->flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 	{
 		return( 0 );
 	}

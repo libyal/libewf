@@ -26,9 +26,10 @@
 #include <common.h>
 #include <types.h>
 
-/* Fix HAVE_FSTAT define in pyport.h
+/* Fix HAVE_FSTAT and HAVE_STAT defines in pyport.h
  */
 #undef HAVE_FSTAT
+#undef HAVE_STAT
 
 #include <Python.h>
 
@@ -39,16 +40,16 @@ extern "C" {
 PyObject *pyewf_get_version(
            PyObject *self );
 
-PyObject *pyewf_get_flags_read(
+PyObject *pyewf_get_access_flags_read(
            PyObject *self );
 
-PyObject *pyewf_get_flags_read_write(
+PyObject *pyewf_get_access_flags_read_write(
            PyObject *self );
 
-PyObject *pyewf_get_flags_write(
+PyObject *pyewf_get_access_flags_write(
            PyObject *self );
 
-PyObject *pyewf_get_flags_write_resume(
+PyObject *pyewf_get_access_flags_write_resume(
            PyObject *self );
 
 PyObject *pyewf_check_file_signature(

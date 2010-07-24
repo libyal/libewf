@@ -1,4 +1,4 @@
-.Dd July 23, 2010
+.Dd July 24, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -13,13 +13,13 @@ Support functions
 .Ft const char *
 .Fn libewf_get_version "void"
 .Ft uint8_t
-.Fn libewf_get_flags_read
+.Fn libewf_get_access_flags_read
 .Ft uint8_t
-.Fn libewf_get_flags_read_write
+.Fn libewf_get_access_flags_read_write
 .Ft uint8_t
-.Fn libewf_get_flags_write
+.Fn libewf_get_access_flags_write
 .Ft uint8_t
-.Fn libewf_get_flags_write_resume
+.Fn libewf_get_access_flags_write_resume
 .Ft int
 .Fn libewf_check_file_signature "const char *filename, libewf_error_t **error"
 .Ft int
@@ -69,7 +69,7 @@ File/Handle functions
 .Ft int
 .Fn libewf_handle_free "libewf_handle_t **handle, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_open "libewf_handle_t *handle, char * const filenames[], int number_of_filenames, uint8_t flags, libewf_error_t **error"
+.Fn libewf_handle_open "libewf_handle_t *handle, char * const filenames[], int number_of_filenames, uint8_t access_flags, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_close "libewf_handle_t *handle, libewf_error_t **error"
 .Ft ssize_t
@@ -123,7 +123,7 @@ File/Handle functions
 .Pp
 Available when compiled with wide character string support:
 .Ft int
-.Fn libewf_handle_open_wide "libewf_handle_t *handle, wchar_t * const filenames[], int number_of_filenames, uint8_t flags"
+.Fn libewf_handle_open_wide "libewf_handle_t *handle, wchar_t * const filenames[], int number_of_filenames, uint8_t access_flags"
 .Ft int
 .Fn libewf_handle_get_segment_filename_size_wide "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int
@@ -143,7 +143,7 @@ Available when compiled with wide character string support:
 .Pp
 Available when compiled with libbfio support:
 .Ft int
-.Fn libewf_handle_open_file_io_pool "libewf_handle_t *handle, libbfio_pool_t *file_io_pool, uint8_t flags, libewf_error_t **error"
+.Fn libewf_handle_open_file_io_pool "libewf_handle_t *handle, libbfio_pool_t *file_io_pool, uint8_t access_flags, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_file_io_handle "libewf_handle_t *handle, libbfio_handle_t **file_io_handle, libewf_error_t **error"
 .Pp

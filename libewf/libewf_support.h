@@ -39,16 +39,16 @@ extern "C" {
 LIBEWF_EXTERN const char *libewf_get_version(
                            void );
 
-LIBEWF_EXTERN uint8_t libewf_get_flags_read(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_read(
                        void );
 
-LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_read_write(
                        void );
 
-LIBEWF_EXTERN uint8_t libewf_get_flags_write(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_write(
                        void );
 
-LIBEWF_EXTERN uint8_t libewf_get_flags_write_resume(
+LIBEWF_EXTERN uint8_t libewf_get_access_flags_write_resume(
                        void );
 
 #endif

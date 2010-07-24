@@ -47,36 +47,36 @@ const char *libewf_get_version(
 	return( (const char *) LIBEWF_VERSION_STRING );
 }
 
-/* Returns the flags for reading
+/* Returns the access flags for reading
  */
-uint8_t libewf_get_flags_read(
+uint8_t libewf_get_access_flags_read(
          void )
 {
-	return( (uint8_t) LIBEWF_FLAG_READ );
+	return( (uint8_t) LIBEWF_ACCESS_FLAG_READ );
 }
 
-/* Returns the flags for reading and writing
+/* Returns the access flags for reading and writing
  */
-uint8_t libewf_get_flags_read_write(
+uint8_t libewf_get_access_flags_read_write(
          void )
 {
-	return( (uint8_t) ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) );
+	return( (uint8_t) ( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE ) );
 }
 
-/* Returns the flags for writing
+/* Returns the access flags for writing
  */
-uint8_t libewf_get_flags_write(
+uint8_t libewf_get_access_flags_write(
          void )
 {
-	return( (uint8_t) LIBEWF_FLAG_WRITE );
+	return( (uint8_t) LIBEWF_ACCESS_FLAG_WRITE );
 }
 
-/* Returns the flags for resume writing
+/* Returns the access flags for resume writing
  */
-uint8_t libewf_get_flags_write_resume(
+uint8_t libewf_get_access_flags_write_resume(
          void )
 {
-	return( (uint8_t) LIBEWF_FLAG_WRITE | LIBEWF_FLAG_RESUME );
+	return( (uint8_t) LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME );
 }
 
 #endif
