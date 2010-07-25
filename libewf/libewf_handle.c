@@ -261,6 +261,8 @@ int libewf_handle_free(
 				result = -1;
 			}
 		}
+		*handle = NULL;
+
 		if( libewf_io_handle_free(
 		     &( internal_handle->io_handle ),
 		     error ) != 1 )
@@ -328,8 +330,6 @@ int libewf_handle_free(
 		}
 		memory_free(
 		 internal_handle );
-
-		*handle = NULL;
 	}
 	return( result );
 }

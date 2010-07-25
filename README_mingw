@@ -26,13 +26,14 @@ CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP CFLAGS="$CFL
 And install it in the mingw build tree with:
 sudo make install
 
-To build a DLL use:
+To build a DLL using mingw use:
 mingw32-configure --enable-winapi=yes
 mingw32-make
 
-It is possible to compile libewf without WINAPI support (--enable-winapi=no).
-libewf will need a mingw build of openssl libcrypto for MD5 and SHA1 support
-and optionally a mingw build of libuuid for GUID/UUID support.
+It is recommended that you use WINAPI support but it is possible to compile 
+libewf without it (--enable-winapi=no). Without WINAPI support libewf will
+need a mingw build of openssl libcrypto for MD5 and SHA1 support and optionally
+a mingw build of libuuid for GUID/UUID support.
 
 If mingw32-configure and mingw32-make are not available you'll need to build
 it by hand. For this you can use a script similar to the following:
