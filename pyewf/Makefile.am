@@ -11,7 +11,8 @@ pyexec_LTLIBRARIES = pyewf.la
 pyewf_la_SOURCES = \
 	pyewf.c pyewf.h \
 	pyewf_handle.c pyewf_handle.h \
-	pyewf_metadata.c pyewf_metadata.h
+	pyewf_metadata.c pyewf_metadata.h \
+	pyewf_python.h
 
 pyewf_la_LIBADD = \
 	../libcstring/libcstring.la \

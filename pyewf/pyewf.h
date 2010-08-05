@@ -26,12 +26,7 @@
 #include <common.h>
 #include <types.h>
 
-/* Fix HAVE_FSTAT and HAVE_STAT defines in pyport.h
- */
-#undef HAVE_FSTAT
-#undef HAVE_STAT
-
-#include <Python.h>
+#include "pyewf_python.h"
 
 #if defined( __cplusplus )
 extern "C" {

@@ -452,7 +452,7 @@ int libewf_handle_set_hash_value(
 	         error ) );
 }
 
-/* Retrieves the amount of sub file entries from a file entry
+/* Retrieves the amount of sub file entries
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_get_amount_of_sub_file_entries(
@@ -934,7 +934,7 @@ ssize_t libewf_read_buffer(
 	return( read_count );
 }
 
-/* Reads media data from an offset into a buffer
+/* Reads media data at the current offset
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_read_random(
@@ -1023,7 +1023,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 	return( chunk_data_size );
 }
 
-/* Writes 'raw' data in EWF format from a buffer at the current offset
+/* Writes 'raw' data in EWF format the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -1075,7 +1075,7 @@ ssize_t libewf_raw_write_buffer(
 	return( write_count );
 }
 
-/* Writes data in EWF format from a buffer at the current offset
+/* Writes data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -1114,7 +1114,7 @@ ssize_t libewf_write_buffer(
 	return( write_count );
 }
 
-/* Writes data in EWF format from a buffer at an specific offset,
+/* Writes data in EWF format at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error

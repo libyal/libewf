@@ -30,17 +30,11 @@
 #include <stdlib.h>
 #endif
 
-/* Fix HAVE_FSTAT and HAVE_STAT defines in pyport.h
- */
-#undef HAVE_FSTAT
-#undef HAVE_STAT
-
-#include <Python.h>
-
 #include <libewf.h>
 
 #include "pyewf.h"
 #include "pyewf_handle.h"
+#include "pyewf_python.h"
 
 /* The pyewf module methods
  */

@@ -1044,7 +1044,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	if( ( media_values->number_of_chunks != 0 )
 	 && ( media_values->number_of_chunks == number_of_chunks_written ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1060,7 +1060,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	if( ( media_values->media_size != 0 )
 	 && ( input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1078,7 +1078,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	{
 		if( number_of_chunks_written_to_segment >= chunks_per_segment )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1094,7 +1094,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	 */
 	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1105,7 +1105,7 @@ int libewf_write_io_handle_test_segment_file_full(
 
 		return( 1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1174,7 +1174,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	 */
 	if( chunks_section_offset == 0 )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1190,7 +1190,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	if( ( media_values->number_of_chunks != 0 )
 	 && ( media_values->number_of_chunks == number_of_chunks_written ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1206,7 +1206,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	if( ( media_values->media_size != 0 )
 	 && ( input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1222,7 +1222,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	if( ( unrestrict_offset_table == 0 )
 	 && ( number_of_chunks_written_to_section >= maximum_chunks_per_section ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1237,7 +1237,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	 */
 	if( number_of_chunks_written_to_section > (uint32_t) INT32_MAX )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1252,7 +1252,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	 */
 	if( ( segment_file_offset - chunks_section_offset ) > (off64_t) INT32_MAX )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1270,7 +1270,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	{
 		if( number_of_chunks_written_to_section >= chunks_per_section )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1286,7 +1286,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	 */
 	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1297,7 +1297,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 
 		return( 1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -1464,7 +1464,7 @@ int libewf_write_io_handle_create_segment_file(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2007,7 +2007,7 @@ ssize_t libewf_write_io_handle_process_chunk(
 	return( (ssize_t) data_write_size );
 }
 
-/* Writes a new chunk of data in EWF format from a buffer at the current offset
+/* Writes a new chunk of data in EWF format at the current offset
  * The necessary settings of the write values must have been made
  * Returns the number of bytes written, 0 when no longer bytes can be written or -1 on error
  */
@@ -2210,7 +2210,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	{
 		return( 0 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2341,7 +2341,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		segment_number += 1;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2446,7 +2446,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 				return( -1 );
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -2489,7 +2489,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	 */
 	if( write_io_handle->create_chunks_section == 1 )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2560,7 +2560,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 				return( -1 );
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -2591,7 +2591,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			return( -1 );
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2636,7 +2636,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		if( write_count == -1 )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -2652,7 +2652,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	/* Write the chunk data
 	 */
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2754,7 +2754,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	else if( result == 1 )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2845,7 +2845,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			if( ( media_values->media_size == 0 )
 			 || ( write_io_handle->input_write_count < (ssize64_t) media_values->media_size ) )
 			{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
@@ -2890,7 +2890,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	return( total_write_count );
 }
 
-/* Writes an existing chunk of data in EWF format from a buffer at the current offset
+/* Writes an existing chunk of data in EWF format at the current offset
  * The necessary settings of the write values must have been made
  * Returns the number of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
@@ -3067,7 +3067,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	segment_file_handle = chunk_value->segment_file_handle;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -3384,7 +3384,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		}
 		no_section_append = 1;
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
@@ -3466,7 +3466,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	return( total_write_count );
 }
 
-/* Writes a new chunk of data in EWF format from a buffer at the current offset
+/* Writes a new chunk of data in EWF format at the current offset
  * The necessary settings of the write values must have been made
  * Returns the number of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
@@ -3579,7 +3579,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -3635,7 +3635,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		{
 			read_size = remaining_chunk_size;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -3789,7 +3789,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 	return( (ssize_t) read_size );
 }
 
-/* Writes an existing chunk of data in EWF format from a buffer at the current offset
+/* Writes an existing chunk of data in EWF format at the current offset
  * The necessary settings of the write values must have been made
  * Returns the number of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
@@ -3899,7 +3899,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -3961,7 +3961,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		{
 			data_size = remaining_chunk_size;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -4259,7 +4259,7 @@ ssize_t libewf_write_io_handle_finalize(
 	 && ( ( media_values->media_size == 0 )
 	  || ( write_io_handle->input_write_count < (ssize64_t) media_values->media_size ) ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -4408,7 +4408,7 @@ ssize_t libewf_write_io_handle_finalize(
 		{
 			/* Correct the offset, size in the chunks section
 			 */
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -4465,7 +4465,7 @@ ssize_t libewf_write_io_handle_finalize(
 		}
 		/* Close the segment file
 		 */
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(

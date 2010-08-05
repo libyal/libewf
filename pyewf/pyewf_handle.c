@@ -31,17 +31,11 @@
 #include <stdlib.h>
 #endif
 
-/* Fix HAVE_FSTAT and HAVE_STAT defines in pyport.h
- */
-#undef HAVE_FSTAT
-#undef HAVE_STAT
-
-#include <Python.h>
-
 #include <libewf.h>
 
 #include "pyewf_handle.h"
 #include "pyewf_metadata.h"
+#include "pyewf_python.h"
 
 PyMethodDef pyewf_handle_object_methods[] = {
 
@@ -90,7 +84,7 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	{ "get_offset",
 	  (PyCFunction) pyewf_handle_get_offset,
 	  METH_NOARGS,
-	  "Return the current offset within the media data" },
+	  "Returns the current offset within the media data" },
 
 	/* Some Pythonesque aliases */
 
@@ -112,7 +106,7 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	{ "tell",
 	  (PyCFunction) pyewf_handle_get_offset,
 	  METH_NOARGS,
-	  "Return the current offset within the media data" },
+	  "Returns the current offset within the media data" },
 
 	/* Functions to access the metadata */
 

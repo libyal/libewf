@@ -141,7 +141,7 @@ int libewf_compress(
 	}
 	else if( result == Z_BUF_ERROR )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -261,7 +261,7 @@ int libewf_decompress(
 	}
 	else if( result == Z_DATA_ERROR )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -276,7 +276,7 @@ int libewf_decompress(
 	}
 	else if( result == Z_BUF_ERROR )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(

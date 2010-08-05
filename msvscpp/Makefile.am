@@ -9,6 +9,8 @@ EXTRA_DIST = \
 	libcstring/libcstring.vcproj \
 	liberror/liberror.vcproj \
 	libewf_dll/libewf_dll.vcproj \
+	libfvalue/libfvalue.vcproj \
+	libmfdata/libmfdata.vcproj \
 	libnotify/libnotify.vcproj \
 	libsmdev/libsmdev.vcproj \
 	libsmraw/libsmraw.vcproj \

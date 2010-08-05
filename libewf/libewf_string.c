@@ -28,7 +28,7 @@
 #include "libewf_string.h"
 
 /* Copies a string to a decimal 64-bit value
- * Return 1 if successful or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_string_copy_to_64bit_decimal(
      libcstring_character_t *string,
@@ -118,7 +118,7 @@ int libewf_string_copy_to_64bit_decimal(
 }
 
 /* Copies a string to a hexadecimal 64-bit value
- * Return 1 if successful or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_string_copy_to_64bit_hexadecimal(
      libcstring_character_t *string,

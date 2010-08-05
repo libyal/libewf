@@ -642,7 +642,7 @@ int libewf_single_files_parse_record_values(
 		{
 			value_string_length -= 1;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -959,7 +959,7 @@ int libewf_single_files_parse_file_entry(
 		{
 			value_string_length -= 1;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(

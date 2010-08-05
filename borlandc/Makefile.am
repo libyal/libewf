@@ -38,10 +38,13 @@ CODEGEAR_FILES = \
 	codegear/ewfexport/ewfexport.cbproj \
 	codegear/ewfinfo/ewfinfo.cbproj \
 	codegear/ewfverify/ewfverify.cbproj \
+	codegear/libcstring/libcstring.cbproj \
 	codegear/libbfio/libbfio.cbproj \
 	codegear/liberror/liberror.cbproj \
 	codegear/libewf/libewf.cbproj \
 	codegear/libewf.groupproj \
+	codegear/libfvalue/libfvalue.cbproj \
+	codegear/libmfdata/libmfdata.cbproj \
 	codegear/libnotify/libnotify.cbproj \
 	codegear/libsmdev/libsmdev.cbproj \
 	codegear/libsmraw/libsmraw.cbproj \

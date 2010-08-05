@@ -16,6 +16,7 @@ SUBDIRS = \
 	libsystem \
 	ewftools \
 	pyewf \
+	po \
 	documents \
 	manuals \
 	tests \
@@ -65,11 +66,13 @@ SPEC_FILES = \
 	libewf.spec.in
 
 EXTRA_DIST = \
-	$(DPKG_FILES) \
-	$(SPEC_FILES) \
+	config.rpath  \
+	README.mingw \
+	po/Makevars.in \
 	libewf.pc \
 	libewf.pc.in \
-	README_mingw
+	$(DPKG_FILES) \
+	$(SPEC_FILES)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
@@ -94,6 +97,7 @@ library:
 	(cd $(srcdir)/libmfdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfvalue && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))
 
 distclean: clean
 	/bin/rm -f Makefile

@@ -38,7 +38,7 @@
 #endif
 
 /* Determines the operating system string
- * Return 1 if successful or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int platform_get_operating_system(
      libcstring_system_character_t *operating_system_string,

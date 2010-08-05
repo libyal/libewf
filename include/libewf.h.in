@@ -352,7 +352,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
                        size_t buffer_size,
                        libewf_error_t **error );
 
-/* Reads (media) data from an offset into a buffer
+/* Reads (media) data at the current offset
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_read_random(
@@ -379,7 +379,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_write_chunk(
                        int8_t *write_checksum,
                        libewf_error_t **error );
 
-/* Writes a chunk of (media) data in EWF format from a buffer at the current offset
+/* Writes a chunk of (media) data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -397,7 +397,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
                        int8_t write_checksum,
                        libewf_error_t **error );
 
-/* Writes (media) data in EWF format from a buffer at the current offset
+/* Writes (media) data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -408,7 +408,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_buffer(
                        size_t buffer_size,
                        libewf_error_t **error );
 
-/* Writes (media) data in EWF format from a buffer at an specific offset,
+/* Writes (media) data in EWF format at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -1799,9 +1799,8 @@ LIBEWF_EXTERN int libewf_handle_set_hash_value(
  * Single file entry functions
  * ------------------------------------------------------------------------- */
 
-/* Frees an file entry
- * Detaches the reference from the file if necessary
- * Return 1 if successful or -1 on error
+/* Frees a file entry
+ * REturns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_free(
                    libewf_file_entry_t **file_entry,
@@ -1842,7 +1841,7 @@ LIBEWF_EXTERN int libewf_file_entry_get_size(
                    size64_t *size,
                    libewf_error_t **error );
 
-/* Retrieves the number of sub file entries from a file entry
+/* Retrieves the number of sub file entries
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_get_number_of_sub_file_entries(
@@ -1850,7 +1849,7 @@ LIBEWF_EXTERN int libewf_file_entry_get_number_of_sub_file_entries(
                    int *number_of_sub_file_entries,
                    libewf_error_t **error );
 
-/* Retrieves the sub file entry for the specific index from a file entry
+/* Retrieves the sub file entry for the specific index
  * Creates a new file entry which is attached to the same handle as the parent file entry
  * Returns 1 if successful or -1 on error
  */
@@ -1860,7 +1859,7 @@ LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
                    libewf_file_entry_t **sub_file_entry,
                    libewf_error_t **error );
 
-/* Reads data from the curent offset into a buffer
+/* Reads data at the curent offset
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
@@ -1869,7 +1868,7 @@ LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
                        size_t buffer_size,
                        libewf_error_t **error );
 
-/* Reads data from an offset into a buffer
+/* Reads data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_file_entry_read_random(
@@ -1917,7 +1916,7 @@ LIBEWF_EXTERN int libewf_file_entry_get_name(
                    size_t name_size,
                    libewf_error_t **error );
 
-/* Retrieves the amount of sub file entries from a file entry
+/* Retrieves the amount of sub file entries
  * Returns 1 if successful or -1 on error
  *
  * This function deprecated use libewf_file_entry_get_number_of_sub_file_entries instead
@@ -2061,7 +2060,7 @@ LIBEWF_EXTERN ssize_t libewf_read_buffer(
                        void *buffer,
                        size_t buffer_size );
 
-/* Reads (media) data from an offset into a buffer
+/* Reads (media) data at the current offset
  * Returns the amount of bytes read or -1 on error
  *
  * This function is deprecated use libewf_handle_read_random instead
@@ -2092,7 +2091,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        uint32_t *chunk_checksum,
                        int8_t *write_checksum );
 
-/* Writes 'raw' data in EWF format from a buffer at the current offset
+/* Writes 'raw' data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -2111,7 +2110,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
                        uint32_t chunk_checksum,
                        int8_t write_checksum );
 
-/* Writes data in EWF format from a buffer at the current offset
+/* Writes data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -2124,7 +2123,7 @@ LIBEWF_EXTERN ssize_t libewf_write_buffer(
                        void *buffer,
                        size_t buffer_size );
 
-/* Writes data in EWF format from a buffer at an specific offset,
+/* Writes data in EWF format at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error

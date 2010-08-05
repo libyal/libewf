@@ -358,7 +358,7 @@ int libewf_split_values_parse_string(
 
 	do
 	{
-		split_value_end = libcstring_string_search(
+		split_value_end = libcstring_string_search_character(
 				   split_value_start,
 				   delimiter,
 				   remaining_string_size );
@@ -429,7 +429,7 @@ int libewf_split_values_parse_string(
 		{
 			split_value_start = split_value_end + 1;
 		}
-		split_value_end = libcstring_string_search(
+		split_value_end = libcstring_string_search_character(
 		                   split_value_start,
 		                   delimiter,
 		                   remaining_string_size );

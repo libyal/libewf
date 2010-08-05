@@ -1426,7 +1426,7 @@ int libewf_header_values_parse_header_string(
 					/* If the date time values string contains spaces it's in the old header
 					 * format otherwise is in new header2 format
 					 */
-					else if( libcstring_string_search(
+					else if( libcstring_string_search_character(
 					          value_string,
 					          (libcstring_character_t) ' ',
 					          value_string_length ) != NULL )
@@ -6116,7 +6116,7 @@ int libewf_header_values_parse_header_string_xml(
 		}
 		string_length = lines->sizes[ line_iterator ] - 1;
 
-		open_tag_start = libcstring_string_search(
+		open_tag_start = libcstring_string_search_character(
 		                  lines->values[ line_iterator ],
 		                  (libcstring_character_t) '<',
 		                  string_length );
@@ -6127,7 +6127,7 @@ int libewf_header_values_parse_header_string_xml(
 		{
 			continue;
 		}
-		open_tag_end = libcstring_string_search(
+		open_tag_end = libcstring_string_search_character(
 		                lines->values[ line_iterator ],
 		                (libcstring_character_t) '>',
 		                string_length );
@@ -6148,7 +6148,7 @@ int libewf_header_values_parse_header_string_xml(
 		{
 			continue;
 		}
-		close_tag_start = libcstring_string_search_reverse(
+		close_tag_start = libcstring_string_search_character_reverse(
 		                   &open_tag_end[ 1 ],
 		                   (libcstring_character_t) '<',
 		                   string_length );
@@ -6159,7 +6159,7 @@ int libewf_header_values_parse_header_string_xml(
 		{
 			continue;
 		}
-		close_tag_end = libcstring_string_search_reverse(
+		close_tag_end = libcstring_string_search_character_reverse(
 		                 &open_tag_end[ 1 ],
 		                 (libcstring_character_t) '>',
 		                 string_length );

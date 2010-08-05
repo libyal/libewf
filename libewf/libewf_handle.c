@@ -568,7 +568,7 @@ int libewf_handle_open(
 			}
 			file_io_handle = NULL;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1039,7 +1039,7 @@ int libewf_handle_open_wide(
 			}
 			file_io_handle = NULL;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1591,7 +1591,7 @@ int libewf_handle_open_file_io_pool(
 
 				return( -1 );
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -2502,7 +2502,7 @@ int libewf_handle_open_read(
 	     segment_number < number_of_segment_file_handles;
 	     segment_number++ )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2881,7 +2881,7 @@ ssize_t libewf_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
@@ -2898,7 +2898,7 @@ ssize_t libewf_handle_read_buffer(
 
 	if( chunk_data_size > internal_handle->chunk_cache->size )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -2982,7 +2982,7 @@ ssize_t libewf_handle_read_buffer(
 	return( total_read_count );
 }
 
-/* Reads (media) data from an offset into a buffer
+/* Reads (media) data at the current offset
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_handle_read_random(
@@ -3030,7 +3030,7 @@ ssize_t libewf_handle_read_random(
 	return( read_count );
 }
 
-/* Writes a chunk of (media) data in EWF format from a buffer at the current offset
+/* Writes a chunk of (media) data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -3180,7 +3180,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	return( chunk_data_size );
 }
 
-/* Writes a chunk of (media) data in EWF format from a buffer at the current offset
+/* Writes a chunk of (media) data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
@@ -3203,7 +3203,7 @@ ssize_t libewf_handle_write_chunk(
 	ssize_t write_count                       = 0;
 	int chunk_exists                          = 0;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	uint32_t number_of_chunk_values           = 0;
 #endif
 
@@ -3306,7 +3306,7 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_offset_table_get_number_of_chunk_values(
@@ -3428,7 +3428,7 @@ ssize_t libewf_handle_write_chunk(
 	return( (ssize_t) chunk_buffer_size );
 }
 
-/* Writes (media) data in EWF format from a buffer at the current offset
+/* Writes (media) data in EWF format at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -3550,7 +3550,7 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( chunk_data_size > internal_handle->chunk_cache->size )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -3696,7 +3696,7 @@ ssize_t libewf_handle_write_buffer(
 	return( total_write_count );
 }
 
-/* Writes (media) data in EWF format from a buffer at an specific offset,
+/* Writes (media) data in EWF format at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -3872,7 +3872,7 @@ off64_t libewf_handle_seek_offset(
 	{	
 		offset += (off64_t) internal_handle->media_values->media_size;
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(

@@ -454,6 +454,7 @@ int main( int argc, char * const argv[] )
 	 1 );
 
 	if( libsystem_initialize(
+	     "ewftools",
 	     &error ) != 1 )
 	{
 		fprintf(

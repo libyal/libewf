@@ -338,7 +338,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	size_t chunk_size                 = 0;
 	uint32_t number_of_chunk_values   = 0;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
         char *chunk_type                  = NULL;
 #endif
 	if( io_handle == NULL )
@@ -514,7 +514,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK ) != 0 )
@@ -752,7 +752,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 
 		if( chunk_size > chunk_cache->size )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(

@@ -342,7 +342,7 @@ int export_handle_signal_abort(
 }
 
 /* Create a directory
- * Return 1 if successful or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int export_handle_make_directory(
      export_handle_t *export_handle,
@@ -396,7 +396,7 @@ int export_handle_make_directory(
 }
 
 /* Sanitizes the filename
- * Return 1 if successful or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int export_handle_sanitize_filename(
      export_handle_t *export_handle,
@@ -2232,7 +2232,7 @@ int export_handle_set_output_values(
 			return( -1 );
 		}
 		if( ( compression_level != LIBEWF_COMPRESSION_NONE )
-		 || ( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) )
+		 || ( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 ) )
 		{
 			export_handle->write_compressed = 1;
 		}
@@ -2582,7 +2582,7 @@ int export_handle_set_hash_value(
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	      && ( export_handle->use_stdout == 0 ) )
 	{
-		if( libsmraw_handle_set_integrity_hash_value(
+		if( libsmraw_handle_set_utf8_integrity_hash_value(
 		     export_handle->raw_output_handle,
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_length,

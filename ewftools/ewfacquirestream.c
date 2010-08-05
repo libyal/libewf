@@ -412,7 +412,7 @@ int ewfacquirestream_acquiry_parameters_fprint(
 	}
 	else if( compression_level == LIBEWF_COMPRESSION_NONE )
 	{
-		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
+		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
 		{
 			fprintf(
 			 stream,
@@ -1289,6 +1289,7 @@ int main( int argc, char * const argv[] )
 	 1 );
 
 	if( libsystem_initialize(
+	     "ewftools",
 	     &error ) != 1 )
 	{
 		fprintf(

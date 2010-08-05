@@ -192,7 +192,7 @@ void usage_fprint(
 }
 
 /* Prints an overview of the acquiry parameters and asks the for confirmation
- * Return 1 if confirmed by user, 0 otherwise or -1 on error
+ * Returns 1 if confirmed by user, 0 otherwise or -1 on error
  */
 int8_t ewfacquire_confirm_acquiry_parameters(
         FILE *stream,
@@ -446,7 +446,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	}
 	else if( compression_level == LIBEWF_COMPRESSION_NONE )
 	{
-		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
+		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
 		{
 			fprintf(
 			 stream,
@@ -1420,6 +1420,7 @@ int main( int argc, char * const argv[] )
 	 1 );
 
 	if( libsystem_initialize(
+	     "ewftools",
 	     &error ) != 1 )
 	{
 		fprintf(

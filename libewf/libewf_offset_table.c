@@ -493,7 +493,7 @@ int libewf_offset_table_fill(
 	uint8_t overflow                  = 0;
 	int number_of_chunk_values        = 0;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	char *chunk_type                  = NULL;
 	char *remarks                     = NULL;
 #endif
@@ -615,7 +615,7 @@ int libewf_offset_table_fill(
 		{
 			if( stored_offset < current_offset )
 			{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
@@ -628,7 +628,7 @@ int libewf_offset_table_fill(
 
 				corrupted = 1;
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			else if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -664,7 +664,7 @@ int libewf_offset_table_fill(
 			}
 			corrupted = 1;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( compressed == 0 )
 		{
 			chunk_type = "uncompressed";
@@ -763,7 +763,7 @@ int libewf_offset_table_fill(
 		if( ( overflow == 0 )
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -792,7 +792,7 @@ int libewf_offset_table_fill(
 	}
 	corrupted = 0;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( compressed == 0 )
 	{
 		chunk_type = "uncompressed";
@@ -901,7 +901,7 @@ int libewf_offset_table_fill_last_offset(
 	off64_t chunk_size                                = 0;
 	uint8_t corrupted                                 = 0;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	char *remarks                                     = NULL;
 #endif
 
@@ -1008,7 +1008,7 @@ int libewf_offset_table_fill_last_offset(
 
 			if( chunk_size == 0 )
 			{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
@@ -1021,7 +1021,7 @@ int libewf_offset_table_fill_last_offset(
 			}
 			if( chunk_size > (off64_t) INT32_MAX )
 			{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
@@ -1032,7 +1032,7 @@ int libewf_offset_table_fill_last_offset(
 
 				corrupted = 1;
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( corrupted != 0 )
 			{
 				remarks = " corrupted";
@@ -1222,7 +1222,7 @@ int libewf_offset_table_compare(
 	uint8_t overflow                  = 0;
 	int number_of_chunk_values        = 0;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	char *chunk_type                  = NULL;
 	char *remarks                     = NULL;
 #endif
@@ -1344,7 +1344,7 @@ int libewf_offset_table_compare(
 		{
 			if( stored_offset < current_offset )
 			{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
@@ -1357,7 +1357,7 @@ int libewf_offset_table_compare(
 
 				corrupted = 1;
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			else if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1377,7 +1377,7 @@ int libewf_offset_table_compare(
 
 		if( chunk_size == 0 )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1389,7 +1389,7 @@ int libewf_offset_table_compare(
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1429,7 +1429,7 @@ int libewf_offset_table_compare(
 		}
 		if( chunk_value->file_offset != (off64_t) ( base_offset + current_offset ) )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1443,7 +1443,7 @@ int libewf_offset_table_compare(
 		}
 		else if( chunk_value->size != (size_t) chunk_size )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1457,7 +1457,7 @@ int libewf_offset_table_compare(
 		}
 		else if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != compressed )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1473,7 +1473,7 @@ int libewf_offset_table_compare(
 		{
 			mismatch = 0;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( compressed == 0 )
 		{
 			chunk_type = "uncompressed";
@@ -1530,7 +1530,7 @@ int libewf_offset_table_compare(
 		if( ( overflow == 0 )
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
@@ -1588,7 +1588,7 @@ int libewf_offset_table_compare(
 	}
 	if( chunk_value->file_offset != (off64_t) ( base_offset + current_offset ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1602,7 +1602,7 @@ int libewf_offset_table_compare(
 	}
 	else if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != compressed )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
@@ -1618,7 +1618,7 @@ int libewf_offset_table_compare(
 	{
 		mismatch = 0;
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( compressed == 0 )
 	{
 		chunk_type = "uncompressed";
@@ -1686,7 +1686,7 @@ int libewf_offset_table_compare_last_offset(
 	uint8_t corrupted                                 = 0;
 	uint8_t mismatch                                  = 0;
 
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	char *remarks                                     = NULL;
 #endif
 
@@ -1810,7 +1810,7 @@ int libewf_offset_table_compare_last_offset(
 			}
 			if( chunk_value->size != (size_t) chunk_size )
 			{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
@@ -1826,7 +1826,7 @@ int libewf_offset_table_compare_last_offset(
 			{
 				mismatch = 0;
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( corrupted != 0 )
 			{
 				remarks = " corrupted";

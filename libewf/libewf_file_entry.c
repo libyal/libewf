@@ -135,9 +135,8 @@ int libewf_file_entry_initialize(
 	return( 1 );
 }
 
-/* Frees an file entry
- * Detaches the reference from the file if necessary
- * Return 1 if successful or -1 on error
+/* Frees a file entry
+ * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_free(
      libewf_file_entry_t **file_entry,
@@ -741,7 +740,7 @@ int libewf_file_entry_get_entry_modification_time(
 	return( 1 );
 }
 
-/* Retrieves the number of sub file entries from a file entry
+/* Retrieves the number of sub file entries
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_get_number_of_sub_file_entries(
@@ -782,7 +781,7 @@ int libewf_file_entry_get_number_of_sub_file_entries(
 	return( 1 );
 }
 
-/* Retrieves the sub file entry for the specific index from a file entry
+/* Retrieves the sub file entry for the specific index
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_get_sub_file_entry(
@@ -887,7 +886,7 @@ int libewf_file_entry_get_sub_file_entry(
 	return( 1 );
 }
 
-/* Reads data from the curent offset into a buffer
+/* Reads data at the curent offset
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_file_entry_read_buffer(
@@ -984,7 +983,7 @@ ssize_t libewf_file_entry_read_buffer(
 	return( read_count );
 }
 
-/* Reads data from an offset into a buffer
+/* Reads data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_file_entry_read_random(
@@ -1103,7 +1102,7 @@ off64_t libewf_file_entry_seek_offset(
 	{	
 		offset += (off64_t) single_file_entry->data_size;
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(

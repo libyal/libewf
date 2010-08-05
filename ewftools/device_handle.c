@@ -834,7 +834,7 @@ int device_handle_get_information_value(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		result = libsmdev_handle_get_information_value(
+		result = libsmraw_handle_get_utf8_information_value(
 		          device_handle->dev_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
@@ -857,7 +857,7 @@ int device_handle_get_information_value(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		result = libsmraw_handle_get_information_value(
+		result = libsmraw_handle_get_utf8_information_value(
 		          device_handle->raw_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
@@ -1388,7 +1388,7 @@ int device_handle_media_information_fprint(
 			 "Removable:\t\tyes\n" );
 		}
 #endif
-		result = libsmdev_handle_get_information_value(
+		result = libsmraw_handle_get_utf8_information_value(
 		          device_handle->dev_input_handle,
 		          (uint8_t *) "vendor",
 		          6,
@@ -1416,7 +1416,7 @@ int device_handle_media_information_fprint(
 		 "Vendor:\t\t\t%s\n",
 		 (char *) media_information_value );
 
-		result = libsmdev_handle_get_information_value(
+		result = libsmraw_handle_get_utf8_information_value(
 		          device_handle->dev_input_handle,
 		          (uint8_t *) "model",
 		          5,
@@ -1444,7 +1444,7 @@ int device_handle_media_information_fprint(
 		 "Model:\t\t\t%s\n",
 		 (char *) media_information_value );
 
-		result = libsmdev_handle_get_information_value(
+		result = libsmraw_handle_get_utf8_information_value(
 		          device_handle->dev_input_handle,
 		          (uint8_t *) "serial_number",
 		          13,

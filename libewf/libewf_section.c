@@ -101,7 +101,7 @@ int libewf_section_test_zero(
 	return( 1 );
 }
 
-/* Reads a section start from a segment file
+/* Reads the section start
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_start_read(
@@ -430,7 +430,7 @@ ssize_t libewf_section_start_write(
 	return( write_count );
 }
 
-/* Reads a compressed string section from a segment file and uncompresses it
+/* Reads a compressed string section and decompresses it
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_compressed_string_read(

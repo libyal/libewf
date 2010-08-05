@@ -27,21 +27,11 @@
 #include <libcstring.h>
 #include <liberror.h>
 
-#if defined( HAVE_STDLIB_H )
-#include <stdlib.h>
-#endif
-
-/* Fix HAVE_FSTAT and HAVE_STAT defines in pyport.h
- */
-#undef HAVE_FSTAT
-#undef HAVE_STAT
-
-#include <Python.h>
-
 #include <libewf.h>
 
 #include "pyewf_handle.h"
 #include "pyewf_metadata.h"
+#include "pyewf_python.h"
 
 /* Retrieves the size of the media data
  * Returns a Python object holding the offset if successful or NULL on error
@@ -105,7 +95,7 @@ PyObject *pyewf_handle_get_header_value(
 	header_value_identifier_length = libcstring_narrow_string_length(
 	                                  header_value_identifier );
 
-	result = libewf_handle_get_header_value_size(
+	result = libewf_handle_get_utf8_header_value_size(
 	          pyewf_handle->handle,
 	          (uint8_t *) header_value_identifier,
 	          header_value_identifier_length,
@@ -118,7 +108,7 @@ PyObject *pyewf_handle_get_header_value(
 
 		PyErr_Format(
 		 PyExc_IOError,
-	         "%s: unable to retrieve header value size: %s.",
+	         "%s: unable to retrieve UTF-8 header value size: %s.",
 		 function,
 		 header_value_identifier );
 
@@ -145,7 +135,7 @@ PyObject *pyewf_handle_get_header_value(
 
 		return( NULL );
 	}
-	result = libewf_handle_get_header_value(
+	result = libewf_handle_get_utf8_header_value(
 	          pyewf_handle->handle,
 	          (uint8_t *) header_value_identifier,
 	          header_value_identifier_length,
@@ -159,7 +149,7 @@ PyObject *pyewf_handle_get_header_value(
 
 		PyErr_Format(
 		 PyExc_IOError,
-	         "%s: unable to retrieve header value: %s.",
+	         "%s: unable to retrieve UTF-8 header value: %s.",
 		 function,
 		 header_value_identifier );
 
@@ -232,7 +222,7 @@ PyObject *pyewf_handle_get_header_values(
 	     header_value_iterator < number_of_header_values;
 	     header_value_iterator++ )
 	{
-		if( libewf_handle_get_header_value_identifier_size(
+		if( libewf_handle_get_utf8_header_value_identifier_size(
 		     pyewf_handle->handle,
 		     header_value_iterator,
 		     &header_value_identifier_size,
@@ -242,7 +232,7 @@ PyObject *pyewf_handle_get_header_values(
 	
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to retrieve header value identifier size: %d.",
+			 "%s: unable to retrieve UTF-8 header value identifier size: %d.",
 			 function,
 			 header_value_iterator );
 
@@ -263,7 +253,7 @@ PyObject *pyewf_handle_get_header_values(
 
 			return( NULL );
 		}
-		if( libewf_handle_get_header_value_identifier(
+		if( libewf_handle_get_utf8_header_value_identifier(
 		     pyewf_handle->handle,
 		     header_value_iterator,
 		     (uint8_t *) header_value_identifier,
@@ -274,7 +264,7 @@ PyObject *pyewf_handle_get_header_values(
 
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to retrieve header value identifier: %d.",
+			 "%s: unable to retrieve UTF-8 header value identifier: %d.",
 			 function,
 			 header_value_iterator );
 
@@ -288,7 +278,7 @@ PyObject *pyewf_handle_get_header_values(
 		header_value_identifier_length = libcstring_narrow_string_length(
 						  header_value_identifier );
 
-		if( libewf_handle_get_header_value_size(
+		if( libewf_handle_get_utf8_header_value_size(
 		     pyewf_handle->handle,
 		     (uint8_t *) header_value_identifier,
 		     header_value_identifier_length,
@@ -299,7 +289,7 @@ PyObject *pyewf_handle_get_header_values(
 
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to retrieve header value size: %s.",
+			 "%s: unable to retrieve UTF-8 header value size: %s.",
 			 function,
 			 header_value_identifier );
 
@@ -327,7 +317,7 @@ PyObject *pyewf_handle_get_header_values(
 		}
 		/* Ignore emtpy header values
 		 */
-		if( libewf_handle_get_header_value(
+		if( libewf_handle_get_utf8_header_value(
 		     pyewf_handle->handle,
 		     (uint8_t *) header_value_identifier,
 		     header_value_identifier_length,
@@ -387,7 +377,7 @@ PyObject *pyewf_handle_get_hash_value(
 	hash_value_identifier_length = libcstring_narrow_string_length(
 	                                hash_value_identifier );
 
-	result = libewf_handle_get_hash_value_size(
+	result = libewf_handle_get_utf8_hash_value_size(
 	          pyewf_handle->handle,
 	          (uint8_t *) hash_value_identifier,
 	          hash_value_identifier_length,
@@ -400,7 +390,7 @@ PyObject *pyewf_handle_get_hash_value(
 
 		PyErr_Format(
 		 PyExc_IOError,
-	         "%s: unable to retrieve hash value size: %s.",
+	         "%s: unable to retrieve UTF-8 hash value size: %s.",
 		 function,
 		 hash_value_identifier );
 
@@ -427,7 +417,7 @@ PyObject *pyewf_handle_get_hash_value(
 
 		return( NULL );
 	}
-	result = libewf_handle_get_hash_value(
+	result = libewf_handle_get_utf8_hash_value(
 	          pyewf_handle->handle,
 	          (uint8_t *) hash_value_identifier,
 	          hash_value_identifier_length,
@@ -441,7 +431,7 @@ PyObject *pyewf_handle_get_hash_value(
 
 		PyErr_Format(
 		 PyExc_IOError,
-	         "%s: unable to retrieve hash value: %s.",
+	         "%s: unable to retrieve UTF-8 hash value: %s.",
 		 function,
 		 hash_value_identifier );
 
@@ -514,7 +504,7 @@ PyObject *pyewf_handle_get_hash_values(
 	     hash_value_iterator < number_of_hash_values;
 	     hash_value_iterator++ )
 	{
-		if( libewf_handle_get_hash_value_identifier_size(
+		if( libewf_handle_get_utf8_hash_value_identifier_size(
 		     pyewf_handle->handle,
 		     hash_value_iterator,
 		     &hash_value_identifier_size,
@@ -524,7 +514,7 @@ PyObject *pyewf_handle_get_hash_values(
 	
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to retrieve hash value identifier size: %d.",
+			 "%s: unable to retrieve UTF-8 hash value identifier size: %d.",
 			 function,
 			 hash_value_iterator );
 
@@ -545,7 +535,7 @@ PyObject *pyewf_handle_get_hash_values(
 
 			return( NULL );
 		}
-		if( libewf_handle_get_hash_value_identifier(
+		if( libewf_handle_get_utf8_hash_value_identifier(
 		     pyewf_handle->handle,
 		     hash_value_iterator,
 		     (uint8_t *) hash_value_identifier,
@@ -556,7 +546,7 @@ PyObject *pyewf_handle_get_hash_values(
 
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to retrieve hash value identifier: %d.",
+			 "%s: unable to retrieve UTF-8 hash value identifier: %d.",
 			 function,
 			 hash_value_iterator );
 
@@ -570,7 +560,7 @@ PyObject *pyewf_handle_get_hash_values(
 		hash_value_identifier_length = libcstring_narrow_string_length(
 						  hash_value_identifier );
 
-		if( libewf_handle_get_hash_value_size(
+		if( libewf_handle_get_utf8_hash_value_size(
 		     pyewf_handle->handle,
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_length,
@@ -581,7 +571,7 @@ PyObject *pyewf_handle_get_hash_values(
 
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to retrieve hash value size: %s.",
+			 "%s: unable to retrieve UTF-8 hash value size: %s.",
 			 function,
 			 hash_value_identifier );
 
@@ -609,7 +599,7 @@ PyObject *pyewf_handle_get_hash_values(
 		}
 		/* Ignore emtpy hash values
 		 */
-		if( libewf_handle_get_hash_value(
+		if( libewf_handle_get_utf8_hash_value(
 		     pyewf_handle->handle,
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_length,

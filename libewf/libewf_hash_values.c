@@ -360,7 +360,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		string_length = lines->sizes[ line_iterator ] - 1;
 
-		open_tag_start = libcstring_string_search(
+		open_tag_start = libcstring_string_search_character(
 		                  lines->values[ line_iterator ],
 		                  '<',
 		                  string_length );
@@ -371,7 +371,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		open_tag_end = libcstring_string_search(
+		open_tag_end = libcstring_string_search_character(
 		                lines->values[ line_iterator ],
 		                '>',
 		                string_length );
@@ -392,7 +392,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		close_tag_start = libcstring_string_search_reverse(
+		close_tag_start = libcstring_string_search_character_reverse(
 		                   &open_tag_end[ 1 ],
 		                   '<',
 		                   string_length );
@@ -403,7 +403,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		close_tag_end = libcstring_string_search_reverse(
+		close_tag_end = libcstring_string_search_character_reverse(
 		                 &open_tag_end[ 1 ],
 		                 '>',
 		                 string_length );

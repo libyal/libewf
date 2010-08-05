@@ -1,11 +1,9 @@
 TODO
-* update pyewf (replace deprecated functions)
-* update builder5, codegear and msvscpp files
+* update builder5 files
+* update macosx project files
 
-* revise DEBUG and VERBOSE output
 * rename section_list to section_value
 * add UTF-16 header and hash values, file entry name functions
-* update macosx project files
 
 * configure validate libuna and libbfio check
 * documentation:
@@ -214,6 +212,15 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20100805
+* worked on gettext support
+* updated array type
+* updated libcstring, libsystem, libuna, libbfio, libfvalue, libmfdata,
+  libsmdev, libsmraw
+* code clean up
+* worked on pyewf
+* updated msvscpp and codegear files
 
 20100724
 * updated libmfdata, libsmraw

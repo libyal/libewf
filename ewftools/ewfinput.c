@@ -981,7 +981,7 @@ int ewfinput_get_string_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libcstring_system_string_search(
+			end_of_input = libcstring_system_string_search_character(
 			                string_variable,
 			                (libcstring_system_character_t) '\n',
 			                string_variable_size );
@@ -999,7 +999,7 @@ int ewfinput_get_string_variable(
 					                 string_variable,
 					                 string_variable_size - 1 );
 
-					end_of_input = libcstring_system_string_search(
+					end_of_input = libcstring_system_string_search_character(
 					                string_variable,
 					                (libcstring_system_character_t) '\n',
 					                string_variable_size );
@@ -1128,7 +1128,7 @@ int ewfinput_get_size_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libcstring_system_string_search(
+			end_of_input = libcstring_system_string_search_character(
 			                input_buffer,
 			                (libcstring_system_character_t) '\n',
 			                input_buffer_size );
@@ -1146,7 +1146,7 @@ int ewfinput_get_size_variable(
 					                 input_buffer,
 					                 input_buffer_size - 1 );
 
-					end_of_input = libcstring_system_string_search(
+					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
 					                (libcstring_system_character_t) '\n',
 					                input_buffer_size );
@@ -1345,7 +1345,7 @@ int ewfinput_get_byte_size_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libcstring_system_string_search(
+			end_of_input = libcstring_system_string_search_character(
 			                input_buffer,
 			                (libcstring_system_character_t) '\n',
 			                input_buffer_size );
@@ -1363,7 +1363,7 @@ int ewfinput_get_byte_size_variable(
 					                 input_buffer,
 					                 input_buffer_size - 1 );
 
-					end_of_input = libcstring_system_string_search(
+					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
 					                (libcstring_system_character_t) '\n',
 					                input_buffer_size );
@@ -1537,7 +1537,7 @@ int ewfinput_get_fixed_string_variable(
 
 		if( result_string != NULL )
 		{
-			end_of_input = libcstring_system_string_search(
+			end_of_input = libcstring_system_string_search_character(
 			                input_buffer,
 			                (libcstring_system_character_t) '\n',
 			                input_buffer_size );
@@ -1555,7 +1555,7 @@ int ewfinput_get_fixed_string_variable(
 					                 input_buffer,
 					                 input_buffer_size - 1 );
 
-					end_of_input = libcstring_system_string_search(
+					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
 					                (libcstring_system_character_t) '\n',
 					                input_buffer_size );

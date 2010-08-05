@@ -45,7 +45,7 @@ const uint8_t dvf_file_signature[ 8 ] = { 0x64, 0x76, 0x66, 0x09, 0x0d, 0x0a, 0x
 const uint8_t evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
 const uint8_t lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
 
-/* Reads the file header from a segment file
+/* Reads the segment file header
  * Returns the number of bytes read if successful, or -1 on errror
  */
 ssize_t libewf_segment_file_read_file_header(
@@ -164,8 +164,7 @@ ssize_t libewf_segment_file_read_file_header(
 	return( read_count );
 }
 
-/* Reads all sections from a segment file into the section list specific
- * for the segment file in the segment table in the handle
+/* Reads all sections into the section list
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int libewf_segment_file_read_sections(
