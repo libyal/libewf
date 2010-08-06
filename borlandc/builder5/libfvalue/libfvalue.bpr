@@ -3,28 +3,25 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\Release\libsmdev.lib"/>
-    <OBJFILES value="libsmdev_ata.obj libsmdev_error.obj libsmdev_error_string.obj 
-      libsmdev_handle.obj libsmdev_legacy.obj libsmdev_list_type.obj 
-      libsmdev_metadata.obj libsmdev_notify.obj libsmdev_offset_list.obj 
-      libsmdev_optical_disk.obj libsmdev_scsi.obj libsmdev_string.obj 
-      libsmdev_support.obj libsmdev_usb.obj"/>
+    <PROJECT value="..\Release\libfvalue.lib"/>
+    <OBJFILES value="libfvalue_array_type.obj libfvalue_debug.obj libfvalue_string.obj 
+      libfvalue_table.obj libfvalue_value.obj libfvalue_value_entry.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;..\..\..\libsmdev"/>
+    <PATHCPP value=".;..\..\..\libfvalue"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV"/>
-    <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
-    <MAINSOURCE value="libsmdev.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBFVALUE"/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
+    <MAINSOURCE value="libfvalue.bpf"/>
+    <INCLUDEPATH value="..\..\..\libfvalue;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\..\libfvalue;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
@@ -68,15 +65,15 @@ Comments=
 
 [HistoryLists\hlIncludePath]
 Count=4
-Item0=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item2=..\..\..\libsmdev;$(BCB)\include;$(BCB)\include\vcl
+Item0=..\..\..\libfvalue;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libfvalue;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libfvalue;$(BCB)\include;$(BCB)\include\vcl
 Item3=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=3
-Item0=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib
-Item1=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
+Item0=..\..\..\libfvalue;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\libfvalue;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 Item2=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
@@ -84,14 +81,16 @@ Count=1
 Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=3
-Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV
-Item1=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO
-Item2=_DEBUG
+Count=4
+Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBFVALUE
+Item1=WINVER=0x0400;_WIN32_WINNT=0x0400;UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBFVALUE
+Item2=WINNT;UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBFVALUE
+Item3=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBFVALUE
 
 [HistoryLists\hlIntOutputDir]
-Count=1
+Count=2
 Item0=.
+Item1=..\libfvalue
 
 [HistoryLists\hlFinalOutputDir]
 Count=2

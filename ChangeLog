@@ -213,6 +213,10 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20100806
+* updated builder5 files
+* updated libbfio, libsystem
+
 20100805
 * worked on gettext support
 * updated array type

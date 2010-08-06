@@ -18,6 +18,10 @@ BUILDER5_FILES = \
 	builder5/libewf/libewf.bpf \
 	builder5/libewf/libewf.bpr \
 	builder5/libewf.bpg \
+	builder5/libmfdata/libmfdata.bpf \
+	builder5/libmfdata/libmfdata.bpr \
+	builder5/libfvalue/libfvalue.bpf \
+	builder5/libfvalue/libfvalue.bpr \
 	builder5/libnotify/libnotify.bpf \
 	builder5/libnotify/libnotify.bpr \
 	builder5/libsmdev/libsmdev.bpf \
@@ -38,8 +42,8 @@ CODEGEAR_FILES = \
 	codegear/ewfexport/ewfexport.cbproj \
 	codegear/ewfinfo/ewfinfo.cbproj \
 	codegear/ewfverify/ewfverify.cbproj \
-	codegear/libcstring/libcstring.cbproj \
 	codegear/libbfio/libbfio.cbproj \
+	codegear/libcstring/libcstring.cbproj \
 	codegear/liberror/liberror.cbproj \
 	codegear/libewf/libewf.cbproj \
 	codegear/libewf.groupproj \

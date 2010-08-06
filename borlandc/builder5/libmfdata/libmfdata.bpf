@@ -1,0 +1,26 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+USEUNIT("..\..\..\libmfdata\libmfdata_array_type.c");
+USEUNIT("..\..\..\libmfdata\libmfdata_error.c");
+USEUNIT("..\..\..\libmfdata\libmfdata_notify.c");
+USEUNIT("..\..\..\libmfdata\libmfdata_segment.c");
+USEUNIT("..\..\..\libmfdata\libmfdata_segment_table.c");
+USEUNIT("..\..\..\libmfdata\libmfdata_support.c");
+USE("..\..\..\libmfdata\libmfdata_support.h", File);
+USE("..\..\..\libmfdata\libmfdata_types.h", File);
+USE("..\..\..\libmfdata\libmfdata_array_type.h", File);
+USE("..\..\..\libmfdata\libmfdata_definitions.h", File);
+USE("..\..\..\libmfdata\libmfdata_error.h", File);
+USE("..\..\..\libmfdata\libmfdata_extern.h", File);
+USE("..\..\..\libmfdata\libmfdata_inline.h", File);
+USE("..\..\..\libmfdata\libmfdata_libbfio.h", File);
+USE("..\..\..\libmfdata\libmfdata_notify.h", File);
+USE("..\..\..\libmfdata\libmfdata_segment.h", File);
+USE("..\..\..\libmfdata\libmfdata_segment_table.h", File);
+//---------------------------------------------------------------------------
+#define Library
+
+// To add a file to the library use the Project menu 'Add to Project'.
+

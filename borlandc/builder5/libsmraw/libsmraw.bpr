@@ -5,8 +5,9 @@
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libsmraw.lib"/>
     <OBJFILES value="libsmraw_error.obj libsmraw_filename.obj libsmraw_handle.obj 
-      libsmraw_information_file.obj libsmraw_metadata.obj libsmraw_notify.obj 
-      libsmraw_string.obj libsmraw_support.obj libsmraw_values_table.obj"/>
+      libsmraw_information_file.obj libsmraw_legacy.obj libsmraw_metadata.obj 
+      libsmraw_notify.obj libsmraw_string.obj libsmraw_support.obj 
+      libsmraw_values_table.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -18,10 +19,10 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMRAW"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBSMRAW"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
     <MAINSOURCE value="libsmraw.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsmraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libsmraw;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
