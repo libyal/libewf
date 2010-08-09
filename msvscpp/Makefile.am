@@ -16,6 +16,7 @@ EXTRA_DIST = \
 	libsmraw/libsmraw.vcproj \
 	libsystem/libsystem.vcproj \
 	libuna/libuna.vcproj \
+	zlib_dll/zlib_dll.vcproj \
 	libewf.sln
 
 MAINTAINERCLEANFILES = \

@@ -2,11 +2,11 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewfacquire"
-	ProjectGUID="{7D57918B-6B13-4F5D-BA51-04BB6047A91C}"
-	RootNamespace="ewfacquire"
+	Name="zlib_dll"
+	ProjectGUID="{33D32A22-B3DF-4963-B512-BAAC8FB4785D}"
+	RootNamespace="zlib_dll"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -20,7 +20,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -41,14 +41,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsmdev;..\..\libsmraw;..\..\libsystem;..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV;HAVE_LOCAL_LIBSMRAW;LIBEWF_DLL_IMPORT"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;ZLIB_DLL"
 				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				WarningLevel="4"
-				Detect64BitPortabilityProblems="false"
+				WarningLevel="3"
 				DebugInformationFormat="3"
-				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -61,16 +61,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib rpcrt4.lib"
+				OutputFile="$(OutDir)\zlib.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				GenerateDebugInformation="false"
+				SubSystem="0"
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				TargetMachine="1"
+				ImportLibrary="$(TargetDir)zlib.lib"
+				TargetMachine="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -104,55 +104,63 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.c"
+				RelativePath="..\zlib\adler32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\device_handle.c"
+				RelativePath="..\zlib\compress.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_context.c"
+				RelativePath="..\zlib\crc32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_hash.c"
+				RelativePath="..\zlib\deflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfacquire.c"
+				RelativePath="..\zlib\gzclose.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfinput.c"
+				RelativePath="..\zlib\gzlib.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfoutput.c"
+				RelativePath="..\zlib\gzread.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\guid.c"
+				RelativePath="..\zlib\gzwrite.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\imaging_handle.c"
+				RelativePath="..\zlib\infback.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\log_handle.c"
+				RelativePath="..\zlib\inffast.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\platform.c"
+				RelativePath="..\zlib\inflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\process_status.c"
+				RelativePath="..\zlib\inftrees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\storage_media_buffer.c"
+				RelativePath="..\zlib\trees.c"
+				>
+			</File>
+			<File
+				RelativePath="..\zlib\uncompr.c"
+				>
+			</File>
+			<File
+				RelativePath="..\zlib\zutil.c"
 				>
 			</File>
 		</Filter>
@@ -162,63 +170,47 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.h"
+				RelativePath="..\zlib\crc32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\device_handle.h"
+				RelativePath="..\zlib\deflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_context.h"
+				RelativePath="..\zlib\gzguts.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_hash.h"
+				RelativePath="..\zlib\inffast.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfcommon.h"
+				RelativePath="..\zlib\inffixed.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfinput.h"
+				RelativePath="..\zlib\inflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfoutput.h"
+				RelativePath="..\zlib\inftrees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\guid.h"
+				RelativePath="..\zlib\trees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\imaging_handle.h"
+				RelativePath="..\zlib\zconf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\log_handle.h"
+				RelativePath="..\zlib\zlib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\md5.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\platform.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\process_status.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\sha1.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\storage_media_buffer.h"
+				RelativePath="..\zlib\zutil.h"
 				>
 			</File>
 		</Filter>

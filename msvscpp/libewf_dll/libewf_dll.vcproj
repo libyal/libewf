@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libewf_dll"
 	ProjectGUID="{B5225323-AC67-411D-8FBA-199E9467FAB5}"
 	RootNamespace="libewf"
@@ -39,7 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio;..\..\libewf;..\zlib\include"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio;..\..\libewf;..\zlib"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;ZLIB_DLL;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
 				WarningLevel="4"
@@ -56,9 +56,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="zdll.lib"
+				AdditionalDependencies="zlib.lib"
 				OutputFile="$(OutDir)\libewf.dll"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;;..\zlib\lib"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)\libewf.lib"
@@ -104,10 +104,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_chunk_cache.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_chunk_value.c"
 				>
 			</File>
 			<File
@@ -257,7 +253,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libewf\ewf_checksum.h"
+				RelativePath="..\..\libewf\ewf_crc.h"
 				>
 			</File>
 			<File
@@ -321,7 +317,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_chunk_value.h"
+				RelativePath="..\..\libewf\libewf_chunk_offset.h"
 				>
 			</File>
 			<File

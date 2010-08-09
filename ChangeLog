@@ -213,6 +213,9 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20100807
+* fixed errors introduced by libsmraw update in device handle
+
 20100806
 * updated builder5 files
 * updated libbfio, libsystem

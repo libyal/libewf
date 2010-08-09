@@ -86,19 +86,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libbfio\libbfio_error.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libbfio\libbfio_error_string.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libbfio\libbfio_file.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libbfio\libbfio_file_pool.c"
 				>
 			</File>
 			<File
@@ -153,10 +145,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libbfio\libbfio_file.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libbfio\libbfio_file_pool.h"
 				>
 			</File>
 			<File
