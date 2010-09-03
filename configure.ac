@@ -1276,10 +1276,10 @@ AS_IF(
   ])
  AC_SUBST(
   [libewf_spec_requires_libuuid],
-  [e2fsprogs-devel])
+  [libuuid])
  AC_SUBST(
   [libewf_spec_build_requires_libuuid],
-  [e2fsprogs-devel]) ],
+  [libuuid-devel]) ],
  [AC_SUBST(
   [libewf_spec_requires_libuuid],
   [])

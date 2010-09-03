@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -70,7 +69,7 @@ int libewf_file_entry_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create internal file entry.",
+			 "%s: unable to create file entry.",
 			 function );
 
 			return( -1 );
@@ -84,7 +83,7 @@ int libewf_file_entry_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear internal file entry.",
+			 "%s: unable to clear file entry.",
 			 function );
 
 			memory_free(
