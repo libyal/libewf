@@ -648,6 +648,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	ssize_t read_count                = 0;
 	int64_t sector                    = 0;
 	uint32_t chunk_checksum           = 0;
+	uint32_t number_of_chunk_values   = 0;
 	uint32_t number_of_sectors        = 0;
 	uint8_t checksum_mismatch         = 0;
 	int8_t is_compressed              = 0;
@@ -714,6 +715,24 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	if( ( chunk_cache->chunk != chunk )
 	 || ( chunk_cache->cached == 0 ) )
 	{
+		if( libewf_offset_table_get_number_of_chunk_values(
+		     offset_table,
+		     &number_of_chunk_values,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of chunk values.",
+			 function );
+
+			return( -1 );
+		}
+		if( chunk >= number_of_chunk_values )
+		{
+			return( 0 );
+		}
 		if( libewf_offset_table_get_chunk_value(
 		     offset_table,
 		     chunk,
@@ -761,7 +780,6 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 				 chunk_size );
 			}
 #endif
-
 			if( libewf_chunk_cache_resize(
 			     chunk_cache,
 			     chunk_size,

@@ -677,6 +677,7 @@ int info_handle_header_values_fprint(
 
 	static char *function               = "info_handle_header_values_fprint";
 	size_t header_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
+	size_t header_value_length          = 0;
 	size_t header_value_size            = INFO_HANDLE_VALUE_SIZE;
 	uint32_t header_value_iterator      = 0;
 	uint32_t number_of_values           = 0;
@@ -1252,21 +1253,26 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		else if( ( header_value_result == 1 )
-		      && ( info_handle_header_value_extents_fprint(
-		            header_value,
-		            header_value_size - 1,
-		            stream,
-		            error ) != 1 ) )
+		else if( header_value_result == 1 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print header value: extents.",
-			 function );
+			header_value_length = libcstring_system_string_length(
+			                       header_value );
 
-			result = -1;
+			if( info_handle_header_value_extents_fprint(
+			     header_value,
+			     header_value_length,
+			     stream,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print header value: extents.",
+				 function );
+
+				result = -1;
+			}
 		}
 		/* Currently there are 16 default values
 		 */
@@ -1280,7 +1286,7 @@ int info_handle_header_values_fprint(
 			     header_value_iterator < number_of_values;
 			     header_value_iterator++ )
 			{
-				if( libewf_handle_get_utf8_header_value_identifier_size(
+				if( libewf_handle_get_header_value_identifier_size(
 				     info_handle->input_handle,
 				     header_value_iterator,
 				     &header_value_identifier_size,
@@ -1312,7 +1318,7 @@ int info_handle_header_values_fprint(
 
 					continue;
 				}
-				if( libewf_handle_get_utf8_header_value_identifier(
+				if( libewf_handle_get_header_value_identifier(
 				     info_handle->input_handle,
 				     header_value_iterator,
 				     (uint8_t *) header_value_identifier,
@@ -2084,7 +2090,7 @@ int info_handle_hash_values_fprint(
 	     hash_value_iterator < number_of_values;
 	     hash_value_iterator++ )
 	{
-		if( libewf_handle_get_utf8_hash_value_identifier_size(
+		if( libewf_handle_get_hash_value_identifier_size(
 		     info_handle->input_handle,
 		     hash_value_iterator,
 		     &hash_value_identifier_size,
@@ -2116,7 +2122,7 @@ int info_handle_hash_values_fprint(
 
 			continue;
 		}
-		if( libewf_handle_get_utf8_hash_value_identifier(
+		if( libewf_handle_get_hash_value_identifier(
 		     info_handle->input_handle,
 		     hash_value_iterator,
 		     (uint8_t *) hash_value_identifier,

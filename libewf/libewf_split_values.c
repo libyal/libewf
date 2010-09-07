@@ -101,7 +101,7 @@ int libewf_split_values_initialize(
 		 && ( string_size > 0 ) )
 		{
 			( *split_values )->string = (libcstring_character_t *) memory_allocate(
-			                                                    sizeof( libcstring_character_t ) * string_size );
+			                                                        sizeof( libcstring_character_t ) * string_size );
 
 			if( ( *split_values )->string == NULL )
 			{
@@ -144,7 +144,7 @@ int libewf_split_values_initialize(
 		if( number_of_values > 0 )
 		{
 			( *split_values )->values = (libcstring_character_t **) memory_allocate(
-			                                                     sizeof( libcstring_character_t * ) * number_of_values );
+			                                                         sizeof( libcstring_character_t * ) * number_of_values );
 
 			if( ( *split_values )->values == NULL )
 			{
@@ -299,11 +299,11 @@ int libewf_split_values_parse_string(
 	libcstring_character_t *split_value_start = NULL;
 	libcstring_character_t *split_value_end   = NULL;
 	libcstring_character_t *string_end        = NULL;
-	static char *function                 = "libewf_split_values_parse_string";
-	size_t remaining_string_size          = 0;
-	ssize_t split_value_size              = 0;
-	int number_of_split_values            = 0;
-	int split_value_iterator              = 0;
+	static char *function                     = "libewf_split_values_parse_string";
+	size_t remaining_string_size              = 0;
+	ssize_t split_value_size                  = 0;
+	int number_of_split_values                = 0;
+	int split_value_iterator                  = 0;
 
 	if( split_values == NULL )
 	{

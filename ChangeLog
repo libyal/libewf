@@ -1,7 +1,6 @@
 TODO
 * move sections into separate objects ?
 * update builder5 files
-* update macosx project files
 
 * rename section_list to section_value
 * add UTF-16 header and hash values, file entry name functions
@@ -213,6 +212,14 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20100907
+* updated libbfio
+* fixed read beyond media size issue
+* ewfinfo fixed issue handling empty extents
+* updated macosx project file
+* updated msvscpp files
+* updated codegear files
 
 20100807
 * fixed errors introduced by libsmraw update in device handle

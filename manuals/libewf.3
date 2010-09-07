@@ -1,4 +1,4 @@
-.Dd July 24, 2010
+.Dd September 7, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -231,9 +231,9 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_number_of_header_values "libewf_handle_t *handle, uint32_t *number_of_values, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_utf8_header_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_header_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_utf8_header_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_header_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_utf8_header_value_size "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, size_t *value_size, libewf_error_t **error"
 .Ft int
@@ -293,9 +293,9 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_number_of_hash_values "libewf_handle_t *handle, uint32_t *number_of_values, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_utf8_hash_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_hash_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_utf8_hash_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
+.Fn libewf_handle_get_hash_value_identifier "libewf_handle_t *handle, uint32_t index, uint8_t *identifier, size_t identifier_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_utf8_hash_value_size "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, size_t *value_size, libewf_error_t **error"
 .Ft int

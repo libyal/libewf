@@ -50,13 +50,13 @@ You'll need:
   The provided Visual Studio project files were created using
   the 2008 express version. The express verion is available on the
   Microsoft website
-* Microsoft Platform API for the Windows Crypto API
-  The platform API verion is available on the Microsoft website
-* The zlib DLL package including the .lib file available from the zlib
-  project site: http://www.gzip.org/zlib/
+* Microsoft Windows SDK (if not already included) for the Windows Crypto API
+  The Windows SDK is available on the Microsoft website
+* The zlib 1.2.5 source package including from the zlib project site:
+  http://www.gzip.org/zlib/
 
 Extract the contents of the zlib DLL package to:
-libewf-<version>/msvscpp/zlib
+libewf-<version>/msvscpp/zlib-1.2.5
 
 You should be able to build the libewf DLL using the provided
 project files. Note that the project files contain a debug and release

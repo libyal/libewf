@@ -2890,7 +2890,6 @@ ssize_t libewf_handle_read_buffer(
 		 buffer_size );
 	}
 #endif
-
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents some reallocations of the chunk cache
 	 */
@@ -2907,7 +2906,6 @@ ssize_t libewf_handle_read_buffer(
 			 chunk_data_size );
 		}
 #endif
-
 		if( libewf_chunk_cache_resize(
 		     internal_handle->chunk_cache,
 		     chunk_data_size,
@@ -2938,7 +2936,7 @@ ssize_t libewf_handle_read_buffer(
 		                    buffer_size,
 		                    error );
 
-		if( chunk_read_count <= -1 )
+		if( chunk_read_count == -1 )
 		{
 			liberror_error_set(
 			 error,

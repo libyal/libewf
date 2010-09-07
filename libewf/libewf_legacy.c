@@ -246,43 +246,7 @@ int libewf_handle_get_amount_of_header_values(
 	         error ) );
 }
 
-/* Retrieves the size of the UTF-8 encoded header value identifier of a specific index
- * The identifier size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_header_value_identifier_size(
-     libewf_handle_t *handle,
-     uint32_t index,
-     size_t *identifier_size,
-     liberror_error_t **error )
-{
-	return( libewf_handle_get_utf8_header_value_identifier_size(
-	         handle,
-	         index,
-	         identifier_size,
-	         error ) );
-}
-
-/* Retrieves the UTF-8 encoded header value identifier of a specific index
- * The identifier size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_header_value_identifier(
-     libewf_handle_t *handle,
-     uint32_t index,
-     uint8_t *identifier,
-     size_t identifier_size,
-     liberror_error_t **error )
-{
-	return( libewf_handle_get_utf8_header_value_identifier(
-	         handle,
-	         index,
-	         identifier,
-	         identifier_size,
-	         error ) );
-}
-
-/* Retrieves the size of the UTF-8 encoded header value of an UTF-8 encoded identifier
+/* Retrieves the size of the UTF-8 encoded header value of an identifier
  * The value size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -301,7 +265,7 @@ int libewf_handle_get_header_value_size(
 	         error ) );
 }
 
-/* Retrieves the UTF-8 encoded header value of an UTF-8 encoded identifier
+/* Retrieves the UTF-8 encoded header value of an identifier
  * The value size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -322,7 +286,7 @@ int libewf_handle_get_header_value(
 	         error ) );
 }
 
-/* Sets the UTF-8 encoded header value specified by the UTF-8 encoded identifier
+/* Sets the UTF-8 encoded header value specified by the identifier
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_header_value(
@@ -356,43 +320,7 @@ int libewf_handle_get_amount_of_hash_values(
 	         error ) );
 }
 
-/* Retrieves the size of the UTF-8 encoded hash value identifier of a specific index
- * The identifier size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_hash_value_identifier_size(
-     libewf_handle_t *handle,
-     uint32_t index,
-     size_t *identifier_size,
-     liberror_error_t **error )
-{
-	return( libewf_handle_get_utf8_hash_value_identifier_size(
-	         handle,
-	         index,
-	         identifier_size,
-	         error ) );
-}
-
-/* Retrieves the UTF-8 encoded hash value identifier of a specific index
- * The identifier size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_hash_value_identifier(
-     libewf_handle_t *handle,
-     uint32_t index,
-     uint8_t *identifier,
-     size_t identifier_size,
-     liberror_error_t **error )
-{
-	return( libewf_handle_get_utf8_hash_value_identifier(
-	         handle,
-	         index,
-	         identifier,
-	         identifier_size,
-	         error ) );
-}
-
-/* Retrieves the size of the UTF-8 encoded hash value of an UTF-8 encoded identifier
+/* Retrieves the size of the UTF-8 encoded hash value of an identifier
  * The value size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -411,7 +339,7 @@ int libewf_handle_get_hash_value_size(
 	         error ) );
 }
 
-/* Retrieves the UTF-8 encoded hash value of an UTF-8 encoded identifier
+/* Retrieves the UTF-8 encoded hash value of an identifier
  * The value size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -432,7 +360,7 @@ int libewf_handle_get_hash_value(
 	         error ) );
 }
 
-/* Sets the UTF-8 encoded hash value specified by the UTF-8 encoded identifier
+/* Sets the UTF-8 encoded hash value specified by the identifier
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_hash_value(
