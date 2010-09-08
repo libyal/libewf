@@ -328,7 +328,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_prepare_read_chunk(
                        int8_t read_checksum,
                        libewf_error_t **error );
 
-/* Reads a chunk of (media) data from the curent offset into a buffer
+/* Reads a chunk of (media) data from the current offset into a buffer
  * size contains the size of the chunk buffer
  * The function sets the chunk checksum, is compressed and read checksum values
  * Returns the number of bytes read or -1 on error
@@ -343,7 +343,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        int8_t *read_checksum,
                        libewf_error_t **error );
 
-/* Reads (media) data from the curent offset into a buffer
+/* Reads (media) data from the current offset into a buffer
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
@@ -1752,7 +1752,7 @@ LIBEWF_EXTERN int libewf_file_entry_free(
                    libewf_file_entry_t **file_entry,
                    libewf_error_t **error );
 
-/* Retrieves the flags from the referenced file entry
+/* Retrieves the flags
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_get_flags(
@@ -1760,31 +1760,63 @@ LIBEWF_EXTERN int libewf_file_entry_get_flags(
                    uint32_t *flags,
                    libewf_error_t **error );
 
-/* Retrieves the size of the UTF-8 encoded name from the referenced file entry
+/* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_get_utf8_name_size(
                    libewf_file_entry_t *file_entry,
-                   size_t *name_size,
+                   size_t *utf8_name_size,
                    libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded name value from the referenced file entry
+/* Retrieves the UTF-8 encoded name value
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_get_utf8_name(
                    libewf_file_entry_t *file_entry,
-                   uint8_t *name,
-                   size_t name_size,
+                   uint8_t *utf8_name,
+                   size_t utf8_name_size,
                    libewf_error_t **error );
 
-/* Retrieves the size from the referenced file entry
+/* Retrieves the size
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_get_size(
                    libewf_file_entry_t *file_entry,
                    size64_t *size,
+                   libewf_error_t **error );
+
+/* Retrieves the creation date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_file_entry_get_creation_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *creation_time,
+                   libewf_error_t **error );
+
+/* Retrieves the modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_file_entry_get_modification_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *modification_time,
+                   libewf_error_t **error );
+
+/* Retrieves the access date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_file_entry_get_access_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *access_time,
+                   libewf_error_t **error );
+
+/* Retrieves the entry modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_file_entry_get_entry_modification_time(
+                   libewf_file_entry_t *file_entry,
+                   uint64_t *entry_modification_time,
                    libewf_error_t **error );
 
 /* Retrieves the number of sub file entries
@@ -1805,7 +1837,7 @@ LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
                    libewf_file_entry_t **sub_file_entry,
                    libewf_error_t **error );
 
-/* Reads data at the curent offset
+/* Reads data at the current offset
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
@@ -1837,7 +1869,7 @@ LIBEWF_EXTERN off64_t libewf_file_entry_seek_offset(
  * Single file entry functions - deprecated
  * ------------------------------------------------------------------------- */
 
-/* Retrieves the size of the UTF-8 encoded name from the referenced file entry
+/* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  *
@@ -1849,7 +1881,7 @@ LIBEWF_EXTERN int libewf_file_entry_get_name_size(
                    size_t *name_size,
                    libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded name value from the referenced file entry
+/* Retrieves the UTF-8 encoded name value
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  *
@@ -1979,7 +2011,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        uint32_t chunk_checksum,
                        int8_t read_checksum );
 
-/* Reads 'raw' data from the curent offset into a buffer
+/* Reads 'raw' data from the current offset into a buffer
  * size contains the size of the buffer
  * The function sets the chunk checksum, is compressed and read checksum values
  * Returns the amount of bytes read or -1 on error
@@ -1995,7 +2027,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
                        uint32_t *chunk_checksum,
                        int8_t *read_checksum );
 
-/* Reads data from the curent offset into a buffer
+/* Reads data from the current offset into a buffer
  * Returns the amount of bytes read or -1 on error
  *
  * This function is deprecated use libewf_handle_read_buffer instead

@@ -81,13 +81,13 @@ LIBEWF_EXTERN int libewf_file_entry_get_flags(
 
 LIBEWF_EXTERN int libewf_file_entry_get_utf8_name_size(
                    libewf_file_entry_t *file_entry,
-                   size_t *name_size,
+                   size_t *utf8_name_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_file_entry_get_utf8_name(
                    libewf_file_entry_t *file_entry,
-                   uint8_t *name,
-                   size_t name_size,
+                   uint8_t *utf8_name,
+                   size_t utf8_name_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_file_entry_get_size(

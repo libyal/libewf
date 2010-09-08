@@ -100,8 +100,59 @@ int libewf_single_file_entry_free(
      liberror_error_t **error );
 
 int libewf_single_file_entry_clone(
-     intptr_t **destination,
-     intptr_t *source,
+     intptr_t **destination_single_file_entry,
+     intptr_t *source_single_file_entry,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_flags(
+     libewf_single_file_entry_t *single_file_entry,
+     uint32_t *flags,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_data_offset(
+     libewf_single_file_entry_t *single_file_entry,
+     off64_t *data_offset,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_data_size(
+     libewf_single_file_entry_t *single_file_entry,
+     size64_t *data_size,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_utf8_name_size(
+     libewf_single_file_entry_t *single_file_entry,
+     size_t *utf8_name_size,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_utf8_name(
+     libewf_single_file_entry_t *single_file_entry,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_size(
+     libewf_single_file_entry_t *single_file_entry,
+     size64_t *size,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_creation_time(
+     libewf_single_file_entry_t *single_file_entry,
+     uint64_t *creation_time,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_modification_time(
+     libewf_single_file_entry_t *single_file_entry,
+     uint64_t *modification_time,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_access_time(
+     libewf_single_file_entry_t *single_file_entry,
+     uint64_t *access_time,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_entry_modification_time(
+     libewf_single_file_entry_t *single_file_entry,
+     uint64_t *entry_modification_time,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

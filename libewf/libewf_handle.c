@@ -2691,7 +2691,7 @@ ssize_t libewf_handle_prepare_read_chunk(
 	return( chunk_data_size );
 }
 
-/* Reads a chunk of (media) data from the curent offset into a buffer
+/* Reads a chunk of (media) data from the current offset into a buffer
  * size contains the size of the chunk buffer
  * The function sets the chunk checksum, is compressed and read checksum values
  * Returns the number of bytes read or -1 on error

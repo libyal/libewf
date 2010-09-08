@@ -777,7 +777,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 	return( chunk_data_size );
 }
 
-/* Reads 'raw' data from the curent offset into a buffer
+/* Reads 'raw' data from the current offset into a buffer
  * size contains the size of the buffer
  * The function sets the chunk checksum, is compressed and read checksum values
  * Returns the amount of bytes read or -1 on error

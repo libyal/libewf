@@ -1,4 +1,7 @@
 TODO
+* single file entry delay conversion of file name
+* are single file entry flags similar to file attribute flags ?
+
 * move sections into separate objects ?
 * update builder5 files
 
@@ -13,6 +16,7 @@ TODO
 * improve open file io pool (set basename ?)
 
 Roadmap:
+* code clean up
 * improve python bindings
 * improve device handle (libsmdev)
 * support missing segment files (chunks)
@@ -212,6 +216,10 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20100908
+* code clean up
+* added single file entry date/time functions to the API
 
 20100907
 * updated libbfio
