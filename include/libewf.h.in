@@ -1828,7 +1828,6 @@ LIBEWF_EXTERN int libewf_file_entry_get_number_of_sub_file_entries(
                    libewf_error_t **error );
 
 /* Retrieves the sub file entry for the specific index
- * Creates a new file entry which is attached to the same handle as the parent file entry
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
