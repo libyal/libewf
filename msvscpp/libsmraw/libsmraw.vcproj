@@ -114,15 +114,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmraw\libsmraw_support.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_values_table.c"
 				>
 			</File>
 		</Filter>
@@ -180,19 +172,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_string.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmraw\libsmraw_support.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libsmraw\libsmraw_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_values_table.h"
 				>
 			</File>
 		</Filter>

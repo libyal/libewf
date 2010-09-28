@@ -41,9 +41,6 @@
 			<CppCompile Include="..\..\..\libsmraw\libsmraw_metadata.c">
 				<BuildOrder>0</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_values_table.c">
-				<BuildOrder>1</BuildOrder>
-			</CppCompile>
 			<CppCompile Include="..\..\..\libsmraw\libsmraw_error.c">
 				<BuildOrder>2</BuildOrder>
 			</CppCompile>
@@ -62,18 +59,12 @@
 			<None Include="..\..\..\libsmraw\libsmraw_definitions.h">
 				<BuildOrder>7</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libsmraw\libsmraw_string.c">
-				<BuildOrder>8</BuildOrder>
-			</CppCompile>
 			<CppCompile Include="..\..\..\libsmraw\libsmraw_support.c">
 				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmraw\libsmraw_notify.c">
 				<BuildOrder>10</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libsmraw\libsmraw_values_table.h">
-				<BuildOrder>11</BuildOrder>
-			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_codepage.h">
 				<BuildOrder>12</BuildOrder>
 			</None>
@@ -112,9 +103,6 @@
 			</None>
 			<None Include="..\..\..\libsmraw\libsmraw_notify.h">
 				<BuildOrder>24</BuildOrder>
-			</None>
-			<None Include="..\..\..\libsmraw\libsmraw_string.h">
-				<BuildOrder>25</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
