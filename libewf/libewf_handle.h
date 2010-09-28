@@ -31,6 +31,7 @@
 #include "libewf_extern.h"
 #include "libewf_hash_sections.h"
 #include "libewf_libbfio.h"
+#include "libewf_libfvalue.h"
 #include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
@@ -40,8 +41,10 @@
 #include "libewf_sector_table.h"
 #include "libewf_single_files.h"
 #include "libewf_types.h"
-#include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
+
+/* TODO remove after refactoring */
+#include "libewf_values_table.h"
 
 #if defined( _MSC_VER ) || defined( __BORLANDC__ )
 
@@ -126,7 +129,7 @@ struct libewf_internal_handle
 
 	/* The header values
 	 */
-	libewf_values_table_t *header_values;
+	libfvalue_table_t *header_values;
 
 	/* Value to indicate the header values were parsed
 	 */

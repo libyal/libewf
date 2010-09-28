@@ -262,14 +262,6 @@ int export_handle_set_output_values(
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error );
 
-int export_handle_set_header_value(
-     export_handle_t *export_handle,
-     char *header_value_identifier,
-     size_t header_value_identifier_length,
-     libcstring_system_character_t *header_value,
-     size_t header_value_length,
-     liberror_error_t **error );
-
 int export_handle_set_hash_value(
      export_handle_t *export_handle,
      char *hash_value_identifier,

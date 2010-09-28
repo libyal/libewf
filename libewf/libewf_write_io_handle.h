@@ -29,18 +29,21 @@
 
 #include "libewf_chunk_cache.h"
 #include "libewf_libbfio.h"
+#include "libewf_libfvalue.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_read_io_handle.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_table.h"
-#include "libewf_values_table.h"
 
 #include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
+
+/* TODO remove after refactoring */
+#include "libewf_values_table.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -235,7 +238,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
-         libewf_values_table_t **header_values,
+         libfvalue_table_t **header_values,
          libewf_values_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
@@ -276,7 +279,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
-         libewf_values_table_t **header_values,
+         libfvalue_table_t **header_values,
          libewf_values_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
@@ -327,7 +330,7 @@ ssize_t libewf_write_io_handle_finalize(
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
-         libewf_values_table_t **header_values,
+         libfvalue_table_t **header_values,
          libewf_values_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,

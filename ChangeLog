@@ -1,4 +1,7 @@
 TODO
+* UTF-16 support
+  - refactor values tables to libfvalue table
+
 * single file entry delay conversion of file name
 * are single file entry flags similar to file attribute flags ?
 
@@ -159,6 +162,7 @@ Tools:
   - creates write only raw export file with msvscpp compilation
   - limit output formats for input types (lvf vs ewf)
   - does export handle require finalize of md5 and sha1 context?
+  - add information and media values to raw output
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -219,6 +223,7 @@ Test:
 
 20100928
 * updated liberror, libnotify, libsystem, libbfio, libfvalue, libsmraw
+* worked on UTF-16 functions
 
 20100908
 * code clean up

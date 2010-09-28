@@ -1251,6 +1251,40 @@ LIBEWF_EXTERN int libewf_handle_set_utf8_header_value(
 #define libewf_handle_set_utf8_header_value_serial_number( handle, value, value_length, error ) \
         libewf_handle_set_utf8_header_value( handle, (uint8_t *) "serial_number", 13, value, value_length, error )
 
+/* Retrieves the size of the UTF-16 encoded header value of an identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_utf16_header_value_size(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   size_t *value_size,
+                   libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded header value of an identifier
+ * The value size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_utf16_header_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   uint16_t *value,
+                   size_t value_size,
+                   libewf_error_t **error );
+
+/* Sets the UTF-16 encoded header value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_set_utf16_header_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   const uint16_t *value,
+                   size_t value_length,
+                   libewf_error_t **error );
+
 /* Copies the header values from the source to the destination handle
  * Returns 1 if successful or -1 on error
  */

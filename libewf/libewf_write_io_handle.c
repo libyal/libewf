@@ -34,13 +34,13 @@
 #include "libewf_filename.h"
 #include "libewf_header_values.h"
 #include "libewf_libbfio.h"
+#include "libewf_libfvalue.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
 #include "libewf_section.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
-#include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
 
 #include "ewf_checksum.h"
@@ -49,6 +49,9 @@
 #include "ewf_section.h"
 #include "ewf_table.h"
 #include "ewfx_delta_chunk.h"
+
+/* TODO remove after refactoring */
+#include "libewf_values_table.h"
 
 /* Initialize the write IO handle
  * Returns 1 if successful or -1 on error
@@ -2018,7 +2021,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
-         libewf_values_table_t **header_values,
+         libfvalue_table_t **header_values,
          libewf_values_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
@@ -3477,7 +3480,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
-         libewf_values_table_t **header_values,
+         libfvalue_table_t **header_values,
          libewf_values_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
@@ -4157,7 +4160,7 @@ ssize_t libewf_write_io_handle_finalize(
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
-         libewf_values_table_t **header_values,
+         libfvalue_table_t **header_values,
          libewf_values_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,

@@ -292,6 +292,29 @@ LIBEWF_EXTERN int libewf_handle_set_utf8_header_value(
                    size_t value_length,
                    liberror_error_t **error );
 
+LIBEWF_EXTERN int libewf_handle_get_utf16_header_value_size(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   size_t *value_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_utf16_header_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   uint16_t *value,
+                   size_t value_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_utf16_header_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   const uint16_t *value,
+                   size_t value_length,
+                   liberror_error_t **error );
+
 int libewf_handle_parse_header_values(
      libewf_internal_handle_t *internal_handle,
      liberror_error_t **error );

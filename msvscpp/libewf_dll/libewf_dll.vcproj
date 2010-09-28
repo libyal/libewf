@@ -401,6 +401,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_libfvalue.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_libuna.h"
 				>
 			</File>

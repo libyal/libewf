@@ -32,6 +32,7 @@
 #include "libewf_header_values.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libfvalue.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
@@ -2345,7 +2346,7 @@ int libewf_handle_close(
 	}
 	if( internal_handle->header_values != NULL )
 	{
-		if( libewf_values_table_free(
+		if( libfvalue_table_free(
 		     &( internal_handle->header_values ),
 		     error ) != 1 )
 		{

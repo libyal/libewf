@@ -2035,10 +2035,12 @@ int export_handle_set_output_values(
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
 	uint8_t guid[ GUID_SIZE ];
 
-	uint8_t guid_type     = 0;
+	uint8_t guid_type          = 0;
 #endif
 
-	static char *function = "export_handle_set_output_values";
+	static char *function      = "export_handle_set_output_values";
+	size_t value_string_length = 0;
+	int result                 = 0;
 
 	if( export_handle == NULL )
 	{
@@ -2119,33 +2121,61 @@ int export_handle_set_output_values(
 		}
 		/* Set acquiry operating system, software and software version
 		 */
-		if( ( acquiry_operating_system != NULL )
-		 && ( export_handle_set_header_value(
-		       export_handle,
-		       "acquiry_operating_system",
-		       24,
-		       acquiry_operating_system,
-		       libcstring_system_string_length(
-			acquiry_operating_system ),
-		       error ) != 1 ) )
+		if( acquiry_operating_system != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: acquiry operating system.",
-			 function );
+			value_string_length = libcstring_system_string_length(
+			                       acquiry_operating_system );
 
-			return( -1 );
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libewf_handle_set_utf16_header_value(
+			          export_handle->ewf_output_handle,
+			          (uint8_t *) "acquiry_operating_system",
+			          24,
+			          (uint16_t *) acquiry_operating_system,
+			          value_string_length,
+			          error );
+#else
+			result = libewf_handle_set_utf8_header_value(
+			          export_handle->ewf_output_handle,
+			          (uint8_t *) "acquiry_operating_system",
+			          24,
+			          (uint8_t *) acquiry_operating_system,
+			          value_string_length,
+			          error );
+#endif
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set header value: acquiry operating system.",
+				 function );
+
+				return( -1 );
+			}
 		}
-		if( export_handle_set_header_value(
-		     export_handle,
-		     "acquiry_software",
-		     16,
-		     acquiry_software,
-		     libcstring_system_string_length(
-		      acquiry_software ),
-		     error ) != 1 )
+		value_string_length = libcstring_system_string_length(
+				       acquiry_software );
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_handle_set_utf16_header_value(
+			  export_handle->ewf_output_handle,
+			  (uint8_t *) "acquiry_software",
+			  16,
+			  (uint16_t *) acquiry_software,
+			  value_string_length,
+			  error );
+#else
+		result = libewf_handle_set_utf8_header_value(
+			  export_handle->ewf_output_handle,
+			  (uint8_t *) "acquiry_software",
+			  16,
+			  (uint8_t *) acquiry_software,
+			  value_string_length,
+			  error );
+#endif
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -2156,14 +2186,27 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( export_handle_set_header_value(
-		     export_handle,
-		     "acquiry_software_version",
-		     24,
-		     acquiry_software_version,
-		     libcstring_system_string_length(
-		      acquiry_software_version ),
-		     error ) != 1 )
+		value_string_length = libcstring_system_string_length(
+				       acquiry_software_version );
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_handle_set_utf16_header_value(
+			  export_handle->ewf_output_handle,
+			  (uint8_t *) "acquiry_software_version",
+			  24,
+			  (uint16_t *) acquiry_software_version,
+			  value_string_length,
+			  error );
+#else
+		result = libewf_handle_set_utf8_header_value(
+			  export_handle->ewf_output_handle,
+			  (uint8_t *) "acquiry_software_version",
+			  24,
+			  (uint8_t *) acquiry_software_version,
+			  value_string_length,
+			  error );
+#endif
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -2366,118 +2409,6 @@ int export_handle_set_output_values(
 			return( -1 );
 		}
 	}
-	return( 1 );
-}
-
-/* Sets the header value in the output handle
- * Returns 1 if successful or -1 on error
- */
-int export_handle_set_header_value(
-     export_handle_t *export_handle,
-     char *header_value_identifier,
-     size_t header_value_identifier_length,
-     libcstring_system_character_t *header_value,
-     size_t header_value_length,
-     liberror_error_t **error )
-{
-	uint8_t *utf8_header_value    = NULL;
-	static char *function         = "export_handle_set_header_value";
-	size_t utf8_header_value_size = 0;
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->ewf_output_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing ewf output handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libsystem_string_size_to_utf8_string(
-	     header_value,
-	     header_value_length + 1,
-	     &utf8_header_value_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine UTF-8 header value size.",
-		 function );
-
-		return( -1 );
-	}
-	utf8_header_value = (uint8_t *) memory_allocate(
-	                                 sizeof( uint8_t ) * utf8_header_value_size );
-
-	if( utf8_header_value == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create UTF-8 header value.",
-		 function );
-
-		return( -1 );
-	}
-	if( libsystem_string_copy_to_utf8_string(
-	     header_value,
-	     header_value_length + 1,
-	     utf8_header_value,
-	     utf8_header_value_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-8 header value.",
-		 function );
-
-		memory_free(
-		 utf8_header_value );
-
-		return( -1 );
-	}
-	if( libewf_handle_set_utf8_header_value(
-	     export_handle->ewf_output_handle,
-	     (uint8_t *) header_value_identifier,
-	     header_value_identifier_length,
-	     utf8_header_value,
-	     utf8_header_value_size - 1,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: %s.",
-		 function,
-		 header_value_identifier );
-
-		memory_free(
-		 utf8_header_value );
-
-		return( -1 );
-	}
-	memory_free(
-	 utf8_header_value );
-
 	return( 1 );
 }
 

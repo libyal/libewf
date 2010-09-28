@@ -1,4 +1,4 @@
-.Dd September 8, 2010
+.Dd September 28, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -288,6 +288,12 @@ Meta data functions
 .Fn libewf_handle_set_utf8_header_value_model "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_utf8_header_value_serial_number "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_utf16_header_value_size "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, size_t *value_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_utf16_header_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, uint16_t *value, size_t value_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_set_utf16_header_value "libewf_handle_t *handle, const uint8_t *identifier, const uint16_t *value, size_t value_length"
 .Ft int
 .Fn libewf_handle_copy_header_values "libewf_handle_t *destination_handle, libewf_handle_t *source_handle, libewf_error_t **error"
 .Ft int
