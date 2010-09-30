@@ -179,14 +179,33 @@ ssize_t libewf_section_start_read(
 
 		return( -1 );
 	}
-	calculated_checksum = ewf_checksum_calculate(
-	                       section,
-	                       sizeof( ewf_section_t ) - sizeof( uint32_t ),
-	                       1 );
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+	 	"%s: section:\n",
+		 function );
+		libnotify_print_data(
+		 (uint8_t *) section,
+		 sizeof( ewf_section_t ) );
+	}
+#endif
+	byte_stream_copy_to_uint64_little_endian(
+	 section->size,
+	 *section_size );
+
+	byte_stream_copy_to_uint64_little_endian(
+	 section->next,
+	 *section_next );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 section->checksum,
 	 stored_checksum );
+
+	calculated_checksum = ewf_checksum_calculate(
+	                       section,
+	                       sizeof( ewf_section_t ) - sizeof( uint32_t ),
+	                       1 );
 
 	if( stored_checksum != calculated_checksum )
 	{
@@ -204,24 +223,27 @@ ssize_t libewf_section_start_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
-		if( libewf_debug_section_print(
-		     section,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to debug print section.",
-			 function );
+		libnotify_printf(
+		 "%s: type\t\t\t\t: %s\n",
+		 function,
+		 (char *) section->type );
 
-			return( -1 );
-		}
-	}
-#endif
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
-	{
+		libnotify_printf(
+		 "%s: next\t\t\t\t: %" PRIu64 "\n",
+		 function,
+		 *section_next );
+
+		libnotify_printf(
+		 "%s: size\t\t\t\t: %" PRIu64 "\n",
+		 function,
+		 *section_size );
+
+		libnotify_printf(
+		 "%s: checksum\t\t\t: %" PRIu32 " ( %" PRIu32 " )\n",
+		 function,
+		 stored_checksum,
+		 calculated_checksum );
+
 		libnotify_printf(
 	 	"%s: padding:\n",
 		 function );
@@ -230,10 +252,6 @@ ssize_t libewf_section_start_read(
 		 40 );
 	}
 #endif
-	byte_stream_copy_to_uint64_little_endian(
-	 section->size,
-	 *section_size );
-
 	if( *section_size > (uint64_t) INT64_MAX )
 	{
 		liberror_error_set(
@@ -245,10 +263,6 @@ ssize_t libewf_section_start_read(
 
 		return( -1 );
 	}
-	byte_stream_copy_to_uint64_little_endian(
-	 section->next,
-	 *section_next );
-
 	if( *section_next > (uint64_t) INT64_MAX )
 	{
 		liberror_error_set(
@@ -1909,7 +1923,6 @@ ssize_t libewf_section_volume_e01_read(
 		 "\n" );
 	}
 #endif
-
 	return( read_count );
 }
 

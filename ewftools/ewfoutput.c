@@ -51,6 +51,12 @@
 #include <libbfio.h>
 #endif
 
+#if defined( HAVE_LOCAL_LIBFVALUE )
+#include <libfvalue_definitions.h>
+#elif defined( HAVE_LIBFVALUE )
+#include <libfvalue.h>
+#endif
+
 #if defined( HAVE_ZLIB_H ) || defined( ZLIB_DLL )
 #include <zlib.h>
 #endif
@@ -81,13 +87,67 @@
 
 #include "ewfoutput.h"
 
-/* Print the version information to a stream
+/* Prints the executable version information
+ */
+void ewfoutput_copyright_fprint(
+      FILE *stream )
+{
+	static char *function = "ewfoutput_copyright_fprint";
+
+	if( stream == NULL )
+	{
+		libsystem_notify_printf(
+		 "%s: invalid stream.\n",
+		 function );
+
+		return;
+	}
+	fprintf(
+	 stream,
+	 "Copyright (c) 2006-2010, Joachim Metz <%s>.\n"
+	 "This is free software; see the source for copying conditions. There is NO\n"
+	 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+	 PACKAGE_BUGREPORT );
+}
+
+/* Prints the version information to a stream
  */
 void ewfoutput_version_fprint(
       FILE *stream,
       const libcstring_system_character_t *program )
 {
 	static char *function = "ewfoutput_version_fprint";
+
+	if( stream == NULL )
+	{
+		libsystem_notify_printf(
+		 "%s: invalid stream.\n",
+		 function );
+
+		return;
+	}
+	if( program == NULL )
+	{
+		libsystem_notify_printf(
+		 "%s: invalid program name.\n",
+		 function );
+
+		return;
+	}
+	fprintf(
+	 stream,
+	 "%" PRIs_LIBCSTRING_SYSTEM " %s\n\n",
+	 program,
+	 LIBEWF_VERSION_STRING );
+}
+
+/* Prints the detailed version information to a stream
+ */
+void ewfoutput_version_detailed_fprint(
+      FILE *stream,
+      const libcstring_system_character_t *program )
+{
+	static char *function = "ewfoutput_version_detailed_fprint";
 
 	if( stream == NULL )
 	{
@@ -124,6 +184,13 @@ void ewfoutput_version_fprint(
 	 stream,
 	 ", libbfio %s",
 	 LIBBFIO_VERSION_STRING );
+#endif
+
+#if defined( HAVE_LIBFVALUE ) || defined( HAVE_LOCAL_LIBFVALUE )
+	fprintf(
+	 stream,
+	 ", libfvalue %s",
+	 LIBFVALUE_VERSION_STRING );
 #endif
 
 #if defined( HAVE_LIBZ )
@@ -163,28 +230,5 @@ void ewfoutput_version_fprint(
 	fprintf(
 	 stream,
 	 ")\n\n" );
-}
-
-/* Prints the executable version information
- */
-void ewfoutput_copyright_fprint(
-      FILE *stream )
-{
-	static char *function = "ewfoutput_copyright_fprint";
-
-	if( stream == NULL )
-	{
-		libsystem_notify_printf(
-		 "%s: invalid stream.\n",
-		 function );
-
-		return;
-	}
-	fprintf(
-	 stream,
-	 "Copyright (c) 2006-2010, Joachim Metz <%s>.\n"
-	 "This is free software; see the source for copying conditions. There is NO\n"
-	 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-	 PACKAGE_BUGREPORT );
 }
 

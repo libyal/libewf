@@ -29,6 +29,7 @@
 #include "libewf_definitions.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
+#include "libewf_libfvalue.h"
 
 #include "ewf_definitions.h"
 
@@ -141,7 +142,7 @@ int libewf_header_sections_free(
  */
 int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,
-     libewf_values_table_t *header_values,
+     libfvalue_table_t *header_values,
      int8_t compression_level,
      uint8_t format,
      int header_codepage,
@@ -252,6 +253,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header_encase4(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
 		     header_codepage,
@@ -269,6 +271,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header2_encase4(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header2 ),
 		     &( header_sections->header2_size ),
 		     error ) != 1 )
@@ -294,6 +297,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header_encase4(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
 		     header_codepage,
@@ -311,6 +315,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header2_encase5(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header2 ),
 		     &( header_sections->header2_size ),
 		     error ) != 1 )
@@ -336,6 +341,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header_encase4(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
 		     header_codepage,
@@ -353,6 +359,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header2_encase6(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header2 ),
 		     &( header_sections->header2_size ),
 		     error ) != 1 )
@@ -378,6 +385,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header_linen5(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
 		     header_codepage,
@@ -398,6 +406,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header_linen6(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
 		     header_codepage,
@@ -418,6 +427,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header_ewfx(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
 		     header_codepage,
@@ -435,6 +445,7 @@ int libewf_header_sections_create(
 		if( libewf_header_values_generate_header2_ewfx(
 		     header_values,
 		     timestamp,
+		     compression_level,
 		     &( header_sections->header2 ),
 		     &( header_sections->header2_size ),
 		     error ) != 1 )

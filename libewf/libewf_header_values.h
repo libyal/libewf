@@ -67,6 +67,37 @@ enum LIBEWF_HEADER_VALUES_INDEXES
 	LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT
 };
 
+enum LIBEWF_HEADER_STRING_TYPE
+{
+	/* header string: original EWF, EnCase1
+	 */
+	LIBEWF_HEADER_STRING_TYPE_1	= 1,
+
+	/* header string: EnCase2, EnCase3, FTK Imager 2
+	 */
+	LIBEWF_HEADER_STRING_TYPE_2	= 2,
+
+	/* header string: EnCase4, EnCase5
+	 */
+	LIBEWF_HEADER_STRING_TYPE_3	= 3,
+
+	/* header2 string: EnCase4
+	 */
+	LIBEWF_HEADER_STRING_TYPE_4	= 4,
+
+	/* header2 string: EnCase5
+	 */
+	LIBEWF_HEADER_STRING_TYPE_5	= 5,
+
+	/* header2 string: EnCase6, linen6
+	 */
+	LIBEWF_HEADER_STRING_TYPE_6	= 6,
+
+	/* header string: linen5
+	 */
+	LIBEWF_HEADER_STRING_TYPE_7	= 7
+};
+
 int libewf_header_values_initialize(
      libfvalue_table_t **header_values,
      liberror_error_t **error );
@@ -143,67 +174,13 @@ int libewf_header_values_convert_header_string_to_header2(
      size_t *header2_size,
      liberror_error_t **error );
 
-int libewf_header_values_generate_header_string_type1(
+int libewf_header_values_generate_header_string(
      libfvalue_table_t *header_values,
+     uint8_t header_string_type,
+     libcstring_character_t *newline_string,
+     size_t newline_string_length,
      time_t timestamp,
      int8_t compression_level,
-     libcstring_character_t *header_string_head,
-     libcstring_character_t *header_string_tail,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_header_string_type2(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     libcstring_character_t *header_string_head,
-     libcstring_character_t *header_string_tail,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_header_string_type3(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     libcstring_character_t *header_string_head,
-     libcstring_character_t *header_string_tail,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_header_string_type4(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     libcstring_character_t *header_string_head,
-     libcstring_character_t *header_string_tail,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_header_string_type5(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     libcstring_character_t *header_string_head,
-     libcstring_character_t *header_string_tail,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_header_string_type6(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     libcstring_character_t *header_string_head,
-     libcstring_character_t *header_string_tail,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_header_string_type7(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     libcstring_character_t *header_string_head,
-     libcstring_character_t *header_string_tail,
      libcstring_character_t **header_string,
      size_t *header_string_size,
      liberror_error_t **error );
@@ -247,6 +224,7 @@ int libewf_header_values_generate_header_encase2(
 int libewf_header_values_generate_header_encase4(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header,
      size_t *header_size,
      int codepage,
@@ -255,6 +233,7 @@ int libewf_header_values_generate_header_encase4(
 int libewf_header_values_generate_header_linen5(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header,
      size_t *header_size,
      int codepage,
@@ -263,6 +242,7 @@ int libewf_header_values_generate_header_linen5(
 int libewf_header_values_generate_header_linen6(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header,
      size_t *header_size,
      int codepage,
@@ -271,6 +251,7 @@ int libewf_header_values_generate_header_linen6(
 int libewf_header_values_generate_header2_encase4(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header2,
      size_t *header2_size,
      liberror_error_t **error );
@@ -278,6 +259,7 @@ int libewf_header_values_generate_header2_encase4(
 int libewf_header_values_generate_header2_encase5(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header2,
      size_t *header2_size,
      liberror_error_t **error );
@@ -285,6 +267,7 @@ int libewf_header_values_generate_header2_encase5(
 int libewf_header_values_generate_header2_encase6(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header2,
      size_t *header2_size,
      liberror_error_t **error );
@@ -331,6 +314,7 @@ int libewf_header_values_generate_header_string_xml(
 int libewf_header_values_generate_header_ewfx(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header,
      size_t *header_size,
      int codepage,
@@ -339,6 +323,7 @@ int libewf_header_values_generate_header_ewfx(
 int libewf_header_values_generate_header2_ewfx(
      libfvalue_table_t *header_values,
      time_t timestamp,
+     int8_t compression_level,
      uint8_t **header2,
      size_t *header2_size,
      liberror_error_t **error );

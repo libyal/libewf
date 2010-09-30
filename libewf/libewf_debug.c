@@ -108,63 +108,6 @@ int libewf_debug_dump_data(
 	return( 1 );
 }
 
-/* Prints the section data to notify stream
- * Returns 1 if successful or -1 on error
- */
-int libewf_debug_section_print(
-     ewf_section_t *section,
-     liberror_error_t **error )
-{
-	static char *function        = "libewf_debug_section_print";
-	uint64_t section_next        = 0;
-	uint64_t section_size        = 0;
-	uint32_t calculated_checksum = 0;
-	uint32_t stored_checksum     = 0;
-
-	if( section == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
-		 function );
-
-		return( -1 );
-	}
-	calculated_checksum = ewf_checksum_calculate(
-	                       section,
-	                       sizeof( ewf_section_t ) - sizeof( uint32_t ),
-	                       1 );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 section->checksum,
-	 stored_checksum );
-
-	byte_stream_copy_to_uint64_little_endian(
-	 section->next,
-	 section_next );
-
-	byte_stream_copy_to_uint64_little_endian(
-	 section->size,
-	 section_size );
-
-	libnotify_printf(
-	 "Section:\n"
-	 "type:\t%s\n"
-	 "next:\t%" PRIu64 "\n"
-	 "size:\t%" PRIu64 "\n"
-	 "checksum:\t%" PRIu32 " ( %" PRIu32 " )\n"
-	 "\n",
-	 (char *) section->type,
-	 section_next,
-	 section_size,
-	 stored_checksum,
-	 calculated_checksum );
-
-	return( 1 );
-}
-
 /* Prints the byte stream data to the notify stream
  * Returns 1 if successful or -1 on error
  */

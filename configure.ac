@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20100928],
+ [20100930],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -1559,6 +1559,7 @@ AC_CONFIG_FILES([po/Makevars])
 AC_CONFIG_FILES([documents/Makefile])
 AC_CONFIG_FILES([manuals/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
+AC_CONFIG_FILES([examples/Makefile])
 AC_CONFIG_FILES([macosx/Makefile])
 AC_CONFIG_FILES([borlandc/Makefile])
 AC_CONFIG_FILES([msvscpp/Makefile])

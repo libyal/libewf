@@ -1,6 +1,9 @@
 TODO
+* test examples
+
 * UTF-16 support
   - refactor values tables to libfvalue table
+* fix xheader generation
 
 * single file entry delay conversion of file name
 * are single file entry flags similar to file attribute flags ?
@@ -220,6 +223,14 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20100930
+* worked on UTF-16 functions
+* code clean up
+
+20100929
+* added open/close examples
+* worked on UTF-16 functions
 
 20100928
 * updated liberror, libnotify, libsystem, libbfio, libfvalue, libsmraw

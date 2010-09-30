@@ -20,6 +20,7 @@ SUBDIRS = \
 	documents \
 	manuals \
 	tests \
+	examples \
 	macosx \
 	borlandc \
 	msvscpp

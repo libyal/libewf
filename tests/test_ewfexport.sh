@@ -35,7 +35,7 @@ EWFEXPORT="../ewftools/ewfexport";
 
 function test_export_raw
 { 
-	echo "Testing ewfexport of input:" $*;
+	echo "Testing ewfexport to raw of input:" $*;
 
 	mkdir ${TMP};
 
@@ -56,7 +56,7 @@ EOI
 
 function test_export_encase5
 { 
-	echo "Testing ewfexport of input:" $*;
+	echo "Testing ewfexport to encase5 of input:" $*;
 
 	mkdir ${TMP};
 
@@ -80,7 +80,7 @@ EOI
 
 function test_export_encase6
 { 
-	echo "Testing ewfexport of input:" $*;
+	echo "Testing ewfexport to encase6 of input:" $*;
 
 	mkdir ${TMP};
 
@@ -104,7 +104,7 @@ EOI
 
 function test_export_ewfx
 { 
-	echo "Testing ewfexport of input:" $*;
+	echo "Testing ewfexport to ewfx of input:" $*;
 
 	mkdir ${TMP};
 

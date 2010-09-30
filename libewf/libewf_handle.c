@@ -2347,7 +2347,7 @@ int libewf_handle_close(
 	if( internal_handle->header_values != NULL )
 	{
 		if( libfvalue_table_free(
-		     &( internal_handle->header_values ),
+		     (intptr_t *) internal_handle->header_values,
 		     error ) != 1 )
 		{
 			liberror_error_set(

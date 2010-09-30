@@ -78,7 +78,8 @@ libewf_la_LIBADD = \
 	../liberror/liberror.la \
 	../libnotify/libnotify.la \
 	@LIBUNA_LIBADD@ \
-	@LIBBFIO_LIBADD@
+	@LIBBFIO_LIBADD@ \
+	@LIBFVALUE_LIBADD@
 
 libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
 

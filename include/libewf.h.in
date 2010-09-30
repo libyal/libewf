@@ -1040,7 +1040,7 @@ LIBEWF_EXTERN int libewf_handle_get_number_of_header_values(
 
 /* Retrieves the size of the header value identifier of a specific index
  * The identifier size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if no header values are present or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_header_value_identifier_size(
                    libewf_handle_t *handle,
@@ -1050,7 +1050,7 @@ LIBEWF_EXTERN int libewf_handle_get_header_value_identifier_size(
 
 /* Retrieves the header value identifier of a specific index
  * The identifier size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if no header values are present or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_header_value_identifier(
                    libewf_handle_t *handle,

@@ -40,10 +40,6 @@ int libewf_debug_dump_data(
      size_t data_size,
      liberror_error_t **error );
 
-int libewf_debug_section_print(
-     ewf_section_t *section,
-     liberror_error_t **error );
-
 int libewf_debug_byte_stream_print(
      libcstring_character_t *header,
      uint8_t *byte_stream,

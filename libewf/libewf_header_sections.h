@@ -27,7 +27,7 @@
 
 #include <liberror.h>
 
-#include "libewf_values_table.h"
+#include "libewf_libfvalue.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -78,7 +78,7 @@ int libewf_header_sections_free(
 
 int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,
-     libewf_values_table_t *header_values,
+     libfvalue_table_t *header_values,
      int8_t compression_level,
      uint8_t format,
      int header_codepage,

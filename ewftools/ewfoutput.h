@@ -31,12 +31,16 @@
 extern "C" {
 #endif
 
+void ewfoutput_copyright_fprint(
+      FILE *stream );
+
 void ewfoutput_version_fprint(
       FILE *stream,
       const libcstring_system_character_t *program );
 
-void ewfoutput_copyright_fprint(
-      FILE *stream );
+void ewfoutput_version_detailed_fprint(
+      FILE *stream,
+      const libcstring_system_character_t *program );
 
 #if defined( __cplusplus )
 }
