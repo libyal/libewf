@@ -45,7 +45,7 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_date_time_values_copy_from_timestamp(
-     libcstring_character_t *date_time_values_string,
+     uint8_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t timestamp,
      liberror_error_t **error )
@@ -102,8 +102,8 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	print_count = libcstring_string_snprintf(
-		       date_time_values_string,
+	print_count = libcstring_narrow_string_snprintf(
+		       (char *) date_time_values_string,
 		       date_time_values_string_size,
 		       "%04d %02d %02d %02d %02d %02d",
 		       time_elements.tm_year + 1900,
@@ -132,7 +132,7 @@ int libewf_date_time_values_copy_from_timestamp(
  * Returns 1 if successful or -1 on error
  */
 int libewf_date_time_values_copy_to_timestamp(
-     libcstring_character_t *date_time_values_string,
+     const uint8_t *date_time_values_string,
      size_t date_time_values_string_length,
      time_t *timestamp,
      liberror_error_t **error )
@@ -140,7 +140,7 @@ int libewf_date_time_values_copy_to_timestamp(
 	struct tm time_elements;
 
 	libewf_split_values_t *date_time_elements = NULL;
-	static char *function                     = "libewf_convert_date_header_value";
+	static char *function                     = "libewf_date_time_values_copy_to_timestamp";
 
 	if( date_time_values_string == NULL )
 	{
@@ -179,7 +179,7 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_elements,
 	     date_time_values_string,
 	     date_time_values_string_length + 1,
-	     (libcstring_character_t) ' ',
+	     (uint8_t) ' ',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -290,11 +290,11 @@ int libewf_date_time_values_copy_to_string(
 {
 	struct tm time_elements;
 
-	libcstring_character_t *day_of_week = NULL;
-	libcstring_character_t *month       = NULL;
-	static char *function               = "libewf_date_time_values_copy_to_string";
-	time_t timestamp                    = 0;
-	int print_count                     = 0;
+	const char *day_of_week = NULL;
+	const char *month       = NULL;
+	static char *function   = "libewf_date_time_values_copy_to_string";
+	time_t timestamp        = 0;
+	int print_count         = 0;
 
 	if( date_time_values_string == NULL )
 	{
@@ -410,25 +410,25 @@ int libewf_date_time_values_copy_to_string(
 		switch( time_elements.tm_wday )
 		{
 			case 0:
-				day_of_week = _LIBCSTRING_STRING( "Sun" );
+				day_of_week = "Sun";
 				break;
 			case 1:
-				day_of_week = _LIBCSTRING_STRING( "Mon" );
+				day_of_week = "Mon";
 				break;
 			case 2:
-				day_of_week = _LIBCSTRING_STRING( "Tue" );
+				day_of_week = "Tue";
 				break;
 			case 3:
-				day_of_week = _LIBCSTRING_STRING( "Wed" );
+				day_of_week = "Wed";
 				break;
 			case 4:
-				day_of_week = _LIBCSTRING_STRING( "Thu" );
+				day_of_week = "Thu";
 				break;
 			case 5:
-				day_of_week = _LIBCSTRING_STRING( "Fri" );
+				day_of_week = "Fri";
 				break;
 			case 6:
-				day_of_week = _LIBCSTRING_STRING( "Sat" );
+				day_of_week = "Sat";
 				break;
 
 			default:
@@ -444,40 +444,40 @@ int libewf_date_time_values_copy_to_string(
 		switch( time_elements.tm_mon )
 		{
 			case 0:
-				month = _LIBCSTRING_STRING( "Jan" );
+				month = "Jan";
 				break;
 			case 1:
-				month = _LIBCSTRING_STRING( "Feb" );
+				month = "Feb";
 				break;
 			case 2:
-				month = _LIBCSTRING_STRING( "Mar" );
+				month = "Mar";
 				break;
 			case 3:
-				month = _LIBCSTRING_STRING( "Apr" );
+				month = "Apr";
 				break;
 			case 4:
-				month = _LIBCSTRING_STRING( "May" );
+				month = "May";
 				break;
 			case 5:
-				month = _LIBCSTRING_STRING( "Jun" );
+				month = "Jun";
 				break;
 			case 6:
-				month = _LIBCSTRING_STRING( "Jul" );
+				month = "Jul";
 				break;
 			case 7:
-				month = _LIBCSTRING_STRING( "Aug" );
+				month = "Aug";
 				break;
 			case 8:
-				month = _LIBCSTRING_STRING( "Sep" );
+				month = "Sep";
 				break;
 			case 9:
-				month = _LIBCSTRING_STRING( "Oct" );
+				month = "Oct";
 				break;
 			case 10:
-				month = _LIBCSTRING_STRING( "Nov" );
+				month = "Nov";
 				break;
 			case 11:
-				month = _LIBCSTRING_STRING( "Dec" );
+				month = "Dec";
 				break;
 
 			default:

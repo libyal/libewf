@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
 #include <liberror.h>
 
 #include "ewf_section.h"

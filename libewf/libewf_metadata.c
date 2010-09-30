@@ -3025,14 +3025,14 @@ int libewf_handle_get_utf8_header_value_size(
 		return( 0 );
 	}
 	if( ( ( identifier_length == 11 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "system_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "system_date",
 		 11 ) == 0 ) )
 	 || ( ( identifier_length == 12 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "acquiry_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "acquiry_date",
 		 12 ) == 0 ) ) )
 	{
 		if( libfvalue_value_get_data(
@@ -3213,14 +3213,14 @@ int libewf_handle_get_utf8_header_value(
 		return( 0 );
 	}
 	if( ( ( identifier_length == 11 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "system_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "system_date",
 		 11 ) == 0 ) )
 	 || ( ( identifier_length == 12 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "acquiry_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "acquiry_date",
 		 12 ) == 0 ) ) )
 	{
 		if( libfvalue_value_get_data(
@@ -3556,14 +3556,14 @@ int libewf_handle_get_utf16_header_value_size(
 		return( 0 );
 	}
 	if( ( ( identifier_length == 11 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "system_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "system_date",
 		 11 ) == 0 ) )
 	 || ( ( identifier_length == 12 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "acquiry_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "acquiry_date",
 		 12 ) == 0 ) ) )
 	{
 		if( libfvalue_value_get_data(
@@ -3744,14 +3744,14 @@ int libewf_handle_get_utf16_header_value(
 		return( 0 );
 	}
 	if( ( ( identifier_length == 11 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "system_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "system_date",
 		 11 ) == 0 ) )
 	 || ( ( identifier_length == 12 )
-	   && ( libcstring_string_compare(
-		 _LIBCSTRING_STRING( "acquiry_date" ),
-		 identifier,
+	   && ( libcstring_narrow_string_compare(
+		 (char *) identifier,
+		 "acquiry_date",
 		 12 ) == 0 ) ) )
 	{
 		if( libfvalue_value_get_data(

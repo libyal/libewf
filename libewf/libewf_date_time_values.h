@@ -42,13 +42,13 @@ extern "C" {
 #endif
 
 int libewf_date_time_values_copy_from_timestamp(
-     libcstring_character_t *date_time_values_string,
+     uint8_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t timestamp,
      liberror_error_t **error );
 
 int libewf_date_time_values_copy_to_timestamp(
-     libcstring_character_t *date_time_values_string,
+     const uint8_t *date_time_values_string,
      size_t date_time_values_string_length,
      time_t *timestamp,
      liberror_error_t **error );

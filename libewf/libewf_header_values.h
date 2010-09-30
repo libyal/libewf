@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( TIME_WITH_SYS_TIME )
@@ -110,28 +109,28 @@ int libewf_header_values_set_value_by_index(
      liberror_error_t **error );
 
 int libewf_convert_date_header_value(
-     libcstring_character_t *header_value,
+     const uint8_t *header_value,
      size_t header_value_length,
-     libcstring_character_t **date_time_values_string,
+     uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
      liberror_error_t **error );
 
 int libewf_generate_date_header_value(
      time_t timestamp,
-     libcstring_character_t **date_time_values_string,
+     uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
      liberror_error_t **error );
 
 int libewf_convert_date_header2_value(
-     libcstring_character_t *header_value,
+     const uint8_t *header_value,
      size_t header_value_length,
-     libcstring_character_t **date_time_values_string,
+     uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
      liberror_error_t **error );
 
 int libewf_generate_date_header2_value(
      time_t timestamp,
-     libcstring_character_t **date_time_values_string,
+     uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
      liberror_error_t **error );
 
@@ -140,9 +139,9 @@ int libewf_header_values_copy(
      libfvalue_table_t *source_header_values,
      liberror_error_t **error );
 
-int libewf_header_values_parse_header_string(
+int libewf_header_values_parse_utf8_header_string(
      libfvalue_table_t *header_values,
-     libcstring_character_t *header_string,
+     const uint8_t *header_string,
      size_t header_string_size,
      liberror_error_t **error );
 
@@ -159,29 +158,29 @@ int libewf_header_values_parse_header2(
      size_t header2_size,
      liberror_error_t **error );
 
-int libewf_header_values_convert_header_string_to_header(
-     libcstring_character_t *header_string,
+int libewf_header_values_convert_utf8_header_string_to_header(
+     const uint8_t *header_string,
      size_t header_string_size,
      uint8_t **header,
      size_t *header_size,
      int codepage,
      liberror_error_t **error );
 
-int libewf_header_values_convert_header_string_to_header2(
-     libcstring_character_t *header_string,
+int libewf_header_values_convert_utf8_header_string_to_header2(
+     const uint8_t *header_string,
      size_t header_string_size,
      uint8_t **header2,
      size_t *header2_size,
      liberror_error_t **error );
 
-int libewf_header_values_generate_header_string(
+int libewf_header_values_generate_utf8_header_string(
      libfvalue_table_t *header_values,
      uint8_t header_string_type,
-     libcstring_character_t *newline_string,
+     uint8_t *newline_string,
      size_t newline_string_length,
      time_t timestamp,
      int8_t compression_level,
-     libcstring_character_t **header_string,
+     uint8_t **header_string,
      size_t *header_string_size,
      liberror_error_t **error );
 
@@ -273,27 +272,21 @@ int libewf_header_values_generate_header2_encase6(
      liberror_error_t **error );
 
 int libewf_convert_date_xheader_value(
-     libcstring_character_t *header_value,
+     const uint8_t *header_value,
      size_t header_value_length,
-     libcstring_character_t **date_time_values_string,
+     uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
      liberror_error_t **error );
 
 int libewf_generate_date_xheader_value(
      time_t timestamp,
-     libcstring_character_t **date_time_values_string,
+     uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
-     liberror_error_t **error );
-
-int libewf_header_values_parse_header_string_xml(
-     libfvalue_table_t *header_values,
-     libcstring_character_t *header_string_xml,
-     size_t header_string_xml_size,
      liberror_error_t **error );
 
 int libewf_header_values_parse_xheader(
      libfvalue_table_t *header_values,
-     uint8_t *xheader,
+     const uint8_t *xheader,
      size_t size,
      liberror_error_t **error );
 

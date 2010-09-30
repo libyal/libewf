@@ -82,12 +82,6 @@ int libewf_hash_values_generate_sha1_hash(
      uint8_t *sha1_hash_set,
      liberror_error_t **error );
 
-int libewf_hash_values_generate_hash_string_xml(
-     libfvalue_table_t *hash_values,
-     uint8_t **hash_string,
-     size_t *hash_string_size,
-     liberror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

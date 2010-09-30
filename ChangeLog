@@ -233,7 +233,7 @@ Test:
 * code clean up
 * updated msvscpp files
 * fix for non-initialized session data
-* worked on Windows safe debug output
+* worked on UTF-16 debug output
 
 20100929
 * added open/close examples

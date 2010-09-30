@@ -22,7 +22,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
 #include <liberror.h>
 
 #include "libewf_string.h"
@@ -31,7 +30,7 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_string_copy_to_64bit_decimal(
-     libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
      uint64_t *value_64bit,
      liberror_error_t **error )
@@ -93,10 +92,10 @@ int libewf_string_copy_to_64bit_decimal(
 	{
 		*value_64bit *= 10;
 
-		if( ( string[ string_iterator ] >= (libcstring_character_t) '0' )
-		 && ( string[ string_iterator ] <= (libcstring_character_t) '9' ) )
+		if( ( string[ string_iterator ] >= (uint8_t) '0' )
+		 && ( string[ string_iterator ] <= (uint8_t) '9' ) )
 		{
-			byte_value = (uint8_t) ( string[ string_iterator ] - (libcstring_character_t) '0' );
+			byte_value = (uint8_t) ( string[ string_iterator ] - (uint8_t) '0' );
 		}
 		else
 		{
@@ -104,9 +103,9 @@ int libewf_string_copy_to_64bit_decimal(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported character value: %" PRIc_LIBCSTRING ".",
+			 "%s: unsupported character value: %c.",
 			 function,
-			 string[ string_iterator ] );
+			 (char) string[ string_iterator ] );
 
 			return( -1 );
 		}
@@ -121,7 +120,7 @@ int libewf_string_copy_to_64bit_decimal(
  * Returns 1 if successful or -1 on error
  */
 int libewf_string_copy_to_64bit_hexadecimal(
-     libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
      uint64_t *value_64bit,
      liberror_error_t **error )
@@ -164,8 +163,8 @@ int libewf_string_copy_to_64bit_hexadecimal(
 		return( -1 );
 	}
 	if( ( string_size > 2 )
-	 && ( string[ 0 ] == (libcstring_character_t) '0' )
-	 && ( string[ 1 ] == (libcstring_character_t) 'x' ) )
+	 && ( string[ 0 ] == (uint8_t) '0' )
+	 && ( string[ 1 ] == (uint8_t) 'x' ) )
 	{
 		string_iterator = 2;
 	}
@@ -188,20 +187,20 @@ int libewf_string_copy_to_64bit_hexadecimal(
 	{
 		*value_64bit <<= 4;
 
-		if( ( string[ string_iterator ] >= (libcstring_character_t) '0' )
-		 && ( string[ string_iterator ] <= (libcstring_character_t) '9' ) )
+		if( ( string[ string_iterator ] >= (uint8_t) '0' )
+		 && ( string[ string_iterator ] <= (uint8_t) '9' ) )
 		{
-			byte_value = (uint8_t) ( string[ string_iterator ] - (libcstring_character_t) '0' );
+			byte_value = (uint8_t) ( string[ string_iterator ] - (uint8_t) '0' );
 		}
-		else if( ( string[ string_iterator ] >= (libcstring_character_t) 'A' )
-		      && ( string[ string_iterator ] <= (libcstring_character_t) 'F' ) )
+		else if( ( string[ string_iterator ] >= (uint8_t) 'A' )
+		      && ( string[ string_iterator ] <= (uint8_t) 'F' ) )
 		{
-			byte_value = (uint8_t) ( string[ string_iterator ] - (libcstring_character_t) 'A' );
+			byte_value = (uint8_t) ( string[ string_iterator ] - (uint8_t) 'A' );
 		}
-		else if( ( string[ string_iterator ] >= (libcstring_character_t) 'a' )
-		      && ( string[ string_iterator ] <= (libcstring_character_t) 'f' ) )
+		else if( ( string[ string_iterator ] >= (uint8_t) 'a' )
+		      && ( string[ string_iterator ] <= (uint8_t) 'f' ) )
 		{
-			byte_value = (uint8_t) ( string[ string_iterator ] - (libcstring_character_t) 'a' );
+			byte_value = (uint8_t) ( string[ string_iterator ] - (uint8_t) 'a' );
 		}
 		else
 		{
@@ -209,9 +208,9 @@ int libewf_string_copy_to_64bit_hexadecimal(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported character value: %" PRIc_LIBCSTRING ".",
+			 "%s: unsupported character value: %c.",
 			 function,
-			 string[ string_iterator ] );
+			 (char) string[ string_iterator ] );
 
 			return( -1 );
 		}

@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( _cplusplus )
@@ -33,13 +32,13 @@ extern "C" {
 #endif
 
 int libewf_string_copy_to_64bit_decimal(
-     libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
      uint64_t *value_64bit,
      liberror_error_t **error );
 
 int libewf_string_copy_to_64bit_hexadecimal(
-     libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
      uint64_t *value_64bit,
      liberror_error_t **error );
