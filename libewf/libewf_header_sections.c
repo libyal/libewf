@@ -465,7 +465,7 @@ int libewf_header_sections_create(
 
 			return( -1 );
 		}
-		if( libewf_header_values_generate_xheader_ewfx(
+		if( libewf_header_values_generate_xheader(
 		     header_values,
 		     timestamp,
 		     &( header_sections->xheader ),

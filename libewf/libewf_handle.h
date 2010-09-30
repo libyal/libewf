@@ -43,9 +43,6 @@
 #include "libewf_types.h"
 #include "libewf_write_io_handle.h"
 
-/* TODO remove after refactoring */
-#include "libewf_values_table.h"
-
 #if defined( _MSC_VER ) || defined( __BORLANDC__ )
 
 /* This inclusion is needed otherwise some linkers
@@ -137,7 +134,7 @@ struct libewf_internal_handle
 
 	/* The hash values
 	 */
-	libewf_values_table_t *hash_values;
+	libfvalue_table_t *hash_values;
 
 	/* Value to indicate the hash values were parsed
 	 */

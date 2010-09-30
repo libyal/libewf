@@ -50,9 +50,6 @@
 #include "ewf_table.h"
 #include "ewfx_delta_chunk.h"
 
-/* TODO remove after refactoring */
-#include "libewf_values_table.h"
-
 /* Initialize the write IO handle
  * Returns 1 if successful or -1 on error
  */
@@ -2022,7 +2019,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
          libfvalue_table_t **header_values,
-         libewf_values_table_t *hash_values,
+         libfvalue_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
          libewf_sector_table_t *sessions,
@@ -3481,7 +3478,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
          libfvalue_table_t **header_values,
-         libewf_values_table_t *hash_values,
+         libfvalue_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
          libewf_sector_table_t *sessions,
@@ -4056,7 +4053,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      uint32_t number_of_chunks_written_to_last_segment,
      libewf_media_values_t *media_values,
      libewf_segment_table_t *segment_table,
-     libewf_values_table_t *hash_values,
+     libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
@@ -4161,7 +4158,7 @@ ssize_t libewf_write_io_handle_finalize(
          libewf_offset_table_t *offset_table,
          libewf_segment_table_t *segment_table,
          libfvalue_table_t **header_values,
-         libewf_values_table_t *hash_values,
+         libfvalue_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
          libewf_sector_table_t *sessions,

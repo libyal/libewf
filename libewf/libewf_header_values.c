@@ -1228,17 +1228,6 @@ int libewf_header_values_parse_header_string(
 	int iterator                                    = 0;
 	int result                                      = 0;
 
-	if( header_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header values.",
-		 function );
-
-		return( -1 );
-	}
 	if( header_string == NULL )
 	{
 		liberror_error_set(
@@ -5445,15 +5434,15 @@ int libewf_header_values_parse_header_string_xml(
      size_t header_string_xml_size,
      liberror_error_t **error )
 {
-	libcstring_character_t *open_tag_start          = NULL;
-	libcstring_character_t *open_tag_end            = NULL;
 	libcstring_character_t *close_tag_start         = NULL;
 	libcstring_character_t *close_tag_end           = NULL;
 	libcstring_character_t *date_time_values_string = NULL;
+	libcstring_character_t *identifier              = NULL;
+	libcstring_character_t *open_tag_start          = NULL;
+	libcstring_character_t *open_tag_end            = NULL;
+	libcstring_character_t *value_string            = NULL;
 	libewf_split_values_t *lines                    = NULL;
 	libfvalue_value_t *header_value                 = NULL;
-	uint8_t *identifier                             = NULL;
-	uint8_t *value_string                           = NULL;
 	static char *function                           = "libewf_header_values_parse_header_string_xml";
 	size_t date_time_values_string_length           = 0;
 	size_t date_time_values_string_size             = 0;
@@ -5462,17 +5451,6 @@ int libewf_header_values_parse_header_string_xml(
 	size_t value_string_length                      = 0;
 	int line_iterator                               = 0;
 
-	if( header_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header values.",
-		 function );
-
-		return( -1 );
-	}
 	if( header_string_xml == NULL )
 	{
 		liberror_error_set(
@@ -5850,30 +5828,36 @@ int libewf_header_values_parse_xheader(
 	return( 1 );
 }
 
-/* Converts an XML header string into a xheader
- * Sets the xheader and xheader size
+/* Generate an xheader
+ * Sets xheader and the xheader size
  * Returns 1 if successful or -1 on error
  */
-int libewf_header_values_convert_header_string_xml_to_xheader(
-     libcstring_character_t *header_string_xml,
-     size_t header_string_xml_size,
+int libewf_header_values_generate_xheader(
+     libfvalue_table_t *header_values,
+     time_t timestamp,
      uint8_t **xheader,
      size_t *xheader_size,
      liberror_error_t **error )
 {
-	static char *function = "libewf_header_values_convert_header_string_xml_to_xheader";
+	libcstring_character_t *generated_acquiry_date = NULL;
+	libfvalue_value_t *header_value                = NULL;
+	uint8_t *identifier                            = NULL;
+	char *xml_head                                 = NULL;
+	char *xml_xheader_close_tag                    = NULL;
+	char *xml_xheader_open_tag                     = NULL;
+	static char *function                          = "libewf_header_values_generate_xheader";
+	size_t acquiry_date_string_length              = 0;
+	size_t generated_acquiry_date_size             = 0;
+	size_t identifier_size                         = 0;
+	size_t value_string_size                       = 0;
+	size_t xheader_index                           = 0;
+	size_t xml_head_length                         = 0;
+	size_t xml_xheader_close_tag_length            = 0;
+	size_t xml_xheader_open_tag_length             = 0;
+	int header_value_index                         = 0;
+	int number_of_header_values                    = 0;
+	int result                                     = 0;
 
-	if( header_string_xml == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid XML header string.",
-		 function );
-
-		return( -1 );
-	}
 	if( xheader == NULL )
 	{
 		liberror_error_set(
@@ -5902,125 +5886,6 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid xheader size.",
-		 function );
-
-		return( -1 );
-	}
-	if( libuna_utf8_stream_size_from_utf8(
-	     header_string_xml,
-	     header_string_xml_size,
-	     xheader_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine xheader size.",
-		 function );
-
-		return( -1 );
-	}
-	*xheader = (uint8_t *) memory_allocate(
-	                        sizeof( uint8_t ) * *xheader_size );
-
-	if( *xheader == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create xheader.",
-		 function );
-
-		*xheader_size = 0;
-
-		return( -1 );
-	}
-	if( libuna_utf8_stream_copy_from_utf8(
-	     *xheader,
-	     *xheader_size,
-	     header_string_xml,
-	     header_string_xml_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set xheader.",
-		 function );
-
-		memory_free(
-		 xheader );
-
-		*xheader      = NULL;
-		*xheader_size = 0;
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Generate a header format in XML
- * Sets header string and the header string length
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_generate_header_string_xml(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
-     liberror_error_t **error )
-{
-	libcstring_character_t *generated_acquiry_date = NULL;
-	libcstring_character_t *xml_head               = NULL;
-	libcstring_character_t *xml_xheader_close_tag  = NULL;
-	libcstring_character_t *xml_xheader_open_tag   = NULL;
-	libfvalue_value_t *header_value                = NULL;
-	uint8_t *identifier                            = NULL;
-	static char *function                          = "libewf_header_values_generate_header_string_xml";
-	size_t acquiry_date_string_length              = 0;
-	size_t generated_acquiry_date_size             = 0;
-	size_t header_string_index                     = 0;
-	size_t identifier_size                         = 0;
-	size_t value_string_size                       = 0;
-	size_t xml_head_length                         = 0;
-	size_t xml_xheader_close_tag_length            = 0;
-	size_t xml_xheader_open_tag_length             = 0;
-	int header_value_index                         = 0;
-	int number_of_header_values                    = 0;
-	int result                                     = 0;
-
-	if( header_string == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header string.",
-		 function );
-
-		return( -1 );
-	}
-	if( *header_string != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: header string already created.",
-		 function );
-
-		return( -1 );
-	}
-	if( header_string_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string size.",
 		 function );
 
@@ -6040,24 +5905,24 @@ int libewf_header_values_generate_header_string_xml(
 
 		return( -1 );
 	}
-	xml_head = _LIBCSTRING_STRING( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
+	xml_head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
-	xml_head_length = libcstring_string_length(
+	xml_head_length = libcstring_narrow_string_length(
 	                   xml_head );
 
-	xml_xheader_open_tag = _LIBCSTRING_STRING( "<xheader>\n" );
+	xml_xheader_open_tag = "<xheader>\n";
 
-	xml_xheader_open_tag_length = libcstring_string_length(
+	xml_xheader_open_tag_length = libcstring_narrow_string_length(
 	                               xml_xheader_open_tag );
 
-	xml_xheader_close_tag = _LIBCSTRING_STRING( "</xheader>\n\n" );
+	xml_xheader_close_tag = "</xheader>\n\n";
 
-	xml_xheader_close_tag_length = libcstring_string_length(
+	xml_xheader_close_tag_length = libcstring_narrow_string_length(
 	                                xml_xheader_close_tag );
 
-	/* Reserve space for the XML skeleton data
+	/* Reserve space for the UTF-8 byte order mark and the XML skeleton data
 	 */
-	*header_string_size = xml_head_length + xml_xheader_open_tag_length + xml_xheader_close_tag_length;
+	*xheader_size = 3 + xml_head_length + xml_xheader_open_tag_length + xml_xheader_close_tag_length;
 
 	for( header_value_index = 0;
 	     header_value_index < number_of_header_values;
@@ -6166,7 +6031,7 @@ int libewf_header_values_generate_header_string_xml(
 					/* Reserve space for a leading tab, <acquiry_date>, header value, </acquiry_date> and a newline
 					 * Make sure to determine the effective length of the acquiry date time values string
 					 */
-					*header_string_size += 7 + ( 2 * ( identifier_size - 1 ) ) + acquiry_date_string_length;
+					*xheader_size += 7 + ( 2 * ( identifier_size - 1 ) ) + acquiry_date_string_length;
 				}
 			}
 			continue;
@@ -6193,26 +6058,26 @@ int libewf_header_values_generate_header_string_xml(
 		{
 			/* Reserve space for a leading tab, <identifier>value</identifier> and a newline
 			 */
-			*header_string_size += 7 + ( 2 * ( identifier_size - 1 ) ) + ( value_string_size - 1 );
+			*xheader_size += 7 + ( 2 * ( identifier_size - 1 ) ) + ( value_string_size - 1 );
 		}
 	}
-	/* Reserve space for an empty line and an end of string
+	/* Reserve space for the end-of-string character
 	 */
-	*header_string_size += 2;
+	*xheader_size += 1;
 
-	*header_string = (libcstring_character_t *) memory_allocate(
-	                                             sizeof( libcstring_character_t ) * *header_string_size );
+	*xheader = (uint8_t *) memory_allocate(
+	                        sizeof( uint8_t ) * *xheader_size );
 
-	if( *header_string == NULL )
+	if( *xheader == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_MEMORY,
 		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create header string.",
+		 "%s: unable to create xheader.",
 		 function );
 
-		*header_string_size = 0;
+		*xheader_size = 0;
 
 		if( generated_acquiry_date != NULL )
 		{
@@ -6221,8 +6086,12 @@ int libewf_header_values_generate_header_string_xml(
 		}
 		return( -1 );
 	}
-	if( libcstring_string_copy(
-	     &( ( *header_string )[ header_string_index ] ),
+	( *xheader )[ xheader_index++ ] = 0xef;
+	( *xheader )[ xheader_index++ ] = 0xbb;
+	( *xheader )[ xheader_index++ ] = 0xbf;
+
+	if( libcstring_narrow_string_copy(
+	     (char *) &( ( *xheader )[ xheader_index ] ),
 	     xml_head,
 	     xml_head_length ) == NULL )
 	{
@@ -6234,10 +6103,10 @@ int libewf_header_values_generate_header_string_xml(
 		 function );
 
 		memory_free(
-		 *header_string );
+		 *xheader );
 
-		*header_string      = NULL;
-		*header_string_size = 0;
+		*xheader      = NULL;
+		*xheader_size = 0;
 
 		if( generated_acquiry_date != NULL )
 		{
@@ -6246,10 +6115,10 @@ int libewf_header_values_generate_header_string_xml(
 		}
 		return( -1 );
 	}
-	header_string_index += xml_head_length;
+	xheader_index += xml_head_length;
 
-	if( libcstring_string_copy(
-	     &( ( *header_string )[ header_string_index ] ),
+	if( libcstring_narrow_string_copy(
+	     (char *) &( ( *xheader )[ xheader_index ] ),
 	     xml_xheader_open_tag,
 	     xml_xheader_open_tag_length ) == NULL )
 	{
@@ -6261,10 +6130,10 @@ int libewf_header_values_generate_header_string_xml(
 		 function );
 
 		memory_free(
-		 *header_string );
+		 *xheader );
 
-		*header_string      = NULL;
-		*header_string_size = 0;
+		*xheader      = NULL;
+		*xheader_size = 0;
 
 		if( generated_acquiry_date != NULL )
 		{
@@ -6273,7 +6142,7 @@ int libewf_header_values_generate_header_string_xml(
 		}
 		return( -1 );
 	}
-	header_string_index += xml_xheader_open_tag_length;
+	xheader_index += xml_xheader_open_tag_length;
 
 	for( header_value_index = 0;
 	     header_value_index < number_of_header_values;
@@ -6294,10 +6163,10 @@ int libewf_header_values_generate_header_string_xml(
 			 header_value_index );
 
 			memory_free(
-			 *header_string );
+			 *xheader );
 
-			*header_string      = NULL;
-			*header_string_size = 0;
+			*xheader      = NULL;
+			*xheader_size = 0;
 
 			if( generated_acquiry_date != NULL )
 			{
@@ -6321,10 +6190,10 @@ int libewf_header_values_generate_header_string_xml(
 			 header_value_index );
 
 			memory_free(
-			 *header_string );
+			 *xheader );
 
-			*header_string      = NULL;
-			*header_string_size = 0;
+			*xheader      = NULL;
+			*xheader_size = 0;
 
 			if( generated_acquiry_date != NULL )
 			{
@@ -6361,6 +6230,17 @@ int libewf_header_values_generate_header_string_xml(
 			 function,
 			 (char *) identifier );
 
+			memory_free(
+			 *xheader );
+
+			*xheader      = NULL;
+			*xheader_size = 0;
+
+			if( generated_acquiry_date != NULL )
+			{
+				memory_free(
+				 generated_acquiry_date );
+			}
 			return( -1 );
 		}
 		else if( result == 0 )
@@ -6383,16 +6263,27 @@ int libewf_header_values_generate_header_string_xml(
 			 function,
 			 (char *) identifier );
 
+			memory_free(
+			 *xheader );
+
+			*xheader      = NULL;
+			*xheader_size = 0;
+
+			if( generated_acquiry_date != NULL )
+			{
+				memory_free(
+				 generated_acquiry_date );
+			}
 			return( -1 );
 		}
 		if( value_string_size > 1 )
 		{
-			( *header_string )[ header_string_index++ ] = (libcstring_character_t) '\t';
-			( *header_string )[ header_string_index++ ] = (libcstring_character_t) '<';
+			( *xheader )[ xheader_index++ ] = (uint8_t) '\t';
+			( *xheader )[ xheader_index++ ] = (uint8_t) '<';
 
-			if( libcstring_string_copy(
-			     &( ( *header_string )[ header_string_index ] ),
-			     identifier,
+			if( libcstring_narrow_string_copy(
+			     (char *) &( ( *xheader )[ xheader_index ] ),
+			     (char *) identifier,
 			     identifier_size - 1 ) == NULL )
 			{
 				liberror_error_set(
@@ -6404,10 +6295,10 @@ int libewf_header_values_generate_header_string_xml(
 				 (char *) identifier );
 
 				memory_free(
-				 *header_string );
+				 *xheader );
 
-				*header_string      = NULL;
-				*header_string_size = 0;
+				*xheader      = NULL;
+				*xheader_size = 0;
 
 				if( generated_acquiry_date != NULL )
 				{
@@ -6416,14 +6307,14 @@ int libewf_header_values_generate_header_string_xml(
 				}
 				return( -1 );
 			}
-			header_string_index += identifier_size - 1;
+			xheader_index += identifier_size - 1;
 
-			( *header_string )[ header_string_index++ ] = (libcstring_character_t) '>';
+			( *xheader )[ xheader_index++ ] = (uint8_t) '>';
 
 			result = libfvalue_value_copy_to_utf8_string(
 				  header_value,
 				  0,
-				  &( ( *header_string )[ header_string_index ] ),
+				  &( ( *xheader )[ xheader_index ] ),
 				  value_string_size,
 				  error );
 
@@ -6438,10 +6329,10 @@ int libewf_header_values_generate_header_string_xml(
 				 (char *) identifier );
 
 				memory_free(
-				 *header_string );
+				 *xheader );
 
-				*header_string      = NULL;
-				*header_string_size = 0;
+				*xheader      = NULL;
+				*xheader_size = 0;
 
 				if( generated_acquiry_date != NULL )
 				{
@@ -6450,14 +6341,14 @@ int libewf_header_values_generate_header_string_xml(
 				}
 				return( -1 );
 			}
-			header_string_index += value_string_size - 1;
+			xheader_index += value_string_size - 1;
 
-			( *header_string )[ header_string_index++ ] = (libcstring_character_t) '<';
-			( *header_string )[ header_string_index++ ] = (libcstring_character_t) '/';
+			( *xheader )[ xheader_index++ ] = (uint8_t) '<';
+			( *xheader )[ xheader_index++ ] = (uint8_t) '/';
 
-			if( libcstring_string_copy(
-			     &( ( *header_string )[ header_string_index ] ),
-			     identifier,
+			if( libcstring_narrow_string_copy(
+			     (char *) &( ( *xheader )[ xheader_index ] ),
+			     (char *) identifier,
 			     identifier_size - 1 ) == NULL )
 			{
 				liberror_error_set(
@@ -6469,10 +6360,10 @@ int libewf_header_values_generate_header_string_xml(
 				 (char *) identifier );
 
 				memory_free(
-				 *header_string );
+				 *xheader );
 
-				*header_string      = NULL;
-				*header_string_size = 0;
+				*xheader      = NULL;
+				*xheader_size = 0;
 
 				if( generated_acquiry_date != NULL )
 				{
@@ -6481,32 +6372,41 @@ int libewf_header_values_generate_header_string_xml(
 				}
 				return( -1 );
 			}
-			header_string_index += identifier_size - 1;
+			xheader_index += identifier_size - 1;
 
-			( *header_string )[ header_string_index++ ] = (libcstring_character_t) '>';
-			( *header_string )[ header_string_index++ ] = (libcstring_character_t) '\n';
+			( *xheader )[ xheader_index++ ] = (uint8_t) '>';
+			( *xheader )[ xheader_index++ ] = (uint8_t) '\n';
 		}
 	}
 	if( generated_acquiry_date != NULL )
 	{
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '\t';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '<';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'a';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'c';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'q';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'u';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'i';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'r';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'y';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '_';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'd';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'a';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 't';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'e';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '>';
+		if( libcstring_narrow_string_copy(
+		     (char *) &( ( *xheader )[ xheader_index ] ),
+		     "\t<acquiry_date>",
+		     15 ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy acquiry_date open tag string.",
+			 function );
 
-		if( libcstring_string_copy(
-		     &( ( *header_string )[ header_string_index ] ),
+			memory_free(
+			 *xheader );
+
+			*xheader      = NULL;
+			*xheader_size = 0;
+
+			memory_free(
+			 generated_acquiry_date );
+
+			return( -1 );
+		}
+		xheader_index += 15;
+
+		if( libcstring_narrow_string_copy(
+		     &( ( *xheader )[ xheader_index ] ),
 		     generated_acquiry_date,
 		     acquiry_date_string_length ) == NULL )
 		{
@@ -6518,40 +6418,45 @@ int libewf_header_values_generate_header_string_xml(
 			 function );
 
 			memory_free(
-			 *header_string );
+			 *xheader );
 
-			*header_string      = NULL;
-			*header_string_size = 0;
+			*xheader      = NULL;
+			*xheader_size = 0;
 
 			memory_free(
 			 generated_acquiry_date );
 
 			return( -1 );
 		}
-		header_string_index += acquiry_date_string_length;
+		xheader_index += acquiry_date_string_length;
 
 		memory_free(
 		 generated_acquiry_date );
 
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '<';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '/';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'a';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'c';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'q';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'u';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'i';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'r';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'y';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '_';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'd';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'a';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 't';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) 'e';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '>';
-		( *header_string )[ header_string_index++ ] = (libcstring_character_t) '\n';
+		if( libcstring_narrow_string_copy(
+		     (char *) &( ( *xheader )[ xheader_index ] ),
+		     "</acquiry_date>\n",
+		     16 ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy acquiry_date close tag string.",
+			 function );
+
+			memory_free(
+			 *xheader );
+
+			*xheader      = NULL;
+			*xheader_size = 0;
+
+			return( -1 );
+		}
+		xheader_index += 16;
 	}
-	if( libcstring_string_copy(
-	     &( ( *header_string )[ header_string_index ] ),
+	if( libcstring_narrow_string_copy(
+	     (char *) &( ( *xheader )[ xheader_index ] ),
 	     xml_xheader_close_tag,
 	     xml_xheader_close_tag_length ) == NULL )
 	{
@@ -6563,18 +6468,18 @@ int libewf_header_values_generate_header_string_xml(
 		 function );
 
 		memory_free(
-		 *header_string );
+		 *xheader );
 
-		*header_string      = NULL;
-		*header_string_size = 0;
+		*xheader      = NULL;
+		*xheader_size = 0;
 
 		return( -1 );
 	}
-	header_string_index += xml_xheader_close_tag_length;
+	xheader_index += xml_xheader_close_tag_length;
 
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ header_string_index ] = 0;
+	( *xheader )[ xheader_index ] = 0;
 
 	return( 1 );
 }
@@ -6701,59 +6606,5 @@ int libewf_header_values_generate_header2_ewfx(
 	 header_string );
 
 	return( 1 );
-}
-
-/* Generate an EWFX xheader
- * Sets xheader and the xheader size
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_generate_xheader_ewfx(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     uint8_t **xheader,
-     size_t *xheader_size,
-     liberror_error_t **error )
-{
-	libcstring_character_t *header_string_xml = NULL;
-	static char *function                     = "libewf_header_values_generate_xheader_ewfx";
-	size_t header_string_xml_size             = 0;
-	int result                                = 0;
-
-	if( libewf_header_values_generate_header_string_xml(
-	     header_values,
-	     timestamp,
-	     &header_string_xml,
-	     &header_string_xml_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create xheader string.",
-		 function );
-
-		return( -1 );
-	}
-	result = libewf_header_values_convert_header_string_xml_to_xheader(
-	          header_string_xml,
-	          header_string_xml_size,
-	          xheader,
-	          xheader_size,
-	          error );
-
-	if( result != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create xheader.",
-		 function );
-	}
-	memory_free(
-	 header_string_xml );
-
-	return( result );
 }
 

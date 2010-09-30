@@ -273,46 +273,46 @@ LIBEWF_EXTERN int libewf_handle_get_utf8_header_value_size(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   size_t *value_size,
+                   size_t *utf8_string_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_utf8_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   uint8_t *value,
-                   size_t value_size,
+                   uint8_t *utf8_string,
+                   size_t utf8_string_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_set_utf8_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   const uint8_t *value,
-                   size_t value_length,
+                   const uint8_t *utf8_string,
+                   size_t utf8_string_length,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_utf16_header_value_size(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   size_t *value_size,
+                   size_t *utf16_string_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_utf16_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   uint16_t *value,
-                   size_t value_size,
+                   uint16_t *utf16_string,
+                   size_t utf16_string_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_set_utf16_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   const uint16_t *value,
-                   size_t value_length,
+                   const uint16_t *utf16_string,
+                   size_t utf16_string_length,
                    liberror_error_t **error );
 
 int libewf_handle_parse_header_values(
@@ -346,23 +346,46 @@ LIBEWF_EXTERN int libewf_handle_get_utf8_hash_value_size(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   size_t *value_size,
+                   size_t *utf8_string_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_utf8_hash_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   uint8_t *value,
-                   size_t value_size,
+                   uint8_t *utf8_string,
+                   size_t utf8_string_size,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_set_utf8_hash_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   const uint8_t *value,
-                   size_t value_length,
+                   const uint8_t *utf8_string,
+                   size_t utf8_string_length,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_utf16_hash_value_size(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   size_t *utf16_string_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_utf16_hash_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   uint16_t *utf16_string,
+                   size_t utf16_string_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_utf16_hash_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   const uint16_t *utf16_string,
+                   size_t utf16_string_length,
                    liberror_error_t **error );
 
 int libewf_handle_parse_hash_values(

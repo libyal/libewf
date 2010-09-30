@@ -2362,8 +2362,8 @@ int libewf_handle_close(
 	}
 	if( internal_handle->hash_values != NULL )
 	{
-		if( libewf_values_table_free(
-		     &( internal_handle->hash_values ),
+		if( libfvalue_table_free(
+		     (intptr_t *) internal_handle->hash_values,
 		     error ) != 1 )
 		{
 			liberror_error_set(

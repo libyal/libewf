@@ -25,9 +25,11 @@
 
 #include <libcstring.h>
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_definitions.h"
 #include "libewf_hash_values.h"
+#include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_split_values.h"
 
@@ -37,12 +39,12 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_initialize(
-     libewf_values_table_t **hash_values,
+     libfvalue_table_t **hash_values,
      liberror_error_t **error )
 {
 	static char *function = "libewf_hash_values_initialize";
 
-	if( libewf_values_table_initialize(
+	if( libfvalue_table_initialize(
 	     hash_values,
 	     LIBEWF_HASH_VALUES_DEFAULT_NUMBER,
 	     error ) != 1 )
@@ -59,34 +61,24 @@ int libewf_hash_values_initialize(
 	return( 1 );
 }
 
-/* Parses an MD5 hash for its value
+/* Parses a MD5 hash for its value
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_md5_hash(
-     libewf_values_table_t *hash_values,
+     libfvalue_table_t *hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
      liberror_error_t **error )
 {
-	libcstring_character_t md5_hash_string[ 33 ];
+	uint8_t md5_hash_string[ 33 ];
 
-	static char *function           = "libewf_hash_values_parse_md5_hash";
-	size_t md5_hash_iterator        = 0;
-	size_t md5_hash_string_iterator = 0;
-	int result                      = 0;
-	uint8_t md5_digit               = 0;
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_parse_md5_hash";
+	size_t md5_hash_index         = 0;
+	size_t md5_hash_string_index  = 0;
+	uint8_t md5_digit             = 0;
+	int result                    = 0;
 
-	if( hash_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash values.",
-		 function );
-
-		return( -1 );
-	}
 	if( md5_hash == NULL )
 	{
 		liberror_error_set(
@@ -109,12 +101,12 @@ int libewf_hash_values_parse_md5_hash(
 
 		return( -1 );
 	}
-	result = libewf_values_table_get_value(
+	result = libfvalue_table_get_value_by_identifier(
 	          hash_values,
-	          _LIBCSTRING_STRING( "MD5" ),
-	          3,
-	          md5_hash_string,
-	          33,
+	          (uint8_t *) "MD5",
+	          4,
+	          &hash_value,
+	          0,
 	          error );
 
 	if( result == -1 )
@@ -123,78 +115,134 @@ int libewf_hash_values_parse_md5_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if MD5 hash value was set.",
+		 "%s: unable to retrieve if hash value: MD5.",
 		 function );
 
 		return( -1 );
 	}
-	/* The MD5 hash values has been set
-	 */
-	else if( result == 1 )
+	else if( result == 0 )
 	{
-		return( 1 );
-	}
-	for( md5_hash_iterator = 0;
-	     md5_hash_iterator < md5_hash_size;
-	     md5_hash_iterator++ )
-	{
-		md5_digit = md5_hash[ md5_hash_iterator ] / 16;
+		for( md5_hash_index = 0;
+		     md5_hash_index < md5_hash_size;
+		     md5_hash_index++ )
+		{
+			md5_digit = md5_hash[ md5_hash_index ] / 16;
 
-		if( md5_digit <= 9 )
-		{
-			md5_hash_string[ md5_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) '0' + md5_digit );
-		}
-		else
-		{
-			md5_hash_string[ md5_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) 'a' + ( md5_digit - 10 ) );
-		}
-		md5_digit = md5_hash[ md5_hash_iterator ] % 16;
+			if( md5_digit <= 9 )
+			{
+				md5_hash_string[ md5_hash_string_index++ ] = (uint8_t) '0' + md5_digit;
+			}
+			else
+			{
+				md5_hash_string[ md5_hash_string_index++ ] = (uint8_t) 'a' + ( md5_digit - 10 );
+			}
+			md5_digit = md5_hash[ md5_hash_index ] % 16;
 
-		if( md5_digit <= 9 )
-		{
-			md5_hash_string[ md5_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) '0' + md5_digit );
+			if( md5_digit <= 9 )
+			{
+				md5_hash_string[ md5_hash_string_index++ ] = (uint8_t) '0' + md5_digit;
+			}
+			else
+			{
+				md5_hash_string[ md5_hash_string_index++ ] = (uint8_t) 'a' + ( md5_digit - 10 );
+			}
 		}
-		else
+		md5_hash_string[ md5_hash_string_index++ ] = 0;
+
+		if( libfvalue_value_initialize(
+		     &hash_value,
+		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
+		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
+		     error ) != 1 )
 		{
-			md5_hash_string[ md5_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) 'a' + ( md5_digit - 10 ) );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash value.",
+			 function );
+
+			return( -1 );
+		}
+		if( libfvalue_value_set_identifier(
+		     hash_value,
+		     (uint8_t *) "MD5",
+		     4,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: MD5 identifier.",
+			 function );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfvalue_value_set_data(
+		     hash_value,
+		     (uint8_t *) md5_hash_string,
+		     33,
+		     LIBFVALUE_ENDIAN_NATIVE,
+		     0,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: MD5 data.",
+			 function );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfvalue_table_set_value(
+		     hash_values,
+		     hash_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: MD5 in table.",
+			 function );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
 		}
 	}
-	result = libewf_values_table_set_value(
-		  hash_values,
-		  _LIBCSTRING_STRING( "MD5" ),
-		  3,
-		  md5_hash_string,
-		  32,
-	          error );
-
-	if( result != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set value with identifier: MD5.",
-		 function );
-	}
-	return( result );
+	return( 1 );
 }
 
 /* Parses an SHA1 hash for its value
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_sha1_hash(
-     libewf_values_table_t *hash_values,
+     libfvalue_table_t *hash_values,
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
      liberror_error_t **error )
 {
-	libcstring_character_t sha1_hash_string[ 41 ];
+	uint8_t sha1_hash_string[ 41 ];
 
-	static char *function            = "libewf_hash_values_parse_sha1_hash";
-	size_t sha1_hash_iterator        = 0;
-	size_t sha1_hash_string_iterator = 0;
-	int result                       = 0;
-	uint8_t sha1_digit               = 0;
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_parse_sha1_hash";
+	size_t sha1_hash_index        = 0;
+	size_t sha1_hash_string_index = 0;
+	int result                    = 0;
+	uint8_t sha1_digit            = 0;
 
 	if( hash_values == NULL )
 	{
@@ -229,12 +277,12 @@ int libewf_hash_values_parse_sha1_hash(
 
 		return( -1 );
 	}
-	result = libewf_values_table_get_value(
+	result = libfvalue_table_get_value_by_identifier(
 	          hash_values,
-	          _LIBCSTRING_STRING( "SHA1" ),
-	          4,
-	          sha1_hash_string,
-	          41,
+	          (uint8_t *) "SHA1",
+	          5,
+	          &hash_value,
+	          0,
 	          error );
 
 	if( result == -1 )
@@ -243,109 +291,181 @@ int libewf_hash_values_parse_sha1_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if SHA1 hash value was set.",
+		 "%s: unable to retrieve if hash value: SHA1.",
 		 function );
 
 		return( -1 );
 	}
-	/* The MD5 hash values has been set
-	 */
-	else if( result == 1 )
+	else if( result == 0 )
 	{
-		return( 1 );
-	}
-	for( sha1_hash_iterator = 0;
-	     sha1_hash_iterator < sha1_hash_size;
-	     sha1_hash_iterator++ )
-	{
-		sha1_digit = sha1_hash[ sha1_hash_iterator ] / 16;
+		for( sha1_hash_index = 0;
+		     sha1_hash_index < sha1_hash_size;
+		     sha1_hash_index++ )
+		{
+			sha1_digit = sha1_hash[ sha1_hash_index ] / 16;
 
-		if( sha1_digit <= 9 )
-		{
-			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) '0' + sha1_digit );
-		}
-		else
-		{
-			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) 'a' + ( sha1_digit - 10 ) );
-		}
-		sha1_digit = sha1_hash[ sha1_hash_iterator ] % 16;
+			if( sha1_digit <= 9 )
+			{
+				sha1_hash_string[ sha1_hash_string_index++ ] = (uint8_t) '0' + sha1_digit;
+			}
+			else
+			{
+				sha1_hash_string[ sha1_hash_string_index++ ] = (uint8_t) 'a' + ( sha1_digit - 10 );
+			}
+			sha1_digit = sha1_hash[ sha1_hash_index ] % 16;
 
-		if( sha1_digit <= 9 )
-		{
-			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) '0' + sha1_digit );
+			if( sha1_digit <= 9 )
+			{
+				sha1_hash_string[ sha1_hash_string_index++ ] = (uint8_t) '0' + sha1_digit;
+			}
+			else
+			{
+				sha1_hash_string[ sha1_hash_string_index++ ] = (uint8_t) 'a' + ( sha1_digit - 10 );
+			}
 		}
-		else
+		sha1_hash_string[ sha1_hash_string_index++ ] = 0;
+
+		if( libfvalue_value_initialize(
+		     &hash_value,
+		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
+		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
+		     error ) != 1 )
 		{
-			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libcstring_character_t) ( (uint8_t) 'a' + ( sha1_digit - 10 ) );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash value.",
+			 function );
+
+			return( -1 );
+		}
+		if( libfvalue_value_set_identifier(
+		     hash_value,
+		     (uint8_t *) "SHA1",
+		     5,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: SHA1 identifier.",
+			 function );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfvalue_value_set_data(
+		     hash_value,
+		     (uint8_t *) sha1_hash_string,
+		     41,
+		     LIBFVALUE_ENDIAN_NATIVE,
+		     0,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: SHA1 data.",
+			 function );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfvalue_table_set_value(
+		     hash_values,
+		     hash_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: SHA1 in table.",
+			 function );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
 		}
 	}
-	result = libewf_values_table_set_value(
-		  hash_values,
-		  _LIBCSTRING_STRING( "SHA1" ),
-		  4,
-		  sha1_hash_string,
-		  40,
-	          error );
-
-	if( result != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set value with identifier: SHA1.",
-		 function );
-	}
-	return( result );
+	return( 1 );
 }
 
-/* Parse a XML hash string for the values
+/* Parse an xhash for the hash values
  * Returns 1 if successful or -1 on error
  */
-int libewf_hash_values_parse_hash_string_xml(
-     libewf_values_table_t *hash_values,
-     libcstring_character_t *hash_string_xml,
-     size_t hash_string_xml_size,
+int libewf_hash_values_parse_xhash(
+     libfvalue_table_t *hash_values,
+     const uint8_t *xhash,
+     size_t xhash_size,
      liberror_error_t **error )
 {
-	libewf_split_values_t *lines            = NULL;
-	libcstring_character_t *open_tag_start  = NULL;
-	libcstring_character_t *open_tag_end    = NULL;
-	libcstring_character_t *close_tag_start = NULL;
-	libcstring_character_t *close_tag_end   = NULL;
-	static char *function                   = "libewf_hash_values_parse_hash_string_xml";
-	size_t identifier_length                = 0;
-	size_t string_length                    = 0;
-	size_t value_length                     = 0;
-	int line_iterator                       = 0;
+	libewf_split_values_t *lines  = NULL;
+	libfvalue_value_t *hash_value = NULL;
+	uint8_t *close_tag_start      = NULL;
+	uint8_t *close_tag_end        = NULL;
+	uint8_t *identifier           = NULL;
+	uint8_t *open_tag_start       = NULL;
+	uint8_t *open_tag_end         = NULL;
+	uint8_t *value_string         = NULL;
+	static char *function         = "libewf_hash_values_parse_xhash";
+	size_t identifier_length      = 0;
+	size_t string_length          = 0;
+	size_t value_string_length    = 0;
+	size_t xhash_index            = 0;
+	int line_iterator             = 0;
 
-	if( hash_string_xml == NULL )
+	if( xhash == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash string.",
+		 "%s: invalid xhash.",
 		 function );
 
 		return( -1 );
 	}
+	/* Check if xhash starts with an UTF-8 byte order mark (BOM)
+	*/
+        if( xhash_size >= 3 )
+        {
+                if( ( xhash[ 0 ] == 0x0ef )
+                 && ( xhash[ 1 ] == 0x0bb )
+                 && ( xhash[ 2 ] == 0x0bf ) )
+                {
+                        xhash_index += 3;
+                }
+        }
 	if( libewf_split_values_parse_string(
 	     &lines,
-	     hash_string_xml,
-	     hash_string_xml_size,
-	     (libcstring_character_t) '\n',
+	     &( xhash[ xhash_index ] ),
+	     xhash_size - xhash_index,
+	     (uint8_t) '\n',
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split hash string into lines.",
+		 "%s: unable to split xhash into lines.",
 		 function );
 
 		return( -1 );
 	}
+/* TODO validate if enclosing tag is <xhash> */
+
 	for( line_iterator = 0;
 	     line_iterator < lines->number_of_values;
 	     line_iterator++ )
@@ -360,10 +480,10 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		string_length = lines->sizes[ line_iterator ] - 1;
 
-		open_tag_start = libcstring_string_search_character(
-		                  lines->values[ line_iterator ],
-		                  '<',
-		                  string_length );
+		open_tag_start = (uint8_t *) libcstring_narrow_string_search_character(
+		                              (char *) lines->values[ line_iterator ],
+		                              '<',
+		                              string_length );
 
 		/* Ignore lines without an open tag
 		 */
@@ -371,10 +491,10 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		open_tag_end = libcstring_string_search_character(
-		                lines->values[ line_iterator ],
-		                '>',
-		                string_length );
+		open_tag_end = (uint8_t *) libcstring_narrow_string_search_character(
+		                            (char *) lines->values[ line_iterator ],
+		                            '>',
+		                            string_length );
 
 		/* Ignore lines without an open tag
 		 */
@@ -392,10 +512,10 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		close_tag_start = libcstring_string_search_character_reverse(
-		                   &open_tag_end[ 1 ],
-		                   '<',
-		                   string_length );
+		close_tag_start = (uint8_t *) libcstring_narrow_string_search_character_reverse(
+		                               (char *) &open_tag_end[ 1 ],
+		                               '<',
+		                               string_length );
 
 		/* Ignore lines without a close tag
 		 */
@@ -403,10 +523,10 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		close_tag_end = libcstring_string_search_character_reverse(
-		                 &open_tag_end[ 1 ],
-		                 '>',
-		                 string_length );
+		close_tag_end = (uint8_t *) libcstring_narrow_string_search_character_reverse(
+		                             (char *) &open_tag_end[ 1 ],
+		                             '>',
+		                             string_length );
 
 		/* Ignore lines without a close tag
 		 */
@@ -416,38 +536,95 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		/* Ignore the second part of the XML string
 		 */
+		identifier        = &open_tag_start[ 1 ];
 		identifier_length = (size_t) ( open_tag_end - open_tag_start ) - 1;
 
 		/* Ignore the second part of the XML string
 		 */
-		value_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
+		value_string        = &open_tag_end[ 1 ];
+		value_string_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
 
 		/* Make sure the identifier string will be terminated
 		 */
 		*open_tag_end = 0;
 
-		if( libewf_values_table_set_value(
-		     hash_values,
-		     &open_tag_start[ 1 ],
-		     identifier_length,
-		     &open_tag_end[ 1 ],
-		     value_length,
+		if( libfvalue_value_initialize(
+		     &hash_value,
+		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
+		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash value.",
+			 function );
+
+			return( -1 );
+		}
+		if( libfvalue_value_set_identifier(
+		     hash_value,
+		     identifier,
+		     identifier_length + 1,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set value with identifier: %s.",
+			 "%s: unable to set hash value: %s identifier.",
 			 function,
-			 (char *) &open_tag_start[ 1 ] );
+			 (char *) identifier );
 
-			libewf_split_values_free(
-			 &lines,
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
 			 NULL );
 
 			return( -1 );
 		}
+		if( libfvalue_value_set_data(
+		     hash_value,
+		     value_string,
+		     value_string_length,
+		     LIBFVALUE_ENDIAN_NATIVE,
+		     0,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: %s data.",
+			 function,
+			 (char *) identifier );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfvalue_table_set_value(
+		     hash_values,
+		     hash_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: %s in table.",
+			 function,
+			 (char *) identifier );
+
+			libfvalue_value_free(
+			 (intptr_t *) hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		hash_value = NULL;
 	}
 	if( libewf_split_values_free(
 	     &lines,
@@ -465,136 +642,32 @@ int libewf_hash_values_parse_hash_string_xml(
 	return( 1 );
 }
 
-/* Parse an EWF xhash for the values
+/* Generate an xhash
+ * Sets xhash and xhash size
  * Returns 1 if successful or -1 on error
  */
-int libewf_hash_values_parse_xhash(
-     libewf_values_table_t *hash_values,
-     uint8_t *xhash,
-     size_t xhash_size,
-     liberror_error_t **error )
-{
-	libcstring_character_t *xml_hash_string = NULL;
-	static char *function                   = "libewf_hash_values_parse_xhash";
-	size_t xml_hash_string_size             = 0;
-	int result                              = 0;
-
-	if( xhash == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid xhash.",
-		 function );
-
-		return( -1 );
-	}
-	if( libuna_utf8_string_size_from_utf8_stream(
-	     xhash,
-	     xhash_size,
-	     &xml_hash_string_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine XML hash string size.",
-		 function );
-
-		return( -1 );
-	}
-	xml_hash_string = (libcstring_character_t *) memory_allocate(
-	                                              sizeof( libcstring_character_t ) * xml_hash_string_size );
-
-	if( xml_hash_string == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: unable to create XML hash string.",
-		 function );
-
-		return( -1 );
-	}
-	if( libuna_utf8_string_copy_from_utf8_stream(
-	     xml_hash_string,
-	     xml_hash_string_size,
-	     xhash,
-	     xhash_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to XML set hash string.",
-		 function );
-
-		memory_free(
-		 xml_hash_string );
-
-		return( -1 );
-	}
-	result = libewf_hash_values_parse_hash_string_xml(
-	          hash_values,
-	          xml_hash_string,
-	          xml_hash_string_size,
-	          error );
-
-	if( result != 1 )
-	{
-		liberror_error_set(
-		 error,
-	         LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse XML hash string.",
-		 function );
-	}
-	memory_free(
-	 xml_hash_string );
-
-	return( result );
-}
-
-/* Converts a hash string into a hash
- * Sets the hash and hash size
- * Returns 1 if successful or -1 on error
- */
-int libewf_hash_values_convert_hash_string_to_xhash(
-     libcstring_character_t *hash_string,
-     size_t hash_string_size,
+int libewf_hash_values_generate_xhash(
+     libfvalue_table_t *hash_values,
      uint8_t **xhash,
      size_t *xhash_size,
      liberror_error_t **error )
 {
-	static char *function = "libewf_hash_values_convert_hash_string_to_xhash";
+	libfvalue_value_t *hash_value     = NULL;
+	uint8_t *identifier               = NULL;
+	char *xml_head                    = NULL;
+	char *xml_xhash_close_tag         = NULL;
+	char *xml_xhash_open_tag          = NULL;
+	static char *function             = "libewf_hash_values_generate_xhash";
+	size_t xhash_index                = 0;
+	size_t identifier_size            = 0;
+	size_t value_string_size          = 0;
+	size_t xml_head_length            = 0;
+	size_t xml_xhash_close_tag_length = 0;
+	size_t xml_xhash_open_tag_length  = 0;
+	int hash_value_index              = 0;
+	int number_of_hash_values         = 0;
+	int result                        = 0;
 
-	if( hash_string == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash string.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( hash_string_size == 0 )
-	 || ( hash_string_size > (size_t) SSIZE_MAX ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash string size.",
-		 function );
-
-		return( -1 );
-	}
 	if( xhash == NULL )
 	{
 		liberror_error_set(
@@ -602,17 +675,6 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xhash.",
-		 function );
-
-		return( -1 );
-	}
-	if( xhash_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid xhash size.",
 		 function );
 
 		return( -1 );
@@ -628,23 +690,151 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 
 		return( -1 );
 	}
-	if( libuna_utf8_stream_size_from_utf8(
-	     hash_string,
-	     hash_string_size,
-	     xhash_size,
-	     error ) != 1 )
+	if( xhash_size == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine xhash size.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid xhash size.",
 		 function );
 
 		return( -1 );
 	}
+	if( libfvalue_table_get_number_of_values(
+	     hash_values,
+	     &number_of_hash_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of hash values.",
+		 function );
+
+		return( -1 );
+	}
+	xml_head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+
+	xml_head_length = libcstring_narrow_string_length(
+	                   xml_head );
+
+	xml_xhash_open_tag = "<xhash>\n";
+
+	xml_xhash_open_tag_length = libcstring_narrow_string_length(
+	                             xml_xhash_open_tag );
+
+	xml_xhash_close_tag = "</xhash>\n\n";
+
+	xml_xhash_close_tag_length = libcstring_narrow_string_length(
+	                              xml_xhash_close_tag );
+
+	/* Reserve space for the UTF-8 byte order mark and the XML skeleton data
+	 */
+	*xhash_size = 3 + xml_head_length + xml_xhash_open_tag_length + xml_xhash_close_tag_length;
+
+	for( hash_value_index = 0;
+	     hash_value_index < number_of_hash_values;
+	     hash_value_index++ )
+	{
+		if( libfvalue_table_get_value_by_index(
+		     hash_values,
+		     hash_value_index,
+		     &hash_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: %d.",
+			 function,
+			 hash_value_index );
+
+			return( -1 );
+		}
+		if( libfvalue_value_get_identifier(
+		     hash_value,
+		     &identifier,
+		     &identifier_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve identifier of hash value: %d.",
+			 function,
+			 hash_value_index );
+
+			return( -1 );
+		}
+		if( ( identifier == NULL )
+		 || ( identifier_size == 0 ) )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: missing identifier for hash value: %d.\n",
+				 function,
+				 hash_value_index );
+			}
+#endif
+			continue;
+		}
+		result = libfvalue_value_has_data(
+		          hash_value,
+		          error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data of hash value: %s.",
+			 function,
+			 (char *) identifier );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			continue;
+		}
+		result = libfvalue_value_get_utf8_string_size(
+		          hash_value,
+		          0,
+		          &value_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of hash value: %s.",
+			 function,
+			 (char *) identifier );
+
+			return( -1 );
+		}
+		if( value_string_size > 1 )
+		{
+			/* Reserve space for a leading tab, <identifier>value</identifier> and a newline
+			 */
+			*xhash_size += 7 + ( 2 * ( identifier_size - 1 ) ) + ( value_string_size - 1 );
+		}
+	}
+	/* Reserve space for the end-of-string character
+	 */
+	*xhash_size += 1;
+
 	*xhash = (uint8_t *) memory_allocate(
-	                      sizeof( uint8_t ) * *xhash_size );
+                              sizeof( uint8_t ) * *xhash_size );
 
 	if( *xhash == NULL )
 	{
@@ -659,18 +849,20 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 
 		return( -1 );
 	}
-	if( libuna_utf8_stream_copy_from_utf8(
-	     *xhash,
-	     *xhash_size,
-	     hash_string,
-	     hash_string_size,
-	     error ) != 1 )
+	( *xhash )[ xhash_index++ ] = 0xef;
+	( *xhash )[ xhash_index++ ] = 0xbb;
+	( *xhash )[ xhash_index++ ] = 0xbf;
+
+	if( libcstring_narrow_string_copy(
+	     (char *) &( ( *xhash )[ xhash_index ] ),
+	     xml_head,
+	     xml_head_length ) == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set xhash.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy XML head string.",
 		 function );
 
 		memory_free(
@@ -681,301 +873,276 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 
 		return( -1 );
 	}
-	return( 1 );
-}
+	xhash_index += xml_head_length;
 
-/* Generate a hash format in XML
- * Sets hash sting and hash string size
- * Returns 1 if successful or -1 on error
- */
-int libewf_hash_values_generate_hash_string_xml(
-     libewf_values_table_t *hash_values,
-     libcstring_character_t **hash_string,
-     size_t *hash_string_size,
-     liberror_error_t **error )
-{
-	libcstring_character_t *xml_head            = _LIBCSTRING_STRING( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
-	libcstring_character_t *xml_open_tag_xhash  = _LIBCSTRING_STRING( "<xhash>" );
-	libcstring_character_t *xml_close_tag_xhash = _LIBCSTRING_STRING( "</xhash>" );
-	static char *function                       = "libewf_hash_values_generate_hash_string_xml";
-	int print_count                             = 0;
-	int string_offset                           = 0;
-	int values_table_iterator                   = 0;
-
-	if( hash_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash values.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_values->number_of_values < 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid hash values - number of values less than zero.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_values->identifier == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash values - missing identifiers.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_values->identifier_length == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash values - missing identifier lengths.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_values->value == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash values - missing values.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_values->value_length == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash values - missing value lengths.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_string == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash string.",
-		 function );
-
-		return( -1 );
-	}
-	if( *hash_string != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: hash string already created.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_string_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash string size.",
-		 function );
-
-		return( -1 );
-	}
-	/* Add space for the XML data and an end of line
-	 */
-	*hash_string_size = 1 + libcstring_string_length(
-	                         xml_head );
-
-	*hash_string_size += 1 + libcstring_string_length(
-	                          xml_open_tag_xhash );
-
-	*hash_string_size += 1 + libcstring_string_length(
-	                          xml_close_tag_xhash );
-
-	for( values_table_iterator = 0;
-	     values_table_iterator < hash_values->number_of_values;
-	     values_table_iterator++ )
-	{
-		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
-		 || ( hash_values->identifier_length[ values_table_iterator ] == 0 ) )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid hash value - missing identifier.",
-			 function );
-
-			continue;
-		}
-		if( ( hash_values->value[ values_table_iterator ] != NULL )
-		 && ( hash_values->value_length[ values_table_iterator ] > 0 ) )
-		{
-			/* Add space for a leading tab, <identifier>value</identifier> and an end of line
-			 */
-			*hash_string_size += ( 2 * hash_values->identifier_length[ values_table_iterator ] )
-			                   + hash_values->value_length[ values_table_iterator ] + 7;
-		}
-	}
-	/* allow for an empty line and an end of string
-	 */
-	*hash_string_size += 2;
-
-	*hash_string = (libcstring_character_t *) memory_allocate(
-                                                   sizeof( libcstring_character_t ) * *hash_string_size );
-
-	if( *hash_string == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: unable to create hash string.",
-		 function );
-
-		*hash_string_size = 0;
-
-		return( -1 );
-	}
-	print_count = libcstring_string_snprintf(
-	               *hash_string,
-	               *hash_string_size,
-	               "%s\n%s\n",
-	               (char *) xml_head,
-	               (char *) xml_open_tag_xhash );
-
-	if( ( print_count <= -1 )
-	 || ( (size_t) print_count > *hash_string_size ) )
+	if( libcstring_narrow_string_copy(
+	     (char *) &( ( *xhash )[ xhash_index ] ),
+	     xml_xhash_open_tag,
+	     xml_xhash_open_tag_length ) == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set hash string.",
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy xhash open tag string.",
 		 function );
 
 		memory_free(
-		 *hash_string );
+		 *xhash );
 
-		*hash_string      = NULL;
-		*hash_string_size = 0;
+		*xhash      = NULL;
+		*xhash_size = 0;
 
 		return( -1 );
 	}
-	string_offset = print_count;
+	xhash_index += xml_xhash_open_tag_length;
 
-	for( values_table_iterator = 0;
-	     values_table_iterator < hash_values->number_of_values;
-	     values_table_iterator++ )
+	for( hash_value_index = 0;
+	     hash_value_index < number_of_hash_values;
+	     hash_value_index++ )
 	{
-		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
-		 || ( hash_values->identifier_length[ values_table_iterator ] == 0 ) )
+		if( libfvalue_table_get_value_by_index(
+		     hash_values,
+		     hash_value_index,
+		     &hash_value,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid hash value - missing identifier.",
-			 function );
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: %d.",
+			 function,
+			 hash_value_index );
 
+			memory_free(
+			 *xhash );
+
+			*xhash      = NULL;
+			*xhash_size = 0;
+
+			return( -1 );
+		}
+		if( libfvalue_value_get_identifier(
+		     hash_value,
+		     &identifier,
+		     &identifier_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve identifier of hash value: %d.",
+			 function,
+			 hash_value_index );
+
+			memory_free(
+			 *xhash );
+
+			*xhash      = NULL;
+			*xhash_size = 0;
+
+			return( -1 );
+		}
+		if( ( identifier == NULL )
+		 || ( identifier_size == 0 ) )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: missing identifier for hash value: %d.\n",
+				 function,
+				 hash_value_index );
+			}
+#endif
 			continue;
 		}
-		if( ( hash_values->value[ values_table_iterator ] != NULL )
-		 && ( hash_values->value_length[ values_table_iterator ] > 0 ) )
-		{
-			print_count = libcstring_string_snprintf(
-			               &( ( *hash_string) [ string_offset ] ),
-			               ( *hash_string_size - string_offset ),
-			               "\t<%s>%s</%s>\n",
-			               (char *) hash_values->identifier[ values_table_iterator ],
-			               (char *) hash_values->value[ values_table_iterator ],
-			               (char *) hash_values->identifier[ values_table_iterator ] );
+		result = libfvalue_value_has_data(
+		          hash_value,
+		          error );
 
-			if( ( print_count <= -1 )
-			 || ( (size_t) print_count > ( *hash_string_size - string_offset ) ) )
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data of hash value: %s.",
+			 function,
+			 (char *) identifier );
+
+			memory_free(
+			 *xhash );
+
+			*xhash      = NULL;
+			*xhash_size = 0;
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			continue;
+		}
+		result = libfvalue_value_get_utf8_string_size(
+		          hash_value,
+		          0,
+		          &value_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of hash value: %s.",
+			 function,
+			 (char *) identifier );
+
+			memory_free(
+			 *xhash );
+
+			*xhash      = NULL;
+			*xhash_size = 0;
+
+			return( -1 );
+		}
+		if( value_string_size > 1 )
+		{
+			( *xhash )[ xhash_index++ ] = (uint8_t) '\t';
+			( *xhash )[ xhash_index++ ] = (uint8_t) '<';
+
+			if( libcstring_narrow_string_copy(
+			     (char *) &( ( *xhash )[ xhash_index ] ),
+			     (char *) identifier,
+			     identifier_size - 1 ) == NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set hash string.",
-				 function );
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy %s open tag string.",
+				 function,
+				 (char *) identifier );
 
 				memory_free(
-				 *hash_string );
+				 *xhash );
 
-				*hash_string      = NULL;
-				*hash_string_size = 0;
+				*xhash      = NULL;
+				*xhash_size = 0;
 
 				return( -1 );
 			}
-			string_offset += print_count;
+			xhash_index += identifier_size - 1;
+
+			( *xhash )[ xhash_index++ ] = (uint8_t) '>';
+
+			result = libfvalue_value_copy_to_utf8_string(
+				  hash_value,
+				  0,
+				  &( ( *xhash )[ xhash_index ] ),
+				  value_string_size,
+				  error );
+
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy string of hash value: %s.",
+				 function,
+				 (char *) identifier );
+
+				memory_free(
+				 *xhash );
+
+				*xhash      = NULL;
+				*xhash_size = 0;
+
+				return( -1 );
+			}
+			xhash_index += value_string_size - 1;
+
+			( *xhash )[ xhash_index++ ] = (uint8_t) '<';
+			( *xhash )[ xhash_index++ ] = (uint8_t) '/';
+
+			if( libcstring_narrow_string_copy(
+			     (char *) &( ( *xhash )[ xhash_index ] ),
+			     (char *) identifier,
+			     identifier_size - 1 ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy %s close tag string.",
+				 function,
+				 (char *) identifier );
+
+				memory_free(
+				 *xhash );
+
+				*xhash      = NULL;
+				*xhash_size = 0;
+
+				return( -1 );
+			}
+			xhash_index += identifier_size - 1;
+
+			( *xhash )[ xhash_index++ ] = (uint8_t) '>';
+			( *xhash )[ xhash_index++ ] = (uint8_t) '\n';
 		}
 	}
-	print_count = libcstring_string_snprintf(
-	               &( ( *hash_string )[ string_offset ] ),
-	               ( *hash_string_size - string_offset ),
-	               "%s\n\n",
-	               (char *) xml_close_tag_xhash );
-
-	if( ( print_count <= -1 )
-	 || ( (size_t) print_count > ( *hash_string_size - string_offset ) ) )
+	if( libcstring_narrow_string_copy(
+	     (char *) &( ( *xhash )[ xhash_index ] ),
+	     xml_xhash_close_tag,
+	     xml_xhash_close_tag_length ) == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set hash string.",
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy xhash close tag string.",
 		 function );
 
 		memory_free(
-		 *hash_string );
+		 *xhash );
 
-		*hash_string      = NULL;
-		*hash_string_size = 0;
+		*xhash      = NULL;
+		*xhash_size = 0;
 
 		return( -1 );
 	}
+	xhash_index += xml_xhash_close_tag_length;
+
+	/* Make sure the string is terminated
+	 */
+	( *xhash )[ xhash_index ] = 0;
+
 	return( 1 );
 }
 
-/* Generate an MD5 hash
+/* Generate a MD5 hash
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_generate_md5_hash(
-     libewf_values_table_t *hash_values,
+     libfvalue_table_t *hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
      uint8_t *md5_hash_set,
      liberror_error_t **error )
 {
-	libcstring_character_t md5_hash_string[ 33 ];
+	uint8_t md5_hash_string[ 33 ];
 
-	static char *function           = "libewf_hash_values_generate_md5_hash";
-	size_t md5_hash_iterator        = 0;
-	size_t md5_hash_string_iterator = 0;
-	int result                      = 0;
-	uint8_t md5_digit               = 0;
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_generate_md5_hash";
+	size_t md5_hash_index         = 0;
+	size_t md5_hash_string_index  = 0;
+	uint8_t md5_digit             = 0;
+	int result                    = 0;
 
 	if( hash_values == NULL )
 	{
@@ -1021,12 +1188,12 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( -1 );
 	}
-	result = libewf_values_table_get_value(
+	result = libfvalue_table_get_value_by_identifier(
 	          hash_values,
-	          _LIBCSTRING_STRING( "MD5" ),
-	          3,
-	          md5_hash_string,
-	          33,
+	          (uint8_t *) "MD5",
+	          4,
+	          &hash_value,
+	          0,
 	          error );
 
 	if( result == -1 )
@@ -1035,7 +1202,7 @@ int libewf_hash_values_generate_md5_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if MD5 hash value was set.",
+		 "%s: unable to retrieve if hash value: MD5.",
 		 function );
 
 		return( -1 );
@@ -1048,45 +1215,61 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( 1 );
 	}
-	for( md5_hash_string_iterator = 0;
-	     md5_hash_string_iterator < 33;
-	     md5_hash_string_iterator++ )
+	if( libfvalue_value_copy_to_utf8_string(
+	     hash_value,
+	     0,
+	     md5_hash_string,
+	     33,
+	     error ) != 1 )
 	{
-		if( ( md5_hash_string[ md5_hash_string_iterator ] >= (libcstring_character_t) '0' )
-		 && ( md5_hash_string[ md5_hash_string_iterator ] <= (libcstring_character_t) '9' ) )
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy hash value: MD5 to UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	for( md5_hash_string_index = 0;
+	     md5_hash_string_index < 33;
+	     md5_hash_string_index++ )
+	{
+		if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) '0' )
+		 && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) '9' ) )
 		{
-			md5_digit = (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (libcstring_character_t) '0' );
+			md5_digit = (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) '0' );
 		}
-		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (libcstring_character_t) 'A' )
-		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (libcstring_character_t) 'F' ) )
+		else if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) 'A' )
+		      && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) 'F' ) )
 		{
-			md5_digit = 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (libcstring_character_t) 'A' );
+			md5_digit = 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) 'A' );
 		}
-		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (libcstring_character_t) 'a' )
-		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (libcstring_character_t) 'f' ) )
+		else if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) 'a' )
+		      && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) 'f' ) )
 		{
-			md5_digit = 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (libcstring_character_t) 'a' );
+			md5_digit = 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) 'a' );
 		}
-		md5_hash_string_iterator++;
+		md5_hash_string_index++;
 
 		md5_digit *= 16;
 
-		if( ( md5_hash_string[ md5_hash_string_iterator ] >= (libcstring_character_t) '0' )
-		 && ( md5_hash_string[ md5_hash_string_iterator ] <= (libcstring_character_t) '9' ) )
+		if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) '0' )
+		 && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) '9' ) )
 		{
-			md5_digit += (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (libcstring_character_t) '0' );
+			md5_digit += (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) '0' );
 		}
-		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (libcstring_character_t) 'A' )
-		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (libcstring_character_t) 'F' ) )
+		else if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) 'A' )
+		      && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) 'F' ) )
 		{
-			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (libcstring_character_t) 'A' );
+			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) 'A' );
 		}
-		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (libcstring_character_t) 'a' )
-		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (libcstring_character_t) 'f' ) )
+		else if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) 'a' )
+		      && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) 'f' ) )
 		{
-			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (libcstring_character_t) 'a' );
+			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) 'a' );
 		}
-		md5_hash[ md5_hash_iterator++ ] = md5_digit;
+		md5_hash[ md5_hash_index++ ] = md5_digit;
 	}
 	*md5_hash_set = 1;
 
@@ -1097,19 +1280,20 @@ int libewf_hash_values_generate_md5_hash(
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_generate_sha1_hash(
-     libewf_values_table_t *hash_values,
+     libfvalue_table_t *hash_values,
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
      uint8_t *sha1_hash_set,
      liberror_error_t **error )
 {
-	libcstring_character_t sha1_hash_string[ 41 ];
+	uint8_t sha1_hash_string[ 41 ];
 
-	static char *function            = "libewf_hash_values_generate_sha1_hash";
-	size_t sha1_hash_iterator        = 0;
-	size_t sha1_hash_string_iterator = 0;
-	int result                       = 0;
-	uint8_t sha1_digit               = 0;
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_generate_sha1_hash";
+	size_t sha1_hash_index        = 0;
+	size_t sha1_hash_string_index = 0;
+	uint8_t sha1_digit            = 0;
+	int result                    = 0;
 
 	if( hash_values == NULL )
 	{
@@ -1155,12 +1339,12 @@ int libewf_hash_values_generate_sha1_hash(
 
 		return( -1 );
 	}
-	result = libewf_values_table_get_value(
+	result = libfvalue_table_get_value_by_identifier(
 	          hash_values,
-	          _LIBCSTRING_STRING( "SHA1" ),
-	          4,
-	          sha1_hash_string,
-	          41,
+	          (uint8_t *) "SHA1",
+	          5,
+	          &hash_value,
+	          0,
 	          error );
 
 	if( result == -1 )
@@ -1169,7 +1353,7 @@ int libewf_hash_values_generate_sha1_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if SHA1 hash value was set.",
+		 "%s: unable to retrieve if hash value: SHA1.",
 		 function );
 
 		return( -1 );
@@ -1182,99 +1366,64 @@ int libewf_hash_values_generate_sha1_hash(
 
 		return( 1 );
 	}
-	for( sha1_hash_string_iterator = 0;
-	     sha1_hash_string_iterator < 41;
-	     sha1_hash_string_iterator++ )
-	{
-		if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libcstring_character_t) '0' )
-		 && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libcstring_character_t) '9' ) )
-		{
-			sha1_digit = (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libcstring_character_t) '0' );
-		}
-		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libcstring_character_t) 'A' )
-		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libcstring_character_t) 'F' ) )
-		{
-			sha1_digit = 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libcstring_character_t) 'A' );
-		}
-		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libcstring_character_t) 'a' )
-		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libcstring_character_t) 'f' ) )
-		{
-			sha1_digit = 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libcstring_character_t) 'a' );
-		}
-		sha1_hash_string_iterator++;
-
-		sha1_digit *= 16;
-
-		if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libcstring_character_t) '0' )
-		 && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libcstring_character_t) '9' ) )
-		{
-			sha1_digit += (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libcstring_character_t) '0' );
-		}
-		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libcstring_character_t) 'A' )
-		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libcstring_character_t) 'F' ) )
-		{
-			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libcstring_character_t) 'A' );
-		}
-		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libcstring_character_t) 'a' )
-		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libcstring_character_t) 'f' ) )
-		{
-			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libcstring_character_t) 'a' );
-		}
-		sha1_hash[ sha1_hash_iterator++ ] = sha1_digit;
-	}
-	*sha1_hash_set = 1;
-
-	return( 1 );
-}
-
-/* Generate an EWFX xhash
- * Returns 1 if successful or -1 on error
- */
-int libewf_hash_values_generate_xhash_string_ewfx(
-     libewf_values_table_t *hash_values,
-     uint8_t **xhash,
-     size_t *xhash_size,
-     liberror_error_t **error )
-{
-	libcstring_character_t *xml_hash_string = NULL;
-	static char *function                   = "libewf_hash_values_generate_xhash_string_ewfx";
-	size_t xml_hash_string_size             = 0;
-	int result                              = 0;
-
-	if( libewf_hash_values_generate_hash_string_xml(
-	     hash_values,
-	     &xml_hash_string,
-	     &xml_hash_string_size,
+	if( libfvalue_value_copy_to_utf8_string(
+	     hash_value,
+	     0,
+	     sha1_hash_string,
+	     41,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create XML hash string.",
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy hash value: SHA1 to UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
-	result = libewf_hash_values_convert_hash_string_to_xhash(
-	          xml_hash_string,
-	          xml_hash_string_size,
-	          xhash,
-	          xhash_size,
-	          error );
-
-	if( result != 1 )
+	for( sha1_hash_string_index = 0;
+	     sha1_hash_string_index < 41;
+	     sha1_hash_string_index++ )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to create xhash.",
-		 function );
-	}
-	memory_free(
-	 xml_hash_string );
+		if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) '0' )
+		 && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) '9' ) )
+		{
+			sha1_digit = (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) '0' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) 'A' )
+		      && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) 'F' ) )
+		{
+			sha1_digit = 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) 'A' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) 'a' )
+		      && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) 'f' ) )
+		{
+			sha1_digit = 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) 'a' );
+		}
+		sha1_hash_string_index++;
 
-	return( result );
+		sha1_digit *= 16;
+
+		if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) '0' )
+		 && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) '9' ) )
+		{
+			sha1_digit += (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) '0' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) 'A' )
+		      && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) 'F' ) )
+		{
+			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) 'A' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) 'a' )
+		      && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) 'f' ) )
+		{
+			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) 'a' );
+		}
+		sha1_hash[ sha1_hash_index++ ] = sha1_digit;
+	}
+	*sha1_hash_set = 1;
+
+	return( 1 );
 }
 

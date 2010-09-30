@@ -39,8 +39,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio;..\..\libewf;&quot;..\zlib-1.2.5&quot;"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;ZLIB_DLL;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libnotify;..\..\libuna;..\..\libbfio;..\..\libfvalue;..\..\libewf;&quot;..\zlib-1.2.5&quot;"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;ZLIB_DLL;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				CompileAs="1"
@@ -240,10 +240,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_tree_type.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_values_table.c"
 				>
 			</File>
 			<File
@@ -482,10 +478,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_values_table.h"
 				>
 			</File>
 			<File

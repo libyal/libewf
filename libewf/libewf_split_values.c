@@ -33,7 +33,7 @@
  */
 int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
-     const libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
      int number_of_values,
      liberror_error_t **error )
@@ -100,8 +100,8 @@ int libewf_split_values_initialize(
 		if( ( string != NULL )
 		 && ( string_size > 0 ) )
 		{
-			( *split_values )->string = (libcstring_character_t *) memory_allocate(
-			                                                        sizeof( libcstring_character_t ) * string_size );
+			( *split_values )->string = (uint8_t *) memory_allocate(
+			                                         sizeof( uint8_t ) * string_size );
 
 			if( ( *split_values )->string == NULL )
 			{
@@ -122,7 +122,7 @@ int libewf_split_values_initialize(
 			if( memory_copy(
 			     ( *split_values )->string,
 			     string,
-			     sizeof( libcstring_character_t ) * string_size ) == NULL )
+			     sizeof( uint8_t ) * string_size ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -143,8 +143,8 @@ int libewf_split_values_initialize(
 		}
 		if( number_of_values > 0 )
 		{
-			( *split_values )->values = (libcstring_character_t **) memory_allocate(
-			                                                         sizeof( libcstring_character_t * ) * number_of_values );
+			( *split_values )->values = (uint8_t **) memory_allocate(
+			                                          sizeof( uint8_t * ) * number_of_values );
 
 			if( ( *split_values )->values == NULL )
 			{
@@ -167,7 +167,7 @@ int libewf_split_values_initialize(
 			if( memory_set(
 			     ( *split_values )->values,
 			     0,
-			     sizeof( libcstring_character_t * ) * number_of_values ) == NULL )
+			     sizeof( uint8_t * ) * number_of_values ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -291,19 +291,19 @@ int libewf_split_values_free(
  */
 int libewf_split_values_parse_string(
      libewf_split_values_t **split_values,
-     const libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
-     libcstring_character_t delimiter,
+     uint8_t delimiter,
      liberror_error_t **error )
 {
-	libcstring_character_t *split_value_start = NULL;
-	libcstring_character_t *split_value_end   = NULL;
-	libcstring_character_t *string_end        = NULL;
-	static char *function                     = "libewf_split_values_parse_string";
-	size_t remaining_string_size              = 0;
-	ssize_t split_value_size                  = 0;
-	int number_of_split_values                = 0;
-	int split_value_iterator                  = 0;
+	uint8_t *split_value_start   = NULL;
+	uint8_t *split_value_end     = NULL;
+	uint8_t *string_end          = NULL;
+	static char *function        = "libewf_split_values_parse_string";
+	size_t remaining_string_size = 0;
+	ssize_t split_value_size     = 0;
+	int number_of_split_values   = 0;
+	int split_value_iterator     = 0;
 
 	if( split_values == NULL )
 	{
@@ -352,16 +352,16 @@ int libewf_split_values_parse_string(
 	/* Determine the number of split values
 	 */
 	remaining_string_size = string_size;
-	split_value_start     = (libcstring_character_t *) string;
-	split_value_end       = (libcstring_character_t *) string;
-	string_end            = (libcstring_character_t *) &( string[ string_size - 1 ] );
+	split_value_start     = (uint8_t *) string;
+	split_value_end       = (uint8_t *) string;
+	string_end            = (uint8_t *) &( string[ string_size - 1 ] );
 
 	do
 	{
-		split_value_end = libcstring_string_search_character(
-				   split_value_start,
-				   delimiter,
-				   remaining_string_size );
+		split_value_end = (uint8_t *) libcstring_narrow_string_search_character(
+				               (char *) split_value_start,
+				               (char) delimiter,
+				               remaining_string_size );
 
 		if( split_value_end > string_end )
 		{
@@ -429,10 +429,10 @@ int libewf_split_values_parse_string(
 		{
 			split_value_start = split_value_end + 1;
 		}
-		split_value_end = libcstring_string_search_character(
-		                   split_value_start,
-		                   delimiter,
-		                   remaining_string_size );
+		split_value_end = (uint8_t *) libcstring_narrow_string_search_character(
+		                               (char *) split_value_start,
+		                               (char) delimiter,
+		                               remaining_string_size );
 
 		/* Check for last value
 		 */

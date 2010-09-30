@@ -297,18 +297,11 @@ int libewf_header_values_parse_xheader(
      size_t size,
      liberror_error_t **error );
 
-int libewf_header_values_convert_header_string_xml_to_xheader(
-     libcstring_character_t *header_string_xml,
-     size_t header_string_xml_size,
-     uint8_t **xheader,
-     size_t *xheader_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_header_string_xml(
+int libewf_header_values_generate_xheader(
      libfvalue_table_t *header_values,
      time_t timestamp,
-     libcstring_character_t **header_string,
-     size_t *header_string_size,
+     uint8_t **xheader,
+     size_t *xheader_size,
      liberror_error_t **error );
 
 int libewf_header_values_generate_header_ewfx(
@@ -326,13 +319,6 @@ int libewf_header_values_generate_header2_ewfx(
      int8_t compression_level,
      uint8_t **header2,
      size_t *header2_size,
-     liberror_error_t **error );
-
-int libewf_header_values_generate_xheader_ewfx(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     uint8_t **xheader,
-     size_t *xheader_size,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

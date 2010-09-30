@@ -37,23 +37,22 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_dump_data(
-     libcstring_character_t *header,
-     uint8_t *data,
+     const char *header_string,
+     const uint8_t *data,
      size_t data_size,
      liberror_error_t **error )
 {
-	uint8_t *checksum_data       = NULL;
 	static char *function        = "libewf_debug_dump_data";
 	uint32_t stored_checksum     = 0;
 	uint32_t calculated_checksum = 0;
 
-	if( header == NULL )
+	if( header_string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.",
+		 "%s: invalid header string.",
 		 function );
 
 		return( -1 );
@@ -85,15 +84,14 @@ int libewf_debug_dump_data(
 	                       data_size - sizeof( uint32_t ),
 	                       1 );
 
-	checksum_data = &data[ data_size - sizeof( uint32_t ) ];
 
 	byte_stream_copy_to_uint32_little_endian(
-	 checksum_data,
+	 &( data[ data_size - sizeof( uint32_t ) ] ),
 	 stored_checksum );
 
 	libnotify_printf(
-	 "%" PRIs_LIBCSTRING ":\n",
-	 header );
+	 "%s:\n",
+	 header_string );
 
 	libnotify_print_data(
 	 data,
@@ -112,22 +110,23 @@ int libewf_debug_dump_data(
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_byte_stream_print(
-     libcstring_character_t *header,
-     uint8_t *byte_stream,
+     const char *header_string,
+     const uint8_t *byte_stream,
      size_t byte_stream_size,
      liberror_error_t **error )
 {
-	libcstring_character_t *string = NULL;
-	static char *function          = "libewf_debug_byte_stream_print";
-	size_t string_size             = 0;
+	libcstring_system_character_t *string = NULL;
+	static char *function                 = "libewf_debug_byte_stream_print";
+	size_t string_size                    = 0;
+	int result                            = 0;
 
-	if( header == NULL )
+	if( header_string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.",
+		 "%s: invalid header string.",
 		 function );
 
 		return( -1 );
@@ -143,24 +142,34 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	if( libuna_utf8_string_size_from_byte_stream(
-	     byte_stream,
-	     byte_stream_size,
-	     LIBUNA_CODEPAGE_ASCII,
-	     &string_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libuna_utf16_string_size_from_byte_stream(
+	          byte_stream,
+	          byte_stream_size,
+	          LIBUNA_CODEPAGE_ASCII,
+	          &string_size,
+	          error );
+#else
+	result = libuna_utf8_string_size_from_byte_stream(
+	          byte_stream,
+	          byte_stream_size,
+	          LIBUNA_CODEPAGE_ASCII,
+	          &string_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine string size.",
 		 function );
 
 		return( -1 );
 	}
-	string = (libcstring_character_t *) memory_allocate(
-	                                     sizeof( libcstring_character_t ) * string_size );
+	string = (libcstring_system_character_t *) memory_allocate(
+	                                            sizeof( libcstring_system_character_t ) * string_size );
 
 	if( string == NULL )
 	{
@@ -173,19 +182,30 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	if( libuna_utf8_string_copy_from_byte_stream(
-	     string,
-	     string_size,
-	     byte_stream,
-	     byte_stream_size,
-	     LIBUNA_CODEPAGE_ASCII,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libuna_utf16_string_copy_from_byte_stream(
+	          (uint16_t *) string,
+	          string_size,
+	          byte_stream,
+	          byte_stream_size,
+	          LIBUNA_CODEPAGE_ASCII,
+	          error );
+#else
+	result = libuna_utf8_string_copy_from_byte_stream(
+	          (uint8_t *) string,
+	          string_size,
+	          byte_stream,
+	          byte_stream_size,
+	          LIBUNA_CODEPAGE_ASCII,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set string.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy string from byte stream.",
 		 function );
 
 		memory_free(
@@ -194,9 +214,9 @@ int libewf_debug_byte_stream_print(
 		return( -1 );
 	}
 	libnotify_printf(
-	 "%" PRIs_LIBCSTRING ":\n"
-	 "%" PRIs_LIBCSTRING "",
-	 header,
+	 "%s:\n"
+	 "%" PRIs_LIBCSTRING_SYSTEM "",
+	 header_string,
 	 string );
 
 	memory_free(
@@ -209,22 +229,23 @@ int libewf_debug_byte_stream_print(
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_utf8_stream_print(
-     libcstring_character_t *header,
-     uint8_t *utf8_stream,
+     const char *header_string,
+     const uint8_t *utf8_stream,
      size_t utf8_stream_size,
      liberror_error_t **error )
 {
-	libcstring_character_t *string = NULL;
-	static char *function          = "libewf_debug_utf8_stream_print";
-	size_t string_size             = 0;
+	libcstring_system_character_t *string = NULL;
+	static char *function                 = "libewf_debug_utf8_stream_print";
+	size_t string_size                    = 0;
+	int result                            = 0;
 
-	if( header == NULL )
+	if( header_string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.",
+		 "%s: invalid header string.",
 		 function );
 
 		return( -1 );
@@ -240,23 +261,32 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	if( libuna_utf8_string_size_from_utf8_stream(
-	     utf8_stream,
-	     utf8_stream_size,
-	     &string_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libuna_utf16_string_size_from_utf8_stream(
+	          utf8_stream,
+	          utf8_stream_size,
+	          &string_size,
+	          error );
+#else
+	result = libuna_utf8_string_size_from_utf8_stream(
+	          utf8_stream,
+	          utf8_stream_size,
+	          &string_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine string size.",
 		 function );
 
 		return( -1 );
 	}
-	string = (libcstring_character_t *) memory_allocate(
-	                                     sizeof( libcstring_character_t ) * string_size );
+	string = (libcstring_system_character_t *) memory_allocate(
+	                                            sizeof( libcstring_system_character_t ) * string_size );
 
 	if( string == NULL )
 	{
@@ -269,18 +299,28 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	if( libuna_utf8_string_copy_from_utf8_stream(
-	     string,
-	     string_size,
-	     utf8_stream,
-	     utf8_stream_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libuna_utf16_string_copy_from_utf8_stream(
+	          (uint16_t *) string,
+	          string_size,
+	          utf8_stream,
+	          utf8_stream_size,
+	          error );
+#else
+	result = libuna_utf8_string_copy_from_utf8_stream(
+	          (uint8_t *) string,
+	          string_size,
+	          utf8_stream,
+	          utf8_stream_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set string.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy string from UTF-8 stream.",
 		 function );
 
 		memory_free(
@@ -289,9 +329,9 @@ int libewf_debug_utf8_stream_print(
 		return( -1 );
 	}
 	libnotify_printf(
-	 "%" PRIs_LIBCSTRING ":\n"
-	 "%" PRIs_LIBCSTRING "",
-	 header,
+	 "%s:\n"
+	 "%" PRIs_LIBCSTRING_SYSTEM "",
+	 header_string,
 	 string );
 
 	memory_free(
@@ -304,22 +344,23 @@ int libewf_debug_utf8_stream_print(
  * Returns 1 if successful or -1 on error
  */
 int libewf_debug_utf16_stream_print(
-     libcstring_character_t *header,
-     uint8_t *utf16_stream,
+     const char *header_string,
+     const uint8_t *utf16_stream,
      size_t utf16_stream_size,
      liberror_error_t **error )
 {
-	libcstring_character_t *string = NULL;
-	static char *function          = "libewf_debug_utf16_stream_print";
-	size_t string_size             = 0;
+	libcstring_system_character_t *string = NULL;
+	static char *function                 = "libewf_debug_utf16_stream_print";
+	size_t string_size                    = 0;
+	int result                            = 0;
 
-	if( header == NULL )
+	if( header_string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.",
+		 "%s: invalid header string.",
 		 function );
 
 		return( -1 );
@@ -335,24 +376,34 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	if( libuna_utf8_string_size_from_utf16_stream(
-	     utf16_stream,
-	     utf16_stream_size,
-	     LIBUNA_ENDIAN_LITTLE,
-	     &string_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libuna_utf16_string_size_from_utf16_stream(
+	          utf16_stream,
+	          utf16_stream_size,
+	          LIBUNA_ENDIAN_LITTLE,
+	          &string_size,
+	          error );
+#else
+	result = libuna_utf8_string_size_from_utf16_stream(
+	          utf16_stream,
+	          utf16_stream_size,
+	          LIBUNA_ENDIAN_LITTLE,
+	          &string_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine string size.",
 		 function );
 
 		return( -1 );
 	}
-	string = (libcstring_character_t *) memory_allocate(
-	                                     sizeof( libcstring_character_t ) * string_size );
+	string = (libcstring_system_character_t *) memory_allocate(
+	                                            sizeof( libcstring_system_character_t ) * string_size );
 
 	if( string == NULL )
 	{
@@ -365,19 +416,30 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	if( libuna_utf8_string_copy_from_utf16_stream(
-	     string,
-	     string_size,
-	     utf16_stream,
-	     utf16_stream_size,
-	     LIBUNA_ENDIAN_LITTLE,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libuna_utf16_string_copy_from_utf16_stream(
+	          (uint16_t *) string,
+	          string_size,
+	          utf16_stream,
+	          utf16_stream_size,
+	          LIBUNA_ENDIAN_LITTLE,
+	          error );
+#else
+	result = libuna_utf8_string_copy_from_utf16_stream(
+	          (uint8_t *) string,
+	          string_size,
+	          utf16_stream,
+	          utf16_stream_size,
+	          LIBUNA_ENDIAN_LITTLE,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set string.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy string from UTF-16 stream.",
 		 function );
 
 		memory_free(
@@ -386,9 +448,9 @@ int libewf_debug_utf16_stream_print(
 		return( -1 );
 	}
 	libnotify_printf(
-	 "%" PRIs_LIBCSTRING ":\n"
-	 "%" PRIs_LIBCSTRING "",
-	 header,
+	 "%s:\n"
+	 "%" PRIs_LIBCSTRING_SYSTEM "",
+	 header_string,
 	 string );
 
 	memory_free(

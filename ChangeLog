@@ -1,15 +1,19 @@
 TODO
+* update codegear and builder5 files
+
 * test examples
 
 * UTF-16 support
+  - libfvalue: move type and flags from initialize
+    allow value to have identifier but no type ?
+    combine type with data ?
   - refactor values tables to libfvalue table
-* fix xheader generation
+  - remove libcstring
 
 * single file entry delay conversion of file name
 * are single file entry flags similar to file attribute flags ?
 
 * move sections into separate objects ?
-* update builder5 files
 
 * rename section_list to section_value
 * add UTF-16 header and hash values, file entry name functions
@@ -227,6 +231,9 @@ Test:
 20100930
 * worked on UTF-16 functions
 * code clean up
+* updated msvscpp files
+* fix for non-initialized session data
+* worked on Windows safe debug output
 
 20100929
 * added open/close examples

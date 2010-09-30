@@ -501,119 +501,6 @@ int info_handle_get_header_value(
 	return( result );
 }
 
-/* Retrieves the hash value from the input handle
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int info_handle_get_hash_value(
-     info_handle_t *info_handle,
-     char *hash_value_identifier,
-     size_t hash_value_identifier_length,
-     libcstring_system_character_t *hash_value,
-     size_t hash_value_size,
-     liberror_error_t **error )
-{
-	uint8_t utf8_hash_value[ INFO_HANDLE_VALUE_SIZE ];
-
-	static char *function             = "info_handle_get_hash_value";
-	size_t calculated_hash_value_size = 0;
-	size_t utf8_hash_value_size       = INFO_HANDLE_VALUE_SIZE;
-	int result                        = 0;
-
-	if( info_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid info handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( info_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid info handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-	result = libewf_handle_get_utf8_hash_value(
-	          info_handle->input_handle,
-	          (uint8_t *) hash_value_identifier,
-	          hash_value_identifier_length,
-	          utf8_hash_value,
-	          utf8_hash_value_size,
-	          error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value: %s.",
-		 function,
-		 hash_value_identifier );
-
-		return( -1 );
-	}
-	else if( result == 1 )
-	{
-		/* Determine the hash value size
-		 */
-		utf8_hash_value_size = 1 + libcstring_narrow_string_length(
-		                            (char *) utf8_hash_value );
-
-		if( libsystem_string_size_from_utf8_string(
-		     utf8_hash_value,
-		     utf8_hash_value_size,
-		     &calculated_hash_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to determine hash value size.",
-			 function );
-
-			return( -1 );
-		}
-		if( hash_value_size < calculated_hash_value_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: hash value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( libsystem_string_copy_from_utf8_string(
-		     hash_value,
-		     hash_value_size,
-		     utf8_hash_value,
-		     utf8_hash_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to set hash value.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( result );
-}
-
 /* Sets the header codepage
  * Returns 1 if successful or -1 on error
  */
@@ -2150,13 +2037,24 @@ int info_handle_hash_values_fprint(
 			continue;
 		}
 #endif
-		if( info_handle_get_hash_value(
-		     info_handle,
-		     hash_value_identifier,
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libewf_handle_get_utf16_hash_value(
+		     info_handle->input_handle,
+		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_size - 1,
-		     hash_value,
+		     (uint16_t *) hash_value,
 		     hash_value_size,
 		     error ) != 1 )
+#else
+		if( libewf_handle_get_utf8_hash_value(
+		     info_handle->input_handle,
+		     (uint8_t *) hash_value_identifier,
+		     hash_value_identifier_size - 1,
+		     (uint8_t *) hash_value,
+		     hash_value_size,
+		     error ) != 1 )
+#endif
 		{
 			liberror_error_set(
 			 error,

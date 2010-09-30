@@ -933,119 +933,6 @@ int verification_handle_get_number_of_checksum_errors(
 	return( 1 );
 }
 
-/* Retrieves the hash value from the input handle
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int verification_handle_get_hash_value(
-     verification_handle_t *verification_handle,
-     char *hash_value_identifier,
-     size_t hash_value_identifier_length,
-     libcstring_system_character_t *hash_value,
-     size_t hash_value_size,
-     liberror_error_t **error )
-{
-	uint8_t utf8_hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
-
-	static char *function             = "verification_handle_get_hash_value";
-	size_t calculated_hash_value_size = 0;
-	size_t utf8_hash_value_size       = VERIFICATION_HANDLE_VALUE_SIZE;
-	int result                        = 0;
-
-	if( verification_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( verification_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-	result = libewf_handle_get_utf8_hash_value(
-	          verification_handle->input_handle,
-	          (uint8_t *) hash_value_identifier,
-	          hash_value_identifier_length,
-	          utf8_hash_value,
-	          utf8_hash_value_size,
-	          error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value: %s.",
-		 function,
-		 hash_value_identifier );
-
-		return( -1 );
-	}
-	else if( result == 1 )
-	{
-		/* Determine the hash value size
-		 */
-		utf8_hash_value_size = 1 + libcstring_narrow_string_length(
-		                            (char *) utf8_hash_value );
-
-		if( libsystem_string_size_from_utf8_string(
-		     utf8_hash_value,
-		     utf8_hash_value_size,
-		     &calculated_hash_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to determine hash value size.",
-			 function );
-
-			return( -1 );
-		}
-		if( hash_value_size < calculated_hash_value_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: hash value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( libsystem_string_copy_from_utf8_string(
-		     hash_value,
-		     hash_value_size,
-		     utf8_hash_value,
-		     utf8_hash_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to set hash value.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( result );
-}
-
 /* Sets the header codepage
  * Returns 1 if successful or -1 on error
  */
@@ -1346,14 +1233,23 @@ int verification_handle_finalize(
 			return( -1 );
 		}
 #elif defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
-		*stored_md5_hash_available = verification_handle_get_hash_value(
-		                              verification_handle,
-		                              "MD5",
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		*stored_md5_hash_available = libewf_handle_get_utf16_hash_value(
+		                              verification_handle->input_handle,
+		                              (uint8_t *) "MD5",
 		                              3,
-		                              stored_md5_hash_string,
+		                              (uint16_t *) stored_md5_hash_string,
 		                              stored_md5_hash_string_size,
 		                              error );
-
+#else
+		*stored_md5_hash_available = libewf_handle_get_utf8_hash_value(
+		                              verification_handle->input_handle,
+		                              (uint8_t *) "MD5",
+		                              3,
+		                              (uint8_t *) stored_md5_hash_string,
+		                              stored_md5_hash_string_size,
+		                              error );
+#endif
 		if( *stored_md5_hash_available == -1 )
 		{
 			liberror_error_set(
@@ -1413,14 +1309,23 @@ int verification_handle_finalize(
 
 			return( -1 );
 		}
-		*stored_sha1_hash_available = verification_handle_get_hash_value(
-		                               verification_handle,
-		                               "SHA1",
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		*stored_sha1_hash_available = libewf_handle_get_utf16_hash_value(
+		                               verification_handle->input_handle,
+		                               (uint8_t *) "SHA1",
 		                               4,
-		                               stored_sha1_hash_string,
+		                               (uint16_t *) stored_sha1_hash_string,
 		                               stored_sha1_hash_string_size,
 		                               error );
-
+#else
+		*stored_sha1_hash_available = libewf_handle_get_utf8_hash_value(
+		                               verification_handle->input_handle,
+		                               (uint8_t *) "SHA1",
+		                               4,
+		                               (uint8_t *) stored_sha1_hash_string,
+		                               stored_sha1_hash_string_size,
+		                               error );
+#endif
 		if( *stored_sha1_hash_available == -1 )
 		{
 			liberror_error_set(
@@ -1444,7 +1349,7 @@ int verification_handle_additional_hash_values_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	char hash_identifier[ VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE ];
+	char hash_value_identifier[ VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE ];
 	libcstring_system_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
 
 	static char *function             = "verification_handle_additional_hash_values_fprint";
@@ -1541,7 +1446,7 @@ int verification_handle_additional_hash_values_fprint(
 		if( libewf_handle_get_hash_value_identifier(
 		     verification_handle->input_handle,
 		     hash_value_iterator,
-		     (uint8_t *) hash_identifier,
+		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_size,
 		     error ) != 1 )
 		{
@@ -1559,7 +1464,7 @@ int verification_handle_additional_hash_values_fprint(
 		}
 		if( ( verification_handle->calculate_md5 != 0 )
 		 && ( libcstring_narrow_string_compare(
-		       hash_identifier,
+		       hash_value_identifier,
 		       "MD5",
 		       3 ) == 0 ) )
 		{
@@ -1567,19 +1472,29 @@ int verification_handle_additional_hash_values_fprint(
 		}
 		if( ( verification_handle->calculate_sha1 != 0 )
 		 && ( libcstring_narrow_string_compare(
-		       hash_identifier,
+		       hash_value_identifier,
 		       "SHA1",
 		       4 ) == 0 ) )
 		{
 			continue;
 		}
-		if( verification_handle_get_hash_value(
-		     verification_handle,
-		     hash_identifier,
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libewf_handle_get_utf16_hash_value(
+		     verification_handle->input_handle,
+		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_size - 1,
-		     hash_value,
+		     (uint16_t *) hash_value,
 		     hash_value_size,
 		     error ) != 1 )
+#else
+		if( libewf_handle_get_utf8_hash_value(
+		     verification_handle->input_handle,
+		     (uint8_t *) hash_value_identifier,
+		     hash_value_identifier_size - 1,
+		     (uint8_t *) hash_value,
+		     hash_value_size,
+		     error ) != 1 )
+#endif
 		{
 			liberror_error_set(
 			 error,
@@ -1587,7 +1502,7 @@ int verification_handle_additional_hash_values_fprint(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the hash value for identifier: %s.",
 			 function,
-			 hash_identifier );
+			 hash_value_identifier );
 
 			result = -1;
 		}
@@ -1604,7 +1519,7 @@ int verification_handle_additional_hash_values_fprint(
 			fprintf(
 			 stream,
 			 "%s:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 hash_identifier,
+			 hash_value_identifier,
 			 hash_value );
 		}
 	}

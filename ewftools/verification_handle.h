@@ -140,14 +140,6 @@ int verification_handle_get_number_of_checksum_errors(
      uint32_t *number_of_errors,
      liberror_error_t **error );
 
-int verification_handle_get_hash_value(
-     verification_handle_t *verification_handle,
-     char *hash_value_identifier,
-     size_t hash_value_identifier_length,
-     libcstring_system_character_t *hash_value,
-     size_t hash_value_size,
-     liberror_error_t **error );
-
 int verification_handle_set_header_codepage(
      verification_handle_t *verification_handle,
      int header_codepage,

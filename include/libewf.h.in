@@ -1067,7 +1067,7 @@ LIBEWF_EXTERN int libewf_handle_get_utf8_header_value_size(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   size_t *value_size,
+                   size_t *utf8_string_size,
                    libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded header value of an identifier
@@ -1078,8 +1078,8 @@ LIBEWF_EXTERN int libewf_handle_get_utf8_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   uint8_t *value,
-                   size_t value_size,
+                   uint8_t *utf8_string,
+                   size_t utf8_string_size,
                    libewf_error_t **error );
 
 /* Retrieves the header value case number
@@ -1169,8 +1169,8 @@ LIBEWF_EXTERN int libewf_handle_set_utf8_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   const uint8_t *value,
-                   size_t value_length,
+                   const uint8_t *utf8_string,
+                   size_t utf8_string_length,
                    libewf_error_t **error );
 
 /* Sets the header value case number
@@ -1251,6 +1251,8 @@ LIBEWF_EXTERN int libewf_handle_set_utf8_header_value(
 #define libewf_handle_set_utf8_header_value_serial_number( handle, value, value_length, error ) \
         libewf_handle_set_utf8_header_value( handle, (uint8_t *) "serial_number", 13, value, value_length, error )
 
+#ifdef TODO
+
 /* Retrieves the size of the UTF-16 encoded header value of an identifier
  * The value size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -1259,7 +1261,7 @@ LIBEWF_EXTERN int libewf_handle_get_utf16_header_value_size(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   size_t *value_size,
+                   size_t *utf16_string_size,
                    libewf_error_t **error );
 
 /* Retrieves the UTF-16 encoded header value of an identifier
@@ -1270,8 +1272,8 @@ LIBEWF_EXTERN int libewf_handle_get_utf16_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   uint16_t *value,
-                   size_t value_size,
+                   uint16_t *utf16_string,
+                   size_t utf16_string_size,
                    libewf_error_t **error );
 
 /* Sets the UTF-16 encoded header value specified by the identifier
@@ -1281,9 +1283,11 @@ LIBEWF_EXTERN int libewf_handle_set_utf16_header_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   const uint16_t *value,
-                   size_t value_length,
+                   const uint16_t *utf16_string,
+                   size_t utf16_string_length,
                    libewf_error_t **error );
+
+#endif
 
 /* Copies the header values from the source to the destination handle
  * Returns 1 if successful or -1 on error
@@ -1303,7 +1307,7 @@ LIBEWF_EXTERN int libewf_handle_get_number_of_hash_values(
 
 /* Retrieves the size of the hash value identifier of a specific index
  * The identifier size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_hash_value_identifier_size(
                    libewf_handle_t *handle,
@@ -1313,7 +1317,7 @@ LIBEWF_EXTERN int libewf_handle_get_hash_value_identifier_size(
 
 /* Retrieves the hash value identifier of a specific index
  * The identifier size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_hash_value_identifier(
                    libewf_handle_t *handle,
@@ -1330,7 +1334,7 @@ LIBEWF_EXTERN int libewf_handle_get_utf8_hash_value_size(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   size_t *value_size,
+                   size_t *utf8_string_size,
                    libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded hash value of an identifier
@@ -1341,8 +1345,8 @@ LIBEWF_EXTERN int libewf_handle_get_utf8_hash_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   uint8_t *value,
-                   size_t value_size,
+                   uint8_t *utf8_string,
+                   size_t utf8_string_size,
                    libewf_error_t **error );
 
 /* Retrieves the hash value MD5
@@ -1364,8 +1368,8 @@ LIBEWF_EXTERN int libewf_handle_set_utf8_hash_value(
                    libewf_handle_t *handle,
                    const uint8_t *identifier,
                    size_t identifier_length,
-                   const uint8_t *value,
-                   size_t value_length,
+                   const uint8_t *utf8_string,
+                   size_t utf8_string_length,
                    libewf_error_t **error );
 
 /* Sets the hash value MD5
@@ -1379,6 +1383,40 @@ LIBEWF_EXTERN int libewf_handle_set_utf8_hash_value(
  */
 #define libewf_handle_set_utf8_hash_value_sha1( handle, value, value_length, error ) \
         libewf_handle_set_utf8_hash_value( handle, "SHA1", 4, value, value_length, error )
+
+/* Retrieves the size of the UTF-16 encoded hash value of an identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_utf16_hash_value_size(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   size_t *utf16_string_size,
+                   libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded hash value of an identifier
+ * The value size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_utf16_hash_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   uint16_t *utf16_string,
+                   size_t utf16_string_size,
+                   libewf_error_t **error );
+
+/* Sets the UTF-16 hash value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_set_utf16_hash_value(
+                   libewf_handle_t *handle,
+                   const uint8_t *identifier,
+                   size_t identifier_length,
+                   const uint16_t *utf16_string,
+                   size_t utf16_string_length,
+                   libewf_error_t **error );
 
 /* Retrieves the root (single) file entry
  * Returns 1 if successful, 0 if no file entries are present or -1 on error

@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( __cplusplus )
@@ -42,11 +41,11 @@ struct libewf_split_values
 
 	/* The string
 	 */
-	libcstring_character_t *string;
+	uint8_t *string;
 
 	/* The values
 	 */
-	libcstring_character_t **values;
+	uint8_t **values;
 
 	/* The sizes of the values
 	 */
@@ -55,7 +54,7 @@ struct libewf_split_values
 
 int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
-     const libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
      int number_of_values,
      liberror_error_t **error );
@@ -66,9 +65,9 @@ int libewf_split_values_free(
 
 int libewf_split_values_parse_string(
      libewf_split_values_t **split_values,
-     const libcstring_character_t *string,
+     const uint8_t *string,
      size_t string_size,
-     libcstring_character_t delimiter,
+     uint8_t delimiter,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

@@ -947,7 +947,7 @@ ssize_t libewf_section_header_read(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_byte_stream_print(
-		     _LIBCSTRING_STRING( "Header" ),
+		     "Header",
 		     header,
 		     header_size,
 		     error ) != 1 )
@@ -1024,7 +1024,7 @@ ssize_t libewf_section_header_write(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_byte_stream_print(
-		     _LIBCSTRING_STRING( "Header" ),
+		     "Header",
 		     header,
 		     header_size,
 		     error ) != 1 )
@@ -1159,7 +1159,7 @@ ssize_t libewf_section_header2_read(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_utf16_stream_print(
-		     _LIBCSTRING_STRING( "Header2" ),
+		     "Header2",
 		     header2,
 		     header2_size,
 		     error ) != 1 )
@@ -1236,7 +1236,7 @@ ssize_t libewf_section_header2_write(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_utf16_stream_print(
-		     _LIBCSTRING_STRING( "Header2" ),
+		     "Header2",
 		     header2,
 		     header2_size,
 		     error ) != 1 )
@@ -3690,7 +3690,7 @@ ssize_t libewf_section_ltree_read(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_utf16_stream_print(
-		     _LIBCSTRING_STRING( "ltree data" ),
+		     "ltree data",
 		     ltree_data,
 		     ltree_data_size,
 		     error ) != 1 )
@@ -4151,6 +4151,23 @@ ssize_t libewf_section_session_write(
 		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create session entries.",
 		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     ewf_sessions,
+	     0,
+	     ewf_sessions_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear sessions entries.",
+		 function );
+
+		memory_free(
+		 ewf_sessions );
 
 		return( -1 );
 	}
@@ -4730,6 +4747,11 @@ ssize_t libewf_section_data_write(
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear data.",
 			 function );
+
+			memory_free(
+			 *cached_data_section );
+
+			*cached_data_section = NULL;
 
 			return( -1 );
 		}
@@ -6262,7 +6284,7 @@ ssize_t libewf_section_xheader_read(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_utf8_stream_print(
-		     _LIBCSTRING_STRING( "XHeader" ),
+		     "XHeader",
 		     xheader,
 		     xheader_size,
 		     error ) != 1 )
@@ -6339,10 +6361,10 @@ ssize_t libewf_section_xheader_write(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_utf8_stream_print(
-		       _LIBCSTRING_STRING( "XHeader" ),
-		       xheader,
-		       xheader_size,
-		       error ) != 1 )
+		     "XHeader",
+		     xheader,
+		     xheader_size,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -6474,7 +6496,7 @@ ssize_t libewf_section_xhash_read(
 	if( libnotify_verbose != 0 )
 	{
 		 if( libewf_debug_utf8_stream_print(
-		      _LIBCSTRING_STRING( "XHash" ),
+		      "XHash",
 		      xhash,
 		      xhash_size,
 		      error ) != 1 )
@@ -6551,7 +6573,7 @@ ssize_t libewf_section_xhash_write(
 	if( libnotify_verbose != 0 )
 	{
 		if( libewf_debug_utf8_stream_print(
-		     _LIBCSTRING_STRING( "XHash" ),
+		     "XHash",
 		     xhash,
 		     xhash_size,
 		     error ) != 1 )
@@ -7164,7 +7186,7 @@ ssize_t libewf_section_debug_read(
 	if( result == 0 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBCSTRING_STRING( "UNCOMPRESSED data" ),
+		          "UNCOMPRESSED data",
 		          data,
 		          (size_t) section_size,
 	                  error );
@@ -7172,7 +7194,7 @@ ssize_t libewf_section_debug_read(
 	else if( result == 1 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBCSTRING_STRING( "COMPRESSED data" ),
+		          "COMPRESSED data",
 		          uncompressed_data,
 		          uncompressed_size,
 	                  error );

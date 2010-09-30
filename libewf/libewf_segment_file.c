@@ -1875,7 +1875,7 @@ ssize_t libewf_segment_file_write_close(
          uint32_t number_of_chunks_written_to_segment,
          int last_segment_file,
          libewf_hash_sections_t *hash_sections,
-         libewf_values_table_t *hash_values,
+         libfvalue_table_t *hash_values,
          libewf_media_values_t *media_values,
          libewf_sector_table_t *sessions,
          libewf_sector_table_t *acquiry_errors,
@@ -2110,7 +2110,7 @@ ssize_t libewf_segment_file_write_close(
 
 				hash_sections->xhash = NULL;
 			}
-			if( libewf_hash_values_generate_xhash_string_ewfx(
+			if( libewf_hash_values_generate_xhash(
 			     hash_values,
 			     &( hash_sections->xhash ),
 			     &( hash_sections->xhash_size ),
@@ -2203,7 +2203,7 @@ int libewf_segment_file_write_sections_correction(
      uint32_t number_of_chunks_written_to_segment,
      int last_segment_file,
      libewf_media_values_t *media_values,
-     libewf_values_table_t *hash_values,
+     libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,

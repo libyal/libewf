@@ -243,10 +243,6 @@
 			</None>
 			<None Include="..\..\..\libewf\libewf_types.h">
 			</None>
-			<CppCompile Include="..\..\..\libewf\libewf_values_table.c">
-			</CppCompile>
-			<None Include="..\..\..\libewf\libewf_values_table.h">
-			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_write_io_handle.c">
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_write_io_handle.h">

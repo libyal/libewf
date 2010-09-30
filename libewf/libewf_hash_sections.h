@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include "libewf_values_table.h"
+#include <liberror.h>
 
 #if defined( __cplusplus )
 extern "C" {
