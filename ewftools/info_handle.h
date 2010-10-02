@@ -72,14 +72,6 @@ int info_handle_close(
      info_handle_t *info_handle,
      liberror_error_t **error );
 
-int info_handle_get_header_value(
-     info_handle_t *info_handle,
-     char *header_value_identifier,
-     size_t header_value_identifier_length,
-     libcstring_system_character_t *header_value,
-     size_t header_value_size,
-     liberror_error_t **error );
-
 int info_handle_set_header_codepage(
      info_handle_t *info_handle,
      int header_codepage,

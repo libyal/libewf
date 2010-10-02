@@ -7,8 +7,9 @@ TODO
   - libfvalue: move type and flags from initialize
     allow value to have identifier but no type ?
     combine type with data ?
-  - refactor values tables to libfvalue table
   - remove libcstring
+  - refactor imaging_handle
+* add UTF-16 file entry name functions
 
 * single file entry delay conversion of file name
 * are single file entry flags similar to file attribute flags ?
@@ -16,7 +17,6 @@ TODO
 * move sections into separate objects ?
 
 * rename section_list to section_value
-* add UTF-16 header and hash values, file entry name functions
 
 * configure validate libuna and libbfio check
 * documentation:
@@ -227,6 +227,9 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20101002
+* worked on UTF-16 functions
 
 20100930
 * worked on UTF-16 functions

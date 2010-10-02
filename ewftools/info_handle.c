@@ -388,119 +388,6 @@ int info_handle_close(
 	return( 0 );
 }
 
-/* Retrieves the header value from the input handle
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int info_handle_get_header_value(
-     info_handle_t *info_handle,
-     char *header_value_identifier,
-     size_t header_value_identifier_length,
-     libcstring_system_character_t *header_value,
-     size_t header_value_size,
-     liberror_error_t **error )
-{
-	uint8_t utf8_header_value[ INFO_HANDLE_VALUE_SIZE ];
-
-	static char *function               = "info_handle_get_header_value";
-	size_t calculated_header_value_size = 0;
-	size_t utf8_header_value_size       = INFO_HANDLE_VALUE_SIZE;
-	int result                          = 0;
-
-	if( info_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid info handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( info_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid info handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-	result = libewf_handle_get_utf8_header_value(
-	          info_handle->input_handle,
-	          (uint8_t *) header_value_identifier,
-	          header_value_identifier_length,
-	          utf8_header_value,
-	          utf8_header_value_size,
-	          error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value: %s.",
-		 function,
-		 header_value_identifier );
-
-		return( -1 );
-	}
-	else if( result == 1 )
-	{
-		/* Determine the header value size
-		 */
-		utf8_header_value_size = 1 + libcstring_narrow_string_length(
-		                              (char *) utf8_header_value );
-
-		if( libsystem_string_size_from_utf8_string(
-		     utf8_header_value,
-		     utf8_header_value_size,
-		     &calculated_header_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to determine header value size.",
-			 function );
-
-			return( -1 );
-		}
-		if( header_value_size < calculated_header_value_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: header value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( libsystem_string_copy_from_utf8_string(
-		     header_value,
-		     header_value_size,
-		     utf8_header_value,
-		     utf8_header_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to set header value.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( result );
-}
-
 /* Sets the header codepage
  * Returns 1 if successful or -1 on error
  */
@@ -659,24 +546,25 @@ int info_handle_header_values_fprint(
 	}
 	else
 	{
-		/* Case number
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "case_number",
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "case_number",
 		                       11,
-		                       header_value,
+		                       (uint16_t *) header_value,
 		                       header_value_size,
 		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "case_number",
+		                       11,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
 
-		if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tCase number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-		else if( header_value_result == -1 )
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -687,24 +575,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Description
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "description",
-		                       11,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tDescription:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tCase number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "description",
+		                       11,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "description",
+		                       11,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -715,24 +610,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Examiner name
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "examiner_name",
-		                       13,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tExaminer name:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tDescription:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "examiner_name",
+		                       13,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "examiner_name",
+		                       13,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -743,24 +645,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Evidence nubmer
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "evidence_number",
-		                       15,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tEvidence number:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tExaminer name:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "evidence_number",
+		                       15,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "evidence_number",
+		                       15,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -771,24 +680,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Notes
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "notes",
-		                       5,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tNotes:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tEvidence number:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "notes",
+		                       5,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "notes",
+		                       5,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -799,24 +715,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Acquiry date
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "acquiry_date",
-		                       12,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tAcquiry date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tNotes:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "acquiry_date",
+		                       12,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "acquiry_date",
+		                       12,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -827,24 +750,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* System date
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "system_date",
-		                       11,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tSystem date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tAcquiry date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "system_date",
+		                       11,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "system_date",
+		                       11,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -855,24 +785,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Acquiry operating system
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "acquiry_operating_system",
-		                       24,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tOperating system used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tSystem date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "acquiry_operating_system",
+		                       24,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "acquiry_operating_system",
+		                       24,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -883,24 +820,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Acquiry software version
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "acquiry_software_version",
-		                       24,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tSoftware version used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tOperating system used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "acquiry_software_version",
+		                       24,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "acquiry_software_version",
+		                       24,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -911,17 +855,42 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Password
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "password",
+		else if( header_value_result == 1 )
+		{
+			fprintf(
+			 stream,
+			 "\tSoftware version used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 header_value );
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "password",
 		                       8,
-		                       header_value,
+		                       (uint16_t *) header_value,
 		                       header_value_size,
 		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "password",
+		                       8,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if(  header_value_result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value: password.",
+			 function );
 
-		if( header_value_result == 1 )
+			result = -1;
+		}
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
@@ -934,28 +903,35 @@ int info_handle_header_values_fprint(
 			 stream,
 			 "\tPassword:\t\tN/A\n" );
 		}
-		else
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "compression_type",
+		                       16,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "compression_type",
+		                       16,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: password.",
+			 "%s: unable to retrieve header value: compression_type.",
 			 function );
 
 			result = -1;
 		}
-		/* Compression type
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "compression_type",
-		                       16,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
@@ -995,35 +971,24 @@ int info_handle_header_values_fprint(
 				 "unknown compression\n" );
 			}
 		}
-		else if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: compression_type.",
-			 function );
-
-			result = -1;
-		}
-		/* Model
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "model",
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "model",
 		                       5,
-		                       header_value,
+		                       (uint16_t *) header_value,
 		                       header_value_size,
 		                       error );
-
-		if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tModel:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-		else if( header_value_result == -1 )
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "model",
+		                       5,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1034,24 +999,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Serial number
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "serial_number",
-		                       13,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tSerial number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tModel:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "serial_number",
+		                       13,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "serial_number",
+		                       13,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1062,24 +1034,31 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Process identifier
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "process_identifier",
-		                       18,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tProcess identifier:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tSerial number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "process_identifier",
+		                       18,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "process_identifier",
+		                       18,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1090,25 +1069,33 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Unknown dc
-		 * TODO figure out what this value represents and add get & set API functions to libewf
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "unknown_dc",
-		                       10,
-		                       header_value,
-		                       header_value_size,
-		                       error );
-
-		if( header_value_result == 1 )
+		else if( header_value_result == 1 )
 		{
 			fprintf(
 			 stream,
-			 "\tUnknown value dc:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tProcess identifier:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 header_value );
 		}
-		else if( header_value_result == -1 )
+		/* TODO figure out what this value represents
+		 */
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "unknown_dc",
+		                       10,
+		                       (uint16_t *) header_value,
+		                       header_value_size,
+		                       error );
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "unknown_dc",
+		                       10,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
+		if( header_value_result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1119,16 +1106,30 @@ int info_handle_header_values_fprint(
 
 			result = -1;
 		}
-		/* Extents
-		 */
-		header_value_result = info_handle_get_header_value(
-		                       info_handle,
-		                       "extents",
+		else if( header_value_result == 1 )
+		{
+			fprintf(
+			 stream,
+			 "\tUnknown value dc:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 header_value );
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		header_value_result = libewf_handle_get_utf16_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "extents",
 		                       7,
-		                       header_value,
+		                       (uint16_t *) header_value,
 		                       header_value_size,
 		                       error );
-
+#else
+		header_value_result = libewf_handle_get_utf8_header_value(
+		                       info_handle->input_handle,
+		                       (uint8_t *) "extents",
+		                       7,
+		                       (uint8_t *) header_value,
+		                       header_value_size,
+		                       error );
+#endif
 		if( header_value_result == -1 )
 		{
 			liberror_error_set(
@@ -1224,14 +1225,23 @@ int info_handle_header_values_fprint(
 
 					continue;
 				}
-				header_value_result = info_handle_get_header_value(
-				                       info_handle,
-				                       header_value_identifier,
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+				header_value_result = libewf_handle_get_utf16_header_value(
+				                       info_handle->input_handle,
+				                       (uint8_t *) header_value_identifier,
 				                       header_value_identifier_size - 1,
-				                       header_value,
+				                       (uint16_t *) header_value,
 				                       header_value_size,
 				                       error );
-
+#else
+				header_value_result = libewf_handle_get_utf8_header_value(
+				                       info_handle->input_handle,
+				                       (uint8_t *) header_value_identifier,
+				                       header_value_identifier_size - 1,
+				                       (uint8_t *) header_value,
+				                       header_value_size,
+				                       error );
+#endif
 				if( header_value_result == 1 )
 				{
 					fprintf(

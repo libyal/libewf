@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
 #include <liberror.h>
 
 #if defined( TIME_WITH_SYS_TIME )
@@ -53,12 +52,62 @@ int libewf_date_time_values_copy_to_timestamp(
      time_t *timestamp,
      liberror_error_t **error );
 
-int libewf_date_time_values_copy_to_string(
-     libcstring_character_t *date_time_values_string,
+int libewf_utf8_string_day_of_week_copy_from_time_elements(
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     size_t *utf8_string_index,
+     struct tm *time_elements,
+     liberror_error_t **error );
+
+int libewf_utf8_string_month_copy_from_time_elements(
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     size_t *utf8_string_index,
+     struct tm *time_elements,
+     liberror_error_t **error );
+
+int libewf_utf8_string_time_copy_from_time_elements(
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     size_t *utf8_string_index,
+     struct tm *time_elements,
+     liberror_error_t **error );
+
+int libewf_utf16_string_day_of_week_copy_from_time_elements(
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     size_t *utf16_string_index,
+     struct tm *time_elements,
+     liberror_error_t **error );
+
+int libewf_utf16_string_month_copy_from_time_elements(
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     size_t *utf16_string_index,
+     struct tm *time_elements,
+     liberror_error_t **error );
+
+int libewf_utf16_string_time_copy_from_time_elements(
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     size_t *utf16_string_index,
+     struct tm *time_elements,
+     liberror_error_t **error );
+
+int libewf_date_time_values_copy_to_utf8_string(
+     const uint8_t *date_time_values_string,
      size_t date_time_values_string_length,
      int date_format,
-     libcstring_character_t *string,
-     size_t string_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     liberror_error_t **error );
+
+int libewf_date_time_values_copy_to_utf16_string(
+     const uint8_t *date_time_values_string,
+     size_t date_time_values_string_length,
+     int date_format,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

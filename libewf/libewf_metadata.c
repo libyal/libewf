@@ -3051,8 +3051,7 @@ int libewf_handle_get_utf8_header_value_size(
 
 			return( -1 );
 		}
-/* TODO move conversion to libfvalue */
-		if( libewf_date_time_values_copy_to_string(
+		if( libewf_date_time_values_copy_to_utf8_string(
 		     header_value_data,
 		     header_value_data_size - 1,
 		     internal_handle->date_format,
@@ -3063,8 +3062,8 @@ int libewf_handle_get_utf8_header_value_size(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to create date string.",
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value data to date time string.",
 			 function );
 
 			return( -1 );
@@ -3239,8 +3238,7 @@ int libewf_handle_get_utf8_header_value(
 
 			return( -1 );
 		}
-/* TODO move conversion to libfvalue */
-		if( libewf_date_time_values_copy_to_string(
+		if( libewf_date_time_values_copy_to_utf8_string(
 		     header_value_data,
 		     header_value_data_size - 1,
 		     internal_handle->date_format,
@@ -3251,8 +3249,8 @@ int libewf_handle_get_utf8_header_value(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to create date string.",
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value data to UTF-8 string.",
 			 function );
 
 			return( -1 );
@@ -3456,7 +3454,7 @@ int libewf_handle_get_utf16_header_value_size(
      size_t *utf16_string_size,
      liberror_error_t **error )
 {
-	uint8_t date_time_string[ 64 ];
+	uint16_t date_time_string[ 64 ];
 
 	libewf_internal_handle_t *internal_handle = NULL;
 	libfvalue_value_t *header_value           = NULL;
@@ -3582,8 +3580,7 @@ int libewf_handle_get_utf16_header_value_size(
 
 			return( -1 );
 		}
-/* TODO move conversion to libfvalue */
-		if( libewf_date_time_values_copy_to_string(
+		if( libewf_date_time_values_copy_to_utf16_string(
 		     header_value_data,
 		     header_value_data_size - 1,
 		     internal_handle->date_format,
@@ -3594,8 +3591,8 @@ int libewf_handle_get_utf16_header_value_size(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to create date string.",
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value data to date time string.",
 			 function );
 
 			return( -1 );
@@ -3770,8 +3767,7 @@ int libewf_handle_get_utf16_header_value(
 
 			return( -1 );
 		}
-/* TODO move conversion to libfvalue */
-		if( libewf_date_time_values_copy_to_string(
+		if( libewf_date_time_values_copy_to_utf16_string(
 		     header_value_data,
 		     header_value_data_size - 1,
 		     internal_handle->date_format,
@@ -3782,8 +3778,8 @@ int libewf_handle_get_utf16_header_value(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to create date string.",
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value data to UTF-16 string.",
 			 function );
 
 			return( -1 );
