@@ -1479,6 +1479,7 @@ int imaging_handle_get_output_values(
      liberror_error_t **error )
 {
 	static char *function = "imaging_handle_get_output_values";
+	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -1502,15 +1503,24 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-	/* Get case number
-	 */
-	if( imaging_handle_get_header_value(
-	     imaging_handle,
-	     "case_number",
-	     11,
-	     case_number,
-	     case_number_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "case_number",
+	          11,
+	          (uint16_t *) case_number,
+	          case_number_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "case_number",
+	          11,
+	          (uint8_t *) case_number,
+	          case_number_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1521,15 +1531,24 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-	/* Get description
-	 */
-	if( imaging_handle_get_header_value(
-	     imaging_handle,
-	     "description",
-	     11,
-	     description,
-	     description_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "description",
+	          11,
+	          (uint16_t *) description,
+	          description_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "description",
+	          11,
+	          (uint8_t *) description,
+	          description_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1540,15 +1559,24 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-	/* Get evidence number
-	 */
-	if( imaging_handle_get_header_value(
-	     imaging_handle,
-	     "evidence_number",
-	     15,
-	     evidence_number,
-	     evidence_number_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "evidence_number",
+	          15,
+	          (uint16_t *) evidence_number,
+	          evidence_number_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "evidence_number",
+	          15,
+	          (uint8_t *) evidence_number,
+	          evidence_number_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1559,15 +1587,24 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-	/* Get examiner name
-	 */
-	if( imaging_handle_get_header_value(
-	     imaging_handle,
-	     "examiner_name",
-	     13,
-	     examiner_name,
-	     examiner_name_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "examiner_name",
+	          13,
+	          (uint16_t *) examiner_name,
+	          examiner_name_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "examiner_name",
+	          13,
+	          (uint8_t *) examiner_name,
+	          examiner_name_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1578,15 +1615,24 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-	/* Get notes
-	 */
-	if( imaging_handle_get_header_value(
-	     imaging_handle,
-	     "notes",
-	     5,
-	     notes,
-	     notes_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "notes",
+	          5,
+	          (uint16_t *) notes,
+	          notes_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) "notes",
+	          5,
+	          (uint8_t *) notes,
+	          notes_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2372,119 +2418,6 @@ int imaging_handle_set_output_values(
 	return( 1 );
 }
 
-/* Retrieves the header value from the output handle
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int imaging_handle_get_header_value(
-     imaging_handle_t *imaging_handle,
-     char *header_value_identifier,
-     size_t header_value_identifier_length,
-     libcstring_system_character_t *header_value,
-     size_t header_value_size,
-     liberror_error_t **error )
-{
-	uint8_t utf8_header_value[ IMAGING_HANDLE_VALUE_SIZE ];
-
-	static char *function               = "imaging_handle_get_header_value";
-	size_t calculated_header_value_size = 0;
-	size_t utf8_header_value_size       = IMAGING_HANDLE_VALUE_SIZE;
-	int result                          = 0;
-
-	if( imaging_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid imaging handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( imaging_handle->output_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid imaging handle - missing output handle.",
-		 function );
-
-		return( -1 );
-	}
-	result = libewf_handle_get_utf8_header_value(
-	          imaging_handle->output_handle,
-	          (uint8_t *) header_value_identifier,
-	          header_value_identifier_length,
-	          utf8_header_value,
-	          utf8_header_value_size,
-	          error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value: %s.",
-		 function,
-		 header_value_identifier );
-
-		return( -1 );
-	}
-	else if( result == 1 )
-	{
-		/* Determine the header value size
-		 */
-		utf8_header_value_size = 1 + libcstring_narrow_string_length(
-		                              (char *) utf8_header_value );
-
-		if( libsystem_string_size_from_utf8_string(
-		     utf8_header_value,
-		     utf8_header_value_size,
-		     &calculated_header_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to determine header value size.",
-			 function );
-
-			return( -1 );
-		}
-		if( header_value_size < calculated_header_value_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: header value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( libsystem_string_copy_from_utf8_string(
-		     header_value,
-		     header_value_size,
-		     utf8_header_value,
-		     utf8_header_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to set header value.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( result );
-}
-
 /* Sets the header value in the output handle
  * Returns 1 if successful or -1 on error
  */
@@ -2496,9 +2429,8 @@ int imaging_handle_set_header_value(
      size_t header_value_length,
      liberror_error_t **error )
 {
-	uint8_t *utf8_header_value    = NULL;
-	static char *function         = "imaging_handle_set_header_value";
-	size_t utf8_header_value_size = 0;
+	static char *function = "imaging_handle_set_header_value";
+	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -2522,61 +2454,24 @@ int imaging_handle_set_header_value(
 
 		return( -1 );
 	}
-	if( libsystem_string_size_to_utf8_string(
-	     header_value,
-	     header_value_length + 1,
-	     &utf8_header_value_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine UTF-8 header value size.",
-		 function );
-
-		return( -1 );
-	}
-	utf8_header_value = (uint8_t *) memory_allocate(
-	                                 sizeof( uint8_t ) * utf8_header_value_size );
-
-	if( utf8_header_value == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create UTF-8 header value.",
-		 function );
-
-		return( -1 );
-	}
-	if( libsystem_string_copy_to_utf8_string(
-	     header_value,
-	     header_value_length + 1,
-	     utf8_header_value,
-	     utf8_header_value_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-8 header value.",
-		 function );
-
-		memory_free(
-		 utf8_header_value );
-
-		return( -1 );
-	}
-	if( libewf_handle_set_utf8_header_value(
-	     imaging_handle->output_handle,
-	     (uint8_t *) header_value_identifier,
-	     header_value_identifier_length,
-	     utf8_header_value,
-	     utf8_header_value_size - 1,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_set_utf16_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) header_value_identifier,
+	          header_value_identifier_length,
+	          (uint16_t *) header_value,
+	          header_value_length,
+	          error );
+#else
+	result = libewf_handle_set_utf8_header_value(
+	          imaging_handle->output_handle,
+	          (uint8_t *) header_value_identifier,
+	          header_value_identifier_length,
+	          (uint8_t *) header_value,
+	          header_value_length,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2586,20 +2481,28 @@ int imaging_handle_set_header_value(
 		 function,
 		 header_value_identifier );
 
-		memory_free(
-		 utf8_header_value );
-
 		return( -1 );
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-		if( libewf_handle_set_utf8_header_value(
-		     imaging_handle->secondary_output_handle,
-		     (uint8_t *) header_value_identifier,
-		     header_value_identifier_length,
-		     utf8_header_value,
-		     utf8_header_value_size - 1,
-		     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_handle_set_utf16_header_value(
+		          imaging_handle->secondary_output_handle,
+		          (uint8_t *) header_value_identifier,
+		          header_value_identifier_length,
+		          (uint16_t *) header_value,
+		          header_value_length,
+		          error );
+#else
+		result = libewf_handle_set_utf8_header_value(
+		          imaging_handle->secondary_output_handle,
+		          (uint8_t *) header_value_identifier,
+		          header_value_identifier_length,
+		          (uint8_t *) header_value,
+		          header_value_length,
+		          error );
+#endif
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -2609,15 +2512,9 @@ int imaging_handle_set_header_value(
 			 function,
 			 header_value_identifier );
 
-			memory_free(
-			 utf8_header_value );
-
 			return( -1 );
 		}
 	}
-	memory_free(
-	 utf8_header_value );
-
 	return( 1 );
 }
 

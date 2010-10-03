@@ -348,6 +348,108 @@ int libewf_single_file_entry_get_utf8_name(
 	return( 1 );
 }
 
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_file_entry_get_utf16_name_size(
+     libewf_single_file_entry_t *single_file_entry,
+     size_t *utf16_name_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_utf16_name_size";
+
+	if( single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_name_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 name size.",
+		 function );
+
+		return( -1 );
+	}
+	*utf16_name_size = single_file_entry->name_size;
+
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded name value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_file_entry_get_utf16_name(
+     libewf_single_file_entry_t *single_file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_utf16_name_size";
+
+	if( single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_name == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 name.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_name_size < single_file_entry->name_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: invalid UTF-16 name size value too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcstring_narrow_string_copy(
+	     (char *) utf16_name,
+	     (char *) single_file_entry->name,
+	     single_file_entry->name_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set UTF-16 name.",
+		 function );
+
+		return( -1 );
+	}
+	utf16_name[ single_file_entry->name_size - 1 ] = 0;
+
+	return( 1 );
+}
+
 /* Retrieves the size
  * Returns 1 if successful or -1 on error
  */

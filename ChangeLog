@@ -8,10 +8,10 @@ TODO
     allow value to have identifier but no type ?
     combine type with data ?
   - remove libcstring
-  - refactor imaging_handle
 * add UTF-16 file entry name functions
-
+  - complete libewf_single_file_entry_get_utf16_name
 * single file entry delay conversion of file name
+
 * are single file entry flags similar to file attribute flags ?
 
 * move sections into separate objects ?
@@ -227,6 +227,9 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20101003
+* worked on UTF-16 functions
 
 20101002
 * worked on UTF-16 functions

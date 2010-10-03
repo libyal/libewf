@@ -218,14 +218,6 @@ int imaging_handle_set_output_values(
      uint32_t sector_error_granularity,
      liberror_error_t **error );
 
-int imaging_handle_get_header_value(
-     imaging_handle_t *imaging_handle,
-     char *header_value_identifier,
-     size_t header_value_identifier_length,
-     libcstring_system_character_t *header_value,
-     size_t header_value_size,
-     liberror_error_t **error );
-
 int imaging_handle_set_header_value(
      imaging_handle_t *imaging_handle,
      char *header_value_identifier,

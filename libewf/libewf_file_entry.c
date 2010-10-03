@@ -351,6 +351,114 @@ int libewf_file_entry_get_utf8_name(
 	return( 1 );
 }
 
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_utf16_name_size(
+     libewf_file_entry_t *file_entry,
+     size_t *utf16_name_size,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_utf16_name_size";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_single_file_entry_get_utf16_name_size(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded name value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_utf16_name(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_utf16_name_size";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_single_file_entry_get_utf16_name(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     utf16_name,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the size
  * Returns 1 if successful or -1 on error
  */

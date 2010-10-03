@@ -1,4 +1,4 @@
-.Dd September 30, 2010
+.Dd October 3, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -329,9 +329,13 @@ Single file entry functions
 .Ft int
 .Fn libewf_file_entry_get_flags "libewf_file_entry_t *file_entry, uint32_t *flags, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_utf8_name_size "libewf_file_entry_t *file_entry, size_t *utf8_name_size, libewf_error_t **error"
+.Fn libewf_file_entry_get_utf8_name_size "libewf_file_entry_t *file_entry, size_t *utf8_string_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_utf8_name "libewf_file_entry_t *file_entry, uint8_t *utf8_name, size_t utf8_name_size, libewf_error_t **error"
+.Fn libewf_file_entry_get_utf8_name "libewf_file_entry_t *file_entry, uint8_t *utf8_string, size_t utf8_string_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf16_name_size "libewf_file_entry_t *file_entry, size_t *utf16_string_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf16_name "libewf_file_entry_t *file_entry, uint16_t *utf16_string, size_t utf16_string_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_size "libewf_file_entry_t *file_entry, size64_t *size, libewf_error_t **error"
 .Ft int

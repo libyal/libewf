@@ -130,6 +130,17 @@ int libewf_single_file_entry_get_utf8_name(
      size_t utf8_name_size,
      liberror_error_t **error );
 
+int libewf_single_file_entry_get_utf16_name_size(
+     libewf_single_file_entry_t *single_file_entry,
+     size_t *utf16_name_size,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_utf16_name(
+     libewf_single_file_entry_t *single_file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     liberror_error_t **error );
+
 int libewf_single_file_entry_get_size(
      libewf_single_file_entry_t *single_file_entry,
      size64_t *size,
