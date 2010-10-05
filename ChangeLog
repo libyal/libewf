@@ -229,6 +229,7 @@ Test:
 * updated builder5 files
 * worked on UTF-16 functions
 * fixed small memory leak in error on open
+* fixed bugs in date time values formatting function
 
 20101003
 * worked on UTF-16 functions

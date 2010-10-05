@@ -27,11 +27,11 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_files.h"
 #include "libewf_split_values.h"
-#include "libewf_string.h"
 #include "libewf_tree_type.h"
 
 /* Initialize the single files
@@ -671,7 +671,7 @@ int libewf_single_files_parse_record_values(
 				  "tb",
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit_decimal(
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -855,7 +855,7 @@ int libewf_single_files_parse_file_entry(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_to_64bit_decimal(
+	if( libfvalue_utf8_string_decimal_copy_to_64bit(
 	     values->values[ 1 ],
 	     values->sizes[ 1 ],
 	     &number_of_child_entries,
@@ -988,7 +988,7 @@ int libewf_single_files_parse_file_entry(
 				  "opr",
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit_decimal(
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1035,7 +1035,7 @@ int libewf_single_files_parse_file_entry(
 			     "ac",
 			     type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit_decimal(
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1099,7 +1099,7 @@ int libewf_single_files_parse_file_entry(
 				}
 				if( offset_values->number_of_values == 3 )
 				{
-					if( libewf_string_copy_to_64bit_hexadecimal(
+					if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
 					     offset_values->values[ 1 ],
 					     offset_values->sizes[ 1 ],
 					     &value_64bit,
@@ -1123,7 +1123,7 @@ int libewf_single_files_parse_file_entry(
 					}
 					single_file_entry->data_offset = (off64_t) value_64bit;
 
-					if( libewf_string_copy_to_64bit_hexadecimal(
+					if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
 					     offset_values->values[ 2 ],
 					     offset_values->sizes[ 2 ],
 					     &value_64bit,
@@ -1175,7 +1175,7 @@ int libewf_single_files_parse_file_entry(
 				  "cr",
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit_decimal(
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1290,7 +1290,7 @@ int libewf_single_files_parse_file_entry(
 				  "ls",
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit_decimal(
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1319,7 +1319,7 @@ int libewf_single_files_parse_file_entry(
 				  "mo",
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit_decimal(
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,
@@ -1363,7 +1363,7 @@ int libewf_single_files_parse_file_entry(
 				  "wr",
 				  type_string_length ) == 0 )
 			{
-				if( libewf_string_copy_to_64bit_decimal(
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
 				     &value_64bit,

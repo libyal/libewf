@@ -231,10 +231,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_support.c"
 				>
 			</File>
@@ -462,10 +458,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_split_values.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_string.h"
 				>
 			</File>
 			<File

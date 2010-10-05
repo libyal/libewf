@@ -1602,8 +1602,8 @@ int libewf_date_time_values_copy_to_utf8_string(
 		}
 	}
 	else if( ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
-	      && ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	      && ( date_format == LIBEWF_DATE_FORMAT_ISO8601 ) )
+	      || ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+	      || ( date_format == LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
 		if( ( time_elements.tm_mon < 0 )
 		 || ( time_elements.tm_mon > 11 ) )
@@ -1630,7 +1630,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			return( -1 );
 		}
 		if( ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
-		 && ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH ) )
+		 || ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH ) )
 		{
 			if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 			{
@@ -1806,7 +1806,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			}
 			utf8_string[ utf8_string_index++ ] = (uint8_t) 'T';
 		}
-		if( libewf_utf8_string_month_copy_from_time_elements(
+		if( libewf_utf8_string_time_copy_from_time_elements(
 		     utf8_string,
 		     utf8_string_size,
 		     &utf8_string_index,
@@ -1817,7 +1817,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy month to UTF-8 string.",
+			 "%s: unable to copy time to UTF-8 string.",
 			 function );
 
 			return( -1 );
@@ -2122,8 +2122,8 @@ int libewf_date_time_values_copy_to_utf16_string(
 		}
 	}
 	else if( ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
-	      && ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	      && ( date_format == LIBEWF_DATE_FORMAT_ISO8601 ) )
+	      || ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+	      || ( date_format == LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
 		if( ( time_elements.tm_mon < 0 )
 		 || ( time_elements.tm_mon > 11 ) )
@@ -2150,7 +2150,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 			return( -1 );
 		}
 		if( ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
-		 && ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH ) )
+		 || ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH ) )
 		{
 			if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 			{
@@ -2326,7 +2326,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 			}
 			utf16_string[ utf16_string_index++ ] = (uint16_t) 'T';
 		}
-		if( libewf_utf16_string_month_copy_from_time_elements(
+		if( libewf_utf16_string_time_copy_from_time_elements(
 		     utf16_string,
 		     utf16_string_size,
 		     &utf16_string_index,
@@ -2337,7 +2337,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy month to UTF-16 string.",
+			 "%s: unable to copy time to UTF-16 string.",
 			 function );
 
 			return( -1 );

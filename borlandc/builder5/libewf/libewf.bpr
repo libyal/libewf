@@ -16,7 +16,7 @@
       libewf_sector_table.obj libewf_segment_file.obj 
       libewf_segment_file_handle.obj libewf_segment_table.obj 
       libewf_single_file_entry.obj libewf_single_files.obj 
-      libewf_split_values.obj libewf_string.obj libewf_support.obj 
+      libewf_split_values.obj libewf_support.obj 
       libewf_tree_type.obj libewf_write_io_handle.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
