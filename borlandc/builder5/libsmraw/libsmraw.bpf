@@ -21,13 +21,9 @@ USEUNIT("..\..\..\libsmraw\libsmraw_metadata.c");
 USE("..\..\..\libsmraw\libsmraw_metadata.h", File);
 USEUNIT("..\..\..\libsmraw\libsmraw_notify.c");
 USE("..\..\..\libsmraw\libsmraw_notify.h", File);
-USEUNIT("..\..\..\libsmraw\libsmraw_string.c");
-USE("..\..\..\libsmraw\libsmraw_string.h", File);
 USEUNIT("..\..\..\libsmraw\libsmraw_support.c");
 USE("..\..\..\libsmraw\libsmraw_support.h", File);
 USE("..\..\..\libsmraw\libsmraw_types.h", File);
-USEUNIT("..\..\..\libsmraw\libsmraw_values_table.c");
-USE("..\..\..\libsmraw\libsmraw_values_table.h", File);
 //---------------------------------------------------------------------------
 #define Library
 

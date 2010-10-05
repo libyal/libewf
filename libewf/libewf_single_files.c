@@ -154,9 +154,9 @@ int libewf_single_files_parse(
      size64_t *media_size,
      liberror_error_t **error )
 {
-	libcstring_character_t *file_entries_string = NULL;
-	static char *function                       = "libewf_single_files_parse";
-	size_t file_entries_string_size             = 0;
+	uint8_t *file_entries_string    = NULL;
+	static char *function           = "libewf_single_files_parse";
+	size_t file_entries_string_size = 0;
 
 	if( single_files == NULL )
 	{
@@ -196,8 +196,8 @@ int libewf_single_files_parse(
 
 		return( -1 );
 	}
-	file_entries_string = (libcstring_character_t *) memory_allocate(
-	                                                  sizeof( libcstring_character_t ) * (size_t) file_entries_string_size );
+	file_entries_string = (uint8_t *) memory_allocate(
+	                                   sizeof( uint8_t ) * (size_t) file_entries_string_size );
 
 	if( file_entries_string == NULL )
 	{
@@ -261,7 +261,7 @@ int libewf_single_files_parse(
 int libewf_single_files_parse_file_entries(
      libewf_single_files_t *single_files,
      size64_t *media_size,
-     libcstring_character_t *entries_string,
+     const uint8_t *entries_string,
      size_t entries_string_size,
      liberror_error_t **error )
 {
@@ -296,7 +296,7 @@ int libewf_single_files_parse_file_entries(
 	     &lines,
 	     entries_string,
 	     entries_string_size,
-	     (libcstring_character_t) '\n',
+	     (uint8_t) '\n',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -310,8 +310,8 @@ int libewf_single_files_parse_file_entries(
 	}
 	if( lines->number_of_values > 0 )
 	{
-		if( ( ( lines->values[ 0 ] )[ 0 ] < (libcstring_character_t) '0' )
-		 || ( ( lines->values[ 0 ] )[ 0 ] > (libcstring_character_t) '9' ) )
+		if( ( ( lines->values[ 0 ] )[ 0 ] < (uint8_t) '0' )
+		 || ( ( lines->values[ 0 ] )[ 0 ] > (uint8_t) '9' ) )
 		{
 			liberror_error_set(
 			 error,
@@ -334,9 +334,9 @@ int libewf_single_files_parse_file_entries(
 		{
 			if( lines->sizes[ line_iterator ] == 4 )
 			{
-				if( libcstring_string_compare(
-				     lines->values[ line_iterator ],
-				     _LIBCSTRING_STRING( "rec" ),
+				if( libcstring_narrow_string_compare(
+				     (char *) lines->values[ line_iterator ],
+				     "rec",
 				     3 ) == 0 )
 				{
 					line_iterator += 1;
@@ -373,9 +373,9 @@ int libewf_single_files_parse_file_entries(
 		{
 			if( lines->sizes[ line_iterator ] == 6 )
 			{
-				if( libcstring_string_compare(
-				     lines->values[ line_iterator ],
-				     _LIBCSTRING_STRING( "entry" ),
+				if( libcstring_narrow_string_compare(
+				     (char *) lines->values[ line_iterator ],
+				     "entry",
 				     5 ) == 0 )
 				{
 					line_iterator += 2;
@@ -390,7 +390,7 @@ int libewf_single_files_parse_file_entries(
 			     &types,
 			     lines->values[ line_iterator ],
 			     lines->sizes[ line_iterator ],
-			     (libcstring_character_t) '\t',
+			     (uint8_t) '\t',
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -571,7 +571,7 @@ int libewf_single_files_parse_record_values(
 	     &types,
 	     lines->values[ *line_iterator ],
 	     lines->sizes[ *line_iterator ],
-	     (libcstring_character_t) '\t',
+	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -589,7 +589,7 @@ int libewf_single_files_parse_record_values(
 	     &values,
 	     lines->values[ *line_iterator ],
 	     lines->sizes[ *line_iterator ],
-	     (libcstring_character_t) '\t',
+	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -633,12 +633,12 @@ int libewf_single_files_parse_record_values(
 		/* Remove trailing carriage return
 		 */
 		if( ( type_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ type_string_length - 1 ] == (libcstring_character_t) '\r' ) )
+		 && ( ( types->values[ value_iterator ] )[ type_string_length - 1 ] == (uint8_t) '\r' ) )
 		{
 			type_string_length -= 1;
 		}
 		if( ( value_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ value_string_length - 1 ] == (libcstring_character_t) '\r' ) )
+		 && ( ( types->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
 		{
 			value_string_length -= 1;
 		}
@@ -660,15 +660,15 @@ int libewf_single_files_parse_record_values(
 		}
 		else if( type_string_length == 2 )
 		{
-			if( libcstring_string_compare(
+			if( libcstring_narrow_string_compare(
 			     types->values[ value_iterator ],
-			     _LIBCSTRING_STRING( "cl" ),
+			     "cl",
 			     type_string_length ) == 0 )
 			{
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "tb" ),
+				  "tb",
 				  type_string_length ) == 0 )
 			{
 				if( libewf_string_copy_to_64bit_decimal(
@@ -826,7 +826,7 @@ int libewf_single_files_parse_file_entry(
 	     &values,
 	     lines->values[ *line_iterator ],
 	     lines->sizes[ *line_iterator ],
-	     (libcstring_character_t) '\t',
+	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -896,7 +896,7 @@ int libewf_single_files_parse_file_entry(
 	     &values,
 	     lines->values[ *line_iterator ],
 	     lines->sizes[ *line_iterator ],
-	     (libcstring_character_t) '\t',
+	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -950,12 +950,12 @@ int libewf_single_files_parse_file_entry(
 		/* Remove trailing carriage return
 		 */
 		if( ( type_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ type_string_length - 1 ] == (libcstring_character_t) '\r' ) )
+		 && ( ( types->values[ value_iterator ] )[ type_string_length - 1 ] == (uint8_t) '\r' ) )
 		{
 			type_string_length -= 1;
 		}
 		if( ( value_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ value_string_length - 1 ] == (libcstring_character_t) '\r' ) )
+		 && ( ( types->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
 		{
 			value_string_length -= 1;
 		}
@@ -977,15 +977,15 @@ int libewf_single_files_parse_file_entry(
 		}
 		else if( type_string_length == 3 )
 		{
-			if( libcstring_string_compare(
+			if( libcstring_narrow_string_compare(
 			     types->values[ value_iterator ],
-			     _LIBCSTRING_STRING( "cid" ),
+			     "cid",
 			     type_string_length ) == 0 )
 			{
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "opr" ),
+				  "opr",
 				  type_string_length ) == 0 )
 			{
 				if( libewf_string_copy_to_64bit_decimal(
@@ -1013,15 +1013,15 @@ int libewf_single_files_parse_file_entry(
 				/* TODO range check */
 				single_file_entry->flags = (uint32_t) value_64bit;
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "src" ),
+				  "src",
 				  type_string_length ) == 0 )
 			{
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "sub" ),
+				  "sub",
 				  type_string_length ) == 0 )
 			{
 			}
@@ -1030,9 +1030,9 @@ int libewf_single_files_parse_file_entry(
 		{
 			/* Access time
 			 */
-			if( libcstring_string_compare(
+			if( libcstring_narrow_string_compare(
 			     types->values[ value_iterator ],
-			     _LIBCSTRING_STRING( "ac" ),
+			     "ac",
 			     type_string_length ) == 0 )
 			{
 				if( libewf_string_copy_to_64bit_decimal(
@@ -1060,25 +1060,25 @@ int libewf_single_files_parse_file_entry(
 				/* TODO range check */
 				single_file_entry->access_time = value_64bit;
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "aq" ),
+				  "aq",
 				  type_string_length ) == 0 )
 			{
 			}
 			/* Data offset
 			 * consist of: unknown, offset and size
 			 */
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "be" ),
+				  "be",
 				  type_string_length ) == 0 )
 			{
 				if( libewf_split_values_parse_string(
 				     &offset_values,
 				     values->values[ value_iterator ],
 				     value_string_length + 1,
-				     (libcstring_character_t) ' ',
+				     (uint8_t) ' ',
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1170,9 +1170,9 @@ int libewf_single_files_parse_file_entry(
 			}
 			/* Creation time
 			 */
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "cr" ),
+				  "cr",
 				  type_string_length ) == 0 )
 			{
 				if( libewf_string_copy_to_64bit_decimal(
@@ -1200,27 +1200,27 @@ int libewf_single_files_parse_file_entry(
 				/* TODO range check */
 				single_file_entry->creation_time = value_64bit;
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "dl" ),
+				  "dl",
 				  type_string_length ) == 0 )
 			{
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "du" ),
+				  "du",
 				  type_string_length ) == 0 )
 			{
 			}
 			/* MD5 digest hash
 			 */
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "ha" ),
+				  "ha",
 				  type_string_length ) == 0 )
 			{
-				single_file_entry->md5_hash = (libcstring_character_t *) memory_allocate(
-				                                                          sizeof( libcstring_character_t ) * ( value_string_length + 1 ) );
+				single_file_entry->md5_hash = (uint8_t *) memory_allocate(
+				                                           sizeof( uint8_t ) * ( value_string_length + 1 ) );
 
 				if( single_file_entry->md5_hash == NULL )
 				{
@@ -1240,7 +1240,7 @@ int libewf_single_files_parse_file_entry(
 
 					return( -1 );
 				}
-				if( libcstring_string_copy(
+				if( libcstring_narrow_string_copy(
 				     single_file_entry->md5_hash,
 				     values->values[ value_iterator ],
 				     value_string_length ) == NULL )
@@ -1265,29 +1265,29 @@ int libewf_single_files_parse_file_entry(
 
 				single_file_entry->md5_hash_size = value_string_length + 1;
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "id" ),
+				  "id",
 				  type_string_length ) == 0 )
 			{
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "jq" ),
+				  "jq",
 				  type_string_length ) == 0 )
 			{
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "lo" ),
+				  "lo",
 				  type_string_length ) == 0 )
 			{
 			}
 			/* Size
 			 */
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "ls" ),
+				  "ls",
 				  type_string_length ) == 0 )
 			{
 				if( libewf_string_copy_to_64bit_decimal(
@@ -1314,9 +1314,9 @@ int libewf_single_files_parse_file_entry(
 				}
 				single_file_entry->size = (size64_t) value_64bit;
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "mo" ),
+				  "mo",
 				  type_string_length ) == 0 )
 			{
 				if( libewf_string_copy_to_64bit_decimal(
@@ -1344,23 +1344,23 @@ int libewf_single_files_parse_file_entry(
 				/* TODO range check */
 				single_file_entry->entry_modification_time = value_64bit;
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "pm" ),
+				  "pm",
 				  type_string_length ) == 0 )
 			{
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "po" ),
+				  "po",
 				  type_string_length ) == 0 )
 			{
 			}
 			/* Modification time
 			 */
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "wr" ),
+				  "wr",
 				  type_string_length ) == 0 )
 			{
 				if( libewf_string_copy_to_64bit_decimal(
@@ -1393,13 +1393,13 @@ int libewf_single_files_parse_file_entry(
 		{
 			/* Name
 			 */
-			if( libcstring_string_compare(
+			if( libcstring_narrow_string_compare(
 			     types->values[ value_iterator ],
-			     _LIBCSTRING_STRING( "n" ),
+			     "n",
 			     type_string_length ) == 0 )
 			{
-				single_file_entry->name = (libcstring_character_t *) memory_allocate(
-				                                                      sizeof( libcstring_character_t ) * ( value_string_length + 1 ) );
+				single_file_entry->name = (uint8_t *) memory_allocate(
+				                                       sizeof( uint8_t ) * ( value_string_length + 1 ) );
 
 				if( single_file_entry->name == NULL )
 				{
@@ -1419,7 +1419,7 @@ int libewf_single_files_parse_file_entry(
 
 					return( -1 );
 				}
-				if( libcstring_string_copy(
+				if( libcstring_narrow_string_copy(
 				     single_file_entry->name,
 				     values->values[ value_iterator ],
 				     value_string_length ) == NULL )
@@ -1444,9 +1444,9 @@ int libewf_single_files_parse_file_entry(
 
 				single_file_entry->name_size = value_string_length + 1;
 			}
-			else if( libcstring_string_compare(
+			else if( libcstring_narrow_string_compare(
 				  types->values[ value_iterator ],
-				  _LIBCSTRING_STRING( "p" ),
+				  "p",
 				  type_string_length ) == 0 )
 			{
 				/* p = 0 if directory

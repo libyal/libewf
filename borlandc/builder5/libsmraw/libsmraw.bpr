@@ -6,8 +6,7 @@
     <PROJECT value="..\Release\libsmraw.lib"/>
     <OBJFILES value="libsmraw_error.obj libsmraw_filename.obj libsmraw_handle.obj 
       libsmraw_information_file.obj libsmraw_legacy.obj libsmraw_metadata.obj 
-      libsmraw_notify.obj libsmraw_string.obj libsmraw_support.obj 
-      libsmraw_values_table.obj"/>
+      libsmraw_notify.obj libsmraw_support.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>

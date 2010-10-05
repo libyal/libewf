@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
 #include <liberror.h>
 
 #include "libewf_date_time.h"
@@ -52,7 +51,7 @@ struct libewf_single_file_entry
 
 	/* The name
 	 */
-	libcstring_character_t *name;
+	uint8_t *name;
 
 	/* The name size
 	 */
@@ -84,7 +83,7 @@ struct libewf_single_file_entry
 
 	/* The MD5 digest hash
 	 */
-	libcstring_character_t *md5_hash;
+	uint8_t *md5_hash;
 
 	/* The MD5 digest hash size
 	 */
@@ -121,24 +120,24 @@ int libewf_single_file_entry_get_data_size(
 
 int libewf_single_file_entry_get_utf8_name_size(
      libewf_single_file_entry_t *single_file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      liberror_error_t **error );
 
 int libewf_single_file_entry_get_utf8_name(
      libewf_single_file_entry_t *single_file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      liberror_error_t **error );
 
 int libewf_single_file_entry_get_utf16_name_size(
      libewf_single_file_entry_t *single_file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      liberror_error_t **error );
 
 int libewf_single_file_entry_get_utf16_name(
      libewf_single_file_entry_t *single_file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      liberror_error_t **error );
 
 int libewf_single_file_entry_get_size(

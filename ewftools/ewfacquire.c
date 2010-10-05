@@ -118,38 +118,44 @@ void usage_fprint(
 	fprintf( stream, "Use ewfacquire to acquire data from a file or device and store it in the EWF\n"
 	                 "format (Expert Witness Compression Format).\n\n" );
 
-	fprintf( stream, "Usage: ewfacquire [ -A codepage ] [ -b number_of_sectors ] [ -B number_of_bytes ]\n"
-	                 "                  [ -c compression_type ] [ -C case_number ] [ -d digest_type ]\n"
-	                 "                  [ -D description ] [ -e examiner_name ] [ -E evidence_number ]\n"
-	                 "                  [ -f format ] [ -g number_of_sectors ] [ -l log_filename ]\n"
-	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ] [ -o offset ]\n"
+	fprintf( stream, "Usage: ewfacquire [ -A codepage ] [ -b number_of_sectors ]\n"
+	                 "                  [ -B number_of_bytes ] [ -c compression_type ]\n"
+	                 "                  [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
+	                 "                  [ -e examiner_name ] [ -E evidence_number ] [ -f format ]\n"
+	                 "                  [ -g number_of_sectors ] [ -l log_filename ] [ -m media_type ]\n"
+	                 "                  [ -M media_flags ] [ -N notes ] [ -o offset ]\n"
 	                 "                  [ -p process_buffer_size ] [ -P bytes_per_sector ]\n"
 	                 "                  [ -r read_error_retries ] [ -S segment_file_size ]\n"
 	                 "                  [ -t target ] [ -2 secondary_target ] [ -hqRsuvVw ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
-	fprintf( stream, "\t-A:     codepage of header section, options: ascii (default), windows-874,\n"
-	                 "\t        windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
-	                 "\t        windows-1255, windows-1256, windows-1257, windows-1258\n" );
-	fprintf( stream, "\t-b:     specify the number of sectors to read at once (per chunk), options:\n"
-	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stream, "\t-A:     codepage of header section, options: ascii (default),\n"
+	                 "\t        windows-874, windows-1250, windows-1251, windows-1252,\n"
+	                 "\t        windows-1253, windows-1254, windows-1255, windows-1256,\n"
+	                 "\t        windows-1257, windows-1258\n" );
+	fprintf( stream, "\t-b:     specify the number of sectors to read at once (per chunk),\n"
+	                 "\t        options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192,\n"
+	                 "\t        16384 or 32768\n" );
 	fprintf( stream, "\t-B:     specify the number of bytes to acquire (default is all bytes)\n" );
-	fprintf( stream, "\t-c:     specify the compression type, options: none (default), empty-block, fast\n"
-	                 "\t        or best\n" );
+	fprintf( stream, "\t-c:     specify the compression type, options: none (default),\n"
+	                 "\t        empty-block, fast or best\n" );
 	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
-	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options:"
+	                 "\t        sha1\n" );
 	fprintf( stream, "\t-D:     specify the description (default is description).\n" );
 	fprintf( stream, "\t-e:     specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );
-	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity, options:\n"
-	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart, ftk,\n"
-	                 "\t        encase2, encase3, encase4, encase5, encase6 (default), linen5, linen6,\n"
-	                 "\t        ewfx\n" );
+	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity,\n"
+	                 "\t        options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192,\n"
+	                 "\t        16384 or 32768\n" );
+	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart,\n"
+	                 "\t        ftk, encase2, encase3, encase4, encase5, encase6 (default),\n"
+	                 "\t        linen5, linen6, ewfx\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
-	fprintf( stream, "\t-m:     specify the media type, options: fixed (default), removable, optical, memory\n" );
+	fprintf( stream, "\t-m:     specify the media type, options: fixed (default), removable,\n"
+	                 "\t        optical, memory\n" );
 	fprintf( stream, "\t-M:     specify the media flags, options: logical, physical (default)\n" );
 	fprintf( stream, "\t-N:     specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-o:     specify the offset to start to acquire (default is 0)\n" );
@@ -157,7 +163,8 @@ void usage_fprint(
 	fprintf( stream, "\t-P:     specify the number of bytes per sector (default is 512)\n"
 	                 "\t        (use this to override the automatic bytes per sector detection)\n" );
 	fprintf( stream, "\t-q:     quiet shows no status information\n" );
-	fprintf( stream, "\t-r:     specify the number of retries when a read error occurs (default is 2)\n" );
+	fprintf( stream, "\t-r:     specify the number of retries when a read error occurs (default\n"
+	                 "\t        is 2)\n" );
 	fprintf( stream, "\t-R:     resume acquiry at a safe point\n" );
 	fprintf( stream, "\t-s:     swap byte pairs of the media data (from AB to BA)\n"
 	                 "\t        (use this for big to little endian conversion and vice versa)\n" );
@@ -188,7 +195,8 @@ void usage_fprint(
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 	fprintf( stream, "\t-w:     wipe sectors on read error (mimic EnCase like behavior)\n" );
-	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write to\n" );
+	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write\n"
+	                 "\t        to\n" );
 }
 
 /* Prints an overview of the acquiry parameters and asks the for confirmation

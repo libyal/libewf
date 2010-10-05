@@ -121,28 +121,29 @@ void usage_fprint(
 #else
 	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -B number_of_bytes ] [ -c compression_type ]\n"
 	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
-	                 "                 [ -o offset ] [ -p process_buffer_size ] [ -S segment_file_size ]\n"
-	                 "                 [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
+	                 "                 [ -o offset ] [ -p process_buffer_size ]\n"
+	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
 #endif
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
-	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-874,\n"
-	                 "\t           windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
-	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
+	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default),\n"
+	                 "\t           windows-874, windows-1250, windows-1251, windows-1252,\n"
+	                 "\t           windows-1253, windows-1254, windows-1255, windows-1256,\n"
+	                 "\t           windows-1257, windows-1258\n" );
 #ifdef DISABLED
-	fprintf( stream, "\t-b:        specify the number of sectors to read at once (per chunk), options:\n"
-	                 "\t           64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n"
-	                 "\t           (not used for raw and files formats)\n" );
+	fprintf( stream, "\t-b:        specify the number of sectors to read at once (per chunk),\n"
+	                 "\t           options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192,\n"
+	                 "\t           16384 or 32768 (not used for raw and files formats)\n" );
 #endif
 	fprintf( stream, "\t-B:        specify the number of bytes to export (default is all bytes)\n" );
-	fprintf( stream, "\t-c:        specify the compression type, options: none (default), empty-block,\n"
-	                 "\t           fast or best (not used for raw and files format)\n" );
-	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5, options: sha1\n"
-	                 "\t           (not used for raw and files format)\n" );
-	fprintf( stream, "\t-f:        specify the output format to write to, options: raw (default), files,\n"
-	                 "\t           ewf, smart, encase1, encase2, encase3, encase4, encase5, encase6,\n"
-	                 "\t           linen5, linen6, ewfx\n"
+	fprintf( stream, "\t-c:        specify the compression type, options: none (default),\n"
+	                 "\t           empty-block, fast or best (not used for raw and files format)\n" );
+	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
+	                 "\t           options: sha1 (not used for raw and files format)\n" );
+	fprintf( stream, "\t-f:        specify the output format to write to, options: raw (default),\n"
+	                 "\t           files, ewf, smart, encase1, encase2, encase3, encase4, encase5,\n"
+	                 "\t           encase6, linen5, linen6, ewfx\n"
 	                 "\t           (the files format is restricted to logical volume files)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-l:        logs export errors and the digest (hash) to the log_filename\n" );
@@ -155,9 +156,9 @@ void usage_fprint(
 	if( result == 1 )
 	{
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
-		                 "\t           (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for raw and encase6 format\n"
+		                 "\t           (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for raw and encase6\n"
 		                 "\t           and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n"
-		                 "\t           (not used for files format)\n",
+		                 "\t           format (not used for files format)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -175,8 +176,9 @@ void usage_fprint(
 		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
 	}
 
-	fprintf( stream, "\t-t:        specify the target file to export to, use - for stdout (default is\n"
-	                 "\t           export) stdout is only supported for the raw format\n" );
+	fprintf( stream, "\t-t:        specify the target file to export to, use - for stdout\n"
+	                 "\t           (default is export) stdout is only supported for the raw\n"
+	                 "\t           format\n" );
 	fprintf( stream, "\t-u:        unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );

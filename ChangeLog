@@ -1,22 +1,17 @@
 TODO
-* update codegear and builder5 files
-
 * test examples
 
 * UTF-16 support
   - libfvalue: move type and flags from initialize
     allow value to have identifier but no type ?
     combine type with data ?
-  - remove libcstring
-* add UTF-16 file entry name functions
-  - complete libewf_single_file_entry_get_utf16_name
-* single file entry delay conversion of file name
 
-* are single file entry flags similar to file attribute flags ?
+* single file entry:
+  - are flags similar to file attribute flags ?
 
 * move sections into separate objects ?
 
-* rename section_list to section_value
+* rename section_list to section_value ?
 
 * configure validate libuna and libbfio check
 * documentation:
@@ -227,6 +222,13 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20101005
+* remerged 20101003 changes with 20101002 due to error in bzip2-ed tar file
+* updated codegear files
+* updated builder5 files
+* worked on UTF-16 functions
+* fixed small memory leak in error on open
 
 20101003
 * worked on UTF-16 functions

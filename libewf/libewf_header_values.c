@@ -827,7 +827,7 @@ int libewf_generate_date_header_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_year + 1900,
+	     (uint16_t) time_elements.tm_year + 1900,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -851,7 +851,7 @@ int libewf_generate_date_header_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_mon + 1,
+	     (uint8_t) time_elements.tm_mon + 1,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -875,7 +875,7 @@ int libewf_generate_date_header_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_mday,
+	     (uint8_t) time_elements.tm_mday,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -899,7 +899,7 @@ int libewf_generate_date_header_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_hour,
+	     (uint8_t) time_elements.tm_hour,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -923,7 +923,7 @@ int libewf_generate_date_header_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_min,
+	     (uint8_t) time_elements.tm_min,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -947,7 +947,7 @@ int libewf_generate_date_header_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_sec,
+	     (uint8_t) time_elements.tm_sec,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -5474,13 +5474,13 @@ int libewf_generate_date_xheader_value(
 
 	if( time_elements.tm_mday < 10 )
 	{
-		*date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) ' ';
+		( *date_time_values_string )[ date_time_values_string_index++ ] = (uint8_t) ' ';
 	}
 	if( libfvalue_utf8_string_decimal_copy_from_8bit(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_mday,
+	     (uint8_t) time_elements.tm_mday,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -5528,7 +5528,7 @@ int libewf_generate_date_xheader_value(
 	     *date_time_values_string,
 	     *date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_year + 1900,
+	     (uint16_t) time_elements.tm_year + 1900,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -5550,7 +5550,7 @@ int libewf_generate_date_xheader_value(
 	time_elements.tm_gmtoff /= 60;
 
 	print_count = libcstring_narrow_string_snprintf(
-	               (char *) &( ( *date_time_values_string[ date_time_values_string_index ] ) ),
+	               (char *) &( ( ( *date_time_values_string )[ date_time_values_string_index ] ) ),
 		       *date_time_values_string_size - date_time_values_string_index,
 		       "%+03ld:%02ld (%s)",
 	               time_elements.tm_gmtoff / 60,
@@ -5559,14 +5559,14 @@ int libewf_generate_date_xheader_value(
 
 #elif defined( __BORLANDC__ )
 	print_count = libcstring_narrow_string_snprintf(
-	               (char *) &( ( *date_time_values_string[ date_time_values_string_index ] ) ),
+	               (char *) &( ( ( *date_time_values_string )[ date_time_values_string_index ] ) ),
 		       *date_time_values_string_size - date_time_values_string_index,
 		       "%s",
 		       _tzname[ time_elements.tm_isdst ] );
 
 #else
 	print_count = libcstring_narrow_string_snprintf(
-	               (char *) &( ( *date_time_values_string[ date_time_values_string_index ] ) ),
+	               (char *) &( ( ( *date_time_values_string )[ date_time_values_string_index ] ) ),
 		       *date_time_values_string_size - date_time_values_string_index,
 		       "%s",
 		       tzname[ time_elements.tm_isdst ] );
@@ -5590,7 +5590,7 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	*date_time_values_string[ date_time_values_string_index ] = 0;
+	( *date_time_values_string )[ date_time_values_string_index ] = 0;
 
 	return( 1 );
 }

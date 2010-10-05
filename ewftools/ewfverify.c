@@ -74,12 +74,15 @@ void usage_fprint(
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
-	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-874,\n"
-	                 "\t           windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
-	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
-	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default),\n"
+	                 "\t           windows-874, windows-1250, windows-1251, windows-1252,\n"
+	                 "\t           windows-1253, windows-1254, windows-1255, windows-1256,\n"
+	                 "\t           windows-1257, windows-1258\n" );
+	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
+	                 "\t           options: sha1\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
-	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the log_filename\n" );
+	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the\n"
+	                 "\t           log_filename\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q:        quiet shows no status information\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );

@@ -547,7 +547,7 @@ int info_handle_header_values_fprint(
 	else
 	{
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf8_header_value(
+		header_value_result = libewf_handle_get_utf16_header_value(
 		                       info_handle->input_handle,
 		                       (uint8_t *) "case_number",
 		                       11,
@@ -2440,12 +2440,13 @@ int info_handle_file_entry_fprint(
      int level,
      liberror_error_t **error )
 {
+	libcstring_system_character_t *name = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
-	uint8_t *name                       = NULL;
 	static char *function               = "info_handle_file_entry_fprint";
 	size_t name_size                    = 0;
-	int number_of_sub_file_entries      = 0;
 	int iterator                        = 0;
+	int number_of_sub_file_entries      = 0;
+	int result                          = 0;
 
 	if( info_handle == NULL )
 	{
@@ -2480,10 +2481,18 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	if( libewf_file_entry_get_utf8_name_size(
-	     file_entry,
-	     &name_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_file_entry_get_utf16_name_size(
+	          file_entry,
+	          &name_size,
+	          error );
+#else
+	result = libewf_file_entry_get_utf8_name_size(
+	          file_entry,
+	          &name_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2496,8 +2505,8 @@ int info_handle_file_entry_fprint(
 	}
 	if( name_size > 0 )
 	{
-		name = (uint8_t *) memory_allocate(
-				    sizeof( uint8_t ) * name_size );
+		name = (libcstring_system_character_t *) memory_allocate(
+		                                          sizeof( libcstring_system_character_t ) * name_size );
 
 		if( name == NULL )
 		{
@@ -2510,11 +2519,20 @@ int info_handle_file_entry_fprint(
 
 			return( -1 );
 		}
-		if( libewf_file_entry_get_utf8_name(
-		     file_entry,
-		     name,
-		     name_size,
-		     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_file_entry_get_utf16_name(
+		          file_entry,
+		          (uint16_t *) name,
+		          name_size,
+		          error );
+#else
+		result = libewf_file_entry_get_utf8_name(
+		          file_entry,
+		          (uint8_t *) name,
+		          name_size,
+		          error );
+#endif
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -2542,7 +2560,7 @@ int info_handle_file_entry_fprint(
 		}
 		fprintf(
 		 stream,
-		 "%s\n",
+		 "%" PRIs_LIBCSTRING_SYSTEM "\n",
 		 name );
 
 		memory_free(

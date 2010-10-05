@@ -53,6 +53,7 @@ USE("..\..\..\libewf\libewf_io_handle.h", File);
 USEUNIT("..\..\..\libewf\libewf_legacy.c");
 USE("..\..\..\libewf\libewf_legacy.h", File);
 USE("..\..\..\libewf\libewf_libbfio.h", File);
+USE("..\..\..\libewf\libewf_libfvalue.h", File);
 USE("..\..\..\libewf\libewf_libuna.h", File);
 USEUNIT("..\..\..\libewf\libewf_list_type.c");
 USE("..\..\..\libewf\libewf_list_type.h", File);
@@ -92,8 +93,6 @@ USE("..\..\..\libewf\libewf_system_string.h", File);
 USEUNIT("..\..\..\libewf\libewf_tree_type.c");
 USE("..\..\..\libewf\libewf_tree_type.h", File);
 USE("..\..\..\libewf\libewf_types.h", File);
-USEUNIT("..\..\..\libewf\libewf_values_table.c");
-USE("..\..\..\libewf\libewf_values_table.h", File);
 USEUNIT("..\..\..\libewf\libewf_write_io_handle.c");
 USE("..\..\..\libewf\libewf_write_io_handle.h", File);
 //---------------------------------------------------------------------------

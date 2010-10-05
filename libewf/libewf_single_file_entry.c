@@ -1,5 +1,5 @@
 /*
- * Low level reading functions
+ * Single file entry functions
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -26,6 +26,8 @@
 #include <libcstring.h>
 #include <liberror.h>
 
+#include "libewf_libfvalue.h"
+#include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
 
 /* Initialize the single file entry
@@ -252,7 +254,7 @@ int libewf_single_file_entry_get_data_size(
  */
 int libewf_single_file_entry_get_utf8_name_size(
      libewf_single_file_entry_t *single_file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_name_size";
@@ -268,18 +270,18 @@ int libewf_single_file_entry_get_utf8_name_size(
 
 		return( -1 );
 	}
-	if( utf8_name_size == NULL )
+	if( utf8_string_size == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 name size.",
+		 "%s: invalid UTF-8 string size.",
 		 function );
 
 		return( -1 );
 	}
-	*utf8_name_size = single_file_entry->name_size;
+	*utf8_string_size = single_file_entry->name_size;
 
 	return( 1 );
 }
@@ -290,11 +292,11 @@ int libewf_single_file_entry_get_utf8_name_size(
  */
 int libewf_single_file_entry_get_utf8_name(
      libewf_single_file_entry_t *single_file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      liberror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf8_name_size";
+	static char *function = "libewf_single_file_entry_get_utf8_name";
 
 	if( single_file_entry == NULL )
 	{
@@ -307,30 +309,30 @@ int libewf_single_file_entry_get_utf8_name(
 
 		return( -1 );
 	}
-	if( utf8_name == NULL )
+	if( utf8_string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 name.",
+		 "%s: invalid UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
-	if( utf8_name_size < single_file_entry->name_size )
+	if( utf8_string_size < single_file_entry->name_size )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid UTF-8 name size value too small.",
+		 "%s: invalid UTF-8 string size value too small.",
 		 function );
 
 		return( -1 );
 	}
 	if( libcstring_narrow_string_copy(
-	     (char *) utf8_name,
+	     (char *) utf8_string,
 	     (char *) single_file_entry->name,
 	     single_file_entry->name_size ) == NULL )
 	{
@@ -338,12 +340,12 @@ int libewf_single_file_entry_get_utf8_name(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_MEMORY,
 		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set UTF-8 name.",
+		 "%s: unable to set UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
-	utf8_name[ single_file_entry->name_size - 1 ] = 0;
+	utf8_string[ single_file_entry->name_size - 1 ] = 0;
 
 	return( 1 );
 }
@@ -354,7 +356,7 @@ int libewf_single_file_entry_get_utf8_name(
  */
 int libewf_single_file_entry_get_utf16_name_size(
      libewf_single_file_entry_t *single_file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_name_size";
@@ -370,19 +372,21 @@ int libewf_single_file_entry_get_utf16_name_size(
 
 		return( -1 );
 	}
-	if( utf16_name_size == NULL )
+	if( libuna_utf16_string_size_from_utf8(
+	     single_file_entry->name,
+	     single_file_entry->name_size,
+	     utf16_string_size,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 name size.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 string size.",
 		 function );
 
 		return( -1 );
 	}
-	*utf16_name_size = single_file_entry->name_size;
-
 	return( 1 );
 }
 
@@ -392,11 +396,11 @@ int libewf_single_file_entry_get_utf16_name_size(
  */
 int libewf_single_file_entry_get_utf16_name(
      libewf_single_file_entry_t *single_file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      liberror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf16_name_size";
+	static char *function = "libewf_single_file_entry_get_utf16_name";
 
 	if( single_file_entry == NULL )
 	{
@@ -409,44 +413,22 @@ int libewf_single_file_entry_get_utf16_name(
 
 		return( -1 );
 	}
-	if( utf16_name == NULL )
+	if( libuna_utf16_string_copy_from_utf8(
+	     utf16_string,
+	     utf16_string_size,
+	     single_file_entry->name,
+	     single_file_entry->name_size,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 name.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy name to UTF-16 string.",
 		 function );
 
 		return( -1 );
 	}
-	if( utf16_name_size < single_file_entry->name_size )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid UTF-16 name size value too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcstring_narrow_string_copy(
-	     (char *) utf16_name,
-	     (char *) single_file_entry->name,
-	     single_file_entry->name_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set UTF-16 name.",
-		 function );
-
-		return( -1 );
-	}
-	utf16_name[ single_file_entry->name_size - 1 ] = 0;
-
 	return( 1 );
 }
 

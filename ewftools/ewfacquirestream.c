@@ -114,8 +114,9 @@ void usage_fprint(
 	                 "                        [ -B number_of_bytes ] [ -c compression_type ]\n"
 	                 "                        [ -C case_number ] [ -d digest_type ]\n"
 	                 "                        [ -D description ] [ -e examiner_name ]\n"
-	                 "                        [ -E evidence_number ] [ -f format ] [ -l log_filename ]\n"
-	                 "                        [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
+	                 "                        [ -E evidence_number ] [ -f format ]\n"
+	                 "                        [ -l log_filename ] [ -m media_type ]\n"
+	                 "                        [ -M media_flags ] [ -N notes ]\n"
 	                 "                        [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                        [ -S segment_file_size ] [ -t target ]\n"
 	                 "                        [ -2 secondary_target ] [ -hqsvV ]\n\n" );
@@ -123,23 +124,25 @@ void usage_fprint(
 	fprintf( stream, "\tReads data from stdin\n\n" );
 
 	fprintf( stream, "\t-A: codepage of header section, options: ascii (default), windows-874,\n"
-	                 "\t    windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
-	                 "\t    windows-1255, windows-1256, windows-1257, windows-1258\n" );
+	                 "\t    windows-1250, windows-1251, windows-1252, windows-1253,\n"
+	                 "\t    windows-1254, windows-1255, windows-1256, windows-1257,\n"
+	                 "\t    windows-1258\n" );
 	fprintf( stream, "\t-b: specify the number of sectors to read at once (per chunk), options:\n"
 	                 "\t    64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-B: specify the number of bytes to acquire (default is all bytes)\n" );
-	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast\n"
-	                 "\t    or best\n" );
+	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block,\n"
+	                 "\t    fast or best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t-D: specify the description (default is description).\n" );
 	fprintf( stream, "\t-e: specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E: specify the evidence number (default is evidence_number).\n" );
-	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3,\n"
-	                 "\t    encase4, encase5, encase6 (default), linen5, linen6, ewfx\n" );
+	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2,\n"
+	                 "\t    encase3, encase4, encase5, encase6 (default), linen5, linen6, ewfx\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
 	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the log_filename\n" );
-	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable, optical, memory\n" );
+	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable,\n"
+	                 "\t    optical, memory\n" );
 	fprintf( stream, "\t-M: specify the media flags, options: logical, physical (default)\n" );
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-o: specify the offset to start to acquire (default is 0)\n" );
@@ -168,7 +171,8 @@ void usage_fprint(
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
 		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
 	}
-	fprintf( stream, "\t-t: specify the target file (without extension) to write to (default is image)\n" );
+	fprintf( stream, "\t-t: specify the target file (without extension) to write to (default\n"
+	                 "\t    is image)\n" );
 	fprintf( stream, "\t-v: verbose output to stderr\n" );
 	fprintf( stream, "\t-V: print version\n" );
 	fprintf( stream, "\t-2: specify the secondary target file (without extension) to write to\n" );

@@ -1464,6 +1464,12 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to create write IO handle.",
 			 function );
 
+			if( internal_handle->read_io_handle != NULL )
+			{
+				libewf_read_io_handle_free(
+				 &( internal_handle->read_io_handle ),
+				 error );
+			}
 			return( -1 );
 		}
 	}
@@ -1484,6 +1490,18 @@ int libewf_handle_open_file_io_pool(
 
 		internal_handle->file_io_pool = NULL;
 
+		if( internal_handle->write_io_handle != NULL )
+		{
+			libewf_write_io_handle_free(
+			 &( internal_handle->write_io_handle ),
+			 error );
+		}
+		if( internal_handle->read_io_handle != NULL )
+		{
+			libewf_read_io_handle_free(
+			 &( internal_handle->read_io_handle ),
+			 error );
+		}
 		return( -1 );
 	}
 	if( libewf_header_sections_initialize(
@@ -1503,6 +1521,18 @@ int libewf_handle_open_file_io_pool(
 
 		internal_handle->file_io_pool = NULL;
 
+		if( internal_handle->write_io_handle != NULL )
+		{
+			libewf_write_io_handle_free(
+			 &( internal_handle->write_io_handle ),
+			 error );
+		}
+		if( internal_handle->read_io_handle != NULL )
+		{
+			libewf_read_io_handle_free(
+			 &( internal_handle->read_io_handle ),
+			 error );
+		}
 		return( -1 );
 	}
 	if( libewf_hash_sections_initialize(
@@ -1525,6 +1555,18 @@ int libewf_handle_open_file_io_pool(
 
 		internal_handle->file_io_pool = NULL;
 
+		if( internal_handle->write_io_handle != NULL )
+		{
+			libewf_write_io_handle_free(
+			 &( internal_handle->write_io_handle ),
+			 error );
+		}
+		if( internal_handle->read_io_handle != NULL )
+		{
+			libewf_read_io_handle_free(
+			 &( internal_handle->read_io_handle ),
+			 error );
+		}
 		return( -1 );
 	}
 	if( libewf_single_files_initialize(
@@ -1550,6 +1592,18 @@ int libewf_handle_open_file_io_pool(
 
 		internal_handle->file_io_pool = NULL;
 
+		if( internal_handle->write_io_handle != NULL )
+		{
+			libewf_write_io_handle_free(
+			 &( internal_handle->write_io_handle ),
+			 error );
+		}
+		if( internal_handle->read_io_handle != NULL )
+		{
+			libewf_read_io_handle_free(
+			 &( internal_handle->read_io_handle ),
+			 error );
+		}
 		return( -1 );
 	}
 	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
@@ -1590,6 +1644,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1628,6 +1694,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 			if( libewf_segment_file_read_file_header(
@@ -1661,6 +1739,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 			if( segment_number == 0 )
@@ -1690,6 +1780,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 			if( ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
@@ -1727,6 +1829,18 @@ int libewf_handle_open_file_io_pool(
 
 					internal_handle->file_io_pool = NULL;
 
+					if( internal_handle->write_io_handle != NULL )
+					{
+						libewf_write_io_handle_free(
+						 &( internal_handle->write_io_handle ),
+						 error );
+					}
+					if( internal_handle->read_io_handle != NULL )
+					{
+						libewf_read_io_handle_free(
+						 &( internal_handle->read_io_handle ),
+						 error );
+					}
 					return( -1 );
 				}
 				segment_file_handle = NULL;
@@ -1765,6 +1879,18 @@ int libewf_handle_open_file_io_pool(
 
 					internal_handle->file_io_pool = NULL;
 
+					if( internal_handle->write_io_handle != NULL )
+					{
+						libewf_write_io_handle_free(
+						 &( internal_handle->write_io_handle ),
+						 error );
+					}
+					if( internal_handle->read_io_handle != NULL )
+					{
+						libewf_read_io_handle_free(
+						 &( internal_handle->read_io_handle ),
+						 error );
+					}
 					return( -1 );
 				}
 				segment_file_handle = NULL;
@@ -1802,6 +1928,18 @@ int libewf_handle_open_file_io_pool(
 
 						internal_handle->file_io_pool = NULL;
 
+						if( internal_handle->write_io_handle != NULL )
+						{
+							libewf_write_io_handle_free(
+							 &( internal_handle->write_io_handle ),
+							 error );
+						}
+						if( internal_handle->read_io_handle != NULL )
+						{
+							libewf_read_io_handle_free(
+							 &( internal_handle->read_io_handle ),
+							 error );
+						}
 						return( -1 );
 					}
 				}
@@ -1833,6 +1971,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 			if( (int) segment_number > number_of_file_io_handles )
@@ -1860,6 +2010,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 		}
@@ -1899,6 +2061,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 		}
@@ -1931,6 +2105,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 			if( number_of_segment_file_handles > 1 )
@@ -1962,6 +2148,18 @@ int libewf_handle_open_file_io_pool(
 
 					internal_handle->file_io_pool = NULL;
 
+					if( internal_handle->write_io_handle != NULL )
+					{
+						libewf_write_io_handle_free(
+						 &( internal_handle->write_io_handle ),
+						 error );
+					}
+					if( internal_handle->read_io_handle != NULL )
+					{
+						libewf_read_io_handle_free(
+						 &( internal_handle->read_io_handle ),
+						 error );
+					}
 					return( -1 );
 				}
 			}
@@ -1996,6 +2194,18 @@ int libewf_handle_open_file_io_pool(
 
 			internal_handle->file_io_pool = NULL;
 
+			if( internal_handle->write_io_handle != NULL )
+			{
+				libewf_write_io_handle_free(
+				 &( internal_handle->write_io_handle ),
+				 error );
+			}
+			if( internal_handle->read_io_handle != NULL )
+			{
+				libewf_read_io_handle_free(
+				 &( internal_handle->read_io_handle ),
+				 error );
+			}
 			return( -1 );
 		}
 		if( internal_handle->single_files->ltree_data != NULL )
@@ -2029,6 +2239,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 		}
@@ -2071,6 +2293,18 @@ int libewf_handle_open_file_io_pool(
 
 			internal_handle->file_io_pool = NULL;
 
+			if( internal_handle->write_io_handle != NULL )
+			{
+				libewf_write_io_handle_free(
+				 &( internal_handle->write_io_handle ),
+				 error );
+			}
+			if( internal_handle->read_io_handle != NULL )
+			{
+				libewf_read_io_handle_free(
+				 &( internal_handle->read_io_handle ),
+				 error );
+			}
 			return( -1 );
 		}
 	}
@@ -2108,6 +2342,18 @@ int libewf_handle_open_file_io_pool(
 
 				internal_handle->file_io_pool = NULL;
 
+				if( internal_handle->write_io_handle != NULL )
+				{
+					libewf_write_io_handle_free(
+					 &( internal_handle->write_io_handle ),
+					 error );
+				}
+				if( internal_handle->read_io_handle != NULL )
+				{
+					libewf_read_io_handle_free(
+					 &( internal_handle->read_io_handle ),
+					 error );
+				}
 				return( -1 );
 			}
 		}
@@ -2142,6 +2388,18 @@ int libewf_handle_open_file_io_pool(
 
 			internal_handle->file_io_pool = NULL;
 
+			if( internal_handle->write_io_handle != NULL )
+			{
+				libewf_write_io_handle_free(
+				 &( internal_handle->write_io_handle ),
+				 error );
+			}
+			if( internal_handle->read_io_handle != NULL )
+			{
+				libewf_read_io_handle_free(
+				 &( internal_handle->read_io_handle ),
+				 error );
+			}
 			return( -1 );
 		}
 	}

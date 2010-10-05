@@ -4,15 +4,16 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\zlib.lib"/>
-    <OBJFILES value="adler32.obj compress.obj crc32.obj deflate.obj gzio.obj infback.obj 
-      inffast.obj inflate.obj inftrees.obj trees.obj uncompr.obj zutil.obj"/>
+    <OBJFILES value="adler32.obj compress.obj crc32.obj deflate.obj gzclose.obj gzlib.obj 
+      gzread.obj gzwrite.obj infback.obj inffast.obj inflate.obj inftrees.obj 
+      trees.obj uncompr.obj Zutil.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;"/>
+    <PATHCPP value=".;..\..\zlib-1.2.5"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -20,8 +21,8 @@
     <USERDEFINES value=""/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
     <MAINSOURCE value="zlib.bpf"/>
-    <INCLUDEPATH value="..\..\zlib-1.2.3;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\zlib-1.2.3;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <INCLUDEPATH value="..\..\zlib-1.2.5;..\..\zlib-1.2.3;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\zlib-1.2.5;..\..\zlib-1.2.3;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>

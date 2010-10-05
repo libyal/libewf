@@ -180,7 +180,7 @@ int libewf_date_time_values_copy_from_timestamp(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_year + 1900,
+	     (uint16_t) time_elements.tm_year + 1900,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -192,6 +192,8 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
+	date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) ' ';
+
 	if( ( time_elements.tm_mon + 1 ) < 10 )
 	{
 		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
@@ -200,7 +202,7 @@ int libewf_date_time_values_copy_from_timestamp(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_mon + 1,
+	     (uint8_t) time_elements.tm_mon + 1,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -222,7 +224,7 @@ int libewf_date_time_values_copy_from_timestamp(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_mday,
+	     (uint8_t) time_elements.tm_mday,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -244,7 +246,7 @@ int libewf_date_time_values_copy_from_timestamp(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_hour,
+	     (uint8_t) time_elements.tm_hour,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -266,7 +268,7 @@ int libewf_date_time_values_copy_from_timestamp(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_min,
+	     (uint8_t) time_elements.tm_min,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -288,7 +290,7 @@ int libewf_date_time_values_copy_from_timestamp(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     time_elements.tm_sec,
+	     (uint8_t) time_elements.tm_sec,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -842,7 +844,7 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	     utf8_string,
 	     utf8_string_size,
 	     utf8_string_index,
-	     time_elements->tm_hour,
+	     (uint8_t) time_elements->tm_hour,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -868,7 +870,7 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	     utf8_string,
 	     utf8_string_size,
 	     utf8_string_index,
-	     time_elements->tm_min,
+	     (uint8_t) time_elements->tm_min,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -894,7 +896,7 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	     utf8_string,
 	     utf8_string_size,
 	     utf8_string_index,
-	     time_elements->tm_sec,
+	     (uint8_t) time_elements->tm_sec,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1294,11 +1296,11 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		*utf16_string_index += 1;
 	}
-	if( libfvalue_utf16_string_decimal_copy_from_16bit(
+	if( libfvalue_utf16_string_decimal_copy_from_8bit(
 	     utf16_string,
 	     utf16_string_size,
 	     utf16_string_index,
-	     time_elements->tm_hour,
+	     (uint8_t) time_elements->tm_hour,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1320,11 +1322,11 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		*utf16_string_index += 1;
 	}
-	if( libfvalue_utf16_string_decimal_copy_from_16bit(
+	if( libfvalue_utf16_string_decimal_copy_from_8bit(
 	     utf16_string,
 	     utf16_string_size,
 	     utf16_string_index,
-	     time_elements->tm_min,
+	     (uint8_t) time_elements->tm_min,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1346,11 +1348,11 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		*utf16_string_index += 1;
 	}
-	if( libfvalue_utf16_string_decimal_copy_from_16bit(
+	if( libfvalue_utf16_string_decimal_copy_from_8bit(
 	     utf16_string,
 	     utf16_string_size,
 	     utf16_string_index,
-	     time_elements->tm_sec,
+	     (uint8_t) time_elements->tm_sec,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1550,7 +1552,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 		     utf8_string,
 		     utf8_string_size,
 		     &utf8_string_index,
-		     time_elements.tm_mday,
+		     (uint8_t) time_elements.tm_mday,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1586,7 +1588,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 		     utf8_string,
 		     utf8_string_size,
 		     &utf8_string_index,
-		     time_elements.tm_year + 1900,
+		     (uint16_t) time_elements.tm_year + 1900,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1640,7 +1642,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     time_elements.tm_mon + 1,
+				     (uint8_t) time_elements.tm_mon + 1,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1662,7 +1664,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     time_elements.tm_mday,
+				     (uint8_t) time_elements.tm_mday,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1685,7 +1687,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     time_elements.tm_mday,
+				     (uint8_t) time_elements.tm_mday,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1707,7 +1709,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     time_elements.tm_mon + 1,
+				     (uint8_t) time_elements.tm_mon + 1,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1726,7 +1728,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     time_elements.tm_year + 1900,
+			     (uint16_t) time_elements.tm_year + 1900,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1746,7 +1748,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     time_elements.tm_year + 1900,
+			     (uint16_t) time_elements.tm_year + 1900,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1768,7 +1770,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     time_elements.tm_mon + 1,
+			     (uint8_t) time_elements.tm_mon + 1,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1790,7 +1792,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     time_elements.tm_mday,
+			     (uint8_t) time_elements.tm_mday,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -2070,7 +2072,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 		     utf16_string,
 		     utf16_string_size,
 		     &utf16_string_index,
-		     time_elements.tm_mday,
+		     (uint8_t) time_elements.tm_mday,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2106,7 +2108,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 		     utf16_string,
 		     utf16_string_size,
 		     &utf16_string_index,
-		     time_elements.tm_year + 1900,
+		     (uint16_t) time_elements.tm_year + 1900,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2160,7 +2162,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     time_elements.tm_mon + 1,
+				     (uint8_t) time_elements.tm_mon + 1,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -2182,7 +2184,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     time_elements.tm_mday,
+				     (uint8_t) time_elements.tm_mday,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -2205,7 +2207,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     time_elements.tm_mday,
+				     (uint8_t) time_elements.tm_mday,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -2227,7 +2229,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     time_elements.tm_mon + 1,
+				     (uint8_t) time_elements.tm_mon + 1,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -2246,7 +2248,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     time_elements.tm_year + 1900,
+			     (uint16_t) time_elements.tm_year + 1900,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -2266,7 +2268,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     time_elements.tm_year + 1900,
+			     (uint16_t) time_elements.tm_year + 1900,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -2288,7 +2290,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     time_elements.tm_mon + 1,
+			     (uint8_t) time_elements.tm_mon + 1,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -2310,7 +2312,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     time_elements.tm_mday,
+			     (uint8_t) time_elements.tm_mday,
 			     error ) != 1 )
 			{
 				liberror_error_set(
