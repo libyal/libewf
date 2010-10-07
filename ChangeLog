@@ -223,6 +223,9 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20101007
+* updated libbfio, libsmdev
+
 20101005
 * remerged 20101003 changes with 20101002 due to error in bzip2-ed tar file
 * updated codegear files
@@ -230,6 +233,7 @@ Test:
 * worked on UTF-16 functions
 * fixed small memory leak in error on open
 * fixed bugs in date time values formatting function
+* ewfexport added exporting notification for files export
 
 20101003
 * worked on UTF-16 functions

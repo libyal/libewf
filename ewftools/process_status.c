@@ -459,7 +459,8 @@ int process_status_stop(
 			 ".\n" );
 		}
 		if( ( status == PROCESS_STATUS_COMPLETED )
-	 	 && ( process_status->status_summary_string != NULL ) )
+	 	 && ( process_status->status_summary_string != NULL )
+		 && ( bytes_total > 0 ) )
 		{
 			seconds_total = process_status->last_timestamp - process_status->start_timestamp;
 

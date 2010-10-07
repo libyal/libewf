@@ -2743,10 +2743,10 @@ int imaging_handle_append_read_error(
  * Returns 1 if successful or -1 on error
  */
 int imaging_handle_append_session(
-      imaging_handle_t *imaging_handle,
-      off64_t start_offset,
-      size64_t number_of_bytes,
-      liberror_error_t **error )
+     imaging_handle_t *imaging_handle,
+     off64_t start_offset,
+     size64_t number_of_bytes,
+     liberror_error_t **error )
 {
 	static char *function      = "imaging_handle_append_session";
 	uint64_t number_of_sectors = 0;

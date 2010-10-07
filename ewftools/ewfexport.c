@@ -1867,6 +1867,72 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 	}
+	if( ewfexport_abort == 0 )
+	{
+		fprintf(
+		 stderr,
+		 "\n" );
+
+		if( process_status_initialize(
+		     &process_status,
+		     _LIBCSTRING_SYSTEM_STRING( "Export" ),
+		     _LIBCSTRING_SYSTEM_STRING( "exported" ),
+		     _LIBCSTRING_SYSTEM_STRING( "Written" ),
+		     stderr,
+		     print_status_information,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to initialize process status.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			memory_free(
+			 target_filename );
+
+			export_handle_close(
+			 export_handle,
+			 NULL );
+			export_handle_free(
+			 &export_handle,
+			 NULL );
+			
+			return( EXIT_FAILURE );
+		}
+		if( process_status_start(
+		     process_status,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to start process status.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			process_status_free(
+			 &process_status,
+			 NULL );
+
+			memory_free(
+			 target_filename );
+
+			export_handle_close(
+			 export_handle,
+			 NULL );
+			export_handle_free(
+			 &export_handle,
+			 NULL );
+
+			return( EXIT_FAILURE );
+		}
+	}
 	if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
 	{
 		/* Exports the files 
@@ -1879,6 +1945,10 @@ int main( int argc, char * const argv[] )
 		     NULL,
 		     &error ) != 1 )
 		{
+			fprintf(
+			 stderr,
+			 "Unable to export single files.\n" );
+
 			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
@@ -1910,6 +1980,10 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 
+			process_status_free(
+			 &process_status,
+			 NULL );
+
 			memory_free(
 			 target_filename );
 
@@ -1924,69 +1998,6 @@ int main( int argc, char * const argv[] )
 		}
 		if( ewfexport_abort == 0 )
 		{
-			fprintf(
-			 stderr,
-			 "\n" );
-
-			if( process_status_initialize(
-			     &process_status,
-			     _LIBCSTRING_SYSTEM_STRING( "Export" ),
-			     _LIBCSTRING_SYSTEM_STRING( "exported" ),
-			     _LIBCSTRING_SYSTEM_STRING( "Written" ),
-			     stderr,
-			     print_status_information,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to initialize process status.\n" );
-
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				memory_free(
-				 target_filename );
-
-				export_handle_close(
-				 export_handle,
-				 NULL );
-				export_handle_free(
-				 &export_handle,
-				 NULL );
-				
-				return( EXIT_FAILURE );
-			}
-			if( process_status_start(
-			     process_status,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to start process status.\n" );
-
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				process_status_free(
-				 &process_status,
-				 NULL );
-
-				memory_free(
-				 target_filename );
-
-				export_handle_close(
-				 export_handle,
-				 NULL );
-				export_handle_free(
-				 &export_handle,
-				 NULL );
-
-				return( EXIT_FAILURE );
-			}
 			if( export_handle_open_output(
 			     export_handle,
 			     export_handle_output_format,
@@ -2106,56 +2117,59 @@ int main( int argc, char * const argv[] )
 		{
 			status = PROCESS_STATUS_ABORTED;
 		}
-		if( process_status_stop(
-		     process_status,
-		     (size64_t) export_count,
-		     status,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to stop process status.\n" );
+	}
+	if( process_status_stop(
+	     process_status,
+	     (size64_t) export_count,
+	     status,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to stop process status.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
-			process_status_free(
-			 &process_status,
-			 NULL );
+		process_status_free(
+		 &process_status,
+		 NULL );
 
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
+		export_handle_close(
+		 export_handle,
+		 NULL );
+		export_handle_free(
+		 &export_handle,
+		 NULL );
 
-			return( EXIT_FAILURE );
-		}
-		if( process_status_free(
-		     &process_status,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free process status.\n" );
+		return( EXIT_FAILURE );
+	}
+	if( process_status_free(
+	     &process_status,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free process status.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
-			export_handle_close(
-			 export_handle,
-			 NULL );
-			export_handle_free(
-			 &export_handle,
-			 NULL );
+		export_handle_close(
+		 export_handle,
+		 NULL );
+		export_handle_free(
+		 &export_handle,
+		 NULL );
 
-			return( EXIT_FAILURE );
-		}
+		return( EXIT_FAILURE );
+	}
+	if( export_handle_output_format != EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
+	{
 		if( status == PROCESS_STATUS_COMPLETED )
 		{
 			if( log_filename != NULL )

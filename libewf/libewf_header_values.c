@@ -5603,23 +5603,22 @@ int libewf_header_values_parse_xheader(
      size_t xheader_size,
      liberror_error_t **error )
 {
-	libewf_split_values_t *lines          = NULL;
-	libfvalue_value_t *header_value       = NULL;
-	uint8_t *close_tag_start              = NULL;
-	uint8_t *close_tag_end                = NULL;
-	uint8_t *date_time_values_string      = NULL;
-	uint8_t *identifier                   = NULL;
-	uint8_t *open_tag_start               = NULL;
-	uint8_t *open_tag_end                 = NULL;
-	uint8_t *value_string                 = NULL;
-	static char *function                 = "libewf_header_values_parse_xheader";
-	size_t date_time_values_string_length = 0;
-	size_t date_time_values_string_size   = 0;
-	size_t identifier_length              = 0;
-	size_t string_length                  = 0;
-	size_t value_string_length            = 0;
-	size_t xheader_index                  = 0;
-	int line_iterator                     = 0;
+	libewf_split_values_t *lines        = NULL;
+	libfvalue_value_t *header_value     = NULL;
+	uint8_t *close_tag_start            = NULL;
+	uint8_t *close_tag_end              = NULL;
+	uint8_t *date_time_values_string    = NULL;
+	uint8_t *identifier                 = NULL;
+	uint8_t *open_tag_start             = NULL;
+	uint8_t *open_tag_end               = NULL;
+	uint8_t *value_string               = NULL;
+	static char *function               = "libewf_header_values_parse_xheader";
+	size_t date_time_values_string_size = 0;
+	size_t identifier_length            = 0;
+	size_t string_length                = 0;
+	size_t value_string_length          = 0;
+	size_t xheader_index                = 0;
+	int line_iterator                   = 0;
 
 	if( xheader == NULL )
 	{
@@ -5778,8 +5777,8 @@ int libewf_header_values_parse_xheader(
 			{
 				/* Make sure to determine the actual length of the date time values string
 				 */
-				date_time_values_string_length = libcstring_narrow_string_length(
-				                                  (char *) date_time_values_string );
+				value_string_length = libcstring_narrow_string_length(
+				                       (char *) date_time_values_string );
 			}
 		}
 		if( libfvalue_value_initialize(

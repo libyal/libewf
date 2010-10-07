@@ -341,12 +341,6 @@ int device_handle_open_input(
 		}
 		libsmdev_flags = LIBSMDEV_OPEN_READ;
 
-/* TODO
-#if defined( memory_allocate_aligned )
-		libsmdev_flags |= LIBSMDEV_FLAG_DIRECT_IO;
-#endif
-*/
-
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libsmdev_handle_open_wide(
 		     device_handle->dev_input_handle,
@@ -1134,11 +1128,8 @@ int device_handle_media_information_fprint(
 	static char *function = "device_handle_media_information_fprint";
 	size64_t media_size   = 0;
 	uint8_t bus_type      = 0;
+	uint8_t media_type    = 0;
 	int result            = 0;
-
-#ifdef TODO
-	uint8_t device_type   = 0;
-#endif
 
 	if( device_handle == NULL )
 	{
@@ -1168,169 +1159,6 @@ int device_handle_media_information_fprint(
 		 stream,
 		 "Device information:\n" );
 
-#ifdef TODO
-		if( libsmdev_handle_get_device_type(
-		     device_handle->dev_input_handle,
-		     device_type,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve device type.",
-			 function );
-
-			return( -1 );
-		}
-		fprintf(
-		 stream,
-		 "Device type:\t\t" );
-
-		switch( device_handle->device_type )
-		{
-			case 0x00:
-				fprintf(
-				 stream,
-				 "Direct access" );
-				break;
-
-			case 0x01:
-				fprintf(
-				 stream,
-				 "Sequential access" );
-				break;
-
-			case 0x02:
-				fprintf(
-				 stream,
-				 "Printer" );
-				break;
-
-			case 0x03:
-				fprintf(
-				 stream,
-				 "Processor" );
-				break;
-
-			case 0x04:
-				fprintf(
-				 stream,
-				 "Write-once" );
-				break;
-
-			case 0x05:
-				fprintf(
-				 stream,
-				 "Optical disk (CD/DVD/BD)" );
-				break;
-
-			case 0x06:
-				fprintf(
-				 stream,
-				 "Scanner" );
-				break;
-
-			case 0x07:
-				fprintf(
-				 stream,
-				 "Optical memory" );
-				break;
-
-			case 0x08:
-				fprintf(
-				 stream,
-				 "Medium changer" );
-				break;
-
-			case 0x09:
-				fprintf(
-				 stream,
-				 "Communications" );
-				break;
-
-			case 0x0a:
-			case 0x0b:
-				fprintf(
-				 stream,
-				 "Graphic arts pre-press" );
-				break;
-
-			case 0x0c:
-				fprintf(
-				 stream,
-				 "Storage array controller" );
-				break;
-
-			case 0x0d:
-				fprintf(
-				 stream,
-				 "Enclosure services" );
-				break;
-
-			case 0x0e:
-				fprintf(
-				 stream,
-				 "Simplified direct-access" );
-				break;
-
-			case 0x0f:
-				fprintf(
-				 stream,
-				 "Optical card reader/writer" );
-				break;
-
-			case 0x10:
-				fprintf(
-				 stream,
-				 "Bridging expander" );
-				break;
-
-			case 0x11:
-				fprintf(
-				 stream,
-				 "Object-based Storage" );
-				break;
-
-			case 0x12:
-				fprintf(
-				 stream,
-				 "Automation/Drive Interface" );
-				break;
-
-			case 0x13:
-			case 0x14:
-			case 0x15:
-			case 0x16:
-			case 0x17:
-			case 0x18:
-			case 0x1a:
-			case 0x1b:
-			case 0x1c:
-			case 0x1d:
-				fprintf(
-				 stream,
-				 "Reserved: %d",
-				 device_handle->device_type );
-				break;
-
-			case 0x1e:
-				fprintf(
-				 stream,
-				 "Well known logical unit" );
-				break;
-
-			default:
-				fprintf(
-				 stream,
-				 "Unknown: %d",
-				 device_handle->device_type );
-				break;
-		}
-		fprintf(
-		 stream,
-		 "\n" );
-
 		if( libsmdev_handle_get_bus_type(
 		     device_handle->dev_input_handle,
 		     &bus_type,
@@ -1345,7 +1173,6 @@ int device_handle_media_information_fprint(
 
 			return( -1 );
 		}
-#endif
 		fprintf(
 		 stream,
 		 "Bus type:\t\t" );
@@ -1380,14 +1207,6 @@ int device_handle_media_information_fprint(
 		 stream,
 		 "\n" );
 
-#ifdef TODO
-		if( device_handle->removable != 0 )
-		{
-			fprintf(
-			 stream,
-			 "Removable:\t\tyes\n" );
-		}
-#endif
 		result = libsmdev_handle_get_information_value(
 		          device_handle->dev_input_handle,
 		          (uint8_t *) "vendor",
@@ -1482,6 +1301,54 @@ int device_handle_media_information_fprint(
 
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
+		if( libsmdev_handle_get_media_type(
+		     device_handle->dev_input_handle,
+		     &media_type,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve media type.",
+			 function );
+
+			return( -1 );
+		}
+		fprintf(
+		 stream,
+		 "Media type:\t\t" );
+
+		switch( media_type )
+		{
+			case LIBSMDEV_MEDIA_TYPE_REMOVABLE:
+				fprintf(
+				 stream,
+				 "Removable" );
+				break;
+
+			case LIBSMDEV_MEDIA_TYPE_FIXED:
+				fprintf(
+				 stream,
+				 "Fixed" );
+				break;
+
+			case LIBSMDEV_MEDIA_TYPE_OPTICAL:
+				fprintf(
+				 stream,
+				 "Optical" );
+				break;
+
+			case LIBSMDEV_MEDIA_TYPE_MEMORY:
+				fprintf(
+				 stream,
+				 "Memory" );
+				break;
+		}
+		fprintf(
+		 stream,
+		 "\n" );
+
 		if( libsmdev_handle_get_media_size(
 		     device_handle->dev_input_handle,
 		     &media_size,

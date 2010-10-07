@@ -2995,7 +2995,6 @@ int export_handle_export_file_entry(
 	}
 	if( name_size > 0 )
 	{
-
 		name = (uint8_t *) memory_allocate(
 				    sizeof( uint8_t ) * name_size );
 
