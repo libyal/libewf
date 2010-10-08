@@ -34,7 +34,7 @@
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_section_list.h"
-#include "libewf_sector_table.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
 
@@ -64,8 +64,8 @@ int libewf_segment_file_read_sections(
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
+     libewf_sector_list_t *sessions,
+     libewf_sector_list_t *acquiry_errors,
      libewf_single_files_t *single_files,
      liberror_error_t **error );
 
@@ -157,8 +157,8 @@ ssize_t libewf_segment_file_write_close(
          libewf_hash_sections_t *hash_sections,
          libfvalue_table_t *hash_values,
          libewf_media_values_t *media_values,
-         libewf_sector_table_t *sessions,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *sessions,
+         libewf_sector_list_t *acquiry_errors,
          ewf_data_t **cached_data_section,
          liberror_error_t **error );
 
@@ -172,8 +172,8 @@ int libewf_segment_file_write_sections_correction(
      libewf_media_values_t *media_values,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
+     libewf_sector_list_t *sessions,
+     libewf_sector_list_t *acquiry_errors,
      ewf_data_t **cached_data_section,
      liberror_error_t **error );
 

@@ -223,6 +223,10 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20101008
+* updated libbfio, libsmdev
+* replaced sector table by sector list
+
 20101007
 * updated libbfio, libsmdev
 

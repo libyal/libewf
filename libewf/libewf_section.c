@@ -40,7 +40,7 @@
 #include "libewf_offset_table.h"
 #include "libewf_section.h"
 #include "libewf_section_list.h"
-#include "libewf_sector_table.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
 
@@ -938,7 +938,7 @@ ssize_t libewf_section_header_read(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid header.",
+		 "%s: missing header.",
 		 function );
 
 		return( -1 );
@@ -1150,7 +1150,7 @@ ssize_t libewf_section_header2_read(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid header2.",
+		 "%s: missing header2.",
 		 function );
 
 		return( -1 );
@@ -2662,7 +2662,7 @@ ssize_t libewf_section_table_read(
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		"%s: table contains no offsets.\n",
+		 "%s: table section contains no offset data.\n",
 		 function );
 	}
 	if( section_size < (size_t) section_read_count )
@@ -3045,7 +3045,7 @@ ssize_t libewf_section_table2_read(
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: table contains no offsets.\n",
+		 "%s: table section contains no offset data.\n",
 		 function );
 	}
 	if( section_size < (size_t) section_read_count )
@@ -3729,7 +3729,7 @@ ssize_t libewf_section_session_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
-         libewf_sector_table_t *sessions,
+         libewf_sector_list_t *sessions,
          size_t section_size,
          uint8_t ewf_format,
          liberror_error_t **error )
@@ -3743,11 +3743,13 @@ ssize_t libewf_section_session_read(
 	ssize_t read_count                = 0;
 	size_t ewf_sessions_size          = 0;
 	uint32_t calculated_checksum      = 0;
-	uint32_t iterator                 = 0;
+	uint32_t ewf_session_index        = 0;
 	uint32_t first_sector             = 0;
-	uint32_t number_of_ewf_sessions   = 0;
 	uint32_t last_first_sector        = 0;
+	uint32_t number_of_ewf_sessions   = 0;
+	uint32_t number_of_sectors        = 0;
 	uint32_t stored_checksum          = 0;
+	int number_of_elements            = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3855,7 +3857,6 @@ ssize_t libewf_section_session_read(
 		 28 );
 	}
 #endif
-
 	byte_stream_copy_to_uint32_little_endian(
 	 ewf_session.number_of_sessions,
 	 number_of_ewf_sessions );
@@ -3869,7 +3870,6 @@ ssize_t libewf_section_session_read(
 		 number_of_ewf_sessions );
 	}
 #endif
-
 	if( number_of_ewf_sessions > 0 )
 	{
 		ewf_sessions_size = sizeof( ewf_session_entry_t ) * number_of_ewf_sessions;
@@ -3954,6 +3954,9 @@ ssize_t libewf_section_session_read(
 			 stored_checksum,
 			 calculated_checksum );
 
+			memory_free(
+			 ewf_sessions );
+
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -3967,31 +3970,16 @@ ssize_t libewf_section_session_read(
 			 ewf_sessions_size );
 		}
 #endif
-		if( sessions->sector != NULL )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
-			{
-				libnotify_printf(
-				 "%s: session entries already set in handle - removing previous one.\n",
-				 function );
-			}
-#endif
-			memory_free(
-			 sessions->sector );
-
-			sessions->number_of_sectors = 0;
-		}
-		sessions->sector = (libewf_sector_table_entry_t *) memory_allocate(
-		                                                    sizeof( libewf_sector_table_entry_t ) * number_of_ewf_sessions );
-
-		if( sessions->sector == NULL )
+		if( libewf_sector_list_get_number_of_elements(
+		     sessions,
+		     &number_of_elements,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create session entries.",
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of elements from sessions sector list.",
 			 function );
 
 			memory_free(
@@ -3999,50 +3987,120 @@ ssize_t libewf_section_session_read(
 
 			return( -1 );
 		}
-		sessions->number_of_sectors = number_of_ewf_sessions;
-
-		for( iterator = 0;
-		     iterator < number_of_ewf_sessions;
-		     iterator++ )
+		if( number_of_elements == 0 )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 ewf_sessions[ iterator ].first_sector,
-			 first_sector );
+			 ewf_sessions[ ewf_session_index ].first_sector,
+			 last_first_sector );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: session: %" PRIu32 " first sector: %" PRIu32 "\n",
+				 "%s: session: %" PRIu32 " first sector\t: %" PRIu32 "\n",
 				 function,
-				 iterator,
-				 first_sector );
+				 ewf_session_index,
+				 last_first_sector );
 			}
 #endif
-			sessions->sector[ iterator ].first_sector = (uint64_t) first_sector;
-
-			if( iterator > 0 )
+			for( ewf_session_index = 1;
+			     ewf_session_index < number_of_ewf_sessions;
+			     ewf_session_index++ )
 			{
-				sessions->sector[ iterator - 1 ].number_of_sectors = first_sector - last_first_sector;
+				byte_stream_copy_to_uint32_little_endian(
+				 ewf_sessions[ ewf_session_index ].first_sector,
+				 first_sector );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: session: %" PRIu32 " first sector\t: %" PRIu32 "\n",
+					 function,
+					 ewf_session_index,
+					 first_sector );
+				}
+#endif
+				if( first_sector < last_first_sector )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid first sector: %" PRIu32 " value out of bounds.",
+					 function,
+					 first_sector );
+
+					memory_free(
+					 ewf_sessions );
+
+					return( -1 );
+				}
+				number_of_sectors = first_sector - last_first_sector;
+
+				if( libewf_sector_list_append_sector(
+				     sessions,
+				     (uint64_t) first_sector,
+				     (uint64_t) number_of_sectors,
+				     0,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append session to sector list.",
+					 function );
+
+					memory_free(
+					 ewf_sessions );
+
+					return( -1 );
+				}
+				last_first_sector = first_sector;
 			}
-			last_first_sector = first_sector;
+			if( media_values->number_of_sectors > last_first_sector )
+			{
+				number_of_sectors = media_values->number_of_sectors - last_first_sector;
+			}
+			else
+			{
+				number_of_sectors = 0;
+			}
+			memory_free(
+			 ewf_sessions );
+
+			if( libewf_sector_list_append_sector(
+			     sessions,
+			     (uint64_t) first_sector,
+			     (uint64_t) number_of_sectors,
+			     0,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append session to sector list.",
+				 function );
+
+				return( -1 );
+			}
 		}
-		if( media_values->number_of_sectors > last_first_sector )
+#if defined( HAVE_VERBOSE_OUTPUT )
+		else if( libnotify_verbose != 0 )
 		{
-			sessions->sector[ iterator - 1 ].number_of_sectors = media_values->number_of_sectors - last_first_sector;
+			libnotify_printf(
+			 "%s: sessions already set.\n",
+			 function );
 		}
-		else
-		{
-			sessions->sector[ iterator - 1 ].number_of_sectors = 0;
-		}
-		memory_free(
-		 ewf_sessions );
+#endif
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: session contains no session data.\n",
+		 "%s: session section contains no session data.\n",
 		 function );
 	}
 #endif
@@ -4055,7 +4113,7 @@ ssize_t libewf_section_session_read(
 ssize_t libewf_section_session_write(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_sector_table_t *sessions,
+         libewf_sector_list_t *sessions,
          liberror_error_t **error )
 {
 	ewf_session_t ewf_session;
@@ -4070,8 +4128,11 @@ ssize_t libewf_section_session_write(
 	size_t section_type_length        = 7;
 	size_t section_size               = 0;
 	size_t ewf_sessions_size          = 0;
+	uint64_t first_sector             = 0;
+	uint64_t number_of_sectors        = 0;
 	uint32_t calculated_checksum      = 0;
-	uint32_t iterator                 = 0;
+	int number_of_sessions            = 0;
+	int session_index                 = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -4080,17 +4141,6 @@ ssize_t libewf_section_session_write(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file",
-		 function );
-
-		return( -1 );
-	}
-	if( sessions == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid sessions.",
 		 function );
 
 		return( -1 );
@@ -4110,9 +4160,31 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	ewf_sessions_size = sizeof( ewf_session_entry_t ) * sessions->number_of_sectors;
-	section_size      = sizeof( ewf_session_t ) + ewf_sessions_size + sizeof( uint32_t );
+	if( libewf_sector_list_get_number_of_elements(
+	     sessions,
+	     &number_of_sessions,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from sessions sector list.",
+		 function );
 
+		return( -1 );
+	}
+	if( number_of_sessions <= 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of sessions value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	if( memory_set(
 	     &ewf_session,
 	     0,
@@ -4129,7 +4201,7 @@ ssize_t libewf_section_session_write(
 	}
 	byte_stream_copy_from_uint32_little_endian(
 	 ewf_session.number_of_sessions,
-	 sessions->number_of_sectors );
+	 number_of_sessions );
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       &ewf_session,
@@ -4140,8 +4212,10 @@ ssize_t libewf_section_session_write(
 	 ewf_session.checksum,
 	 calculated_checksum );
 
+	ewf_sessions_size = sizeof( ewf_session_entry_t ) * number_of_sessions;
+
 	ewf_sessions = (ewf_session_entry_t *) memory_allocate(
-	                                        ewf_sessions_size );
+						ewf_sessions_size );
 
 	if( ewf_sessions == NULL )
 	{
@@ -4171,18 +4245,40 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	for( iterator = 0;
-	     iterator < sessions->number_of_sectors;
-	     iterator++ )
+	for( session_index = 0;
+	     session_index < number_of_sessions;
+	     session_index++ )
 	{
+		if( libewf_sector_list_get_sector(
+		     sessions,
+		     session_index,
+		     &first_sector,
+		     &number_of_sectors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve session: %d from sector list.",
+			 function,
+			 session_index );
+
+			memory_free(
+			 ewf_sessions );
+
+			return( -1 );
+		}
 		byte_stream_copy_from_uint32_little_endian(
-		 ewf_sessions[ iterator ].first_sector,
-		 (uint32_t) sessions->sector[ iterator ].first_sector );
+		 ewf_sessions[ session_index ].first_sector,
+		 (uint32_t) first_sector );
 	}
 	calculated_checksum = ewf_checksum_calculate(
-	                       ewf_sessions,
-	                       ewf_sessions_size,
-	                       1 );
+			       ewf_sessions,
+			       ewf_sessions_size,
+			       1 );
+
+	section_size = sizeof( ewf_session_t ) + ewf_sessions_size + sizeof( uint32_t );
 
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -4232,14 +4328,11 @@ ssize_t libewf_section_session_write(
 	section_write_count += write_count;
 
 	write_count = libbfio_pool_write(
-	               file_io_pool,
-	               segment_file_handle->file_io_pool_entry,
-	               (uint8_t *) ewf_sessions,
-	               ewf_sessions_size,
-	               error );
-
-	memory_free(
-	 ewf_sessions );
+		       file_io_pool,
+		       segment_file_handle->file_io_pool_entry,
+		       (uint8_t *) ewf_sessions,
+		       ewf_sessions_size,
+		       error );
 
 	if( write_count != (ssize_t) ewf_sessions_size )
 	{
@@ -4250,20 +4343,26 @@ ssize_t libewf_section_session_write(
 		 "%s: unable to write session entries to file.",
 		 function );
 
+		memory_free(
+		 ewf_sessions );
+
 		return( -1 );
 	}
 	section_write_count += write_count;
+
+	memory_free(
+	 ewf_sessions );
 
 	byte_stream_copy_from_uint32_little_endian(
 	 calculated_checksum_buffer,
 	 calculated_checksum );
 
 	write_count = libbfio_pool_write(
-	               file_io_pool,
-	               segment_file_handle->file_io_pool_entry,
- 	               calculated_checksum_buffer,
- 	               sizeof( uint32_t ),
-	               error );
+		       file_io_pool,
+		       segment_file_handle->file_io_pool_entry,
+		       calculated_checksum_buffer,
+		       sizeof( uint32_t ),
+		       error );
 
 	if( write_count != (ssize_t) sizeof( uint32_t ) )
 	{
@@ -4886,7 +4985,7 @@ ssize_t libewf_section_data_write(
 ssize_t libewf_section_error2_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *acquiry_errors,
          size_t section_size,
          uint8_t ewf_format,
          liberror_error_t **error )
@@ -4896,14 +4995,16 @@ ssize_t libewf_section_error2_read(
 
 	ewf_error2_sector_t *error2_sectors = NULL;
 	static char *function               = "libewf_section_error2_read";
+	size_t error2_sectors_size          = 0;
 	ssize_t section_read_count          = 0;
 	ssize_t read_count                  = 0;
-	size_t sectors_size                 = 0;
 	uint32_t calculated_checksum        = 0;
-	uint32_t iterator                   = 0;
+	uint32_t error_index                = 0;
 	uint32_t first_sector               = 0;
 	uint32_t number_of_errors           = 0;
+	uint32_t number_of_sectors          = 0;
 	uint32_t stored_checksum            = 0;
+	int number_of_elements              = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -5007,10 +5108,10 @@ ssize_t libewf_section_error2_read(
 
 	if( number_of_errors > 0 )
 	{
-		sectors_size = sizeof( ewf_error2_sector_t ) * number_of_errors;
+		error2_sectors_size = sizeof( ewf_error2_sector_t ) * number_of_errors;
 
 		error2_sectors = (ewf_error2_sector_t *) memory_allocate(
-		                                          sectors_size );
+		                                          error2_sectors_size );
 
 		if( error2_sectors == NULL )
 		{
@@ -5027,10 +5128,10 @@ ssize_t libewf_section_error2_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
 		              (uint8_t *) error2_sectors,
-		              sectors_size,
+		              error2_sectors_size,
 	                      error );
 	
-		if( read_count != (ssize_t) sectors_size )
+		if( read_count != (ssize_t) error2_sectors_size )
 		{
 			liberror_error_set(
 			 error,
@@ -5048,7 +5149,7 @@ ssize_t libewf_section_error2_read(
 
 		calculated_checksum = ewf_checksum_calculate(
 		                       error2_sectors,
-		                       sectors_size,
+		                       error2_sectors_size,
 		                       1 );
 
 		read_count = libbfio_pool_read(
@@ -5102,34 +5203,19 @@ ssize_t libewf_section_error2_read(
 			 function );
 			libnotify_print_data(
 			 (uint8_t *) error2_sectors,
-			 sectors_size );
+			 error2_sectors_size );
 		}
 #endif
-		if( acquiry_errors->sector != NULL )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
-			{
-				libnotify_printf(
-				 "%s: acquiry error sectors already set in handle - removing previous one.\n",
-				 function );
-			}
-#endif
-			memory_free(
-			 acquiry_errors->sector );
-
-			acquiry_errors->number_of_sectors = 0;
-		}
-		acquiry_errors->sector = (libewf_sector_table_entry_t *) memory_allocate(
-		                                                          sizeof( libewf_sector_table_entry_t ) * number_of_errors );
-
-		if( acquiry_errors->sector == NULL )
+		if( libewf_sector_list_get_number_of_elements(
+		     acquiry_errors,
+		     &number_of_elements,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create acquiry error sectors.",
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of elements from acquiry errors sector list.",
 			 function );
 
 			memory_free(
@@ -5137,30 +5223,73 @@ ssize_t libewf_section_error2_read(
 
 			return( -1 );
 		}
-		acquiry_errors->number_of_sectors = number_of_errors;
-
-		for( iterator = 0;
-		     iterator < number_of_errors;
-		     iterator++ )
+		if( number_of_elements == 0 )
 		{
-			byte_stream_copy_to_uint32_little_endian(
-			 error2_sectors[ iterator ].first_sector,
-			 first_sector );
+			for( error_index = 0;
+			     error_index < number_of_errors;
+			     error_index++ )
+			{
+				byte_stream_copy_to_uint32_little_endian(
+				 error2_sectors[ error_index ].first_sector,
+				 first_sector );
 
-			acquiry_errors->sector[ iterator ].first_sector = (uint64_t) first_sector;
+				byte_stream_copy_to_uint32_little_endian(
+				 error2_sectors[ error_index ].number_of_sectors,
+				 number_of_sectors );
 
-			byte_stream_copy_to_uint32_little_endian(
-			 error2_sectors[ iterator ].number_of_sectors,
-			 acquiry_errors->sector[ iterator ].number_of_sectors );
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: error2: %" PRIu32 " first sector\t: %" PRIu32 "\n",
+					 function,
+					 error_index,
+					 first_sector );
+
+					libnotify_printf(
+					 "%s: error2: %" PRIu32 " number of sectors\t: %" PRIu32 "\n",
+					 function,
+					 error_index,
+					 number_of_sectors );
+				}
+#endif
+				if( libewf_sector_list_append_sector(
+				     acquiry_errors,
+				     (uint64_t) first_sector,
+				     (uint64_t) number_of_sectors,
+				     0,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append acquiry error to sector list.",
+					 function );
+
+					memory_free(
+					 error2_sectors );
+
+					return( -1 );
+				}
+			}
+			memory_free(
+			 error2_sectors );
 		}
-		memory_free(
-		 error2_sectors );
+#if defined( HAVE_VERBOSE_OUTPUT )
+		else if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: acquiry errors already set.\n",
+			 function );
+		}
+#endif
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	else if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: error2 contains no sectors.\n",
+		 "%s: error2 section contains no error data.\n",
 		 function );
 	}
 #endif
@@ -5173,7 +5302,7 @@ ssize_t libewf_section_error2_read(
 ssize_t libewf_section_error2_write(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *acquiry_errors,
          liberror_error_t **error )
 {
 	ewf_error2_t error2;
@@ -5188,8 +5317,11 @@ ssize_t libewf_section_error2_write(
 	size_t section_type_length          = 6;
 	size_t section_size                 = 0;
 	size_t sectors_size                 = 0;
+	uint64_t first_sector               = 0;
+	uint64_t number_of_sectors          = 0;
 	uint32_t calculated_checksum        = 0;
-	uint32_t iterator                   = 0;
+	int error_index                     = 0;
+	int number_of_errors                = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -5198,17 +5330,6 @@ ssize_t libewf_section_error2_write(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file",
-		 function );
-
-		return( -1 );
-	}
-	if( acquiry_errors == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid acquiry errors.",
 		 function );
 
 		return( -1 );
@@ -5228,9 +5349,31 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	sectors_size = sizeof( ewf_error2_sector_t ) * acquiry_errors->number_of_sectors;
-	section_size = sizeof( ewf_error2_t ) + sectors_size + sizeof( uint32_t );
+	if( libewf_sector_list_get_number_of_elements(
+	     acquiry_errors,
+	     &number_of_errors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from acquiry error sector list.",
+		 function );
 
+		return( -1 );
+	}
+	if( number_of_errors <= 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of errors value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	if( memory_set(
 	     &error2,
 	     0,
@@ -5247,7 +5390,7 @@ ssize_t libewf_section_error2_write(
 	}
 	byte_stream_copy_from_uint32_little_endian(
 	 error2.number_of_errors,
-	 acquiry_errors->number_of_sectors );
+	 number_of_errors );
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       &error2,
@@ -5258,10 +5401,12 @@ ssize_t libewf_section_error2_write(
 	 error2.checksum,
 	 calculated_checksum );
 
+	sectors_size = sizeof( ewf_error2_sector_t ) * number_of_errors;
+
 	/* TODO EnCase compatible way to handle > 32-bit sector values
 	 */
 	error2_sectors = (ewf_error2_sector_t *) memory_allocate(
-	                                          sectors_size );
+						  sectors_size );
 
 	if( error2_sectors == NULL )
 	{
@@ -5274,22 +5419,44 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	for( iterator = 0;
-	     iterator < acquiry_errors->number_of_sectors;
-	     iterator++ )
+	for( error_index = 0;
+	     error_index < number_of_errors;
+	     error_index++ )
 	{
+		if( libewf_sector_list_get_sector(
+		     acquiry_errors,
+		     error_index,
+		     &first_sector,
+		     &number_of_sectors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve acquiry error: %d from sector list.",
+			 function,
+			 error_index );
+
+			memory_free(
+			 error2_sectors );
+
+			return( -1 );
+		}
 		byte_stream_copy_from_uint32_little_endian(
-		 error2_sectors[ iterator ].first_sector,
-		 (uint32_t) acquiry_errors->sector[ iterator ].first_sector );
+		 error2_sectors[ error_index ].first_sector,
+		 (uint32_t) first_sector );
 
 		byte_stream_copy_from_uint32_little_endian(
-		 error2_sectors[ iterator ].number_of_sectors,
-		 acquiry_errors->sector[ iterator ].number_of_sectors );
+		 error2_sectors[ error_index ].number_of_sectors,
+		 (uint32_t) number_of_sectors );
 	}
 	calculated_checksum = ewf_checksum_calculate(
-	                       error2_sectors,
-	                       sectors_size,
-	                       1 );
+			       error2_sectors,
+			       sectors_size,
+			       1 );
+
+	section_size = sizeof( ewf_error2_t ) + sectors_size + sizeof( uint32_t );
 
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -5339,14 +5506,11 @@ ssize_t libewf_section_error2_write(
 	section_write_count += write_count;
 
 	write_count = libbfio_pool_write(
-	               file_io_pool,
-	               segment_file_handle->file_io_pool_entry,
-	               (uint8_t *) error2_sectors,
-	               sectors_size,
-	               error );
-
-	memory_free(
-	 error2_sectors );
+		       file_io_pool,
+		       segment_file_handle->file_io_pool_entry,
+		       (uint8_t *) error2_sectors,
+		       sectors_size,
+		       error );
 
 	if( write_count != (ssize_t) sectors_size )
 	{
@@ -5357,20 +5521,26 @@ ssize_t libewf_section_error2_write(
 		 "%s: unable to write error2 sectors to file.",
 		 function );
 
+		memory_free(
+		 error2_sectors );
+
 		return( -1 );
 	}
 	section_write_count += write_count;
+
+	memory_free(
+	 error2_sectors );
 
 	byte_stream_copy_from_uint32_little_endian(
 	 calculated_checksum_buffer,
 	 calculated_checksum );
 
 	write_count = libbfio_pool_write(
-	               file_io_pool,
-	               segment_file_handle->file_io_pool_entry,
- 	               calculated_checksum_buffer,
- 	               sizeof( uint32_t ),
-	               error );
+		       file_io_pool,
+		       segment_file_handle->file_io_pool_entry,
+		       calculated_checksum_buffer,
+		       sizeof( uint32_t ),
+		       error );
 
 	if( write_count != (ssize_t) sizeof( uint32_t ) )
 	{
@@ -6275,7 +6445,7 @@ ssize_t libewf_section_xheader_read(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid xheader.",
+		 "%s: missing xheader.",
 		 function );
 
 		return( -1 );
@@ -6487,7 +6657,7 @@ ssize_t libewf_section_xhash_read(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid xhash.",
+		 "%s: missing xhash.",
 		 function );
 
 		return( -1 );
@@ -7231,8 +7401,8 @@ int libewf_section_read(
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
+     libewf_sector_list_t *sessions,
+     libewf_sector_list_t *acquiry_errors,
      libewf_single_files_t *single_files,
      int8_t *compression_level,
      uint8_t *format,

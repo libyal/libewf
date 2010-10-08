@@ -33,6 +33,7 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_section.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_single_files.h"
@@ -176,8 +177,8 @@ int libewf_segment_file_read_sections(
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
+     libewf_sector_list_t *sessions,
+     libewf_sector_list_t *acquiry_errors,
      libewf_single_files_t *single_files,
      liberror_error_t **error )
 {
@@ -1877,14 +1878,15 @@ ssize_t libewf_segment_file_write_close(
          libewf_hash_sections_t *hash_sections,
          libfvalue_table_t *hash_values,
          libewf_media_values_t *media_values,
-         libewf_sector_table_t *sessions,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *sessions,
+         libewf_sector_list_t *acquiry_errors,
          ewf_data_t **cached_data_section,
 	 liberror_error_t **error )
 {
 	static char *function     = "libewf_segment_file_write_close";
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
+	int number_of_elements    = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1984,61 +1986,93 @@ ssize_t libewf_segment_file_write_close(
 		}
 		/* Write the session section if required
 		 */
-		if( ( sessions->number_of_sectors > 0 )
-		 && ( ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
-		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
-		  || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
-		  || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
-		  || ( io_handle->format == LIBEWF_FORMAT_EWFX ) ) )
+		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_EWFX ) )
 		{
-			write_count = libewf_section_session_write(
-			               file_io_pool,
-			               segment_file_handle,
-			               sessions,
-			               error );
-
-			if( write_count == -1 )
+			if( libewf_sector_list_get_number_of_elements(
+			     sessions,
+			     &number_of_elements,
+			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write sessions section.",
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve number of elements from sessions sector list.",
 				 function );
 
 				return( -1 );
 			}
-			total_write_count += write_count;
+			if( number_of_elements > 0 )
+			{
+				write_count = libewf_section_session_write(
+					       file_io_pool,
+					       segment_file_handle,
+					       sessions,
+					       error );
+
+				if( write_count == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 "%s: unable to write sessions section.",
+					 function );
+
+					return( -1 );
+				}
+				total_write_count += write_count;
+			}
 		}
 		/* Write the error2 section if required
 		 */
-		if( ( acquiry_errors->number_of_sectors > 0 )
-		 && ( ( io_handle->format == LIBEWF_FORMAT_ENCASE3 )
-		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE4 )
-		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
-		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
-		  || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
-		  || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
-		  || ( io_handle->format == LIBEWF_FORMAT_EWFX ) ) )
+		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE3 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE4 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_EWFX ) )
 		{
-			write_count = libewf_section_error2_write(
-			               file_io_pool,
-			               segment_file_handle,
-			               acquiry_errors,
-			               error );
-
-			if( write_count == -1 )
+			if( libewf_sector_list_get_number_of_elements(
+			     acquiry_errors,
+			     &number_of_elements,
+			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write error2 section.",
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve number of elements from acquiry errors sector list.",
 				 function );
 
 				return( -1 );
 			}
-			total_write_count += write_count;
+			if( number_of_elements > 0 )
+			{
+				write_count = libewf_section_error2_write(
+					       file_io_pool,
+					       segment_file_handle,
+					       acquiry_errors,
+					       error );
+
+				if( write_count == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 "%s: unable to write error2 section.",
+					 function );
+
+					return( -1 );
+				}
+				total_write_count += write_count;
+			}
 		}
 		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
 		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 ) )
@@ -2205,8 +2239,8 @@ int libewf_segment_file_write_sections_correction(
      libewf_media_values_t *media_values,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
+     libewf_sector_list_t *sessions,
+     libewf_sector_list_t *acquiry_errors,
      ewf_data_t **cached_data_section,
      liberror_error_t **error )
 {

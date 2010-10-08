@@ -203,7 +203,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_sector_table.c"
+				RelativePath="..\..\libewf\libewf_sector_list.c"
 				>
 			</File>
 			<File
@@ -433,7 +433,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_sector_table.h"
+				RelativePath="..\..\libewf\libewf_sector_list.h"
 				>
 			</File>
 			<File

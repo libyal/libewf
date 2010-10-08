@@ -34,7 +34,7 @@
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_read_io_handle.h"
-#include "libewf_sector_table.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_table.h"
 
 #include "ewf_checksum.h"
@@ -239,8 +239,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libfvalue_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
-         libewf_sector_table_t *sessions,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *sessions,
+         libewf_sector_list_t *acquiry_errors,
          uint32_t chunk,
          uint8_t *chunk_buffer,
          size_t chunk_size,
@@ -280,8 +280,8 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          libfvalue_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
-         libewf_sector_table_t *sessions,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *sessions,
+         libewf_sector_list_t *acquiry_errors,
          libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          void *buffer,
@@ -315,8 +315,8 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_segment_table_t *segment_table,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
+     libewf_sector_list_t *sessions,
+     libewf_sector_list_t *acquiry_errors,
      ewf_data_t **cached_data_section,
      liberror_error_t **error );
 
@@ -331,8 +331,8 @@ ssize_t libewf_write_io_handle_finalize(
          libfvalue_table_t *hash_values,
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
-         libewf_sector_table_t *sessions,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *sessions,
+         libewf_sector_list_t *acquiry_errors,
          libewf_chunk_cache_t *chunk_cache,
          liberror_error_t **error );
 

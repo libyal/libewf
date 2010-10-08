@@ -32,7 +32,7 @@
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
-#include "libewf_sector_table.h"
+#include "libewf_sector_list.h"
 
 #include "ewf_checksum.h"
 
@@ -46,7 +46,7 @@ struct libewf_read_io_handle
 {
 	/* The sectors with checksum errors
 	 */
-	libewf_sector_table_t *checksum_errors;
+	libewf_sector_list_t *checksum_errors;
 
 	/* A value to indicate if a chunk should be wiped on error
 	 */

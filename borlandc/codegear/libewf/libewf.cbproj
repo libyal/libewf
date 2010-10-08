@@ -201,9 +201,9 @@
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_section_list.h">
 			</None>
-			<CppCompile Include="..\..\..\libewf\libewf_sector_table.c">
+			<CppCompile Include="..\..\..\libewf\libewf_sector_list.c">
 			</CppCompile>
-			<None Include="..\..\..\libewf\libewf_sector_table.h">
+			<None Include="..\..\..\libewf\libewf_sector_list.h">
 			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_segment_file.c">
 			</CppCompile>

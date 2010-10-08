@@ -34,7 +34,7 @@
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_read_io_handle.h"
-#include "libewf_sector_table.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
 
 #include "ewf_checksum.h"
@@ -95,16 +95,15 @@ int libewf_read_io_handle_initialize(
 
 			return( -1 );
 		}
-		if( libewf_sector_table_initialize(
+		if( libewf_sector_list_initialize(
 		     &( ( *read_io_handle )->checksum_errors ),
-		     0,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create checksum errors.",
+			 "%s: unable to create checksum errors sector list.",
 			 function );
 
 			memory_free(
@@ -142,7 +141,7 @@ int libewf_read_io_handle_free(
 	}
 	if( *read_io_handle != NULL )
 	{
-		if( libewf_sector_table_free(
+		if( libewf_sector_list_free(
 		     &( ( *read_io_handle )->checksum_errors ),
 		     error ) != 1 )
 		{
@@ -150,7 +149,7 @@ int libewf_read_io_handle_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free checksum errors.",
+			 "%s: unable to free checksum errors sector list.",
 			 function );
 
 			result = -1;
@@ -933,7 +932,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 			{
 				number_of_sectors = (uint32_t) ( (int64_t) media_values->number_of_sectors - sector );
 			}
-			if( libewf_sector_table_append_sector(
+			if( libewf_sector_list_append_sector(
 			     read_io_handle->checksum_errors,
 			     sector,
 			     number_of_sectors,
@@ -944,7 +943,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append checksum error.",
+				 "%s: unable to append checksum error to sectors list.",
 				 function );
 
 				return( -1 );

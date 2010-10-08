@@ -33,7 +33,7 @@
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_section_list.h"
-#include "libewf_sector_table.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
 
@@ -221,7 +221,7 @@ ssize_t libewf_section_session_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
-         libewf_sector_table_t *sessions,
+         libewf_sector_list_t *sessions,
          size_t section_size,
          uint8_t ewf_format,
          liberror_error_t **error );
@@ -229,7 +229,7 @@ ssize_t libewf_section_session_read(
 ssize_t libewf_section_session_write(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_sector_table_t *sessions,
+         libewf_sector_list_t *sessions,
          liberror_error_t **error );
 
 ssize_t libewf_section_data_read(
@@ -253,7 +253,7 @@ ssize_t libewf_section_data_write(
 ssize_t libewf_section_error2_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *acquiry_errors,
          size_t section_size,
          uint8_t ewf_format,
          liberror_error_t **error );
@@ -261,7 +261,7 @@ ssize_t libewf_section_error2_read(
 ssize_t libewf_section_error2_write(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_sector_table_t *acquiry_errors,
+         libewf_sector_list_t *acquiry_errors,
          liberror_error_t **error );
 
 ssize_t libewf_section_digest_read(
@@ -365,8 +365,8 @@ int libewf_section_read(
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
+     libewf_sector_list_t *sessions,
+     libewf_sector_list_t *acquiry_errors,
      libewf_single_files_t *single_files,
      int8_t *compression_level,
      uint8_t *format,

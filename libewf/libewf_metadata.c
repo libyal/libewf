@@ -36,6 +36,7 @@
 #include "libewf_header_values.h"
 #include "libewf_libfvalue.h"
 #include "libewf_metadata.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
 #include "libewf_types.h"
@@ -1983,6 +1984,7 @@ int libewf_handle_get_number_of_acquiry_errors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_acquiry_errors";
+	int number_of_elements                    = 0;
 
 	if( handle == NULL )
 	{
@@ -1997,17 +1999,6 @@ int libewf_handle_get_number_of_acquiry_errors(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->acquiry_errors == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing acquiry errors.",
-		 function );
-
-		return( -1 );
-	}
 	if( number_of_errors == NULL )
 	{
 		liberror_error_set(
@@ -2019,7 +2010,32 @@ int libewf_handle_get_number_of_acquiry_errors(
 
 		return( -1 );
 	}
-	*number_of_errors = internal_handle->acquiry_errors->number_of_sectors;
+	if( libewf_sector_list_get_number_of_elements(
+	     internal_handle->acquiry_errors,
+	     &number_of_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from acquiry errors sector list.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_elements < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of elements value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_errors = (uint32_t) number_of_elements;
 
 	return( 1 );
 }
@@ -2034,8 +2050,9 @@ int libewf_handle_get_acquiry_error(
      uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
-	static char *function = "libewf_handle_get_acquiry_error";
-	int result            = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_acquiry_error";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -2048,9 +2065,11 @@ int libewf_handle_get_acquiry_error(
 
 		return( -1 );
 	}
-	result = libewf_sector_table_get_sector(
-	          ( (libewf_internal_handle_t *) handle )->acquiry_errors,
-	          index,
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	result = libewf_sector_list_get_sector(
+	          internal_handle->acquiry_errors,
+	          (int) index,
 	          first_sector,
 	          number_of_sectors,
 	          error );
@@ -2063,6 +2082,8 @@ int libewf_handle_get_acquiry_error(
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve acquiry error.",
 		 function );
+
+		return( -1 );
 	}
 	return( result );
 }
@@ -2089,7 +2110,7 @@ int libewf_handle_append_acquiry_error(
 
 		return( -1 );
 	}
-	if( libewf_sector_table_append_sector(
+	if( libewf_sector_list_append_sector(
 	     ( (libewf_internal_handle_t *) handle )->acquiry_errors,
 	     first_sector,
 	     number_of_sectors,
@@ -2118,6 +2139,7 @@ int libewf_handle_get_number_of_checksum_errors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_checksum_errors";
+	int number_of_elements                    = 0;
 
 	if( handle == NULL )
 	{
@@ -2143,17 +2165,6 @@ int libewf_handle_get_number_of_checksum_errors(
 
 		return( -1 );
 	}
-	if( internal_handle->read_io_handle->checksum_errors == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid read IO handle - missing checksum errors.",
-		 function );
-
-		return( -1 );
-	}
 	if( number_of_errors == NULL )
 	{
 		liberror_error_set(
@@ -2165,7 +2176,32 @@ int libewf_handle_get_number_of_checksum_errors(
 
 		return( -1 );
 	}
-	*number_of_errors = internal_handle->read_io_handle->checksum_errors->number_of_sectors;
+	if( libewf_sector_list_get_number_of_elements(
+	     internal_handle->read_io_handle->checksum_errors,
+	     &number_of_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from checksum errors sector list.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_elements < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of elements value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_errors = (uint32_t) number_of_elements;
 
 	return( 1 );
 }
@@ -2208,9 +2244,9 @@ int libewf_handle_get_checksum_error(
 
 		return( -1 );
 	}
-	result = libewf_sector_table_get_sector(
+	result = libewf_sector_list_get_sector(
 	          internal_handle->read_io_handle->checksum_errors,
-	          index,
+	          (int) index,
 	          first_sector,
 	          number_of_sectors,
 	          error );
@@ -2223,6 +2259,8 @@ int libewf_handle_get_checksum_error(
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve checksum error.",
 		 function );
+
+		return( -1 );
 	}
 	return( result );
 }
@@ -2263,7 +2301,7 @@ int libewf_handle_append_checksum_error(
 
 		return( -1 );
 	}
-	if( libewf_sector_table_append_sector(
+	if( libewf_sector_list_append_sector(
 	     internal_handle->read_io_handle->checksum_errors,
 	     first_sector,
 	     number_of_sectors,
@@ -2292,6 +2330,7 @@ int libewf_handle_get_number_of_sessions(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_sessions";
+	int number_of_elements                    = 0;
 
 	if( handle == NULL )
 	{
@@ -2306,17 +2345,6 @@ int libewf_handle_get_number_of_sessions(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->sessions == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing sessions.",
-		 function );
-
-		return( -1 );
-	}
 	if( number_of_sessions == NULL )
 	{
 		liberror_error_set(
@@ -2328,7 +2356,32 @@ int libewf_handle_get_number_of_sessions(
 
 		return( -1 );
 	}
-	*number_of_sessions = internal_handle->sessions->number_of_sectors;
+	if( libewf_sector_list_get_number_of_elements(
+	     internal_handle->sessions,
+	     &number_of_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from sessions sector list.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_elements < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of elements value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_sessions = (uint32_t) number_of_elements;
 
 	return( 1 );
 }
@@ -2343,8 +2396,9 @@ int libewf_handle_get_session(
      uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
-	static char *function = "libewf_handle_get_session";
-	int result            = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_session";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -2357,9 +2411,11 @@ int libewf_handle_get_session(
 
 		return( -1 );
 	}
-	result = libewf_sector_table_get_sector(
-	          ( (libewf_internal_handle_t *) handle )->sessions,
-	          index,
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	result = libewf_sector_list_get_sector(
+	          internal_handle->sessions,
+	          (int) index,
 	          first_sector,
 	          number_of_sectors,
 	          error );
@@ -2372,6 +2428,8 @@ int libewf_handle_get_session(
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve session.",
 		 function );
+
+		return( -1 );
 	}
 	return( result );
 }
@@ -2398,7 +2456,7 @@ int libewf_handle_append_session(
 
 		return( -1 );
 	}
-	if( libewf_sector_table_append_sector(
+	if( libewf_sector_list_append_sector(
 	     ( (libewf_internal_handle_t *) handle )->sessions,
 	     first_sector,
 	     number_of_sectors,

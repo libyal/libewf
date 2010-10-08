@@ -33,6 +33,7 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libfvalue.h"
+#include "libewf_sector_list.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
@@ -157,16 +158,15 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
-		if( libewf_sector_table_initialize(
+		if( libewf_sector_list_initialize(
 		     &( internal_handle->sessions ),
-		     0,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create sessions.",
+			 "%s: unable to create sessions sector list.",
 			 function );
 
 			libewf_chunk_cache_free(
@@ -183,19 +183,18 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
-		if( libewf_sector_table_initialize(
+		if( libewf_sector_list_initialize(
 		     &( internal_handle->acquiry_errors ),
-		     0,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create acquiry errors.",
+			 "%s: unable to create acquiry errors sector list.",
 			 function );
 
-			libewf_sector_table_free(
+			libewf_sector_list_free(
 			 &( internal_handle->sessions ),
 			 NULL );
 			libewf_chunk_cache_free(
@@ -303,7 +302,7 @@ int libewf_handle_free(
 
 			result = -1;
 		}
-		if( libewf_sector_table_free(
+		if( libewf_sector_list_free(
 		     &( internal_handle->sessions ),
 		     error ) != 1 )
 		{
@@ -311,12 +310,12 @@ int libewf_handle_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sessions.",
+			 "%s: unable to free sessions sector list.",
 			 function );
 
 			result = -1;
 		}
-		if( libewf_sector_table_free(
+		if( libewf_sector_list_free(
 		     &( internal_handle->acquiry_errors ),
 		     error ) != 1 )
 		{
@@ -324,7 +323,7 @@ int libewf_handle_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free acquiry errors.",
+			 "%s: unable to free acquiry errors sector list.",
 			 function );
 
 			result = -1;
@@ -2650,6 +2649,48 @@ int libewf_handle_close(
 			result = -1;
 		}
 	}
+	if( internal_handle->read_io_handle != NULL )
+	{
+		if( libewf_sector_list_empty(
+		     internal_handle->read_io_handle->checksum_errors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to empty checksum errors sector list.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( libewf_sector_list_empty(
+	     internal_handle->sessions,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty sessions sector list.",
+		 function );
+
+		result = -1;
+	}
+	if( libewf_sector_list_empty(
+	     internal_handle->acquiry_errors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty acquiry errors sector list.",
+		 function );
+
+		result = -1;
+	}
 	return( result );
 }
 
@@ -2675,6 +2716,56 @@ int libewf_handle_open_read(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->read_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing read IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_sector_list_empty(
+	     internal_handle->read_io_handle->checksum_errors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty checksum errors sector list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_sector_list_empty(
+	     internal_handle->sessions,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty sessions sector list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_sector_list_empty(
+	     internal_handle->acquiry_errors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty acquiry errors sector list.",
 		 function );
 
 		return( -1 );
