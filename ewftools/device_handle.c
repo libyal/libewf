@@ -925,6 +925,119 @@ int device_handle_get_information_value(
 	return( result );
 }
 
+/* Retrieves the number of sessions
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_number_of_sessions(
+     device_handle_t *device_handle,
+     int *number_of_sessions,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_number_of_sessions";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_get_number_of_errors(
+		     device_handle->dev_input_handle,
+		     number_of_sessions,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of sessions.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		if( number_of_sessions == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of sessions.",
+			 function );
+
+			return( -1 );
+		}
+		*number_of_sessions = 0;
+	}
+	return( 1 );
+}
+
+/* Retrieves the information of a session
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_session(
+     device_handle_t *device_handle,
+     int index,
+     off64_t *offset,
+     size64_t *size,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_session";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_get_error(
+		     device_handle->dev_input_handle,
+		     index,
+		     offset,
+		     size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve session: %d.",
+			 function,
+			 index );
+
+			return( -1 );
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the error values
  * Returns 1 if successful or -1 on error
  */
@@ -1067,7 +1180,7 @@ int device_handle_get_read_error(
      size64_t *size,
      liberror_error_t **error )
 {
-	static char *function = "device_handle_get_number_of_read_errors";
+	static char *function = "device_handle_get_read_error";
 
 	if( device_handle == NULL )
 	{
@@ -1093,8 +1206,9 @@ int device_handle_get_read_error(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of read errors.",
-			 function );
+			 "%s: unable to retrieve read error: %d.",
+			 function,
+			 index );
 
 			return( -1 );
 		}

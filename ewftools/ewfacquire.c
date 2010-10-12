@@ -2314,14 +2314,14 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			evidence_number = (libcstring_system_character_t *) memory_allocate(
-			                                                     sizeof( libcstring_system_character_t ) * 256 );
+			examiner_name = (libcstring_system_character_t *) memory_allocate(
+			                                                   sizeof( libcstring_system_character_t ) * 256 );
 
-			if( evidence_number == NULL )
+			if( examiner_name == NULL )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to create evidence number string.\n" );
+				 "Unable to create examiner name string.\n" );
 
 				error_abort = 1;
 			}
@@ -2362,14 +2362,14 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			examiner_name = (libcstring_system_character_t *) memory_allocate(
-			                                                   sizeof( libcstring_system_character_t ) * 256 );
+			evidence_number = (libcstring_system_character_t *) memory_allocate(
+			                                                     sizeof( libcstring_system_character_t ) * 256 );
 
-			if( examiner_name == NULL )
+			if( evidence_number == NULL )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to create examiner name string.\n" );
+				 "Unable to create evidence number string.\n" );
 
 				error_abort = 1;
 			}
@@ -3523,8 +3523,6 @@ int main( int argc, char * const argv[] )
 		if( ( ewfacquire_abort == 0 )
 		 && ( error_abort == 0 ) )
 		{
-			/* TODO for now just fake one session
-			 */
 			if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
 			{
 				if( media_size > (size_t) UINT32_MAX )
@@ -3539,6 +3537,8 @@ int main( int argc, char * const argv[] )
 
 					error_abort = 1;
 				}
+				/* TODO for now just fake one session
+				 */
 				if( imaging_handle_append_session(
 				     ewfacquire_imaging_handle,
 				     bytes_per_sector,

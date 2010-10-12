@@ -132,6 +132,18 @@ int device_handle_get_information_value(
      size_t information_value_size,
      liberror_error_t **error );
 
+int device_handle_get_number_of_sessions(
+     device_handle_t *device_handle,
+     int *number_of_sessions,
+     liberror_error_t **error );
+
+int device_handle_get_sessions(
+     device_handle_t *device_handle,
+     int index,
+     off64_t *offset,
+     size64_t *size,
+     liberror_error_t **error );
+
 int device_handle_set_error_values(
      device_handle_t *device_handle,
      uint8_t number_of_error_retries,

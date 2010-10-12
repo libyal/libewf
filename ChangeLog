@@ -141,6 +141,7 @@ Tools:
   - remove the cryptographic options if crypto library is missing
 * have failed on open return a more sensible error (extract from error)
 * ewfacquire
+  - code clean up: move imaging preferences into imaging handle
   - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
     no, although not set in EWF file, the granualarity is still used in handling read errors
   - warn if values exceed maximum segment count
@@ -222,6 +223,9 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20101012
+* updated libsmdev
 
 20101008
 * updated libbfio, libsmdev
@@ -2772,7 +2776,7 @@ Test:
 20060910
 * worked on code clean up and improved error handling
 * renamed file_read and file_write to read and write
-* ewfaquire: add offset and size question
+* ewfacquire: add offset and size question
 * write: add offset and size support in write function
 * added lseek to common, removed off_t from code
 * ewfacquire: added nice byte print for status
@@ -2964,7 +2968,7 @@ Test:
 * fixed media size bug - old method of calculation was still in there :-(
 * worked on ewfacquire read on error
 * added alternative write method to test acquired images against existing tooling
-* ewfaquire: able to produce exact media data as linen
+* ewfacquire: able to produce exact media data as linen
 * write: what if read error is in last chunk and it is smaller than chunk size !?
 
 20060517

@@ -51,6 +51,28 @@ typedef struct imaging_handle imaging_handle_t;
 
 struct imaging_handle
 {
+#ifdef REFACTOR
+	/* The case number header value
+	 */
+	libcstring_system_character_t *case_number;
+
+	/* The description header value
+	 */
+	libcstring_system_character_t *description;
+
+	/* The evidence number header value
+	 */
+	libcstring_system_character_t *evidence_number;
+
+	/* The examiner name header value
+	 */
+	libcstring_system_character_t *examiner_name;
+
+	/* The notes header value
+	 */
+	libcstring_system_character_t *notes;
+#endif
+
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
 	uint8_t calculate_md5;
