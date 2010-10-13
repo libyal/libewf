@@ -1,4 +1,4 @@
-.Dd September 29, 2010
+.Dd October 13, 2010
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -56,7 +56,7 @@ currently does not support the Logical Volume format (EWF-L01). EWF-X is an expi
 allows you to read and write media data in the EWF format.
 .Pp
 .Ar source
-the source file or device
+the source file(s) or device
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -138,10 +138,25 @@ None
 None
 .Sh EXAMPLES
 .Nm ewfacquire
+can either image devices or RAW file(s).
+.Nm ewfacquire
+will try to detect device information, but results may vary per platform.
+In attended mode (default)
+.Nm ewfacquire
 will ask for the information it requires.
+.Ss To image a floppy:
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20100929
+ewfacquire 20101013
+
+Device information:
+Bus type:		
+Vendor:			Y-E DATA
+Model:			USB-FDU
+Serial:			
+
+Storage media information:
+Media size:		1.4 MB (1474560 bytes)
 
 Information about acquiry required, please provide the necessary input
 Image path and filename without extension: floppy
@@ -202,6 +217,18 @@ Acquiry completed at: Sat Feb 28 11:32:42 2009
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
 MD5 hash calculated over data: ae1ce8f5ac079d3ee93f97fe3792bda3
+
+.Ed
+.Ss To convert a split RAW image into an EWF image:
+.Bd -literal
+# ewfacquire usb256.raw.0??
+ewfacquire 20101013
+
+Storage media information:
+Media size:             262 MB (262144000 bytes)
+
+.Dl ...
+
 .Ed
 .Sh DIAGNOSTICS
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.

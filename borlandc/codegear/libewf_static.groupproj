@@ -1,0 +1,228 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{300D3777-05D4-4B99-A889-67A010B63D04}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="libcstring\libcstring.cbproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="liberror\liberror.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libnotify\libnotify.cbproj">
+				<Dependencies>liberror\liberror.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libuna\libuna.cbproj">
+				<Dependencies>liberror\liberror.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libbfio\libbfio.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libmfdata\libmfdata.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libbfio\libbfio.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libfvalue\libfvalue.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="zlib\zlib_static.cbproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="libewf\libewf_static.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib_static.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libsmdev\libsmdev.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libsmraw\libsmraw.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libmfdata\libmfdata.cbproj;libfvalue\libfvalue.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libsystem\libsystem.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="ewfacquire\ewfacquire_static.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libsmdev\libsmdev.cbproj;libsmraw\libsmraw.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="ewfacquirestream\ewfacquirestream_static.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="ewfexport\ewfexport_static.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="ewfinfo\ewfinfo_static.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="ewfverify\ewfverify_static.cbproj">
+				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="libcstring">
+			<MSBuild Projects="libcstring\libcstring.cbproj"/>
+		</Target>
+		<Target Name="libcstring:Clean">
+			<MSBuild Targets="Clean" Projects="libcstring\libcstring.cbproj"/>
+		</Target>
+		<Target Name="libcstring:Make">
+			<MSBuild Targets="Make" Projects="libcstring\libcstring.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring" Name="liberror">
+			<MSBuild Projects="liberror\liberror.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean" Name="liberror:Clean">
+			<MSBuild Targets="Clean" Projects="liberror\liberror.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make" Name="liberror:Make">
+			<MSBuild Targets="Make" Projects="liberror\liberror.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror" Name="libnotify">
+			<MSBuild Projects="libnotify\libnotify.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean" Name="libnotify:Clean">
+			<MSBuild Targets="Clean" Projects="libnotify\libnotify.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make" Name="libnotify:Make">
+			<MSBuild Targets="Make" Projects="libnotify\libnotify.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror" Name="libuna">
+			<MSBuild Projects="libuna\libuna.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean" Name="libuna:Clean">
+			<MSBuild Targets="Clean" Projects="libuna\libuna.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make" Name="libuna:Make">
+			<MSBuild Targets="Make" Projects="libuna\libuna.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libuna;libcstring" Name="libbfio">
+			<MSBuild Projects="libbfio\libbfio.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libcstring:Clean" Name="libbfio:Clean">
+			<MSBuild Targets="Clean" Projects="libbfio\libbfio.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libuna:Make;libcstring:Make" Name="libbfio:Make">
+			<MSBuild Targets="Make" Projects="libbfio\libbfio.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libbfio" Name="libmfdata">
+			<MSBuild Projects="libmfdata\libmfdata.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libbfio:Clean" Name="libmfdata:Clean">
+			<MSBuild Targets="Clean" Projects="libmfdata\libmfdata.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libbfio:Make" Name="libmfdata:Make">
+			<MSBuild Targets="Make" Projects="libmfdata\libmfdata.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna" Name="libfvalue">
+			<MSBuild Projects="libfvalue\libfvalue.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean" Name="libfvalue:Clean">
+			<MSBuild Targets="Clean" Projects="libfvalue\libfvalue.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make" Name="libfvalue:Make">
+			<MSBuild Targets="Make" Projects="libfvalue\libfvalue.cbproj"/>
+		</Target>
+		<Target Name="zlib_static">
+			<MSBuild Projects="zlib\zlib_static.cbproj"/>
+		</Target>
+		<Target Name="zlib_static:Clean">
+			<MSBuild Targets="Clean" Projects="zlib\zlib_static.cbproj"/>
+		</Target>
+		<Target Name="zlib_static:Make">
+			<MSBuild Targets="Make" Projects="zlib\zlib_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna;libbfio;libfvalue;zlib_static" Name="libewf_static">
+			<MSBuild Projects="libewf\libewf_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libfvalue:Clean;zlib_static:Clean" Name="libewf_static:Clean">
+			<MSBuild Targets="Clean" Projects="libewf\libewf_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libfvalue:Make;zlib_static:Make" Name="libewf_static:Make">
+			<MSBuild Targets="Make" Projects="libewf\libewf_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libnotify;libuna;libcstring" Name="libsmdev">
+			<MSBuild Projects="libsmdev\libsmdev.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libnotify:Clean;libuna:Clean;libcstring:Clean" Name="libsmdev:Clean">
+			<MSBuild Targets="Clean" Projects="libsmdev\libsmdev.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libnotify:Make;libuna:Make;libcstring:Make" Name="libsmdev:Make">
+			<MSBuild Targets="Make" Projects="libsmdev\libsmdev.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna;libbfio;libmfdata;libfvalue" Name="libsmraw">
+			<MSBuild Projects="libsmraw\libsmraw.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libmfdata:Clean;libfvalue:Clean" Name="libsmraw:Clean">
+			<MSBuild Targets="Clean" Projects="libsmraw\libsmraw.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libmfdata:Make;libfvalue:Make" Name="libsmraw:Make">
+			<MSBuild Targets="Make" Projects="libsmraw\libsmraw.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libuna;libcstring" Name="libsystem">
+			<MSBuild Projects="libsystem\libsystem.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libcstring:Clean" Name="libsystem:Clean">
+			<MSBuild Targets="Clean" Projects="libsystem\libsystem.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libuna:Make;libcstring:Make" Name="libsystem:Make">
+			<MSBuild Targets="Make" Projects="libsystem\libsystem.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libnotify;libuna;libbfio;libewf_static;libsmdev;libsmraw;libsystem;libcstring" Name="ewfacquire_static">
+			<MSBuild Projects="ewfacquire\ewfacquire_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libewf_static:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;libcstring:Clean" Name="ewfacquire_static:Clean">
+			<MSBuild Targets="Clean" Projects="ewfacquire\ewfacquire_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libewf_static:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;libcstring:Make" Name="ewfacquire_static:Make">
+			<MSBuild Targets="Make" Projects="ewfacquire\ewfacquire_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfacquirestream_static">
+			<MSBuild Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libcstring:Clean" Name="ewfacquirestream_static:Clean">
+			<MSBuild Targets="Clean" Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfacquirestream_static:Make">
+			<MSBuild Targets="Make" Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfexport_static">
+			<MSBuild Projects="ewfexport\ewfexport_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libcstring:Clean" Name="ewfexport_static:Clean">
+			<MSBuild Targets="Clean" Projects="ewfexport\ewfexport_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfexport_static:Make">
+			<MSBuild Targets="Make" Projects="ewfexport\ewfexport_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfinfo_static">
+			<MSBuild Projects="ewfinfo\ewfinfo_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libcstring:Clean" Name="ewfinfo_static:Clean">
+			<MSBuild Targets="Clean" Projects="ewfinfo\ewfinfo_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfinfo_static:Make">
+			<MSBuild Targets="Make" Projects="ewfinfo\ewfinfo_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfverify_static">
+			<MSBuild Projects="ewfverify\ewfverify_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libcstring:Clean" Name="ewfverify_static:Clean">
+			<MSBuild Targets="Clean" Projects="ewfverify\ewfverify_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfverify_static:Make">
+			<MSBuild Targets="Make" Projects="ewfverify\ewfverify_static.cbproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="libcstring;liberror;libnotify;libuna;libbfio;libmfdata;libfvalue;zlib_static;libewf_static;libsmdev;libsmraw;libsystem;ewfacquire_static;ewfacquirestream_static;ewfexport_static;ewfinfo_static;ewfverify_static"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libmfdata:Clean;libfvalue:Clean;zlib_static:Clean;libewf_static:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;ewfacquire_static:Clean;ewfacquirestream_static:Clean;ewfexport_static:Clean;ewfinfo_static:Clean;ewfverify_static:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libmfdata:Make;libfvalue:Make;zlib_static:Make;libewf_static:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;ewfacquire_static:Make;ewfacquirestream_static:Make;ewfexport_static:Make;ewfinfo_static:Make;ewfverify_static:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>

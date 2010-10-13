@@ -48,14 +48,8 @@ extern "C" {
 
 enum DEVICE_HANDLE_TYPES
 {
-	DEVICE_HANDLE_TYPE_DEVICE	= (int) 'd',
-	DEVICE_HANDLE_TYPE_FILE		= (int) 'f'
-};
-
-enum DEVICE_TYPES
-{
-	DEVICE_TYPE_HARDDISK		= (int) 'h',
-	DEVICE_TYPE_OPTICAL_DISK	= (int) 'o'
+	DEVICE_HANDLE_TYPE_DEVICE	= (uint8_t) 'd',
+	DEVICE_HANDLE_TYPE_FILE		= (uint8_t) 'f'
 };
 
 typedef struct device_handle device_handle_t;
@@ -64,7 +58,7 @@ struct device_handle
 {
 	/* The device handle type
 	 */
-	int type;
+	uint8_t type;
 
 	/* libsmdev input handle
 	 */
@@ -109,6 +103,11 @@ off64_t device_handle_seek_offset(
          int whence,
          liberror_error_t **error );
 
+int device_handle_get_type(
+     device_handle_t *device_handle,
+     uint8_t *type,
+     liberror_error_t **error );
+
 int device_handle_get_media_size(
      device_handle_t *device_handle,
      size64_t *media_size,
@@ -137,7 +136,7 @@ int device_handle_get_number_of_sessions(
      int *number_of_sessions,
      liberror_error_t **error );
 
-int device_handle_get_sessions(
+int device_handle_get_session(
      device_handle_t *device_handle,
      int index,
      off64_t *offset,
@@ -169,6 +168,11 @@ int device_handle_media_information_fprint(
      liberror_error_t **error );
 
 int device_handle_read_errors_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
+     liberror_error_t **error );
+
+int device_handle_sessions_fprint(
      device_handle_t *device_handle,
      FILE *stream,
      liberror_error_t **error );

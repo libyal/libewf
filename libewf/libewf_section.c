@@ -2126,9 +2126,6 @@ ssize_t libewf_section_volume_e01_write(
 	               sizeof( ewf_volume_t ),
 	               error );
 
-	memory_free(
-	 volume );
-
 	if( write_count != (ssize_t) sizeof( ewf_volume_t ) )
 	{
 		liberror_error_set(
@@ -2138,8 +2135,14 @@ ssize_t libewf_section_volume_e01_write(
 		 "%s: unable to write volume to file.",
 		 function );
 
+		memory_free(
+		 volume );
+
 		return( -1 );
 	}
+	memory_free(
+	 volume );
+
 	section_write_count += write_count;
 
 	if( ( no_section_append == 0 )
@@ -4061,7 +4064,7 @@ ssize_t libewf_section_session_read(
 			}
 			if( media_values->number_of_sectors > last_first_sector )
 			{
-				number_of_sectors = media_values->number_of_sectors - last_first_sector;
+				number_of_sectors = (uint32_t) ( media_values->number_of_sectors - last_first_sector );
 			}
 			else
 			{

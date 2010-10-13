@@ -150,6 +150,7 @@ Tools:
   - warn if media does not fit using chunk size or APIv1
     a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
   - for EnCase 6 format request serial number and model if not set ?
+  - add support to enter sessions for optical images
 * ewfacquirestream
   - add parameter to set sector size?
   - allow user to set bytes per sector for raw file conversion
@@ -224,8 +225,15 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20101013
+* worked on optical media session detection for Linux
+* fixed bug in header string generation function
+* updated libsmdev, libbfio
+* added static codegear project files
+
 20101012
 * updated libsmdev
+* worked on optical media session detection for Linux
 
 20101008
 * updated libbfio, libsmdev

@@ -38,15 +38,22 @@ BUILDER5_FILES = \
 
 CODEGEAR_FILES = \
 	codegear/ewfacquire/ewfacquire.cbproj \
+	codegear/ewfacquire/ewfacquire_static.cbproj \
 	codegear/ewfacquirestream/ewfacquirestream.cbproj \
+	codegear/ewfacquirestream/ewfacquirestream_static.cbproj \
 	codegear/ewfexport/ewfexport.cbproj \
+	codegear/ewfexport/ewfexport_static.cbproj \
 	codegear/ewfinfo/ewfinfo.cbproj \
+	codegear/ewfinfo/ewfinfo_static.cbproj \
 	codegear/ewfverify/ewfverify.cbproj \
+	codegear/ewfverify/ewfverify_static.cbproj \
 	codegear/libbfio/libbfio.cbproj \
 	codegear/libcstring/libcstring.cbproj \
 	codegear/liberror/liberror.cbproj \
 	codegear/libewf/libewf.cbproj \
+	codegear/libewf/libewf_static.cbproj \
 	codegear/libewf.groupproj \
+	codegear/libewf_static.groupproj \
 	codegear/libfvalue/libfvalue.cbproj \
 	codegear/libmfdata/libmfdata.cbproj \
 	codegear/libnotify/libnotify.cbproj \
@@ -54,7 +61,8 @@ CODEGEAR_FILES = \
 	codegear/libsmraw/libsmraw.cbproj \
 	codegear/libsystem/libsystem.cbproj \
 	codegear/libuna/libuna.cbproj \
-	codegear/zlib/zlib.cbproj
+	codegear/zlib/zlib.cbproj \
+	codegear/zlib/zlib_static.cbproj
 
 EXTRA_DIST = \
 	$(BUILDER5_FILES) \

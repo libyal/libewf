@@ -128,7 +128,7 @@ void usage_fprint(
 	                 "                  [ -r read_error_retries ] [ -S segment_file_size ]\n"
 	                 "                  [ -t target ] [ -2 secondary_target ] [ -hqRsuvVw ] source\n\n" );
 
-	fprintf( stream, "\tsource: the source file or device\n\n" );
+	fprintf( stream, "\tsource: the source file(s) or device\n\n" );
 
 	fprintf( stream, "\t-A:     codepage of header section, options: ascii (default),\n"
 	                 "\t        windows-874, windows-1250, windows-1251, windows-1252,\n"
@@ -715,6 +715,132 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	 "\n" );
 
 	return( input_confirmed );
+}
+
+/* Determines the sessions of an optical disc using the device handle
+ * and appends them to the imaging handle, if the device is a file
+ * a single session is simulated
+ * Returns 1 if successful or -1 on error
+ */
+int ewfacquire_determine_sessions(
+     imaging_handle_t *imaging_handle,
+     device_handle_t *device_handle,
+     uint32_t bytes_per_sector,
+     uint64_t media_size,
+     liberror_error_t **error )
+{
+	static char *function  = "ewfacquire_determine_sessions";
+	off64_t session_offset = 0;
+	size64_t session_size  = 0;
+	uint8_t type           = 0;
+	int number_of_sessions = 0;
+	int session_index      = 0;
+
+	if( media_size > (uint64_t) UINT32_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid media size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle_get_number_of_sessions(
+	     device_handle,
+	     &number_of_sessions,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of sessions.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_sessions == 0 )
+	{
+		if( device_handle_get_type(
+		     device_handle,
+		     &type,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve device handle type.",
+			 function );
+
+			return( -1 );
+		}
+		if( type != DEVICE_HANDLE_TYPE_FILE )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to determine number of session on optical disc - defaulting to single session.\n" );
+		}
+		if( imaging_handle_append_session(
+		     ewfacquire_imaging_handle,
+		     (off64_t) bytes_per_sector,
+		     (size64_t) media_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to append session to imaging handle.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		for( session_index = 0;
+		     session_index < number_of_sessions;
+		     session_index++ )
+		{
+			if( device_handle_get_session(
+			     device_handle,
+			     session_index,
+			     &session_offset,
+			     &session_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve session: %d from device handle.",
+				 function,
+				 session_index );
+
+				return( -1 );
+			}
+			if( imaging_handle_append_session(
+			     imaging_handle,
+			     session_offset,
+			     session_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append session: %d to imaging handle.",
+				 function,
+				 session_index );
+
+				return( -1 );
+			}
+		}
+	}
+	return( 1 );
 }
 
 /* Reads data from a file descriptor and writes it in EWF format
@@ -1953,10 +2079,6 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	/* TODO test if argument is file or device
-	 * move test into imaging handle ?
-	 */
-
 	/* Open the input file or device size
 	 */
 	if( device_handle_open_input(
@@ -1967,8 +2089,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open file or device: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-		 argv[ optind ] );
+		 "Unable to open file(s) or device.\n" );
 
 		libsystem_notify_print_error_backtrace(
 		 error );
@@ -3525,29 +3646,16 @@ int main( int argc, char * const argv[] )
 		{
 			if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
 			{
-				if( media_size > (size_t) UINT32_MAX )
-				{
-					fprintf(
-					 stderr,
-					 "Invalid media size value out of bounds to append session.\n" );
-
-					imaging_handle_close(
-					 ewfacquire_imaging_handle,
-					 NULL );
-
-					error_abort = 1;
-				}
-				/* TODO for now just fake one session
-				 */
-				if( imaging_handle_append_session(
+				if( ewfacquire_determine_sessions(
 				     ewfacquire_imaging_handle,
+				     ewfacquire_device_handle,
 				     bytes_per_sector,
 				     media_size,
 				     &error ) != 1 )
 				{
 					fprintf(
 					 stderr,
-					 "Unable to append session.\n" );
+					 "Unable to determine sessions.\n" );
 
 					imaging_handle_close(
 					 ewfacquire_imaging_handle,

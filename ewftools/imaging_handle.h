@@ -257,16 +257,16 @@ int imaging_handle_set_hash_value(
      liberror_error_t **error );
 
 int imaging_handle_append_read_error(
-      imaging_handle_t *imaging_handle,
-      off64_t start_offset,
-      size64_t number_of_bytes,
-      liberror_error_t **error );
+     imaging_handle_t *imaging_handle,
+     off64_t start_offset,
+     size64_t number_of_bytes,
+     liberror_error_t **error );
 
 int imaging_handle_append_session(
-      imaging_handle_t *imaging_handle,
-      off64_t start_offset,
-      size64_t number_of_bytes,
-      liberror_error_t **error );
+     imaging_handle_t *imaging_handle,
+     off64_t start_offset,
+     size64_t number_of_bytes,
+     liberror_error_t **error );
 
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,

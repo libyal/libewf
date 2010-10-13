@@ -627,6 +627,43 @@ off64_t device_handle_seek_offset(
 	return( offset );
 }
 
+/* Retrieves the type
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_type(
+     device_handle_t *device_handle,
+     uint8_t *type,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_type";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( type == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid type.",
+		 function );
+
+		return( -1 );
+	}
+	*type = device_handle->type;
+
+	return( 1 );
+}
+
 /* Retrieves the media size
  * Returns 1 if successful or -1 on error
  */
@@ -948,7 +985,7 @@ int device_handle_get_number_of_sessions(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_number_of_errors(
+		if( libsmdev_handle_get_number_of_sessions(
 		     device_handle->dev_input_handle,
 		     number_of_sessions,
 		     error ) != 1 )
@@ -1006,7 +1043,7 @@ int device_handle_get_session(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_error(
+		if( libsmdev_handle_get_session(
 		     device_handle->dev_input_handle,
 		     index,
 		     offset,
@@ -1237,13 +1274,14 @@ int device_handle_media_information_fprint(
 {
 	uint8_t media_information_value[ 64 ];
 
-        libcstring_system_character_t media_size_string[ 16 ];
+        libcstring_system_character_t byte_size_string[ 16 ];
 
-	static char *function = "device_handle_media_information_fprint";
-	size64_t media_size   = 0;
-	uint8_t bus_type      = 0;
-	uint8_t media_type    = 0;
-	int result            = 0;
+	static char *function     = "device_handle_media_information_fprint";
+	size64_t media_size       = 0;
+	uint32_t bytes_per_sector = 0;
+	uint8_t bus_type          = 0;
+	uint8_t media_type        = 0;
+	int result                = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1462,41 +1500,23 @@ int device_handle_media_information_fprint(
 		fprintf(
 		 stream,
 		 "\n" );
-
-		if( libsmdev_handle_get_media_size(
-		     device_handle->dev_input_handle,
-		     &media_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media size from device input handle.",
-			 function );
-
-			return( -1 );
-		}
 	}
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	if( device_handle_get_media_size(
+	     device_handle,
+	     &media_size,
+	     error ) != 1 )
 	{
-		if( libsmraw_handle_get_media_size(
-		     device_handle->raw_input_handle,
-		     &media_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media size from raw input handle.",
-			 function );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media size.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	result = byte_size_string_create(
-		  media_size_string,
+		  byte_size_string,
 		  16,
 		  media_size,
 		  BYTE_SIZE_STRING_UNIT_MEGABYTE,
@@ -1507,7 +1527,7 @@ int device_handle_media_information_fprint(
 		fprintf(
 		 stream,
 		 "Media size:\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
-		 media_size_string,
+		 byte_size_string,
 		 media_size );
 	}
 	else
@@ -1516,6 +1536,59 @@ int device_handle_media_information_fprint(
 		 stream,
 		 "Media size:\t\t%" PRIu64 " bytes\n",
 		 media_size );
+	}
+	if( media_type == LIBSMDEV_MEDIA_TYPE_OPTICAL )
+	{
+		if( libsmdev_handle_get_bytes_per_sector(
+		     device_handle->dev_input_handle,
+		     &bytes_per_sector,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
+
+			return( -1 );
+		}
+		result = byte_size_string_create(
+			  byte_size_string,
+			  16,
+			  (uint64_t) bytes_per_sector,
+			  BYTE_SIZE_STRING_UNIT_MEGABYTE,
+			  NULL );
+
+		if( result == 1 )
+		{
+			fprintf(
+			 stream,
+			 "Bytes per sector:\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu32 " bytes)\n",
+			 byte_size_string,
+			 bytes_per_sector );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "Bytes per sector:\t%" PRIu32 " bytes\n",
+			 bytes_per_sector );
+		}
+		if( device_handle_sessions_fprint(
+		     device_handle,
+		     stream,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print sessions.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	fprintf(
 	 stream,
@@ -1537,7 +1610,7 @@ int device_handle_read_errors_fprint(
 	size64_t read_error_size  = 0;
 	uint32_t bytes_per_sector = 0;
 	int number_of_read_errors = 0;
-	int read_error_iterator   = 0;
+	int read_error_index      = 0;
 	int result                = 1;
 
 	if( device_handle == NULL )
@@ -1613,13 +1686,13 @@ int device_handle_read_errors_fprint(
 			 "\ttotal number: %d\n",
 			 number_of_read_errors );
 			
-			for( read_error_iterator = 0;
-			     read_error_iterator < number_of_read_errors;
-			     read_error_iterator++ )
+			for( read_error_index = 0;
+			     read_error_index < number_of_read_errors;
+			     read_error_index++ )
 			{
 				if( libsmdev_handle_get_error(
 				     device_handle->dev_input_handle,
-				     read_error_iterator,
+				     read_error_index,
 				     &read_error_offset,
 				     &read_error_size,
 				     error ) != 1 )
@@ -1630,7 +1703,7 @@ int device_handle_read_errors_fprint(
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 					 "%s: unable to retrieve read error: %d.",
 					 function,
-					 read_error_iterator );
+					 read_error_index );
 
 					result = -1;
 				}
@@ -1644,6 +1717,135 @@ int device_handle_read_errors_fprint(
 					 read_error_size / bytes_per_sector,
 					 read_error_offset,
 					 read_error_size );
+				}
+			}
+			fprintf(
+			 stream,
+			 "\n" );
+		}
+	}
+	return( result );
+}
+
+/* Print the sessions to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_sessions_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
+     liberror_error_t **error )
+{
+	static char *function     = "device_handle_sessions_fprint";
+	off64_t session_offset    = 0;
+	size64_t session_size     = 0;
+	uint32_t bytes_per_sector = 0;
+	int number_of_sessions    = 0;
+	int session_index         = 0;
+	int result                = 1;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+		if( libsmdev_handle_get_bytes_per_sector(
+		     device_handle->dev_input_handle,
+		     &bytes_per_sector,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
+
+			return( -1 );
+		}
+		if( bytes_per_sector == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid bytes per sector returned.",
+			 function );
+
+			return( -1 );
+		}
+		if( libsmdev_handle_get_number_of_sessions(
+		     device_handle->dev_input_handle,
+		     &number_of_sessions,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of sessions.",
+			 function );
+
+			return( -1 );
+		}
+		if( number_of_sessions > 0 )
+		{
+			fprintf(
+			 stream,
+			 "Sessions:\n" );
+			
+			fprintf(
+			 stream,
+			 "\ttotal number: %d\n",
+			 number_of_sessions );
+
+			for( session_index = 0;
+			     session_index < number_of_sessions;
+			     session_index++ )
+			{
+				if( libsmdev_handle_get_session(
+				     device_handle->dev_input_handle,
+				     session_index,
+				     &session_offset,
+				     &session_size,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve session: %d.",
+					 function,
+					 session_index );
+
+					result = -1;
+				}
+				else
+				{
+					fprintf(
+					 stream,
+					 "\tat sector(s): %" PRIi64 " - %" PRIi64 " number: %" PRIu64 "\n",
+					 session_offset / bytes_per_sector,
+					 ( session_offset + session_size ) / bytes_per_sector,
+					 session_size / bytes_per_sector );
 				}
 			}
 			fprintf(

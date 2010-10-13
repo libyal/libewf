@@ -3306,6 +3306,8 @@ int libewf_header_values_generate_utf8_header_string(
 			if( model_string_length > 0 )
 			{
 				model_string_length -= 1;
+
+				*header_string_size += model_string_length;
 			}
 		}
 		if( serial_number_header_value != NULL )
@@ -3340,6 +3342,8 @@ int libewf_header_values_generate_utf8_header_string(
 			if( serial_number_string_length > 0 )
 			{
 				serial_number_string_length -= 1;
+
+				*header_string_size += serial_number_string_length;
 			}
 		}
 	}
@@ -3378,6 +3382,8 @@ int libewf_header_values_generate_utf8_header_string(
 			if( unknown_dc_string_length > 0 )
 			{
 				unknown_dc_string_length -= 1;
+
+				*header_string_size += unknown_dc_string_length;
 			}
 		}
 	}
