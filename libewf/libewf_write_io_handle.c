@@ -739,12 +739,13 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	/* Set offset into media data
 	 */
+	io_handle->current_offset       = (off64_t) offset_table->last_chunk_value_compared * media_values->chunk_size;
 	io_handle->current_chunk        = offset_table->last_chunk_value_compared;
 	io_handle->current_chunk_offset = 0;
 
 	/* Set write IO handle values
 	 */
-	write_io_handle->input_write_count        = offset_table->last_chunk_value_compared * media_values->chunk_size;
+	write_io_handle->input_write_count        = (ssize64_t) io_handle->current_offset;
 	write_io_handle->number_of_chunks_written = offset_table->last_chunk_value_compared;
 	write_io_handle->write_finalized          = 0;
 
@@ -3952,6 +3953,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 
 			return( -1 );
 		}
+		io_handle->current_offset      += chunk_offset;
 		io_handle->current_chunk_offset = chunk_offset;
 
 		remaining_chunk_size = media_values->chunk_size
@@ -4269,7 +4271,6 @@ ssize_t libewf_write_io_handle_finalize(
 			 chunk_cache->data_size );
 		}
 #endif
-
 		write_count = libewf_write_io_handle_write_new_chunk_data(
 		               write_io_handle,
 		               io_handle,
@@ -4303,6 +4304,15 @@ ssize_t libewf_write_io_handle_finalize(
 			return( -1 );
 		}
 		write_finalize_count += write_count;
+
+		io_handle->current_offset       += (off64_t) write_count;
+		io_handle->current_chunk_offset += (uint32_t) write_count;
+
+		if( io_handle->current_chunk_offset == media_values->chunk_size )
+		{
+			io_handle->current_chunk_offset = 0;
+			io_handle->current_chunk       += 1;
+		}
 	}
 	/* Check if all the media data has been written
 	 */

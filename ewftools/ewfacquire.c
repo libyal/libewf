@@ -122,11 +122,12 @@ void usage_fprint(
 	                 "                  [ -B number_of_bytes ] [ -c compression_type ]\n"
 	                 "                  [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
 	                 "                  [ -e examiner_name ] [ -E evidence_number ] [ -f format ]\n"
-	                 "                  [ -g number_of_sectors ] [ -l log_filename ] [ -m media_type ]\n"
-	                 "                  [ -M media_flags ] [ -N notes ] [ -o offset ]\n"
-	                 "                  [ -p process_buffer_size ] [ -P bytes_per_sector ]\n"
-	                 "                  [ -r read_error_retries ] [ -S segment_file_size ]\n"
-	                 "                  [ -t target ] [ -2 secondary_target ] [ -hqRsuvVw ] source\n\n" );
+	                 "                  [ -g number_of_sectors ] [ -l log_filename ]\n"
+	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
+	                 "                  [ -o offset ] [ -p process_buffer_size ]\n"
+	                 "                  [ -P bytes_per_sector ] [ -r read_error_retries ]\n"
+	                 "                  [ -S segment_file_size ] [ -t target ]\n"
+	                 "                  [ -2 secondary_target ] [ -hqRsuvVw ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file(s) or device\n\n" );
 
@@ -141,7 +142,7 @@ void usage_fprint(
 	fprintf( stream, "\t-c:     specify the compression type, options: none (default),\n"
 	                 "\t        empty-block, fast or best\n" );
 	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
-	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options:"
+	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options:\n"
 	                 "\t        sha1\n" );
 	fprintf( stream, "\t-D:     specify the description (default is description).\n" );
 	fprintf( stream, "\t-e:     specify the examiner name (default is examiner_name).\n" );

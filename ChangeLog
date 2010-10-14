@@ -1,15 +1,6 @@
 TODO
-* UTF-16 support
-  - libfvalue: move type and flags from initialize
-    allow value to have identifier but no type ?
-    combine type with data ?
-
 * single file entry:
   - are flags similar to file attribute flags ?
-
-* move sections into separate objects ?
-
-* rename section_list to section_value ?
 
 * configure validate libuna and libbfio check
 * documentation:
@@ -20,7 +11,6 @@ TODO
 
 Roadmap:
 * code clean up
-  - implement libmfdata
 * improve python bindings
 * improve device handle (libsmdev)
 * support missing segment files (chunks)
@@ -45,6 +35,12 @@ Roadmap:
   - protect reading when writing to internal data structures
   - thread safe functions
   - check for race conditions especially on change of data elements
+
+Code clean up:
+* implement libmfdata
+* move sections into separate objects ?
+* rename section_list to section_value ?
+* clean up ewfacquire: move imaging preferences into imaging handle
 
 Further analysis of the EWF format:
 * password hash
@@ -134,7 +130,6 @@ Tools:
   - remove the cryptographic options if crypto library is missing
 * have failed on open return a more sensible error (extract from error)
 * ewfacquire
-  - code clean up: move imaging preferences into imaging handle
   - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
     no, although not set in EWF file, the granualarity is still used in handling read errors
   - warn if values exceed maximum segment count
@@ -209,7 +204,9 @@ Work in progress:
 * check make distclean
 
 Deprecated functions
-* add BORLANDC deprecated function support
+* add BORLANDC deprecated function support, unable to find suitable macro
+  #pragma deprecated( function )
+  __declspec(deprecated)
 
 Next stable release:
 * full test
@@ -220,12 +217,14 @@ Test:
 
 20101014
 * updated codegear project files
-* updated liberror, libbfio
+* updated liberror, libbfio, libmfdata, libsmraw
 * worked on pyewf
   - fixed multiple bugs
   - added error handling
   - removed stub of pyewf_set_notify_values
   - implemented pyewf_glob
+* added seek test
+* fixed complex seek scenario
 
 20101013
 * worked on optical media session detection for Linux

@@ -41,6 +41,10 @@ struct libewf_io_handle
 	 */
 	uint8_t flags;
 
+	/* The current offset
+	 */
+	off64_t current_offset;
+
 	/* The current chunk
 	 */
 	uint32_t current_chunk;

@@ -14,6 +14,7 @@ endif
 TESTS = \
 	test_glob.sh \
 	test_read.sh \
+	test_seek.sh \
 	test_ewfverify.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
@@ -22,6 +23,7 @@ TESTS = \
 check_SCRIPTS = \
 	test_glob.sh \
 	test_read.sh \
+	test_seek.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
 	test_ewfverify.sh \
@@ -32,7 +34,8 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	ewf_test_glob \
-	ewf_test_read
+	ewf_test_read \
+	ewf_test_seek
 
 ewf_test_glob_SOURCES = \
 	ewf_test_glob.c
@@ -46,6 +49,14 @@ ewf_test_read_SOURCES = \
 	ewf_test_read.c
 
 ewf_test_read_LDADD = \
+	../libcstring/libcstring.la \
+	../libewf/libewf.la \
+        @MEMWATCH_LIBADD@
+
+ewf_test_seek_SOURCES = \
+	ewf_test_seek.c
+
+ewf_test_seek_LDADD = \
 	../libcstring/libcstring.la \
 	../libewf/libewf.la \
         @MEMWATCH_LIBADD@

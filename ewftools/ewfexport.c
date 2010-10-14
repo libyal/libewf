@@ -142,8 +142,8 @@ void usage_fprint(
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
 	                 "\t           options: sha1 (not used for raw and files format)\n" );
 	fprintf( stream, "\t-f:        specify the output format to write to, options: raw (default),\n"
-	                 "\t           files, ewf, smart, encase1, encase2, encase3, encase4, encase5,\n"
-	                 "\t           encase6, linen5, linen6, ewfx\n"
+	                 "\t           files, ewf, smart, encase1, encase2, encase3, encase4,\n"
+	                 "\t           encase5, encase6, linen5, linen6, ewfx\n"
 	                 "\t           (the files format is restricted to logical volume files)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-l:        logs export errors and the digest (hash) to the log_filename\n" );

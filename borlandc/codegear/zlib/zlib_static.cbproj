@@ -13,6 +13,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<BCC_waus>false</BCC_waus>
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<Multithreaded>true</Multithreaded>
@@ -37,14 +38,47 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<CppCompile Include="..\..\zlib-1.2.5\adler32.c">
-				<BuildOrder>0</BuildOrder>
+			<None Include="..\..\zlib-1.2.5\inflate.h">
+				<BuildOrder>17</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\zlib-1.2.5\inftrees.c">
+				<BuildOrder>18</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.5\compress.c">
-				<BuildOrder>1</BuildOrder>
+			<None Include="..\..\zlib-1.2.5\inftrees.h">
+				<BuildOrder>19</BuildOrder>
+			</None>
+			<None Include="..\..\zlib-1.2.5\inffast.h">
+				<BuildOrder>14</BuildOrder>
+			</None>
+			<None Include="..\..\zlib-1.2.5\inffixed.h">
+				<BuildOrder>15</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\zlib-1.2.5\inflate.c">
+				<BuildOrder>16</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.5\crc32.c">
-				<BuildOrder>2</BuildOrder>
+			<CppCompile Include="..\..\zlib-1.2.5\trees.c">
+				<BuildOrder>20</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\zlib-1.2.5\zlib.h">
+				<BuildOrder>24</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\zlib-1.2.5\zutil.c">
+				<BuildOrder>25</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\zlib-1.2.5\zutil.h">
+				<BuildOrder>26</BuildOrder>
+			</None>
+			<None Include="..\..\zlib-1.2.5\trees.h">
+				<BuildOrder>21</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\zlib-1.2.5\uncompr.c">
+				<BuildOrder>22</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\zlib-1.2.5\zconf.h">
+				<BuildOrder>23</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\zlib-1.2.5\inffast.c">
+				<BuildOrder>13</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\zlib-1.2.5\crc32.h">
 				<BuildOrder>3</BuildOrder>
@@ -55,17 +89,17 @@
 			<None Include="..\..\zlib-1.2.5\deflate.h">
 				<BuildOrder>5</BuildOrder>
 			</None>
+			<CppCompile Include="..\..\zlib-1.2.5\adler32.c">
+				<BuildOrder>0</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\zlib-1.2.5\compress.c">
+				<BuildOrder>1</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\zlib-1.2.5\crc32.c">
+				<BuildOrder>2</BuildOrder>
+			</CppCompile>
 			<CppCompile Include="..\..\zlib-1.2.5\example.c">
 				<BuildOrder>6</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.5\gzclose.c">
-				<BuildOrder>7</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\zlib-1.2.5\gzguts.h">
-				<BuildOrder>8</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\zlib-1.2.5\gzlib.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\zlib-1.2.5\gzread.c">
 				<BuildOrder>10</BuildOrder>
@@ -76,48 +110,15 @@
 			<CppCompile Include="..\..\zlib-1.2.5\infback.c">
 				<BuildOrder>12</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.5\inffast.c">
-				<BuildOrder>13</BuildOrder>
+			<CppCompile Include="..\..\zlib-1.2.5\gzclose.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.5\inffast.h">
-				<BuildOrder>14</BuildOrder>
+			<None Include="..\..\zlib-1.2.5\gzguts.h">
+				<BuildOrder>8</BuildOrder>
 			</None>
-			<None Include="..\..\zlib-1.2.5\inffixed.h">
-				<BuildOrder>15</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\zlib-1.2.5\inflate.c">
-				<BuildOrder>16</BuildOrder>
+			<CppCompile Include="..\..\zlib-1.2.5\gzlib.c">
+				<BuildOrder>9</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.5\inflate.h">
-				<BuildOrder>17</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\zlib-1.2.5\inftrees.c">
-				<BuildOrder>18</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\zlib-1.2.5\inftrees.h">
-				<BuildOrder>19</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\zlib-1.2.5\trees.c">
-				<BuildOrder>20</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\zlib-1.2.5\trees.h">
-				<BuildOrder>21</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\zlib-1.2.5\uncompr.c">
-				<BuildOrder>22</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\zlib-1.2.5\zconf.h">
-				<BuildOrder>23</BuildOrder>
-			</None>
-			<None Include="..\..\zlib-1.2.5\zlib.h">
-				<BuildOrder>24</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\zlib-1.2.5\zutil.c">
-				<BuildOrder>25</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\zlib-1.2.5\zutil.h">
-				<BuildOrder>26</BuildOrder>
-			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

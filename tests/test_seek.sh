@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Expert Witness Compression Format (EWF) library read buffer testing script
+# Expert Witness Compression Format (EWF) library seek offset testing script
 #
 # Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
 #
@@ -35,13 +35,13 @@ SORT="sort";
 UNIQ="uniq";
 WC="wc";
 
-EWF_TEST_READ="ewf_test_read";
+EWF_TEST_SEEK="ewf_test_seek";
 
-function test_read
+function test_seek
 { 
-	echo "Testing read of input:" $*;
+	echo "Testing seek offset of input:" $*;
 
-	./${EWF_TEST_READ} $*;
+	./${EWF_TEST_SEEK} $*;
 
 	RESULT=$?;
 
@@ -50,16 +50,16 @@ function test_read
 	return ${RESULT};
 }
 
-if ! test -x ${EWF_TEST_READ};
+if ! test -x ${EWF_TEST_SEEK};
 then
-	echo "Missing executable: ${EWF_TEST_READ}";
+	echo "Missing executable: ${EWF_TEST_SEEK}";
 
 	exit ${EXIT_FAILURE};
 fi
 
 if ! test -d ${INPUT};
 then
-	echo "No input directory found, to test read create input directory and place test files in directory.";
+	echo "No input directory found, to test seek create input directory and place test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};
@@ -69,7 +69,7 @@ RESULT=`${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${U
 
 if test ${RESULT} -eq 0;
 then
-	echo "No files found in input directory, to test read place test files in directory.";
+	echo "No files found in input directory, to test seek place test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};
@@ -77,7 +77,7 @@ fi
 
 for BASENAME in `${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
 do
-	if ! test_read `${LS} ${INPUT}/${BASENAME}.*`;
+	if ! test_seek `${LS} ${INPUT}/${BASENAME}.*`;
 	then
 		exit ${EXIT_FAILURE};
 	fi
