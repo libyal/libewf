@@ -290,7 +290,6 @@ int verification_handle_open_input(
 	libcstring_system_character_t **libewf_filenames = NULL;
 	static char *function                            = "verification_handle_open_input";
 	size_t first_filename_length                     = 0;
-	int result                                       = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -393,17 +392,45 @@ int verification_handle_open_input(
 		 "%s: unable to open files.",
 		 function );
 
-		result = -1;
+		if( libewf_filenames != NULL )
+		{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			libewf_glob_wide_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#else
+			libewf_glob_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#endif
+		}
+		return( -1 );
 	}
 	if( libewf_filenames != NULL )
 	{
-		for( ; number_of_filenames > 0; number_of_filenames-- )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libewf_glob_wide_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#else
+		if( libewf_glob_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#endif
 		{
-			memory_free(
-			 libewf_filenames[ number_of_filenames - 1 ] );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free globbed filenames.",
+			 function );
+
+			return( -1 );
 		}
-		memory_free(
-		 libewf_filenames );
 	}
 	if( libewf_handle_get_chunk_size(
 	     verification_handle->input_handle,
@@ -419,7 +446,7 @@ int verification_handle_open_input(
 
 		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Closes the verification handle

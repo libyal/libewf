@@ -1,6 +1,4 @@
 TODO
-* test examples
-
 * UTF-16 support
   - libfvalue: move type and flags from initialize
     allow value to have identifier but no type ?
@@ -22,6 +20,7 @@ TODO
 
 Roadmap:
 * code clean up
+  - implement libmfdata
 * improve python bindings
 * improve device handle (libsmdev)
 * support missing segment files (chunks)
@@ -109,14 +108,8 @@ Error handling/tollerance
   - if not correctable skip chunk while reading and mark as crc error
     or try to determine offset/size of chunk somehow
 
-Python bindings
-* rewrite pyewf to match libewf API
-  - library module functions
-  - handle object
-  - keep file object for legacy support ?
-* implement error backtrace support in v2 API version
-* keep certain Python function names as alias
-* use Unicode strings
+Python bindings (pyewf)
+* add WINAPI wide character support for open() and glob()
 
 API changes
 * add wide character functions definitions by default?
@@ -224,6 +217,15 @@ Next stable release:
 
 Test:
 * add autoconf/make test suite
+
+20101014
+* updated codegear project files
+* updated liberror, libbfio
+* worked on pyewf
+  - fixed multiple bugs
+  - added error handling
+  - removed stub of pyewf_set_notify_values
+  - implemented pyewf_glob
 
 20101013
 * worked on optical media session detection for Linux

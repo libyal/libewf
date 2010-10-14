@@ -13,6 +13,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_DebugInformation>false</DCC_DebugInformation>
 			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
 			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
@@ -41,15 +42,46 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\ewftools\storage_media_buffer.h">
-				<BuildOrder>0</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\storage_media_buffer.c">
-				<BuildOrder>1</BuildOrder>
+			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
+				<BuildOrder>16</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\ewftools\sha1.h">
-				<BuildOrder>2</BuildOrder>
+			<None Include="..\..\..\ewftools\byte_size_string.h">
+				<BuildOrder>17</BuildOrder>
 			</None>
+			<CppCompile Include="..\..\..\ewftools\digest_context.c">
+				<BuildOrder>18</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\digest_context.h">
+				<BuildOrder>13</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\digest_hash.c">
+				<BuildOrder>14</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\digest_hash.h">
+				<BuildOrder>15</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\ewfoutput.h">
+				<BuildOrder>19</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\ewfinput.h">
+				<BuildOrder>23</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
+				<BuildOrder>24</BuildOrder>
+			</CppCompile>
+			<LibFiles Include="..\Release\libcstring.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>25</BuildOrder>
+			</LibFiles>
+			<CppCompile Include="..\..\..\ewftools\ewfverify.c">
+				<BuildOrder>20</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\log_handle.c">
+				<BuildOrder>21</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
+				<BuildOrder>22</BuildOrder>
+			</CppCompile>
 			<None Include="..\..\..\ewftools\md5.h">
 				<BuildOrder>3</BuildOrder>
 			</None>
@@ -59,10 +91,29 @@
 			<None Include="..\..\..\ewftools\process_status.h">
 				<BuildOrder>5</BuildOrder>
 			</None>
+			<None Include="..\..\..\ewftools\storage_media_buffer.h">
+				<BuildOrder>0</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\ewftools\storage_media_buffer.c">
+				<BuildOrder>1</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\ewftools\sha1.h">
+				<BuildOrder>2</BuildOrder>
+			</None>
 			<LibFiles Include="..\Release\libuna.lib">
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>6</BuildOrder>
 			</LibFiles>
+			<None Include="..\..\..\ewftools\verification_handle.h">
+				<BuildOrder>10</BuildOrder>
+			</None>
+			<LibFiles Include="..\Release\libsystem.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>11</BuildOrder>
+			</LibFiles>
+			<None Include="..\..\..\ewftools\log_handle.h">
+				<BuildOrder>12</BuildOrder>
+			</None>
 			<LibFiles Include="..\Release\liberror.lib">
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>7</BuildOrder>
@@ -74,56 +125,6 @@
 			<CppCompile Include="..\..\..\ewftools\verification_handle.c">
 				<BuildOrder>9</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\ewftools\verification_handle.h">
-				<BuildOrder>10</BuildOrder>
-			</None>
-			<LibFiles Include="..\Release\libsystem.lib">
-				<IgnorePath>true</IgnorePath>
-				<BuildOrder>11</BuildOrder>
-			</LibFiles>
-			<None Include="..\..\..\ewftools\log_handle.h">
-				<BuildOrder>12</BuildOrder>
-			</None>
-			<None Include="..\..\..\ewftools\digest_context.h">
-				<BuildOrder>13</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\digest_hash.c">
-				<BuildOrder>14</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\digest_hash.h">
-				<BuildOrder>15</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
-				<BuildOrder>16</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\byte_size_string.h">
-				<BuildOrder>17</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\digest_context.c">
-				<BuildOrder>18</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\ewfoutput.h">
-				<BuildOrder>19</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\ewfverify.c">
-				<BuildOrder>20</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\..\ewftools\log_handle.c">
-				<BuildOrder>21</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
-				<BuildOrder>22</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\ewftools\ewfinput.h">
-				<BuildOrder>23</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
-				<BuildOrder>24</BuildOrder>
-			</CppCompile>
-			<LibFiles Include="..\Release\libcstring.lib">
-				<IgnorePath>true</IgnorePath>
-				<BuildOrder>25</BuildOrder>
-			</LibFiles>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

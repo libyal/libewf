@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+#define PYEWF_ERROR_STRING_SIZE		512
+
 PyObject *pyewf_get_version(
            PyObject *self );
 
@@ -61,9 +63,6 @@ PyObject *pyewf_set_notify_values(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
-
-PyObject *pyewf_new_handle(
-           PyObject *self );
 
 PyMODINIT_FUNC initpyewf(
                 void );

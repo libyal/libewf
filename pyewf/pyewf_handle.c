@@ -33,6 +33,7 @@
 
 #include <libewf.h>
 
+#include "pyewf.h"
 #include "pyewf_handle.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
@@ -213,7 +214,7 @@ PyTypeObject pyewf_handle_type_object = {
 	/* tp_dictoffset */
 	0,
 	/* tp_init */
-	(initproc) pyewf_handle_initialize,
+	(initproc) pyewf_handle_init,
 	/* tp_alloc */
 	0,
 	/* tp_new */
@@ -236,38 +237,169 @@ PyTypeObject pyewf_handle_type_object = {
 	0
 };
 
-/* Initialize a pyewf handle object
- * Returns 1 if successful or -1 on handle
+/* Creates a new pyewf handle object
+ * Returns a Python object if successful or NULL on error
  */
-int pyewf_handle_initialize(
-     pyewf_handle_t *pyewf_handle,
-     liberror_error_t **error )
+PyObject *pyewf_new_handle(
+           PyObject *self )
 {
-	static char *function = "pyewf_handle_initialize";
+	static char *function        = "pyewf_new_handle";
+	pyewf_handle_t *pyewf_handle = NULL;
 
-	if( libewf_handle_initialize(
-	     &( pyewf_handle->handle ),
-	     error ) != 1 )
+	pyewf_handle = PyObject_New(
+	                struct pyewf_handle,
+	                &pyewf_handle_type_object );
+
+	if( pyewf_handle == NULL )
 	{
-		/* TODO something with error */
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to initialize handle.",
+		 function );
 
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: failed to initialize libewf handle.",
+		return( NULL );
+	}
+	if( pyewf_handle_init(
+	     pyewf_handle ) != 0 )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to initialize handle.",
+		 function );
+
+		Py_DECREF(
+		 pyewf_handle );
+
+		return( NULL );
+	}
+	return( (PyObject *) pyewf_handle );
+}
+
+/* Intializes a handle object
+ * Returns 0 if successful or -1 on error
+ */
+int pyewf_handle_init(
+     pyewf_handle_t *pyewf_handle )
+{
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	static char *function   = "pyewf_handle_init";
+	liberror_error_t *error = NULL;
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+	/* Make sure libewf handle is set to NULL
+	 */
+	pyewf_handle->handle = NULL;
+
+	if( libewf_handle_initialize(
+	     &( pyewf_handle->handle ),
+	     &error ) != 1 )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "%s: unable to initialize handle.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "%s: unable to initialize handle.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 0 );
 }
 
-/* Frees a pyewf handle object
+/* Frees a handle object
  */
 void pyewf_handle_free(
       pyewf_handle_t *pyewf_handle )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	liberror_error_t *error = NULL;
+	static char *function   = "pyewf_handle_free";
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return;
+	}
+	if( pyewf_handle->ob_type == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle - missing ob_type.",
+		 function );
+
+		return;
+	}
+	if( pyewf_handle->ob_type->tp_free == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle - invalid ob_type - missing tp_free.",
+		 function );
+
+		return;
+	}
+	if( pyewf_handle->handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle - missing libewf handle.",
+		 function );
+
+		return;
+	}
+	if( libewf_handle_free(
+	     &( pyewf_handle->handle ),
+	     &error ) != 1 )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "%s: unable to free handle.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "%s: unable to free handle.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
+	}
 	pyewf_handle->ob_type->tp_free(
 	 (PyObject*) pyewf_handle );
 }
@@ -278,6 +410,8 @@ void pyewf_handle_free(
 PyObject *pyewf_handle_signal_abort(
            pyewf_handle_t *pyewf_handle )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_signal_abort";
 
@@ -303,13 +437,24 @@ PyObject *pyewf_handle_signal_abort(
 	     pyewf_handle->handle,
 	     &error ) != 1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to signal abort.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to signal abort.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to signal abort.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -326,15 +471,18 @@ PyObject *pyewf_handle_open(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error     = NULL;
 	char **filenames            = NULL;
-	static char *keyword_list[] = { "files", NULL };
+	static char *keyword_list[] = { "filenames", "access_flags", NULL };
 	PyObject *sequence_object   = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_handle_open";
-	size_t filename_size        = 0;
+	size_t filename_length      = 0;
+	int access_flags            = 0;
+	int filename_index          = 0;
 	int number_of_filenames     = 0;
-	int filename_iterator       = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -348,9 +496,10 @@ PyObject *pyewf_handle_open(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	      keywords,
-	      "O",
+	      "O|i",
 	      keyword_list,
-	      &sequence_object ) == 0 )
+	      &sequence_object,
+	      &access_flags ) == 0 )
 	{
 		return( NULL );
 	}
@@ -404,32 +553,32 @@ PyObject *pyewf_handle_open(
 
 		return( NULL );
 	}
-	for( filename_iterator = 0;
-	     filename_iterator < number_of_filenames;
-	     filename_iterator++ )
+	for( filename_index = 0;
+	     filename_index < number_of_filenames;
+	     filename_index++ )
 	{
 		string_object = PySequence_GetItem(
 		                 sequence_object,
-		                 filename_iterator );
+		                 filename_index );
 
-		filename_size = PyString_Size(
-		                 string_object );
+		filename_length = PyString_Size(
+		                   string_object );
 
-		filenames[ filename_iterator ] = (char *) memory_allocate(
-		                                           sizeof( char ) * filename_size );
+		filenames[ filename_index ] = (char *) memory_allocate(
+		                                        sizeof( char ) * ( filename_length + 1 ) );
 
-		if( filenames[ filename_iterator ] == NULL )
+		if( filenames[ filename_index ] == NULL )
 		{
 			PyErr_Format(
 			 PyExc_MemoryError,
 			 "%s: unable to create filename: %d.",
 			 function,
-			 filename_iterator );
+			 filename_index );
 
-			for( ; filename_iterator > 0; filename_iterator-- )
+			for( ; filename_index > 0; filename_index-- )
 			{
 				memory_free(
-				 filenames[ filename_iterator - 1 ] );
+				 filenames[ filename_index - 1 ] );
 			}
 			memory_free(
 			 filenames );
@@ -437,28 +586,28 @@ PyObject *pyewf_handle_open(
 			return( NULL );
 		}
 		if( libcstring_narrow_string_copy(
-		     filenames[ filename_iterator ],
+		     filenames[ filename_index ],
 		     PyString_AsString(
 		      string_object ),
-		     filename_size ) == NULL )
+		     filename_length ) == NULL )
 		{
 			PyErr_Format(
 			 PyExc_MemoryError,
 			 "%s: unable to set filename: %d.",
 			 function,
-			 filename_iterator );
+			 filename_index );
 
-			for( ; filename_iterator > 0; filename_iterator-- )
+			for( ; filename_index > 0; filename_index-- )
 			{
 				memory_free(
-				 filenames[ filename_iterator - 1 ] );
+				 filenames[ filename_index - 1 ] );
 			}
 			memory_free(
 			 filenames );
 
 			return( NULL );
 		}
-		( filenames[ filename_iterator ] )[ filename_size - 1 ] = 0;
+		( filenames[ filename_index ] )[ filename_length ] = 0;
 
 		Py_DECREF(
 		 string_object );
@@ -467,37 +616,48 @@ PyObject *pyewf_handle_open(
 	     pyewf_handle->handle,
              filenames,
              number_of_filenames,
-             LIBEWF_OPEN_READ,
+             (uint8_t) access_flags,
 	     &error ) != 1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to open file(s).",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to open handle.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to open handle.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
-		for( filename_iterator = 0;
-		     filename_iterator < number_of_filenames;
-		     filename_iterator++ )
+		for( filename_index = 0;
+		     filename_index < number_of_filenames;
+		     filename_index++ )
 		{
 			memory_free(
-			 filenames[ filename_iterator ] );
+			 filenames[ filename_index ] );
 		}
 		memory_free(
 		 filenames );
 
 		return( NULL );
 	}
-	for( filename_iterator = 0;
-	     filename_iterator < number_of_filenames;
-	     filename_iterator++ )
+	for( filename_index = 0;
+	     filename_index < number_of_filenames;
+	     filename_index++ )
 	{
 		memory_free(
-		 filenames[ filename_iterator ] );
+		 filenames[ filename_index ] );
 	}
 	memory_free(
 	 filenames );
@@ -511,6 +671,8 @@ PyObject *pyewf_handle_open(
 PyObject *pyewf_handle_close(
            pyewf_handle_t *pyewf_handle )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_close";
 
@@ -536,29 +698,24 @@ PyObject *pyewf_handle_close(
 	     pyewf_handle->handle,
 	     &error ) != 0 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to close file(s).",
-		 function );
-
-		liberror_error_free(
-		 &error );
-
-		return( NULL );
-	}
-	if( libewf_handle_free(
-	     &( pyewf_handle->handle ),
-	     &error ) != 1 )
-	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to free libewf handle.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to close handle.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to close handle.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -575,6 +732,8 @@ PyObject *pyewf_handle_read_buffer(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_buffer";
@@ -642,15 +801,24 @@ PyObject *pyewf_handle_read_buffer(
 
 	if( read_count != (ssize_t) read_size )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to read data (requested %d, returned %" PRIzd ").",
-		 function,
-		 read_size,
-		 read_count );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to read data.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to read data.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -667,12 +835,14 @@ PyObject *pyewf_handle_read_random(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
-	ssize_t read_count          = 0;
 	off64_t read_offset         = 0;
+	ssize_t read_count          = 0;
 	int read_size               = 0;
 
 	if( pyewf_handle == NULL )
@@ -723,6 +893,17 @@ PyObject *pyewf_handle_read_random(
 
 		return( NULL );
 	}
+	if( read_offset < 0 )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid argument read offset value less than zero.",
+		 function );
+
+		return( NULL );
+	}
+	/* Make sure the data fits into a memory buffer
+	 */
 	result_data = PyString_FromStringAndSize(
 	               NULL,
 	               read_size );
@@ -737,15 +918,24 @@ PyObject *pyewf_handle_read_random(
 
 	if( read_count != (ssize_t) read_size )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to read data (requested %d, returned %" PRIzd ").",
-		 function,
-		 read_size,
-		 read_count );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to read data.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to read data.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -762,6 +952,8 @@ PyObject *pyewf_handle_write_buffer(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_write_buffer";
@@ -824,20 +1016,144 @@ PyObject *pyewf_handle_write_buffer(
 	               pyewf_handle->handle,
 	               PyString_AsString(
 	                result_data ),
-	               write_size,
+	               (size_t) write_size,
 	               &error );
 
 	if( write_count != (ssize_t) write_size )
 	{
-		/* TODO something with error */
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to write data.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to write data.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
 
+		return( NULL );
+	}
+	return( result_data );
+}
+
+/* Writes a buffer of media data at a specific offset to EWF file(s)
+ * Returns a Python object holding the data if successful or NULL on error
+ */
+PyObject *pyewf_handle_write_random(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	liberror_error_t *error     = NULL;
+	PyObject *result_data       = NULL;
+	static char *function       = "pyewf_handle_write_random";
+	static char *keyword_list[] = { "size", "offset", NULL };
+	off64_t write_offset        = 0;
+	ssize_t write_count         = 0;
+	int write_size              = -1;
+
+	if( pyewf_handle == NULL )
+	{
 		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to write data (requested %d, returned %" PRIzd ").",
-		 function,
-		 write_size,
-		 write_count );
+		 PyExc_TypeError,
+		 "%s: invalid pyewf handle.",
+		 function );
 
+		return( NULL );
+	}
+	if( pyewf_handle->handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid pyewf handle - missing libewf handle.",
+		 function );
+
+		return( NULL );
+	}
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "i|L",
+	     keyword_list,
+	     &write_size,
+	     &write_offset ) == 0 )
+	{
+		return( NULL );
+	}
+	if( write_size < 0 )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid argument read size value less than zero.",
+		 function );
+
+		return( NULL );
+	}
+	/* Make sure the data fits into a memory buffer
+	 */
+	if( write_size > INT_MAX )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid argument read size value exceeds maximum.",
+		 function );
+
+		return( NULL );
+	}
+	if( write_offset < 0 )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid argument write offset value less than zero.",
+		 function );
+
+		return( NULL );
+	}
+	result_data = PyString_FromStringAndSize(
+	               NULL,
+	               write_size );
+
+	write_count = libewf_handle_write_random(
+	               pyewf_handle->handle,
+	               PyString_AsString(
+	                result_data ),
+	               (size_t) write_size,
+	               write_offset,
+	               &error );
+
+	if( write_count != (ssize_t) write_size )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to write data.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to write data.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -854,6 +1170,8 @@ PyObject *pyewf_handle_seek_offset(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error     = NULL;
 	static char *function       = "pyewf_handle_seek_offset";
 	static char *keyword_list[] = { "offset", "whence", NULL };
@@ -894,13 +1212,24 @@ PyObject *pyewf_handle_seek_offset(
 	     whence,
 	     &error ) < 0 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to seek offset.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to seek offset.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to seek offset.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -915,6 +1244,8 @@ PyObject *pyewf_handle_seek_offset(
 PyObject *pyewf_handle_get_offset(
            pyewf_handle_t *pyewf_handle )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_get_offset";
 	off64_t current_offset  = 0;
@@ -924,13 +1255,24 @@ PyObject *pyewf_handle_get_offset(
 	     &current_offset,
 	     &error ) != 1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve offset.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve offset.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve offset.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 

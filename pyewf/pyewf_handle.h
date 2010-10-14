@@ -52,9 +52,11 @@ struct pyewf_handle
 extern PyMethodDef pyewf_handle_object_methods[];
 extern PyTypeObject pyewf_handle_type_object;
 
-int pyewf_handle_initialize(
-     pyewf_handle_t *pyewf_handle,
-     liberror_error_t **error );
+PyObject *pyewf_new_handle(
+           PyObject *self );
+
+int pyewf_handle_init(
+     pyewf_handle_t *pyewf_handle );
 
 void pyewf_handle_free(
       pyewf_handle_t *pyewf_handle );

@@ -74,11 +74,6 @@ PyMethodDef pyewf_module_methods[] = {
 	  METH_VARARGS | METH_KEYWORDS,
 	  "Globs filenames according to the EWF segment file naming schema" },
 
-	{ "set_notify_values",
-	  (PyCFunction) pyewf_set_notify_values,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Sets pyewf (libewf) notification values" },
-
 	{ "new_handle",
 	  (PyCFunction) pyewf_new_handle,
 	  METH_NOARGS,
@@ -182,6 +177,8 @@ PyObject *pyewf_check_file_signature(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error     = NULL;
 	static char *function       = "pyewf_check_file_signature";
 	static char *keyword_list[] = { "filename", NULL };
@@ -203,13 +200,24 @@ PyObject *pyewf_check_file_signature(
 
 	if( result == -1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: unable to check file signature.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to check file signature.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to check file signature.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -230,10 +238,19 @@ PyObject *pyewf_glob(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	char **filenames            = NULL;
 	liberror_error_t *error     = NULL;
+	PyObject *list_object       = NULL;
+	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_glob";
 	static char *keyword_list[] = { "filename", NULL };
+	const char *errors          = NULL;
 	const char *filename        = NULL;
+	size_t filename_length      = 0;
+	int filename_index          = 0;
+	int number_of_filenames     = 0;
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
@@ -244,60 +261,129 @@ PyObject *pyewf_glob(
 	{
 		return( NULL );
 	}
-	/* TODO implement function */
+	filename_length = libcstring_narrow_string_length(
+	                   filename );
 
-	return( Py_None );
-}
-
-/* Sets the pyewf (libewf) notification values
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyewf_set_notify_values(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	static char *function       = "pyewf_set_notify_values";
-	static char *keyword_list[] = { "stream", "verbose", NULL };
-
-	/* TODO implement function */
-
-	return( Py_None );
-}
-
-/* Creates a new pyewf handle object
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyewf_new_handle(
-           PyObject *self )
-{
-	static char *function       = "pyewf_new_handle";
-	pyewf_handle_t *pyewf_handle = NULL;
-	liberror_error_t *error      = NULL;
-
-	pyewf_handle = PyObject_New(
-	                struct pyewf_handle,
-	                &pyewf_handle_type_object );
-
-	if( pyewf_handle_initialize(
-	     pyewf_handle,
+	if( libewf_glob(
+	     filename,
+	     filename_length,
+	     LIBEWF_FORMAT_UNKNOWN,
+	     &filenames,
+	     &number_of_filenames,
 	     &error ) != 1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to initialize pyewf handle.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to glob filenames.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to glob filenames.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
-		Py_DECREF(
-		 pyewf_handle );
 
 		return( NULL );
 	}
-	return( (PyObject *) pyewf_handle );
+	list_object = PyList_New(
+	               (Py_ssize_t) number_of_filenames );
+
+	for( filename_index = 0;
+	     filename_index < number_of_filenames;
+	     filename_index++ )
+	{
+		filename_length = libcstring_narrow_string_length(
+		                   filenames[ filename_index ] );
+
+		string_object = PyUnicode_DecodeUTF8(
+		                 filenames[ filename_index ],
+		                 filename_length,
+		                 errors );
+
+		if( string_object == NULL )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to convert UTF-8 filename: %d into Unicode.",
+			 function,
+			 filename_index );
+
+			libewf_glob_free(
+			 filenames,
+			 number_of_filenames,
+			 NULL );
+
+			Py_DECREF(
+			 list_object );
+
+			return( NULL );
+		}
+		if( PyList_SetItem(
+		     list_object,
+		     (Py_ssize_t) filename_index,
+		     string_object ) != 0 )
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "%s: unable to set filename: %d in list.",
+			 function,
+			 filename_index );
+
+			libewf_glob_free(
+			 filenames,
+			 number_of_filenames,
+			 NULL );
+
+			Py_DECREF(
+			 string_object );
+			Py_DECREF(
+			 list_object );
+
+			return( NULL );
+		}
+	}
+	if( libewf_glob_free(
+	     filenames,
+	     number_of_filenames,
+	     &error ) != 1 )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "%s: unable to free globbed filenames.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "%s: unable to free globbed filenames.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
+
+		Py_DECREF(
+		 list_object );
+
+		return( NULL );
+	}
+	return( list_object );
 }
 
 /* Declarations for DLL import/export

@@ -310,11 +310,10 @@ int imaging_handle_open_output(
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
-	static char *function                    = "imaging_handle_open_output";
-	size_t first_filename_length             = 0;
-	int number_of_filenames                  = 0;
-	int result                               = 1;
-	uint8_t flags                            = 0;
+	static char *function                            = "imaging_handle_open_output";
+	size_t first_filename_length                     = 0;
+	int number_of_filenames                          = 0;
+	uint8_t access_flags                             = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -384,26 +383,26 @@ int imaging_handle_open_output(
 
 			return( -1 );
 		}
-		flags = LIBEWF_OPEN_WRITE_RESUME;
+		access_flags = LIBEWF_OPEN_WRITE_RESUME;
 	}
 	else
 	{
 		libewf_filenames = filenames;
-		flags            = LIBEWF_OPEN_WRITE;
+		access_flags     = LIBEWF_OPEN_WRITE;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     imaging_handle->output_handle,
 	     libewf_filenames,
 	     number_of_filenames,
-	     flags,
+	     access_flags,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     imaging_handle->output_handle,
 	     libewf_filenames,
 	     number_of_filenames,
-	     flags,
+	     access_flags,
 	     error ) != 1 )
 #endif
 	{
@@ -414,19 +413,47 @@ int imaging_handle_open_output(
 		 "%s: unable to open file.",
 		 function );
 
-		result = -1;
+		if( libewf_filenames != filenames )
+		{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			libewf_glob_wide_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#else
+			libewf_glob_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#endif
+		}
+		return( -1 );
 	}
 	if( libewf_filenames != filenames )
 	{
-		for( ; number_of_filenames > 0; number_of_filenames-- )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libewf_glob_wide_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#else
+		if( libewf_glob_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#endif
 		{
-			memory_free(
-			 libewf_filenames[ number_of_filenames - 1 ] );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free globbed filenames.",
+			 function );
+
+			return( -1 );
 		}
-		memory_free(
-		 libewf_filenames );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Opens the secondary output of the imaging handle
@@ -440,11 +467,10 @@ int imaging_handle_open_secondary_output(
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
-	static char *function                    = "imaging_handle_open_secondary_output";
-	size_t first_filename_length             = 0;
-	int number_of_filenames                  = 0;
-	int result                               = 1;
-	uint8_t flags                            = 0;
+	static char *function                            = "imaging_handle_open_secondary_output";
+	size_t first_filename_length                     = 0;
+	int number_of_filenames                          = 0;
+	uint8_t access_flags                             = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -514,12 +540,12 @@ int imaging_handle_open_secondary_output(
 
 			return( -1 );
 		}
-		flags = LIBEWF_OPEN_WRITE_RESUME;
+		access_flags = LIBEWF_OPEN_WRITE_RESUME;
 	}
 	else
 	{
 		libewf_filenames = filenames;
-		flags            = LIBEWF_OPEN_WRITE;
+		access_flags     = LIBEWF_OPEN_WRITE;
 	}
 	if( libewf_handle_initialize(
 	     &( imaging_handle->secondary_output_handle ),
@@ -532,6 +558,20 @@ int imaging_handle_open_secondary_output(
 		 "%s: unable to initialize secondary output handle.",
 		 function );
 
+		if( libewf_filenames != filenames )
+		{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			libewf_glob_wide_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#else
+			libewf_glob_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#endif
+		}
 		return( -1 );
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -539,14 +579,14 @@ int imaging_handle_open_secondary_output(
 	     imaging_handle->secondary_output_handle,
 	     libewf_filenames,
 	     number_of_filenames,
-	     flags,
+	     access_flags,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     imaging_handle->secondary_output_handle,
 	     libewf_filenames,
 	     number_of_filenames,
-	     flags,
+	     access_flags,
 	     error ) != 1 )
 #endif
 	{
@@ -557,19 +597,55 @@ int imaging_handle_open_secondary_output(
 		 "%s: unable to open file.",
 		 function );
 
-		result = -1;
+		libewf_handle_free(
+		 &( imaging_handle->secondary_output_handle ),
+		 NULL );
+
+		if( libewf_filenames != filenames )
+		{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			libewf_glob_wide_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#else
+			libewf_glob_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#endif
+		}
+		return( -1 );
 	}
 	if( libewf_filenames != filenames )
 	{
-		for( ; number_of_filenames > 0; number_of_filenames-- )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libewf_glob_wide_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#else
+		if( libewf_glob_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#endif
 		{
-			memory_free(
-			 libewf_filenames[ number_of_filenames - 1 ] );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free globbed filenames.",
+			 function );
+
+			libewf_handle_free(
+			 &( imaging_handle->secondary_output_handle ),
+			 NULL );
+
+			return( -1 );
 		}
-		memory_free(
-		 libewf_filenames );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Closes the imaging handle

@@ -29,6 +29,7 @@
 
 #include <libewf.h>
 
+#include "pyewf.h"
 #include "pyewf_handle.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
@@ -39,6 +40,8 @@
 PyObject *pyewf_handle_get_media_size(
            pyewf_handle_t *pyewf_handle )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_get_media_size";
 	size64_t media_size     = 0;
@@ -48,13 +51,24 @@ PyObject *pyewf_handle_get_media_size(
 	     &media_size,
 	     &error ) != 1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve media size.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: failed to retrieve media size.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: failed to retrieve media size.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -72,6 +86,8 @@ PyObject *pyewf_handle_get_header_value(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error               = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_value";
@@ -104,14 +120,26 @@ PyObject *pyewf_handle_get_header_value(
 
 	if( result == -1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-	         "%s: unable to retrieve UTF-8 header value size: %s.",
-		 function,
-		 header_value_identifier );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 header value: %s size.",
+			 function,
+			 header_value_identifier );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 header value: %s size.\n%s",
+			 function,
+			 header_value_identifier,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -145,16 +173,29 @@ PyObject *pyewf_handle_get_header_value(
 
 	if( result == -1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-	         "%s: unable to retrieve UTF-8 header value: %s.",
-		 function,
-		 header_value_identifier );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 header value: %s.",
+			 function,
+			 header_value_identifier );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 header value: %s.\n%s",
+			 function,
+			 header_value_identifier,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
+
 		memory_free(
 		 header_value );
 
@@ -174,6 +215,19 @@ PyObject *pyewf_handle_get_header_value(
 	                 (Py_ssize_t) header_value_size,
 	                 errors );
 
+	if( string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to convert UTF-8 header value: %s into Unicode.",
+		 function,
+		 header_value_identifier );
+
+		memory_free(
+		 header_value );
+
+		return( NULL );
+	}
 	memory_free(
 	 header_value );
 
@@ -186,6 +240,8 @@ PyObject *pyewf_handle_get_header_value(
 PyObject *pyewf_handle_get_header_values(
            pyewf_handle_t *pyewf_handle )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error               = NULL;
 	PyObject *dictionary_object           = NULL;
 	PyObject *string_object               = NULL;
@@ -197,20 +253,32 @@ PyObject *pyewf_handle_get_header_values(
 	size_t header_value_identifier_size   = 0;
 	size_t header_value_size              = 0;
 	uint32_t number_of_header_values      = 0;
-	uint32_t header_value_iterator        = 0;
+	uint32_t header_value_index           = 0;
+	int result                            = 0;
 
 	if( libewf_handle_get_number_of_header_values(
 	     pyewf_handle->handle,
 	     &number_of_header_values,
 	     &error ) != 1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve number of header values.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: failed to retrieve number of header values.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: failed to retrieve number of header values.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -218,26 +286,41 @@ PyObject *pyewf_handle_get_header_values(
 	}
 	dictionary_object = PyDict_New();
 
-	for( header_value_iterator = 0;
-	     header_value_iterator < number_of_header_values;
-	     header_value_iterator++ )
+	for( header_value_index = 0;
+	     header_value_index < number_of_header_values;
+	     header_value_index++ )
 	{
 		if( libewf_handle_get_header_value_identifier_size(
 		     pyewf_handle->handle,
-		     header_value_iterator,
+		     header_value_index,
 		     &header_value_identifier_size,
 		     &error ) != 1 )
 		{
-			/* TODO something with error */
-	
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header value identifier size: %d.",
-			 function,
-			 header_value_iterator );
-
+			if( liberror_error_backtrace_sprint(
+			     error,
+			     error_string,
+			     PYEWF_ERROR_STRING_SIZE ) == -1 )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve header value: %d identifier size.",
+				 function,
+				 header_value_index );
+			}
+			else
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve header value: %d identifier size.\n%s",
+				 function,
+				 header_value_index,
+				 error_string );
+			}
 			liberror_error_free(
 			 &error );
+
+			Py_DECREF(
+			 dictionary_object );
 
 			return( NULL );
 		}
@@ -251,97 +334,210 @@ PyObject *pyewf_handle_get_header_values(
 			 "%s: unable to create header value identifier.",
 			 function );
 
+			Py_DECREF(
+			 dictionary_object );
+
 			return( NULL );
 		}
 		if( libewf_handle_get_header_value_identifier(
 		     pyewf_handle->handle,
-		     header_value_iterator,
+		     header_value_index,
 		     (uint8_t *) header_value_identifier,
 		     header_value_identifier_size,
 		     &error ) != 1 )
 		{
-			/* TODO something with error */
-
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header value identifier: %d.",
-			 function,
-			 header_value_iterator );
-
+			if( liberror_error_backtrace_sprint(
+			     error,
+			     error_string,
+			     PYEWF_ERROR_STRING_SIZE ) == -1 )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve header value: %d identifier.",
+				 function,
+				 header_value_index );
+			}
+			else
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve header value: %d identifier.\n%s",
+				 function,
+				 header_value_index,
+				 error_string );
+			}
 			liberror_error_free(
 			 &error );
+
 			memory_free(
 			 header_value_identifier );
+
+			Py_DECREF(
+			 dictionary_object );
 
 			return( NULL );
 		}
 		header_value_identifier_length = libcstring_narrow_string_length(
 						  header_value_identifier );
 
-		if( libewf_handle_get_utf8_header_value_size(
-		     pyewf_handle->handle,
-		     (uint8_t *) header_value_identifier,
-		     header_value_identifier_length,
-		     &header_value_size,
-		     &error ) != 1 )
+		result = libewf_handle_get_utf8_header_value_size(
+		          pyewf_handle->handle,
+		          (uint8_t *) header_value_identifier,
+		          header_value_identifier_length,
+		          &header_value_size,
+		          &error );
+
+		if( result == -1 )
 		{
-			/* TODO something with error */
-
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 header value size: %s.",
-			 function,
-			 header_value_identifier );
-
+			if( liberror_error_backtrace_sprint(
+			     error,
+			     error_string,
+			     PYEWF_ERROR_STRING_SIZE ) == -1 )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve UTF-8 header value: %s size.",
+				 function,
+				 header_value_identifier );
+			}
+			else
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve UTF-8 header value: %s size.\n%s",
+				 function,
+				 header_value_identifier,
+				 error_string );
+			}
 			liberror_error_free(
 			 &error );
+
 			memory_free(
 			 header_value_identifier );
 
-			return( NULL );
-		}
-		header_value = (char *) memory_allocate(
-		                         sizeof( char ) * header_value_size );
-
-		if( header_value == NULL )
-		{
-			memory_free(
-			 header_value_identifier );
-
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to create header value.",
-			 function );
+			Py_DECREF(
+			 dictionary_object );
 
 			return( NULL );
 		}
 		/* Ignore emtpy header values
 		 */
-		if( libewf_handle_get_utf8_header_value(
-		     pyewf_handle->handle,
-		     (uint8_t *) header_value_identifier,
-		     header_value_identifier_length,
-		     (uint8_t *) header_value,
-		     header_value_size,
-		     NULL ) == 1 )
+		if( ( result != 0 )
+		 && ( header_value_size > 0 ) )
 		{
+			header_value = (char *) memory_allocate(
+			                         sizeof( char ) * header_value_size );
+
+			if( header_value == NULL )
+			{
+				memory_free(
+				 header_value_identifier );
+
+				PyErr_Format(
+				 PyExc_MemoryError,
+				 "%s: unable to create header value.",
+				 function );
+
+				memory_free(
+				 header_value_identifier );
+
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
+			if( libewf_handle_get_utf8_header_value(
+			     pyewf_handle->handle,
+			     (uint8_t *) header_value_identifier,
+			     header_value_identifier_length,
+			     (uint8_t *) header_value,
+			     header_value_size,
+			     &error ) != 1 )
+			{
+				if( liberror_error_backtrace_sprint(
+				     error,
+				     error_string,
+				     PYEWF_ERROR_STRING_SIZE ) == -1 )
+				{
+					PyErr_Format(
+					 PyExc_IOError,
+					 "%s: unable to retrieve UTF-8 header value: %s.",
+					 function,
+					 header_value_identifier );
+				}
+				else
+				{
+					PyErr_Format(
+					 PyExc_IOError,
+					 "%s: unable to retrieve UTF-8 header value: %s.\n%s",
+					 function,
+					 header_value_identifier,
+					 error_string );
+				}
+				liberror_error_free(
+				 &error );
+
+				memory_free(
+				 header_value );
+				memory_free(
+				 header_value_identifier );
+
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
 			string_object = PyUnicode_DecodeUTF8(
 			                 header_value,
 			                 header_value_size,
 			                 errors );
 
-			PyDict_SetItemString(
-			 dictionary_object,
-			 header_value_identifier,
-			 string_object );
+			if( string_object == NULL )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to convert UTF-8 header value: %s into Unicode.",
+				 function,
+				 header_value_identifier );
 
-			Py_DECREF(
-			 string_object );
+				memory_free(
+				 header_value );
+				memory_free(
+				 header_value_identifier );
+
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
+			if( PyDict_SetItemString(
+			     dictionary_object,
+			     header_value_identifier,
+			     string_object ) != 0 )
+			{
+				PyErr_Format(
+				 PyExc_MemoryError,
+				 "%s: unable to set header value: %s in dictionary.",
+				 function,
+				 header_value_identifier );
+
+				memory_free(
+				 header_value );
+				memory_free(
+				 header_value_identifier );
+
+				Py_DECREF(
+				 string_object );
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
+			memory_free(
+			 header_value );
 		}
 		memory_free(
 		 header_value_identifier );
-		memory_free(
-		 header_value );
 	}
 	return( dictionary_object );
 }
@@ -354,6 +550,8 @@ PyObject *pyewf_handle_get_hash_value(
            PyObject *arguments,
            PyObject *keywords )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error             = NULL;
 	PyObject *string_object             = NULL;
 	static char *function               = "pyewf_handle_get_hash_value";
@@ -386,14 +584,26 @@ PyObject *pyewf_handle_get_hash_value(
 
 	if( result == -1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-	         "%s: unable to retrieve UTF-8 hash value size: %s.",
-		 function,
-		 hash_value_identifier );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 hash value: %s size.",
+			 function,
+			 hash_value_identifier );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 hash value: %s size.\n%s",
+			 function,
+			 hash_value_identifier,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -427,16 +637,29 @@ PyObject *pyewf_handle_get_hash_value(
 
 	if( result == -1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-	         "%s: unable to retrieve UTF-8 hash value: %s.",
-		 function,
-		 hash_value_identifier );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 hash value: %s.",
+			 function,
+			 hash_value_identifier );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 hash value: %s.\n%s",
+			 function,
+			 hash_value_identifier,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
+
 		memory_free(
 		 hash_value );
 
@@ -456,6 +679,19 @@ PyObject *pyewf_handle_get_hash_value(
 	                 (Py_ssize_t) hash_value_size,
 	                 errors );
 
+	if( string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to convert UTF-8 hash value: %s into Unicode.",
+		 function,
+		 hash_value_identifier );
+
+		memory_free(
+		 hash_value );
+
+		return( NULL );
+	}
 	memory_free(
 	 hash_value );
 
@@ -468,6 +704,8 @@ PyObject *pyewf_handle_get_hash_value(
 PyObject *pyewf_handle_get_hash_values(
            pyewf_handle_t *pyewf_handle )
 {
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
 	liberror_error_t *error             = NULL;
 	PyObject *dictionary_object         = NULL;
 	PyObject *string_object             = NULL;
@@ -479,20 +717,32 @@ PyObject *pyewf_handle_get_hash_values(
 	size_t hash_value_identifier_size   = 0;
 	size_t hash_value_size              = 0;
 	uint32_t number_of_hash_values      = 0;
-	uint32_t hash_value_iterator        = 0;
+	uint32_t hash_value_index           = 0;
+	int result                          = 0;
 
 	if( libewf_handle_get_number_of_hash_values(
 	     pyewf_handle->handle,
 	     &number_of_hash_values,
 	     &error ) != 1 )
 	{
-		/* TODO something with error */
-
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: failed to retrieve number of hash values.",
-		 function );
-
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: failed to retrieve number of hash values.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: failed to retrieve number of hash values.\n%s",
+			 function,
+			 error_string );
+		}
 		liberror_error_free(
 		 &error );
 
@@ -500,26 +750,41 @@ PyObject *pyewf_handle_get_hash_values(
 	}
 	dictionary_object = PyDict_New();
 
-	for( hash_value_iterator = 0;
-	     hash_value_iterator < number_of_hash_values;
-	     hash_value_iterator++ )
+	for( hash_value_index = 0;
+	     hash_value_index < number_of_hash_values;
+	     hash_value_index++ )
 	{
 		if( libewf_handle_get_hash_value_identifier_size(
 		     pyewf_handle->handle,
-		     hash_value_iterator,
+		     hash_value_index,
 		     &hash_value_identifier_size,
 		     &error ) != 1 )
 		{
-			/* TODO something with error */
-	
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve hash value identifier size: %d.",
-			 function,
-			 hash_value_iterator );
-
+			if( liberror_error_backtrace_sprint(
+			     error,
+			     error_string,
+			     PYEWF_ERROR_STRING_SIZE ) == -1 )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve hash value: %d identifier size.",
+				 function,
+				 hash_value_index );
+			}
+			else
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve hash value: %d identifier size.\n%s",
+				 function,
+				 hash_value_index,
+				 error_string );
+			}
 			liberror_error_free(
 			 &error );
+
+			Py_DECREF(
+			 dictionary_object );
 
 			return( NULL );
 		}
@@ -533,97 +798,210 @@ PyObject *pyewf_handle_get_hash_values(
 			 "%s: unable to create hash value identifier.",
 			 function );
 
+			Py_DECREF(
+			 dictionary_object );
+
 			return( NULL );
 		}
 		if( libewf_handle_get_hash_value_identifier(
 		     pyewf_handle->handle,
-		     hash_value_iterator,
+		     hash_value_index,
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_size,
 		     &error ) != 1 )
 		{
-			/* TODO something with error */
-
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve hash value identifier: %d.",
-			 function,
-			 hash_value_iterator );
-
+			if( liberror_error_backtrace_sprint(
+			     error,
+			     error_string,
+			     PYEWF_ERROR_STRING_SIZE ) == -1 )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve hash value: %d identifier.",
+				 function,
+				 hash_value_index );
+			}
+			else
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve hash value: %d identifier.\n%s",
+				 function,
+				 hash_value_index,
+				 error_string );
+			}
 			liberror_error_free(
 			 &error );
+
 			memory_free(
 			 hash_value_identifier );
+
+			Py_DECREF(
+			 dictionary_object );
 
 			return( NULL );
 		}
 		hash_value_identifier_length = libcstring_narrow_string_length(
 						  hash_value_identifier );
 
-		if( libewf_handle_get_utf8_hash_value_size(
-		     pyewf_handle->handle,
-		     (uint8_t *) hash_value_identifier,
-		     hash_value_identifier_length,
-		     &hash_value_size,
-		     &error ) != 1 )
+		result = libewf_handle_get_utf8_hash_value_size(
+		          pyewf_handle->handle,
+		          (uint8_t *) hash_value_identifier,
+		          hash_value_identifier_length,
+		          &hash_value_size,
+		          &error );
+
+		if( result == -1 )
 		{
-			/* TODO something with error */
-
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 hash value size: %s.",
-			 function,
-			 hash_value_identifier );
-
+			if( liberror_error_backtrace_sprint(
+			     error,
+			     error_string,
+			     PYEWF_ERROR_STRING_SIZE ) == -1 )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve UTF-8 hash value: %s size.",
+				 function,
+				 hash_value_identifier );
+			}
+			else
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to retrieve UTF-8 hash value: %s size.\n%s",
+				 function,
+				 hash_value_identifier,
+				 error_string );
+			}
 			liberror_error_free(
 			 &error );
+
 			memory_free(
 			 hash_value_identifier );
 
-			return( NULL );
-		}
-		hash_value = (char *) memory_allocate(
-		                       sizeof( char ) * hash_value_size );
-
-		if( hash_value == NULL )
-		{
-			memory_free(
-			 hash_value_identifier );
-
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to create hash value.",
-			 function );
+			Py_DECREF(
+			 dictionary_object );
 
 			return( NULL );
 		}
 		/* Ignore emtpy hash values
 		 */
-		if( libewf_handle_get_utf8_hash_value(
-		     pyewf_handle->handle,
-		     (uint8_t *) hash_value_identifier,
-		     hash_value_identifier_length,
-		     (uint8_t *) hash_value,
-		     hash_value_size,
-		     NULL ) == 1 )
+		if( ( result != 0 )
+		 && ( hash_value_size > 0 ) )
 		{
+			hash_value = (char *) memory_allocate(
+			                       sizeof( char ) * hash_value_size );
+
+			if( hash_value == NULL )
+			{
+				memory_free(
+				 hash_value_identifier );
+
+				PyErr_Format(
+				 PyExc_MemoryError,
+				 "%s: unable to create hash value.",
+				 function );
+
+				memory_free(
+				 hash_value_identifier );
+
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
+			if( libewf_handle_get_utf8_hash_value(
+			     pyewf_handle->handle,
+			     (uint8_t *) hash_value_identifier,
+			     hash_value_identifier_length,
+			     (uint8_t *) hash_value,
+			     hash_value_size,
+			     &error ) != 1 )
+			{
+				if( liberror_error_backtrace_sprint(
+				     error,
+				     error_string,
+				     PYEWF_ERROR_STRING_SIZE ) == -1 )
+				{
+					PyErr_Format(
+					 PyExc_IOError,
+					 "%s: unable to retrieve UTF-8 hash value: %s.",
+					 function,
+					 hash_value_identifier );
+				}
+				else
+				{
+					PyErr_Format(
+					 PyExc_IOError,
+					 "%s: unable to retrieve UTF-8 hash value: %s.\n%s",
+					 function,
+					 hash_value_identifier,
+					 error_string );
+				}
+				liberror_error_free(
+				 &error );
+
+				memory_free(
+				 hash_value );
+				memory_free(
+				 hash_value_identifier );
+
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
 			string_object = PyUnicode_DecodeUTF8(
 			                 hash_value,
 			                 hash_value_size,
 			                 errors );
 
-			PyDict_SetItemString(
-			 dictionary_object,
-			 hash_value_identifier,
-			 string_object );
+			if( string_object == NULL )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to convert UTF-8 hash value: %s into Unicode.",
+				 function,
+				 hash_value_identifier );
 
-			Py_DECREF(
-			 string_object );
+				memory_free(
+				 hash_value );
+				memory_free(
+				 hash_value_identifier );
+
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
+			if( PyDict_SetItemString(
+			     dictionary_object,
+			     hash_value_identifier,
+			     string_object ) != 0 )
+			{
+				PyErr_Format(
+				 PyExc_MemoryError,
+				 "%s: unable to set hash value: %s in dictionary.",
+				 function,
+				 hash_value_identifier );
+
+				memory_free(
+				 hash_value );
+				memory_free(
+				 hash_value_identifier );
+
+				Py_DECREF(
+				 string_object );
+				Py_DECREF(
+				 dictionary_object );
+
+				return( NULL );
+			}
+			memory_free(
+			 hash_value );
 		}
 		memory_free(
 		 hash_value_identifier );
-		memory_free(
-		 hash_value );
 	}
 	return( dictionary_object );
 }
