@@ -22,6 +22,8 @@
 #if !defined( _LIBEWF_ERROR_H )
 #define _LIBEWF_ERROR_H
 
+#include <libewf/types.h>
+
 /* External error type definition hides internal structure
  */
 typedef intptr_t libewf_error_t;

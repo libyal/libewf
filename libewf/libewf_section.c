@@ -4043,7 +4043,7 @@ ssize_t libewf_section_session_read(
 
 				if( libewf_sector_list_append_sector(
 				     sessions,
-				     (uint64_t) first_sector,
+				     (uint64_t) last_first_sector,
 				     (uint64_t) number_of_sectors,
 				     0,
 				     error ) != 1 )
@@ -4075,7 +4075,7 @@ ssize_t libewf_section_session_read(
 
 			if( libewf_sector_list_append_sector(
 			     sessions,
-			     (uint64_t) first_sector,
+			     (uint64_t) last_first_sector,
 			     (uint64_t) number_of_sectors,
 			     0,
 			     error ) != 1 )

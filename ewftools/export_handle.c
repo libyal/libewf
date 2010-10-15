@@ -996,16 +996,16 @@ int export_handle_open_output(
 			     export_handle->raw_output_handle,
 			     filenames,
 			     1,
-			     LIBEWF_OPEN_WRITE,
+			     LIBSMRAW_OPEN_WRITE,
 			     error ) != 1 )
 #else
 			if( libsmraw_handle_open(
 			     export_handle->raw_output_handle,
 			     filenames,
 			     1,
-			     LIBEWF_OPEN_WRITE,
+			     LIBSMRAW_OPEN_WRITE,
 			     error ) != 1 )
-#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+#endif
 			{
 				liberror_error_set(
 				 error,

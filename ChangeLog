@@ -215,6 +215,10 @@ Next stable release:
 Test:
 * add autoconf/make test suite
 
+20101015
+* added missing types to error include header
+* fix for incorrect session information
+
 20101014
 * updated codegear project files
 * updated liberror, libbfio, libmfdata, libsmraw

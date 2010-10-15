@@ -268,6 +268,9 @@ int ewf_test_read_segment_file(
 		 error,
 		 stderr );
 
+		libewf_error_free(
+		 &error );
+
 		return( -1 );
 	}
 	if( segment_file_size > (size64_t) INT64_MAX )
@@ -279,6 +282,9 @@ int ewf_test_read_segment_file(
 		libewf_error_backtrace_fprint(
 		 error,
 		 stderr );
+
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
