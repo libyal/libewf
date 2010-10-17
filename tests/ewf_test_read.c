@@ -247,7 +247,7 @@ int ewf_test_read(
 int ewf_test_read_segment_file(
      libewf_handle_t *handle )
 {
-	libewf_error_t *error    = NULL;
+	libewf_error_t *error      = NULL;
 	size64_t segment_file_size = 0;
 	int result                 = 0;
 
@@ -345,7 +345,7 @@ int main( int argc, char * const argv[] )
 {
 	libewf_error_t *error   = NULL;
 	libewf_handle_t *handle = NULL;
-	size64_t media_size       = 0;
+	size64_t media_size     = 0;
 
 	if( argc < 2 )
 	{

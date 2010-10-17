@@ -31,6 +31,11 @@ SEQ="seq";
 
 EWF_TEST_GLOB="ewf_test_glob";
 
+function chr
+{
+	printf \\$(( ( ( $1 / 64 ) * 100 ) + ( ( ( $1 % 64 ) / 8 ) * 10 ) + ( $1 % 8 ) ))
+} 
+
 function test_glob
 { 
 	BASENAME=$1;
@@ -77,8 +82,85 @@ function test_glob_sequence
 	FILENAME=$3;
 	LAST=$4;
 
-	SEQUENCE=`${SEQ} 1 ${LAST}`;
-	FILENAMES=`for NUMBER in ${SEQUENCE}; do echo -n "${FILENAME}.${NUMBER}of${LAST} "; echo $FILE; done`;
+	RESULT=`echo ${LAST} | grep -e "^[esEL][0-9a-zA-Z][0-9a-zA-Z]$"`;
+	LAST_IS_VALID=$?;
+
+	if [ ${LAST_IS_VALID} -ne 0 ];
+	then
+		echo "Unsupported last: ${LAST}";
+
+		exit ${EXIT_FAILURE};
+	fi
+
+	FIRST_LETTER=`echo ${LAST} | cut -c 1`;
+
+	if [ ${LAST} = "${FIRST_LETTER}00" ];
+	then
+		echo "Unsupported last: ${LAST}";
+
+		exit ${EXIT_FAILURE};
+	fi
+
+	RESULT=`echo ${LAST} | grep -e "^[esEL][0-9][0-9]$"`;
+	LAST_IS_NUMERIC=$?;
+
+	if [ ${LAST_IS_NUMERIC} -eq 0 ];
+	then
+		LAST=`echo ${LAST} | cut -c '2 3'`;
+
+		SEQUENCE=`${SEQ} -w 1 ${LAST}`;
+	else
+		SEQUENCE=`${SEQ} -w 1 99`;
+	fi
+
+	FILENAMES=`for NUMBER in ${SEQUENCE}; do echo -n "${FILENAME}.${FIRST_LETTER}${NUMBER} "; echo $FILE; done`;
+
+	if [ ${LAST_IS_NUMERIC} -ne 0 ];
+	then
+		RESULT=`echo ${LAST} | grep -e "^[esEL][A-Z][A-Z]$"`;
+		LAST_IS_UPPER_CASE=$?;
+
+		SECOND_ITERATOR=0;
+		THIRD_ITERATOR=0;
+
+		if [ ${LAST_IS_UPPER_CASE} -eq 0 ];
+		then
+			SECOND_LETTER=`chr $(( 0x41 + ${SECOND_ITERATOR} ))`;
+			THIRD_LETTER=`chr $(( 0x41 + ${THIRD_ITERATOR} ))`;
+		else
+			SECOND_LETTER=`chr $(( 0x61 + ${SECOND_ITERATOR} ))`;
+			THIRD_LETTER=`chr $(( 0x61 + ${THIRD_ITERATOR} ))`;
+		fi
+
+		EXTENSION="${FIRST_LETTER}${SECOND_LETTER}${THIRD_LETTER}";
+
+		until [ ${EXTENSION} = ${LAST} ];
+		do
+			FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
+
+			THIRD_ITERATOR=$(( ${THIRD_ITERATOR} + 1 ));
+
+			if [ ${THIRD_ITERATOR} -ge 26 ];
+			then
+				SECOND_ITERATOR=$(( ${SECOND_ITERATOR} + 1 ));
+
+				THIRD_ITERATOR=0;
+			fi
+
+			if [ ${LAST_IS_UPPER_CASE} -eq 0 ];
+			then
+				SECOND_LETTER=`chr $(( 0x41 + ${SECOND_ITERATOR} ))`;
+				THIRD_LETTER=`chr $(( 0x41 + ${THIRD_ITERATOR} ))`;
+			else
+				SECOND_LETTER=`chr $(( 0x61 + ${SECOND_ITERATOR} ))`;
+				THIRD_LETTER=`chr $(( 0x61 + ${THIRD_ITERATOR} ))`;
+			fi
+
+			EXTENSION="${FIRST_LETTER}${SECOND_LETTER}${THIRD_LETTER}";
+		done
+
+		FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
+	fi
 
 	mkdir ${TMP};
 	cd ${TMP};
@@ -137,6 +219,11 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+if ! test_glob_sequence "PREFIX.e01" ".e01" "PREFIX" "eba";
+then
+	exit ${EXIT_FAILURE};
+fi
+
 if ! test_glob "PREFIX.s01" ".s01" "PREFIX.s01";
 then
 	exit ${EXIT_FAILURE};
@@ -152,6 +239,11 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+if ! test_glob_sequence "PREFIX.s01" ".s01" "PREFIX" "sba";
+then
+	exit ${EXIT_FAILURE};
+fi
+
 if ! test_glob "PREFIX.E01" ".E01" "PREFIX.E01";
 then
 	exit ${EXIT_FAILURE};
@@ -163,6 +255,31 @@ then
 fi
 
 if ! test_glob "PREFIX.E01" ".E01" "PREFIX.E01 PREFIX.E02 PREFIX.E03 PREFIX.E04 PREFIX.E05 PREFIX.E06 PREFIX.E07 PREFIX.E08 PREFIX.E09 PREFIX.E10 PREFIX.E11";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob_sequence "PREFIX.E01" ".E01" "PREFIX" "EBA";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob "PREFIX.L01" ".L01" "PREFIX.L01";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob "PREFIX.L01" ".L01" "PREFIX.L01 PREFIX.L02 PREFIX.L03 PREFIX.L04 PREFIX.L05 PREFIX.L06 PREFIX.L07 PREFIX.L08 PREFIX.L09";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob "PREFIX.L01" ".L01" "PREFIX.L01 PREFIX.L02 PREFIX.L03 PREFIX.L04 PREFIX.L05 PREFIX.L06 PREFIX.L07 PREFIX.L08 PREFIX.L09 PREFIX.L10 PREFIX.L11";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob_sequence "PREFIX.L01" ".L01" "PREFIX" "LBA";
 then
 	exit ${EXIT_FAILURE};
 fi

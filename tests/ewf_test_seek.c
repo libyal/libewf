@@ -48,7 +48,7 @@ int ewf_test_seek_offset(
      off64_t output_offset )
 {
 	const char *whence_string = NULL;
-	libewf_error_t *error   = NULL;
+	libewf_error_t *error     = NULL;
 	off64_t result_offset     = 0;
 	int result                = 0;
 
@@ -126,7 +126,7 @@ int main( int argc, char * const argv[] )
 {
 	libewf_error_t *error   = NULL;
 	libewf_handle_t *handle = NULL;
-	size64_t media_size       = 0;
+	size64_t media_size     = 0;
 
 	if( argc < 2 )
 	{

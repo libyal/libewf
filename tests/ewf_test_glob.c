@@ -44,7 +44,7 @@ int main( int argc, char * const argv[] )
 #else
 	char **filenames        = NULL;
 #endif
-	libewf_error_t *error = NULL;
+	libewf_error_t *error   = NULL;
 	int number_of_filenames = 0;
 	int filename_iterator   = 0;
 

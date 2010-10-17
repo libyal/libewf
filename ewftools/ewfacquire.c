@@ -551,13 +551,15 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 		 "\n" );
 	}
 	fprintf(
-	 stream, "Acquiry start offset:\t\t%" PRIi64 "\n",
+	 stream,
+	 "Acquiry start offset:\t\t%" PRIi64 "\n",
 	 acquiry_offset );
 
 	if( resume_acquiry != 0 )
 	{
 		fprintf(
-		 stream, "Resuming acquiry at offset:\t%" PRIi64 "\n",
+		 stream,
+		 "Resuming acquiry at offset:\t%" PRIi64 "\n",
 		 resume_acquiry_offset );
 	}
 	result = byte_size_string_create(
@@ -583,7 +585,8 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 		fprintf(
 		 stream,
 		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
-		 acquiry_size_string, acquiry_size );
+		 acquiry_size_string,
+		 acquiry_size );
 	}
 	else
 	{
@@ -610,7 +613,8 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	if( result == 1 )
 	{
 		fprintf(
-		 stream, "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
+		 stream,
+		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
 		 segment_file_size_string,
 		 segment_file_size );
 	}
@@ -923,9 +927,18 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	if( ( acquiry_size == 0 )
-         || ( acquiry_size > media_size )
-         || ( acquiry_size > (ssize64_t) INT64_MAX ) )
+        if( acquiry_size > (ssize64_t) INT64_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid write size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( acquiry_size > media_size )
 	{
 		liberror_error_set(
 		 error,
@@ -1044,7 +1057,6 @@ ssize64_t ewfacquire_read_input(
 		process_buffer_size = (size_t) chunk_size;
 	}
 #endif
-
 	if( storage_media_buffer_initialize(
 	     &storage_media_buffer,
 	     process_buffer_size,
@@ -1206,7 +1218,8 @@ ssize64_t ewfacquire_read_input(
 				 LIBERROR_IO_ERROR_READ_FAILED,
 				 "%s: more bytes read than requested.",
 				 function,
-				 process_count, read_size );
+				 process_count,
+				 read_size );
 
 				storage_media_buffer_free(
 				 &storage_media_buffer,

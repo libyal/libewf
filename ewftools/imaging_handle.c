@@ -2779,6 +2779,10 @@ int imaging_handle_append_read_error(
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / imaging_handle->bytes_per_sector;
 
+	if( ( number_of_bytes % imaging_handle->bytes_per_sector ) != 0 )
+	{
+		number_of_sectors += 1;
+	}
 	if( libewf_handle_append_acquiry_error(
 	     imaging_handle->output_handle,
 	     start_sector,
@@ -2864,6 +2868,10 @@ int imaging_handle_append_session(
 	start_sector      = start_offset / imaging_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / imaging_handle->bytes_per_sector;
 
+	if( ( number_of_bytes % imaging_handle->bytes_per_sector ) != 0 )
+	{
+		number_of_sectors += 1;
+	}
 	if( libewf_handle_append_session(
 	     imaging_handle->output_handle,
 	     start_sector,

@@ -82,6 +82,62 @@ int libewf_handle_set_maximum_amount_of_open_handles(
 	         error ) );
 }
 
+/* Retrieves the segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t *segment_file_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_maximum_segment_size(
+	         handle,
+	         segment_file_size,
+	         error ) );
+}
+
+/* Sets the segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t segment_file_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_set_maximum_segment_size(
+	         handle,
+	         segment_file_size,
+	         error ) );
+}
+
+/* Retrieves the delta segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_delta_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t *delta_segment_file_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_get_maximum_delta_segment_size(
+	         handle,
+	         delta_segment_file_size,
+	         error ) );
+}
+
+/* Sets the delta segment file size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_delta_segment_file_size(
+     libewf_handle_t *handle,
+     size64_t delta_segment_file_size,
+     liberror_error_t **error )
+{
+	return( libewf_handle_set_maximum_delta_segment_size(
+	         handle,
+	         delta_segment_file_size,
+	         error ) );
+}
+
 /* Retrieves the amount of sectors from the media information
  * Returns 1 if successful or -1 on error
  */

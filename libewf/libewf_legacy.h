@@ -53,6 +53,26 @@ LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
                    int maximum_amount_of_open_handles,
                    liberror_error_t **error );
 
+LIBEWF_EXTERN int libewf_handle_get_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *segment_file_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t segment_file_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *delta_segment_file_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t delta_segment_file_size,
+                   liberror_error_t **error );
+
 LIBEWF_EXTERN int libewf_handle_get_amount_of_sectors(
                    libewf_handle_t *handle,
                    uint64_t *amount_of_sectors,

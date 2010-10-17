@@ -1111,6 +1111,10 @@ int verification_handle_append_read_error(
 	start_sector      = start_offset / verification_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / verification_handle->bytes_per_sector;
 
+	if( ( number_of_bytes % verification_handle->bytes_per_sector ) != 0 )
+	{
+		number_of_sectors += 1;
+	}
 	if( libewf_handle_append_checksum_error(
 	     verification_handle->input_handle,
 	     start_sector,

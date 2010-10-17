@@ -4829,16 +4829,16 @@ int libewf_handle_set_segment_filename_wide(
 
 #endif
 
-/* Retrieves the segment file size
+/* Retrieves the maximum segment file size
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_segment_file_size(
+int libewf_handle_get_maximum_segment_size(
      libewf_handle_t *handle,
-     size64_t *segment_file_size,
+     size64_t *maximum_segment_size,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_segment_file_size";
+	static char *function                     = "libewf_handle_get_maximum_segment_size";
 
 	if( handle == NULL )
 	{
@@ -4864,32 +4864,32 @@ int libewf_handle_get_segment_file_size(
 
 		return( -1 );
 	}
-	if( segment_file_size == NULL )
+	if( maximum_segment_size == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file size.",
+		 "%s: invalid maximum segment size.",
 		 function );
 
 		return( -1 );
 	}
-	*segment_file_size = internal_handle->segment_table->maximum_segment_size;
+	*maximum_segment_size = internal_handle->segment_table->maximum_segment_size;
 
 	return( 1 );
 }
 
-/* Sets the segment file size
+/* Sets the maximum segment file size
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_set_segment_file_size(
+int libewf_handle_set_maximum_segment_size(
      libewf_handle_t *handle,
-     size64_t segment_file_size,
+     size64_t maximum_segment_size,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_segment_file_size";
+	static char *function                     = "libewf_handle_set_maximum_segment_size";
 
 	if( handle == NULL )
 	{
@@ -4923,24 +4923,24 @@ int libewf_handle_set_segment_file_size(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: segment file size cannot be changed.",
+		 "%s: maximum segment size cannot be changed.",
 		 function );
 
 		return( -1 );
 	}
-	if( segment_file_size > (size64_t) INT64_MAX )
+	if( maximum_segment_size > (size64_t) INT64_MAX )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid segment file size value exceeds maximum.",
+		 "%s: invalid maximum segment size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( segment_file_size == 0 )
-	 || ( segment_file_size > internal_handle->write_io_handle->maximum_segment_file_size ) )
+	if( ( maximum_segment_size == 0 )
+	 || ( maximum_segment_size > internal_handle->write_io_handle->maximum_segment_file_size ) )
 	{
 		liberror_error_set(
 		 error,
@@ -4951,7 +4951,7 @@ int libewf_handle_set_segment_file_size(
 
 		return( -1 );
 	}
-	internal_handle->segment_table->maximum_segment_size = segment_file_size;
+	internal_handle->segment_table->maximum_segment_size = maximum_segment_size;
 
 	return( 1 );
 }
@@ -5318,16 +5318,16 @@ int libewf_handle_set_delta_segment_filename_wide(
 
 #endif
 
-/* Retrieves the delta segment file size
+/* Retrieves the maximum delta segment file size
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_delta_segment_file_size(
+int libewf_handle_get_maximum_delta_segment_size(
      libewf_handle_t *handle,
-     size64_t *delta_segment_file_size,
+     size64_t *maximum_delta_segment_size,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_delta_segment_file_size";
+	static char *function                     = "libewf_handle_get_maximum_delta_segment_size";
 
 	if( handle == NULL )
 	{
@@ -5353,32 +5353,32 @@ int libewf_handle_get_delta_segment_file_size(
 
 		return( -1 );
 	}
-	if( delta_segment_file_size == NULL )
+	if( maximum_delta_segment_size == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid delta segment file size.",
+		 "%s: invalid maximum delta segment size.",
 		 function );
 
 		return( -1 );
 	}
-	*delta_segment_file_size = internal_handle->delta_segment_table->maximum_segment_size;
+	*maximum_delta_segment_size = internal_handle->delta_segment_table->maximum_segment_size;
 
 	return( 1 );
 }
 
-/* Sets the delta segment file size
+/* Sets the maximum delta segment file size
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_set_delta_segment_file_size(
+int libewf_handle_set_maximum_delta_segment_size(
      libewf_handle_t *handle,
-     size64_t delta_segment_file_size,
+     size64_t maximum_delta_segment_size,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_delta_segment_file_size";
+	static char *function                     = "libewf_handle_set_maximum_delta_segment_size";
 
 	if( handle == NULL )
 	{
@@ -5411,34 +5411,34 @@ int libewf_handle_set_delta_segment_file_size(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: delta segment file size cannot be changed.",
+		 "%s: maximum delta segment size cannot be changed.",
 		 function );
 
 		return( -1 );
 	}
-	if( delta_segment_file_size > (size64_t) INT64_MAX )
+	if( maximum_delta_segment_size > (size64_t) INT64_MAX )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid delta segment file size value exceeds maximum.",
+		 "%s: invalid maximum delta segment size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	if( delta_segment_file_size == 0 )
+	if( maximum_delta_segment_size == 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid delta segment file size value out of bounds.",
+		 "%s: invalid maximum delta segment size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle->delta_segment_table->maximum_segment_size = delta_segment_file_size;
+	internal_handle->delta_segment_table->maximum_segment_size = maximum_delta_segment_size;
 
 	return( 1 );
 }
@@ -5825,8 +5825,8 @@ int libewf_internal_handle_set_media_values(
 	static char *function            = "libewf_internal_handle_set_media_values";
 	size32_t chunk_size              = 0;
 	size64_t maximum_input_file_size = 0;
+	uint64_t number_of_chunks        = 0;
 	uint64_t number_of_sectors       = 0;
-	int64_t number_of_chunks         = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -5930,13 +5930,13 @@ int libewf_internal_handle_set_media_values(
 	{
 		/* Determine the number of chunks to write
 		 */
-		number_of_chunks = (int64_t) media_size / (int64_t) chunk_size;
+		number_of_chunks = (uint64_t) media_size / (uint64_t) chunk_size;
 
-		if( ( media_size % chunk_size ) != 0 )
+		if( ( (uint64_t) media_size % (uint64_t) chunk_size ) != 0 )
 		{
 			number_of_chunks += 1;
 		}
-		if( number_of_chunks > (int64_t) UINT32_MAX )
+		if( number_of_chunks > (uint64_t) UINT32_MAX )
 		{
 			liberror_error_set(
 			 error,
@@ -5953,6 +5953,12 @@ int libewf_internal_handle_set_media_values(
 		 */
 		number_of_sectors = (uint64_t) media_size / (uint64_t) bytes_per_sector;
 
+/* TODO what to do with a non-sector multitude media size
+		if( ( (uint64_t) media_size % (uint64_t) bytes_per_sector ) != 0 )
+		{
+			number_of_sectors += 1;
+		}
+*/
 		if( number_of_sectors > (uint64_t) INT64_MAX )
 		{
 			liberror_error_set(

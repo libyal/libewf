@@ -511,20 +511,20 @@ LIBEWF_EXTERN int libewf_handle_set_segment_filename_wide(
                    libewf_error_t **error );
 #endif
 
-/* Retrieves the segment file size
+/* Retrieves the maximum segment file size
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_get_segment_file_size(
+LIBEWF_EXTERN int libewf_handle_get_maximum_segment_size(
                    libewf_handle_t *handle,
-                   size64_t *segment_file_size,
+                   size64_t *maximum_segment_size,
                    libewf_error_t **error );
 
-/* Sets the segment file size
+/* Sets the maximum segment file size
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_set_segment_file_size(
+LIBEWF_EXTERN int libewf_handle_set_maximum_segment_size(
                    libewf_handle_t *handle,
-                   size64_t segment_file_size,
+                   size64_t maximum_segment_size,
                    libewf_error_t **error );
 
 /* Retrieves the delta segment filename size
@@ -585,20 +585,20 @@ LIBEWF_EXTERN int libewf_handle_set_delta_segment_filename_wide(
                    libewf_error_t **error );
 #endif
 
-/* Retrieves the delta segment file size
+/* Retrieves the maximum delta segment file size
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_get_delta_segment_file_size(
+LIBEWF_EXTERN int libewf_handle_get_maximum_delta_segment_size(
                    libewf_handle_t *handle,
-                   size64_t *delta_segment_file_size,
+                   size64_t *maximum_delta_segment_size,
                    libewf_error_t **error );
 
-/* Sets the delta segment file size
+/* Sets the maximum delta segment file size
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
+LIBEWF_EXTERN int libewf_handle_set_maximum_delta_segment_size(
                    libewf_handle_t *handle,
-                   size64_t delta_segment_file_size,
+                   size64_t maximum_delta_segment_size,
                    libewf_error_t **error );
 
 /* Retrieves the filename size of the (delta) segment file of the current chunk
@@ -686,6 +686,50 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_handle_get_write_amount_of_chunks(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_chunks,
+                   libewf_error_t **error );
+
+/* Retrieves the segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_maximum_segment_size instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN int libewf_handle_get_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *segment_file_size,
+                   libewf_error_t **error );
+
+/* Sets the segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_set_maximum_segment_size instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN int libewf_handle_set_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t segment_file_size,
+                   libewf_error_t **error );
+
+/* Retrieves the delta segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_maximum_delta_segment_size instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN int libewf_handle_get_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t *delta_segment_file_size,
+                   libewf_error_t **error );
+
+/* Sets the delta segment file size
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_set_maximum_delta_segment_size instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t delta_segment_file_size,
                    libewf_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -2262,7 +2306,7 @@ LIBEWF_EXTERN int libewf_set_segment_filename_wide(
 /* Retrieves the segment file size
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_get_segment_file_size instead
+ * This function is deprecated use libewf_handle_get_maximum_segment_size instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_segment_file_size(
@@ -2272,7 +2316,7 @@ LIBEWF_EXTERN int libewf_get_segment_file_size(
 /* Sets the segment file size
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_set_segment_file_size instead
+ * This function is deprecated use libewf_handle_set_maximum_segment_size instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_set_segment_file_size(
@@ -2330,7 +2374,7 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
 /* Retrieves the delta segment file size
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_get_delta_segment_file_size instead
+ * This function is deprecated use libewf_handle_get_maximum_delta_segment_size instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_delta_segment_file_size(
@@ -2340,7 +2384,7 @@ LIBEWF_EXTERN int libewf_get_delta_segment_file_size(
 /* Sets the delta segment file size
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_set_delta_segment_file_size instead
+ * This function is deprecated use libewf_handle_set_maximum_delta_segment_size instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_set_delta_segment_file_size(

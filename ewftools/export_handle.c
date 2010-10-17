@@ -2619,6 +2619,10 @@ int export_handle_append_read_error(
 	start_sector      = start_offset / export_handle->bytes_per_sector;
 	number_of_sectors = number_of_bytes / export_handle->bytes_per_sector;
 
+	if( ( number_of_bytes % export_handle->bytes_per_sector ) != 0 )
+	{
+		number_of_sectors += 1;
+	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( libewf_handle_append_checksum_error(
 	     export_handle->input_handle,
@@ -2649,7 +2653,6 @@ int export_handle_append_read_error(
 
 			return( -1 );
 		}
-
 		if( libewf_handle_append_acquiry_error(
 		     export_handle->ewf_output_handle,
 		     start_sector,
