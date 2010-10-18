@@ -200,7 +200,7 @@ int imaging_handle_get_output_values(
      int8_t *compression_level,
      uint8_t *compression_flags,
      uint8_t *libewf_format,
-     size64_t *segment_file_size,
+     size64_t *maximum_segment_size,
      uint32_t *sectors_per_chunk,
      uint32_t *sector_error_granularity,
      liberror_error_t **error );
@@ -235,7 +235,7 @@ int imaging_handle_set_output_values(
      int8_t compression_level,
      uint8_t compression_flags,
      uint8_t libewf_format,
-     size64_t segment_file_size,
+     size64_t maximum_segment_size,
      uint32_t sectors_per_chunk,
      uint32_t sector_error_granularity,
      liberror_error_t **error );

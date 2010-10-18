@@ -1549,7 +1549,7 @@ int imaging_handle_get_output_values(
      int8_t *compression_level,
      uint8_t *compression_flags,
      uint8_t *libewf_format,
-     size64_t *segment_file_size,
+     size64_t *maximum_segment_size,
      uint32_t *sectors_per_chunk,
      uint32_t *sector_error_granularity,
      liberror_error_t **error )
@@ -1804,16 +1804,16 @@ int imaging_handle_get_output_values(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_segment_file_size(
+	if( libewf_handle_get_maximum_segment_size(
 	     imaging_handle->output_handle,
-	     segment_file_size,
+	     maximum_segment_size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment file size.",
+		 "%s: unable to retrieve maximum segment size.",
 		 function );
 
 		return( -1 );
@@ -1882,7 +1882,7 @@ int imaging_handle_set_output_values(
      int8_t compression_level,
      uint8_t compression_flags,
      uint8_t libewf_format,
-     size64_t segment_file_size,
+     size64_t maximum_segment_size,
      uint32_t sectors_per_chunk,
      uint32_t sector_error_granularity,
      liberror_error_t **error )
@@ -2235,16 +2235,16 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_segment_file_size(
+	if( libewf_handle_set_maximum_segment_size(
 	     imaging_handle->output_handle,
-	     segment_file_size,
+	     maximum_segment_size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set segment file size.",
+		 "%s: unable to set maximum segment size.",
 		 function );
 
 		return( -1 );
@@ -2380,16 +2380,16 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( libewf_handle_set_segment_file_size(
+		if( libewf_handle_set_maximum_segment_size(
 		     imaging_handle->secondary_output_handle,
-		     segment_file_size,
+		     maximum_segment_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set segment file size in secondary output handle.",
+			 "%s: unable to set maximum segment size in secondary output handle.",
 			 function );
 
 			return( -1 );

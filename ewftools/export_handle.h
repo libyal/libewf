@@ -257,7 +257,7 @@ int export_handle_set_output_values(
      int8_t compression_level,
      uint8_t compression_flags,
      uint8_t libewf_format,
-     size64_t segment_file_size,
+     size64_t maximum_segment_size,
      uint32_t sectors_per_chunk,
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error );

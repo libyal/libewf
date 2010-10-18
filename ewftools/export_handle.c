@@ -2054,7 +2054,7 @@ int export_handle_set_output_values(
      int8_t compression_level,
      uint8_t compression_flags,
      uint8_t libewf_format,
-     size64_t segment_file_size,
+     size64_t maximum_segment_size,
      uint32_t sectors_per_chunk,
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error )
@@ -2327,16 +2327,16 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( libewf_handle_set_segment_file_size(
+		if( libewf_handle_set_maximum_segment_size(
 		     export_handle->ewf_output_handle,
-		     segment_file_size,
+		     maximum_segment_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set segment file size.",
+			 "%s: unable to set maximum segment size.",
 			 function );
 
 			return( -1 );
@@ -2423,14 +2423,14 @@ int export_handle_set_output_values(
 		}
 		if( libsmraw_handle_set_maximum_segment_size(
 		     export_handle->raw_output_handle,
-		     segment_file_size,
+		     maximum_segment_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set segment file size.",
+			 "%s: unable to set maximum segment size.",
 			 function );
 
 			return( -1 );

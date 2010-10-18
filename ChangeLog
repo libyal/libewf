@@ -1,7 +1,6 @@
 TODO
 * have libewf write empty ewf file if media size is 0
 * have libewf handle non-sector multitude media size
-* rename libewf_handle_[gs]et_segment_file_size in libewf_handle_[gs]et_maximum_segment_size
 
 * single file entry:
   - are flags similar to file attribute flags ?
@@ -216,12 +215,16 @@ Next stable release:
 * full test
 * disable ewfalter, ewfdebug
 
+20101018
+* renamed libewf_handle_[gs]et_segment_file_size
+
 20101017
 * ewfacquire now allows 0 byte input file
 * fixed number of sector rounding errors in output
   issue only affects media sizes which are a non-sector multitude
 * worked on automated tests
   - improved glob test
+* renamed libewf_handle_[gs]et_segment_file_size
 
 20101015
 * added missing types to error include header
