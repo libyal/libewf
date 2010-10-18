@@ -3591,7 +3591,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 	}
 #endif
 
-	/* Determine the size of data to read
+	/* Determine the size of data to read from the buffer
 	 */
 	if( data_size < (size_t) media_values->chunk_size )
 	{
@@ -3645,7 +3645,6 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 			 read_size );
 		}
 #endif
-
 		if( memory_copy(
 		     &( chunk_cache->data[ chunk_cache->data_offset ] ),
 		     buffer,

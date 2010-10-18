@@ -154,29 +154,32 @@ int ewf_test_write(
 			return( -1 );
 		}
 	}
-	if( libewf_handle_set_maximum_segment_size(
-	     handle,
-	     maximum_segment_size,
-	     &error ) != 1 )
+	if( maximum_segment_size > 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable set maximum segment size.\n" );
+		if( libewf_handle_set_maximum_segment_size(
+		     handle,
+		     maximum_segment_size,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable set maximum segment size.\n" );
 
-		libewf_error_backtrace_fprint(
-		 error,
-		 stderr );
+			libewf_error_backtrace_fprint(
+			 error,
+			 stderr );
 
-		libewf_error_free(
-		 &error );
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
+			libewf_error_free(
+			 &error );
+			libewf_handle_close(
+			 handle,
+			 NULL );
+			libewf_handle_free(
+			 &handle,
+			 NULL );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	write_size = 512;
 

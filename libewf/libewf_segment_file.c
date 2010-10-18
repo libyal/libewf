@@ -962,8 +962,8 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          liberror_error_t **error )
 {
 	static char *function           = "libewf_segment_file_write_chunks_section_start";
-	ssize_t write_count             = 0;
 	size_t section_size             = 0;
+	ssize_t write_count             = 0;
 	uint32_t number_of_chunk_values = 0;
 
 	if( segment_file_handle == NULL )
@@ -984,17 +984,6 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( table_offsets == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid table offsets.",
 		 function );
 
 		return( -1 );

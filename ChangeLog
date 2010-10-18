@@ -217,6 +217,7 @@ Next stable release:
 
 20101018
 * renamed libewf_handle_[gs]et_segment_file_size
+* worked on write beyond media size
 
 20101017
 * ewfacquire now allows 0 byte input file

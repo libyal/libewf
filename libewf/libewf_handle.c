@@ -3988,6 +3988,11 @@ ssize_t libewf_handle_write_buffer(
 			return( -1 );
 		}
 	}
+	if( ( internal_handle->media_values->media_size > 0 )
+	 && ( (size64_t) ( internal_handle->io_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size ) )
+	{
+		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
+	}
 	while( buffer_size > 0 )
 	{
 		if( ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )

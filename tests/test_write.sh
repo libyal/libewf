@@ -42,7 +42,7 @@ function test_write
 	echo "";
 
 	cd ..;
-	rm -rf ${TMP};
+	#rm -rf ${TMP};
 
 	return ${RESULT};
 }
