@@ -1490,6 +1490,7 @@ int main( int argc, char * const argv[] )
 					 "Unsupported EWF file format type defaulting to: encase6.\n" );
 				}
 				else if( ( ewf_format == LIBEWF_FORMAT_EWF )
+				      || ( ewf_format == LIBEWF_FORMAT_ENCASE1 )
 				      || ( ewf_format == LIBEWF_FORMAT_SMART ) )
 				{
 					ewf_format = LIBEWF_FORMAT_ENCASE6;

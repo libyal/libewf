@@ -369,16 +369,6 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
   dnl Byte stream functions
   AC_CHECK_LIB(
    una,
-   libuna_utf8_string_size_from_byte_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf8_string_copy_from_byte_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
    libuna_byte_stream_size_from_utf8,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
@@ -389,32 +379,12 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
-   libuna_utf16_string_size_from_byte_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf16_string_copy_from_byte_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
    libuna_byte_stream_size_from_utf16,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
    libuna_byte_stream_copy_from_utf16,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf32_string_size_from_byte_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf32_string_copy_from_byte_stream,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
@@ -431,16 +401,6 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
   dnl UTF-8 stream functions
   AC_CHECK_LIB(
    una,
-   libuna_utf8_string_size_from_utf8_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf8_string_copy_from_utf8_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
    libuna_utf8_stream_size_from_utf8,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
@@ -451,32 +411,12 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
-   libuna_utf16_string_size_from_utf8_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf16_string_copy_from_utf8_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-   AC_CHECK_LIB(
-   una,
    libuna_utf8_stream_size_from_utf16,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
    libuna_utf8_stream_copy_from_utf16,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf32_string_size_from_utf8_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf32_string_copy_from_utf8_stream,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
@@ -493,32 +433,12 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
   dnl UTF-16 stream functions
   AC_CHECK_LIB(
    una,
-   libuna_utf8_string_size_from_utf16_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf8_string_copy_from_utf16_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
    libuna_utf16_stream_size_from_utf8,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
    libuna_utf16_stream_copy_from_utf8,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf16_string_size_from_utf16_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf16_string_copy_from_utf16_stream,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
@@ -533,16 +453,6 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
    [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
-   libuna_utf32_string_size_from_utf16_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
-   libuna_utf32_string_copy_from_utf16_stream,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libuna=no])
-  AC_CHECK_LIB(
-   una,
    libuna_utf16_stream_size_from_utf32,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
@@ -552,7 +462,79 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
 
+  dnl UTF-32 stream functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_stream_size_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_stream_copy_from_utf8,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_stream_size_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_stream_copy_from_utf16,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_stream_size_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_stream_copy_from_utf32,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+
   dnl UTF-8 string functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_size_from_utf32_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf8_string_copy_from_utf32_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
    libuna_utf8_string_size_from_utf16,
@@ -577,6 +559,46 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
   dnl UTF-16 string functions
   AC_CHECK_LIB(
    una,
+   libuna_utf16_string_size_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_size_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_size_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_size_from_utf32_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf16_string_copy_from_utf32_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
    libuna_utf16_string_size_from_utf8,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libuna=no])
@@ -587,6 +609,46 @@ AC_DEFUN([LIBEWF_CHECK_LIBUNA],
    [ac_libewf_have_libuna=no])
 
   dnl UTF-32 string functions
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_byte_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_utf8_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_utf16_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_size_from_utf32_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
+  AC_CHECK_LIB(
+   una,
+   libuna_utf32_string_copy_from_utf32_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libuna=no])
   AC_CHECK_LIB(
    una,
    libuna_utf32_string_size_from_utf8,
@@ -640,7 +702,27 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
    libbfio_handle_read,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_write,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
 
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_is_open,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_get_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_get_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
   AC_CHECK_LIB(
    bfio,
    libbfio_handle_set_track_offsets_read,
@@ -767,6 +849,276 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
   ])
  ])
 
+dnl Function to detect if libmfdata available
+AC_DEFUN([LIBEWF_CHECK_LIBMFDATA],
+ [AC_CHECK_HEADERS([libmfdata.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libmfdata_h" = xno],
+  [ac_libewf_have_libmfdata=no],
+  [ac_libewf_have_libmfdata=yes
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_get_version,
+   [],
+   [ac_libewf_have_libmfdata=no])
+ 
+  dnl Segment table functions
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_empty,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_resize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_read_buffer,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_seek_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_write_buffer,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_get_file_io_handle,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_get_maximum_segment_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_get_number_of_segments,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_get_value_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_get_value_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_set_maximum_segment_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  AC_CHECK_LIB(
+   mfdata,
+   libmfdata_segment_table_set_segment_by_index,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libmfdata=no])
+  ])
+ ])
+
+dnl Function to detect if libfvalue available
+AC_DEFUN([LIBEWF_CHECK_LIBFVALUE],
+ [AC_CHECK_HEADERS([libfvalue.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libfvalue_h" = xno],
+  [ac_libewf_have_libfvalue=no],
+  [ac_libewf_have_libfvalue=yes
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_get_version,
+   [],
+   [ac_libewf_have_libfvalue=no])
+ 
+  dnl String functions
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_utf8_string_decimal_copy_from_8bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_utf8_string_decimal_copy_from_16bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_utf8_string_decimal_copy_from_32bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_utf8_string_decimal_copy_to_64bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_utf8_string_hexadecimal_copy_to_64bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_utf16_string_decimal_copy_from_8bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_utf16_string_decimal_copy_from_16bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+ 
+  dnl Table functions
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_get_number_of_values,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_get_value_by_identifier,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_get_value_by_index,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_set_value,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_set_value_by_index,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+ 
+  dnl Value functions
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_clone,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_get_identifier,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_set_identifier,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_get_data,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_set_data,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_has_data,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_copy_from_64bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_copy_to_64bit,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_get_utf8_string_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_copy_from_utf8_string,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_copy_to_utf8_string,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_get_utf16_string_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_copy_from_utf16_string,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_copy_to_utf16_string,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_value_write_to_file_stream,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  ])
+ ])
+
 dnl Function to detect if libsmdev available
 AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
  [AC_CHECK_HEADERS([libsmdev.h])
@@ -780,6 +1132,20 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
    libsmdev_get_version,
    [],
    [ac_libewf_have_libsmdev=no])
+
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_check_device,
+   [],
+   [ac_libewf_have_libsmdev=no])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_enable_wide_character_type" != xno],
+   [AC_CHECK_LIB(
+    smdev,
+    libsmdev_check_device_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libsmdev=no]) ])
 
   dnl Handle functions
   AC_CHECK_LIB(
@@ -809,7 +1175,7 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
    [ac_libewf_have_libsmdev=no])
   AC_CHECK_LIB(
    smdev,
-   libsmdev_handle_write_buffer,
+   libsmdev_handle_seek_offset,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmdev=no])
 
@@ -820,6 +1186,74 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
     libsmdev_handle_open_wide,
     [ac_libewf_dummy=yes],
     [ac_libewf_have_libsmdev=no]) ])
+
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_signal_abort,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_bus_type,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_bytes_per_sector,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_error,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_information_value,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_media_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_media_type,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_number_of_errors,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_number_of_sessions,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_session,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_set_error_flags,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_set_error_granularity,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_set_number_of_error_retries,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
   ])
  ])
 
@@ -865,6 +1299,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
    [ac_libewf_have_libsmraw=no])
   AC_CHECK_LIB(
    smraw,
+   libsmraw_handle_seek_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
    libsmraw_handle_write_buffer,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmraw=no])
@@ -876,6 +1315,39 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
     libsmraw_handle_open_wide,
     [ac_libewf_dummy=yes],
     [ac_libewf_have_libsmraw=no]) ])
+
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_signal_abort,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_get_media_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_get_utf8_information_value
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_set_maximum_segment_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_set_media_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_set_utf8_integrity_hash_value
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
   ])
  ])
 

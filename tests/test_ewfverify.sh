@@ -24,6 +24,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
+ERROR_INPUT="error";
 INPUT="input";
 TMP="tmp";
 
@@ -31,26 +32,13 @@ LS="ls";
 TR="tr";
 WC="wc";
 
-EWFVERIFY="../ewftools/ewfverify";
-
 function test_verify
 { 
-	echo "Testing ewfverify of input:" $*;
+	INPUT_FILE=$1;
 
-	./${EWFVERIFY} -q $*;
+	echo "Testing ewfverify of input: ${INPUT_FILE}";
 
-	RESULT=$?;
-
-	echo "";
-
-	return ${RESULT};
-}
-
-function test_verify_sha1
-{ 
-	echo "Testing ewfverify with SHA1 of input:" $*;
-
-	./${EWFVERIFY} -q -d sha1 $*;
+	./${EWFVERIFY} -q -d sha1 ${INPUT_FILE};
 
 	RESULT=$?;
 
@@ -58,6 +46,13 @@ function test_verify_sha1
 
 	return ${RESULT};
 }
+
+EWFVERIFY="../ewftools/ewfverify";
+
+if ! test -x ${EWFVERIFY};
+then
+	EWFVERIFY="../ewftools/ewfverify.exe";
+fi
 
 if ! test -x ${EWFVERIFY};
 then
@@ -68,35 +63,52 @@ fi
 
 if ! test -d ${INPUT};
 then
-	echo "No input directory found, to test read create input directory and place test files in directory.";
+	echo "No ${INPUT} directory found, to test ewfverify create ${INPUT} directory and place EWF test files in directory.";
 
 	exit ${EXIT_IGNORE};
 fi
 
-RESULT=`${LS} ${INPUT}/*.[eE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+EXIT_RESULT=${EXIT_IGNORE};
 
-if test ${RESULT} -eq 0;
+if test -d ${INPUT};
 then
-	echo "No files found in input directory, to test read place test files in directory.";
+	RESULT=`${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
 
-	exit ${EXIT_IGNORE};
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files found in ${INPUT} directory, to test ewfverify place EWF test files in directory.";
+	else
+		for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
+		do
+			if ! test_verify "${FILENAME}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+
+		EXIT_RESULT=${EXIT_SUCCESS};
+	fi
 fi
 
-for FILENAME in `${LS} ${INPUT}/*.[eE]01 | ${TR} ' ' '\n'`;
-do
-	if ! test_verify "${FILENAME}";
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
+if test -d ${ERROR_INPUT};
+then
+	RESULT=`${LS} ${ERROR_INPUT}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
 
-for FILENAME in `${LS} ${INPUT}/*.[eE]01 | ${TR} ' ' '\n'`;
-do
-	if ! test_verify_sha1 "${FILENAME}";
+	if test ${RESULT} -eq 0;
 	then
-		exit ${EXIT_FAILURE};
-	fi
-done
+		echo "No files found in error directory, to test read place test files in directory.";
+	else
+		for FILENAME in `${LS} ${ERROR_INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
+		do
+			if test_verify "${FILENAME}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
 
-exit ${EXIT_SUCCESS};
+		EXIT_RESULT=${EXIT_SUCCESS};
+	fi
+fi
+
+exit ${EXIT_RESULT};
 

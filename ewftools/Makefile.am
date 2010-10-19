@@ -18,7 +18,6 @@ AM_LDFLAGS = @STATIC_LDFLAGS@
 bin_PROGRAMS = \
 	ewfacquire \
 	ewfacquirestream \
-	ewfalter \
 	ewfdebug \
 	ewfexport \
 	ewfinfo \
@@ -77,22 +76,6 @@ ewfacquirestream_LDADD = \
 	../libsystem/libsystem.la \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
-	@MEMWATCH_LIBADD@
-
-ewfalter_SOURCES = \
-	alteration_handle.c alteration_handle.h \
-	byte_size_string.c byte_size_string.h \
-	ewfalter.c \
-	ewfcommon.h \
-	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
-	storage_media_buffer.c storage_media_buffer.h
-
-ewfalter_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
 	@MEMWATCH_LIBADD@
 
 ewfdebug_SOURCES = \
@@ -186,8 +169,6 @@ splint:
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfacquire_SOURCES) 
 	@echo "Running splint on ewfacquirestream ..." 
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfacquirestream_SOURCES) 
-	@echo "Running splint on ewfalter ..." 
-	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfalter_SOURCES) 
 	@echo "Running splint on ewfdebug ..." 
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfdebug_SOURCES) 
 	@echo "Running splint on ewfexport ..." 

@@ -158,7 +158,7 @@ void usage_fprint(
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
 		                 "\t           (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for raw and encase6\n"
 		                 "\t           and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n"
-		                 "\t           format (not used for files format)\n",
+		                 "\t           (not used for files format)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -1473,8 +1473,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* Request the necessary case data
 	 */
-	if( ( ewfexport_abort == 0 )
-	 && ( interactive_mode == 1 ) )
+	if( interactive_mode != 0 )
 	{
 		if( libsystem_signal_detach(
 		     &error ) != 1 )
@@ -1865,6 +1864,27 @@ int main( int argc, char * const argv[] )
 			 error );
 			liberror_error_free(
 			 &error );
+		}
+	}
+	else
+	{
+		if( segment_file_size == 0 )
+		{
+			if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+			{
+				if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
+				{
+					segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+				}
+				else
+				{
+					segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+				}
+			}
+			else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+			{
+				segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+			}
 		}
 	}
 	if( ewfexport_abort == 0 )

@@ -25,19 +25,18 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 INPUT="input";
-TMP="tmp";
 
 LS="ls";
 TR="tr";
 WC="wc";
 
-EWFINFO="../ewftools/ewfinfo";
-
 function test_info
 { 
-	echo "Testing ewfinfo of input:" $*;
+	INPUT_FILE=$1;
 
-	./${EWFINFO} $*;
+	echo "Testing ewfinfo of input: ${INPUT_FILE}";
+
+	./${EWFINFO} ${INPUT_FILE};
 
 	RESULT=$?;
 
@@ -45,6 +44,13 @@ function test_info
 
 	return ${RESULT};
 }
+
+EWFINFO="../ewftools/ewfinfo";
+
+if ! test -x ${EWFINFO};
+then
+	EWFINFO="../ewftools/ewfinfo.exe";
+fi
 
 if ! test -x ${EWFINFO};
 then
@@ -55,27 +61,32 @@ fi
 
 if ! test -d ${INPUT};
 then
-	echo "No input directory found, to test read create input directory and place test files in directory.";
+	echo "No ${INPUT} directory found, to test ewfinfo create ${INPUT} directory and place EWF test files in directory.";
 
 	exit ${EXIT_IGNORE};
 fi
 
-RESULT=`${LS} ${INPUT}/*.[eE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+EXIT_RESULT=${EXIT_IGNORE};
 
-if test ${RESULT} -eq 0;
+if test -d ${INPUT};
 then
-	echo "No files found in input directory, to test read place test files in directory.";
+	RESULT=`${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
 
-	exit ${EXIT_IGNORE};
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files found in ${INPUT} directory, to test ewfinfo place EWF test files in directory.";
+	else
+		for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
+		do
+			if ! test_info "${FILENAME}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+
+		EXIT_RESULT=${EXIT_SUCCESS};
+	fi
 fi
 
-for FILENAME in `${LS} ${INPUT}/*.[eE]01 | ${TR} ' ' '\n'`;
-do
-	if ! test_info "${FILENAME}";
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
-
-exit ${EXIT_SUCCESS};
+exit ${EXIT_RESULT};
 

@@ -2625,7 +2625,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* Request the necessary case data
 	 */
-	while( ( interactive_mode == 1 )
+	while( ( interactive_mode != 0 )
 	    && ( acquiry_parameters_confirmed == 0 ) )
 	{
 		fprintf(
@@ -3459,6 +3459,20 @@ int main( int argc, char * const argv[] )
 				 "Cannot acquire more than 2 TiB in selected ewf format.\n" );
 
 				acquiry_parameters_confirmed = 0;
+			}
+		}
+	}
+	if( interactive_mode == 0 )
+	{
+		if( segment_file_size == 0 )
+		{
+			if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
+			{
+				segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+			}
+			else
+			{
+				segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 			}
 		}
 	}

@@ -35,8 +35,6 @@ SORT="sort";
 UNIQ="uniq";
 WC="wc";
 
-EWF_TEST_READ="ewf_test_read";
-
 function test_read
 { 
 	echo "Testing read of input:" $*;
@@ -50,6 +48,13 @@ function test_read
 	return ${RESULT};
 }
 
+EWF_TEST_READ="ewf_test_read";
+
+if ! test -x ${EWF_TEST_READ};
+then
+	EWF_TEST_READ="ewf_test_read.exe";
+fi
+
 if ! test -x ${EWF_TEST_READ};
 then
 	echo "Missing executable: ${EWF_TEST_READ}";
@@ -59,7 +64,7 @@ fi
 
 if ! test -d ${INPUT};
 then
-	echo "No input directory found, to test read create input directory and place test files in directory.";
+	echo "No ${INPUT} directory found, to test read create ${INPUT} directory and place EWF test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};
@@ -69,7 +74,7 @@ RESULT=`${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${U
 
 if test ${RESULT} -eq 0;
 then
-	echo "No files found in input directory, to test read place test files in directory.";
+	echo "No files found in ${INPUT} directory, to test read place EWF test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};

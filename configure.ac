@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101018],
+ [20101019],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -760,21 +760,7 @@ AM_CONDITIONAL(
  [test "x$ac_libewf_have_libbfio" = xlocal])
 
 dnl Check for enabling libmfdata for multi-file data support
-AC_CHECK_HEADERS(
- [libmfdata.h],
- [],
- [ac_libewf_have_libmfdata=no])
-
-AS_IF(
-	[test "x$ac_libewf_have_libmfdata" != xno],
-	[ac_libewf_have_libmfdata=yes
-	AC_CHECK_LIB(
-	 mfdata,
-	 libmfdata_get_version,
-	 [],
-	 [ac_libewf_have_libmfdata=no])
-
-	])
+LIBEWF_CHECK_LIBMFDATA
 
 AS_IF(
 [test "x$ac_libewf_have_libmfdata" = xyes],
@@ -824,21 +810,7 @@ AM_CONDITIONAL(
  [test "x$ac_libewf_have_libmfdata" = xlocal])
 
 dnl Check for enabling libfvalue for file value support
-AC_CHECK_HEADERS(
- [libfvalue.h],
- [],
- [ac_libewf_have_libfvalue=no])
-
-AS_IF(
-	[test "x$ac_libewf_have_libfvalue" != xno],
-	[ac_libewf_have_libfvalue=yes
-	AC_CHECK_LIB(
-	 fvalue,
-	 libfvalue_get_version,
-	 [],
-	 [ac_libewf_have_libfvalue=no])
-
-	])
+LIBEWF_CHECK_LIBFVALUE
 
 AS_IF(
 [test "x$ac_libewf_have_libfvalue" = xyes],

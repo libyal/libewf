@@ -1,16 +1,34 @@
 TODO
-* have libewf write empty ewf file if media size is 0
+* implement write chunk test
+* implement read/write buffer and chunk test
+  - refactor ewfalter and alteration_handle into ewf_test_read_write
+  - allow to set maximum delta file size default 4 GiB?
+* have libewf write empty ewf file if media size is 0 and no data was written
 * have libewf handle non-sector multitude media size
 
 * single file entry:
   - are flags similar to file attribute flags ?
 
-* configure validate libuna and libbfio check
 * documentation:
   - add that error can be NULL
 * libewf: make libewf_convert_date_header_value more strict
 * improve output when encountering a read error
 * improve open file io pool (set basename ?)
+
+Work in progress:
+* what about header values parsing with preservation of timestamps?
+  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
+  - force set header value to require string formatted in the date format ?
+* check TODO
+* ewfexport: fix different input and output chunk sizes for low level functions
+* ewfexport: remove DISABLED
+* move manuals/ewfexport.1.backup to manuals/ewfexport.1
+* check into resume write error for 32-bit compile (different zlib sizes)
+* check make distclean
+
+Next stable release:
+* full test
+* disable ewfdebug
 
 Roadmap:
 * code clean up
@@ -23,26 +41,28 @@ Roadmap:
 * lvf support
   - set initial file entry offset
   - add support for permissions
-* thread aware lvf support
-  - implement libewf_single_file_entry_clone
-  - what about current offset and IO back-end ?
-* xsignature section to sign xhash and/or hash
-* library/tools enhancements
-  - getoptlong
 * internationalisation
   - Unicode support (added)
   - locale support (partial)
   - multi language string support (gettext)
+    need WINAPI version of gettext without libiconv dependency
+* thread aware lvf support
+  - implement libewf_single_file_entry_clone
+  - what about current offset and IO back-end ?
 * enhance thread safety
   - protect writing to internal data structures
   - protect reading when writing to internal data structures
   - thread safe functions
   - check for race conditions especially on change of data elements
+* library/tools enhancements
+  - getoptlong
+* ewfx enhancements
+  - xsignature section to sign xhash and/or hash
 
 Code clean up:
 * implement libmfdata
 * move sections into separate objects ?
-* rename section_list to section_value ?
+* refactor section_list to list_type and section_value ?
 * clean up ewfacquire: move imaging preferences into imaging handle
 
 Further analysis of the EWF format:
@@ -112,6 +132,7 @@ Python bindings (pyewf)
 
 API changes
 * add wide character functions definitions by default?
+  - not necessary on most platforms
 * libbfio API extension
   - add means to obtain libbfio handle of media data in ewf
   - add means to set narrow string codepage
@@ -126,6 +147,10 @@ API changes
 * file structure API extension (idea)
 
 Tools:
+* locale support
+  - print output convert to system string
+  - reduce string conversions, use as much as possible the system string type in the tools
+* check char/wchar in/output
 * rename wipe/clean buffer to zero buffer
 * add getoptlong support
 * make compilation resilient for missing crypto library
@@ -147,8 +172,6 @@ Tools:
   - allow user to set bytes per sector for raw file conversion
 * stream handle
   - implement
-* ewfalter
-  - allow to set maximum delta file size default 4 GiB?
 * ewfexport
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
@@ -166,21 +189,16 @@ Tools:
 
 Windows build
 * windows port
-  - some of the Windows functions are MVC 2005 or later specific
+  - some of the CRT functions are MVC 2005 or later specific
   - figure out a way to warn about the compiler used
 * add VC_EXTRALEAN to msvscpp config
-* locale support
-  - print output convert to system string
-  - reduce string conversions, use as much as possible the system string type in the tools
-* ewftools check char/wchar in/output
 
-Testing
-* add files export test
-* add export split raw test
-* change export raw test to handle additional segment file size input
-* add export unattended to automated tests
-* add encase 6.12 sha1 support to tests
-* read/write of EnCase 6.12 SHA1
+Tests
+* glob: .ezz, .faa ... .zzz
+* seek: media size 0 instead of < 1024
+* read: media size 0 instead of < 1024
+* ewfexport: export of split RAW
+* ewfexport: export of files
 
 Deployment
 * debian package
@@ -195,25 +213,23 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
-Work in progress:
-* what about header values parsing with preservation of timestamps?
-  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
-  - force set header value to require string formatted in the date format ?
-* check TODO
-* ewfexport: fix different input and output chunk sizes for low level functions
-* ewfexport: remove DISABLED
-* move manuals/ewfexport.1.backup to manuals/ewfexport.1
-* check into resume write error for 32-bit compile (different zlib sizes)
-* check make distclean
-
 Deprecated functions
 * add BORLANDC deprecated function support, unable to find suitable macro
   #pragma deprecated( function )
   __declspec(deprecated)
 
-Next stable release:
-* full test
-* disable ewfalter, ewfdebug
+20101019
+* validated configure functions checks of: libuna, libbfio, libsmdev,
+  libsmraw, libfvalue, libmfdata
+* worked on automated tests
+  - moved existing tests into autoconf test framework
+* ewfacquirestream will now also default to encase6 for encase1 format
+* removed ewfalter from msvscpp project files
+* removed ewfalter from automake files
+* moved ewfalter to ewf_test_read_write
+* updated libsmraw
+* ewfacquire: fixed missing default maximum segment size in unattended mode
+* ewfexport: fixed missing default maximum segment size in unattended mode
 
 20101018
 * renamed libewf_handle_[gs]et_segment_file_size

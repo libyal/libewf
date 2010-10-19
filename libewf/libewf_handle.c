@@ -2938,7 +2938,7 @@ int libewf_handle_open_read(
 
 /* Prepares chunk of (media) data after reading it according to the handle settings
  * This function should be used after libewf_handle_read_chunk
- * The chunk buffer size should contain the actual chunk size
+ * The chunk_buffer_size should contain the actual chunk size
  * Returns the resulting chunk size or -1 on error
  */
 ssize_t libewf_handle_prepare_read_chunk(
@@ -3411,12 +3411,11 @@ ssize_t libewf_handle_read_random(
 	return( read_count );
 }
 
-/* Writes a chunk of (media) data in EWF format at the current offset
- * the necessary settings of the write values must have been made
- * size contains the size of the data within the buffer while
- * data size contains the size of the actual input data
- * Will initialize write if necessary
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+/* Prepares a chunk of (media) data before writing according to the handle settings
+ * This function should be used before libewf_handle_write_chunk
+ * The chunk_buffer_size should contain the actual chunk size
+ * The function sets the chunk checksum, is compressed and write checksum values
+ * Returns the resulting chunk size or -1 on error
  */
 ssize_t libewf_handle_prepare_write_chunk(
          libewf_handle_t *handle,

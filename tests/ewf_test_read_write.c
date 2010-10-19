@@ -1,5 +1,5 @@
 /*
- * Expert Witness Compression Format (EWF) library write testing program
+ * Expert Witness Compression Format (EWF) library read/write testing program
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -32,7 +32,7 @@
 
 #include <libewf.h>
 
-int ewf_test_write(
+int ewf_test_read_write(
      const char *filename,
      size_t media_size,
      size_t maximum_segment_size )
@@ -74,14 +74,14 @@ int ewf_test_write(
 	     handle,
 	     (wchar_t * const *) &filename,
 	     1,
-	     LIBEWF_OPEN_WRITE,
+	     LIBEWF_OPEN_READ_WRITE,
 	     &error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     handle,
 	     (char * const *) &filename,
 	     1,
-	     LIBEWF_OPEN_WRITE,
+	     LIBEWF_OPEN_READ_WRITE,
 	     &error ) != 1 )
 #endif
 	{
@@ -100,60 +100,6 @@ int ewf_test_write(
 		 NULL );
 
 		return( -1 );
-	}
-	if( media_size > 0 )
-	{
-		if( libewf_handle_set_media_size(
-		     handle,
-		     media_size,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable set media size.\n" );
-
-			libewf_error_backtrace_fprint(
-			 error,
-			 stderr );
-
-			libewf_error_free(
-			 &error );
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( -1 );
-		}
-	}
-	if( maximum_segment_size > 0 )
-	{
-		if( libewf_handle_set_maximum_segment_size(
-		     handle,
-		     maximum_segment_size,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable set maximum segment size.\n" );
-
-			libewf_error_backtrace_fprint(
-			 error,
-			 stderr );
-
-			libewf_error_free(
-			 &error );
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( -1 );
-		}
 	}
 	write_size = 512;
 
@@ -349,47 +295,14 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	if( ewf_test_write(
+	if( ewf_test_read_write(
 	     _LIBCSTRING_SYSTEM_STRING( "test1" ),
 	     0,
 	     0 ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test write.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	if( ewf_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test2" ),
-	     0,
-	     10000 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test write.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	if( ewf_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test3" ),
-	     100000,
-	     0 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test write.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	if( ewf_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test4" ),
-	     100000,
-	     10000 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test write.\n" );
+		 "Unable to test read/write.\n" );
 
 		return( EXIT_FAILURE );
 	}

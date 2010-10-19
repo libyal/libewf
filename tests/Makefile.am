@@ -17,19 +17,23 @@ TESTS = \
 	test_read.sh \
 	test_write.sh \
 	test_ewfverify.sh \
+	test_ewfacquire.sh \
+	test_ewfacquirestream.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
-	test_glob.sh \
-	test_read.sh \
-	test_seek.sh \
-	test_write.sh \
+	test_ewfacquire.sh \
+	test_ewfacquirestream.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
 	test_ewfverify.sh \
-	test_pyewf.sh
+	test_glob.sh \
+	test_pyewf.sh \
+	test_read.sh \
+	test_seek.sh \
+	test_write.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
@@ -65,15 +69,11 @@ ewf_test_seek_LDADD = \
         @MEMWATCH_LIBADD@
 
 ewf_test_write_SOURCES = \
-	digest_context.c digest_context.h \
-	digest_hash.c digest_hash.h \
-	ewf_test_write.c \
-	md5.h
+	ewf_test_write.c
 
 ewf_test_write_LDADD = \
 	../libcstring/libcstring.la \
 	../libewf/libewf.la \
-	@LIBCRYPTO_LIBADD@ \
         @MEMWATCH_LIBADD@
 
 MAINTAINERCLEANFILES = \

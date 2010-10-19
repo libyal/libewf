@@ -26,8 +26,6 @@ EXIT_IGNORE=77;
 
 TMP="tmp";
 
-EWF_TEST_WRITE="ewf_test_write";
-
 function test_write
 { 
 	mkdir ${TMP};
@@ -46,6 +44,13 @@ function test_write
 
 	return ${RESULT};
 }
+
+EWF_TEST_WRITE="ewf_test_write";
+
+if ! test -x ${EWF_TEST_WRITE};
+then
+	EWF_TEST_WRITE="ewf_test_write.exe";
+fi
 
 if ! test -x ${EWF_TEST_WRITE};
 then

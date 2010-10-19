@@ -29,8 +29,6 @@ TMP="tmp";
 CMP="cmp";
 SEQ="seq";
 
-EWF_TEST_GLOB="ewf_test_glob";
-
 function chr
 {
 	printf \\$(( ( ( $1 / 64 ) * 100 ) + ( ( ( $1 % 64 ) / 8 ) * 10 ) + ( $1 % 8 ) ))
@@ -194,6 +192,13 @@ function test_glob_sequence
 	fi
 	return ${RESULT};
 }
+
+EWF_TEST_GLOB="ewf_test_glob";
+
+if ! test -x ${EWF_TEST_GLOB};
+then
+	EWF_TEST_GLOB="ewf_test_glob.exe";
+fi
 
 if ! test -x ${EWF_TEST_GLOB};
 then
