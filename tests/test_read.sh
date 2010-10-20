@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Expert Witness Compression Format (EWF) library read buffer testing script
+# Expert Witness Compression Format (EWF) library read testing script
 #
 # Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
 #

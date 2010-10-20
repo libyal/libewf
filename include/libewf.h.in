@@ -3181,5 +3181,5 @@ LIBEWF_EXTERN int libewf_parse_hash_values(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_H ) */
 

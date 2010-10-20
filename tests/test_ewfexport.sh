@@ -41,7 +41,7 @@ function test_export_raw
 
 ${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
 raw
-tmp/export.raw
+${TMP}/export.raw
 
 
 
@@ -65,7 +65,7 @@ function test_export_ewf
 
 ${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
 ${OUTPUT_FORMAT}
-tmp/export
+${TMP}/export
 none
 no
 
@@ -91,7 +91,7 @@ function test_export_unattended
 	mkdir ${TMP};
 
 	${EWFEXPORT} -q -u -d sha1 \
-	-t tmp/unattended_export \
+	-t ${TMP}/unattended_export \
 	-f ${OUTPUT_FORMAT} \
 	${INPUT_FILE}
 

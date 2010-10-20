@@ -22,6 +22,7 @@
 #include <common.h>
 
 #include <libcstring.h>
+#include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -38,24 +39,21 @@
 
 #include <libewf.h>
 
-/* Tests libewf_handle_seek_offset
+/* Tests seeking an offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_seek_offset(
      libewf_handle_t *handle,
      off64_t input_offset,
      int input_whence,
-     off64_t output_offset )
+     off64_t expected_offset )
 {
+	liberror_error_t *error   = NULL;
 	const char *whence_string = NULL;
-	libewf_error_t *error     = NULL;
+	static char *function     = "ewf_test_seek_offset";
 	off64_t result_offset     = 0;
 	int result                = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	if( input_whence == SEEK_CUR )
 	{
 		whence_string = "SEEK_CUR";
@@ -84,17 +82,28 @@ int ewf_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
-	if( result_offset == -1 )
+	if( result_offset != expected_offset )
 	{
-		libewf_error_backtrace_fprint(
-		 error,
-		 stderr );
+		if( result_offset == -1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset: %" PRIi64 ".",
+			 function,
+			 input_offset );
 
-		libewf_error_free(
-		 &error );
+			result = -1;
+		}
 	}
-	if( result_offset == output_offset )
+	else
 	{
+		if( result_offset == -1 )
+		{
+			liberror_error_free(
+			 &error );
+		}
 		result = 1;
 	}
 	if( result != 0 )
@@ -113,6 +122,23 @@ int ewf_test_seek_offset(
 	 stdout,
 	 "\n" );
 
+	if( result == -1 )
+	{
+		liberror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		liberror_error_free(
+		 &error );
+	}
+	else if( result == 0 )
+	{
+		fprintf(
+		 stdout,
+		 "%s: unexpected result offset: %" PRIi64 "\n",
+		 function,
+		 result_offset );
+	}
 	return( result );
 }
 
@@ -124,7 +150,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libewf_error_t *error   = NULL;
+	liberror_error_t *error = NULL;
 	libewf_handle_t *handle = NULL;
 	size64_t media_size     = 0;
 
@@ -146,11 +172,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create handle.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
@@ -179,11 +205,11 @@ int main( int argc, char * const argv[] )
 		 &handle,
 		 NULL );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
@@ -197,11 +223,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve media size.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_close(
 		 handle,
@@ -218,11 +244,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Media size exceeds maximum.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_close(
 		 handle,
@@ -601,11 +627,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close file(s).\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_free(
 		 &handle,
@@ -621,11 +647,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free handle.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );

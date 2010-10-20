@@ -23,6 +23,7 @@
 #include <memory.h>
 
 #include <libcstring.h>
+#include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -30,42 +31,46 @@
 
 #include <stdio.h>
 
+/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+ * before including libewf.h
+ */
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_IMPORT
+#endif
+
 #include <libewf.h>
 
+#include <libsystem.h>
+
+#include "ewf_test_definitions.h"
+
+/* Tests writing data of media size to EWF file(s) with a maximum segment size
+ * Return 1 if successful, 0 if not or -1 on error
+ */
 int ewf_test_write(
      const char *filename,
-     size_t media_size,
-     size_t maximum_segment_size )
+     size64_t media_size,
+     size64_t maximum_segment_size,
+     liberror_error_t **error )
 {
-	uint8_t buffer[ 4096 ];
-
-	libewf_error_t *error   = NULL;
 	libewf_handle_t *handle = NULL;
+	uint8_t *buffer         = NULL;
+	static char *function   = "ewf_test_write";
 	size_t write_size       = 0;
 	ssize_t write_count     = 0;
 	int result              = 1;
 	int sector_iterator     = 0;
 
-	fprintf(
-	 stdout,
-	 "Testing writing media size: %" PRIzd ", with maximum segment size: %" PRIzd "\t",
-	 media_size,
-	 maximum_segment_size );
-
 	if( libewf_handle_initialize(
 	     &handle,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to create handle.\n" );
-
-		libewf_error_backtrace_fprint(
+		liberror_error_set(
 		 error,
-		 stderr );
-
-		libewf_error_free(
-		 &error );
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create handle.",
+		 function );
 
 		return( -1 );
 	}
@@ -75,26 +80,23 @@ int ewf_test_write(
 	     (wchar_t * const *) &filename,
 	     1,
 	     LIBEWF_OPEN_WRITE,
-	     &error ) != 1 )
+	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     handle,
 	     (char * const *) &filename,
 	     1,
 	     LIBEWF_OPEN_WRITE,
-	     &error ) != 1 )
+	     error ) != 1 )
 #endif
 	{
-		fprintf(
-		 stderr,
-		 "Unable to open file(s).\n" );
-
-		libewf_error_backtrace_fprint(
+		liberror_error_set(
 		 error,
-		 stderr );
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open handle.",
+		 function );
 
-		libewf_error_free(
-		 &error );
 		libewf_handle_free(
 		 &handle,
 		 NULL );
@@ -106,26 +108,16 @@ int ewf_test_write(
 		if( libewf_handle_set_media_size(
 		     handle,
 		     media_size,
-		     &error ) != 1 )
+		     error ) != 1 )
 		{
-			fprintf(
-			 stderr,
-			 "Unable set media size.\n" );
-
-			libewf_error_backtrace_fprint(
+			liberror_error_set(
 			 error,
-			 stderr );
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable set media size.",
+			 function );
 
-			libewf_error_free(
-			 &error );
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( -1 );
+			result = -1;
 		}
 	}
 	if( maximum_segment_size > 0 )
@@ -133,211 +125,184 @@ int ewf_test_write(
 		if( libewf_handle_set_maximum_segment_size(
 		     handle,
 		     maximum_segment_size,
-		     &error ) != 1 )
+		     error ) != 1 )
 		{
-			fprintf(
-			 stderr,
-			 "Unable set maximum segment size.\n" );
-
-			libewf_error_backtrace_fprint(
+			liberror_error_set(
 			 error,
-			 stderr );
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable set maximum segment size.",
+			 function );
 
-			libewf_error_free(
-			 &error );
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( -1 );
+			result = -1;
 		}
 	}
-	write_size = 512;
+	buffer = (uint8_t *) memory_allocate(
+	                      EWF_TEST_BUFFER_SIZE );
 
-	for( sector_iterator = 0;
-	     sector_iterator < 26;
-	     sector_iterator++ )
+	if( result != -1 )
 	{
-		if( memory_set(
-		     buffer,
-		     (int) 'A' + sector_iterator,
-		     write_size ) == NULL )
+		write_size = 512;
+
+		for( sector_iterator = 0;
+		     sector_iterator < 26;
+		     sector_iterator++ )
 		{
-			fprintf(
-			 stderr,
-			 "Unable to initialize buffer with: %d.\n",
-			 sector_iterator );
-
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( -1 );
-		}
-		write_count = libewf_handle_write_buffer(
-		               handle,
-		               buffer,
-		               write_size,
-		               &error );
-
-		if( write_count != (ssize_t) write_size )
-		{
-			if( write_count != (ssize_t) media_size )
+			if( memory_set(
+			     buffer,
+			     (int) 'A' + sector_iterator,
+			     write_size ) == NULL )
 			{
-				fprintf(
-				 stderr,
-				 "Unable write block of %" PRIzd " bytes to file(s).\n",
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable set value in buffer.",
+				 function );
+
+				result = -1;
+
+				break;
+			}
+			write_count = libewf_handle_write_buffer(
+				       handle,
+				       buffer,
+				       write_size,
+				       error );
+
+			if( write_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable write buffer of size: %" PRIzd ".",
+				 function,
 				 write_size );
 
-				libewf_error_backtrace_fprint(
-				 error,
-				 stderr );
+				result = -1;
 
-				libewf_error_free(
-				 &error );
-				libewf_handle_close(
-				 handle,
-				 NULL );
-				libewf_handle_free(
-				 &handle,
-				 NULL );
+				break;
+			}
+			if( write_count != (ssize_t) write_size )
+			{
+				if( (size64_t) write_count != media_size )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 "%s: unable write buffer of size: %" PRIzd ".",
+					 function,
+					 write_size );
 
-				return( -1 );
+					result = -1;
+
+					break;
+				}
+			}
+			if( media_size > 0 )
+			{
+				media_size -= write_count;
 			}
 		}
-		if( media_size > 0 )
-		{
-			media_size -= write_count;
-		}
 	}
-	write_size = 3751;
-
-	for( sector_iterator = 0;
-	     sector_iterator < 26;
-	     sector_iterator++ )
+	if( result != -1 )
 	{
-		if( memory_set(
-		     buffer,
-		     (int) 'a' + sector_iterator,
-		     write_size ) == NULL )
+		write_size = 3751;
+
+		for( sector_iterator = 0;
+		     sector_iterator < 26;
+		     sector_iterator++ )
 		{
-			fprintf(
-			 stderr,
-			 "Unable to initialize buffer with: %d.\n",
-			 sector_iterator );
-
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( -1 );
-		}
-		write_count = libewf_handle_write_buffer(
-		               handle,
-		               buffer,
-		               write_size,
-		               &error );
-
-		if( write_count != (ssize_t) write_size )
-		{
-			if( write_count != (ssize_t) media_size )
+			if( memory_set(
+			     buffer,
+			     (int) 'a' + sector_iterator,
+			     write_size ) == NULL )
 			{
-				fprintf(
-				 stderr,
-				 "Unable write block of %" PRIzd " bytes to file(s).\n",
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable set value in buffer.",
+				 function );
+
+				result = -1;
+
+				break;
+			}
+			write_count = libewf_handle_write_buffer(
+				       handle,
+				       buffer,
+				       write_size,
+				       error );
+
+			if( write_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable write buffer of size: %" PRIzd ".",
+				 function,
 				 write_size );
 
-				libewf_error_backtrace_fprint(
-				 error,
-				 stderr );
+				result = -1;
 
-				libewf_error_free(
-				 &error );
+				break;
+			}
+			if( write_count != (ssize_t) write_size )
+			{
+				if( (size64_t) write_count != media_size )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 "%s: unable write buffer of size: %" PRIzd ".",
+					 function,
+					 write_size );
 
-				libewf_handle_close(
-				 handle,
-				 NULL );
-				libewf_handle_free(
-				 &handle,
-				 NULL );
+					result = -1;
 
-				return( -1 );
+					break;
+				}
+			}
+			if( media_size > 0 )
+			{
+				media_size -= write_count;
 			}
 		}
-		if( media_size > 0 )
-		{
-			media_size -= write_count;
-		}
 	}
-	/* Clean up
-	 */
+	memory_free(
+	 buffer );
+	
 	if( libewf_handle_close(
 	     handle,
-	     &error ) != 0 )
+	     error ) != 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to close file(s).\n" );
-
-		libewf_error_backtrace_fprint(
+		liberror_error_set(
 		 error,
-		 stderr );
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close handle.",
+		 function );
 
-		libewf_error_free(
-		 &error );
-
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( -1 );
+		result = -1;
 	}
 	if( libewf_handle_free(
 	     &handle,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to free handle.\n" );
-
-		libewf_error_backtrace_fprint(
+		liberror_error_set(
 		 error,
-		 stderr );
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free handle.",
+		 function );
 
-		libewf_error_free(
-		 &error );
-
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( -1 );
+		result = -1;
 	}
-	if( result != 0 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
-
 	return( result );
 }
 
@@ -349,48 +314,105 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	if( ewf_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test1" ),
-	     0,
-	     0 ) != 1 )
+	liberror_error_t *error            = NULL;
+	libcstring_system_integer_t option = 0;
+	size64_t maximum_segment_size      = 0;
+	size64_t media_size                = 0;
+	size_t string_length               = 0;
+	int result                         = 0;
+
+	while( ( option = libsystem_getopt(
+	                   argc,
+	                   argv,
+	                   _LIBCSTRING_SYSTEM_STRING( "B:S:" ) ) ) != (libcstring_system_integer_t) -1 )
+	{
+		switch( option )
+		{
+			case (libcstring_system_integer_t) '?':
+			default:
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 argv[ optind ] );
+
+				return( EXIT_FAILURE );
+
+			case (libcstring_system_integer_t) 'B':
+				string_length = libcstring_system_string_length(
+				                 optarg );
+
+				if( libsystem_string_to_uint64(
+				     optarg,
+				     string_length + 1,
+				     &media_size,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsupported media size.\n" );
+
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					return( EXIT_FAILURE );
+				}
+				break;
+
+			case (libcstring_system_integer_t) 'S':
+				string_length = libcstring_system_string_length(
+				                 optarg );
+
+				if( libsystem_string_to_uint64(
+				     optarg,
+				     string_length + 1,
+				     &maximum_segment_size,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsupported maximum segment size.\n" );
+
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					return( EXIT_FAILURE );
+				}
+				break;
+		}
+	}
+	if( optind == argc )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test write.\n" );
+		 "Missing EWF image filename.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	if( ewf_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test2" ),
-	     0,
-	     10000 ) != 1 )
+	result = ewf_test_write(
+	          argv[ optind ],
+	          media_size,
+	          maximum_segment_size,
+	          &error );
+
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to test write.\n" );
 
-		return( EXIT_FAILURE );
+		liberror_error_backtrace_fprint(
+		 error,
+		 stderr );
+
+		liberror_error_free(
+		 &error );
 	}
-	if( ewf_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test3" ),
-	     100000,
-	     0 ) != 1 )
+	if( result != 1 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to test write.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	if( ewf_test_write(
-	     _LIBCSTRING_SYSTEM_STRING( "test4" ),
-	     100000,
-	     10000 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test write.\n" );
-
 		return( EXIT_FAILURE );
 	}
 	return( EXIT_SUCCESS );

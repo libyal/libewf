@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Expert Witness Compression Format (EWF) library write testing script
+# Expert Witness Compression Format (EWF) library read/write testing script
 #
 # Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
 #
@@ -26,20 +26,20 @@ EXIT_IGNORE=77;
 
 TMP="tmp";
 
-function test_write
+function test_read_write
 { 
-	MEDIA_SIZE=$1;
-	MAXIMUM_SEGMENT_SIZE=$2;
+	WRITE_OFFSET=$1;
+	WRITE_SIZE=$2;
 
 	mkdir ${TMP};
 
-	./${EWF_TEST_WRITE} -B ${MEDIA_SIZE} -S ${MAXIMUM_SEGMENT_SIZE} ${TMP}/write;
+	./${EWF_TEST_READ_WRITE} -B ${WRITE_SIZE} -o ${WRITE_OFFSET} ${TMP}/read_write;
 
 	RESULT=$?;
 
 	rm -rf ${TMP};
 
-	echo -n "Testing write with media size: ${MEDIA_SIZE} and maximum segment size: ${MAXIMUM_SEGMENT_SIZE} ";
+	echo -n "Testing read/write with offset: ${WRITE_OFFSET} and size: ${WRITE_SIZE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -50,36 +50,21 @@ function test_write
 	return ${RESULT};
 }
 
-EWF_TEST_WRITE="ewf_test_write";
+EWF_TEST_READ_WRITE="ewf_test_read_write";
 
-if ! test -x ${EWF_TEST_WRITE};
+if ! test -x ${EWF_TEST_READ_WRITE};
 then
-	EWF_TEST_WRITE="ewf_test_write.exe";
+	EWF_TEST_READ_WRITE="ewf_test_read_write.exe";
 fi
 
-if ! test -x ${EWF_TEST_WRITE};
+if ! test -x ${EWF_TEST_READ_WRITE};
 then
-	echo "Missing executable: ${EWF_TEST_WRITE}";
+	echo "Missing executable: ${EWF_TEST_READ_WRITE}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_write 0 0
-then
-	exit ${EXIT_FAILURE};
-fi
-
-if ! test_write 0 10000
-then
-	exit ${EXIT_FAILURE};
-fi
-
-if ! test_write 100000 0
-then
-	exit ${EXIT_FAILURE};
-fi
-
-if ! test_write 100000 10000
+if ! test_read_write 0 0
 then
 	exit ${EXIT_FAILURE};
 fi

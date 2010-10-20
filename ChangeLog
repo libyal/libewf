@@ -218,6 +218,9 @@ Deprecated functions
   #pragma deprecated( function )
   __declspec(deprecated)
 
+20101020
+* worked on automated tests
+
 20101019
 * validated configure functions checks of: libuna, libbfio, libsmdev,
   libsmraw, libfvalue, libmfdata

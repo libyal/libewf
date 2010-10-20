@@ -44,7 +44,7 @@ function test_acquire_file
 	mkdir ${TMP};
 
 	${EWFACQUIRESTREAM} -q -d sha1 \
-	-t tmp/acquirestream \
+	-t ${TMP}/acquirestream \
 	-C case_number \
 	-D description \
 	-E evidence_number \
@@ -62,7 +62,7 @@ function test_acquire_file
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q -d sha1 tmp/acquirestream.*
+		./${EWFVERIFY} -q -d sha1 ${TMP}/acquirestream.*
 
 		RESULT=$?;
 	fi

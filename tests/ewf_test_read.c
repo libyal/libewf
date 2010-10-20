@@ -23,6 +23,7 @@
 #include <memory.h>
 
 #include <libcstring.h>
+#include <liberror.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -39,7 +40,7 @@
 
 #include <libewf.h>
 
-#define EWF_TEST_READ_BUFFER_SIZE	4096
+#include "ewf_test_definitions.h"
 
 /* Tests libewf_handle_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
@@ -48,52 +49,45 @@ int ewf_test_seek_offset(
      libewf_handle_t *handle,
      off64_t input_offset,
      int input_whence,
-     off64_t output_offset )
+     off64_t expected_offset,
+     liberror_error_t **error )
 {
-	libewf_error_t *error = NULL;
+	static char *function = "ewf_test_seek_offset";
 	off64_t result_offset = 0;
-	int result            = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	result_offset = libewf_handle_seek_offset(
 	                 handle,
 	                 input_offset,
 	                 input_whence,
-	                 &error );
+	                 error );
 
-	if( result_offset == -1 )
+	if( result_offset != expected_offset )
 	{
-		libewf_error_backtrace_fprint(
-		 error,
-		 stderr );
+		if( result_offset == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset: %" PRIi64 ".",
+			 function,
+			 input_offset );
 
-		libewf_error_free(
-		 &error );
-	}
-	if( result_offset == -1 )
-	{
-		libewf_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		libewf_error_free(
-		 &error );
-	}
-	if( result_offset != output_offset )
-	{
-		fprintf(
-		 stderr,
-		 "Unexpected result offset: %" PRIi64 "\n",
+			return( -1 );
+		}
+		libnotify_printf(
+		 "%s: unexpected result offset: %" PRIi64 "\n",
+		 function,
 		 result_offset );
+
+		return( 0 );
 	}
-	else
+	if( result_offset == -1 )
 	{
-		result = 1;
+		liberror_error_free(
+		 error );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Tests libewf_handle_read_buffer
@@ -104,18 +98,15 @@ int ewf_test_read_buffer(
      uint8_t *buffer,
      size_t buffer_size,
      size64_t input_size,
-     size64_t output_size )
+     size64_t expected_size,
+     liberror_error_t **error )
 {
-	libewf_error_t *error   = NULL;
+	static char *function   = "ewf_test_read_buffer";
 	size64_t remaining_size = 0;
 	size64_t result_size    = 0;
 	size_t read_size        = 0;
 	ssize_t read_count      = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	remaining_size = input_size;
 
 	while( remaining_size > 0 )
@@ -130,17 +121,22 @@ int ewf_test_read_buffer(
 			      handle,
 			      buffer,
 			      read_size,
-			      &error );
+			      error );
 
 		if( read_count < 0 )
 		{
-			libewf_error_backtrace_fprint(
+			liberror_error_set(
 			 error,
-			 stderr );
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read buffer of size: %" PRIzd ".",
+			 function,
+			 read_size );
 
-			libewf_error_free(
-			 &error );
-
+			return( -1 );
+		}
+		else if( read_count == 0 )
+		{
 			break;
 		}
 		remaining_size -= (size64_t) read_count;
@@ -151,11 +147,11 @@ int ewf_test_read_buffer(
 			break;
 		}
 	}
-	if( output_size != result_size )
+	if( expected_size != result_size )
 	{
-		fprintf(
-		 stderr,
-		 "Unexpected read count: %" PRIu64 "\n",
+		libnotify_printf(
+		 "%s: unexpected read count: %" PRIu64 "\n",
+		 function,
 		 result_size );
 
 		return( 0 );
@@ -173,11 +169,12 @@ int ewf_test_read_chunk(
      uint8_t *buffer,
      size_t buffer_size,
      size64_t input_size,
-     size64_t output_size )
+     size64_t expected_size,
+     liberror_error_t **error )
 {
 	uint8_t checksum_buffer[ 4 ];
 
-	libewf_error_t *error   = NULL;
+	static char *function   = "ewf_test_read_chunk";
 	size64_t remaining_size = 0;
 	size64_t result_size    = 0;
 	size_t data_size        = 0;
@@ -187,10 +184,6 @@ int ewf_test_read_chunk(
 	int8_t is_compressed    = 0;
 	int8_t read_checksum    = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	remaining_size = input_size;
 
 	while( remaining_size > 0 )
@@ -203,18 +196,19 @@ int ewf_test_read_chunk(
 			      (void *) checksum_buffer,
 			      &chunk_checksum,
 			      &read_checksum,
-			      &error );
+			      error );
 
 		if( read_count < 0 )
 		{
-			libewf_error_backtrace_fprint(
+			liberror_error_set(
 			 error,
-			 stderr );
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read chunk of size: %" PRIzd ".",
+			 function,
+			 chunk_buffer_size );
 
-			libewf_error_free(
-			 &error );
-
-			break;
+			return( -1 );
 		}
 		else if( read_count == 0 )
 		{
@@ -231,27 +225,28 @@ int ewf_test_read_chunk(
 		                 is_compressed,
 		                 chunk_checksum,
 		                 read_checksum,
-		                 &error );
+		                 error );
 
 		if( process_count < 0 )
 		{
-			libewf_error_backtrace_fprint(
+			liberror_error_set(
 			 error,
-			 stderr );
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to prepare chunk of size: %" PRIzd " after read.",
+			 function,
+			 read_count );
 
-			libewf_error_free(
-			 &error );
-
-			break;
+			return( -1 );
 		}
 		remaining_size -= (size64_t) process_count;
 		result_size    += (size64_t) process_count;
 	}
-	if( output_size != result_size )
+	if( expected_size != result_size )
 	{
-		fprintf(
-		 stderr,
-		 "Unexpected read count: %" PRIu64 "\n",
+		libnotify_printf(
+		 "%s: unexpected read count: %" PRIu64 "\n",
+		 function,
 		 result_size );
 
 		return( 0 );
@@ -259,7 +254,7 @@ int ewf_test_read_chunk(
 	return( 1 );
 }
 
-/* Tests libewf_handle_read_buffer at a specific offset
+/* Tests reading a buffers at a specific offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_read_buffer_at_offset(
@@ -267,17 +262,14 @@ int ewf_test_read_buffer_at_offset(
      off64_t input_offset,
      int input_whence,
      size64_t input_size,
-     off64_t output_offset,
-     size64_t output_size )
+     off64_t expected_offset,
+     size64_t expected_size )
 {
+	liberror_error_t *error   = NULL;
 	uint8_t *buffer           = NULL;
 	const char *whence_string = NULL;
 	int result                = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	if( input_whence == SEEK_CUR )
 	{
 		whence_string = "SEEK_CUR";
@@ -302,13 +294,14 @@ int ewf_test_read_buffer_at_offset(
 	 input_size );
 
 	buffer = (uint8_t *) memory_allocate(
-	                      EWF_TEST_READ_BUFFER_SIZE );
+	                      EWF_TEST_BUFFER_SIZE );
 
 	result = ewf_test_seek_offset(
 	          handle,
 	          input_offset,
 	          input_whence,
-	          output_offset );
+	          expected_offset,
+	          &error );
 
 	if( result == 1 )
 	{
@@ -317,9 +310,10 @@ int ewf_test_read_buffer_at_offset(
 			result = ewf_test_read_buffer(
 				  handle,
 				  buffer,
-				  EWF_TEST_READ_BUFFER_SIZE,
+				  EWF_TEST_BUFFER_SIZE,
 				  input_size,
-				  output_size );
+				  expected_size,
+			          &error );
 		}
 	}
 	memory_free(
@@ -341,10 +335,19 @@ int ewf_test_read_buffer_at_offset(
 	 stdout,
 	 "\n" );
 
+	if( result == -1 )
+	{
+		liberror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		liberror_error_free(
+		 &error );
+	}
 	return( result );
 }
 
-/* Tests libewf_handle_read_chunk and libewf_handle_prepare_read_chunk at a specific offset
+/* Tests reading chunks at a specific offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_read_chunk_at_offset(
@@ -353,18 +356,15 @@ int ewf_test_read_chunk_at_offset(
      off64_t input_offset,
      int input_whence,
      size64_t input_size,
-     off64_t output_offset,
-     size64_t output_size )
+     off64_t expected_offset,
+     size64_t expected_size )
 {
+	liberror_error_t *error   = NULL;
 	uint8_t *buffer           = NULL;
 	uint8_t *chunk_buffer     = NULL;
 	const char *whence_string = NULL;
 	int result                = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	if( ( chunk_size == 0 )
 	 || ( (size_t) chunk_size > (size_t) SSIZE_MAX ) )
 	{
@@ -397,7 +397,8 @@ int ewf_test_read_chunk_at_offset(
 	          handle,
 	          input_offset,
 	          input_whence,
-	          output_offset );
+	          expected_offset,
+	          &error );
 
 	buffer = (uint8_t *) memory_allocate(
 	                      chunk_size * 2 );
@@ -416,7 +417,8 @@ int ewf_test_read_chunk_at_offset(
 				  buffer,
 				  (size_t) chunk_size * 2,
 				  input_size,
-				  output_size );
+				  expected_size,
+			          &error );
 		}
 	}
 	memory_free(
@@ -440,6 +442,15 @@ int ewf_test_read_chunk_at_offset(
 	 stdout,
 	 "\n" );
 
+	if( result == -1 )
+	{
+		liberror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		liberror_error_free(
+		 &error );
+	}
 	return( result );
 }
 
@@ -451,7 +462,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libewf_error_t *error   = NULL;
+	liberror_error_t *error = NULL;
 	libewf_handle_t *handle = NULL;
 	off64_t read_offset     = 0;
 	size64_t media_size     = 0;
@@ -476,11 +487,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create handle.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
@@ -505,11 +516,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to open file(s).\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_free(
 		 &handle,
@@ -526,11 +537,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve media size.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_close(
 		 handle,
@@ -547,11 +558,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Media size exceeds maximum.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_close(
 		 handle,
@@ -571,11 +582,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve chunk size.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_close(
 		 handle,
@@ -592,11 +603,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Invalid chunk size.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_close(
 		 handle,
@@ -782,7 +793,7 @@ int main( int argc, char * const argv[] )
 		     read_offset,
 		     SEEK_SET,
 		     read_size,
-		     (off64_t) ( media_size - 1024 ),
+		     read_offset,
 		     1024 ) != 1 )
 		{
 			fprintf(
@@ -803,7 +814,7 @@ int main( int argc, char * const argv[] )
 		     read_offset,
 		     SEEK_SET,
 		     read_size,
-		     (off64_t) ( media_size - 1024 ),
+		     read_offset,
 		     1024 ) != 1 )
 		{
 			fprintf(
@@ -1051,11 +1062,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close file(s).\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 		libewf_handle_free(
 		 &handle,
@@ -1071,11 +1082,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free handle.\n" );
 
-		libewf_error_backtrace_fprint(
+		liberror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );

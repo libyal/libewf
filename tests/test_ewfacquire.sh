@@ -44,7 +44,7 @@ function test_acquire_file
 	mkdir ${TMP};
 
 ${EWFACQUIRE} -q -d sha1 ${INPUT_FILE} <<EOI
-tmp/acquire
+${TMP}/acquire
 case_number
 description
 evidence_number
@@ -69,7 +69,7 @@ EOI
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q -d sha1 tmp/acquire.*
+		./${EWFVERIFY} -q -d sha1 ${TMP}/acquire.*
 
 		RESULT=$?;
 	fi
@@ -94,7 +94,7 @@ function test_acquire_unattended_file
 	mkdir ${TMP};
 
 	${EWFACQUIRE} -q -u -d sha1 \
-	-t tmp/unattended_acquire \
+	-t ${TMP}/unattended_acquire \
 	-C case_number \
 	-D description \
 	-E evidence_number \
@@ -112,7 +112,7 @@ function test_acquire_unattended_file
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q -d sha1 tmp/unattended_acquire.*
+		./${EWFVERIFY} -q -d sha1 ${TMP}/unattended_acquire.*
 
 		RESULT=$?;
 	fi

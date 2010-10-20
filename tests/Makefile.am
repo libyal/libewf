@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	-I$(top_srcdir)/libcstring \
 	-I$(top_srcdir)/liberror \
+	-I$(top_srcdir)/libnotify \
 	-I$(top_srcdir)/libsystem \
 	@MEMWATCH_CPPFLAGS@
 
@@ -41,6 +42,7 @@ EXTRA_DIST = \
 check_PROGRAMS = \
 	ewf_test_glob \
 	ewf_test_read \
+	ewf_test_read_write \
 	ewf_test_seek \
 	ewf_test_write
 
@@ -53,11 +55,25 @@ ewf_test_glob_LDADD = \
         @MEMWATCH_LIBADD@
 
 ewf_test_read_SOURCES = \
+	ewf_test_definitions.h \
 	ewf_test_read.c
 
 ewf_test_read_LDADD = \
 	../libcstring/libcstring.la \
+	../liberror/liberror.la \
+	../libnotify/libnotify.la \
 	../libewf/libewf.la \
+        @MEMWATCH_LIBADD@
+
+ewf_test_read_write_SOURCES = \
+	ewf_test_definitions.h \
+	ewf_test_read_write.c
+
+ewf_test_read_write_LDADD = \
+	../libcstring/libcstring.la \
+	../liberror/liberror.la \
+	../libewf/libewf.la \
+	../libsystem/libsystem.la \
         @MEMWATCH_LIBADD@
 
 ewf_test_seek_SOURCES = \
@@ -65,15 +81,19 @@ ewf_test_seek_SOURCES = \
 
 ewf_test_seek_LDADD = \
 	../libcstring/libcstring.la \
+	../liberror/liberror.la \
 	../libewf/libewf.la \
         @MEMWATCH_LIBADD@
 
 ewf_test_write_SOURCES = \
+	ewf_test_definitions.h \
 	ewf_test_write.c
 
 ewf_test_write_LDADD = \
 	../libcstring/libcstring.la \
+	../liberror/liberror.la \
 	../libewf/libewf.la \
+	../libsystem/libsystem.la \
         @MEMWATCH_LIBADD@
 
 MAINTAINERCLEANFILES = \
