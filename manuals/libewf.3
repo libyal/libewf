@@ -1,4 +1,4 @@
-.Dd October 17, 2010
+.Dd October 21, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -259,7 +259,7 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_utf8_header_value_password "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_utf8_header_value_compression_type "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
+.Fn libewf_handle_get_utf8_header_value_compression_level "libewf_handle_t *handle, uint8_t *value, size_t value_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_utf8_header_value "libewf_handle_t *handle, const uint8_t *identifier, const uint8_t *utf8_string, size_t utf8_string_length"
 .Ft int
@@ -283,7 +283,7 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_set_utf8_header_value_password "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_utf8_header_value_compression_type "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
+.Fn libewf_handle_set_utf8_header_value_compression_level "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_utf8_header_value_model "libewf_handle_t *handle, const uint8_t *value, size_t value_length, libewf_error_t **error"
 .Ft int

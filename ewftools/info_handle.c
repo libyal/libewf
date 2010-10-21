@@ -933,7 +933,7 @@ int info_handle_header_values_fprint(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		header_value_result = libewf_handle_get_utf16_header_value(
 		                       info_handle->input_handle,
-		                       (uint8_t *) "compression_type",
+		                       (uint8_t *) "compression_level",
 		                       16,
 		                       (uint16_t *) header_value,
 		                       header_value_size,
@@ -941,7 +941,7 @@ int info_handle_header_values_fprint(
 #else
 		header_value_result = libewf_handle_get_utf8_header_value(
 		                       info_handle->input_handle,
-		                       (uint8_t *) "compression_type",
+		                       (uint8_t *) "compression_level",
 		                       16,
 		                       (uint8_t *) header_value,
 		                       header_value_size,
@@ -953,7 +953,7 @@ int info_handle_header_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: compression_type.",
+			 "%s: unable to retrieve header value: compression_level.",
 			 function );
 
 			result = -1;
@@ -962,11 +962,11 @@ int info_handle_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "\tCompression type:\t" );
+			 "\tCompression level:\t" );
 
 			if( libcstring_system_string_compare(
 			     header_value,
-			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_TYPE_NONE ),
+			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_NONE ),
 			     1 ) == 0 )
 			{
 				fprintf(
@@ -975,7 +975,7 @@ int info_handle_header_values_fprint(
 			}
 			else if( libcstring_system_string_compare(
 				  header_value,
-				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_TYPE_FAST ),
+				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_FAST ),
 				  1 ) == 0 )
 			{
 				fprintf(
@@ -984,7 +984,7 @@ int info_handle_header_values_fprint(
 			}
 			else if( libcstring_system_string_compare(
 				  header_value,
-				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_TYPE_BEST ),
+				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_BEST ),
 				  1 ) == 0 )
 			{
 				fprintf(
@@ -1583,29 +1583,33 @@ int info_handle_media_information_fprint(
 		     &compression_flags,
 		     error ) == 1 )
 		{
+			fprintf(
+			 stream,
+			 "\tCompression level:\t" );
+
 			if( compression_level == LIBEWF_COMPRESSION_NONE )
 			{
 				fprintf(
 				 stream,
-				 "\tCompression type:\tno compression\n" );
+				 "no compression\n" );
 			}
 			else if( compression_level == LIBEWF_COMPRESSION_FAST )
 			{
 				fprintf(
 				 stream,
-				 "\tCompression type:\tgood (fast) compression\n" );
+				 "good (fast) compression\n" );
 			}
 			else if( compression_level == LIBEWF_COMPRESSION_BEST )
 			{
 				fprintf(
 				 stream,
-				 "\tCompression type:\tbest compression\n" );
+				 "best compression\n" );
 			}
 			else
 			{
 				fprintf(
 				 stream,
-				 "\tCompression type:\tunknown compression\n" );
+				 "unknown compression\n" );
 			}
 		}
 		else

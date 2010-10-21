@@ -716,22 +716,6 @@ int libewf_handle_get_media_size(
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->media_size == 0 )
-	{
-		internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->number_of_sectors
-		                                          * (size64_t) internal_handle->media_values->bytes_per_sector;
-	}
-	if( internal_handle->media_values->media_size > (size64_t) INT64_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid media size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	*media_size = internal_handle->media_values->media_size;
 
 	return( 1 );
@@ -3039,14 +3023,30 @@ int libewf_handle_get_utf8_header_value_size(
 	{
 		return( 0 );
 	}
-	result = libfvalue_table_get_value_by_identifier(
-	          internal_handle->header_values,
-	          identifier,
-	          identifier_length + 1,
-	          &header_value,
-	          0,
-	          error );
-
+	if( ( identifier_length == 16 )
+	 && ( libcstring_narrow_string_compare(
+	       (char *) identifier,
+	       "compression_type",
+	       16 ) == 0 ) )
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          (uint8_t *) "compression_level",
+		          18,
+		          &header_value,
+		          0,
+		          error );
+	}
+	else
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          identifier,
+		          identifier_length + 1,
+		          &header_value,
+		          0,
+		          error );
+	}
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -3226,14 +3226,30 @@ int libewf_handle_get_utf8_header_value(
 	{
 		return( 0 );
 	}
-	result = libfvalue_table_get_value_by_identifier(
-	          internal_handle->header_values,
-	          identifier,
-	          identifier_length + 1,
-	          &header_value,
-	          0,
-	          error );
-
+	if( ( identifier_length == 16 )
+	 && ( libcstring_narrow_string_compare(
+	       (char *) identifier,
+	       "compression_type",
+	       16 ) == 0 ) )
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          (uint8_t *) "compression_level",
+		          18,
+		          &header_value,
+		          0,
+		          error );
+	}
+	else
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          identifier,
+		          identifier_length + 1,
+		          &header_value,
+		          0,
+		          error );
+	}
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -3568,14 +3584,30 @@ int libewf_handle_get_utf16_header_value_size(
 	{
 		return( 0 );
 	}
-	result = libfvalue_table_get_value_by_identifier(
-	          internal_handle->header_values,
-	          identifier,
-	          identifier_length + 1,
-	          &header_value,
-	          0,
-	          error );
-
+	if( ( identifier_length == 16 )
+	 && ( libcstring_narrow_string_compare(
+	       (char *) identifier,
+	       "compression_type",
+	       16 ) == 0 ) )
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          (uint8_t *) "compression_level",
+		          18,
+		          &header_value,
+		          0,
+		          error );
+	}
+	else
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          identifier,
+		          identifier_length + 1,
+		          &header_value,
+		          0,
+		          error );
+	}
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -3755,14 +3787,30 @@ int libewf_handle_get_utf16_header_value(
 	{
 		return( 0 );
 	}
-	result = libfvalue_table_get_value_by_identifier(
-	          internal_handle->header_values,
-	          identifier,
-	          identifier_length + 1,
-	          &header_value,
-	          0,
-	          error );
-
+	if( ( identifier_length == 16 )
+	 && ( libcstring_narrow_string_compare(
+	       (char *) identifier,
+	       "compression_type",
+	       16 ) == 0 ) )
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          (uint8_t *) "compression_level",
+		          18,
+		          &header_value,
+		          0,
+		          error );
+	}
+	else
+	{
+		result = libfvalue_table_get_value_by_identifier(
+		          internal_handle->header_values,
+		          identifier,
+		          identifier_length + 1,
+		          &header_value,
+		          0,
+		          error );
+	}
 	if( result == -1 )
 	{
 		liberror_error_set(

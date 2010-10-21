@@ -2035,7 +2035,7 @@ int imaging_handle_set_output_values(
 	/* Password is not used within libewf
 	 */
 
-	/* Acquiry date, system date and compression type will be generated automatically when set to NULL
+	/* Acquiry date, system date and compression level will be generated automatically when set to NULL
 	 */
 
 	/* Set acquiry operating system, software and software version

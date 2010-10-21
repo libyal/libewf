@@ -302,15 +302,15 @@ int libewf_header_values_initialize(
 	if( libewf_header_values_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE,
-	     (uint8_t *) "compression_type",
-	     17,
+	     (uint8_t *) "compression_level",
+	     18,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: compression_type.",
+		 "%s: unable to set header value: compression_level.",
 		 function );
 
 		libfvalue_table_free(
@@ -1708,8 +1708,8 @@ int libewf_header_values_parse_utf8_header_string(
 					  "r",
 					  type_string_length ) == 0 )
 				{
-					identifier      = (uint8_t *) "compression_type";
-					identifier_size = 17;
+					identifier      = (uint8_t *) "compression_level";
+					identifier_size = 18;
 				}
 			}
 			if( identifier != NULL )
@@ -2360,7 +2360,7 @@ int libewf_header_values_generate_utf8_header_string(
 	libfvalue_value_t *acquiry_operating_system_header_value = NULL;
 	libfvalue_value_t *acquiry_software_version_header_value = NULL;
 	libfvalue_value_t *case_number_header_value              = NULL;
-	libfvalue_value_t *compression_type_header_value         = NULL;
+	libfvalue_value_t *compression_level_header_value        = NULL;
 	libfvalue_value_t *description_header_value              = NULL;
 	libfvalue_value_t *examiner_name_header_value            = NULL;
 	libfvalue_value_t *evidence_number_header_value          = NULL;
@@ -2372,7 +2372,7 @@ int libewf_header_values_generate_utf8_header_string(
 	libfvalue_value_t *unknown_dc_header_value               = NULL;
 	uint8_t *generated_acquiry_date                          = NULL;
 	uint8_t *generated_system_date                           = NULL;
-	char *generated_compression_type                         = NULL;
+	char *generated_compression_level                        = NULL;
 	char *generated_password                                 = NULL;
 	char *generated_srce_section                             = NULL;
 	char *generated_sub_section                              = NULL;
@@ -2381,7 +2381,7 @@ int libewf_header_values_generate_utf8_header_string(
 	size_t acquiry_operating_system_string_length            = 0;
 	size_t acquiry_software_version_string_length            = 0;
 	size_t case_number_string_length                         = 0;
-	size_t compression_type_string_length                    = 0;
+	size_t compression_level_string_length                   = 0;
 	size_t description_string_length                         = 0;
 	size_t evidence_number_string_length                     = 0;
 	size_t examiner_name_string_length                       = 0;
@@ -2668,9 +2668,9 @@ int libewf_header_values_generate_utf8_header_string(
 	{
 		if( libfvalue_table_get_value_by_identifier(
 		     header_values,
-		     (uint8_t *) "compression_type",
-		     17,
-		     &compression_type_header_value,
+		     (uint8_t *) "compression_level",
+		     18,
+		     &compression_level_header_value,
 		     0,
 		     error ) == -1 )
 		{
@@ -2678,7 +2678,7 @@ int libewf_header_values_generate_utf8_header_string(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: compression_type.",
+			 "%s: unable to retrieve header value: compression_level.",
 			 function );
 
 			return( -1 );
@@ -3218,12 +3218,12 @@ int libewf_header_values_generate_utf8_header_string(
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_1 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_2 ) )
 	{
-		if( compression_type_header_value != NULL )
+		if( compression_level_header_value != NULL )
 		{
 			result = libfvalue_value_get_utf8_string_size(
-				  compression_type_header_value,
+				  compression_level_header_value,
 				  0,
-				  &compression_type_string_length,
+				  &compression_level_string_length,
 				  error );
 
 			if( result != 1 )
@@ -3232,7 +3232,7 @@ int libewf_header_values_generate_utf8_header_string(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve string size of header value: compression_type",
+				 "%s: unable to retrieve string size of header value: compression_level",
 				 function );
 
 				if( generated_system_date != NULL )
@@ -3247,30 +3247,30 @@ int libewf_header_values_generate_utf8_header_string(
 				}
 				return( -1 );
 			}
-			if( compression_type_string_length > 0 )
+			if( compression_level_string_length > 0 )
 			{
-				compression_type_string_length -= 1;
+				compression_level_string_length -= 1;
 			}
 		}
-		if( ( compression_type_header_value == NULL )
-		 || ( compression_type_string_length == 0 ) )
+		if( ( compression_level_header_value == NULL )
+		 || ( compression_level_string_length == 0 ) )
 		{
 			if( compression_level == EWF_COMPRESSION_NONE )
 			{
-				generated_compression_type = LIBEWF_COMPRESSION_TYPE_NONE;
+				generated_compression_level = LIBEWF_COMPRESSION_LEVEL_NONE;
 			}
 			else if( compression_level == EWF_COMPRESSION_FAST )
 			{
-				generated_compression_type = LIBEWF_COMPRESSION_TYPE_FAST;
+				generated_compression_level = LIBEWF_COMPRESSION_LEVEL_FAST;
 			}
 			else if( compression_level == EWF_COMPRESSION_BEST )
 			{
-				generated_compression_type = LIBEWF_COMPRESSION_TYPE_BEST;
+				generated_compression_level = LIBEWF_COMPRESSION_LEVEL_BEST;
 			}
-			compression_type_string_length = libcstring_narrow_string_length(
-			                                  generated_compression_type );
+			compression_level_string_length = libcstring_narrow_string_length(
+			                                   generated_compression_level );
 		}
-		*header_string_size += compression_type_string_length;
+		*header_string_size += compression_level_string_length;
 	}
 	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	{
@@ -4162,10 +4162,10 @@ int libewf_header_values_generate_utf8_header_string(
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 
-		if( generated_compression_type == NULL )
+		if( generated_compression_level == NULL )
 		{
 			result = libfvalue_value_copy_to_utf8_string(
-				  compression_type_header_value,
+				  compression_level_header_value,
 				  0,
 				  &( ( *header_string )[ header_string_index ] ),
 			          *header_string_size - header_string_index,
@@ -4177,7 +4177,7 @@ int libewf_header_values_generate_utf8_header_string(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy string of header value: compression_type.",
+				 "%s: unable to copy string of header value: compression_level.",
 				 function );
 
 				memory_free(
@@ -4193,14 +4193,14 @@ int libewf_header_values_generate_utf8_header_string(
 		{
 			if( libcstring_narrow_string_copy(
 			     (char *) &( ( *header_string )[ header_string_index ] ),
-			     generated_compression_type,
-			     compression_type_string_length ) == NULL )
+			     generated_compression_level,
+			     compression_level_string_length ) == NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy compression type string.",
+				 "%s: unable to copy compression level string.",
 				 function );
 
 				memory_free(
@@ -4212,7 +4212,7 @@ int libewf_header_values_generate_utf8_header_string(
 				return( -1 );
 			}
 		}
-		header_string_index += compression_type_string_length;
+		header_string_index += compression_level_string_length;
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 ) )

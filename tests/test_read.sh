@@ -82,7 +82,9 @@ fi
 
 for BASENAME in `${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
 do
-	if ! test_read `${LS} ${INPUT}/${BASENAME}.*`;
+	FILENAMES=`${LS} ${INPUT}/${BASENAME}.* | ${TR} '\n' ' '`;
+
+	if ! test_read ${FILENAMES};
 	then
 		exit ${EXIT_FAILURE};
 	fi

@@ -26,20 +26,23 @@ EXIT_IGNORE=77;
 
 TMP="tmp";
 
+CUT="cut";
+
 function test_write
 { 
 	MEDIA_SIZE=$1;
 	MAXIMUM_SEGMENT_SIZE=$2;
+	COMPRESSION_LEVEL=$3;
 
 	mkdir ${TMP};
 
-	./${EWF_TEST_WRITE} -B ${MEDIA_SIZE} -S ${MAXIMUM_SEGMENT_SIZE} ${TMP}/write;
+	./${EWF_TEST_WRITE} -B ${MEDIA_SIZE} -c `echo ${COMPRESSION_LEVEL} | ${CUT} -c 1` -S ${MAXIMUM_SEGMENT_SIZE} ${TMP}/write;
 
 	RESULT=$?;
 
 	rm -rf ${TMP};
 
-	echo -n "Testing write with media size: ${MEDIA_SIZE} and maximum segment size: ${MAXIMUM_SEGMENT_SIZE} ";
+	echo -n "Testing write with media size: ${MEDIA_SIZE}, maximum segment size: ${MAXIMUM_SEGMENT_SIZE} and compression level: ${COMPRESSION_LEVEL} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -64,25 +67,30 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_write 0 0
-then
-	exit ${EXIT_FAILURE};
-fi
+for COMPRESSION_LEVEL in none empty-block fast best;
+do
+	if ! test_write 0 0 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-if ! test_write 0 10000
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! test_write 0 10000 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-if ! test_write 100000 0
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! test_write 100000 0 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-if ! test_write 100000 10000
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! test_write 100000 10000 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	echo "";
+done
 
 exit ${EXIT_SUCCESS};
 

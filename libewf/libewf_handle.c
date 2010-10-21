@@ -1447,7 +1447,7 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to create read IO handle.",
 			 function );
 
-			return( -1 );
+			goto libewf_handle_open_file_io_pool_on_error;
 		}
 	}
 	if( ( flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
@@ -1463,13 +1463,7 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to create write IO handle.",
 			 function );
 
-			if( internal_handle->read_io_handle != NULL )
-			{
-				libewf_read_io_handle_free(
-				 &( internal_handle->read_io_handle ),
-				 error );
-			}
-			return( -1 );
+			goto libewf_handle_open_file_io_pool_on_error;
 		}
 	}
 	internal_handle->io_handle->flags = flags;
@@ -1487,21 +1481,7 @@ int libewf_handle_open_file_io_pool(
 		 "%s: unable to create offset table.",
 		 function );
 
-		internal_handle->file_io_pool = NULL;
-
-		if( internal_handle->write_io_handle != NULL )
-		{
-			libewf_write_io_handle_free(
-			 &( internal_handle->write_io_handle ),
-			 error );
-		}
-		if( internal_handle->read_io_handle != NULL )
-		{
-			libewf_read_io_handle_free(
-			 &( internal_handle->read_io_handle ),
-			 error );
-		}
-		return( -1 );
+		goto libewf_handle_open_file_io_pool_on_error;
 	}
 	if( libewf_header_sections_initialize(
 	     &( internal_handle->header_sections ),
@@ -1514,25 +1494,7 @@ int libewf_handle_open_file_io_pool(
 		 "%s: unable to create header sections.",
 		 function );
 
-		libewf_offset_table_free(
-		 &( internal_handle->offset_table ),
-		 NULL );
-
-		internal_handle->file_io_pool = NULL;
-
-		if( internal_handle->write_io_handle != NULL )
-		{
-			libewf_write_io_handle_free(
-			 &( internal_handle->write_io_handle ),
-			 error );
-		}
-		if( internal_handle->read_io_handle != NULL )
-		{
-			libewf_read_io_handle_free(
-			 &( internal_handle->read_io_handle ),
-			 error );
-		}
-		return( -1 );
+		goto libewf_handle_open_file_io_pool_on_error;
 	}
 	if( libewf_hash_sections_initialize(
 	     &( internal_handle->hash_sections ),
@@ -1545,28 +1507,7 @@ int libewf_handle_open_file_io_pool(
 		 "%s: unable to create hash sections.",
 		 function );
 
-		libewf_header_sections_free(
-		 &( internal_handle->header_sections ),
-		 NULL );
-		libewf_offset_table_free(
-		 &( internal_handle->offset_table ),
-		 NULL );
-
-		internal_handle->file_io_pool = NULL;
-
-		if( internal_handle->write_io_handle != NULL )
-		{
-			libewf_write_io_handle_free(
-			 &( internal_handle->write_io_handle ),
-			 error );
-		}
-		if( internal_handle->read_io_handle != NULL )
-		{
-			libewf_read_io_handle_free(
-			 &( internal_handle->read_io_handle ),
-			 error );
-		}
-		return( -1 );
+		goto libewf_handle_open_file_io_pool_on_error;
 	}
 	if( libewf_single_files_initialize(
 	     &( internal_handle->single_files ),
@@ -1579,31 +1520,7 @@ int libewf_handle_open_file_io_pool(
 		 "%s: unable to create single files.",
 		 function );
 
-		libewf_hash_sections_free(
-		 &( internal_handle->hash_sections ),
-		 NULL );
-		libewf_header_sections_free(
-		 &( internal_handle->header_sections ),
-		 NULL );
-		libewf_offset_table_free(
-		 &( internal_handle->offset_table ),
-		 NULL );
-
-		internal_handle->file_io_pool = NULL;
-
-		if( internal_handle->write_io_handle != NULL )
-		{
-			libewf_write_io_handle_free(
-			 &( internal_handle->write_io_handle ),
-			 error );
-		}
-		if( internal_handle->read_io_handle != NULL )
-		{
-			libewf_read_io_handle_free(
-			 &( internal_handle->read_io_handle ),
-			 error );
-		}
-		return( -1 );
+		goto libewf_handle_open_file_io_pool_on_error;
 	}
 	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 || ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
@@ -1628,34 +1545,7 @@ int libewf_handle_open_file_io_pool(
 				 function,
 				 file_io_handle_iterator );
 
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
-
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
@@ -1678,34 +1568,7 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to create segment file handle.",
 				 function );
 
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
-
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 			if( libewf_segment_file_read_file_header(
 			     segment_file_handle,
@@ -1723,34 +1586,8 @@ int libewf_handle_open_file_io_pool(
 				libewf_segment_file_handle_free(
 				 (intptr_t *) segment_file_handle,
 				 NULL );
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
 
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 			if( segment_number == 0 )
 			{
@@ -1764,34 +1601,8 @@ int libewf_handle_open_file_io_pool(
 				libewf_segment_file_handle_free(
 				 (intptr_t *) segment_file_handle,
 				 NULL );
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
 
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 			if( ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
 			 || ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
@@ -1813,34 +1624,8 @@ int libewf_handle_open_file_io_pool(
 					libewf_segment_file_handle_free(
 					 (intptr_t *) segment_file_handle,
 					 NULL );
-					libewf_single_files_free(
-					 &( internal_handle->single_files ),
-					 NULL );
-					libewf_hash_sections_free(
-					 &( internal_handle->hash_sections ),
-					 NULL );
-					libewf_header_sections_free(
-					 &( internal_handle->header_sections ),
-					 NULL );
-					libewf_offset_table_free(
-					 &( internal_handle->offset_table ),
-					 NULL );
 
-					internal_handle->file_io_pool = NULL;
-
-					if( internal_handle->write_io_handle != NULL )
-					{
-						libewf_write_io_handle_free(
-						 &( internal_handle->write_io_handle ),
-						 error );
-					}
-					if( internal_handle->read_io_handle != NULL )
-					{
-						libewf_read_io_handle_free(
-						 &( internal_handle->read_io_handle ),
-						 error );
-					}
-					return( -1 );
+					goto libewf_handle_open_file_io_pool_on_error;
 				}
 				segment_file_handle = NULL;
 			}
@@ -1863,34 +1648,8 @@ int libewf_handle_open_file_io_pool(
 					libewf_segment_file_handle_free(
 					 (intptr_t *) segment_file_handle,
 					 NULL );
-					libewf_single_files_free(
-					 &( internal_handle->single_files ),
-					 NULL );
-					libewf_hash_sections_free(
-					 &( internal_handle->hash_sections ),
-					 NULL );
-					libewf_header_sections_free(
-					 &( internal_handle->header_sections ),
-					 NULL );
-					libewf_offset_table_free(
-					 &( internal_handle->offset_table ),
-					 NULL );
 
-					internal_handle->file_io_pool = NULL;
-
-					if( internal_handle->write_io_handle != NULL )
-					{
-						libewf_write_io_handle_free(
-						 &( internal_handle->write_io_handle ),
-						 error );
-					}
-					if( internal_handle->read_io_handle != NULL )
-					{
-						libewf_read_io_handle_free(
-						 &( internal_handle->read_io_handle ),
-						 error );
-					}
-					return( -1 );
+					goto libewf_handle_open_file_io_pool_on_error;
 				}
 				segment_file_handle = NULL;
 
@@ -1912,34 +1671,7 @@ int libewf_handle_open_file_io_pool(
 						 function,
 						 segment_number );
 
-						libewf_single_files_free(
-						 &( internal_handle->single_files ),
-						 NULL );
-						libewf_hash_sections_free(
-						 &( internal_handle->hash_sections ),
-						 NULL );
-						libewf_header_sections_free(
-						 &( internal_handle->header_sections ),
-						 NULL );
-						libewf_offset_table_free(
-						 &( internal_handle->offset_table ),
-						 NULL );
-
-						internal_handle->file_io_pool = NULL;
-
-						if( internal_handle->write_io_handle != NULL )
-						{
-							libewf_write_io_handle_free(
-							 &( internal_handle->write_io_handle ),
-							 error );
-						}
-						if( internal_handle->read_io_handle != NULL )
-						{
-							libewf_read_io_handle_free(
-							 &( internal_handle->read_io_handle ),
-							 error );
-						}
-						return( -1 );
+						goto libewf_handle_open_file_io_pool_on_error;
 					}
 				}
 			}
@@ -1955,34 +1687,8 @@ int libewf_handle_open_file_io_pool(
 				libewf_segment_file_handle_free(
 				 (intptr_t *) segment_file_handle,
 				 NULL );
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
 
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 			if( (int) segment_number > number_of_file_io_handles )
 			{
@@ -1994,34 +1700,7 @@ int libewf_handle_open_file_io_pool(
 				 function,
 				 segment_number );
 
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
-
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 		}
 		if( libewf_handle_open_read(
@@ -2036,44 +1715,16 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to read segment table.",
 			 function );
 
-			if( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 )
+			if( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 )
 			{
-				libnotify_print_error_backtrace(
-				 *error );
-				liberror_error_free(
-				 error );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
-			else
-			{
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
-
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
-			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			libnotify_print_error_backtrace(
+			 *error );
+#endif
+			liberror_error_free(
+			 error );
 		}
 		if( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 )
 		{
@@ -2089,34 +1740,7 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to retrieve number of delta segment file handles.",
 				 function );
 
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
-
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 			if( number_of_segment_file_handles > 1 )
 			{
@@ -2132,34 +1756,7 @@ int libewf_handle_open_file_io_pool(
 					 "%s: unable to read delta segment table.",
 					 function );
 
-					libewf_single_files_free(
-					 &( internal_handle->single_files ),
-					 NULL );
-					libewf_hash_sections_free(
-					 &( internal_handle->hash_sections ),
-					 NULL );
-					libewf_header_sections_free(
-					 &( internal_handle->header_sections ),
-					 NULL );
-					libewf_offset_table_free(
-					 &( internal_handle->offset_table ),
-					 NULL );
-
-					internal_handle->file_io_pool = NULL;
-
-					if( internal_handle->write_io_handle != NULL )
-					{
-						libewf_write_io_handle_free(
-						 &( internal_handle->write_io_handle ),
-						 error );
-					}
-					if( internal_handle->read_io_handle != NULL )
-					{
-						libewf_read_io_handle_free(
-						 &( internal_handle->read_io_handle ),
-						 error );
-					}
-					return( -1 );
+					goto libewf_handle_open_file_io_pool_on_error;
 				}
 			}
 		}
@@ -2178,39 +1775,21 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to determine format.",
 			 function );
 
-			libewf_single_files_free(
-			 &( internal_handle->single_files ),
-			 NULL );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ),
-			 NULL );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
+			goto libewf_handle_open_file_io_pool_on_error;
+		}
+		if( internal_handle->media_values == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid handle - missing media values.",
+			 function );
 
-			internal_handle->file_io_pool = NULL;
-
-			if( internal_handle->write_io_handle != NULL )
-			{
-				libewf_write_io_handle_free(
-				 &( internal_handle->write_io_handle ),
-				 error );
-			}
-			if( internal_handle->read_io_handle != NULL )
-			{
-				libewf_read_io_handle_free(
-				 &( internal_handle->read_io_handle ),
-				 error );
-			}
-			return( -1 );
+			goto libewf_handle_open_file_io_pool_on_error;
 		}
 		if( internal_handle->single_files->ltree_data != NULL )
 		{
-			/* Parse the single file entries
-			 */
 			if( libewf_single_files_parse(
 			     internal_handle->single_files,
 			     &( internal_handle->media_values->media_size ),
@@ -2223,42 +1802,25 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to parse single files.",
 				 function );
 
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
-
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 		}
 		else
 		{
-			/* Calculate the media size
-			 */
-			internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->number_of_sectors
-			                                          * (size64_t) internal_handle->media_values->bytes_per_sector;
+			if( libewf_internal_handle_get_media_values(
+			     internal_handle,
+			     &( internal_handle->media_values->media_size ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine media values.",
+				 function );
+
+				goto libewf_handle_open_file_io_pool_on_error;
+			}
 		}
 	}
 	/* Make sure format specific values are set
@@ -2277,34 +1839,7 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to set format.",
 			 function );
 
-			libewf_single_files_free(
-			 &( internal_handle->single_files ),
-			 NULL );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ),
-			 NULL );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-
-			internal_handle->file_io_pool = NULL;
-
-			if( internal_handle->write_io_handle != NULL )
-			{
-				libewf_write_io_handle_free(
-				 &( internal_handle->write_io_handle ),
-				 error );
-			}
-			if( internal_handle->read_io_handle != NULL )
-			{
-				libewf_read_io_handle_free(
-				 &( internal_handle->read_io_handle ),
-				 error );
-			}
-			return( -1 );
+			goto libewf_handle_open_file_io_pool_on_error;
 		}
 	}
 	if( ( ( flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
@@ -2326,34 +1861,7 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to initialize write IO handle values.",
 				 function );
 
-				libewf_single_files_free(
-				 &( internal_handle->single_files ),
-				 NULL );
-				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ),
-				 NULL );
-				libewf_header_sections_free(
-				 &( internal_handle->header_sections ),
-				 NULL );
-				libewf_offset_table_free(
-				 &( internal_handle->offset_table ),
-				 NULL );
-
-				internal_handle->file_io_pool = NULL;
-
-				if( internal_handle->write_io_handle != NULL )
-				{
-					libewf_write_io_handle_free(
-					 &( internal_handle->write_io_handle ),
-					 error );
-				}
-				if( internal_handle->read_io_handle != NULL )
-				{
-					libewf_read_io_handle_free(
-					 &( internal_handle->read_io_handle ),
-					 error );
-				}
-				return( -1 );
+				goto libewf_handle_open_file_io_pool_on_error;
 			}
 		}
 		if( libewf_write_io_handle_initialize_resume(
@@ -2372,37 +1880,51 @@ int libewf_handle_open_file_io_pool(
 			 "%s: unable to initialize write IO handle to resume.",
 			 function );
 
-			libewf_single_files_free(
-			 &( internal_handle->single_files ),
-			 NULL );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ),
-			 NULL );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ),
-			 NULL );
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ),
-			 NULL );
-
-			internal_handle->file_io_pool = NULL;
-
-			if( internal_handle->write_io_handle != NULL )
-			{
-				libewf_write_io_handle_free(
-				 &( internal_handle->write_io_handle ),
-				 error );
-			}
-			if( internal_handle->read_io_handle != NULL )
-			{
-				libewf_read_io_handle_free(
-				 &( internal_handle->read_io_handle ),
-				 error );
-			}
-			return( -1 );
+			goto libewf_handle_open_file_io_pool_on_error;
 		}
 	}
 	return( 1 );
+
+libewf_handle_open_file_io_pool_on_error:
+	if( internal_handle->single_files != NULL )
+	{
+		libewf_single_files_free(
+		 &( internal_handle->single_files ),
+		 NULL );
+	}
+	if( internal_handle->hash_sections != NULL )
+	{
+		libewf_hash_sections_free(
+		 &( internal_handle->hash_sections ),
+		 NULL );
+	}
+	if( internal_handle->header_sections != NULL )
+	{
+		libewf_header_sections_free(
+		 &( internal_handle->header_sections ),
+		 NULL );
+	}
+	if( internal_handle->offset_table != NULL )
+	{
+		libewf_offset_table_free(
+		 &( internal_handle->offset_table ),
+		 NULL );
+	}
+	internal_handle->file_io_pool = NULL;
+
+	if( internal_handle->write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &( internal_handle->write_io_handle ),
+		 error );
+	}
+	if( internal_handle->read_io_handle != NULL )
+	{
+		libewf_read_io_handle_free(
+		 &( internal_handle->read_io_handle ),
+		 error );
+	}
+	return( -1 );
 }
 
 /* Closes the EWF handle
@@ -3268,7 +2790,8 @@ ssize_t libewf_handle_read_buffer(
 	}
 	/* Do not read beyond the media size
 	 */
-	if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size )
+	if( ( internal_handle->media_values->media_size > 0 )
+	 && ( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size ) )
 	{
 		return( 0 );
 	}
@@ -4394,17 +3917,6 @@ int libewf_handle_get_offset(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -5708,17 +5220,6 @@ int libewf_handle_get_file_io_handle(
 
 		return( -1 );
 	}
-	if( internal_handle->media_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_offset_table_get_segment_file_handle(
 	     internal_handle->offset_table,
 	     internal_handle->io_handle->current_chunk,
@@ -5792,15 +5293,15 @@ int libewf_internal_handle_get_write_maximum_number_of_segments(
 	}
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
-		/* = 4831
+		/* ( ( ( 'z' - 's' ) * 26 * 26 ) + 99 ) = 4831
 		 */
-		*maximum_number_of_segments = (uint16_t) ( ( (int) ( 'z' - 's' ) * 26 * 26 ) + 99 );
+		*maximum_number_of_segments = (uint16_t) 4831;
 	}
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
-		/* = 14295
+		/* ( ( ( 'Z' - 'E' ) * 26 * 26 ) + 99 ) = 14295
 		 */
-		*maximum_number_of_segments = (uint16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
+		*maximum_number_of_segments = (uint16_t) 14295;
 	}
 	else
 	{
@@ -5813,6 +5314,219 @@ int libewf_internal_handle_get_write_maximum_number_of_segments(
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Retrieves the media values
+ * Returns 1 if successful or -1 on errror
+ */
+int libewf_internal_handle_get_media_values(
+     libewf_internal_handle_t *internal_handle,
+     size64_t *media_size,
+     liberror_error_t **error )
+{
+	libewf_chunk_value_t *chunk_value = NULL;
+	static char *function             = "libewf_internal_handle_get_media_values";
+	size64_t chunk_data_size          = 0;
+	size64_t sector_data_size         = 0;
+	size_t chunk_size                 = 0;
+	ssize_t read_count                = 0;
+	uint32_t number_of_chunk_values   = 0;
+
+	if( internal_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_cache == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media size.",
+		 function );
+
+		return( -1 );
+	}
+	sector_data_size  = internal_handle->media_values->number_of_sectors;
+	sector_data_size *= internal_handle->media_values->bytes_per_sector;
+
+	if( ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( internal_handle->io_handle->flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
+	{
+		if( libewf_offset_table_get_number_of_chunk_values(
+		     internal_handle->offset_table,
+		     &number_of_chunk_values,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of chunk values in offset table.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			if( internal_handle->media_values->number_of_chunks != number_of_chunk_values )
+			{
+				libnotify_printf(
+				 "%s: mismatch of number of chunks in volume: %" PRIu32 " and offset table(s): %" PRIu32 "\n",
+				 function,
+				 internal_handle->media_values->number_of_chunks,
+				 number_of_chunk_values );
+			}
+		}
+#endif
+		if( number_of_chunk_values > 0 )
+		{
+			if( libewf_offset_table_get_chunk_value(
+			     internal_handle->offset_table,
+			     number_of_chunk_values - 1,
+			     &chunk_value,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve chunk value: %" PRIu32 " from offset table.",
+				 function,
+				 number_of_chunk_values - 1 );
+
+				return( -1 );
+			}
+			if( chunk_value == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing chunk value.",
+				 function );
+
+				return( -1 );
+			}
+			chunk_data_size  = number_of_chunk_values - 1;
+			chunk_data_size *= internal_handle->media_values->sectors_per_chunk;
+			chunk_data_size *= internal_handle->media_values->bytes_per_sector;
+
+			if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) == 0 )
+			{
+				chunk_data_size += chunk_value->size - 4;
+			}
+			else
+			{
+				/* Reallocate the chunk cache if the chunk size is not the default chunk size
+				 * this prevents some reallocations of the chunk cache
+				 */
+				chunk_size = internal_handle->media_values->chunk_size + sizeof( uint32_t );
+
+				if( chunk_size > internal_handle->chunk_cache->size )
+				{
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libnotify_verbose != 0 )
+					{
+						libnotify_printf(
+						 "%s: reallocating chunk data size: %" PRIzu ".\n",
+						 function,
+						 chunk_size );
+					}
+#endif
+					if( libewf_chunk_cache_resize(
+					     internal_handle->chunk_cache,
+					     chunk_size,
+					     error ) != 1 )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+						 "%s: unable to resize chunk cache.",
+						 function );
+
+						return( -1 );
+					}
+				}
+				/* The only way to determine the size of the last compressed chunk
+				 * is to read and decompress it
+				 */
+				read_count = libewf_read_io_handle_read_chunk_data(
+				              internal_handle->read_io_handle,
+				              internal_handle->io_handle,
+				              internal_handle->file_io_pool,
+				              internal_handle->media_values,
+				              internal_handle->offset_table,
+				              internal_handle->chunk_cache,
+				              number_of_chunk_values - 1,
+				              0,
+				              internal_handle->chunk_cache->data,
+				              internal_handle->chunk_cache->size,
+				              error );
+
+				if( read_count == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read data from chunk.",
+					 function );
+
+					return( -1 );
+				}
+				chunk_data_size += internal_handle->chunk_cache->data_size;
+			}
+			if( sector_data_size != chunk_data_size )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: mismatch of media data size in volume: %" PRIu64 " and offset table(s): %" PRIu64 "\n",
+					 function,
+					 sector_data_size,
+					 chunk_data_size );
+				}
+#endif
+				sector_data_size = chunk_data_size;
+			}
+		}
+	}
+	*media_size = sector_data_size;
+
 	return( 1 );
 }
 
@@ -5957,12 +5671,6 @@ int libewf_internal_handle_set_media_values(
 		 */
 		number_of_sectors = (uint64_t) media_size / (uint64_t) bytes_per_sector;
 
-/* TODO what to do with a non-sector multitude media size
-		if( ( (uint64_t) media_size % (uint64_t) bytes_per_sector ) != 0 )
-		{
-			number_of_sectors += 1;
-		}
-*/
 		if( number_of_sectors > (uint64_t) INT64_MAX )
 		{
 			liberror_error_set(

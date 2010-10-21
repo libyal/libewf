@@ -75,7 +75,8 @@ int ewf_test_seek_offset(
 
 			return( -1 );
 		}
-		libnotify_printf(
+		fprintf(
+		 stderr,
 		 "%s: unexpected result offset: %" PRIi64 "\n",
 		 function,
 		 result_offset );
@@ -149,7 +150,8 @@ int ewf_test_read_buffer(
 	}
 	if( expected_size != result_size )
 	{
-		libnotify_printf(
+		fprintf(
+		 stderr,
 		 "%s: unexpected read count: %" PRIu64 "\n",
 		 function,
 		 result_size );
@@ -244,7 +246,8 @@ int ewf_test_read_chunk(
 	}
 	if( expected_size != result_size )
 	{
-		libnotify_printf(
+		fprintf(
+		 stderr,
 		 "%s: unexpected read count: %" PRIu64 "\n",
 		 function,
 		 result_size );
@@ -365,11 +368,16 @@ int ewf_test_read_chunk_at_offset(
 	const char *whence_string = NULL;
 	int result                = 0;
 
-	if( ( chunk_size == 0 )
-	 || ( (size_t) chunk_size > (size_t) SSIZE_MAX ) )
+	if( chunk_size == 0 )
 	{
 		return( -1 );
 	}
+#if SIZEOF_SIZE_T < 8
+	if( (size_t) chunk_size > (size_t) SSIZE_MAX )
+	{
+		return( -1 );
+	}
+#endif
 	if( input_whence == SEEK_CUR )
 	{
 		whence_string = "SEEK_CUR";

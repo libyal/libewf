@@ -115,11 +115,11 @@ void usage_fprint(
 
 #ifdef DISABLED
 	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -b number_of_sectors ] [ -B number_of_bytes ]\n"
-	                 "                 [ -c compression_type ] [ -d digest_type ] [ -f format ]\n"
+	                 "                 [ -c compression_level ] [ -d digest_type ] [ -f format ]\n"
 	                 "                 [ -l log_filename ] [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
 #else
-	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -B number_of_bytes ] [ -c compression_type ]\n"
+	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -B number_of_bytes ] [ -c compression_level ]\n"
 	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
 	                 "                 [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
@@ -137,7 +137,7 @@ void usage_fprint(
 	                 "\t           16384 or 32768 (not used for raw and files formats)\n" );
 #endif
 	fprintf( stream, "\t-B:        specify the number of bytes to export (default is all bytes)\n" );
-	fprintf( stream, "\t-c:        specify the compression type, options: none (default),\n"
+	fprintf( stream, "\t-c:        specify the compression level, options: none (default),\n"
 	                 "\t           empty-block, fast or best (not used for raw and files format)\n" );
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
 	                 "\t           options: sha1 (not used for raw and files format)\n" );
@@ -1004,7 +1004,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsupported compression type defaulting to: none.\n" );
+					 "Unsupported compression level defaulting to: none.\n" );
 
 					compression_level = LIBEWF_COMPRESSION_NONE;
 					compression_flags = 0;
@@ -1597,7 +1597,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unable to determine compression type defaulting to: none.\n" );
+					 "Unable to determine compression level defaulting to: none.\n" );
 
 					compression_level = LIBEWF_COMPRESSION_NONE;
 					compression_flags = 0;
@@ -1615,7 +1615,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsupported compression type defaulting to: none.\n" );
+					 "Unsupported compression level defaulting to: none.\n" );
 
 					compression_level = LIBEWF_COMPRESSION_NONE;
 					compression_flags = 0;

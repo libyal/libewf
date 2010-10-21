@@ -51,6 +51,8 @@ int ewf_test_write(
      const char *filename,
      size64_t media_size,
      size64_t maximum_segment_size,
+     int8_t compression_level,
+     uint8_t compression_flags,
      liberror_error_t **error )
 {
 	libewf_handle_t *handle = NULL;
@@ -136,6 +138,21 @@ int ewf_test_write(
 
 			result = -1;
 		}
+	}
+	if( libewf_handle_set_compression_values(
+	     handle,
+	     compression_level,
+	     compression_flags,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable set compression values.",
+		 function );
+
+		result = -1;
 	}
 	buffer = (uint8_t *) memory_allocate(
 	                      EWF_TEST_BUFFER_SIZE );
@@ -316,15 +333,18 @@ int main( int argc, char * const argv[] )
 {
 	liberror_error_t *error            = NULL;
 	libcstring_system_integer_t option = 0;
+	size64_t chunk_size                = 0;
 	size64_t maximum_segment_size      = 0;
 	size64_t media_size                = 0;
 	size_t string_length               = 0;
+	uint8_t compression_flags          = 0;
+	int8_t compression_level           = LIBEWF_COMPRESSION_NONE;
 	int result                         = 0;
 
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "B:S:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "b:B:c:S:" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -336,6 +356,71 @@ int main( int argc, char * const argv[] )
 				 argv[ optind ] );
 
 				return( EXIT_FAILURE );
+
+			case (libcstring_system_integer_t) 'b':
+				string_length = libcstring_system_string_length(
+				                 optarg );
+
+				if( libsystem_string_to_uint64(
+				     optarg,
+				     string_length + 1,
+				     &chunk_size,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsupported chunk size.\n" );
+
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+
+					return( EXIT_FAILURE );
+				}
+				break;
+
+			case (libcstring_system_integer_t) 'c':
+				string_length = libcstring_system_string_length(
+				                 optarg );
+
+				if( string_length != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsupported compression level.\n" );
+
+					return( EXIT_FAILURE );
+				}
+				if( optarg[ 0 ] == (libcstring_system_integer_t) 'n' )
+				{
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
+				}
+				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'e' )
+				{
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+				}
+				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'f' )
+				{
+					compression_level = LIBEWF_COMPRESSION_FAST;
+					compression_flags = 0;
+				}
+				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'b' )
+				{
+					compression_level = LIBEWF_COMPRESSION_BEST;
+					compression_flags = 0;
+				}
+				else
+				{
+					fprintf(
+					 stderr,
+					 "Unsupported compression level.\n" );
+
+					return( EXIT_FAILURE );
+				}
+				break;
 
 			case (libcstring_system_integer_t) 'B':
 				string_length = libcstring_system_string_length(
@@ -396,6 +481,8 @@ int main( int argc, char * const argv[] )
 	          argv[ optind ],
 	          media_size,
 	          maximum_segment_size,
+	          compression_level,
+	          compression_flags,
 	          &error );
 
 	if( result == -1 )

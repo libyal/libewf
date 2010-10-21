@@ -216,7 +216,7 @@ ssize_t libewf_read_io_handle_process_chunk(
 	}
 	*checksum_mismatch = 0;
 
-	/* Do not bother with an empry chunk
+	/* Do not bother with an empty chunk
 	 */
 	if( chunk_buffer_size == 0 )
 	{
@@ -250,7 +250,6 @@ ssize_t libewf_read_io_handle_process_chunk(
 				 calculated_checksum );
 			}
 #endif
-
 			*checksum_mismatch = 1;
 		}
 		*uncompressed_buffer_size = chunk_buffer_size;
@@ -908,20 +907,22 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		{
 			/* Wipe the chunk if nescessary
 			 */
-			if( ( read_io_handle->wipe_on_error != 0 )
-			 && ( memory_set(
-			       chunk_read_buffer,
-			       0,
-			       size ) == NULL ) )
+			if( read_io_handle->wipe_on_error != 0 )
 			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe chunk data.",
-				 function );
+				if( memory_set(
+				     chunk_read_buffer,
+				     0,
+				     size ) == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to wipe chunk data.",
+					 function );
 
-				return( -1 );
+					return( -1 );
+				}
 			}
 			/* Add checksum error
 			 */
@@ -1005,20 +1006,22 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	{
 		/* Copy the relevant data to buffer
 		 */
-		if( ( bytes_available > 0 )
-		 && ( memory_copy(
-		       buffer,
-		       &( chunk_buffer[ chunk_offset ] ),
-		       bytes_available ) == NULL ) )
+		if( bytes_available > 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set chunk data in buffer.",
-			 function );
+			if( memory_copy(
+			     buffer,
+			     &( chunk_buffer[ chunk_offset ] ),
+			     bytes_available ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to set chunk data in buffer.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
 		}
 	}
 	return( (ssize_t) bytes_available );

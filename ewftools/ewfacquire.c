@@ -119,7 +119,7 @@ void usage_fprint(
 	                 "format (Expert Witness Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfacquire [ -A codepage ] [ -b number_of_sectors ]\n"
-	                 "                  [ -B number_of_bytes ] [ -c compression_type ]\n"
+	                 "                  [ -B number_of_bytes ] [ -c compression_level ]\n"
 	                 "                  [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
 	                 "                  [ -e examiner_name ] [ -E evidence_number ] [ -f format ]\n"
 	                 "                  [ -g number_of_sectors ] [ -l log_filename ]\n"
@@ -139,7 +139,7 @@ void usage_fprint(
 	                 "\t        options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192,\n"
 	                 "\t        16384 or 32768\n" );
 	fprintf( stream, "\t-B:     specify the number of bytes to acquire (default is all bytes)\n" );
-	fprintf( stream, "\t-c:     specify the compression type, options: none (default),\n"
+	fprintf( stream, "\t-c:     specify the compression level, options: none (default),\n"
 	                 "\t        empty-block, fast or best\n" );
 	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options:\n"
@@ -1689,7 +1689,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsupported compression type defaulting to: none.\n" );
+					 "Unsupported compression level defaulting to: none.\n" );
 				}
 				else
 				{
@@ -3027,7 +3027,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stdout,
-					 "Unable to determine compression type defaulting to: none.\n" );
+					 "Unable to determine compression level defaulting to: none.\n" );
 
 					compression_level = LIBEWF_COMPRESSION_NONE;
 					compression_flags = 0;
@@ -3045,7 +3045,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stdout,
-					 "Unsupported compression type defaulting to: none.\n" );
+					 "Unsupported compression level defaulting to: none.\n" );
 
 					compression_level = LIBEWF_COMPRESSION_NONE;
 					compression_flags = 0;

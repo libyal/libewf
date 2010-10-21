@@ -1697,7 +1697,7 @@ ssize_t libewf_write_io_handle_process_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
-		 "%s: invalid chunk data size: %" PRIzd " value exceeds media values chunk size: %" PRIzd ".",
+		 "%s: invalid chunk data size: %" PRIzd " value exceeds media values chunk size: %" PRIu32 ".",
 		 function,
 		 chunk_data_size,
 		 media_values->chunk_size );
@@ -3003,19 +3003,21 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		return( -1 );
 	}
+/* TODO does not work for last chunk
 	if( chunk_size != media_values->chunk_size )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_CONFLICTING_VALUE,
-		 "%s: invalid chunk size: %" PRIzd " expected size: %" PRIzd ".",
+		 "%s: invalid chunk size: %" PRIzd " expected size: %" PRIu32 ".",
 		 function,
 		 chunk_size,
 		 media_values->chunk_size );
 
 		return( -1 );
 	}
+*/
 	if( is_compressed != 0 )
 	{
 		liberror_error_set(

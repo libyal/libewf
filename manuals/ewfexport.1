@@ -1,4 +1,4 @@
-.Dd September 29, 2010
+.Dd October 21, 2010
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -8,7 +8,7 @@
 .Nm ewfexport
 .Op Fl A Ar codepage
 .Op Fl B Ar number_of_bytes
-.Op Fl c Ar compression_type
+.Op Fl c Ar compression_level
 .Op Fl d Ar digest_type
 .Op Fl f Ar format
 .Op Fl l Ar log_filename
@@ -44,8 +44,8 @@ The options are as follows:
 the codepage of header section, options: ascii (default), windows-874, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
 .It Fl B Ar number_of_bytes
 the number of bytes to export
-.It Fl c Ar compression_type
-the compression type, options: none (default), empty-block, fast, best (not used for raw and files formats)
+.It Fl c Ar compression_level
+the compression level, options: none (default), empty-block, fast, best (not used for raw and files formats)
 .It Fl d Ar digest_type
 calculate additional digest (hash) types besides md5, options: sha1 (not used for raw and files formats)
 .It Fl f Ar format

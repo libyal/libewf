@@ -1,4 +1,4 @@
-.Dd October 13, 2010
+.Dd October 21, 2010
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -9,7 +9,7 @@
 .Op Fl A Ar codepage
 .Op Fl b Ar number_of_sectors
 .Op Fl B Ar number_of_bytes
-.Op Fl c Ar compression_type
+.Op Fl c Ar compression_level
 .Op Fl C Ar case_number
 .Op Fl d Ar digest_type
 .Op Fl D Ar description
@@ -66,8 +66,8 @@ the codepage of header section, options: ascii (default), windows-874, windows-1
 the number of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl B Ar number_of_bytes
 the number of bytes to acquire
-.It Fl c Ar compression_type
-the compression type, options: none (default), empty-block, fast, best
+.It Fl c Ar compression_level
+the compression level, options: none (default), empty-block, fast, best
 .It Fl C Ar case_number
 the case number (default is case_number)
 .It Fl d Ar digest_type

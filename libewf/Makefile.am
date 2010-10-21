@@ -6,6 +6,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libnotify \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
+	@LIBMFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@
 
@@ -49,6 +50,7 @@ libewf_la_SOURCES = \
 	libewf_io_handle.c libewf_io_handle.h \
 	libewf_legacy.c libewf_legacy.h \
 	libewf_libbfio.h \
+	libewf_libmfdata.h \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
 	libewf_list_type.c libewf_list_type.h \
@@ -77,6 +79,7 @@ libewf_la_LIBADD = \
 	../libnotify/libnotify.la \
 	@LIBUNA_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
+	@LIBMFDATA_LIBADD@ \
 	@LIBFVALUE_LIBADD@
 
 libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0

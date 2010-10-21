@@ -48,10 +48,10 @@ int libewf_compress(
      int8_t compression_level,
      liberror_error_t **error )
 {
-	static char *function        = "libewf_compress";
-	uLongf safe_compressed_size  = 0;
-	int zlib_compression_level   = 0;
-	int result                   = 0;
+	static char *function       = "libewf_compress";
+	uLongf safe_compressed_size = 0;
+	int zlib_compression_level  = 0;
+	int result                  = 0;
 
 	if( compressed_data == NULL )
 	{

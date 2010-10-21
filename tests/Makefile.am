@@ -3,7 +3,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	-I$(top_srcdir)/libcstring \
 	-I$(top_srcdir)/liberror \
-	-I$(top_srcdir)/libnotify \
 	-I$(top_srcdir)/libsystem \
 	@MEMWATCH_CPPFLAGS@
 
@@ -17,6 +16,7 @@ TESTS = \
 	test_seek.sh \
 	test_read.sh \
 	test_write.sh \
+	test_read_write.sh \
 	test_ewfverify.sh \
 	test_ewfacquire.sh \
 	test_ewfacquirestream.sh \
@@ -33,6 +33,7 @@ check_SCRIPTS = \
 	test_glob.sh \
 	test_pyewf.sh \
 	test_read.sh \
+	test_read_write.sh \
 	test_seek.sh \
 	test_write.sh
 
@@ -61,7 +62,6 @@ ewf_test_read_SOURCES = \
 ewf_test_read_LDADD = \
 	../libcstring/libcstring.la \
 	../liberror/liberror.la \
-	../libnotify/libnotify.la \
 	../libewf/libewf.la \
         @MEMWATCH_LIBADD@
 

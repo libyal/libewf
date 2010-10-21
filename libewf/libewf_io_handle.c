@@ -125,3 +125,81 @@ int libewf_io_handle_free(
 	return( 1 );
 }
 
+/* Retrieves the current chunk and chunk offset
+ * Returns 1 if the succesful or -1 on error
+ */
+int libewf_io_handle_get_current_chunk(
+     libewf_io_handle_t *io_handle,
+     uint32_t *current_chunk,
+     size_t *current_chunk_offset,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_io_handle_get_current_chunk";
+
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( current_chunk == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid current chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( current_chunk_offset == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid current chunk offset.",
+		 function );
+
+		return( -1 );
+	}
+	*current_chunk        = io_handle->current_chunk;
+	*current_chunk_offset = io_handle->current_chunk_offset;
+
+	return( 1 );
+}
+
+/* Sets the current chunk and chunk offset
+ * Returns 1 if the succesful or -1 on error
+ */
+int libewf_io_handle_set_current_chunk(
+     libewf_io_handle_t *io_handle,
+     uint32_t current_chunk,
+     size_t current_chunk_offset,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_io_handle_set_current_chunk";
+
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	io_handle->current_chunk        = current_chunk;
+	io_handle->current_chunk_offset = current_chunk_offset;
+
+	return( 1 );
+}
+

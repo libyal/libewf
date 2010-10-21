@@ -142,6 +142,13 @@ enum LIBEWF_DATE_FORMATS
 	LIBEWF_DATE_FORMAT_CTIME		= 0x04
 };
 
+/* The compression levels
+ */
+#define LIBEWF_COMPRESSION_LEVEL_NONE		"n"
+#define LIBEWF_COMPRESSION_LEVEL_FAST		"f"
+#define LIBEWF_COMPRESSION_LEVEL_BEST		"b"
+
+/* TODO deprecated remove after a while */
 /* The compression types
  */
 #define LIBEWF_COMPRESSION_TYPE_NONE		"n"

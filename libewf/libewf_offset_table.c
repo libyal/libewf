@@ -177,7 +177,7 @@ int libewf_offset_table_resize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset_table.",
+		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
@@ -1186,7 +1186,7 @@ int libewf_offset_table_fill_offsets(
 		}
 		offset32_value = (uint32_t) offset64_value;
 
-		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) == LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED )
+		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != 0 )
 		{
 			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
@@ -1520,7 +1520,7 @@ int libewf_offset_table_compare(
 			chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 			chunk_value->size                = (size_t) chunk_size;
 			chunk_value->flags              |= compressed;
-			chunk_value->flags              &= ~ ( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
+			chunk_value->flags              &= ~( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
 		}
 		offset_table->last_chunk_value_compared++;
 
@@ -1663,7 +1663,7 @@ int libewf_offset_table_compare(
 		chunk_value->segment_file_handle = segment_file_handle;
 		chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 		chunk_value->flags              |= compressed;
-		chunk_value->flags              &= ~ ( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
+		chunk_value->flags              &= ~( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
 	}
 	return( 1 );
 }
@@ -1860,7 +1860,7 @@ int libewf_offset_table_compare_last_offset(
 			 && ( mismatch == 1 ) )
 			{
 				chunk_value->size   = (size_t) chunk_size;
-				chunk_value->flags &= ~ ( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
+				chunk_value->flags &= ~( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
 			}
 			offset_table->last_chunk_value_compared++;
 

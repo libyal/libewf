@@ -1,10 +1,12 @@
 TODO
 * implement write chunk test
-* implement read/write buffer and chunk test
-  - refactor ewfalter and alteration_handle into ewf_test_read_write
+* implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
 * have libewf write empty ewf file if media size is 0 and no data was written
+  - have write finalize create empty file ?
 * have libewf handle non-sector multitude media size
+  - set media_size on write finalize
+* fix todo in write existing chunk
 
 * single file entry:
   - are flags similar to file attribute flags ?
@@ -64,6 +66,8 @@ Code clean up:
 * move sections into separate objects ?
 * refactor section_list to list_type and section_value ?
 * clean up ewfacquire: move imaging preferences into imaging handle
+* make debug output similar to other libraries
+  - clean up libewf_section.c
 
 Further analysis of the EWF format:
 * password hash
@@ -217,6 +221,14 @@ Deprecated functions
 * add BORLANDC deprecated function support, unable to find suitable macro
   #pragma deprecated( function )
   __declspec(deprecated)
+
+20101021
+* worked on automated tests
+* changed compression_type into compression_level, libewf will return
+  compression_level if compression_type is requested
+* small fixes in error notification
+* added check for chunk data size not equal to media data size as specified in
+  volume section
 
 20101020
 * worked on automated tests

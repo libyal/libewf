@@ -83,6 +83,18 @@ int libewf_io_handle_free(
      libewf_io_handle_t **io_handle,
      liberror_error_t **error );
 
+int libewf_io_handle_get_current_chunk(
+     libewf_io_handle_t *io_handle,
+     uint32_t *current_chunk,
+     size_t *current_chunk_offset,
+     liberror_error_t **error );
+
+int libewf_io_handle_set_current_chunk(
+     libewf_io_handle_t *io_handle,
+     uint32_t current_chunk,
+     size_t current_chunk_offset,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

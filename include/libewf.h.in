@@ -819,6 +819,7 @@ LIBEWF_EXTERN int libewf_handle_set_compression_values(
                    libewf_error_t **error );
 
 /* Retrieves the size of the contained (media) data
+ * This function will compensate for a media_size that is not a multitude of bytes_per_sector
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_media_size(
@@ -827,6 +828,7 @@ LIBEWF_EXTERN int libewf_handle_get_media_size(
                    libewf_error_t **error );
 
 /* Sets the media size
+ * The media_size is stored as number_of_sectors x bytes_per_sector
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_set_media_size(
@@ -1188,11 +1190,11 @@ LIBEWF_EXTERN int libewf_handle_get_utf8_header_value(
 #define libewf_handle_get_utf8_header_value_password( handle, value, value_size, error ) \
         libewf_handle_get_utf8_header_value( handle, (uint8_t *) "password", 8, value, value_size, error )
 
-/* Retrieves the header value compression type
+/* Retrieves the header value compression level
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#define libewf_handle_get_utf8_header_value_compression_type( handle, value, value_size, error ) \
-        libewf_handle_get_utf8_header_value( handle, (uint8_t *) "compression_type", 16, value, value_size, error )
+#define libewf_handle_get_utf8_header_value_compression_level( handle, value, value_size, error ) \
+        libewf_handle_get_utf8_header_value( handle, (uint8_t *) "compression_level", 17, value, value_size, error )
 
 /* Retrieves the header value model
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -1277,11 +1279,11 @@ LIBEWF_EXTERN int libewf_handle_set_utf8_header_value(
 #define libewf_handle_set_utf8_header_value_password( handle, value, value_length, error ) \
         libewf_handle_set_utf8_header_value( handle, (uint8_t *) "password", 8, value, value_length, error )
 
-/* Sets the header value compression type
+/* Sets the header value compression level
  * Returns 1 if successful or -1 on error
  */
-#define libewf_handle_set_utf8_header_value_compression_type( handle, value, value_length, error ) \
-        libewf_handle_set_utf8_header_value( handle, (uint8_t *) "compression_type", 16, value, value_length, error )
+#define libewf_handle_set_utf8_header_value_compression_level( handle, value, value_length, error ) \
+        libewf_handle_set_utf8_header_value( handle, (uint8_t *) "compression_level", 17, value, value_length, error )
 
 /* Sets the header value model
  * Returns 1 if successful or -1 on error
@@ -1683,6 +1685,14 @@ LIBEWF_EXTERN int libewf_handle_get_header_value(
 #define libewf_handle_get_header_value_serial_number( handle, value, value_size, error ) \
         libewf_handle_get_header_value( handle, (uint8_t *) "serial_number", 13, value, value_size, error )
 
+/* Retrieves the header value compression type
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ *
+ * This function deprecated use libewf_handle_get_utf8_header_value_compression_level instead
+ */
+#define libewf_handle_get_utf8_header_value_compression_type( handle, value, value_size, error ) \
+        libewf_handle_get_utf8_header_value( handle, (uint8_t *) "compression_type", 16, value, value_size, error )
+
 /* Sets the UTF-8 encoded header value specified by the identifier
  * Returns 1 if successful or -1 on error
  *
@@ -1774,6 +1784,14 @@ LIBEWF_EXTERN int libewf_handle_set_header_value(
  */
 #define libewf_handle_set_header_value_serial_number( handle, value, value_length, error ) \
         libewf_handle_set_header_value( handle, (uint8_t *) "serial_number", 13, value, value_length, error )
+
+/* Sets the header value compression type
+ * Returns 1 if successful or -1 on error
+ *
+ * This function deprecated use libewf_handle_set_utf8_header_value_compression_level instead
+ */
+#define libewf_handle_set_utf8_header_value_compression_type( handle, value, value_length, error ) \
+        libewf_handle_set_utf8_header_value( handle, (uint8_t *) "compression_type", 16, value, value_length, error )
 
 /* Retrieves the amount of hash values
  * Returns 1 if successful, 0 if no hash values are present or -1 on error

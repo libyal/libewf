@@ -407,6 +407,11 @@ int libewf_internal_handle_get_write_maximum_number_of_segments(
      uint16_t *maximum_number_of_segments,
      liberror_error_t **error );
 
+int libewf_internal_handle_get_media_values(
+     libewf_internal_handle_t *internal_handle,
+     size64_t *media_size,
+     liberror_error_t **error );
+
 int libewf_internal_handle_set_media_values(
      libewf_internal_handle_t *internal_handle,
      uint32_t sectors_per_chunk,
