@@ -25,43 +25,6 @@ SUBDIRS = \
 	borlandc \
 	msvscpp
 
-DPKG_FILES = \
-	dpkg/changelog \
-	dpkg/changelog.in \
-	dpkg/compat \
-	dpkg/control \
-	dpkg/copyright \
-	dpkg/cron.d.ex \
-	dpkg/emacsen-install.ex \
-	dpkg/emacsen-startup.ex \
-	dpkg/emacsen-remove.ex \
-	dpkg/init.d.ex \
-	dpkg/libewf.install \
-	dpkg/libewf.dirs \
-	dpkg/libewf.docs \
-	dpkg/libewf.postinst.debhelper \
-	dpkg/libewf.postrm.debhelper \
-	dpkg/libewf-default.ex \
-	dpkg/libewf-dev.dirs \
-	dpkg/libewf-dev.docs \
-	dpkg/libewf-dev.install \
-	dpkg/libewf-tools.dirs \
-	dpkg/libewf-tools.docs \
-	dpkg/libewf-tools.install \
-	dpkg/libewf.doc-base.EX \
-	dpkg/manpage.1.ex \
-	dpkg/manpage.sgml.ex \
-	dpkg/manpage.xml.ex \
-	dpkg/menu.ex \
-	dpkg/rules \
-	dpkg/postinst.ex \
-	dpkg/postrm.ex \
-	dpkg/preinst.ex \
-	dpkg/prerm.ex \
-	dpkg/shlibs.local.ex \
-	dpkg/shlibs.local.ex.in \
-	dpkg/watch.ex
-
 SPEC_FILES = \
 	libewf.spec \
 	libewf.spec.in
@@ -72,7 +35,6 @@ EXTRA_DIST = \
 	po/Makevars.in \
 	libewf.pc \
 	libewf.pc.in \
-	$(DPKG_FILES) \
 	$(SPEC_FILES)
 
 MAINTAINERCLEANFILES = \

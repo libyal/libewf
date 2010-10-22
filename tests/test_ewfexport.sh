@@ -35,8 +35,6 @@ function test_export_raw
 { 
 	INPUT_FILE=$1;
 
-	echo "Testing ewfexport to raw of input: ${INPUT_FILE}";
-
 	mkdir ${TMP};
 
 ${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
@@ -51,6 +49,14 @@ EOI
 
 	rm -rf ${TMP};
 
+	echo -n "Testing ewfexport to raw of input: ${INPUT_FILE} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 
@@ -58,8 +64,6 @@ function test_export_ewf
 { 
 	OUTPUT_FORMAT=$1;
 	INPUT_FILE=$2;
-
-	echo "Testing ewfexport to ewf format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE}";
 
 	mkdir ${TMP};
 
@@ -78,6 +82,14 @@ EOI
 
 	rm -rf ${TMP};
 
+	echo -n "Testing ewfexport to ewf format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 
@@ -85,8 +97,6 @@ function test_export_unattended
 { 
 	OUTPUT_FORMAT=$1;
 	INPUT_FILE=$2;
-
-	echo "Testing unattended ewfexport to format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE}";
 
 	mkdir ${TMP};
 
@@ -99,6 +109,14 @@ function test_export_unattended
 
 	rm -rf ${TMP};
 
+	echo -n "Testing unattended ewfexport to format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 EWFEXPORT="../ewftools/ewfexport";

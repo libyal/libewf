@@ -7,6 +7,8 @@ TODO
 * have libewf handle non-sector multitude media size
   - set media_size on write finalize
 * fix todo in write existing chunk
+* ewfexport: fix different input and output chunk sizes for low level functions
+  (option: -b)
 
 * single file entry:
   - are flags similar to file attribute flags ?
@@ -22,9 +24,6 @@ Work in progress:
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
-* ewfexport: fix different input and output chunk sizes for low level functions
-* ewfexport: remove DISABLED
-* move manuals/ewfexport.1.backup to manuals/ewfexport.1
 * check into resume write error for 32-bit compile (different zlib sizes)
 * check make distclean
 
@@ -34,7 +33,7 @@ Next stable release:
 
 Roadmap:
 * code clean up
-* improve python bindings
+* improve python bindings (partial)
 * improve device handle (libsmdev)
 * support missing segment files (chunks)
 * libbfio API extensions (partial)
@@ -133,6 +132,7 @@ Error handling/tollerance
 
 Python bindings (pyewf)
 * add WINAPI wide character support for open() and glob()
+* add more functions
 
 API changes
 * add wide character functions definitions by default?
@@ -204,9 +204,7 @@ Tests
 * ewfexport: export of split RAW
 * ewfexport: export of files
 
-Deployment
-* debian package
-  - implement non local libuna and libbfio support like in spec file
+Deployment:
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -221,6 +219,11 @@ Deprecated functions
 * add BORLANDC deprecated function support, unable to find suitable macro
   #pragma deprecated( function )
   __declspec(deprecated)
+
+20101022
+* worked on automated tests
+* removed dpkg files
+* ewfexport: reactivated DISABLED
 
 20101021
 * worked on automated tests

@@ -34,14 +34,18 @@ function test_info
 { 
 	INPUT_FILE=$1;
 
-	echo "Testing ewfinfo of input: ${INPUT_FILE}";
-
 	./${EWFINFO} ${INPUT_FILE};
 
 	RESULT=$?;
 
-	echo "";
+	echo -n "Testing ewfinfo of input: ${INPUT_FILE} ";
 
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 

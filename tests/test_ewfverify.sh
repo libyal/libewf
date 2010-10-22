@@ -24,8 +24,8 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-ERROR_INPUT="error";
 INPUT="input";
+INPUT_ERROR="input_error";
 TMP="tmp";
 
 LS="ls";
@@ -36,14 +36,20 @@ function test_verify
 { 
 	INPUT_FILE=$1;
 
-	echo "Testing ewfverify of input: ${INPUT_FILE}";
-
 	./${EWFVERIFY} -q -d sha1 ${INPUT_FILE};
 
 	RESULT=$?;
 
 	echo "";
 
+	echo -n "Testing ewfverify of input: ${INPUT_FILE} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 
@@ -90,15 +96,15 @@ then
 	fi
 fi
 
-if test -d ${ERROR_INPUT};
+if test -d ${INPUT_ERROR};
 then
-	RESULT=`${LS} ${ERROR_INPUT}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+	RESULT=`${LS} ${INPUT_ERROR}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
 
 	if test ${RESULT} -eq 0;
 	then
 		echo "No files found in error directory, to test read place test files in directory.";
 	else
-		for FILENAME in `${LS} ${ERROR_INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
+		for FILENAME in `${LS} ${INPUT_ERROR}/*.[esE]01 | ${TR} ' ' '\n'`;
 		do
 			if test_verify "${FILENAME}";
 			then

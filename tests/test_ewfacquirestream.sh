@@ -39,8 +39,6 @@ function test_acquire_file
 	MAXIMUM_SEGMENT_SIZE=$4;
 	CHUNK_SIZE=$5;
 
-	echo "Testing ewfacquirestream of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL}";
-
 	mkdir ${TMP};
 
 	${EWFACQUIRESTREAM} -q -d sha1 \
@@ -71,6 +69,14 @@ function test_acquire_file
 
 	rm -rf ${TMP};
 
+	echo -n "Testing ewfacquirestream of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 

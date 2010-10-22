@@ -1,1 +1,0 @@
-liblibewf @VERSION@ libewf (>> @VERSION@-0), libewf (<< @VERSION@-99)

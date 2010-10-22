@@ -39,8 +39,6 @@ function test_acquire_file
 	MAXIMUM_SEGMENT_SIZE=$4;
 	CHUNK_SIZE=$5;
 
-	echo "Testing ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL}";
-
 	mkdir ${TMP};
 
 ${EWFACQUIRE} -q -d sha1 ${INPUT_FILE} <<EOI
@@ -78,6 +76,14 @@ EOI
 
 	rm -rf ${TMP};
 
+	echo -n "Testing ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 
@@ -88,8 +94,6 @@ function test_acquire_unattended_file
 	COMPRESSION_LEVEL=$3;
 	MAXIMUM_SEGMENT_SIZE=$4;
 	CHUNK_SIZE=$5;
-
-	echo "Testing unattended ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL}";
 
 	mkdir ${TMP};
 
@@ -119,6 +123,14 @@ function test_acquire_unattended_file
 
 	rm -rf ${TMP};
 
+	echo -n "Testing unattended ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
 	return ${RESULT};
 }
 
