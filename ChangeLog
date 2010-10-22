@@ -7,11 +7,7 @@ TODO
 * have libewf handle non-sector multitude media size
   - set media_size on write finalize
 * fix todo in write existing chunk
-* ewfexport: fix different input and output chunk sizes for low level functions
-  (option: -b)
-
-* single file entry:
-  - are flags similar to file attribute flags ?
+* disk full check
 
 * documentation:
   - add that error can be NULL
@@ -19,7 +15,6 @@ TODO
 * improve output when encountering a read error
 * improve open file io pool (set basename ?)
 
-Work in progress:
 * what about header values parsing with preservation of timestamps?
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
@@ -81,6 +76,8 @@ Further analysis of the EWF format:
 * number of sectors in volume/data section has changed to a 64-bit value
   but what about error2/sessions ?
 * does newer linen6 has sha1 support?
+* LVF: single file entry:
+  - are flags similar to file attribute flags ?
 
 Features
 * resume write support for ENCASE1/SMART table sections ?
@@ -91,6 +88,7 @@ Features
 Recovery and analysis:
 * imaging: detect disk full and ask for new segment file location?
   - have libewf allow to set the segment file path during write (done)
+  - have separate function to preallocate segment file?
   - like alternative segment file path in EnCase
     however EnCase seems to fully test if the segment file upfront by
     allocating the necessary disk space
@@ -223,7 +221,8 @@ Deprecated functions
 20101022
 * worked on automated tests
 * removed dpkg files
-* ewfexport: reactivated DISABLED
+* ewfexport: reactivated DISABLED, fixed export in different chunk size for
+  low level functions
 
 20101021
 * worked on automated tests

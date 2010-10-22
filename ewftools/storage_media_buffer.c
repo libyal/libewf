@@ -126,7 +126,6 @@ int storage_media_buffer_initialize(
 
 				return( -1 );
 			}
-
 #else
 			( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
 			                                       sizeof( uint8_t ) * raw_buffer_size );
@@ -148,6 +147,7 @@ int storage_media_buffer_initialize(
 				return( -1 );
 			}
 #endif /* defined( memory_allocate_aligned ) */
+
 			( *buffer )->raw_buffer_size = size;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
@@ -175,7 +175,6 @@ int storage_media_buffer_initialize(
 				return( -1 );
 			}
 			( *buffer )->compression_buffer_size = size * 2;
-
 #endif
 		}
 	}
@@ -263,8 +262,8 @@ int storage_media_buffer_resize(
 
 			return( -1 );
 		}
-		buffer->raw_buffer       = (uint8_t *) reallocation;
-		buffer->raw_buffer_size  = size;
+		buffer->raw_buffer           = (uint8_t *) reallocation;
+		buffer->raw_buffer_size      = size;
 		buffer->raw_buffer_data_size = 0;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )

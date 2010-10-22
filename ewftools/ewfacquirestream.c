@@ -130,8 +130,8 @@ void usage_fprint(
 	fprintf( stream, "\t-b: specify the number of sectors to read at once (per chunk), options:\n"
 	                 "\t    64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-B: specify the number of bytes to acquire (default is all bytes)\n" );
-	fprintf( stream, "\t-c: specify the compression level, options: none (default), empty-block,\n"
-	                 "\t    fast or best\n" );
+	fprintf( stream, "\t-c: specify the compression level, options: none (default),\n"
+	                 "\t    empty-block, fast or best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t-D: specify the description (default is description).\n" );
