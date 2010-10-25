@@ -20,12 +20,14 @@ TESTS = \
 	test_ewfverify.sh \
 	test_ewfacquire.sh \
 	test_ewfacquirestream.sh \
+	test_ewfacquire_resume.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
 	test_ewfacquire.sh \
+	test_ewfacquire_resume.sh \
 	test_ewfacquirestream.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \

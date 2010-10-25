@@ -33,7 +33,6 @@ EXTRA_DIST = \
 	config.rpath  \
 	README.mingw \
 	po/Makevars.in \
-	libewf.pc \
 	libewf.pc.in \
 	$(SPEC_FILES)
 

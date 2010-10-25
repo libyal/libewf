@@ -169,6 +169,7 @@ Tools:
     a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
   - for EnCase 6 format request serial number and model if not set ?
   - add support to enter sessions for optical images
+  - add support for unattended write resume ?
 * ewfacquirestream
   - add parameter to set sector size?
   - allow user to set bytes per sector for raw file conversion
@@ -217,6 +218,10 @@ Deprecated functions
 * add BORLANDC deprecated function support, unable to find suitable macro
   #pragma deprecated( function )
   __declspec(deprecated)
+
+20101025
+* worked on automated tests
+  - added ewfacquire resume test
 
 20101022
 * worked on automated tests
