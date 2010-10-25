@@ -2716,7 +2716,17 @@ ssize_t export_handle_finalize(
 	}
 	if( export_handle->calculate_md5 != 0 )
 	{
-		/* TODO check if calculated_md5_hash_string was already set */
+		if( export_handle->calculated_md5_hash_string != NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 "%s: invalid calculate MD5 hash string value already set.",
+			 function );
+
+			return( -1 );
+		}
 		export_handle->calculated_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
 		                                                                               sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
 
@@ -2726,7 +2736,7 @@ ssize_t export_handle_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create calculated md5 digest hash string.",
+			 "%s: unable to create calculated MD5 digest hash string.",
 			 function );
 
 			return( -1 );
@@ -2784,7 +2794,17 @@ ssize_t export_handle_finalize(
 	}
 	if( export_handle->calculate_sha1 != 0 )
 	{
-		/* TODO check if calculated_sha1_hash_string was already set */
+		if( export_handle->calculated_sha1_hash_string != NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 "%s: invalid calculate SHA1 hash string value already set.",
+			 function );
+
+			return( -1 );
+		}
 		export_handle->calculated_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
 		                                                                                sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
@@ -3154,7 +3174,7 @@ int export_handle_export_file_entry(
 	}
 	/* TODO what about NTFS streams ?
 	 */
-	if( ( file_entry_flags & LIBEWF_FILE_ENTRY_FLAG_IS_FILE ) == LIBEWF_FILE_ENTRY_FLAG_IS_FILE )
+	if( ( file_entry_flags & LIBEWF_FILE_ENTRY_FLAG_IS_FILE ) != 0 )
 	{
 		/* Create the file entry data file
 		 */
@@ -3474,8 +3494,17 @@ int export_handle_hash_values_fprint(
 	}
 	if( export_handle->calculate_md5 == 1 )
 	{
-		/* TODO check if md5 hash is set */
+		if( export_handle->calculated_md5_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing calculated MD5 hash string.",
+			 function );
 
+			return( -1 );
+		}
 		fprintf(
 		 stream,
 		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
@@ -3483,8 +3512,17 @@ int export_handle_hash_values_fprint(
 	}
 	if( export_handle->calculate_sha1 == 1 )
 	{
-		/* TODO check if sha1 hash is set */
+		if( export_handle->calculated_sha1_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing calculated SHA1 hash string.",
+			 function );
 
+			return( -1 );
+		}
 		fprintf(
 		 stream,
 		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",

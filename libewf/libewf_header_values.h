@@ -290,6 +290,12 @@ int libewf_header_values_parse_xheader(
      size_t size,
      liberror_error_t **error );
 
+int libewf_header_values_parse_xheader_date_value(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_size,
+     liberror_error_t **error );
+
 int libewf_header_values_generate_xheader(
      libfvalue_table_t *header_values,
      time_t timestamp,

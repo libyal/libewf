@@ -295,7 +295,7 @@ int libewf_single_files_parse_file_entries(
 	if( libewf_split_values_parse_string(
 	     &lines,
 	     entries_string,
-	     entries_string_size,
+	     entries_string_size - 1,
 	     (uint8_t) '\n',
 	     error ) != 1 )
 	{
@@ -389,7 +389,7 @@ int libewf_single_files_parse_file_entries(
 			if( libewf_split_values_parse_string(
 			     &types,
 			     lines->values[ line_iterator ],
-			     lines->sizes[ line_iterator ],
+			     lines->sizes[ line_iterator ] - 1,
 			     (uint8_t) '\t',
 			     error ) != 1 )
 			{
@@ -570,7 +570,7 @@ int libewf_single_files_parse_record_values(
 	if( libewf_split_values_parse_string(
 	     &types,
 	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ],
+	     lines->sizes[ *line_iterator ] - 1,
 	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
@@ -588,7 +588,7 @@ int libewf_single_files_parse_record_values(
 	if( libewf_split_values_parse_string(
 	     &values,
 	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ],
+	     lines->sizes[ *line_iterator ] - 1,
 	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
@@ -825,7 +825,7 @@ int libewf_single_files_parse_file_entry(
 	if( libewf_split_values_parse_string(
 	     &values,
 	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ],
+	     lines->sizes[ *line_iterator ] - 1,
 	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
@@ -895,7 +895,7 @@ int libewf_single_files_parse_file_entry(
 	if( libewf_split_values_parse_string(
 	     &values,
 	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ],
+	     lines->sizes[ *line_iterator ] - 1,
 	     (uint8_t) '\t',
 	     error ) != 1 )
 	{
@@ -1077,7 +1077,7 @@ int libewf_single_files_parse_file_entry(
 				if( libewf_split_values_parse_string(
 				     &offset_values,
 				     values->values[ value_iterator ],
-				     value_string_length + 1,
+				     value_string_length,
 				     (uint8_t) ' ',
 				     error ) != 1 )
 				{

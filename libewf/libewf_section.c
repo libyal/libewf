@@ -2310,7 +2310,7 @@ ssize_t libewf_section_volume_read(
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
-			 "%s: chunk size value exceeds maximum defaulting to: %d.n",
+			 "%s: chunk size value exceeds maximum defaulting to: %d.\n",
 			 function,
 			 EWF_MINIMUM_CHUNK_SIZE );
 		}

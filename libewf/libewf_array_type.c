@@ -265,6 +265,7 @@ int libewf_array_empty(
 				array->entries[ entry_iterator ] = NULL;
 			}
 		}
+		array->number_of_entries = 0;
 	}
 	return( result );
 }

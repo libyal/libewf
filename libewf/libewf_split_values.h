@@ -55,7 +55,7 @@ struct libewf_split_values
 int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
      const uint8_t *string,
-     size_t string_size,
+     size_t string_length,
      int number_of_values,
      liberror_error_t **error );
 
@@ -66,7 +66,7 @@ int libewf_split_values_free(
 int libewf_split_values_parse_string(
      libewf_split_values_t **split_values,
      const uint8_t *string,
-     size_t string_size,
+     size_t string_length,
      uint8_t delimiter,
      liberror_error_t **error );
 

@@ -34,7 +34,7 @@
 int libewf_split_values_initialize(
      libewf_split_values_t **split_values,
      const uint8_t *string,
-     size_t string_size,
+     size_t string_length,
      int number_of_values,
      liberror_error_t **error )
 {
@@ -98,10 +98,10 @@ int libewf_split_values_initialize(
 			return( -1 );
 		}
 		if( ( string != NULL )
-		 && ( string_size > 0 ) )
+		 && ( string_length > 0 ) )
 		{
 			( *split_values )->string = (uint8_t *) memory_allocate(
-			                                         sizeof( uint8_t ) * string_size );
+			                                         sizeof( uint8_t ) * ( string_length + 1 ) );
 
 			if( ( *split_values )->string == NULL )
 			{
@@ -122,7 +122,7 @@ int libewf_split_values_initialize(
 			if( memory_copy(
 			     ( *split_values )->string,
 			     string,
-			     sizeof( uint8_t ) * string_size ) == NULL )
+			     sizeof( uint8_t ) * string_length ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -140,6 +140,7 @@ int libewf_split_values_initialize(
 
 				return( -1 );
 			}
+			( *split_values )->string[ string_length ] = 0;
 		}
 		if( number_of_values > 0 )
 		{
@@ -292,18 +293,17 @@ int libewf_split_values_free(
 int libewf_split_values_parse_string(
      libewf_split_values_t **split_values,
      const uint8_t *string,
-     size_t string_size,
+     size_t string_length,
      uint8_t delimiter,
      liberror_error_t **error )
 {
-	uint8_t *split_value_start   = NULL;
-	uint8_t *split_value_end     = NULL;
-	uint8_t *string_end          = NULL;
-	static char *function        = "libewf_split_values_parse_string";
-	size_t remaining_string_size = 0;
-	ssize_t split_value_size     = 0;
-	int number_of_split_values   = 0;
-	int split_value_iterator     = 0;
+	uint8_t *split_value_start = NULL;
+	uint8_t *split_value_end   = NULL;
+	uint8_t *string_end        = NULL;
+	static char *function      = "libewf_split_values_parse_string";
+	ssize_t split_value_length = 0;
+	int number_of_split_values = 0;
+	int split_value_iterator   = 0;
 
 	if( split_values == NULL )
 	{
@@ -338,31 +338,41 @@ int libewf_split_values_parse_string(
 
 		return( -1 );
 	}
-	if( string_size > (size_t) SSIZE_MAX )
+	if( string_length > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.",
+		 "%s: invalid string length value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
 	/* Determine the number of split values
 	 */
-	remaining_string_size = string_size;
-	split_value_start     = (uint8_t *) string;
-	split_value_end       = (uint8_t *) string;
-	string_end            = (uint8_t *) &( string[ string_size - 1 ] );
+	split_value_start = (uint8_t *) string;
+	string_end        = (uint8_t *) &( string[ string_length ] );
 
 	do
 	{
-		split_value_end = (uint8_t *) libcstring_narrow_string_search_character(
-				               (char *) split_value_start,
-				               (char) delimiter,
-				               remaining_string_size );
+		split_value_end = split_value_start;
 
+		while( split_value_end <= string_end )
+		{
+			if( ( split_value_end == string_end )
+			 || ( *split_value_end == 0 ) )
+			{
+				split_value_end = NULL;
+
+				break;
+			}
+			else if( *split_value_end == (char) delimiter )
+			{
+				break;
+			}
+			split_value_end++;
+		}
 		if( split_value_end > string_end )
 		{
 			break;
@@ -373,13 +383,9 @@ int libewf_split_values_parse_string(
 		{
 			break;
 		}
-		/* Include delimiter character
-		 */
-		remaining_string_size -= (size_t) ( split_value_end - split_value_start ) + 1;
-
 		if( split_value_end == split_value_start )
 		{
-			split_value_start += 1;
+			split_value_start++;
 		}
 		else if( split_value_end != string )
 		{
@@ -393,7 +399,7 @@ int libewf_split_values_parse_string(
 	if( libewf_split_values_initialize(
 	     split_values,
 	     string,
-	     string_size,
+	     string_length,
 	     number_of_split_values,
 	     error ) != 1 )
 	{
@@ -413,53 +419,59 @@ int libewf_split_values_parse_string(
 		return( 1 );
 	}
 	/* Determine the split values
+	 * empty values are stored as strings only containing the end of character
 	 */
-	remaining_string_size = string_size;
-	split_value_start     = ( *split_values )->string;
-	split_value_end       = ( *split_values )->string;
-	string_end            = &( ( *split_values )->string[ string_size - 1 ] );
+	split_value_start = ( *split_values )->string;
+	split_value_end   = ( *split_values )->string;
+	string_end        = &( ( *split_values )->string[ string_length ] );
 
-	/* Empty values are stored as strings only containing the end of character
-	 */
 	for( split_value_iterator = 0;
 	     split_value_iterator < number_of_split_values;
 	     split_value_iterator++ )
 	{
-		if( split_value_end != ( *split_values )->string )
-		{
-			split_value_start = split_value_end + 1;
-		}
-		split_value_end = (uint8_t *) libcstring_narrow_string_search_character(
-		                               (char *) split_value_start,
-		                               (char) delimiter,
-		                               remaining_string_size );
+		split_value_end = split_value_start;
 
-		/* Check for last value
-		 */
+		while( split_value_end <= string_end )
+		{
+			if( ( split_value_end == string_end )
+			 || ( *split_value_end == 0 ) )
+			{
+				split_value_end = NULL;
+
+				break;
+			}
+			else if( *split_value_end == (char) delimiter )
+			{
+				break;
+			}
+			split_value_end++;
+		}
 		if( split_value_end == NULL )
 		{
-			split_value_size = (ssize_t) ( string_end - split_value_start );
+			split_value_length = (ssize_t) ( string_end - split_value_start );
 		}
 		else
 		{
-			split_value_size = (ssize_t) ( split_value_end - split_value_start );
+			split_value_length = (ssize_t) ( split_value_end - split_value_start );
 		}
-		if( split_value_size >= 0 )
+		if( split_value_length >= 0 )
 		{
 			( *split_values )->values[ split_value_iterator ] = split_value_start;
-			( *split_values )->sizes[ split_value_iterator ]  = split_value_size + 1;
+			( *split_values )->sizes[ split_value_iterator ]  = split_value_length + 1;
 
-			( ( *split_values )->values[ split_value_iterator ] )[ split_value_size ] = 0;
+			( ( *split_values )->values[ split_value_iterator ] )[ split_value_length ] = 0;
 		}
-		/* Include delimiter character
-		 */
-		remaining_string_size -= (size_t) ( split_value_end - split_value_start ) + 1;
-
-		/* Correct if first value is empty
-		 */
+		if( split_value_end == NULL )
+		{
+			break;
+		}
 		if( split_value_end == ( *split_values )->string )
 		{
-			split_value_start += 1;
+			split_value_start++;
+		}
+		if( split_value_end != ( *split_values )->string )
+		{
+			split_value_start = split_value_end + 1;
 		}
 	}
 	return( 1 );

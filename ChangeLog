@@ -1,7 +1,9 @@
 TODO
+* apply xml patch Simson
 * implement write chunk test
 * implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
+* implement pyewf tests
 * have libewf write empty ewf file if media size is 0 and no data was written
   - have write finalize create empty file ?
 * have libewf handle non-sector multitude media size
@@ -56,6 +58,7 @@ Roadmap:
   - xsignature section to sign xhash and/or hash
 
 Code clean up:
+* clean up configure.ac
 * implement libmfdata
 * move sections into separate objects ?
 * refactor section_list to list_type and section_value ?
@@ -222,6 +225,13 @@ Deprecated functions
 20101025
 * worked on automated tests
   - added ewfacquire resume test
+* worked on TODOs
+* updated array type
+* updated libfvalue, libsmraw
+* moved xheader and xhash section reading into libfvalue
+* added support for 5 value xheader date/time value
+* fix for EWFX date/time value missing timezone introduced in 20100719
+* fix in date/time string generation for timezone description
 
 20101022
 * worked on automated tests

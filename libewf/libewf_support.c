@@ -800,7 +800,6 @@ int libewf_glob_free(
 	{
 		memory_free(
 		 filenames[ filename_iterator ] );
-
 	}
 	memory_free(
 	 filenames );
@@ -1179,7 +1178,6 @@ int libewf_glob_wide_free(
 	{
 		memory_free(
 		 filenames[ filename_iterator ] );
-
 	}
 	memory_free(
 	 filenames );
@@ -1188,20 +1186,4 @@ int libewf_glob_wide_free(
 }
 
 #endif
-
-/* Globs the segment files according to the EWF naming schema
- * if format is known the filename should contain the base of the filename
- * otherwise the function will try to determine the format based on the extension
- * Returns 1 if successful or -1 on error
- */
-/* TODO
-int libewf_glob_file_io_handle(
-     libbfio_handle_t *file_io_handle,
-     uint8_t format,
-     libbfio_pool_t *file_io_pool,
-     liberror_error_t **error )
-{
-	return( -1 );
-}
-*/
 

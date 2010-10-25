@@ -95,14 +95,6 @@ LIBEWF_EXTERN int libewf_glob_wide_free(
                    liberror_error_t **error );
 #endif
 
-/* TODO
-LIBEWF_EXTERN int libewf_glob_file_io_handle(
-                   libbfio_handle_t *file_io_handle,
-                   uint8_t format,
-                   libbfio_pool_t *file_io_pool,
-                   liberror_error_t **error );
-*/
-
 #if defined( __cplusplus )
 }
 #endif

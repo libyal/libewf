@@ -1742,7 +1742,7 @@ int info_handle_media_information_fprint(
 			 stream,
 			 "\tIs physical:\t\t" );
 
-			if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) == LIBEWF_MEDIA_FLAG_PHYSICAL )
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
 			{
 				fprintf(
 				 stream,
@@ -1758,13 +1758,13 @@ int info_handle_media_information_fprint(
 			 stream,
 			 "\n" );
 
-			if( ( media_flags & LIBEWF_MEDIA_FLAG_FASTBLOC ) == LIBEWF_MEDIA_FLAG_FASTBLOC )
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_FASTBLOC ) != 0 )
 			{
 				fprintf(
 				 stream,
 				 "\tWrite blocked:\t\tFastbloc\n" );
 			}
-			if( ( media_flags & LIBEWF_MEDIA_FLAG_TABLEAU ) == LIBEWF_MEDIA_FLAG_TABLEAU )
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_TABLEAU ) != 0 )
 			{
 				fprintf(
 				 stream,

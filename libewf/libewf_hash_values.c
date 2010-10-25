@@ -31,7 +31,6 @@
 #include "libewf_hash_values.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
-#include "libewf_split_values.h"
 
 #include "ewf_definitions.h"
 
@@ -411,230 +410,21 @@ int libewf_hash_values_parse_xhash(
      size_t xhash_size,
      liberror_error_t **error )
 {
-	libewf_split_values_t *lines  = NULL;
-	libfvalue_value_t *hash_value = NULL;
-	uint8_t *close_tag_start      = NULL;
-	uint8_t *close_tag_end        = NULL;
-	uint8_t *identifier           = NULL;
-	uint8_t *open_tag_start       = NULL;
-	uint8_t *open_tag_end         = NULL;
-	uint8_t *value_string         = NULL;
-	static char *function         = "libewf_hash_values_parse_xhash";
-	size_t identifier_length      = 0;
-	size_t string_length          = 0;
-	size_t value_string_length    = 0;
-	size_t xhash_index            = 0;
-	int line_iterator             = 0;
+	static char *function = "libewf_hash_values_parse_xhash";
 
-	if( xhash == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid xhash.",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if xhash starts with an UTF-8 byte order mark (BOM)
-	*/
-        if( xhash_size >= 3 )
-        {
-                if( ( xhash[ 0 ] == 0x0ef )
-                 && ( xhash[ 1 ] == 0x0bb )
-                 && ( xhash[ 2 ] == 0x0bf ) )
-                {
-                        xhash_index += 3;
-                }
-        }
-	if( libewf_split_values_parse_string(
-	     &lines,
-	     &( xhash[ xhash_index ] ),
-	     xhash_size - xhash_index,
-	     (uint8_t) '\n',
+	if( libfvalue_table_copy_from_utf8_xml_string(
+	     hash_values,
+	     xhash,
+	     xhash_size,
+	     (uint8_t *) "xhash",
+	     5,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split xhash into lines.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO validate if enclosing tag is <xhash> */
-
-	for( line_iterator = 0;
-	     line_iterator < lines->number_of_values;
-	     line_iterator++ )
-	{
-		/* Ignore empty lines
-		 */
-		if( ( lines->sizes[ line_iterator ] <= 1 )
-		 || ( lines->values[ line_iterator ] == NULL )
-		 || ( ( lines->values[ line_iterator ] )[ 0 ] == 0 ) )
-		{
-			continue;
-		}
-		string_length = lines->sizes[ line_iterator ] - 1;
-
-		open_tag_start = (uint8_t *) libcstring_narrow_string_search_character(
-		                              (char *) lines->values[ line_iterator ],
-		                              '<',
-		                              string_length );
-
-		/* Ignore lines without an open tag
-		 */
-		if( open_tag_start == NULL )
-		{
-			continue;
-		}
-		open_tag_end = (uint8_t *) libcstring_narrow_string_search_character(
-		                            (char *) lines->values[ line_iterator ],
-		                            '>',
-		                            string_length );
-
-		/* Ignore lines without an open tag
-		 */
-		if( open_tag_end == NULL )
-		{
-			continue;
-		}
-		/* Ignore the first part of the XML string
-		 */
-		string_length -= (size_t) ( open_tag_end - lines->values[ line_iterator ] );
-
-		/* Ignore lines only containing a single tag
-		 */
-		if( string_length <= 1 )
-		{
-			continue;
-		}
-		close_tag_start = (uint8_t *) libcstring_narrow_string_search_character_reverse(
-		                               (char *) &open_tag_end[ 1 ],
-		                               '<',
-		                               string_length );
-
-		/* Ignore lines without a close tag
-		 */
-		if( close_tag_start == NULL )
-		{
-			continue;
-		}
-		close_tag_end = (uint8_t *) libcstring_narrow_string_search_character_reverse(
-		                             (char *) &open_tag_end[ 1 ],
-		                             '>',
-		                             string_length );
-
-		/* Ignore lines without a close tag
-		 */
-		if( close_tag_end == NULL )
-		{
-			continue;
-		}
-		/* Ignore the second part of the XML string
-		 */
-		identifier        = &open_tag_start[ 1 ];
-		identifier_length = (size_t) ( open_tag_end - open_tag_start ) - 1;
-
-		/* Ignore the second part of the XML string
-		 */
-		value_string        = &open_tag_end[ 1 ];
-		value_string_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
-
-		/* Make sure the identifier string will be terminated
-		 */
-		*open_tag_end = 0;
-
-		if( libfvalue_value_initialize(
-		     &hash_value,
-		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash value.",
-			 function );
-
-			return( -1 );
-		}
-		if( libfvalue_value_set_identifier(
-		     hash_value,
-		     identifier,
-		     identifier_length + 1,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value: %s identifier.",
-			 function,
-			 (char *) identifier );
-
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
-		}
-		if( libfvalue_value_set_data(
-		     hash_value,
-		     value_string,
-		     value_string_length,
-		     LIBFVALUE_ENDIAN_NATIVE,
-		     0,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value: %s data.",
-			 function,
-			 (char *) identifier );
-
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
-		}
-		if( libfvalue_table_set_value(
-		     hash_values,
-		     hash_value,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value: %s in table.",
-			 function,
-			 (char *) identifier );
-
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
-		}
-		hash_value = NULL;
-	}
-	if( libewf_split_values_free(
-	     &lines,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split lines.",
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy UTF-8 string to hash values table.",
 		 function );
 
 		return( -1 );

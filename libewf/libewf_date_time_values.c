@@ -357,7 +357,7 @@ int libewf_date_time_values_copy_to_timestamp(
 	if( libewf_split_values_parse_string(
 	     &date_time_elements,
 	     date_time_values_string,
-	     date_time_values_string_length + 1,
+	     date_time_values_string_length,
 	     (uint8_t) ' ',
 	     error ) != 1 )
 	{
@@ -1865,7 +1865,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 			return( -1 );
 		}
 		for( date_time_values_string_index = 19;
-		     date_time_values_string_index < date_time_values_string_length;
+		     date_time_values_string_index <= date_time_values_string_length;
 		     date_time_values_string_index++ )
 		{
 			utf8_string[ utf8_string_index++ ] = (uint8_t) date_time_values_string[ date_time_values_string_index ];

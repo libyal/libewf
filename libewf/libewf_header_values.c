@@ -563,7 +563,7 @@ int libewf_convert_date_header_value(
 	if( libewf_split_values_parse_string(
 	     &date_time_elements,
 	     header_value,
-	     header_value_length + 1,
+	     header_value_length,
 	     (uint8_t) ' ',
 	     error ) != 1 )
 	{
@@ -1367,7 +1367,7 @@ int libewf_header_values_parse_utf8_header_string(
 	if( libewf_split_values_parse_string(
 	     &lines,
 	     header_string,
-	     header_string_size,
+	     header_string_size - 1,
 	     (uint8_t) '\n',
 	     error ) != 1 )
 	{
@@ -1401,7 +1401,7 @@ int libewf_header_values_parse_utf8_header_string(
 		if( libewf_split_values_parse_string(
 		     &types,
 		     lines->values[ 2 ],
-		     lines->sizes[ 2 ],
+		     lines->sizes[ 2 ] - 1,
 		     (uint8_t) '\t',
 		     error ) != 1 )
 		{
@@ -1421,7 +1421,7 @@ int libewf_header_values_parse_utf8_header_string(
 		if( libewf_split_values_parse_string(
 		     &values,
 		     lines->values[ 3 ],
-		     lines->sizes[ 3 ],
+		     lines->sizes[ 3 ] - 1,
 		     (uint8_t) '\t',
 		     error ) != 1 )
 		{
@@ -4945,7 +4945,7 @@ int libewf_header_values_generate_header2_encase6(
 
 /* Convert date time values string within an xheader value
  * Sets date time values string and length
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not an xheader value or -1 on error
  */
 int libewf_convert_date_xheader_value(
      const uint8_t *header_value,
@@ -5010,7 +5010,7 @@ int libewf_convert_date_xheader_value(
 	if( libewf_split_values_parse_string(
 	     &date_time_elements,
 	     header_value,
-	     header_value_length + 1,
+	     header_value_length,
 	     (uint8_t) ' ',
 	     error ) != 1 )
 	{
@@ -5023,20 +5023,31 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
-	if( date_time_elements->number_of_values < 6 )
+	if( date_time_elements->number_of_values < 5 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported number of date time elements in header value.",
-		 function );
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: unsupported number of date time element values: %d.\n",
+			 function,
+			 date_time_elements->number_of_values );
+		}
+#endif
+		if( libewf_split_values_free(
+		     &date_time_elements,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free split date time elements.",
+			 function );
 
-		libewf_split_values_free(
-		 &date_time_elements,
-		 NULL );
-
-		return( -1 );
+			return( -1 );
+		}
+		return( 0 );
 	}
 	/* The ctime formatted string use an additional space
 	 * when the day is less than 10
@@ -5045,12 +5056,107 @@ int libewf_convert_date_xheader_value(
 	{
 		empty_date_element_correction = 1;
 	}
+	if( date_time_elements->number_of_values < ( 5 + empty_date_element_correction ) )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: unsupported number of date time element values: %d.\n",
+			 function,
+			 date_time_elements->number_of_values );
+		}
+#endif
+		if( libewf_split_values_free(
+		     &date_time_elements,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free split date time elements.",
+			 function );
+
+			return( -1 );
+		}
+		return( 0 );
+	}
+	/* Check the day of the week
+	 */
+	if( libcstring_narrow_string_compare(
+	     date_time_elements->values[ 0 ],
+	     "Mon",
+	     3 ) == 0 )
+	{
+	}
+	else if( libcstring_narrow_string_compare(
+		  date_time_elements->values[ 0 ],
+		  "Tue",
+		  3 ) == 0 )
+	{
+	}
+	else if( libcstring_narrow_string_compare(
+		  date_time_elements->values[ 0 ],
+		  "Wed",
+		  3 ) == 0 )
+	{
+	}
+	else if( libcstring_narrow_string_compare(
+		  date_time_elements->values[ 0 ],
+		  "Thu",
+		  3 ) == 0 )
+	{
+	}
+	else if( libcstring_narrow_string_compare(
+		  date_time_elements->values[ 0 ],
+		  "Fri",
+		  3 ) == 0 )
+	{
+	}
+	else if( libcstring_narrow_string_compare(
+		  date_time_elements->values[ 0 ],
+		  "Sat",
+		  3 ) == 0 )
+	{
+	}
+	else if( libcstring_narrow_string_compare(
+		  date_time_elements->values[ 0 ],
+		  "Sun",
+		  3 ) == 0 )
+	{
+	}
+	else
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: unsupported day of the week string.\n",
+			 function );
+		}
+#endif
+		if( libewf_split_values_free(
+		     &date_time_elements,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free split date time elements.",
+			 function );
+
+			return( -1 );
+		}
+		return( 0 );
+	}
 	/* Set the year
 	 */
-	time_elements.tm_year = (int) ( ( ( ( date_time_elements->values[ empty_date_element_correction + 4 ] )[ 0 ] - (uint8_t) '0' ) * 1000 )
-			      + ( ( ( date_time_elements->values[ empty_date_element_correction + 4 ] )[ 1 ] - (uint8_t) '0' ) * 100 )
-			      + ( ( ( date_time_elements->values[ empty_date_element_correction + 4 ] )[ 2 ] - (uint8_t) '0' ) * 10 )
-			      + ( ( date_time_elements->values[ empty_date_element_correction + 4 ] )[ 3 ] - (uint8_t) '0' )
+	time_elements.tm_year = (int) ( ( ( ( date_time_elements->values[ 4 + empty_date_element_correction ] )[ 0 ] - (uint8_t) '0' ) * 1000 )
+			      + ( ( ( date_time_elements->values[ 4 + empty_date_element_correction ] )[ 1 ] - (uint8_t) '0' ) * 100 )
+			      + ( ( ( date_time_elements->values[ 4 + empty_date_element_correction ] )[ 2 ] - (uint8_t) '0' ) * 10 )
+			      + ( ( date_time_elements->values[ 4 + empty_date_element_correction ] )[ 3 ] - (uint8_t) '0' )
 			      - 1900 );
 
 	/* Set the month
@@ -5128,7 +5234,7 @@ int libewf_convert_date_xheader_value(
 	else if( libcstring_narrow_string_compare(
 		  date_time_elements->values[ 1 ],
 		  "Nov",
-	  3 ) == 0 )
+	          3 ) == 0 )
 	{
 		time_elements.tm_mon = 10;
 	}
@@ -5141,44 +5247,54 @@ int libewf_convert_date_xheader_value(
 	}
 	else
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported month string.",
-		 function );
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: unsupported month string.\n",
+			 function );
+		}
+#endif
+		if( libewf_split_values_free(
+		     &date_time_elements,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free split date time elements.",
+			 function );
 
-		libewf_split_values_free(
-		 &date_time_elements,
-		 NULL );
-
-		return( -1 );
+			return( -1 );
+		}
+		return( 0 );
 	}
 	/* Set the day of the month
 	 */
-	if( ( date_time_elements->values[ empty_date_element_correction + 2 ] )[ 1 ] == 0 )
+	if( ( date_time_elements->values[ 2 + empty_date_element_correction ] )[ 1 ] == 0 )
 	{
-		time_elements.tm_mday = (int) ( ( date_time_elements->values[ empty_date_element_correction + 2 ] )[ 0 ] - (uint8_t) '0' );
+		time_elements.tm_mday = (int) ( ( date_time_elements->values[ 2 + empty_date_element_correction ] )[ 0 ] - (uint8_t) '0' );
 	}
 	else
 	{
-		time_elements.tm_mday = (int) ( ( ( ( date_time_elements->values[ empty_date_element_correction + 2 ] )[ 0 ] - (uint8_t) '0' ) * 10 )
-				      + ( ( date_time_elements->values[ empty_date_element_correction + 2 ] )[ 1 ] - (uint8_t) '0' ) );
+		time_elements.tm_mday = (int) ( ( ( ( date_time_elements->values[ 2 + empty_date_element_correction ] )[ 0 ] - (uint8_t) '0' ) * 10 )
+				      + ( ( date_time_elements->values[ 2 + empty_date_element_correction ] )[ 1 ] - (uint8_t) '0' ) );
 	}
 	/* Set the hour
 	 */
-	time_elements.tm_hour = (int) ( ( ( ( date_time_elements->values[ empty_date_element_correction + 3 ] )[ 0 ] - (uint8_t) '0' ) * 10 )
-			      + ( ( date_time_elements->values[ empty_date_element_correction + 3 ] )[ 1 ] - (uint8_t) '0' ) );
+	time_elements.tm_hour = (int) ( ( ( ( date_time_elements->values[ 3 + empty_date_element_correction ] )[ 0 ] - (uint8_t) '0' ) * 10 )
+			      + ( ( date_time_elements->values[ 3 + empty_date_element_correction ] )[ 1 ] - (uint8_t) '0' ) );
 
 	/* Set the minutes
 	 */
-	time_elements.tm_min  = (int) ( ( ( ( date_time_elements->values[ empty_date_element_correction + 3 ] )[ 3 ] - (uint8_t) '0' ) * 10 )
-			      + ( ( date_time_elements->values[ empty_date_element_correction + 3 ] )[ 4 ] - (uint8_t) '0' ) );
+	time_elements.tm_min  = (int) ( ( ( ( date_time_elements->values[ 3 + empty_date_element_correction ] )[ 3 ] - (uint8_t) '0' ) * 10 )
+			      + ( ( date_time_elements->values[ 3 + empty_date_element_correction ] )[ 4 ] - (uint8_t) '0' ) );
 
 	/* Set the seconds
 	 */
-	time_elements.tm_sec = (int) ( ( ( ( date_time_elements->values[ empty_date_element_correction + 3 ] )[ 6 ] - (uint8_t) '0' ) * 10 )
-			     + ( ( date_time_elements->values[ empty_date_element_correction + 3 ] )[ 7 ] - (uint8_t) '0' ) );
+	time_elements.tm_sec = (int) ( ( ( ( date_time_elements->values[ 3 + empty_date_element_correction ] )[ 6 ] - (uint8_t) '0' ) * 10 )
+			     + ( ( date_time_elements->values[ 3 + empty_date_element_correction ] )[ 7 ] - (uint8_t) '0' ) );
 
 	/* Set to ignore the daylight saving time
 	 */
@@ -5208,13 +5324,13 @@ int libewf_convert_date_xheader_value(
 
 	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 5 )
 	{
-		timezone_string_length         = date_time_elements->sizes[ empty_date_element_correction + 5 ] - 1;
-		*date_time_values_string_size += date_time_elements->sizes[ empty_date_element_correction + 5 ];
+		timezone_string_length         = date_time_elements->sizes[ 5 + empty_date_element_correction ] - 1;
+		*date_time_values_string_size += date_time_elements->sizes[ 5 + empty_date_element_correction ];
 	}
 	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 6 )
 	{
-		timezone_name_length           = date_time_elements->sizes[ empty_date_element_correction + 6 ] - 1;
-		*date_time_values_string_size += date_time_elements->sizes[ empty_date_element_correction + 6 ];
+		timezone_name_length           = date_time_elements->sizes[ 6 + empty_date_element_correction ] - 1;
+		*date_time_values_string_size += date_time_elements->sizes[ 6 + empty_date_element_correction ];
 	}
 	*date_time_values_string = (uint8_t *) memory_allocate(
 	                                        sizeof( uint8_t ) * *date_time_values_string_size );
@@ -5261,13 +5377,13 @@ int libewf_convert_date_xheader_value(
 
 		return( -1 );
 	}
-	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 5 )
+	if( date_time_elements->number_of_values > ( 5 + empty_date_element_correction ) )
 	{
 		( *date_time_values_string )[ 19 ] = (uint8_t) ' ';
 
 		if( libcstring_narrow_string_copy(
 		     (char *) &( ( *date_time_values_string )[ 20 ] ),
-		     (char *) date_time_elements->values[ empty_date_element_correction + 5 ],
+		     (char *) date_time_elements->values[ 5 + empty_date_element_correction ],
 		     timezone_string_length ) == NULL )
 		{
 			liberror_error_set(
@@ -5290,13 +5406,13 @@ int libewf_convert_date_xheader_value(
 			return( -1 );
 		}
 	}
-	if( ( date_time_elements->number_of_values - empty_date_element_correction ) > 6 )
+	if( date_time_elements->number_of_values > ( 6 + empty_date_element_correction ) )
 	{
 		( *date_time_values_string )[ 20 + timezone_string_length ] = (uint8_t) ' ';
 
 		if( libcstring_narrow_string_copy(
 		     (char *) &( ( *date_time_values_string )[ 21 + timezone_string_length ] ),
-		     (char *) date_time_elements->values[ empty_date_element_correction + 6 ],
+		     (char *) date_time_elements->values[ 6 + empty_date_element_correction ],
 		     timezone_name_length ) == NULL )
 		{
 			liberror_error_set(
@@ -5551,6 +5667,8 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
+	( *date_time_values_string )[ date_time_values_string_index++ ] = (uint8_t) ' ';
+
 #if defined( _BSD_SOURCE )
 	time_elements.tm_gmtoff /= 60;
 
@@ -5595,6 +5713,8 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
+	date_time_values_string_index += print_count;
+
 	( *date_time_values_string )[ date_time_values_string_index ] = 0;
 
 	return( 1 );
@@ -5609,313 +5729,174 @@ int libewf_header_values_parse_xheader(
      size_t xheader_size,
      liberror_error_t **error )
 {
-	libewf_split_values_t *lines        = NULL;
-	libfvalue_value_t *header_value     = NULL;
-	uint8_t *close_tag_start            = NULL;
-	uint8_t *close_tag_end              = NULL;
-	uint8_t *date_time_values_string    = NULL;
-	uint8_t *identifier                 = NULL;
-	uint8_t *open_tag_start             = NULL;
-	uint8_t *open_tag_end               = NULL;
-	uint8_t *value_string               = NULL;
-	static char *function               = "libewf_header_values_parse_xheader";
-	size_t date_time_values_string_size = 0;
-	size_t identifier_length            = 0;
-	size_t string_length                = 0;
-	size_t value_string_length          = 0;
-	size_t xheader_index                = 0;
-	int line_iterator                   = 0;
+	static char *function = "libewf_header_values_parse_xheader";
 
-	if( xheader == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid xheader",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if xheader starts with an UTF-8 byte order mark (BOM)
-	*/
-        if( xheader_size >= 3 )
-        {
-                if( ( xheader[ 0 ] == 0x0ef )
-                 && ( xheader[ 1 ] == 0x0bb )
-                 && ( xheader[ 2 ] == 0x0bf ) )
-                {
-                        xheader_index += 3;
-                }
-        }
-	if( libewf_split_values_parse_string(
-	     &lines,
-	     &( xheader[ xheader_index ] ),
+	if( libfvalue_table_copy_from_utf8_xml_string(
+	     header_values,
+	     xheader,
 	     xheader_size,
-	     (uint8_t) '\n',
+	     (uint8_t *) "xheader",
+	     7,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split header string into lines.",
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy UTF-8 string to header values table.",
 		 function );
 
 		return( -1 );
 	}
-/* TODO validate if enclosing tag is <xheader> */
-
-	for( line_iterator = 0;
-	     line_iterator < lines->number_of_values;
-	     line_iterator++ )
+	if( libewf_header_values_parse_xheader_date_value(
+	     header_values,
+	     (uint8_t *) "acquiry_date",
+	     13,
+	     error ) != 1 )
 	{
-		/* Ignore empty lines
-		 */
-		if( ( lines->sizes[ line_iterator ] <= 1 )
-		 || ( lines->values[ line_iterator ] == NULL )
-		 || ( ( lines->values[ line_iterator ] )[ 0 ] == 0 ) )
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to parse xheader date value: acquiry_date.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_header_values_parse_xheader_date_value(
+	     header_values,
+	     (uint8_t *) "system_date",
+	     12,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to parse xheader date value: system_date.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Parses a xheader date value
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_header_values_parse_xheader_date_value(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_size,
+     liberror_error_t **error )
+{
+	libfvalue_value_t *header_value       = NULL;
+	uint8_t *date_time_values_string      = NULL;
+	uint8_t *value_data                   = NULL;
+	static char *function                 = "libewf_header_values_parse_xheader_date_value";
+	size_t date_time_values_string_length = 0;
+	size_t date_time_values_string_size   = 0;
+	size_t value_data_size                = 0;
+	uint8_t value_byte_order              = 0;
+	int result                            = 0;
+
+	result = libfvalue_table_get_value_by_identifier(
+	          header_values,
+	          identifier,
+	          identifier_size,
+		  &header_value,
+		  0,
+		  error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 1 )
+	{
+		if( libfvalue_value_get_data(
+		     header_value,
+		     &value_data,
+		     &value_data_size,
+		     &value_byte_order,
+		     error ) != 1 )
 		{
-			continue;
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value: %s data.",
+			 function,
+			 (char *) identifier );
+
+			return( -1 );
 		}
-		string_length = lines->sizes[ line_iterator ] - 1;
+		result = libewf_convert_date_xheader_value(
+		          value_data,
+		          value_data_size,
+		          &date_time_values_string,
+		          &date_time_values_string_size,
+		          error );
 
-		open_tag_start = (uint8_t *) libcstring_narrow_string_search_character(
-		                              (char *) lines->values[ line_iterator ],
-		                              '<',
-		                              string_length );
-
-		/* Ignore lines without an open tag
-		 */
-		if( open_tag_start == NULL )
+		if( result == -1 )
 		{
-			continue;
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to create date time values string.",
+			 function );
+
+			return( -1 );
 		}
-		open_tag_end = (uint8_t *) libcstring_narrow_string_search_character(
-		                            (char *) lines->values[ line_iterator ],
-		                            '>',
-		                            string_length );
-
-		/* Ignore lines without an open tag
-		 */
-		if( open_tag_end == NULL )
+		else if( result != 0 )
 		{
-			continue;
-		}
-		/* Ignore the first part of the XML string
-		 */
-		string_length -= (size_t) ( open_tag_end - lines->values[ line_iterator ] );
+			/* Make sure to determine the actual length of the date time values string
+			 */
+			date_time_values_string_length = libcstring_narrow_string_length(
+							  (char *) date_time_values_string );
 
-		/* Ignore lines only containing a single tag
-		 */
-		if( string_length <= 1 )
-		{
-			continue;
-		}
-		close_tag_start = (uint8_t *) libcstring_narrow_string_search_character_reverse(
-		                               (char *) &open_tag_end[ 1 ],
-		                               '<',
-		                               string_length );
-
-		/* Ignore lines without a close tag
-		 */
-		if( close_tag_start == NULL )
-		{
-			continue;
-		}
-		close_tag_end = (uint8_t *) libcstring_narrow_string_search_character_reverse(
-		                             (char *) &open_tag_end[ 1 ],
-		                             '>',
-		                             string_length );
-
-		/* Ignore lines without a close tag
-		 */
-		if( close_tag_end == NULL )
-		{
-			continue;
-		}
-		/* Ignore the second part of the XML string
-		 */
-		identifier        = &( open_tag_start[ 1 ] );
-		identifier_length = (size_t) ( open_tag_end - open_tag_start ) - 1;
-
-		/* Ignore the second part of the XML string
-		 */
-		value_string        = &( open_tag_end[ 1 ] );
-		value_string_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
-
-		/* Make sure the string is terminated
-		 */
-		*open_tag_end = 0;
-
-		if( ( ( identifier_length == 12 )
-		   && ( libcstring_narrow_string_compare(
-		         (char *) identifier,
-		         "acquiry_date",
-		         12 ) == 0 ) )
-		 || ( ( identifier_length == 11 )
-		   && ( libcstring_narrow_string_compare(
-		         (char *) identifier,
-		         "system_date",
-		         11 ) == 0 ) ) )
-		{
-			if( libewf_convert_date_xheader_value(
-			     &open_tag_end[ 1 ],
-			     value_string_length,
-			     &date_time_values_string,
-			     &date_time_values_string_size,
+			if( libfvalue_value_set_data(
+			     header_value,
+			     date_time_values_string,
+			     date_time_values_string_length,
+			     LIBFVALUE_ENDIAN_NATIVE,
+			     0,
 			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBERROR_CONVERSION_ERROR_GENERIC,
-				 "%s: unable to create date time values string.",
-				 function );
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set header value: %s data.",
+				 function,
+				 (char *) identifier );
 
-				libewf_split_values_free(
-				 &lines,
-				 NULL );
+				memory_free(
+				 date_time_values_string );
 
 				return( -1 );
 			}
-			else
-			{
-				/* Make sure to determine the actual length of the date time values string
-				 */
-				value_string_length = libcstring_narrow_string_length(
-				                       (char *) date_time_values_string );
-			}
-		}
-		if( libfvalue_value_initialize(
-		     &header_value,
-		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header value.",
-			 function );
-
-			libewf_split_values_free(
-			 &lines,
-			 NULL );
-
-			return( -1 );
-		}
-		if( libfvalue_value_set_identifier(
-		     header_value,
-		     identifier,
-		     identifier_length + 1,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s identifier.",
-			 function,
-			 (char *) identifier );
-
-			libfvalue_value_free(
-			 (intptr_t *) header_value,
-			 NULL );
-
-			if( date_time_values_string != NULL )
-			{
-				memory_free(
-				 date_time_values_string );
-			}
-			libewf_split_values_free(
-			 &lines,
-			 NULL );
-
-			return( -1 );
-		}
-		if( libfvalue_value_set_data(
-		     header_value,
-		     value_string,
-		     value_string_length,
-		     LIBFVALUE_ENDIAN_NATIVE,
-		     0,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s data.",
-			 function,
-			 (char *) identifier );
-
-			libfvalue_value_free(
-			 (intptr_t *) header_value,
-			 NULL );
-
-			if( date_time_values_string != NULL )
-			{
-				memory_free(
-				 date_time_values_string );
-			}
-			libewf_split_values_free(
-			 &lines,
-			 NULL );
-
-			return( -1 );
-		}
-		if( libfvalue_table_set_value(
-		     header_values,
-		     header_value,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s in table.",
-			 function,
-			 (char *) identifier );
-
-			libfvalue_value_free(
-			 (intptr_t *) header_value,
-			 NULL );
-
-			if( date_time_values_string != NULL )
-			{
-				memory_free(
-				 date_time_values_string );
-			}
-			libewf_split_values_free(
-			 &lines,
-			 NULL );
-
-			return( -1 );
-		}
-		header_value = NULL;
-
-		if( date_time_values_string != NULL )
-		{
 			memory_free(
 			 date_time_values_string );
-
-			date_time_values_string = NULL;
 		}
-	}
-	if( libewf_split_values_free(
-	     &lines,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split lines.",
-		 function );
-
-		return( -1 );
+#if defined( HAVE_VERBOSE_OUTPUT )
+		else if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: unsupported xheader date value: %s.\n",
+			 function,
+			 (char *) identifier );
+		}
+#endif
 	}
 	return( 1 );
 }
