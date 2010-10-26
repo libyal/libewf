@@ -235,8 +235,8 @@ int libewf_header_values_initialize(
 	}
 	if( libewf_header_values_set_value_by_index(
 	     *header_values,
-	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM,
-	     (uint8_t *) "acquiry_operating_system",
+	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION,
+	     (uint8_t *) "acquiry_software_version",
 	     25,
 	     error ) != 1 )
 	{
@@ -244,7 +244,7 @@ int libewf_header_values_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: acquiry_operating_system.",
+		 "%s: unable to set header value: acquiry_software_version.",
 		 function );
 
 		libfvalue_table_free(
@@ -257,8 +257,8 @@ int libewf_header_values_initialize(
 	}
 	if( libewf_header_values_set_value_by_index(
 	     *header_values,
-	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION,
-	     (uint8_t *) "acquiry_software_version",
+	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM,
+	     (uint8_t *) "acquiry_operating_system",
 	     25,
 	     error ) != 1 )
 	{
@@ -266,7 +266,7 @@ int libewf_header_values_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: acquiry_software_version.",
+		 "%s: unable to set header value: acquiry_operating_system.",
 		 function );
 
 		libfvalue_table_free(
@@ -2613,23 +2613,6 @@ int libewf_header_values_generate_utf8_header_string(
 	{
 		if( libfvalue_table_get_value_by_identifier(
 		     header_values,
-		     (uint8_t *) "acquiry_operating_system",
-		     25,
-		     &acquiry_operating_system_header_value,
-		     0,
-		     error ) == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: acquiry_operating_system.",
-			 function );
-
-			return( -1 );
-		}
-		if( libfvalue_table_get_value_by_identifier(
-		     header_values,
 		     (uint8_t *) "acquiry_software_version",
 		     25,
 		     &acquiry_software_version_header_value,
@@ -2641,6 +2624,23 @@ int libewf_header_values_generate_utf8_header_string(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve header value: acquiry_software_version.",
+			 function );
+
+			return( -1 );
+		}
+		if( libfvalue_table_get_value_by_identifier(
+		     header_values,
+		     (uint8_t *) "acquiry_operating_system",
+		     25,
+		     &acquiry_operating_system_header_value,
+		     0,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value: acquiry_operating_system.",
 			 function );
 
 			return( -1 );
@@ -3099,42 +3099,6 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
 	{
-		if( acquiry_operating_system_header_value != NULL )
-		{
-			result = libfvalue_value_get_utf8_string_size(
-				  acquiry_operating_system_header_value,
-				  0,
-				  &acquiry_operating_system_string_length,
-				  error );
-
-			if( result != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve string size of header value: acquiry_operating_system.",
-				 function );
-
-				if( generated_system_date != NULL )
-				{
-					memory_free(
-					 generated_system_date );
-				}
-				if( generated_acquiry_date != NULL )
-				{
-					memory_free(
-					 generated_acquiry_date );
-				}
-				return( -1 );
-			}
-			if( acquiry_operating_system_string_length > 0 )
-			{
-				acquiry_operating_system_string_length -= 1;
-
-				*header_string_size += acquiry_operating_system_string_length;
-			}
-		}
 		if( acquiry_software_version_header_value != NULL )
 		{
 			result = libfvalue_value_get_utf8_string_size(
@@ -3169,6 +3133,42 @@ int libewf_header_values_generate_utf8_header_string(
 				acquiry_software_version_string_length -= 1;
 
 				*header_string_size += acquiry_software_version_string_length;
+			}
+		}
+		if( acquiry_operating_system_header_value != NULL )
+		{
+			result = libfvalue_value_get_utf8_string_size(
+				  acquiry_operating_system_header_value,
+				  0,
+				  &acquiry_operating_system_string_length,
+				  error );
+
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve string size of header value: acquiry_operating_system.",
+				 function );
+
+				if( generated_system_date != NULL )
+				{
+					memory_free(
+					 generated_system_date );
+				}
+				if( generated_acquiry_date != NULL )
+				{
+					memory_free(
+					 generated_acquiry_date );
+				}
+				return( -1 );
+			}
+			if( acquiry_operating_system_string_length > 0 )
+			{
+				acquiry_operating_system_string_length -= 1;
+
+				*header_string_size += acquiry_operating_system_string_length;
 			}
 		}
 	}
@@ -3874,47 +3874,6 @@ int libewf_header_values_generate_utf8_header_string(
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 
-		if( ( acquiry_operating_system_header_value != NULL )
-		 && ( acquiry_operating_system_string_length > 0 ) )
-		{
-			result = libfvalue_value_copy_to_utf8_string(
-				  acquiry_operating_system_header_value,
-				  0,
-				  &( ( *header_string )[ header_string_index ] ),
-			          *header_string_size - header_string_index,
-				  error );
-
-			if( result != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy string of header value: acquiry_operating_system.",
-				 function );
-
-				memory_free(
-				 *header_string );
-
-				*header_string      = NULL;
-				*header_string_size = 0;
-
-				if( generated_system_date != NULL )
-				{
-					memory_free(
-					 generated_system_date );
-				}
-				if( generated_acquiry_date != NULL )
-				{
-					memory_free(
-					 generated_acquiry_date );
-				}
-				return( -1 );
-			}
-			header_string_index += acquiry_operating_system_string_length;
-		}
-		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
-
 		if( ( acquiry_software_version_header_value != NULL )
 		 && ( acquiry_software_version_string_length > 0 ) )
 		{
@@ -3953,6 +3912,47 @@ int libewf_header_values_generate_utf8_header_string(
 				return( -1 );
 			}
 			header_string_index += acquiry_software_version_string_length;
+		}
+		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
+
+		if( ( acquiry_operating_system_header_value != NULL )
+		 && ( acquiry_operating_system_string_length > 0 ) )
+		{
+			result = libfvalue_value_copy_to_utf8_string(
+				  acquiry_operating_system_header_value,
+				  0,
+				  &( ( *header_string )[ header_string_index ] ),
+			          *header_string_size - header_string_index,
+				  error );
+
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy string of header value: acquiry_operating_system.",
+				 function );
+
+				memory_free(
+				 *header_string );
+
+				*header_string      = NULL;
+				*header_string_size = 0;
+
+				if( generated_system_date != NULL )
+				{
+					memory_free(
+					 generated_system_date );
+				}
+				if( generated_acquiry_date != NULL )
+				{
+					memory_free(
+					 generated_acquiry_date );
+				}
+				return( -1 );
+			}
+			header_string_index += acquiry_operating_system_string_length;
 		}
 	}
 	( *header_string )[ header_string_index++ ] = (uint8_t) '\t';

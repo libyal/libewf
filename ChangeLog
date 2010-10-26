@@ -10,6 +10,7 @@ TODO
   - set media_size on write finalize
 * fix todo in write existing chunk
 * disk full check
+* ewfacquire: make behaviour of -g equal to user input ?
 
 * documentation:
   - add that error can be NULL
@@ -58,7 +59,7 @@ Roadmap:
   - xsignature section to sign xhash and/or hash
 
 Code clean up:
-* clean up configure.ac
+* clean up configure.ac and acinclude.m4
 * implement libmfdata
 * move sections into separate objects ?
 * refactor section_list to list_type and section_value ?
@@ -222,6 +223,13 @@ Deprecated functions
   #pragma deprecated( function )
   __declspec(deprecated)
 
+20101026
+* updated configure.ac
+* updated include/types.h
+* worked on ewfacquire, ewfacquirestream and imaging_handle code clean up
+* fixed header values mix-up for operation system and software version
+  introduced in 20100719
+
 20101025
 * worked on automated tests
   - added ewfacquire resume test
@@ -232,6 +240,7 @@ Deprecated functions
 * added support for 5 value xheader date/time value
 * fix for EWFX date/time value missing timezone introduced in 20100719
 * fix in date/time string generation for timezone description
+* worked on ewfacquire code clean up
 
 20101022
 * worked on automated tests

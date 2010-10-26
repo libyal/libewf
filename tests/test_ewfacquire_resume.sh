@@ -59,24 +59,14 @@ function test_write_resume
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		if [${TMP}/resume -ne 1478610 ];
-		then
-			echo "ewfacquire resume test currently only supports EWF file of: 1478610 bytes.";
-
-			RESULT=${EXIT_IGNORE};
-		fi
-	fi
-
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
-	then
-		./${EWFVERIFY} -q ${TMP}/resume.*
+		./${EWFVERIFY} -q ${TMP}/resume.E01
 
 		RESULT=$?;
 	fi
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		${TRUNCATE} -s ${RESUME_OFFSET} ${TMP}/resume.*
+		${TRUNCATE} -s ${RESUME_OFFSET} ${TMP}/resume.E01
 
 		RESULT=$?;
 	fi
@@ -95,7 +85,7 @@ EOI
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q ${TMP}/resume.*
+		./${EWFVERIFY} -q ${TMP}/resume.E01
 
 		RESULT=$?;
 	fi

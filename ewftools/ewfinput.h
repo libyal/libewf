@@ -64,8 +64,8 @@ int ewfinput_determine_sectors_per_chunk(
      uint32_t *sectors_per_chunk,
      liberror_error_t **error );
 
-int ewfinput_determine_compression_level(
-     const libcstring_system_character_t *argument,
+int ewfinput_determine_compression_values(
+     const libcstring_system_character_t *string,
      int8_t *compression_level,
      uint8_t *compression_flags,
      liberror_error_t **error );
@@ -92,7 +92,7 @@ int ewfinput_determine_yes_no(
 
 int ewfinput_get_string_variable(
      FILE *stream,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      libcstring_system_character_t *string_variable,
      size_t string_variable_size,
      liberror_error_t **error );
@@ -101,7 +101,7 @@ int ewfinput_get_size_variable(
      FILE *stream,
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
@@ -112,7 +112,7 @@ int ewfinput_get_byte_size_variable(
      FILE *stream,
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
@@ -123,7 +123,7 @@ int ewfinput_get_fixed_string_variable(
      FILE *stream,
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      libcstring_system_character_t **values,
      uint8_t number_of_values,
      uint8_t default_value,

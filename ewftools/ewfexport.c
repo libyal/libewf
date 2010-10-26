@@ -935,7 +935,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'c':
-				if( ewfinput_determine_compression_level(
+				if( ewfinput_determine_compression_values(
 				     optarg,
 				     &compression_level,
 				     &compression_flags,
@@ -1546,7 +1546,7 @@ int main( int argc, char * const argv[] )
 					compression_level = LIBEWF_COMPRESSION_NONE;
 					compression_flags = 0;
 				}
-				else if( ewfinput_determine_compression_level(
+				else if( ewfinput_determine_compression_values(
 				          fixed_string_variable,
 				          &compression_level,
 				          &compression_flags,

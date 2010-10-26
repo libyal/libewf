@@ -76,7 +76,7 @@ EOI
 
 	rm -rf ${TMP};
 
-	echo -n "Testing ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} ";
+	echo -n "Testing ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -123,7 +123,7 @@ function test_acquire_unattended_file
 
 	rm -rf ${TMP};
 
-	echo -n "Testing unattended ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} ";
+	echo -n "Testing unattended ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -203,7 +203,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 64 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_file "${FILENAME}" encase6 none 650MB "${CHUNK_SIZE}";
 		then
@@ -226,7 +226,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 64 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_file "${FILENAME}" smart none 650MB "${CHUNK_SIZE}";
 		then
@@ -275,7 +275,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 64 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_unattended_file "${FILENAME}" encase6 none 650MB "${CHUNK_SIZE}";
 		then
@@ -298,7 +298,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 64 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_unattended_file "${FILENAME}" smart none 650MB "${CHUNK_SIZE}";
 		then

@@ -49,7 +49,6 @@
 #include "ewfoutput.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
-#include "platform.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
 
@@ -207,465 +206,16 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         FILE *stream,
         libcstring_system_character_t *input_buffer,
         size_t input_buffer_size,
-        uint8_t resume_acquiry,
-        libcstring_system_character_t *filename,
-        libcstring_system_character_t *filename_secondary_copy,
-        libcstring_system_character_t *case_number,
-        libcstring_system_character_t *description,
-        libcstring_system_character_t *evidence_number,
-        libcstring_system_character_t *examiner_name,
-        libcstring_system_character_t *notes,
-        uint8_t media_type,
-        uint8_t media_flags,
-        int8_t compression_level,
-        uint8_t compression_flags,
-        uint8_t ewf_format,
-        off64_t acquiry_offset,
-        off64_t resume_acquiry_offset,
-        size64_t acquiry_size,
-        size64_t segment_file_size,
-        uint32_t bytes_per_sector,
-        uint32_t sectors_per_chunk,
-        uint32_t sector_error_granularity,
-        uint8_t read_error_retries,
-        uint8_t wipe_block_on_read_error,
         liberror_error_t **error )
 {
-	libcstring_system_character_t acquiry_size_string[ 16 ];
-	libcstring_system_character_t segment_file_size_string[ 16 ];
-
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "ewfacquire_confirm_acquiry_parameters";
 	int8_t input_confirmed                               = -1;
-	int result                                           = 0;
 
 	if( stream == NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
-		 function );
-
 		return( -1 );
 	}
-	fprintf(
-	 stream,
-	 "The following acquiry parameters were provided:\n" );
-
-	fprintf(
-	 stream,
-	 "Image path and filename:\t%" PRIs_LIBCSTRING_SYSTEM "",
-	 filename );
-
-	if( resume_acquiry == 0 )
-	{
-		if( ewf_format == LIBEWF_FORMAT_SMART )
-		{
-			fprintf(
-			 stream,
-			 ".s01" );
-		}
-		else if( ( ewf_format == LIBEWF_FORMAT_EWF )
-		      || ( ewf_format == LIBEWF_FORMAT_EWFX ) )
-		{
-			fprintf(
-			 stream,
-			 ".e01" );
-		}
-		else
-		{
-			fprintf(
-			 stream,
-			 ".E01" );
-		}
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	if( filename_secondary_copy != NULL )
-	{
-		fprintf(
-		 stream,
-		 "Secondary copy:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "",
-		 filename_secondary_copy );
-
-		if( resume_acquiry == 0 )
-		{
-			if( ewf_format == LIBEWF_FORMAT_SMART )
-			{
-				fprintf(
-				 stream,
-				 ".s01" );
-			}
-			else if( ( ewf_format == LIBEWF_FORMAT_EWF )
-			      || ( ewf_format == LIBEWF_FORMAT_EWFX ) )
-			{
-				fprintf(
-				 stream,
-				 ".e01" );
-			}
-			else
-			{
-				fprintf(
-				 stream,
-				 ".E01" );
-			}
-		}
-		fprintf(
-		 stream,
-		 "\n" );
-	}
-	fprintf(
-	 stream,
-	 "Case number:\t\t\t" );
-
-	if( case_number != NULL )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
-		 case_number );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	fprintf(
-	 stream,
-	 "Description:\t\t\t" );
-
-	if( description != NULL )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
-		 description );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	fprintf(
-	 stream,
-	 "Evidence number:\t\t" );
-
-	if( evidence_number != NULL )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
-		 evidence_number );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	fprintf(
-	 stream,
-	 "Examiner name:\t\t\t" );
-
-	if( examiner_name != NULL )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
-		 examiner_name );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	fprintf(
-	 stream,
-	 "Notes:\t\t\t\t" );
-
-	if( notes != NULL )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
-		 notes );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	fprintf(
-	 stream,
-	 "Media type:\t\t\t" );
-
-	if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
-	{
-		fprintf(
-		 stream,
-		 "fixed disk\n" );
-	}
-	else if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-	{
-		fprintf(
-		 stream,
-		 "removable disk\n" );
-	}
-	else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
-	{
-		fprintf(
-		 stream,
-		 "optical disk (CD/DVD/BD)\n" );
-	}
-	else if( media_type == LIBEWF_MEDIA_TYPE_MEMORY )
-	{
-		fprintf(
-		 stream,
-		 "memory (RAM)\n" );
-	}
-	fprintf(
-	 stream,
-	 "Is physical:\t\t\t" );
-
-	if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) == LIBEWF_MEDIA_FLAG_PHYSICAL )
-	{
-		fprintf(
-		 stream,
-		 "yes\n" );
-	}
-	else
-	{
-		fprintf(
-		 stream,
-		 "no\n" );
-	}
-	fprintf(
-	 stream,
-	 "Compression used:\t\t" );
-
-	if( compression_level == LIBEWF_COMPRESSION_FAST )
-	{
-		fprintf(
-		 stream,
-		 "fast\n" );
-	}
-	else if( compression_level == LIBEWF_COMPRESSION_BEST )
-	{
-		fprintf(
-		 stream,
-		 "best\n" );
-	}
-	else if( compression_level == LIBEWF_COMPRESSION_NONE )
-	{
-		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
-		{
-			fprintf(
-			 stream,
-			 "empty block\n" );
-		}
-		else
-		{
-			fprintf(
-			 stream,
-			 "none\n" );
-		}
-	}
-	fprintf(
-	 stream,
-	 "EWF file format:\t\t" );
-
-	if( ewf_format == LIBEWF_FORMAT_EWF )
-	{
-		fprintf(
-		 stream,
-		 "original EWF\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_SMART )
-	{
-		fprintf(
-		 stream,
-		 "SMART\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_FTK )
-	{
-		fprintf(
-		 stream,
-		 "FTK Imager\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE1 )
-	{
-		fprintf(
-		 stream,
-		 "EnCase 1\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE2 )
-	{
-		fprintf(
-		 stream,
-		 "EnCase 2\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE3 )
-	{
-		fprintf(
-		 stream,
-		 "EnCase 3\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE4 )
-	{
-		fprintf(
-		 stream,
-		 "EnCase 4\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE5 )
-	{
-		fprintf(
-		 stream,
-		 "EnCase 5\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
-	{
-		fprintf(
-		 stream,
-		 "EnCase 6\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_LINEN5 )
-	{
-		fprintf(
-		 stream,
-		 "linen 5\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_LINEN6 )
-	{
-		fprintf(
-		 stream,
-		 "linen 6\n" );
-	}
-	else if( ewf_format == LIBEWF_FORMAT_EWFX )
-	{
-		fprintf(
-		 stream,
-		 "extended EWF (libewf)\n" );
-	}
-	else
-	{
-		fprintf(
-		 stream,
-		 "\n" );
-	}
-	fprintf(
-	 stream,
-	 "Acquiry start offset:\t\t%" PRIi64 "\n",
-	 acquiry_offset );
-
-	if( resume_acquiry != 0 )
-	{
-		fprintf(
-		 stream,
-		 "Resuming acquiry at offset:\t%" PRIi64 "\n",
-		 resume_acquiry_offset );
-	}
-	result = byte_size_string_create(
-	          acquiry_size_string,
-	          16,
-	          acquiry_size,
-	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-	          NULL );
-
-	fprintf(
-	 stream,
-	 "Number of bytes to acquire:\t" );
-
-	if( acquiry_size == 0 )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIu64 " (until end of input)",
-		 acquiry_size );
-	}
-	else if( result == 1 )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
-		 acquiry_size_string,
-		 acquiry_size );
-	}
-	else
-	{
-		fprintf(
-		 stream,
-		 "%" PRIu64 " bytes",
-		 acquiry_size );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	result = byte_size_string_create(
-	          segment_file_size_string,
-	          16,
-	          segment_file_size,
-	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-	          NULL );
-
-	fprintf(
-	 stream,
-	 "Evidence segment file size:\t" );
-
-	if( result == 1 )
-	{
-		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
-		 segment_file_size_string,
-		 segment_file_size );
-	}
-	else
-	{
-		fprintf(
-		 stream,
-		 "%" PRIu64 " bytes",
-		 segment_file_size );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
-	fprintf(
-	 stream,
-	 "Bytes per sector:\t\t%" PRIu32 "\n",
-	 bytes_per_sector );
-	fprintf(
-	 stream,
-	 "Block size:\t\t\t%" PRIu32 " sectors\n",
-	 sectors_per_chunk );
-	fprintf(
-	 stream,
-	 "Error granularity:\t\t%" PRIu32 " sectors\n",
-	 sector_error_granularity );
-	fprintf(
-	 stream,
-	 "Retries on read error:\t\t%" PRIu8 "\n",
-	 read_error_retries );
-
-	fprintf(
-	 stream,
-	 "Wipe sectors on read error:\t" );
-
-	if( wipe_block_on_read_error == 0 )
-	{
-		fprintf(
-		 stream,
-		 "no\n" );
-	}
-	else
-	{
-		fprintf(
-		 stream,
-		 "yes\n" );
-	}
-	fprintf(
-	 stream,
-	 "\n" );
-
 	/* Ask for confirmation
 	 */
 	while( input_confirmed == -1 )
@@ -1479,33 +1029,29 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcstring_system_character_t acquiry_operating_system[ 32 ];
 	libcstring_system_character_t input_buffer[ EWFACQUIRE_INPUT_BUFFER_SIZE ];
 	libcstring_system_character_t media_information_model[ 64 ];
 	libcstring_system_character_t media_information_serial_number[ 64 ];
 
 	liberror_error_t *error                                         = NULL;
 
-	libcstring_system_character_t *acquiry_software_version         = NULL;
 	libcstring_system_character_t *calculated_md5_hash_string       = NULL;
 	libcstring_system_character_t *calculated_sha1_hash_string      = NULL;
-	libcstring_system_character_t *case_number                      = NULL;
-	libcstring_system_character_t *description                      = NULL;
-	libcstring_system_character_t *evidence_number                  = NULL;
-	libcstring_system_character_t *examiner_name                    = NULL;
 	libcstring_system_character_t *fixed_string_variable            = NULL;
 	libcstring_system_character_t *log_filename                     = NULL;
-	libcstring_system_character_t *notes                            = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
+	libcstring_system_character_t *option_compression_level         = NULL;
 	libcstring_system_character_t *option_description               = NULL;
 	libcstring_system_character_t *option_examiner_name             = NULL;
 	libcstring_system_character_t *option_evidence_number           = NULL;
+	libcstring_system_character_t *option_header_codepage           = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
+	libcstring_system_character_t *option_sector_error_granularity  = NULL;
+	libcstring_system_character_t *option_sectors_per_chunk         = NULL;
 	libcstring_system_character_t *option_target_filename           = NULL;
 	libcstring_system_character_t *program                          = _LIBCSTRING_SYSTEM_STRING( "ewfacquire" );
-	libcstring_system_character_t *secondary_target_filename        = NULL;
-	libcstring_system_character_t *target_filename                  = NULL;
+	libcstring_system_character_t *request_string                   = NULL;
 
 	log_handle_t *log_handle                                        = NULL;
 
@@ -1515,8 +1061,6 @@ int main( int argc, char * const argv[] )
 	off64_t resume_acquiry_offset                                   = 0;
 	ssize64_t read_count                                            = 0;
 	size_t string_length                                            = 0;
-	size_t secondary_target_filename_size                           = 0;
-	size_t target_filename_size                                     = 0;
 	uint64_t acquiry_offset                                         = 0;
 	uint64_t acquiry_size                                           = 0;
 	uint64_t input_size_variable                                    = 0;
@@ -1525,11 +1069,8 @@ int main( int argc, char * const argv[] )
 	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint64_t segment_file_size                                      = 0;
 	uint32_t bytes_per_sector                                       = 512;
-	uint32_t sector_error_granularity                               = 0;
-	uint32_t sectors_per_chunk                                      = 0;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
-	uint8_t compression_flags                                       = 0;
 	uint8_t ewf_format                                              = LIBEWF_FORMAT_ENCASE6;
 	uint8_t media_flags                                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
 	uint8_t media_type                                              = LIBEWF_MEDIA_TYPE_FIXED;
@@ -1540,15 +1081,11 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                                                 = 0;
 	uint8_t wipe_block_on_read_error                                = 0;
 	int8_t acquiry_parameters_confirmed                             = 0;
-	int8_t compression_level                                        = LIBEWF_COMPRESSION_NONE;
-	int argument_set_compression                                    = 0;
 	int argument_set_bytes_per_sector                               = 0;
 	int argument_set_format                                         = 0;
 	int argument_set_media_type                                     = 0;
 	int argument_set_offset                                         = 0;
 	int argument_set_read_error_retries                             = 0;
-	int argument_set_sector_error_granularity                       = 0;
-	int argument_set_sectors_per_chunk                              = 0;
 	int argument_set_segment_file_size                              = 0;
 	int argument_set_size                                           = 0;
 	int argument_set_media_flags                                    = 0;
@@ -1556,7 +1093,6 @@ int main( int argc, char * const argv[] )
 	int default_media_flags                                         = 0;
 	int default_media_type                                          = 0;
 	int error_abort                                                 = 0;
-	int header_codepage                                             = LIBEWF_CODEPAGE_ASCII;
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
 	int status                                                      = 0;
@@ -1606,45 +1142,13 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (libcstring_system_integer_t) 'A':
-				if( ewfinput_determine_header_codepage(
-				     optarg,
-				     &header_codepage,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_header_codepage = optarg;
 
-					header_codepage = LIBEWF_CODEPAGE_ASCII;
-
-					fprintf(
-					 stderr,
-					 "Unsuported header codepage defaulting to: ascii.\n" );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'b':
-				if( ewfinput_determine_sectors_per_chunk(
-				     optarg,
-				     &sectors_per_chunk,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_sectors_per_chunk = optarg;
 
-					sectors_per_chunk = 64;
-
-					fprintf(
-					 stderr,
-					 "Unsuported number of sectors per chunk defaulting to: 64.\n" );
-				}
-				else
-				{
-					argument_set_sectors_per_chunk = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'B':
@@ -1673,28 +1177,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'c':
-				if( ewfinput_determine_compression_level(
-				     optarg,
-				     &compression_level,
-				     &compression_flags,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_compression_level = optarg;
 
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
-
-					fprintf(
-					 stderr,
-					 "Unsupported compression level defaulting to: none.\n" );
-				}
-				else
-				{
-					argument_set_compression = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'C':
@@ -1757,26 +1241,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'g':
-				if( ewfinput_determine_sectors_per_chunk(
-				     optarg,
-				     &sector_error_granularity,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_sector_error_granularity = optarg;
 
-					sector_error_granularity = 64;
-
-					fprintf(
-					 stderr,
-					 "Unsuported number of sector error granularity defaulting to: 64.\n" );
-				}
-				else
-				{
-					argument_set_sector_error_granularity = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'h':
@@ -2078,6 +1544,28 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( ( option_target_filename != NULL )
+	 && ( option_secondary_target_filename != NULL ) )
+	{
+		string_length = libcstring_system_string_length(
+				 option_secondary_target_filename );
+
+		if( libcstring_system_string_length(
+		     option_target_filename ) == string_length )
+		{
+			if( libcstring_system_string_compare(
+			     option_target_filename,
+			     option_secondary_target_filename,
+			     string_length ) == 0 )
+			{
+				fprintf(
+				 stderr,
+				 "Primary and secondary target cannot be the same.\n" );
+
+				return( EXIT_FAILURE );
+			}
+		}
+	}
 	if( device_handle_initialize(
 	     &ewfacquire_device_handle,
 	     &error ) != 1 )
@@ -2203,363 +1691,6 @@ int main( int argc, char * const argv[] )
 	{
 		acquiry_size = media_size - acquiry_offset;
 	}
-	/* Create the output targets
-	 */
-	if( option_target_filename != NULL )
-	{
-		string_length = libcstring_system_string_length(
-				 option_target_filename );
-
-		if( string_length > 0 )
-		{
-			target_filename_size = string_length + 1;
-
-			target_filename = (libcstring_system_character_t *) memory_allocate(
-			                                                     sizeof( libcstring_system_character_t ) * target_filename_size );
-
-			if( target_filename == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create target filename string.\n" );
-
-				error_abort = 1;
-			}
-			else if( libcstring_system_string_copy(
-				  target_filename,
-				  option_target_filename,
-				  target_filename_size ) == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to set target filename string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	else
-	{
-		target_filename_size = 1024;
-
-		target_filename = (libcstring_system_character_t *) memory_allocate(
-		                                                     sizeof( libcstring_system_character_t ) * target_filename_size );
-
-		if( target_filename == NULL )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create target filename string.\n" );
-
-			error_abort = 1;
-		}
-		/* Make sure to set the target filename if in unattended mode
-		 */
-		else if( interactive_mode == 0 )
-		{
-			if( libcstring_system_string_copy(
-			     target_filename,
-			     _LIBCSTRING_SYSTEM_STRING( "image" ),
-			     7 ) == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to set target filename string.\n" );
-
-				error_abort = 1;
-			}
-			target_filename[ 7 ] = 0;
-		}
-	}
-	if( option_secondary_target_filename != NULL )
-	{
-		string_length = libcstring_system_string_length(
-				 option_secondary_target_filename );
-
-		if( string_length > 0 )
-		{
-			secondary_target_filename_size = string_length + 1;
-
-			secondary_target_filename = (libcstring_system_character_t *) memory_allocate(
-			                                                               sizeof( libcstring_system_character_t ) * secondary_target_filename_size );
-
-			if( secondary_target_filename == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create secondary target filename string.\n" );
-
-				error_abort = 1;
-			}
-			else if( libcstring_system_string_copy(
-				  secondary_target_filename,
-				  option_secondary_target_filename,
-				  secondary_target_filename_size ) == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to set secondary target filename string.\n" );
-
-				error_abort = 1;
-			}
-		}
-		if( ( target_filename_size == secondary_target_filename_size )
-		 && ( libcstring_system_string_compare(
-		       target_filename,
-		       secondary_target_filename,
-		       target_filename_size ) == 0 ) )
-		{
-			fprintf(
-			 stderr,
-			 "Primary and secondary target cannot be the same.\n" );
-
-			error_abort = 1;
-		}
-	}
-	/* Create the input buffers
-	 */
-	if( error_abort == 0 )
-	{
-		if( option_case_number != NULL )
-		{
-			string_length = libcstring_system_string_length(
-					 option_case_number );
-
-			if( string_length > 0 )
-			{
-				case_number = (libcstring_system_character_t *) memory_allocate(
-				                                                 sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
-
-				if( case_number == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to create case number string.\n" );
-
-					error_abort = 1;
-				}
-				else if( libcstring_system_string_copy(
-					  case_number,
-					  option_case_number,
-					  string_length + 1 ) == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to set case number string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			case_number = (libcstring_system_character_t *) memory_allocate(
-			                                                 sizeof( libcstring_system_character_t ) * 256 );
-
-			if( case_number == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create case number string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_description != NULL )
-		{
-			string_length = libcstring_system_string_length(
-					 option_description );
-
-			if( string_length > 0 )
-			{
-				description = (libcstring_system_character_t *) memory_allocate(
-				                                                 sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
-
-				if( description == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to create description string.\n" );
-
-					error_abort = 1;
-				}
-				else if( libcstring_system_string_copy(
-					  description,
-					  option_description,
-					  string_length + 1 ) == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to set description string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			description = (libcstring_system_character_t *) memory_allocate(
-			                                                 sizeof( libcstring_system_character_t ) * 256 );
-
-			if( description == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create description string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_examiner_name != NULL )
-		{
-			string_length = libcstring_system_string_length(
-					 option_examiner_name );
-
-			if( string_length > 0 )
-			{
-				examiner_name = (libcstring_system_character_t *) memory_allocate(
-				                                                   sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
-
-				if( examiner_name == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to create examiner name string.\n" );
-
-					error_abort = 1;
-				}
-				else if( libcstring_system_string_copy(
-					  examiner_name,
-					  option_examiner_name,
-					  string_length + 1 ) == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to set examiner name string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			examiner_name = (libcstring_system_character_t *) memory_allocate(
-			                                                   sizeof( libcstring_system_character_t ) * 256 );
-
-			if( examiner_name == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create examiner name string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_evidence_number != NULL )
-		{
-			string_length = libcstring_system_string_length(
-					 option_evidence_number );
-
-			if( string_length > 0 )
-			{
-				evidence_number = (libcstring_system_character_t *) memory_allocate(
-				                                                     sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
-
-				if( evidence_number == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to create evidence number string.\n" );
-
-					error_abort = 1;
-				}
-				else if( libcstring_system_string_copy(
-					  evidence_number,
-					  option_evidence_number,
-					  string_length + 1 ) == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to set evidence number string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			evidence_number = (libcstring_system_character_t *) memory_allocate(
-			                                                     sizeof( libcstring_system_character_t ) * 256 );
-
-			if( evidence_number == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create evidence number string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_notes != NULL )
-		{
-			string_length = libcstring_system_string_length(
-					 option_notes );
-
-			if( string_length > 0 )
-			{
-				notes = (libcstring_system_character_t *) memory_allocate(
-				                                           sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
-
-				if( notes == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to create notes string.\n" );
-
-					error_abort = 1;
-				}
-				else if( libcstring_system_string_copy(
-					  notes,
-					  option_notes,
-					  string_length + 1 ) == NULL )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to set notes string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			notes = (libcstring_system_character_t *) memory_allocate(
-			                                           sizeof( libcstring_system_character_t ) * 256 );
-
-			if( notes == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create notes string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	/* Set up the imaging handle
-	 */
 	if( imaging_handle_initialize(
 	     &ewfacquire_imaging_handle,
 	     calculate_md5,
@@ -2570,58 +1701,225 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create imaging handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		error_abort = 1;
+		goto ewfacquire_main_on_error;
 	}
-	if( error_abort != 0 )
+	if( option_target_filename != NULL )
 	{
-		if( case_number != NULL )
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     option_target_filename,
+		     &( ewfacquire_imaging_handle->target_filename ),
+		     &( ewfacquire_imaging_handle->target_filename_size ),
+		     &error ) != 1 )
 		{
-			memory_free(
-			 case_number );
-		}
-		if( description != NULL )
-		{
-			memory_free(
-			 description );
-		}
-		if( examiner_name != NULL )
-		{
-			memory_free(
-			 examiner_name );
-		}
-		if( evidence_number != NULL )
-		{
-			memory_free(
-			 evidence_number );
-		}
-		if( notes != NULL )
-		{
-			memory_free(
-			 notes );
-		}
-		if( secondary_target_filename != NULL )
-		{
-			memory_free(
-			 secondary_target_filename );
-		}
-		if( target_filename != NULL )
-		{
-			memory_free(
-			 target_filename );
-		}
-		device_handle_close(
-		 ewfacquire_device_handle,
-		 NULL );
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
+			fprintf(
+			 stderr,
+			 "Unable to set target filename.\n" );
 
-		return( EXIT_FAILURE );
+			goto ewfacquire_main_on_error;
+		}
+	}
+	else if( interactive_mode == 0 )
+	{
+		/* Make sure the target filename is set in unattended mode
+		 */
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     _LIBCSTRING_SYSTEM_STRING( "image" ),
+		     &( ewfacquire_imaging_handle->target_filename ),
+		     &( ewfacquire_imaging_handle->target_filename_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set target filename.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_secondary_target_filename != NULL )
+	{
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     option_secondary_target_filename,
+		     &( ewfacquire_imaging_handle->secondary_target_filename ),
+		     &( ewfacquire_imaging_handle->secondary_target_filename_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set secondary target filename.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_case_number != NULL )
+	{
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     option_case_number,
+		     &( ewfacquire_imaging_handle->case_number ),
+		     &( ewfacquire_imaging_handle->case_number_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set case number.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_description != NULL )
+	{
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     option_description,
+		     &( ewfacquire_imaging_handle->description ),
+		     &( ewfacquire_imaging_handle->description_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set description.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_evidence_number != NULL )
+	{
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     option_evidence_number,
+		     &( ewfacquire_imaging_handle->evidence_number ),
+		     &( ewfacquire_imaging_handle->evidence_number_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set evidence number.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_examiner_name != NULL )
+	{
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     option_examiner_name,
+		     &( ewfacquire_imaging_handle->examiner_name ),
+		     &( ewfacquire_imaging_handle->examiner_name_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set examiner name.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_notes != NULL )
+	{
+		if( imaging_handle_set_string(
+		     ewfacquire_imaging_handle,
+		     option_notes,
+		     &( ewfacquire_imaging_handle->notes ),
+		     &( ewfacquire_imaging_handle->notes_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set notes.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_compression_level != NULL )
+	{
+		result = imaging_handle_set_compression_values(
+			  ewfacquire_imaging_handle,
+			  option_compression_level,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set compression values.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression level defaulting to: none.\n" );
+		}
+	}
+	if( option_sectors_per_chunk != NULL )
+	{
+		result = imaging_handle_set_sectors_per_chunk(
+			  ewfacquire_imaging_handle,
+			  option_sectors_per_chunk,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set sectors per chunk.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported sectors per chunk defaulting to: 64.\n" );
+		}
+	}
+	if( option_sector_error_granularity != NULL )
+	{
+		result = imaging_handle_set_sector_error_granularity(
+			  ewfacquire_imaging_handle,
+			  option_sector_error_granularity,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set sector error granularity.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported sector error granularity defaulting to: 64.\n" );
+		}
+	}
+	if( option_header_codepage != NULL )
+	{
+		result = ewfinput_determine_header_codepage(
+		          option_header_codepage,
+		          &ewfacquire_imaging_handle->header_codepage,
+		          &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set header codepage.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported header codepage defaulting to: ascii.\n" );
+		}
 	}
 	/* Request the necessary case data
 	 */
@@ -2632,45 +1930,41 @@ int main( int argc, char * const argv[] )
 		 stdout,
 		 "Acquiry parameters required, please provide the necessary input\n" );
 
-		/* Target filename
-		 */
 		if( resume_acquiry != 0 )
 		{
-			while( ewfinput_get_string_variable(
-				stdout,
-				_LIBCSTRING_SYSTEM_STRING( "Image path and filename with extension" ),
-				target_filename,
-				1024,
-			        &error ) != 1 )
-			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				fprintf(
-				 stdout,
-				 "Filename is required, please try again or terminate using Ctrl^C.\n" );
-			}
+			request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename with extension" );
 		}
 		else if( option_target_filename == NULL )
 		{
-			while( ewfinput_get_string_variable(
-				stdout,
-				_LIBCSTRING_SYSTEM_STRING( "Image path and filename without extension" ),
-				target_filename,
-				1024,
-			        &error ) != 1 )
+			request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename without extension" );
+		}
+		if( request_string != NULL )
+		{
+			do
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				result = imaging_handle_prompt_for_string(
+				          ewfacquire_imaging_handle,
+				          request_string,
+				          &( ewfacquire_imaging_handle->target_filename ),
+				          &( ewfacquire_imaging_handle->target_filename_size ),
+				          &error );
 
-				fprintf(
-				 stdout,
-				 "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				if( result == -1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to determine filename.\n" );
+
+					goto ewfacquire_main_on_error;
+				}
+				else if( result == 0 )
+				{
+					fprintf(
+					 stdout,
+					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				}
 			}
+			while( result != 1 );
 		}
 		if( resume_acquiry != 0 )
 		{
@@ -2682,25 +1976,26 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to attach signal handler.\n" );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				goto ewfacquire_main_on_error;
 			}
 			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
-			     target_filename,
+			     ewfacquire_imaging_handle->target_filename,
 			     resume_acquiry,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stdout,
-				 "Unable to resume acquire.\n" );
+				 "Unable to resume acquire - starting from scratch.\n" );
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 				libsystem_notify_print_error_backtrace(
 				 error );
+#endif
 				liberror_error_free(
 				 &error );
+
+				/* TODO what about extension in target filename ? */
 
 				resume_acquiry = 0;
 			}
@@ -2711,36 +2006,20 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to detach signal handler.\n" );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				goto ewfacquire_main_on_error;
 			}
 		}
+/* TODO refactor */
 		if( resume_acquiry != 0 )
 		{
 			if( imaging_handle_get_output_values(
 			     ewfacquire_imaging_handle,
-			     case_number,
-			     256,
-			     description,
-			     256,
-			     evidence_number,
-			     256,
-			     examiner_name,
-			     256,
-			     notes,
-			     256,
 			     &bytes_per_sector,
 			     &acquiry_size,
 			     &media_type,
 			     &media_flags,
-			     &compression_level,
-			     &compression_flags,
 			     &ewf_format,
 			     &segment_file_size,
-			     &sectors_per_chunk,
-			     &sector_error_granularity,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2763,7 +2042,7 @@ int main( int argc, char * const argv[] )
 		{
 			if( imaging_handle_get_offset(
 			     ewfacquire_imaging_handle,
-			     (off64_t *) &resume_acquiry_offset,
+			     &resume_acquiry_offset,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2781,120 +2060,92 @@ int main( int argc, char * const argv[] )
 
 				resume_acquiry = 0;
 			}
-		}
-		if( resume_acquiry != 0 )
-		{
 			fprintf(
 			 stdout,
-			 "Resuming acquire at offset: %" PRIu64 ".\n",
+			 "Resuming acquire at offset: %" PRIi64 ".\n",
 			 resume_acquiry_offset );
 		}
 		if( resume_acquiry == 0 )
 		{
-			/* Case number
-			 */
-			if( ( option_case_number == NULL )
-			 && ( ewfinput_get_string_variable(
-			       stdout,
-			       _LIBCSTRING_SYSTEM_STRING( "Case number" ),
-			       case_number,
-			       256,
-			       &error ) == -1 ) )
+			if( option_case_number == NULL )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				if( imaging_handle_prompt_for_string(
+				     ewfacquire_imaging_handle,
+				     _LIBCSTRING_SYSTEM_STRING( "Case number" ),
+				     &( ewfacquire_imaging_handle->case_number ),
+				     &( ewfacquire_imaging_handle->case_number_size ),
+				     &error ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to set case number.\n" );
 
-				fprintf(
-				 stdout,
-				 "Unable to set case number string.\n" );
-
-				case_number[ 0 ] = 0;
+					goto ewfacquire_main_on_error;
+				}
 			}
-			/* Description
-			 */
-			if( ( option_description == NULL )
-			 && ( ewfinput_get_string_variable(
-			       stdout,
-			       _LIBCSTRING_SYSTEM_STRING( "Description" ),
-			       description,
-			       256,
-			       &error ) == -1 ) )
+			if( option_description == NULL )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				if( imaging_handle_prompt_for_string(
+				     ewfacquire_imaging_handle,
+				     _LIBCSTRING_SYSTEM_STRING( "Description" ),
+				     &( ewfacquire_imaging_handle->description ),
+				     &( ewfacquire_imaging_handle->description_size ),
+				     &error ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to set description.\n" );
 
-				fprintf(
-				 stdout,
-				 "Unable to set description string.\n" );
-
-				description[ 0 ] = 0;
+					goto ewfacquire_main_on_error;
+				}
 			}
-			/* Evidence number
-			 */
-			if( ( option_evidence_number == NULL )
-			 && ( ewfinput_get_string_variable(
-			       stdout,
-			       _LIBCSTRING_SYSTEM_STRING( "Evidence number" ),
-			       evidence_number,
-			       256,
-			       &error ) == -1 ) )
+			if( option_evidence_number == NULL )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				if( imaging_handle_prompt_for_string(
+				     ewfacquire_imaging_handle,
+				     _LIBCSTRING_SYSTEM_STRING( "Evidence number" ),
+				     &( ewfacquire_imaging_handle->evidence_number ),
+				     &( ewfacquire_imaging_handle->evidence_number_size ),
+				     &error ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to set evidence number.\n" );
 
-				fprintf(
-				 stdout,
-				 "Unable to set evidence number string.\n" );
-
-				evidence_number[ 0 ] = 0;
+					goto ewfacquire_main_on_error;
+				}
 			}
-			/* Examiner name
-			 */
-			if( ( option_examiner_name == NULL )
-			 && ( ewfinput_get_string_variable(
-			       stdout,
-			       _LIBCSTRING_SYSTEM_STRING( "Examiner name" ),
-			       examiner_name,
-			       256,
-			       &error ) == -1 ) )
+			if( option_examiner_name == NULL )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				if( imaging_handle_prompt_for_string(
+				     ewfacquire_imaging_handle,
+				     _LIBCSTRING_SYSTEM_STRING( "Examiner name" ),
+				     &( ewfacquire_imaging_handle->examiner_name ),
+				     &( ewfacquire_imaging_handle->examiner_name_size ),
+				     &error ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to set examiner name.\n" );
 
-				fprintf(
-				 stdout,
-				 "Unable to set examiner name string.\n" );
-
-				examiner_name[ 0 ] = 0;
+					goto ewfacquire_main_on_error;
+				}
 			}
-			/* Notes
-			 */
-			if( ( option_notes == NULL )
-			 && ( ewfinput_get_string_variable(
-			       stdout,
-			       _LIBCSTRING_SYSTEM_STRING( "Notes" ),
-			       notes,
-			       256,
-			       &error ) == -1 ) )
+			if( option_notes == NULL )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				if( imaging_handle_prompt_for_string(
+				     ewfacquire_imaging_handle,
+				     _LIBCSTRING_SYSTEM_STRING( "Notes" ),
+				     &( ewfacquire_imaging_handle->notes ),
+				     &( ewfacquire_imaging_handle->notes_size ),
+				     &error ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to set notes.\n" );
 
-				fprintf(
-				 stdout,
-				 "Unable to set notes string.\n" );
-
-				notes[ 0 ] = 0;
+					goto ewfacquire_main_on_error;
+				}
 			}
 			/* Media type
 			 */
@@ -2941,7 +2192,7 @@ int main( int argc, char * const argv[] )
 				else if( ewfinput_determine_media_type(
 					  fixed_string_variable,
 					  &media_type,
-				          &error ) != 1 )
+					  &error ) != 1 )
 				{
 					libsystem_notify_print_error_backtrace(
 					 error );
@@ -2991,7 +2242,7 @@ int main( int argc, char * const argv[] )
 				else if( ewfinput_determine_media_flags(
 					  fixed_string_variable,
 					  &media_flags,
-				          &error ) != 1 )
+					  &error ) != 1 )
 				{
 					libsystem_notify_print_error_backtrace(
 					 error );
@@ -3005,50 +2256,26 @@ int main( int argc, char * const argv[] )
 					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
 			}
-			/* Compression
-			 */
-			if( argument_set_compression == 0 )
+			if( option_compression_level == NULL )
 			{
-				if( ewfinput_get_fixed_string_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Use compression" ),
-				     ewfinput_compression_levels,
-				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
-				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-				     &fixed_string_variable,
-				     &error ) == -1 )
+				result = imaging_handle_prompt_for_compression_level(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Use compression" ),
+					  &error );
+
+				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
-					 stdout,
-					 "Unable to determine compression level defaulting to: none.\n" );
+					 stderr,
+					 "Unable to determine compression level.\n" );
 
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
+					goto ewfacquire_main_on_error;
 				}
-				else if( ewfinput_determine_compression_level(
-					  fixed_string_variable,
-					  &compression_level,
-					  &compression_flags,
-				          &error ) != 1 )
+				else if( result == 0 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
-					 stdout,
+					 stderr,
 					 "Unsupported compression level defaulting to: none.\n" );
-
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
 				}
 			}
 			/* File format
@@ -3080,7 +2307,7 @@ int main( int argc, char * const argv[] )
 				else if( ewfinput_determine_ewf_format(
 					  fixed_string_variable,
 					  &ewf_format,
-				          &error ) != 1 )
+					  &error ) != 1 )
 				{
 					libsystem_notify_print_error_backtrace(
 					 error );
@@ -3100,58 +2327,62 @@ int main( int argc, char * const argv[] )
 		{
 			/* Offset of data to acquire
 			 */
-			if( ( argument_set_offset == 0 )
-			 && ( ewfinput_get_size_variable(
-			       stdout,
-			       input_buffer,
-			       EWFACQUIRE_INPUT_BUFFER_SIZE,
-			       _LIBCSTRING_SYSTEM_STRING( "Start to acquire at offset" ),
-			       0,
-			       media_size,
-			       0,
-			       &acquiry_offset,
-			       &error ) == -1 ) )
+			if( argument_set_offset == 0 )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				if( ewfinput_get_size_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _LIBCSTRING_SYSTEM_STRING( "Start to acquire at offset" ),
+				     0,
+				     media_size,
+				     0,
+				     &acquiry_offset,
+				     &error ) == -1 )
+				{
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
 
-				acquiry_offset = 0;
+					acquiry_offset = 0;
 
-				fprintf(
-				 stdout,
-				 "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
-				 acquiry_offset );
+					fprintf(
+					 stdout,
+					 "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
+					 acquiry_offset );
+				}
 			}
 		}
 		if( resume_acquiry == 0 )
 		{
 			/* Size of data to acquire
 			 */
-			if( ( argument_set_size == 0 )
-			 && ( ewfinput_get_size_variable(
-			       stdout,
-			       input_buffer,
-			       EWFACQUIRE_INPUT_BUFFER_SIZE,
-			       _LIBCSTRING_SYSTEM_STRING( "The number of bytes to acquire" ),
-			       0,
-			       ( media_size - acquiry_offset ),
-			       ( media_size - acquiry_offset ),
-			       &acquiry_size,
-			       &error ) == -1 ) )
+			if( argument_set_size == 0 )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				if( ewfinput_get_size_variable(
+				     stdout,
+				     input_buffer,
+				     EWFACQUIRE_INPUT_BUFFER_SIZE,
+				     _LIBCSTRING_SYSTEM_STRING( "The number of bytes to acquire" ),
+				     0,
+				     ( media_size - acquiry_offset ),
+				     ( media_size - acquiry_offset ),
+				     &acquiry_size,
+				     &error ) == -1 )
+				{
+					libsystem_notify_print_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
 
-				acquiry_size = media_size - acquiry_offset;
+					acquiry_size = media_size - acquiry_offset;
 
-				fprintf(
-				 stdout,
-				 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
-				 acquiry_size );
+					fprintf(
+					 stdout,
+					 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
+					 acquiry_size );
+				}
 			}
 			/* Segment file size
 			 */
@@ -3228,77 +2459,49 @@ int main( int argc, char * const argv[] )
 				}
 				bytes_per_sector = (uint32_t) input_size_variable;
 			}
-			/* Chunk size (sectors per block)
-			 */
-			if( argument_set_sectors_per_chunk == 0 )
+			if( option_sectors_per_chunk == NULL )
 			{
-				if( ewfinput_get_fixed_string_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The number of sectors to read at once" ),
-				     ewfinput_sector_per_block_sizes,
-				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-				     &fixed_string_variable,
-				     &error ) == -1 )
+				result = imaging_handle_prompt_for_sectors_per_chunk(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "The number of sectors to read at once" ),
+					  &error );
+
+				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
-					 stdout,
-					 "Unable to determine sectors per chunk defaulting to: 64.\n" );
+					 stderr,
+					 "Unable to determine sectors per chunk.\n" );
 
-					sectors_per_chunk = 64;
+					goto ewfacquire_main_on_error;
 				}
-				else if( ewfinput_determine_sectors_per_chunk(
-					  fixed_string_variable,
-					  &sectors_per_chunk,
-				          &error ) != 1 )
+				else if( result == 0 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
-					 stdout,
+					 stderr,
 					 "Unsupported sectors per chunk defaulting to: 64.\n" );
-
-					sectors_per_chunk = 64;
 				}
 			}
-			/* Error granularity
-			 */
-			if( argument_set_sector_error_granularity == 0 )
+			if( option_sector_error_granularity == NULL )
 			{
-				if( ewfinput_get_size_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The number of sectors to be used as error granularity" ),
-				     1,
-				     (uint64_t) sectors_per_chunk,
-				     64,
-				     &input_size_variable,
-				     &error ) == -1 )
+				result = imaging_handle_prompt_for_sector_error_granularity(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "The number of sectors to be used as error granularity" ),
+					  &error );
+
+				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					input_size_variable = 64;
-
 					fprintf(
-					 stdout,
-					 "Unable to determine sector error granularity defaulting to: %" PRIu64 ".\n",
-					 input_size_variable );
+					 stderr,
+					 "Unable to determine sector error granularity.\n" );
+
+					goto ewfacquire_main_on_error;
 				}
-				sector_error_granularity = (uint32_t) input_size_variable;
+				else if( result == 0 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsupported sector error granularity defaulting to: 64.\n" );
+				}
 			}
 		}
 		/* The number of read error retries
@@ -3359,7 +2562,7 @@ int main( int argc, char * const argv[] )
 			else if( ewfinput_determine_yes_no(
 				  fixed_string_variable,
 				  &wipe_block_on_read_error,
-			          &error ) != 1 )
+				  &error ) != 1 )
 			{
 				libsystem_notify_print_error_backtrace(
 				 error );
@@ -3377,34 +2580,37 @@ int main( int argc, char * const argv[] )
 		 stdout,
 		 "\n" );
 
+		fprintf(
+		 stdout,
+		 "The following acquiry parameters were provided:\n" );
+
+		if( imaging_handle_print_parameters(
+		     ewfacquire_imaging_handle,
+		     media_type,
+		     media_flags,
+		     ewf_format,
+		     (off64_t) acquiry_offset,
+		     resume_acquiry_offset,
+		     (size64_t) acquiry_size,
+		     (size64_t) segment_file_size,
+		     bytes_per_sector,
+		     read_error_retries,
+		     wipe_block_on_read_error,
+		     resume_acquiry,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to print acquiry parameters.\n" );
+
+			error_abort = 1;
+		}
 		/* Check if user is content with the acquiry parameters
 		 */
 		acquiry_parameters_confirmed = ewfacquire_confirm_acquiry_parameters(
-		                                stdout,
-		                                input_buffer,
-		                                EWFACQUIRE_INPUT_BUFFER_SIZE,
-		                                resume_acquiry,
-		                                target_filename,
-		                                secondary_target_filename,
-		                                case_number,
-		                                description,
-		                                evidence_number,
-		                                examiner_name,
-		                                notes,
-		                                media_type,
-		                                media_flags,
-		                                compression_level,
-		                                compression_flags,
-		                                ewf_format,
-		                                (off64_t) acquiry_offset,
-		                                resume_acquiry_offset,
-		                                (size64_t) acquiry_size,
-		                                (size64_t) segment_file_size,
-		                                bytes_per_sector,
-		                                sectors_per_chunk,
-		                                sector_error_granularity,
-		                                read_error_retries,
-		                                wipe_block_on_read_error,
+						stdout,
+						input_buffer,
+						EWFACQUIRE_INPUT_BUFFER_SIZE,
 		                                &error );
 
 		if( acquiry_parameters_confirmed == -1 )
@@ -3421,13 +2627,19 @@ int main( int argc, char * const argv[] )
 		 */
 		else if( acquiry_parameters_confirmed == 0 )
 		{
-			argument_set_compression              = 0;
+			option_case_number                    = NULL;
+			option_description                    = NULL;
+			option_evidence_number                = NULL;
+			option_examiner_name                  = NULL;
+			option_notes                          = NULL;
+			option_compression_level              = NULL;
+			option_sectors_per_chunk              = NULL;
+			option_sector_error_granularity       = NULL;
+
 			argument_set_format                   = 0;
 			argument_set_media_type               = 0;
 			argument_set_offset                   = 0;
 			argument_set_read_error_retries       = 0;
-			argument_set_sector_error_granularity = 0;
-			argument_set_sectors_per_chunk        = 0;
 			argument_set_segment_file_size        = 0;
 			argument_set_size                     = 0;
 			argument_set_media_flags              = 0;
@@ -3493,24 +2705,6 @@ int main( int argc, char * const argv[] )
 	{
 		if( ewfacquire_abort == 0 )
 		{
-			if( platform_get_operating_system(
-			     acquiry_operating_system,
-			     32,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unable to determine operating system.\n" );
-
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				acquiry_operating_system[ 0 ] = 0;
-			}
-			acquiry_software_version = _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING );
-
 			if( device_handle_get_information_value(
 			     ewfacquire_device_handle,
 			     (uint8_t *) "model",
@@ -3555,7 +2749,7 @@ int main( int argc, char * const argv[] )
 		{
 			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
-			     target_filename,
+			     ewfacquire_imaging_handle->target_filename,
 			     resume_acquiry,
 			     &error ) != 1 )
 			{
@@ -3569,11 +2763,11 @@ int main( int argc, char * const argv[] )
 		if( ( ewfacquire_abort == 0 )
 		 && ( error_abort == 0 ) )
 		{
-			if( secondary_target_filename != NULL )
+			if( ewfacquire_imaging_handle->secondary_target_filename != NULL )
 			{
 				if( imaging_handle_open_secondary_output(
 				     ewfacquire_imaging_handle,
-				     secondary_target_filename,
+				     ewfacquire_imaging_handle->secondary_target_filename,
 				     resume_acquiry,
 				     &error ) != 1 )
 				{
@@ -3595,7 +2789,7 @@ int main( int argc, char * const argv[] )
 			if( device_handle_set_error_values(
 			     ewfacquire_device_handle,
 			     read_error_retries,
-			     sector_error_granularity * bytes_per_sector,
+			     ewfacquire_imaging_handle->sector_error_granularity * bytes_per_sector,
 			     wipe_block_on_read_error,
 			     &error ) != 1 )
 			{
@@ -3615,47 +2809,16 @@ int main( int argc, char * const argv[] )
 		{
 			if( imaging_handle_set_output_values(
 			     ewfacquire_imaging_handle,
-			     case_number,
-			     libcstring_system_string_length(
-			      case_number ),
-			     description,
-			     libcstring_system_string_length(
-			      description ),
-			     evidence_number,
-			     libcstring_system_string_length(
-			      evidence_number ),
-			     examiner_name,
-			     libcstring_system_string_length(
-			      examiner_name ),
-			     notes,
-			     libcstring_system_string_length(
-			      notes ),
-			     acquiry_operating_system,
-			     libcstring_system_string_length(
-			      acquiry_operating_system ),
 			     program,
-			     libcstring_system_string_length(
-			      program ),
-			     acquiry_software_version,
-			     libcstring_system_string_length(
-			      acquiry_software_version ),
+			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
 			     media_information_model,
-			     libcstring_system_string_length(
-			      media_information_model ),
 			     media_information_serial_number,
-			     libcstring_system_string_length(
-			      media_information_serial_number ),
-			     header_codepage,
 			     bytes_per_sector,
 			     acquiry_size,
 			     media_type,
 			     media_flags,
-			     compression_level,
-			     compression_flags,
 			     ewf_format,
 			     segment_file_size,
-			     sectors_per_chunk,
-			     sector_error_granularity,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -3694,25 +2857,6 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-	memory_free(
-	 notes );
-	memory_free(
-	 examiner_name );
-	memory_free(
-	 evidence_number );
-	memory_free(
-	 description );
-	memory_free(
-	 case_number );
-
-	if( secondary_target_filename != NULL )
-	{
-		memory_free(
-		 secondary_target_filename );
-	}
-	memory_free(
-	 target_filename );
-
 	if( error_abort != 0 )
 	{
 		libsystem_notify_print_error_backtrace(
@@ -3892,7 +3036,7 @@ int main( int argc, char * const argv[] )
 		              resume_acquiry_offset,
 		              bytes_per_sector,
 		              swap_byte_pairs,
-		              sector_error_granularity,
+		              ewfacquire_imaging_handle->sector_error_granularity,
 		              (size_t) process_buffer_size,
 		              calculated_md5_hash_string,
 		              DIGEST_HASH_STRING_SIZE_MD5,
@@ -4326,5 +3470,31 @@ int main( int argc, char * const argv[] )
 		}
 	}
 	return( EXIT_SUCCESS );
+
+ewfacquire_main_on_error:
+	libsystem_notify_print_error_backtrace(
+	 error );
+	liberror_error_free(
+	 &error );
+
+	if( ewfacquire_imaging_handle != NULL )
+	{
+		imaging_handle_close(
+		 ewfacquire_imaging_handle,
+		 NULL );
+		imaging_handle_free(
+		 &ewfacquire_imaging_handle,
+		 NULL );
+	}
+	if( ewfacquire_device_handle != NULL )
+	{
+		device_handle_close(
+		 ewfacquire_device_handle,
+		 NULL );
+		device_handle_free(
+		 &ewfacquire_device_handle,
+		 NULL );
+	}
+	return( EXIT_FAILURE );
 }
 

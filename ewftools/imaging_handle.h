@@ -28,6 +28,8 @@
 #include <libcstring.h>
 #include <liberror.h>
 
+#include <stdio.h>
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
@@ -51,27 +53,89 @@ typedef struct imaging_handle imaging_handle_t;
 
 struct imaging_handle
 {
-#ifdef REFACTOR
-	/* The case number header value
+	/* The user input buffer
+	 */
+	libcstring_system_character_t *input_buffer; 
+
+	/* The target filename
+	 */
+	libcstring_system_character_t *target_filename;
+
+	/* The target filename size
+	 */
+	size_t target_filename_size;
+
+	/* The secondary target filename
+	 */
+	libcstring_system_character_t *secondary_target_filename;
+
+	/* The secondary target filename size
+	 */
+	size_t secondary_target_filename_size;
+
+	/* The case number
 	 */
 	libcstring_system_character_t *case_number;
 
-	/* The description header value
+	/* The case number size
+	 */
+	size_t case_number_size;
+
+	/* The description
 	 */
 	libcstring_system_character_t *description;
 
-	/* The evidence number header value
+	/* The description size
+	 */
+	size_t description_size;
+
+	/* The evidence number
 	 */
 	libcstring_system_character_t *evidence_number;
 
-	/* The examiner name header value
+	/* The evidence number size
+	 */
+	size_t evidence_number_size;
+
+	/* The examiner name
 	 */
 	libcstring_system_character_t *examiner_name;
 
-	/* The notes header value
+	/* The examiner name size
+	 */
+	size_t examiner_name_size;
+
+	/* The notes
 	 */
 	libcstring_system_character_t *notes;
-#endif
+
+	/* The notes size
+	 */
+	size_t notes_size;
+
+	/* The number of bytes per sector
+	 */
+	uint32_t bytes_per_sector;
+
+	/* The number of sectors per chunk
+	 */
+	uint32_t sectors_per_chunk;
+
+	/* The error granularity number of sectors
+	 */
+	uint32_t sector_error_granularity;
+
+	/* The compression level
+	 */
+	int8_t compression_level;
+
+	/* The compression flags
+	 */
+	uint8_t compression_flags;
+
+	/* The header codepage
+	 */
+	int header_codepage;
 
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
@@ -97,9 +161,13 @@ struct imaging_handle
 	 */
 	libewf_handle_t *secondary_output_handle;
 
-	/* The number of bytes per sector
+	/* The nofication output stream
 	 */
-	uint32_t bytes_per_sector;
+	FILE *notify_stream;
+
+	/* Value to indicate if abort was signalled
+	 */
+	int abort;
 };
 
 int imaging_handle_initialize(
@@ -181,71 +249,87 @@ int imaging_handle_get_chunk_size(
      size32_t *chunk_size,
      liberror_error_t **error );
 
+int imaging_handle_prompt_for_string(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error );
+
+int imaging_handle_prompt_for_compression_level(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int imaging_handle_prompt_for_sectors_per_chunk(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int imaging_handle_prompt_for_sector_error_granularity(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     libcstring_system_character_t *case_number,
-     size_t case_number_size,
-     libcstring_system_character_t *description,
-     size_t description_size,
-     libcstring_system_character_t *evidence_number,
-     size_t evidence_number_size,
-     libcstring_system_character_t *examiner_name,
-     size_t examiner_name_size,
-     libcstring_system_character_t *notes,
-     size_t notes_size,
      uint32_t *bytes_per_sector,
      size64_t *media_size,
      uint8_t *media_type,
      uint8_t *media_flags,
-     int8_t *compression_level,
-     uint8_t *compression_flags,
      uint8_t *libewf_format,
      size64_t *maximum_segment_size,
-     uint32_t *sectors_per_chunk,
-     uint32_t *sector_error_granularity,
+     liberror_error_t **error );
+
+int imaging_handle_set_string(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error );
+
+int imaging_handle_set_compression_values(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_sectors_per_chunk(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_sector_error_granularity(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
      liberror_error_t **error );
 
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
-     libcstring_system_character_t *case_number,
-     size_t case_number_length,
-     libcstring_system_character_t *description,
-     size_t description_length,
-     libcstring_system_character_t *evidence_number,
-     size_t evidence_number_length,
-     libcstring_system_character_t *examiner_name,
-     size_t examiner_name_length,
-     libcstring_system_character_t *notes,
-     size_t notes_length,
-     libcstring_system_character_t *acquiry_operating_system,
-     size_t acquiry_operating_system_length,
      libcstring_system_character_t *acquiry_software,
-     size_t acquiry_software_length,
      libcstring_system_character_t *acquiry_software_version,
-     size_t acquiry_software_version_length,
      libcstring_system_character_t *model,
-     size_t model_length,
      libcstring_system_character_t *serial_number,
-     size_t serial_number_length,
-     int header_codepage,
      uint32_t bytes_per_sector,
      size64_t media_size,
      uint8_t media_type,
      uint8_t media_flags,
-     int8_t compression_level,
-     uint8_t compression_flags,
      uint8_t libewf_format,
      size64_t maximum_segment_size,
-     uint32_t sectors_per_chunk,
-     uint32_t sector_error_granularity,
+     liberror_error_t **error );
+
+int imaging_handle_get_header_value(
+     imaging_handle_t *imaging_handle,
+     const uint8_t *identifier,
+     size_t identifier_size,
+     libcstring_system_character_t **header_value,
+     size_t *header_value_size,
      liberror_error_t **error );
 
 int imaging_handle_set_header_value(
      imaging_handle_t *imaging_handle,
-     char *header_value_identifier,
-     size_t header_value_identifier_length,
-     libcstring_system_character_t *header_value,
-     size_t header_value_length,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const libcstring_system_character_t *header_value,
      liberror_error_t **error );
 
 int imaging_handle_set_hash_value(
@@ -275,6 +359,21 @@ ssize_t imaging_handle_finalize(
          libcstring_system_character_t *calculated_sha1_hash_string,
          size_t calculated_sha1_hash_string_size,
          liberror_error_t **error );
+
+int imaging_handle_print_parameters(
+     imaging_handle_t *imaging_handle,
+     uint8_t media_type,
+     uint8_t media_flags,
+     uint8_t ewf_format,
+     off64_t acquiry_offset,
+     off64_t resume_acquiry_offset,
+     size64_t acquiry_size,
+     size64_t segment_file_size,
+     uint32_t bytes_per_sector,
+     uint8_t read_error_retries,
+     uint8_t wipe_block_on_read_error,
+     uint8_t resume_acquiry,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

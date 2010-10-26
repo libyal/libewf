@@ -89,24 +89,24 @@ libcstring_system_character_t *ewfinput_yes_no[ 2 ] = \
 {  _LIBCSTRING_SYSTEM_STRING( "yes" ),
    _LIBCSTRING_SYSTEM_STRING( "no" ) };
 
-/* Determines the EWF format from an argument string
+/* Determines the EWF format from a string
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_ewf_format(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *ewf_format,
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_ewf_format";
 	int result            = -1;
 
-	if( argument == NULL )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid argument string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -123,7 +123,7 @@ int ewfinput_determine_ewf_format(
 		return( -1 );
 	}
 	if( libcstring_system_string_compare(
-	     argument,
+	     string,
 	     _LIBCSTRING_SYSTEM_STRING( "smart" ),
 	     5 ) == 0 )
 	{
@@ -131,7 +131,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "ftk" ),
 	          3 ) == 0 )
 	{
@@ -139,7 +139,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "encase1" ),
 	          7 ) == 0 )
 	{
@@ -147,7 +147,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "encase2" ),
 	          7 ) == 0 )
 	{
@@ -155,7 +155,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "encase3" ),
 	          7 ) == 0 )
 	{
@@ -163,7 +163,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "encase4" ),
 	          7 ) == 0 )
 	{
@@ -171,7 +171,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "encase5" ),
 	          7 ) == 0 )
 	{
@@ -179,7 +179,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "encase6" ),
 	          7 ) == 0 )
 	{
@@ -187,7 +187,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "linen5" ),
 	          6 ) == 0 )
 	{
@@ -195,7 +195,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "linen6" ),
 	          6 ) == 0 )
 	{
@@ -205,7 +205,7 @@ int ewfinput_determine_ewf_format(
 	/* This check must before the check for "ewf"
 	 */
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "ewfx" ),
 	          4 ) == 0 )
 	{
@@ -213,7 +213,7 @@ int ewfinput_determine_ewf_format(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "ewf" ),
 	          3 ) == 0 )
 	{
@@ -223,24 +223,25 @@ int ewfinput_determine_ewf_format(
 	return( result );
 }
 
-/* Determines the sectors per chunk value from an argument string
- * Returns 1 if successful or -1 on error
+/* Determines the sectors per chunk value from a string
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int ewfinput_determine_sectors_per_chunk(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint32_t *sectors_per_chunk,
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk";
+	size_t string_length  = 0;
 	int result            = -1;
 
-	if( argument == NULL )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid argument string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -256,108 +257,124 @@ int ewfinput_determine_sectors_per_chunk(
 
 		return( -1 );
 	}
-	if( libcstring_system_string_compare(
-	     argument,
-	     _LIBCSTRING_SYSTEM_STRING( "32768" ),
-	     5 ) == 0 )
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 2 )
 	{
-		*sectors_per_chunk = 32768;
-		result             = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "64" ),
+		     2 ) == 0 )
+		{
+			*sectors_per_chunk = 64;
+			result             = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "16384" ),
-	          5 ) == 0 )
+	else if( string_length == 3 )
 	{
-		*sectors_per_chunk = 16384;
-		result             = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "128" ),
+		     3 ) == 0 )
+		{
+			*sectors_per_chunk = 128;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "256" ),
+			  3 ) == 0 )
+		{
+			*sectors_per_chunk = 256;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "512" ),
+			  3 ) == 0 )
+		{
+			*sectors_per_chunk = 512;
+			result             = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "8192" ),
-	          4 ) == 0 )
+	else if( string_length == 4 )
 	{
-		*sectors_per_chunk = 8192;
-		result             = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "1024" ),
+		     4 ) == 0 )
+		{
+			*sectors_per_chunk = 1024;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "2048" ),
+			  4 ) == 0 )
+		{
+			*sectors_per_chunk = 2048;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "4096" ),
+			  4 ) == 0 )
+		{
+			*sectors_per_chunk = 4096;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "8192" ),
+			  4 ) == 0 )
+		{
+			*sectors_per_chunk = 8192;
+			result             = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "4096" ),
-	          4 ) == 0 )
+	else if( string_length == 5 )
 	{
-		*sectors_per_chunk = 4096;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "2048" ),
-	          4 ) == 0 )
-	{
-		*sectors_per_chunk = 2048;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "1024" ),
-	          4 ) == 0 )
-	{
-		*sectors_per_chunk = 1024;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "512" ),
-	          3 ) == 0 )
-	{
-		*sectors_per_chunk = 512;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "256" ),
-	          3 ) == 0 )
-	{
-		*sectors_per_chunk = 256;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "128" ),
-	          3 ) == 0 )
-	{
-		*sectors_per_chunk = 128;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "64" ),
-	          2 ) == 0 )
-	{
-		*sectors_per_chunk = 64;
-		result             = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "16384" ),
+		     5 ) == 0 )
+		{
+			*sectors_per_chunk = 16384;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+		          string,
+		          _LIBCSTRING_SYSTEM_STRING( "32768" ),
+		          5 ) == 0 )
+		{
+			*sectors_per_chunk = 32768;
+			result             = 1;
+		}
 	}
 	return( result );
 }
 
-/* Determines the compression level value from an argument string
- * Returns 1 if successful or -1 on error
+/* Determines the compression values from a string
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
-int ewfinput_determine_compression_level(
-     const libcstring_system_character_t *argument,
+int ewfinput_determine_compression_values(
+     const libcstring_system_character_t *string,
      int8_t *compression_level,
      uint8_t *compression_flags,
      liberror_error_t **error )
 {
-	static char *function = "ewfinput_determine_compression_level";
-	int result            = 1;
+	static char *function = "ewfinput_determine_compression_values";
+	size_t string_length  = 0;
+	int result            = 0;
 
-	if( argument == NULL )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid argument string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -384,72 +401,81 @@ int ewfinput_determine_compression_level(
 
 		return( -1 );
 	}
-	if( libcstring_system_string_compare(
-	     argument,
-	     _LIBCSTRING_SYSTEM_STRING( "none" ),
-	     4 ) == 0 )
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 4 )
 	{
-		*compression_level = LIBEWF_COMPRESSION_NONE;
-		*compression_flags = 0;
-		result             = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "none" ),
+		     4 ) == 0 )
+		{
+			*compression_level = LIBEWF_COMPRESSION_NONE;
+			*compression_flags = 0;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "fast" ),
+			  4 ) == 0 )
+		{
+			*compression_level = LIBEWF_COMPRESSION_FAST;
+			*compression_flags = 0;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "best" ),
+			  4 ) == 0 )
+		{
+			*compression_level = LIBEWF_COMPRESSION_BEST;
+			*compression_flags = 0;
+			result             = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "empty-block" ),
-	          11 ) == 0 )
+	else if( string_length == 11 )
 	{
-		*compression_level = LIBEWF_COMPRESSION_NONE;
-		*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "empty_block" ),
-	          11 ) == 0 )
-	{
-		*compression_level = LIBEWF_COMPRESSION_NONE;
-		*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "fast" ),
-	          4 ) == 0 )
-	{
-		*compression_level = LIBEWF_COMPRESSION_FAST;
-		*compression_flags = 0;
-		result             = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "best" ),
-	          4 ) == 0 )
-	{
-		*compression_level = LIBEWF_COMPRESSION_BEST;
-		*compression_flags = 0;
-		result             = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "empty-block" ),
+		     11 ) == 0 )
+		{
+			*compression_level = LIBEWF_COMPRESSION_NONE;
+			*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "empty_block" ),
+			  11 ) == 0 )
+		{
+			*compression_level = LIBEWF_COMPRESSION_NONE;
+			*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+			result             = 1;
+		}
 	}
 	return( result );
 }
 
-/* Determines the media type value from an argument string
+/* Determines the media type value from a string
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_media_type(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *media_type,
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_media_type";
 	int result            = -1;
 
-	if( argument == NULL )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid argument string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -466,7 +492,7 @@ int ewfinput_determine_media_type(
 		return( -1 );
 	}
 	if( libcstring_system_string_compare(
-	     argument,
+	     string,
 	     _LIBCSTRING_SYSTEM_STRING( "fixed" ),
 	          5 ) == 0 )
 	{
@@ -474,7 +500,7 @@ int ewfinput_determine_media_type(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "removable" ),
 	          9 ) == 0 )
 	{
@@ -482,7 +508,7 @@ int ewfinput_determine_media_type(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "optical" ),
 	          7 ) == 0 )
 	{
@@ -490,7 +516,7 @@ int ewfinput_determine_media_type(
 		result      = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "memory" ),
 	          6 ) == 0 )
 	{
@@ -500,24 +526,24 @@ int ewfinput_determine_media_type(
 	return( result );
 }
 
-/* Determines the media flags value from an argument string
+/* Determines the media flags value from a string
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_media_flags(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *media_flags,
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_media_flags";
 	int result            = -1;
 
-	if( argument == NULL )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid argument string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -534,7 +560,7 @@ int ewfinput_determine_media_flags(
 		return( -1 );
 	}
 	if( libcstring_system_string_compare(
-	     argument,
+	     string,
 	     _LIBCSTRING_SYSTEM_STRING( "logical" ),
 	     7 ) == 0 )
 	{
@@ -542,7 +568,7 @@ int ewfinput_determine_media_flags(
 		result        = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "physical" ),
 	          8 ) == 0 )
 	{
@@ -550,7 +576,7 @@ int ewfinput_determine_media_flags(
 		result        = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "fastbloc" ),
 	          8 ) == 0 )
 	{
@@ -558,7 +584,7 @@ int ewfinput_determine_media_flags(
 		result        = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "tableau" ),
 	          8 ) == 0 )
 	{
@@ -568,24 +594,25 @@ int ewfinput_determine_media_flags(
 	return( result );
 }
 
-/* Determines the codepage from an argument string
- * Returns 1 if successful or -1 on error
+/* Determines the codepage from a string
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int ewfinput_determine_header_codepage(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      int *header_codepage,
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_header_codepage";
+	size_t string_length  = 0;
 	int result            = -1;
 
-	if( argument == NULL )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid argument string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -601,275 +628,301 @@ int ewfinput_determine_header_codepage(
 
 		return( -1 );
 	}
-	if( libcstring_system_string_compare(
-	     argument,
-	     _LIBCSTRING_SYSTEM_STRING( "ascii" ),
-	     5 ) == 0 )
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 5 )
 	{
-		*header_codepage = LIBEWF_CODEPAGE_ASCII;
-		result           = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "ascii" ),
+		     5 ) == 0 )
+		{
+			*header_codepage = LIBEWF_CODEPAGE_ASCII;
+			result           = 1;
+		}
 	}
 #if defined( HAVE_ISO_CODEPAGES )
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "iso" ),
-	          3 ) == 0 )
+	if( ( string_length == 10 )
+	 || ( string_length == 11 ) )
 	{
-		if( ( argument[ 3 ] != '-' )
-		 && ( argument[ 3 ] != '_' ) )
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "iso" ),
+		     3 ) == 0 )
 		{
-		}
-		else if( libcstring_system_string_compare(
-		          &( argument[ 4 ] ),
-		          _LIBCSTRING_SYSTEM_STRING( "8859" ),
-		          4 ) == 0 )
-		{
-			if( ( argument[ 8 ] != '-' )
-			 && ( argument[ 8 ] != '_' ) )
+			if( ( string[ 3 ] != '-' )
+			 && ( string[ 3 ] != '_' ) )
 			{
 			}
 			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "10" ),
-				  2 ) == 0 )
+				  &( string[ 4 ] ),
+				  _LIBCSTRING_SYSTEM_STRING( "8859" ),
+				  4 ) == 0 )
 			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_10;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "11" ),
-				  2 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_11;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "13" ),
-				  2 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_13;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "14" ),
-				  2 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_14;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "15" ),
-				  2 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_15;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "16" ),
-				  2 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_16;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "1" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_1;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "2" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_2;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "3" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_3;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "4" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_4;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "5" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_5;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "6" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_6;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "7" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_7;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "8" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_8;
-				result           = 1;
-			}
-			else if( libcstring_system_string_compare(
-				  &( argument[ 9 ] ),
-				  _LIBCSTRING_SYSTEM_STRING( "9" ),
-				  1 ) == 0 )
-			{
-				*header_codepage = LIBEWF_CODEPAGE_ISO_8859_9;
-				result           = 1;
+				if( ( string[ 8 ] != '-' )
+				 && ( string[ 8 ] != '_' ) )
+				{
+				}
+				else if( string_length == 10 )
+				{
+					if( libcstring_system_string_compare(
+					     &( string[ 9 ] ),
+					     _LIBCSTRING_SYSTEM_STRING( "1" ),
+					     1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_1;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "2" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_2;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "3" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_3;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "4" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_4;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "5" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_5;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "6" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_6;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "7" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_7;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "8" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_8;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "9" ),
+						  1 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_9;
+						result           = 1;
+					}
+				}
+				else if( string_length == 11 )
+				{
+					if( libcstring_system_string_compare(
+					     &( string[ 9 ] ),
+					     _LIBCSTRING_SYSTEM_STRING( "10" ),
+					     2 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_10;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "11" ),
+						  2 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_11;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "13" ),
+						  2 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_13;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "14" ),
+						  2 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_14;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "15" ),
+						  2 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_15;
+						result           = 1;
+					}
+					else if( libcstring_system_string_compare(
+						  &( string[ 9 ] ),
+						  _LIBCSTRING_SYSTEM_STRING( "16" ),
+						  2 ) == 0 )
+					{
+						*header_codepage = LIBEWF_CODEPAGE_ISO_8859_16;
+						result           = 1;
+					}
+				}
 			}
 		}
 	}
 #endif
-	else if( libcstring_system_string_compare(
-	          argument,
-	          _LIBCSTRING_SYSTEM_STRING( "windows" ),
-	          7 ) == 0 )
+	if( ( string_length == 11 )
+	 || ( string_length == 12 ) )
 	{
-		if( ( argument[ 7 ] != '-' )
-		 && ( argument[ 7 ] != '_' ) )
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "windows" ),
+		     7 ) == 0 )
 		{
-		}
-		else if( libcstring_system_string_compare(
-		          &( argument[ 8 ] ),
-		          _LIBCSTRING_SYSTEM_STRING( "874" ),
-		          3 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_874;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-		          &( argument[ 8 ] ),
-		          _LIBCSTRING_SYSTEM_STRING( "1250" ),
-		          4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1250;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1251" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1251;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1252" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1252;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1253" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1253;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1253" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1253;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1254" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1254;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1255" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1255;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1256" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1256;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1257" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1257;
-			result           = 1;
-		}
-		else if( libcstring_system_string_compare(
-			  &( argument[ 8 ] ),
-			  _LIBCSTRING_SYSTEM_STRING( "1258" ),
-			  4 ) == 0 )
-		{
-			*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1258;
-			result           = 1;
+			if( ( string[ 7 ] != '-' )
+			 && ( string[ 7 ] != '_' ) )
+			{
+			}
+			else if( string_length == 11 )
+			{
+				if( libcstring_system_string_compare(
+				     &( string[ 8 ] ),
+				     _LIBCSTRING_SYSTEM_STRING( "874" ),
+				     3 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_874;
+					result           = 1;
+				}
+			}
+			else if( string_length == 12 )
+			{
+				if( libcstring_system_string_compare(
+				     &( string[ 8 ] ),
+				     _LIBCSTRING_SYSTEM_STRING( "1250" ),
+				     4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1250;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1251" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1251;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1252" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1252;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1253" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1253;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1253" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1253;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1254" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1254;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1255" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1255;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1256" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1256;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1257" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1257;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+					  &( string[ 8 ] ),
+					  _LIBCSTRING_SYSTEM_STRING( "1258" ),
+					  4 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1258;
+					result           = 1;
+				}
+			}
 		}
 	}
 	return( result );
 }
 
-/* Determines the yes or no value from an argument string
+/* Determines the yes or no value from a string
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_yes_no(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *yes_no_value,
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_yes_no";
 	int result            = -1;
 
-	if( argument == NULL )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid argument string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -886,7 +939,7 @@ int ewfinput_determine_yes_no(
 		return( -1 );
 	}
 	if( libcstring_system_string_compare(
-	     argument,
+	     string,
 	     _LIBCSTRING_SYSTEM_STRING( "yes" ),
 	     3 ) == 0 )
 	{
@@ -894,7 +947,7 @@ int ewfinput_determine_yes_no(
 		result        = 1;
 	}
 	else if( libcstring_system_string_compare(
-	          argument,
+	          string,
 	          _LIBCSTRING_SYSTEM_STRING( "no" ),
 	          2 ) == 0 )
 	{
@@ -904,20 +957,20 @@ int ewfinput_determine_yes_no(
 	return( result );
 }
 
-/* Get a string variable
+/* Retrieves a string variable
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
 int ewfinput_get_string_variable(
      FILE *stream,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      libcstring_system_character_t *string_variable,
      size_t string_variable_size,
      liberror_error_t **error )
 {
 	libcstring_system_character_t *end_of_input  = NULL;
 	libcstring_system_character_t *result_string = NULL;
-	static char *function                = "ewfinput_get_variabl_string";
-	ssize_t input_length                 = 0;
+	static char *function                        = "ewfinput_get_string_variable";
+	ssize_t input_length                         = 0;
 
 	if( stream == NULL )
 	{
@@ -1033,14 +1086,14 @@ int ewfinput_get_string_variable(
 	return( 1 );
 }
 
-/* Get a size variable
+/* Retrieves a size variable
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
 int ewfinput_get_size_variable(
      FILE *stream,
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
@@ -1198,14 +1251,14 @@ int ewfinput_get_size_variable(
 	return( 1 );
 }
 
-/* Get a byte size variable
+/* Retrieves a byte size variable
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
 int ewfinput_get_byte_size_variable(
      FILE *stream,
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
@@ -1415,14 +1468,14 @@ int ewfinput_get_byte_size_variable(
 	return( 1 );
 }
 
-/* Get a fixed value string variable
+/* Retrieves a fixed value string variable
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
 int ewfinput_get_fixed_string_variable(
      FILE *stream,
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
-     libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *request_string,
      libcstring_system_character_t **values,
      uint8_t number_of_values,
      uint8_t default_value,
@@ -1432,10 +1485,10 @@ int ewfinput_get_fixed_string_variable(
 
 	libcstring_system_character_t *end_of_input  = NULL;
 	libcstring_system_character_t *result_string = NULL;
-	static char *function                = "ewfinput_get_fixed_value";
-	size_t value_length                  = 0;
-	ssize_t input_length                 = 0;
-	uint8_t value_iterator               = 0;
+	static char *function                        = "ewfinput_get_fixed_value";
+	size_t value_length                          = 0;
+	ssize_t input_length                         = 0;
+	uint8_t value_iterator                       = 0;
 
 	if( stream == NULL )
 	{
