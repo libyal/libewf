@@ -117,6 +117,18 @@ struct imaging_handle
 	 */
 	uint32_t bytes_per_sector;
 
+	/* The compression level
+	 */
+	int8_t compression_level;
+
+	/* The compression flags
+	 */
+	uint8_t compression_flags;
+
+	/* The EWF format
+	 */
+	uint8_t ewf_format;
+
 	/* The number of sectors per chunk
 	 */
 	uint32_t sectors_per_chunk;
@@ -125,13 +137,9 @@ struct imaging_handle
 	 */
 	uint32_t sector_error_granularity;
 
-	/* The compression level
+	/* The maximum segment size
 	 */
-	int8_t compression_level;
-
-	/* The compression flags
-	 */
-	uint8_t compression_flags;
+	size64_t maximum_segment_size;
 
 	/* The header codepage
 	 */
@@ -261,6 +269,11 @@ int imaging_handle_prompt_for_compression_level(
      const libcstring_system_character_t *request_string,
      liberror_error_t **error );
 
+int imaging_handle_prompt_for_format(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
 int imaging_handle_prompt_for_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
@@ -271,14 +284,17 @@ int imaging_handle_prompt_for_sector_error_granularity(
      const libcstring_system_character_t *request_string,
      liberror_error_t **error );
 
+int imaging_handle_prompt_for_maximum_segment_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
      uint32_t *bytes_per_sector,
      size64_t *media_size,
      uint8_t *media_type,
      uint8_t *media_flags,
-     uint8_t *libewf_format,
-     size64_t *maximum_segment_size,
      liberror_error_t **error );
 
 int imaging_handle_set_string(
@@ -293,12 +309,27 @@ int imaging_handle_set_compression_values(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
+int imaging_handle_set_format(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
 int imaging_handle_set_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
 int imaging_handle_set_sector_error_granularity(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_maximum_segment_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_header_codepage(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );
@@ -313,8 +344,6 @@ int imaging_handle_set_output_values(
      size64_t media_size,
      uint8_t media_type,
      uint8_t media_flags,
-     uint8_t libewf_format,
-     size64_t maximum_segment_size,
      liberror_error_t **error );
 
 int imaging_handle_get_header_value(
@@ -364,11 +393,9 @@ int imaging_handle_print_parameters(
      imaging_handle_t *imaging_handle,
      uint8_t media_type,
      uint8_t media_flags,
-     uint8_t ewf_format,
      off64_t acquiry_offset,
      off64_t resume_acquiry_offset,
      size64_t acquiry_size,
-     size64_t segment_file_size,
      uint32_t bytes_per_sector,
      uint8_t read_error_retries,
      uint8_t wipe_block_on_read_error,

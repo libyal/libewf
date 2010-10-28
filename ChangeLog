@@ -223,6 +223,13 @@ Deprecated functions
   #pragma deprecated( function )
   __declspec(deprecated)
 
+20101028
+* worked on ewfacquire, ewfacquirestream and imaging_handle code clean up
+* worked on ewfexport and export_handle code clean up
+
+20101027
+* added fix for liberror WINAPI %s to %S conversion issue
+
 20101026
 * updated configure.ac
 * updated include/types.h

@@ -59,8 +59,9 @@ ${MAXIMUM_SEGMENT_SIZE}
 ${CHUNK_SIZE}
 
 
-
-
+2
+no
+yes
 EOI
 
 	RESULT=$?;

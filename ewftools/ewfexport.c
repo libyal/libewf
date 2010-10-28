@@ -141,7 +141,7 @@ void usage_fprint(
 	fprintf( stream, "\t-l:        logs export errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-o:        specify the offset to start the export (default is 0)\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
-	fprintf( stream, "\t-q:        quiet shows no status information\n" );
+	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
 	fprintf( stream, "\t-s:        swap byte pairs of the media data (from AB to BA)\n"
 	                 "\t           (use this for big to little endian conversion and vice\n"
 	                 "\t           versa)\n" );
@@ -696,21 +696,23 @@ void ewfexport_signal_handler(
 
 	ewfexport_abort = 1;
 
-	if( ( ewfexport_export_handle != NULL )
-	 && ( export_handle_signal_abort(
-	       ewfexport_export_handle,
-	       &error ) != 1 ) )
+	if( ewfexport_export_handle != NULL )
 	{
-		libsystem_notify_printf(
-		 "%s: unable to signal export handle to abort.\n",
-		 function );
+		if( export_handle_signal_abort(
+		     ewfexport_export_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal export handle to abort.\n",
+			 function );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 
-		return;
+			return;
+		}
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
@@ -734,59 +736,57 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 	libcstring_system_character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
-	libcstring_system_character_t * const *argv_filenames   = NULL;
+	libcstring_system_character_t * const *argv_filenames      = NULL;
 
-	export_handle_t *export_handle                          = NULL;
-
-	liberror_error_t *error                                 = NULL;
+	liberror_error_t *error                                    = NULL;
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                                  = NULL;
+	libsystem_glob_t *glob                                     = NULL;
 #endif
 
-	libcstring_system_character_t *acquiry_software_version = NULL;
-	libcstring_system_character_t *fixed_string_variable    = NULL;
-	libcstring_system_character_t *log_filename             = NULL;
-	libcstring_system_character_t *option_target_filename   = NULL;
-	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfexport" );
-	libcstring_system_character_t *target_filename          = NULL;
+	libcstring_system_character_t *acquiry_software_version    = NULL;
+	libcstring_system_character_t *fixed_string_variable       = NULL;
+	libcstring_system_character_t *log_filename                = NULL;
+	libcstring_system_character_t *option_compression_level    = NULL;
+	libcstring_system_character_t *option_format               = NULL;
+	libcstring_system_character_t *option_header_codepage      = NULL;
+	libcstring_system_character_t *option_maximum_segment_size = NULL;
+	libcstring_system_character_t *option_sectors_per_chunk    = NULL;
+	libcstring_system_character_t *option_target_filename      = NULL;
+	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfexport" );
+	libcstring_system_character_t *request_string              = NULL;
 
-	log_handle_t *log_handle                                = NULL;
+	log_handle_t *log_handle                                   = NULL;
 
-	process_status_t *process_status                        = NULL;
+	process_status_t *process_status                           = NULL;
 
-	libcstring_system_integer_t option                      = 0;
-	size64_t media_size                                     = 0;
-	ssize64_t export_count                                  = 0;
-	size_t string_length                                    = 0;
-	uint64_t export_offset                                  = 0;
-	uint64_t export_size                                    = 0;
-	uint64_t maximum_segment_file_size                      = 0;
-	uint64_t process_buffer_size                            = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint64_t segment_file_size                              = 0;
-	uint32_t sectors_per_chunk                              = 64;
-	uint8_t calculate_md5                                   = 1;
-	uint8_t calculate_sha1                                  = 0;
-	uint8_t compression_flags                               = 0;
-	uint8_t ewf_format                                      = LIBEWF_FORMAT_ENCASE6;
-	uint8_t print_status_information                        = 1;
-	uint8_t swap_byte_pairs                                 = 0;
-	uint8_t wipe_chunk_on_error                             = 0;
-	uint8_t verbose                                         = 0;
-	int8_t compression_level                                = LIBEWF_COMPRESSION_NONE;
-	int number_of_filenames                                 = 0;
-	int argument_set_compression                            = 0;
-	int argument_set_format                                 = 0;
-	int argument_set_offset                                 = 0;
-	int argument_set_sectors_per_chunk                      = 0;
-	int argument_set_segment_file_size                      = 0;
-	int argument_set_size                                   = 0;
-	int error_abort                                         = 0;
-	int header_codepage                                     = LIBEWF_CODEPAGE_ASCII;
-	int interactive_mode                                    = 1;
-	int result                                              = 1;
-	int status                                              = 0;
-	uint8_t export_handle_output_format                     = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+	libcstring_system_integer_t option                         = 0;
+	size64_t media_size                                        = 0;
+	ssize64_t export_count                                     = 0;
+	size_t string_length                                       = 0;
+	uint64_t export_offset                                     = 0;
+	uint64_t export_size                                       = 0;
+	uint64_t process_buffer_size                               = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	uint8_t calculate_md5                                      = 1;
+	uint8_t calculate_sha1                                     = 0;
+	uint8_t print_status_information                           = 1;
+	uint8_t swap_byte_pairs                                    = 0;
+	uint8_t wipe_chunk_on_error                                = 0;
+	uint8_t verbose                                            = 0;
+	int number_of_filenames                                    = 0;
+	int argument_set_offset                                    = 0;
+	int argument_set_size                                      = 0;
+	int interactive_mode                                       = 1;
+	int result                                                 = 1;
+	int status                                                 = 0;
+	uint8_t export_handle_output_format                        = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+
+	uint8_t ewf_format                                         = LIBEWF_FORMAT_ENCASE6;
+	int argument_set_format                                    = 0;
+
+	uint64_t maximum_segment_file_size                         = 0;
+	uint64_t segment_file_size                                 = 0;
+	int argument_set_segment_file_size                         = 0;
 
 	libcstring_system_character_t *ewfexport_format_types[ 14 ] = \
 	 { _LIBCSTRING_SYSTEM_STRING( "raw" ),
@@ -873,45 +873,13 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (libcstring_system_integer_t) 'A':
-				if( ewfinput_determine_header_codepage(
-				     optarg,
-				     &header_codepage,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_header_codepage = optarg;
 
-					fprintf(
-					 stderr,
-					 "Unsuported header codepage defaulting to: ascii.\n" );
-
-					header_codepage = LIBEWF_CODEPAGE_ASCII;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'b':
-				if( ewfinput_determine_sectors_per_chunk(
-				     optarg,
-				     &sectors_per_chunk,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_sectors_per_chunk = optarg;
 
-					fprintf(
-					 stderr,
-					 "Unsupported number of sectors per chunk defaulting to: 64.\n" );
-
-					sectors_per_chunk = 64;
-				}
-				else
-				{
-					argument_set_sectors_per_chunk = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'B':
@@ -935,28 +903,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'c':
-				if( ewfinput_determine_compression_values(
-				     optarg,
-				     &compression_level,
-				     &compression_flags,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_compression_level = optarg;
 
-					fprintf(
-					 stderr,
-					 "Unsupported compression level defaulting to: none.\n" );
-
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
-				}
-				else
-				{
-					argument_set_compression = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'd':
@@ -976,6 +924,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'f':
+/* TODO refactor */
 				if( libcstring_system_string_compare(
 				     optarg,
 				     _LIBCSTRING_SYSTEM_STRING( "raw" ),
@@ -1081,38 +1030,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'S':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_maximum_segment_size = optarg;
 
-				result = byte_size_string_convert(
-				          optarg,
-				          string_length,
-				          &segment_file_size,
-				          &error );
-
-				if( result != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-				}
-				argument_set_segment_file_size = 1;
-
-				if( ( result != 1 )
-				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-				 || ( ( ewf_format == LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-				 || ( ( ewf_format != LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
-				{
-					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-					fprintf(
-					 stderr,
-					 "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
-					 segment_file_size );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 't':
@@ -1219,7 +1138,7 @@ int main( int argc, char * const argv[] )
 #endif
 
 	if( export_handle_initialize(
-	     &export_handle,
+	     &ewfexport_export_handle,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -1239,38 +1158,23 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( export_handle_set_header_codepage(
-	     export_handle,
-	     header_codepage,
-	     &error ) != 1 )
+	result = export_handle_open_input(
+	          ewfexport_export_handle,
+	          argv_filenames,
+	          number_of_filenames,
+	          &error );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to set header codepage in export handle.\n" );
+		 "Unable to open EWF file(s).\n" );
 
 		libsystem_notify_print_error_backtrace(
 		 error );
 		liberror_error_free(
 		 &error );
-
-		export_handle_free(
-		 &export_handle,
-		 NULL );
-
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
-#endif
-
-		return( EXIT_FAILURE );
 	}
-	result = export_handle_open_input(
-	          export_handle,
-	          argv_filenames,
-	          number_of_filenames,
-	          &error );
-
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 	if( libsystem_glob_free(
 	     &glob,
@@ -1285,136 +1189,170 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 
-		return( EXIT_FAILURE );
+		result = -1;
 	}
 #endif
-
-	if( ( ewfexport_abort == 0 )
-	 && ( result != 1 ) )
+	if( ewfexport_abort != 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to open EWF file(s).\n" );
+		status = PROCESS_STATUS_ABORTED;
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
+		goto ewfexport_main_on_abort;
+	}
+	if( result != 1 )
+	{
 		export_handle_free(
-		 &export_handle,
+		 &ewfexport_export_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
 	}
-	if( ( ewfexport_abort == 0 )
-	 && ( export_handle_get_input_media_size(
-	       export_handle,
-	       &media_size,
-	       &error ) != 1 ) )
+	if( export_handle_get_input_media_size(
+	     ewfexport_export_handle,
+	     &media_size,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to determine input media size.\n" );
+		 "Unable to retrieve input media size.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		export_handle_close(
-		 export_handle,
-		 NULL );
-		export_handle_free(
-		 &export_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto ewfexport_main_on_error;
 	}
 	if( ( export_size == 0 )
 	 || ( export_size > ( media_size - export_offset ) ) )
 	{
 		export_size = media_size - export_offset;
 	}
-	/* Create the input buffers
-	 */
-	if( option_target_filename != NULL )
+	if( option_header_codepage != NULL )
 	{
-		string_length = libcstring_system_string_length(
-				 option_target_filename );
+		result = export_handle_set_header_codepage(
+			  ewfexport_export_handle,
+		          option_header_codepage,
+			  &error );
 
-		if( string_length > 0 )
-		{
-			target_filename = (libcstring_system_character_t *) memory_allocate(
-			                                                     sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
-
-			if( target_filename == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create target filename.\n" );
-
-				error_abort = 1;
-			}
-			else if( libcstring_system_string_copy(
-				  target_filename,
-				  option_target_filename,
-				  string_length ) == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to set target filename.\n" );
-
-				error_abort = 1;
-			}
-			target_filename[ string_length ] = 0;
-		}
-	}
-	else
-	{
-		target_filename = (libcstring_system_character_t *) memory_allocate(
-		                                                     sizeof( libcstring_system_character_t ) * 1024 );
-
-		if( target_filename == NULL )
+		if( result == -1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to create target filename string.\n" );
+			 "Unable to set header codepage.\n" );
 
-			error_abort = 1;
+			goto ewfexport_main_on_error;
 		}
-		/* Make sure to set the target filename if in unattended mode
-		 */
-		else if( interactive_mode == 0 )
+		else if( result == 0 )
 		{
-			if( libcstring_system_string_copy(
-			     target_filename,
-			     _LIBCSTRING_SYSTEM_STRING( "export" ),
-			     7 ) == NULL )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to set target filename string.\n" );
-
-				error_abort = 1;
-			}
-			target_filename[ 7 ] = 0;
+			fprintf(
+			 stderr,
+			 "Unsuported header codepage defaulting to: ascii.\n" );
 		}
 	}
-	if( error_abort != 0 )
+	if( option_target_filename != NULL )
 	{
-		memory_free(
-		 target_filename );
+		if( export_handle_set_string(
+		     ewfexport_export_handle,
+		     option_target_filename,
+		     &( ewfexport_export_handle->target_filename ),
+		     &( ewfexport_export_handle->target_filename_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set target filename.\n" );
 
-		export_handle_close(
-		 export_handle,
-		 NULL );
-		export_handle_free(
-		 &export_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+			goto ewfexport_main_on_error;
+		}
 	}
+	else if( interactive_mode == 0 )
+	{
+		/* Make sure the target filename is set in unattended mode
+		 */
+		if( export_handle_set_string(
+		     ewfexport_export_handle,
+		     _LIBCSTRING_SYSTEM_STRING( "export" ),
+		     &( ewfexport_export_handle->target_filename ),
+		     &( ewfexport_export_handle->target_filename_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set target filename.\n" );
+
+			goto ewfexport_main_on_error;
+		}
+	}
+	if( option_compression_level != NULL )
+	{
+		result = export_handle_set_compression_values(
+			  ewfexport_export_handle,
+			  option_compression_level,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set compression values.\n" );
+
+			goto ewfexport_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression level defaulting to: none.\n" );
+		}
+	}
+	if( option_sectors_per_chunk != NULL )
+	{
+		result = export_handle_set_sectors_per_chunk(
+			  ewfexport_export_handle,
+			  option_sectors_per_chunk,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set sectors per chunk.\n" );
+
+			goto ewfexport_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported sectors per chunk defaulting to: 64.\n" );
+		}
+	}
+	if( option_maximum_segment_size != NULL )
+	{
+		result = export_handle_set_maximum_segment_size(
+			  ewfexport_export_handle,
+			  option_sectors_per_chunk,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set maximum segment size.\n" );
+
+			goto ewfexport_main_on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfexport_export_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+		      || ( ( ewfexport_export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+		       &&  ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+		      || ( ( ewfexport_export_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+		       &&  ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+		{
+			ewfexport_export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
+			fprintf(
+			 stderr,
+			 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+			 ewfexport_export_handle->maximum_segment_size );
+		}
+	}
+/* TODO refactor */
 	/* Request the necessary case data
 	 */
 	if( interactive_mode != 0 )
@@ -1461,6 +1399,10 @@ int main( int argc, char * const argv[] )
 
 				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 			}
+			else if( result == 0 )
+			{
+				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+			}
 			else if( libcstring_system_string_compare(
 			          fixed_string_variable,
 			          _LIBCSTRING_SYSTEM_STRING( "raw" ),
@@ -1496,247 +1438,161 @@ int main( int argc, char * const argv[] )
 				export_handle_output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 			}
 		}
-		if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+		if( option_target_filename == NULL )
 		{
-			/* Target filename
-			 */
-			if( option_target_filename == NULL )
+			if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 			{
-				while( ewfinput_get_string_variable(
-					stderr,
-					_LIBCSTRING_SYSTEM_STRING( "Target path and filename without extension" ),
-				        target_filename,
-				        1024,
-				        &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				request_string = _LIBCSTRING_SYSTEM_STRING( "Target path and filename without extension" );
+			}
+			else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
+			{
+				request_string = _LIBCSTRING_SYSTEM_STRING( "Target path" );
+			}
+			else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+			{
+				request_string = _LIBCSTRING_SYSTEM_STRING( "Target path and filename without extension or - for stdout" );
+			}
+		}
+		if( request_string != NULL )
+		{
+			do
+			{
+				result = export_handle_prompt_for_string(
+					  ewfexport_export_handle,
+					  request_string,
+					  &( ewfexport_export_handle->target_filename ),
+					  &( ewfexport_export_handle->target_filename_size ),
+					  &error );
 
+				if( result == -1 )
+				{
 					fprintf(
 					 stderr,
-					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
+					 "Unable to determine target.\n" );
+
+					goto ewfexport_main_on_error;
+				}
+				else if( result == 0 )
+				{
+					fprintf(
+					 stdout,
+					 "Target is required, please try again or terminate using Ctrl^C.\n" );
 				}
 			}
-			/* Compression
-			 */
-			if( argument_set_compression == 0 )
+			while( result != 1 );
+		}
+		if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+		{
+			if( option_compression_level == NULL )
 			{
-				if( ewfinput_get_fixed_string_variable(
-				     stderr,
-				     input_buffer,
-				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Use compression" ),
-				     ewfinput_compression_levels,
-				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
-				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-				     &fixed_string_variable,
-				     &error ) == -1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				result = export_handle_prompt_for_compression_level(
+					  ewfexport_export_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Use compression" ),
+					  &error );
 
+				if( result == -1 )
+				{
 					fprintf(
 					 stderr,
-					 "Unable to determine compression level defaulting to: none.\n" );
+					 "Unable to determine compression level.\n" );
 
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
+					goto ewfexport_main_on_error;
 				}
-				else if( ewfinput_determine_compression_values(
-				          fixed_string_variable,
-				          &compression_level,
-				          &compression_flags,
-				          &error ) != 1 )
+				else if( result == 0 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
 					 stderr,
 					 "Unsupported compression level defaulting to: none.\n" );
-
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
 				}
 			}
-			/* Segment file size
-			 */
-			if( argument_set_segment_file_size == 0 )
+			if( option_maximum_segment_size == NULL )
 			{
-				if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
-				{
-					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-				}
-				else
-				{
-					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
-				}
-				if( ewfinput_get_byte_size_variable(
-				     stderr,
-				     input_buffer,
-				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
-				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-				     maximum_segment_file_size,
-				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
-				     &segment_file_size,
-				     &error ) == -1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				result = export_handle_prompt_for_maximum_segment_size(
+					  ewfexport_export_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
+					  &error );
 
-					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+				if( result == -1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to determine maximum segment size.\n" );
+
+					goto ewfexport_main_on_error;
+				}
+				else if( ( result == 0 )
+				      || ( ewfexport_export_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				      || ( ( ewfexport_export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+				       &&  ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				      || ( ( ewfexport_export_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+				       &&  ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+				{
+					ewfexport_export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
 					fprintf(
 					 stderr,
-					 "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
-					 segment_file_size );
-				}
-				/* Make sure the segment file size is smaller than or equal to the maximum
-				 */
-				if( segment_file_size > maximum_segment_file_size )
-				{
-					segment_file_size = maximum_segment_file_size;
+					 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+					 ewfexport_export_handle->maximum_segment_size );
 				}
 			}
-			/* Chunk size (sectors per block)
-			 */
-			if( argument_set_sectors_per_chunk == 0 )
+			if( option_sectors_per_chunk == NULL )
 			{
-				if( ewfinput_get_fixed_string_variable(
-				     stderr,
-				     input_buffer,
-				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The number of sectors to read at once" ),
-				     ewfinput_sector_per_block_sizes,
-				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-				     &fixed_string_variable,
-				     &error ) == -1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				result = export_handle_prompt_for_sectors_per_chunk(
+					  ewfexport_export_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "The number of sectors to read at once" ),
+					  &error );
 
+				if( result == -1 )
+				{
 					fprintf(
 					 stderr,
-					 "Unable to determine sectors per chunk on error defaulting to: 64.\n" );
+					 "Unable to determine sectors per chunk.\n" );
 
-					sectors_per_chunk = 64;
+					goto ewfexport_main_on_error;
 				}
-				else if( ewfinput_determine_sectors_per_chunk(
-				          fixed_string_variable,
-				          &sectors_per_chunk,
-				          &error ) != 1 )
+				else if( result == 0 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
 					 stderr,
-					 "Unsupported sectors per chunk on error defaulting to: 64.\n" );
-
-					sectors_per_chunk = 64;
-				}
-			}
-		}
-		else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
-		{
-			/* Target directory
-			 */
-			if( option_target_filename == NULL )
-			{
-				while( ewfinput_get_string_variable(
-					stderr,
-					_LIBCSTRING_SYSTEM_STRING( "Target path" ),
-					target_filename,
-					1024,
-					&error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					fprintf(
-					 stderr,
-					 "Path is required, please try again or terminate using Ctrl^C.\n" );
+					 "Unsupported sectors per chunk defaulting to: 64.\n" );
 				}
 			}
 		}
 		else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 		{
-			/* Target filename
-			 */
-			if( option_target_filename == NULL )
-			{
-				while( ewfinput_get_string_variable(
-					stderr,
-					_LIBCSTRING_SYSTEM_STRING( "Target path and filename without extension or - for stdout" ),
-					target_filename,
-					1024,
-					&error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					fprintf(
-					 stderr,
-					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
-				}
-			}
-			if( ( target_filename[ 0 ] == (libcstring_system_character_t) '-' )
-			 && ( target_filename[ 1 ] == 0 ) )
+			if( ( ewfexport_export_handle->target_filename != NULL )
+			 && ( ( ewfexport_export_handle->target_filename )[ 0 ] == (libcstring_system_character_t) '-' )
+			 && ( ( ewfexport_export_handle->target_filename )[ 1 ] == 0 ) )
 			{
 				/* No need for segment files when exporting to stdout */
 			}
 			/* Segment file size
 			 */
-			else if( argument_set_segment_file_size == 0 )
+			else if( option_maximum_segment_size == NULL )
 			{
-				maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+				result = export_handle_prompt_for_maximum_segment_size(
+					  ewfexport_export_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
+					  &error );
 
-				if( ewfinput_get_byte_size_variable(
-				     stderr,
-				     input_buffer,
-				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
-				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-				     maximum_segment_file_size,
-				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
-				     &segment_file_size,
-				     &error ) == -1 )
+				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+					fprintf(
+					 stderr,
+					 "Unable to determine maximum segment size.\n" );
 
-					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+					goto ewfexport_main_on_error;
+				}
+				else if( ( result == 0 )
+				      || ( ewfexport_export_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				      || ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				{
+					ewfexport_export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
 					fprintf(
 					 stderr,
-					 "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
-					 segment_file_size );
-				}
-				/* Make sure the segment file size is smaller than or equal to the maximum
-				 */
-				if( segment_file_size > maximum_segment_file_size )
-				{
-					segment_file_size = maximum_segment_file_size;
+					 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+					 ewfexport_export_handle->maximum_segment_size );
 				}
 			}
 		}
@@ -1855,14 +1711,11 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 
-			memory_free(
-			 target_filename );
-
 			export_handle_close(
-			 export_handle,
+			 ewfexport_export_handle,
 			 NULL );
 			export_handle_free(
-			 &export_handle,
+			 &ewfexport_export_handle,
 			 NULL );
 			
 			return( EXIT_FAILURE );
@@ -1884,14 +1737,11 @@ int main( int argc, char * const argv[] )
 			 &process_status,
 			 NULL );
 
-			memory_free(
-			 target_filename );
-
 			export_handle_close(
-			 export_handle,
+			 ewfexport_export_handle,
 			 NULL );
 			export_handle_free(
-			 &export_handle,
+			 &ewfexport_export_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -1902,10 +1752,8 @@ int main( int argc, char * const argv[] )
 		/* Exports the files 
 		 */
 		if( export_handle_export_single_files(
-		     export_handle,
-		     target_filename,
-		     libcstring_system_string_length(
-		      target_filename ) + 1,
+		     ewfexport_export_handle,
+		     ewfexport_export_handle->target_filename,
 		     NULL,
 		     &error ) != 1 )
 		{
@@ -1924,13 +1772,11 @@ int main( int argc, char * const argv[] )
 		{
 			status = PROCESS_STATUS_COMPLETED;
 		}
-		memory_free(
-		 target_filename );
 	}
 	else
 	{
 		if( export_handle_set_processing_values(
-		     export_handle,
+		     ewfexport_export_handle,
 		     calculate_md5,
 		     calculate_sha1,
 		     &error ) != 1 )
@@ -1948,14 +1794,11 @@ int main( int argc, char * const argv[] )
 			 &process_status,
 			 NULL );
 
-			memory_free(
-			 target_filename );
-
 			export_handle_close(
-			 export_handle,
+			 ewfexport_export_handle,
 			 NULL );
 			export_handle_free(
-			 &export_handle,
+			 &ewfexport_export_handle,
 			 NULL );
 
 			return( EXIT_FAILURE );
@@ -1963,9 +1806,9 @@ int main( int argc, char * const argv[] )
 		if( ewfexport_abort == 0 )
 		{
 			if( export_handle_open_output(
-			     export_handle,
+			     ewfexport_export_handle,
 			     export_handle_output_format,
-			     target_filename,
+			     ewfexport_export_handle->target_filename,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -1981,21 +1824,15 @@ int main( int argc, char * const argv[] )
 				 &process_status,
 				 NULL );
 
-				memory_free(
-				 target_filename );
-
 				export_handle_close(
-				 export_handle,
+				 ewfexport_export_handle,
 				 NULL );
 				export_handle_free(
-				 &export_handle,
+				 &ewfexport_export_handle,
 				 NULL );
 
 				return( EXIT_FAILURE );
 			}
-			memory_free(
-			 target_filename );
-
 			if( platform_get_operating_system(
 			     acquiry_operating_system,
 			     32,
@@ -2015,17 +1852,12 @@ int main( int argc, char * const argv[] )
 			acquiry_software_version = _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING );
 
 			if( export_handle_set_output_values(
-			     export_handle,
+			     ewfexport_export_handle,
 			     acquiry_operating_system,
 			     program,
 			     acquiry_software_version,
-			     header_codepage,
 			     export_size,
-			     compression_level,
-			     compression_flags,
 			     ewf_format,
-			     segment_file_size,
-			     sectors_per_chunk,
 			     wipe_chunk_on_error,
 			     &error ) != 1 )
 			{
@@ -2043,10 +1875,10 @@ int main( int argc, char * const argv[] )
 				 NULL );
 
 				export_handle_close(
-				 export_handle,
+				 ewfexport_export_handle,
 				 NULL );
 				export_handle_free(
-				 &export_handle,
+				 &ewfexport_export_handle,
 				 NULL );
 
 				return( EXIT_FAILURE );
@@ -2054,7 +1886,7 @@ int main( int argc, char * const argv[] )
 			/* Exports image media data
 			 */
 			export_count = ewfexport_export_image(
-					export_handle,
+					ewfexport_export_handle,
 					media_size,
 					export_size,
 					export_offset,
@@ -2102,10 +1934,10 @@ int main( int argc, char * const argv[] )
 		 NULL );
 
 		export_handle_close(
-		 export_handle,
+		 ewfexport_export_handle,
 		 NULL );
 		export_handle_free(
-		 &export_handle,
+		 &ewfexport_export_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -2124,10 +1956,10 @@ int main( int argc, char * const argv[] )
 		 &error );
 
 		export_handle_close(
-		 export_handle,
+		 ewfexport_export_handle,
 		 NULL );
 		export_handle_free(
-		 &export_handle,
+		 &ewfexport_export_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
@@ -2172,7 +2004,7 @@ int main( int argc, char * const argv[] )
 				}
 			}
 			if( export_handle_hash_values_fprint(
-			     export_handle,
+			     ewfexport_export_handle,
 			     stdout,
 			     &error ) != 1 )
 			{
@@ -2188,7 +2020,7 @@ int main( int argc, char * const argv[] )
 			if( log_handle != NULL )
 			{
 				if( export_handle_hash_values_fprint(
-				     export_handle,
+				     ewfexport_export_handle,
 				     log_handle->log_stream,
 				     &error ) != 1 )
 				{
@@ -2203,7 +2035,7 @@ int main( int argc, char * const argv[] )
 				}
 			}
 			if( export_handle_checksum_errors_fprint(
-			     export_handle,
+			     ewfexport_export_handle,
 			     stdout,
 			     &error ) != 1 )
 			{
@@ -2219,7 +2051,7 @@ int main( int argc, char * const argv[] )
 			if( log_handle != NULL )
 			{
 				if( export_handle_checksum_errors_fprint(
-				     export_handle,
+				     ewfexport_export_handle,
 				     log_handle->log_stream,
 				     &error ) != 1 )
 				{
@@ -2265,8 +2097,9 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
+ewfexport_main_on_abort:
 	if( export_handle_close(
-	     export_handle,
+	     ewfexport_export_handle,
 	     &error ) != 0 )
 	{
 		fprintf(
@@ -2279,13 +2112,13 @@ int main( int argc, char * const argv[] )
 		 &error );
 
 		export_handle_free(
-		 &export_handle,
+		 &ewfexport_export_handle,
 		 NULL );
 
 		return( EXIT_FAILURE );
 	}
 	if( export_handle_free(
-	     &export_handle,
+	     &ewfexport_export_handle,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -2316,5 +2149,22 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	return( EXIT_SUCCESS );
+
+ewfexport_main_on_error:
+	libsystem_notify_print_error_backtrace(
+	 error );
+	liberror_error_free(
+	 &error );
+
+	if( ewfexport_export_handle != NULL )
+	{
+		export_handle_close(
+		 ewfexport_export_handle,
+		 NULL );
+		export_handle_free(
+		 &ewfexport_export_handle,
+		 NULL );
+	}
+	return( EXIT_FAILURE );
 }
 

@@ -53,9 +53,11 @@
 
 #include <libsystem.h>
 
+#include "byte_size_string.h"
 #include "digest_context.h"
 #include "digest_hash.h"
 #include "ewfcommon.h"
+#include "ewfinput.h"
 #include "export_handle.h"
 #include "guid.h"
 #include "md5.h"
@@ -65,7 +67,10 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
-#define EXPORT_HANDLE_BUFFER_SIZE	8192
+#define EXPORT_HANDLE_BUFFER_SIZE		8192
+#define EXPORT_HANDLE_INPUT_BUFFER_SIZE		64
+#define EXPORT_HANDLE_STRING_SIZE		1024
+#define EXPORT_HANDLE_NOTIFY_STREAM		stdout
 
 /* Initializes the export handle
  * Returns 1 if successful or -1 on error
@@ -140,6 +145,46 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
+		( *export_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
+		                                                                      sizeof( libcstring_system_character_t ) * EXPORT_HANDLE_INPUT_BUFFER_SIZE );
+
+		if( ( *export_handle )->input_buffer == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create input buffer.",
+			 function );
+
+			memory_free(
+			 *export_handle );
+
+			*export_handle = NULL;
+
+			return( -1 );
+		}
+		if( memory_set(
+		     ( *export_handle )->input_buffer,
+		     0,
+		     sizeof( libcstring_system_character_t ) * EXPORT_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear export handle.",
+			 function );
+
+			memory_free(
+			 ( *export_handle )->input_buffer );
+			memory_free(
+			 *export_handle );
+
+			*export_handle = NULL;
+
+			return( -1 );
+		}
 		if( md5_initialize(
 		     &( ( *export_handle )->md5_context ),
 		     error ) != 1 )
@@ -151,6 +196,8 @@ int export_handle_initialize(
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
+			memory_free(
+			 ( *export_handle )->input_buffer );
 			memory_free(
 			 *export_handle );
 
@@ -170,12 +217,20 @@ int export_handle_initialize(
 			 function );
 
 			memory_free(
+			 ( *export_handle )->input_buffer );
+			memory_free(
 			 *export_handle );
 
 			*export_handle = NULL;
 
 			return( -1 );
 		}
+		( *export_handle )->compression_level    = LIBEWF_COMPRESSION_NONE;
+		( *export_handle )->ewf_format           = LIBEWF_FORMAT_ENCASE6;
+		( *export_handle )->sectors_per_chunk    = 64;
+		( *export_handle )->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+		( *export_handle )->header_codepage      = LIBEWF_CODEPAGE_ASCII;
+		( *export_handle )->notify_stream        = EXPORT_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
 }
@@ -203,6 +258,14 @@ int export_handle_free(
 	}
 	if( *export_handle != NULL )
 	{
+		memory_free(
+		 ( *export_handle )->input_buffer );
+
+		if( ( *export_handle )->target_filename != NULL )
+		{
+			memory_free(
+			 ( *export_handle )->target_filename );
+		}
 		if( ( *export_handle )->input_handle != NULL )
 		{
 			if( libewf_handle_free(
@@ -824,6 +887,20 @@ int export_handle_open_input(
 
 			return( -1 );
 		}
+	}
+	if( libewf_handle_set_header_codepage(
+	     export_handle->input_handle,
+	     export_handle->header_codepage,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header codepage.",
+		 function );
+
+		return( -1 );
 	}
 	if( libewf_handle_get_chunk_size(
 	     export_handle->input_handle,
@@ -1964,15 +2041,18 @@ int export_handle_get_output_chunk_size(
 	return( 1 );
 }
 
-/* Sets the header codepage
- * Returns 1 if successful or -1 on error
+/* Prompts the user for a string
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
-int export_handle_set_header_codepage(
+int export_handle_prompt_for_string(
      export_handle_t *export_handle,
-     int header_codepage,
+     const libcstring_system_character_t *request_string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
      liberror_error_t **error )
 {
-	static char *function = "export_handle_set_header_codepage";
+	static char *function = "export_handle_prompt_for_string";
+	int result            = 0;
 
 	if( export_handle == NULL )
 	{
@@ -1985,32 +2065,682 @@ int export_handle_set_header_codepage(
 
 		return( -1 );
 	}
-	if( export_handle->input_handle == NULL )
+	if( internal_string == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string.",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_handle_set_header_codepage(
-	     export_handle->input_handle,
-	     header_codepage,
-	     error ) != 1 )
+	if( internal_string_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( *internal_string != NULL )
+	{
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+	}
+	*internal_string_size = EXPORT_HANDLE_STRING_SIZE;
+
+	*internal_string = (libcstring_system_character_t *) memory_allocate(
+	                                                      sizeof( libcstring_system_character_t ) * *internal_string_size );
+
+	if( *internal_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create internal string.",
+		 function );
+
+		*internal_string_size = 0;
+
+		return( -1 );
+	}
+	if( memory_set(
+	     *internal_string,
+	     0,
+	     *internal_string_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear internal string.",
+		 function );
+
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+
+		return( -1 );
+	}
+	result = ewfinput_get_string_variable(
+	          export_handle->notify_stream,
+	          request_string,
+	          *internal_string,
+	          *internal_string_size,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header codepage.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string variable.",
+		 function );
+
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Prompts the user for the compression level
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int export_handle_prompt_for_compression_level(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *fixed_string_variable = NULL;
+	static char *function                                = "export_handle_prompt_for_compression_level";
+	int result                                           = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
 		 function );
 
 		return( -1 );
+	}
+	if( ewfinput_get_fixed_string_variable(
+	     export_handle->notify_stream,
+	     export_handle->input_buffer,
+	     EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	     request_string,
+	     ewfinput_compression_levels,
+	     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+	     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
+	     &fixed_string_variable,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_compression_values(
+	          fixed_string_variable,
+	          &( export_handle->compression_level ),
+	          &( export_handle->compression_flags ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine compression values.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Prompts the user for the format
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int export_handle_prompt_for_format(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *fixed_string_variable = NULL;
+	static char *function                                = "export_handle_prompt_for_format";
+	int result                                           = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ewfinput_get_fixed_string_variable(
+	     export_handle->notify_stream,
+	     export_handle->input_buffer,
+	     EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	     request_string,
+	     ewfinput_format_types,
+	     EWFINPUT_FORMAT_TYPES_AMOUNT,
+	     EWFINPUT_FORMAT_TYPES_DEFAULT,
+	     &fixed_string_variable,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_ewf_format(
+	          fixed_string_variable,
+	          &( export_handle->ewf_format ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine format.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Prompts the user for the number of sectors per chunk
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int export_handle_prompt_for_sectors_per_chunk(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *fixed_string_variable = NULL;
+	static char *function                                = "export_handle_prompt_for_sectors_per_chunk";
+	int result                                           = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ewfinput_get_fixed_string_variable(
+	     export_handle->notify_stream,
+	     export_handle->input_buffer,
+	     EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	     request_string,
+	     ewfinput_sector_per_block_sizes,
+	     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+	     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
+	     &fixed_string_variable,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_sectors_per_chunk(
+	          fixed_string_variable,
+	          &( export_handle->sectors_per_chunk ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine sectors per chunk.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Prompts the user for the maximum segment size
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int export_handle_prompt_for_maximum_segment_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	static char *function        = "export_handle_prompt_for_maximum_segment_size";
+	uint64_t default_input_size  = 0;
+	uint64_t input_size_variable = 0;
+	uint64_t maximum_input_size  = 0;
+	int result                   = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+	{
+		if( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+		{
+			maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+		}
+		else
+		{
+			maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+		}
+	}
+	else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+	{
+		maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+	}
+	default_input_size = export_handle->maximum_segment_size;
+
+       	if( default_input_size == 0 )
+       	{
+		default_input_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+       	}
+	result = ewfinput_get_size_variable(
+	          export_handle->notify_stream,
+	          export_handle->input_buffer,
+	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
+	          default_input_size,
+	          maximum_input_size,
+	          &input_size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		export_handle->maximum_segment_size = input_size_variable;
+	}
+	return( result );
+}
+
+/* Sets a string
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_set_string(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_string";
+	size_t string_length  = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_string_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( *internal_string != NULL )
+	{
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length > 0 )
+	{
+		*internal_string = (libcstring_system_character_t *) memory_allocate(
+		                                                      sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
+
+		if( *internal_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create internal string.",
+			 function );
+
+			return( -1 );
+		}
+		if( libcstring_system_string_copy(
+		     *internal_string,
+		     string,
+		     string_length ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy string.",
+			 function );
+
+			memory_free(
+			 *internal_string );
+
+			*internal_string = NULL;
+
+			return( -1 );
+		}
+		( *internal_string )[ string_length ] = 0;
+
+		*internal_string_size = string_length + 1;
 	}
 	return( 1 );
+}
+
+/* Sets the compression values
+ * Returns 1 if successful, 0 if unsupported values or -1 on error
+ */
+int export_handle_set_compression_values(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_compression_values";
+	int result            = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_compression_values(
+	          string,
+	          &( export_handle->compression_level ),
+	          &( export_handle->compression_flags ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine compression values.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Sets the format
+ * Returns 1 if successful, 0 if unsupported values or -1 on error
+ */
+int export_handle_set_format(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_format";
+	int result            = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_ewf_format(
+	          string,
+	          &( export_handle->ewf_format ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine format.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Sets the number of sectors per chunk
+ * Returns 1 if successful, 0 if unsupported values or -1 on error
+ */
+int export_handle_set_sectors_per_chunk(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_sectors_per_chunk";
+	int result            = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_sectors_per_chunk(
+	          string,
+	          &( export_handle->sectors_per_chunk ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine sectors per chunk.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Sets the maximum segment file size
+ * Returns 1 if successful, 0 if unsupported values or -1 on error
+ */
+int export_handle_set_maximum_segment_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_maximum_segment_size";
+	size_t string_length  = 0;
+	int result            = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	result = byte_size_string_convert(
+	          string,
+	          string_length,
+	          &( export_handle->maximum_segment_size ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine maximum segment size.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Sets the header codepage
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_set_header_codepage(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_header_codepage";
+	int result            = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_header_codepage(
+	          string,
+	          &export_handle->header_codepage,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine header codepage.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
 }
 
 /* Sets the processing values
@@ -2049,13 +2779,8 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_operating_system,
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
-     int header_codepage,
      size64_t media_size,
-     int8_t compression_level,
-     uint8_t compression_flags,
      uint8_t libewf_format,
-     size64_t maximum_segment_size,
-     uint32_t sectors_per_chunk,
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error )
 {
@@ -2246,7 +2971,7 @@ int export_handle_set_output_values(
 		}
 		if( libewf_handle_set_header_codepage(
 		     export_handle->ewf_output_handle,
-		     header_codepage,
+		     export_handle->header_codepage,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2288,8 +3013,8 @@ int export_handle_set_output_values(
 		}
 		if( libewf_handle_set_compression_values(
 		     export_handle->ewf_output_handle,
-		     compression_level,
-		     compression_flags,
+		     export_handle->compression_level,
+		     export_handle->compression_flags,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2301,8 +3026,8 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( ( compression_level != LIBEWF_COMPRESSION_NONE )
-		 || ( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 ) )
+		if( ( export_handle->compression_level != LIBEWF_COMPRESSION_NONE )
+		 || ( ( export_handle->compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 ) )
 		{
 			export_handle->write_compressed = 1;
 		}
@@ -2310,7 +3035,6 @@ int export_handle_set_output_values(
 		{
 			export_handle->write_compressed = 0;
 		}
-
 		/* Format needs to be set before segment file size
 		 */
 		if( libewf_handle_set_format(
@@ -2329,7 +3053,7 @@ int export_handle_set_output_values(
 		}
 		if( libewf_handle_set_maximum_segment_size(
 		     export_handle->ewf_output_handle,
-		     maximum_segment_size,
+		     export_handle->maximum_segment_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2343,7 +3067,7 @@ int export_handle_set_output_values(
 		}
 		if( libewf_handle_set_sectors_per_chunk(
 		     export_handle->ewf_output_handle,
-		     sectors_per_chunk,
+		     export_handle->sectors_per_chunk,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2423,7 +3147,7 @@ int export_handle_set_output_values(
 		}
 		if( libsmraw_handle_set_maximum_segment_size(
 		     export_handle->raw_output_handle,
-		     maximum_segment_size,
+		     export_handle->maximum_segment_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2728,7 +3452,7 @@ ssize_t export_handle_finalize(
 			return( -1 );
 		}
 		export_handle->calculated_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
-		                                                                               sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
+		                                                                               sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
 
 		if( export_handle->calculated_md5_hash_string == NULL )
 		{
@@ -2806,7 +3530,7 @@ ssize_t export_handle_finalize(
 			return( -1 );
 		}
 		export_handle->calculated_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
-		                                                                                sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+		                                                                                sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_SHA1 );
 
 		if( export_handle->calculated_sha1_hash_string == NULL )
 		{
@@ -2896,13 +3620,13 @@ ssize_t export_handle_finalize(
  */
 int export_handle_export_single_files(
      export_handle_t *export_handle,
-     libcstring_system_character_t *export_path,
-     size_t export_path_size,
+     const libcstring_system_character_t *export_path,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "export_handle_export_single_files";
+	size_t export_path_length       = 0;
 	int result                      = 0;
 
 	if( export_handle == NULL )
@@ -2927,6 +3651,20 @@ int export_handle_export_single_files(
 
 		return( -1 );
 	}
+	if( export_path == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export path.",
+		 function );
+
+		return( -1 );
+	}
+	export_path_length = libcstring_system_string_length(
+	                      export_handle->target_filename );
+
 	result = libewf_handle_get_root_file_entry(
 	          export_handle->input_handle,
 	          &file_entry,
@@ -2946,8 +3684,8 @@ int export_handle_export_single_files(
 	if( export_handle_export_file_entry(
 	     export_handle,
 	     file_entry,
-	     export_path,
-	     export_path_size,
+	     export_handle->target_filename,
+	     export_path_length + 1,
 	     log_handle,
 	     error ) != 1 )
 	{

@@ -162,7 +162,7 @@ void usage_fprint(
 	fprintf( stream, "\t-p:     specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-P:     specify the number of bytes per sector (default is 512)\n"
 	                 "\t        (use this to override the automatic bytes per sector detection)\n" );
-	fprintf( stream, "\t-q:     quiet shows no status information\n" );
+	fprintf( stream, "\t-q:     quiet shows minimal status information\n" );
 	fprintf( stream, "\t-r:     specify the number of retries when a read error occurs (default\n"
 	                 "\t        is 2)\n" );
 	fprintf( stream, "\t-R:     resume acquiry at a safe point\n" );
@@ -211,6 +211,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "ewfacquire_confirm_acquiry_parameters";
 	int8_t input_confirmed                               = -1;
+	int result                                           = 0;
 
 	if( stream == NULL )
 	{
@@ -220,16 +221,18 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	 */
 	while( input_confirmed == -1 )
 	{
-		if( ewfinput_get_fixed_string_variable(
-		     stream,
-		     input_buffer,
-		     input_buffer_size,
-		     _LIBCSTRING_SYSTEM_STRING( "Continue acquiry with these values" ),
-		     ewfinput_yes_no,
-		     2,
-		     0,
-		     &fixed_string_variable,
-		     error ) == -1 )
+		result = ewfinput_get_fixed_string_variable(
+		          stream,
+		          input_buffer,
+		          input_buffer_size,
+		          _LIBCSTRING_SYSTEM_STRING( "Continue acquiry with these values" ),
+		          ewfinput_yes_no,
+		          2,
+		          0,
+		          &fixed_string_variable,
+		          error );
+
+		if( result == -1 )
 		{
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
@@ -244,25 +247,30 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 			 stream,
 			 "Unable to determine answer.\n" );
 		}
-		else if( ewfinput_determine_yes_no(
-		          fixed_string_variable,
-		          (uint8_t *) &input_confirmed,
-		          error ) != 1 )
+		else
 		{
-			if( ( error != NULL )
-			 && ( *error != NULL ) )
+			result = ewfinput_determine_yes_no(
+				  fixed_string_variable,
+				  (uint8_t *) &input_confirmed,
+				  error );
+
+			if( result != 1 )
 			{
-				libsystem_notify_print_error_backtrace(
-				 *error );
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libsystem_notify_print_error_backtrace(
+					 *error );
+				}
+				liberror_error_free(
+				 error );
+
+				fprintf(
+				 stream,
+				 "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
+
+				input_confirmed = -1;
 			}
-			liberror_error_free(
-			 error );
-
-			fprintf(
-			 stream,
-			 "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
-
-			input_confirmed = -1;
 		}
 	}
 	fprintf(
@@ -1044,8 +1052,10 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_description               = NULL;
 	libcstring_system_character_t *option_examiner_name             = NULL;
 	libcstring_system_character_t *option_evidence_number           = NULL;
+	libcstring_system_character_t *option_format                    = NULL;
 	libcstring_system_character_t *option_header_codepage           = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
+	libcstring_system_character_t *option_maximum_segment_size      = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
 	libcstring_system_character_t *option_sector_error_granularity  = NULL;
 	libcstring_system_character_t *option_sectors_per_chunk         = NULL;
@@ -1064,14 +1074,11 @@ int main( int argc, char * const argv[] )
 	uint64_t acquiry_offset                                         = 0;
 	uint64_t acquiry_size                                           = 0;
 	uint64_t input_size_variable                                    = 0;
-	uint64_t maximum_segment_file_size                              = 0;
 	uint64_t media_size                                             = 0;
 	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint64_t segment_file_size                                      = 0;
 	uint32_t bytes_per_sector                                       = 512;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
-	uint8_t ewf_format                                              = LIBEWF_FORMAT_ENCASE6;
 	uint8_t media_flags                                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
 	uint8_t media_type                                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                                = 1;
@@ -1082,11 +1089,9 @@ int main( int argc, char * const argv[] )
 	uint8_t wipe_block_on_read_error                                = 0;
 	int8_t acquiry_parameters_confirmed                             = 0;
 	int argument_set_bytes_per_sector                               = 0;
-	int argument_set_format                                         = 0;
 	int argument_set_media_type                                     = 0;
 	int argument_set_offset                                         = 0;
 	int argument_set_read_error_retries                             = 0;
-	int argument_set_segment_file_size                              = 0;
 	int argument_set_size                                           = 0;
 	int argument_set_media_flags                                    = 0;
 	int argument_set_wipe_block_on_read_error                       = 0;
@@ -1218,26 +1223,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'f':
-				if( ewfinput_determine_ewf_format(
-				     optarg,
-				     &ewf_format,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_format = optarg;
 
-					ewf_format = LIBEWF_FORMAT_ENCASE6;
-
-					fprintf(
-					 stderr,
-					 "Unsupported EWF file format type defaulting to: encase6.\n" );
-				}
-				else
-				{
-					argument_set_format = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'g':
@@ -1445,38 +1432,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'S':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_maximum_segment_size = optarg;
 
-				result = byte_size_string_convert(
-				          optarg,
-				          string_length,
-				          &segment_file_size,
-				          NULL );
-
-				if( result != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-				}
-				argument_set_segment_file_size = 1;
-
-				if( ( result != 1 )
-				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-				 || ( ( ewf_format == LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-				 || ( ( ewf_format != LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
-				{
-					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-					fprintf(
-					 stderr,
-					 "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
-					 segment_file_size );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 't':
@@ -1703,6 +1660,28 @@ int main( int argc, char * const argv[] )
 
 		goto ewfacquire_main_on_error;
 	}
+	if( option_header_codepage != NULL )
+	{
+		result = imaging_handle_set_header_codepage(
+			  ewfacquire_imaging_handle,
+			  option_header_codepage,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set header codepage.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported header codepage defaulting to: ascii.\n" );
+		}
+	}
 	if( option_target_filename != NULL )
 	{
 		if( imaging_handle_set_string(
@@ -1855,6 +1834,28 @@ int main( int argc, char * const argv[] )
 			 "Unsupported compression level defaulting to: none.\n" );
 		}
 	}
+	if( option_format != NULL )
+	{
+		result = imaging_handle_set_format(
+			  ewfacquire_imaging_handle,
+			  option_format,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set format.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported format type defaulting to: encase6.\n" );
+		}
+	}
 	if( option_sectors_per_chunk != NULL )
 	{
 		result = imaging_handle_set_sectors_per_chunk(
@@ -1899,26 +1900,34 @@ int main( int argc, char * const argv[] )
 			 "Unsuported sector error granularity defaulting to: 64.\n" );
 		}
 	}
-	if( option_header_codepage != NULL )
+	if( option_maximum_segment_size != NULL )
 	{
-		result = ewfinput_determine_header_codepage(
-		          option_header_codepage,
-		          &ewfacquire_imaging_handle->header_codepage,
-		          &error );
+		result = imaging_handle_set_maximum_segment_size(
+			  ewfacquire_imaging_handle,
+			  option_sectors_per_chunk,
+			  &error );
 
 		if( result == -1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to set header codepage.\n" );
+			 "Unable to set maximum segment size.\n" );
 
 			goto ewfacquire_main_on_error;
 		}
-		else if( result == 0 )
+		else if( ( result == 0 )
+		      || ( ewfacquire_imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+		      || ( ( ewfacquire_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+		       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+		      || ( ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+		       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 		{
+			ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
 			fprintf(
 			 stderr,
-			 "Unsuported header codepage defaulting to: ascii.\n" );
+			 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+			 ewfacquire_imaging_handle->maximum_segment_size );
 		}
 	}
 	/* Request the necessary case data
@@ -1953,7 +1962,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unable to determine filename.\n" );
+					 "Unable to determine target.\n" );
 
 					goto ewfacquire_main_on_error;
 				}
@@ -1961,7 +1970,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Filename is required, please try again or terminate using Ctrl^C.\n" );
+					 "Target is required, please try again or terminate using Ctrl^C.\n" );
 				}
 			}
 			while( result != 1 );
@@ -2018,8 +2027,6 @@ int main( int argc, char * const argv[] )
 			     &acquiry_size,
 			     &media_type,
 			     &media_flags,
-			     &ewf_format,
-			     &segment_file_size,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2278,47 +2285,26 @@ int main( int argc, char * const argv[] )
 					 "Unsupported compression level defaulting to: none.\n" );
 				}
 			}
-			/* File format
-			 */
-			if( argument_set_format == 0 )
+			if( option_format == NULL )
 			{
-				if( ewfinput_get_fixed_string_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Use EWF file format" ),
-				     ewfinput_format_types,
-				     EWFINPUT_FORMAT_TYPES_AMOUNT,
-				     EWFINPUT_FORMAT_TYPES_DEFAULT,
-				     &fixed_string_variable,
-				     &error ) == -1 )
+				result = imaging_handle_prompt_for_format(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Use EWF file format" ),
+					  &error );
+
+				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
-					 stdout,
-					 "Unable to determine EWF file format type defaulting to: encase6.\n" );
+					 stderr,
+					 "Unable to determine format.\n" );
 
-					ewf_format = LIBEWF_FORMAT_ENCASE6;
+					goto ewfacquire_main_on_error;
 				}
-				else if( ewfinput_determine_ewf_format(
-					  fixed_string_variable,
-					  &ewf_format,
-					  &error ) != 1 )
+				else if( result == 0 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
-					 stdout,
-					 "Unsupported EWF file format type defaulting to: encase6.\n" );
-
-					ewf_format = LIBEWF_FORMAT_ENCASE6;
+					 stderr,
+					 "Unsupported format defaulting to: encase6.\n" );
 				}
 			}
 		}
@@ -2384,50 +2370,34 @@ int main( int argc, char * const argv[] )
 					 acquiry_size );
 				}
 			}
-			/* Segment file size
-			 */
-			if( argument_set_segment_file_size == 0 )
+			if( option_maximum_segment_size == NULL )
 			{
-				if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
-				{
-					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-				}
-				else
-				{
-					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
-				}
-				if( segment_file_size == 0 )
-				{
-					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-				}
-				if( ewfinput_get_byte_size_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
-				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-				     maximum_segment_file_size,
-				     segment_file_size,
-				     &segment_file_size,
-				     &error ) == -1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				result = imaging_handle_prompt_for_maximum_segment_size(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
+					  &error );
 
-					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+				if( result == -1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to determine maximum segment size.\n" );
+
+					goto ewfacquire_main_on_error;
+				}
+				else if( ( result == 0 )
+				      || ( ewfacquire_imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				      || ( ( ewfacquire_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+				       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				      || ( ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+				       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+				{
+					ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
 					fprintf(
-					 stdout,
-					 "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
-					 segment_file_size );
-				}
-				/* Make sure the segment file size is smaller than or equal to the maximum
-				 */
-				if( segment_file_size > maximum_segment_file_size )
-				{
-					segment_file_size = maximum_segment_file_size;
+					 stderr,
+					 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+					 ewfacquire_imaging_handle->maximum_segment_size );
 				}
 			}
 			/* Bytes per sector
@@ -2588,11 +2558,9 @@ int main( int argc, char * const argv[] )
 		     ewfacquire_imaging_handle,
 		     media_type,
 		     media_flags,
-		     ewf_format,
 		     (off64_t) acquiry_offset,
 		     resume_acquiry_offset,
 		     (size64_t) acquiry_size,
-		     (size64_t) segment_file_size,
 		     bytes_per_sector,
 		     read_error_retries,
 		     wipe_block_on_read_error,
@@ -2633,14 +2601,14 @@ int main( int argc, char * const argv[] )
 			option_examiner_name                  = NULL;
 			option_notes                          = NULL;
 			option_compression_level              = NULL;
+			option_format                         = NULL;
 			option_sectors_per_chunk              = NULL;
 			option_sector_error_granularity       = NULL;
+			option_maximum_segment_size           = NULL;
 
-			argument_set_format                   = 0;
 			argument_set_media_type               = 0;
 			argument_set_offset                   = 0;
 			argument_set_read_error_retries       = 0;
-			argument_set_segment_file_size        = 0;
 			argument_set_size                     = 0;
 			argument_set_media_flags              = 0;
 			argument_set_wipe_block_on_read_error = 0;
@@ -2663,12 +2631,12 @@ int main( int argc, char * const argv[] )
 		}
 		else if( acquiry_size > EWFACQUIRE_2_TIB )
 		{
-			if( ( ewf_format != LIBEWF_FORMAT_ENCASE6 )
-			 && ( ewf_format != LIBEWF_FORMAT_EWFX ) )
+			if( ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+			 && ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_EWFX ) )
 			{
 				fprintf(
 				 stdout,
-				 "Cannot acquire more than 2 TiB in selected ewf format.\n" );
+				 "Cannot acquire more than 2 TiB in selected EWF file format.\n" );
 
 				acquiry_parameters_confirmed = 0;
 			}
@@ -2676,15 +2644,15 @@ int main( int argc, char * const argv[] )
 	}
 	if( interactive_mode == 0 )
 	{
-		if( segment_file_size == 0 )
+		if( ewfacquire_imaging_handle->maximum_segment_size == 0 )
 		{
-			if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
+			if( ewfacquire_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
 			{
-				segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+				ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
 			}
 			else
 			{
-				segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+				ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 			}
 		}
 	}
@@ -2817,8 +2785,6 @@ int main( int argc, char * const argv[] )
 			     acquiry_size,
 			     media_type,
 			     media_flags,
-			     ewf_format,
-			     segment_file_size,
 			     &error ) != 1 )
 			{
 				fprintf(

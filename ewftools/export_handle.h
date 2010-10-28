@@ -65,6 +65,42 @@ typedef struct export_handle export_handle_t;
 
 struct export_handle
 {
+	/* The user input buffer
+	 */
+	libcstring_system_character_t *input_buffer; 
+
+	/* The target filename
+	 */
+	libcstring_system_character_t *target_filename;
+
+	/* The target filename size
+	 */
+	size_t target_filename_size;
+
+	/* The compression level
+	 */
+	int8_t compression_level;
+
+	/* The compression flags
+	 */
+	uint8_t compression_flags;
+
+	/* The EWF format
+	 */
+	uint8_t ewf_format;
+
+	/* The number of sectors per chunk
+	 */
+	uint32_t sectors_per_chunk;
+
+	/* The maximum segment size
+	 */
+	size64_t maximum_segment_size;
+
+	/* The header codepage
+	 */
+	int header_codepage;
+
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
 	uint8_t calculate_md5;
@@ -130,6 +166,10 @@ struct export_handle
 	/* Value to indicate if the chunk should be wiped on error
 	 */
 	int wipe_chunk_on_error;
+
+	/* The nofication output stream
+	 */
+	FILE *notify_stream;
 };
 
 int export_handle_initialize(
@@ -236,9 +276,63 @@ int export_handle_get_output_chunk_size(
      size32_t *chunk_size,
      liberror_error_t **error );
 
+int export_handle_prompt_for_string(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error );
+
+int export_handle_prompt_for_compression_level(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int export_handle_prompt_for_format(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int export_handle_prompt_for_sectors_per_chunk(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int export_handle_set_maximum_segment_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int export_handle_set_string(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error );
+
+int export_handle_set_compression_values(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int export_handle_set_format(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int export_handle_set_sectors_per_chunk(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int export_handle_prompt_for_maximum_segment_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
 int export_handle_set_header_codepage(
      export_handle_t *export_handle,
-     int header_codepage,
+     const libcstring_system_character_t *string,
      liberror_error_t **error );
 
 int export_handle_set_processing_values(
@@ -252,13 +346,8 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_operating_system,
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
-     int header_codepage,
      size64_t media_size,
-     int8_t compression_level,
-     uint8_t compression_flags,
      uint8_t libewf_format,
-     size64_t maximum_segment_size,
-     uint32_t sectors_per_chunk,
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error );
 
@@ -284,8 +373,7 @@ ssize_t export_handle_finalize(
 
 int export_handle_export_single_files(
      export_handle_t *export_handle,
-     libcstring_system_character_t *export_path,
-     size_t export_path_size,
+     const libcstring_system_character_t *export_path,
      log_handle_t *log_handle,
      liberror_error_t **error );
 

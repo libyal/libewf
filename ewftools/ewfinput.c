@@ -623,7 +623,7 @@ int ewfinput_determine_header_codepage(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid byte stream codepage.",
+		 "%s: invalid header codepage.",
 		 function );
 
 		return( -1 );
@@ -906,7 +906,7 @@ int ewfinput_determine_header_codepage(
 }
 
 /* Determines the yes or no value from a string
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int ewfinput_determine_yes_no(
      const libcstring_system_character_t *string,
@@ -914,6 +914,7 @@ int ewfinput_determine_yes_no(
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_yes_no";
+	size_t string_length  = 0;
 	int result            = -1;
 
 	if( string == NULL )
@@ -938,21 +939,30 @@ int ewfinput_determine_yes_no(
 
 		return( -1 );
 	}
-	if( libcstring_system_string_compare(
-	     string,
-	     _LIBCSTRING_SYSTEM_STRING( "yes" ),
-	     3 ) == 0 )
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 2 )
 	{
-		*yes_no_value = 1;
-		result        = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "no" ),
+		     2 ) == 0 )
+		{
+			*yes_no_value = 0;
+			result        = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "no" ),
-	          2 ) == 0 )
+	else if( string_length == 3 )
 	{
-		*yes_no_value = 0;
-		result        = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "yes" ),
+		     3 ) == 0 )
+		{
+			*yes_no_value = 1;
+			result        = 1;
+		}
 	}
 	return( result );
 }

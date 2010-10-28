@@ -84,7 +84,7 @@ void usage_fprint(
 	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the\n"
 	                 "\t           log_filename\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
-	fprintf( stream, "\t-q:        quiet shows no status information\n" );
+	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 	fprintf( stream, "\t-w:        wipe sectors on checksum error (mimic EnCase like behavior)\n" );

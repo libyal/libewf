@@ -60,8 +60,8 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
-#define IMAGING_HANDLE_BUFFER_SIZE		1024
-#define IMAGING_HANDLE_STRING_SIZE		512
+#define IMAGING_HANDLE_INPUT_BUFFER_SIZE	64
+#define IMAGING_HANDLE_STRING_SIZE		1024
 #define IMAGING_HANDLE_NOTIFY_STREAM		stdout
 
 /* Initializes the imaging handle
@@ -122,7 +122,7 @@ int imaging_handle_initialize(
 			return( -1 );
 		}
 		( *imaging_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
-		                                                                       sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_BUFFER_SIZE );
+		                                                                       sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_INPUT_BUFFER_SIZE );
 
 		if( ( *imaging_handle )->input_buffer == NULL )
 		{
@@ -143,7 +143,7 @@ int imaging_handle_initialize(
 		if( memory_set(
 		     ( *imaging_handle )->input_buffer,
 		     0,
-		     sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_BUFFER_SIZE ) == NULL )
+		     sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -237,9 +237,11 @@ int imaging_handle_initialize(
 			}
 		}
 		( *imaging_handle )->bytes_per_sector         = 512;
+		( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
+		( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
 		( *imaging_handle )->sectors_per_chunk        = 64;
 		( *imaging_handle )->sector_error_granularity = 64;
-		( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
+		( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 		( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
 		( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
 	}
@@ -1670,7 +1672,7 @@ int imaging_handle_prompt_for_compression_level(
 	if( ewfinput_get_fixed_string_variable(
 	     imaging_handle->notify_stream,
 	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_BUFFER_SIZE,
+	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
 	     request_string,
 	     ewfinput_compression_levels,
 	     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
@@ -1707,6 +1709,68 @@ int imaging_handle_prompt_for_compression_level(
 	return( result );
 }
 
+/* Prompts the user for the format
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int imaging_handle_prompt_for_format(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *fixed_string_variable = NULL;
+	static char *function                                = "imaging_handle_prompt_for_format";
+	int result                                           = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ewfinput_get_fixed_string_variable(
+	     imaging_handle->notify_stream,
+	     imaging_handle->input_buffer,
+	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	     request_string,
+	     ewfinput_format_types,
+	     EWFINPUT_FORMAT_TYPES_AMOUNT,
+	     EWFINPUT_FORMAT_TYPES_DEFAULT,
+	     &fixed_string_variable,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_ewf_format(
+	          fixed_string_variable,
+	          &( imaging_handle->ewf_format ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine format.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Prompts the user for the number of sectors per chunk
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
@@ -1733,7 +1797,7 @@ int imaging_handle_prompt_for_sectors_per_chunk(
 	if( ewfinput_get_fixed_string_variable(
 	     imaging_handle->notify_stream,
 	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_BUFFER_SIZE,
+	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
 	     request_string,
 	     ewfinput_sector_per_block_sizes,
 	     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
@@ -1792,16 +1856,18 @@ int imaging_handle_prompt_for_sector_error_granularity(
 
 		return( -1 );
 	}
-	if( ewfinput_get_size_variable(
-	     imaging_handle->notify_stream,
-	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_BUFFER_SIZE,
-	     request_string,
-	     1,
-	     (uint64_t) imaging_handle->sectors_per_chunk,
-	     64,
-	     &input_size_variable,
-	     error ) == -1 )
+	result = ewfinput_get_size_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          1,
+	          (uint64_t) imaging_handle->sectors_per_chunk,
+	          64,
+	          &input_size_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1812,8 +1878,78 @@ int imaging_handle_prompt_for_sector_error_granularity(
 
 		return( -1 );
 	}
-	imaging_handle->sector_error_granularity = (uint32_t) input_size_variable;
+	else if( result != 0 )
+	{
+		imaging_handle->sector_error_granularity = (uint32_t) input_size_variable;
+	}
+	return( result );
+}
 
+/* Prompts the user for the maximum segment size
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int imaging_handle_prompt_for_maximum_segment_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	static char *function        = "imaging_handle_prompt_for_maximum_segment_size";
+	uint64_t default_input_size  = 0;
+	uint64_t input_size_variable = 0;
+	uint64_t maximum_input_size  = 0;
+	int result                   = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+	{
+		maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+       	}
+	else
+       	{
+		maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+       	}
+	default_input_size = imaging_handle->maximum_segment_size;
+
+       	if( default_input_size == 0 )
+       	{
+		default_input_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+       	}
+	result = ewfinput_get_size_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
+	          default_input_size,
+	          maximum_input_size,
+	          &input_size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		imaging_handle->maximum_segment_size = input_size_variable;
+	}
 	return( result );
 }
 
@@ -1826,8 +1962,6 @@ int imaging_handle_get_output_values(
      size64_t *media_size,
      uint8_t *media_type,
      uint8_t *media_flags,
-     uint8_t *libewf_format,
-     size64_t *maximum_segment_size,
      liberror_error_t **error )
 {
 	static char *function = "imaging_handle_get_output_values";
@@ -2001,7 +2135,7 @@ int imaging_handle_get_output_values(
 	}
 	if( libewf_handle_get_format(
 	     imaging_handle->output_handle,
-	     libewf_format,
+	     &( imaging_handle->ewf_format ),
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2015,7 +2149,7 @@ int imaging_handle_get_output_values(
 	}
 	if( libewf_handle_get_maximum_segment_size(
 	     imaging_handle->output_handle,
-	     maximum_segment_size,
+	     &( imaging_handle->maximum_segment_size ),
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2210,6 +2344,47 @@ int imaging_handle_set_compression_values(
 	return( result );
 }
 
+/* Sets the format
+ * Returns 1 if successful, 0 if unsupported values or -1 on error
+ */
+int imaging_handle_set_format(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_set_format";
+	int result            = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_ewf_format(
+	          string,
+	          &( imaging_handle->ewf_format ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine format.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Sets the number of sectors per chunk
  * Returns 1 if successful, 0 if unsupported values or -1 on error
  */
@@ -2293,6 +2468,93 @@ int imaging_handle_set_sector_error_granularity(
 	return( result );
 }
 
+/* Sets the maximum segment file size
+ * Returns 1 if successful, 0 if unsupported values or -1 on error
+ */
+int imaging_handle_set_maximum_segment_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_set_maximum_segment_size";
+	size_t string_length  = 0;
+	int result            = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	result = byte_size_string_convert(
+	          string,
+	          string_length,
+	          &( imaging_handle->maximum_segment_size ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine maximum segment size.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Sets the header codepage
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_set_header_codepage(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_set_header_codepage";
+	int result            = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_header_codepage(
+	          string,
+	          &imaging_handle->header_codepage,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine header codepage.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* TODO refactor into a function that sets alls the output values
  * for a single output handle, repeat it for the secondary output handle if necessary
  * this requires to unfold imaging_handle_set_header_value
@@ -2311,8 +2573,6 @@ int imaging_handle_set_output_values(
      size64_t media_size,
      uint8_t media_type,
      uint8_t media_flags,
-     uint8_t libewf_format,
-     size64_t maximum_segment_size,
      liberror_error_t **error )
 {
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
@@ -2646,7 +2906,7 @@ int imaging_handle_set_output_values(
 	 */
 	if( libewf_handle_set_format(
 	     imaging_handle->output_handle,
-	     libewf_format,
+	     imaging_handle->ewf_format,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2660,7 +2920,7 @@ int imaging_handle_set_output_values(
 	}
 	if( libewf_handle_set_maximum_segment_size(
 	     imaging_handle->output_handle,
-	     maximum_segment_size,
+	     imaging_handle->maximum_segment_size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2791,7 +3051,7 @@ int imaging_handle_set_output_values(
 		 */
 		if( libewf_handle_set_format(
 		     imaging_handle->secondary_output_handle,
-		     libewf_format,
+		     imaging_handle->ewf_format,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2805,7 +3065,7 @@ int imaging_handle_set_output_values(
 		}
 		if( libewf_handle_set_maximum_segment_size(
 		     imaging_handle->secondary_output_handle,
-		     maximum_segment_size,
+		     imaging_handle->maximum_segment_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2847,14 +3107,14 @@ int imaging_handle_set_output_values(
 		}
 	}
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
-	if( ( libewf_format == LIBEWF_FORMAT_ENCASE5 )
-	 || ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
-	 || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
+	if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
+	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
 	{
 		guid_type = GUID_TYPE_RANDOM;
         }
-	else if( ( libewf_format == LIBEWF_FORMAT_LINEN5 )
-	      || ( libewf_format == LIBEWF_FORMAT_LINEN6 ) )
+	else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_LINEN5 )
+	      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_LINEN6 ) )
 	{
 		guid_type = GUID_TYPE_TIME;
 	}
@@ -3629,11 +3889,9 @@ int imaging_handle_print_parameters(
      imaging_handle_t *imaging_handle,
      uint8_t media_type,
      uint8_t media_flags,
-     uint8_t ewf_format,
      off64_t acquiry_offset,
      off64_t resume_acquiry_offset,
      size64_t acquiry_size,
-     size64_t segment_file_size,
      uint32_t bytes_per_sector,
      uint8_t read_error_retries,
      uint8_t wipe_block_on_read_error,
@@ -3641,7 +3899,7 @@ int imaging_handle_print_parameters(
      liberror_error_t **error )
 {
 	libcstring_system_character_t acquiry_size_string[ 16 ];
-	libcstring_system_character_t segment_file_size_string[ 16 ];
+	libcstring_system_character_t maximum_segment_size_string[ 16 ];
 
 	static char *function = "imaging_handle_print_parameters";
 	int result            = 0;
@@ -3686,14 +3944,14 @@ int imaging_handle_print_parameters(
 
 	if( resume_acquiry == 0 )
 	{
-		if( ewf_format == LIBEWF_FORMAT_SMART )
+		if( imaging_handle->ewf_format == LIBEWF_FORMAT_SMART )
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
 			 "s01" );
 		}
-		else if( ( ewf_format == LIBEWF_FORMAT_EWF )
-		      || ( ewf_format == LIBEWF_FORMAT_EWFX ) )
+		else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWF )
+		      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
@@ -3719,14 +3977,14 @@ int imaging_handle_print_parameters(
 
 		if( resume_acquiry == 0 )
 		{
-			if( ewf_format == LIBEWF_FORMAT_SMART )
+			if( imaging_handle->ewf_format == LIBEWF_FORMAT_SMART )
 			{
 				fprintf(
 				 imaging_handle->notify_stream,
 				 "s01" );
 			}
-			else if( ( ewf_format == LIBEWF_FORMAT_EWF )
-			      || ( ewf_format == LIBEWF_FORMAT_EWFX ) )
+			else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWF )
+			      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
 			{
 				fprintf(
 				 imaging_handle->notify_stream,
@@ -3909,73 +4167,73 @@ int imaging_handle_print_parameters(
 	 imaging_handle->notify_stream,
 	 "EWF file format:\t\t" );
 
-	if( ewf_format == LIBEWF_FORMAT_EWF )
+	if( imaging_handle->ewf_format == LIBEWF_FORMAT_EWF )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "original EWF" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_SMART )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_SMART )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "SMART" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_FTK )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_FTK )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "FTK Imager" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE1 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE1 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "EnCase 1" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE2 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE2 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "EnCase 2" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE3 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE3 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "EnCase 3" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE4 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE4 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "EnCase 4" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE5 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "EnCase 5" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "EnCase 6" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_LINEN5 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_LINEN5 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "linen 5" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_LINEN6 )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_LINEN6 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "linen 6" );
 	}
-	else if( ewf_format == LIBEWF_FORMAT_EWFX )
+	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
@@ -4038,9 +4296,9 @@ int imaging_handle_print_parameters(
 	 "\n" );
 
 	result = byte_size_string_create(
-	          segment_file_size_string,
+	          maximum_segment_size_string,
 	          16,
-	          segment_file_size,
+	          imaging_handle->maximum_segment_size,
 	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	          NULL );
 
@@ -4053,15 +4311,15 @@ int imaging_handle_print_parameters(
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
-		 segment_file_size_string,
-		 segment_file_size );
+		 maximum_segment_size_string,
+		 imaging_handle->maximum_segment_size );
 	}
 	else
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "%" PRIu64 " bytes",
-		 segment_file_size );
+		 imaging_handle->maximum_segment_size );
 	}
 	fprintf(
 	 imaging_handle->notify_stream,

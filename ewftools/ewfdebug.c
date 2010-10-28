@@ -67,7 +67,7 @@ void usage_fprint(
 	                 "\t           windows-1250, windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
-	fprintf( stream, "\t-q:        quiet shows no status information\n" );
+	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 }
