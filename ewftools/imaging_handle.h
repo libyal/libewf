@@ -113,10 +113,6 @@ struct imaging_handle
 	 */
 	size_t notes_size;
 
-	/* The number of bytes per sector
-	 */
-	uint32_t bytes_per_sector;
-
 	/* The compression level
 	 */
 	int8_t compression_level;
@@ -128,6 +124,18 @@ struct imaging_handle
 	/* The EWF format
 	 */
 	uint8_t ewf_format;
+
+	/* The media type
+	 */
+	uint8_t media_type;
+
+	/* The media flags
+	 */
+	uint8_t media_flags;
+
+	/* The number of bytes per sector
+	 */
+	uint32_t bytes_per_sector;
 
 	/* The number of sectors per chunk
 	 */
@@ -274,6 +282,21 @@ int imaging_handle_prompt_for_format(
      const libcstring_system_character_t *request_string,
      liberror_error_t **error );
 
+int imaging_handle_prompt_for_media_type(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int imaging_handle_prompt_for_media_flags(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int imaging_handle_prompt_for_bytes_per_sector(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
 int imaging_handle_prompt_for_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
@@ -291,10 +314,7 @@ int imaging_handle_prompt_for_maximum_segment_size(
 
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     uint32_t *bytes_per_sector,
      size64_t *media_size,
-     uint8_t *media_type,
-     uint8_t *media_flags,
      liberror_error_t **error );
 
 int imaging_handle_set_string(
@@ -310,6 +330,21 @@ int imaging_handle_set_compression_values(
      liberror_error_t **error );
 
 int imaging_handle_set_format(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_media_type(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_media_flags(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_bytes_per_sector(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );
@@ -340,10 +375,7 @@ int imaging_handle_set_output_values(
      libcstring_system_character_t *acquiry_software_version,
      libcstring_system_character_t *model,
      libcstring_system_character_t *serial_number,
-     uint32_t bytes_per_sector,
      size64_t media_size,
-     uint8_t media_type,
-     uint8_t media_flags,
      liberror_error_t **error );
 
 int imaging_handle_get_header_value(
@@ -391,12 +423,9 @@ ssize_t imaging_handle_finalize(
 
 int imaging_handle_print_parameters(
      imaging_handle_t *imaging_handle,
-     uint8_t media_type,
-     uint8_t media_flags,
      off64_t acquiry_offset,
      off64_t resume_acquiry_offset,
      size64_t acquiry_size,
-     uint32_t bytes_per_sector,
      uint8_t read_error_retries,
      uint8_t wipe_block_on_read_error,
      uint8_t resume_acquiry,

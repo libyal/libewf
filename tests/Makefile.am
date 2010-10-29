@@ -47,7 +47,8 @@ check_PROGRAMS = \
 	ewf_test_read \
 	ewf_test_read_write \
 	ewf_test_seek \
-	ewf_test_write
+	ewf_test_write \
+	ewf_test_write_chunk
 
 ewf_test_glob_SOURCES = \
 	ewf_test_glob.c
@@ -92,6 +93,17 @@ ewf_test_write_SOURCES = \
 	ewf_test_write.c
 
 ewf_test_write_LDADD = \
+	../libcstring/libcstring.la \
+	../liberror/liberror.la \
+	../libewf/libewf.la \
+	../libsystem/libsystem.la \
+        @MEMWATCH_LIBADD@
+
+ewf_test_write_chunk_SOURCES = \
+	ewf_test_definitions.h \
+	ewf_test_write_chunk.c
+
+ewf_test_write_chunk_LDADD = \
 	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \

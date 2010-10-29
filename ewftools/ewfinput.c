@@ -90,7 +90,7 @@ libcstring_system_character_t *ewfinput_yes_no[ 2 ] = \
    _LIBCSTRING_SYSTEM_STRING( "no" ) };
 
 /* Determines the EWF format from a string
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int ewfinput_determine_ewf_format(
      const libcstring_system_character_t *string,
@@ -98,7 +98,8 @@ int ewfinput_determine_ewf_format(
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_ewf_format";
-	int result            = -1;
+	size_t string_length  = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -122,103 +123,119 @@ int ewfinput_determine_ewf_format(
 
 		return( -1 );
 	}
-	if( libcstring_system_string_compare(
-	     string,
-	     _LIBCSTRING_SYSTEM_STRING( "smart" ),
-	     5 ) == 0 )
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 3 )
 	{
-		*ewf_format = LIBEWF_FORMAT_SMART;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "ewf" ),
+		     3 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_EWF;
+			result      = 1;
+		}
+		else if( libcstring_system_string_compare(
+		          string,
+		          _LIBCSTRING_SYSTEM_STRING( "ftk" ),
+		          3 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_FTK;
+			result      = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "ftk" ),
-	          3 ) == 0 )
+	else if( string_length == 5 )
 	{
-		*ewf_format = LIBEWF_FORMAT_FTK;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "ewfx" ),
+		     4 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_EWFX;
+			result      = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "encase1" ),
-	          7 ) == 0 )
+	else if( string_length == 5 )
 	{
-		*ewf_format = LIBEWF_FORMAT_ENCASE1;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "smart" ),
+		     5 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_SMART;
+			result      = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "encase2" ),
-	          7 ) == 0 )
+	else if( string_length == 6 )
 	{
-		*ewf_format = LIBEWF_FORMAT_ENCASE2;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "linen5" ),
+		     6 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_LINEN5;
+			result      = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "linen6" ),
+			  6 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_LINEN6;
+			result      = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "encase3" ),
-	          7 ) == 0 )
+	else if( string_length == 7 )
 	{
-		*ewf_format = LIBEWF_FORMAT_ENCASE3;
-		result      = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "encase4" ),
-	          7 ) == 0 )
-	{
-		*ewf_format = LIBEWF_FORMAT_ENCASE4;
-		result      = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "encase5" ),
-	          7 ) == 0 )
-	{
-		*ewf_format = LIBEWF_FORMAT_ENCASE5;
-		result      = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "encase6" ),
-	          7 ) == 0 )
-	{
-		*ewf_format = LIBEWF_FORMAT_ENCASE6;
-		result      = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "linen5" ),
-	          6 ) == 0 )
-	{
-		*ewf_format = LIBEWF_FORMAT_LINEN5;
-		result      = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "linen6" ),
-	          6 ) == 0 )
-	{
-		*ewf_format = LIBEWF_FORMAT_LINEN6;
-		result      = 1;
-	}
-	/* This check must before the check for "ewf"
-	 */
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "ewfx" ),
-	          4 ) == 0 )
-	{
-		*ewf_format = LIBEWF_FORMAT_EWFX;
-		result      = 1;
-	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "ewf" ),
-	          3 ) == 0 )
-	{
-		*ewf_format = LIBEWF_FORMAT_EWF;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "encase1" ),
+		     7 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_ENCASE1;
+			result      = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "encase2" ),
+			  7 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_ENCASE2;
+			result      = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "encase3" ),
+			  7 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_ENCASE3;
+			result      = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "encase4" ),
+			  7 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_ENCASE4;
+			result      = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "encase5" ),
+			  7 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_ENCASE5;
+			result      = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "encase6" ),
+			  7 ) == 0 )
+		{
+			*ewf_format = LIBEWF_FORMAT_ENCASE6;
+			result      = 1;
+		}
 	}
 	return( result );
 }
@@ -459,7 +476,7 @@ int ewfinput_determine_compression_values(
 }
 
 /* Determines the media type value from a string
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int ewfinput_determine_media_type(
      const libcstring_system_character_t *string,
@@ -467,7 +484,8 @@ int ewfinput_determine_media_type(
      liberror_error_t **error )
 {
 	static char *function = "ewfinput_determine_media_type";
-	int result            = -1;
+	size_t string_length  = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -491,37 +509,52 @@ int ewfinput_determine_media_type(
 
 		return( -1 );
 	}
-	if( libcstring_system_string_compare(
-	     string,
-	     _LIBCSTRING_SYSTEM_STRING( "fixed" ),
-	          5 ) == 0 )
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 5 )
 	{
-		*media_type = LIBEWF_MEDIA_TYPE_FIXED;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "fixed" ),
+			  5 ) == 0 )
+		{
+			*media_type = LIBEWF_MEDIA_TYPE_FIXED;
+			result      = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "removable" ),
-	          9 ) == 0 )
+	else if( string_length == 5 )
 	{
-		*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "memory" ),
+		     6 ) == 0 )
+		{
+			*media_type = LIBEWF_MEDIA_TYPE_MEMORY;
+			result      = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "optical" ),
-	          7 ) == 0 )
+	else if( string_length == 7 )
 	{
-		*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "optical" ),
+		     7 ) == 0 )
+		{
+			*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
+			result      = 1;
+		}
 	}
-	else if( libcstring_system_string_compare(
-	          string,
-	          _LIBCSTRING_SYSTEM_STRING( "memory" ),
-	          6 ) == 0 )
+	else if( string_length == 9 )
 	{
-		*media_type = LIBEWF_MEDIA_TYPE_MEMORY;
-		result      = 1;
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "removable" ),
+		     9 ) == 0 )
+		{
+			*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
+			result      = 1;
+		}
 	}
 	return( result );
 }
@@ -1104,16 +1137,16 @@ int ewfinput_get_size_variable(
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
      const libcstring_system_character_t *request_string,
-     uint64_t minimum,
-     uint64_t maximum,
-     uint64_t default_value,
+     uint64_t minimum_size,
+     uint64_t maximum_size,
+     uint64_t default_size,
      uint64_t *size_variable,
      liberror_error_t **error )
 {
 	libcstring_system_character_t *end_of_input  = NULL;
 	libcstring_system_character_t *result_string = NULL;
-	static char *function                = "ewfinput_get_size_variable";
-	ssize_t input_length                 = 0;
+	static char *function                        = "ewfinput_get_size_variable";
+	ssize_t input_length                         = 0;
 
 	if( stream == NULL )
 	{
@@ -1180,9 +1213,9 @@ int ewfinput_get_size_variable(
 		 stream,
 		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ",
 		 request_string,
-		 minimum,
-		 maximum,
-		 default_value );
+		 minimum_size,
+		 maximum_size,
+		 default_size );
 
 		result_string = libsystem_file_stream_get_string(
 		                 stdin,
@@ -1225,7 +1258,7 @@ int ewfinput_get_size_variable(
 			}
 			else if( input_length == 0 )
 			{
-				*size_variable = default_value;
+				*size_variable = default_size;
 
 				return( 0 );
 			}
@@ -1239,8 +1272,8 @@ int ewfinput_get_size_variable(
 				 stream,
 				 "Unable to convert value into number, please try again or terminate using Ctrl^C.\n" );
 			}
-			else if( ( *size_variable >= minimum )
-			      && ( *size_variable <= maximum ) )
+			else if( ( *size_variable >= minimum_size )
+			      && ( *size_variable <= maximum_size ) )
 			{
 				break;
 			}
@@ -1269,9 +1302,9 @@ int ewfinput_get_byte_size_variable(
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
      const libcstring_system_character_t *request_string,
-     uint64_t minimum,
-     uint64_t maximum,
-     uint64_t default_value,
+     uint64_t minimum_size,
+     uint64_t maximum_size,
+     uint64_t default_size,
      uint64_t *byte_size_variable,
      liberror_error_t **error )
 {
@@ -1342,7 +1375,7 @@ int ewfinput_get_byte_size_variable(
 	if( byte_size_string_create(
 	     minimum_size_string,
 	     16,
-	     minimum,
+	     minimum_size,
 	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	     error ) != 1 )
 	{
@@ -1358,7 +1391,7 @@ int ewfinput_get_byte_size_variable(
 	if( byte_size_string_create(
 	     default_size_string,
 	     16,
-	     default_value,
+	     default_size,
 	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	     error ) != 1 )
 	{
@@ -1374,7 +1407,7 @@ int ewfinput_get_byte_size_variable(
 	if( byte_size_string_create(
 	     maximum_size_string,
 	     16,
-	     maximum,
+	     maximum_size,
 	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	     error ) != 1 )
 	{
@@ -1442,7 +1475,7 @@ int ewfinput_get_byte_size_variable(
 			}
 			else if( input_length == 0 )
 			{
-				*byte_size_variable = default_value;
+				*byte_size_variable = default_size;
 
 				return( 0 );
 			}
@@ -1456,8 +1489,8 @@ int ewfinput_get_byte_size_variable(
 				 stream,
 				 "Invalid value, please try again or terminate using Ctrl^C.\n" );
 			}
-			else if( ( *byte_size_variable >= minimum )
-			      && ( *byte_size_variable <= maximum ) )
+			else if( ( *byte_size_variable >= minimum_size )
+			      && ( *byte_size_variable <= maximum_size ) )
 			{
 				break;
 			}

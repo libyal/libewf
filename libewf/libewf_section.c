@@ -226,17 +226,20 @@ ssize_t libewf_section_start_read(
 		 *section_size );
 
 		libnotify_printf(
+	 	 "%s: padding:\n",
+		 function );
+		libnotify_print_data(
+		 section->padding,
+		 40 );
+
+		libnotify_printf(
 		 "%s: checksum\t\t\t: 0x%08" PRIx32 " (0x%08" PRIx32 ")\n",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
 
 		libnotify_printf(
-	 	 "%s: padding:\n",
-		 function );
-		libnotify_print_data(
-		 section->padding,
-		 40 );
+		 "\n" );
 	}
 #endif
 	if( stored_checksum != calculated_checksum )
@@ -3808,9 +3811,9 @@ ssize_t libewf_section_session_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	if( ewf_format == EWF_FORMAT_S01 )
+	if( libnotify_verbose != 0 )
 	{
-		if( libnotify_verbose != 0 )
+		if( ewf_format == EWF_FORMAT_S01 )
 		{
 			libnotify_printf(
 		 	 "%s: EWF-S01 format should not contain session section.\n",
@@ -3836,15 +3839,55 @@ ssize_t libewf_section_session_read(
 
 		return( -1 );
 	}
-	calculated_checksum = ewf_checksum_calculate(
-	                       &ewf_session,
-	                       sizeof( ewf_session_t ) - sizeof( uint32_t ),
-	                       1 );
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: session data:\n",
+		 function );
+		libnotify_print_data(
+		 (uint8_t *) &ewf_session,
+		 sizeof( ewf_session_t ) );
+	}
+#endif
+	byte_stream_copy_to_uint32_little_endian(
+	 ewf_session.number_of_sessions,
+	 number_of_ewf_sessions );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ewf_session.checksum,
 	 stored_checksum );
 
+	calculated_checksum = ewf_checksum_calculate(
+	                       &ewf_session,
+	                       sizeof( ewf_session_t ) - sizeof( uint32_t ),
+	                       1 );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: number of sessions: %" PRIu32 "\n",
+		 function,
+		 number_of_ewf_sessions );
+
+		libnotify_printf(
+		 "%s: unknown1:\n",
+		 function );
+		libnotify_print_data(
+		 ewf_session.unknown1,
+		 28 );
+
+		libnotify_printf(
+		 "%s: checksum\t\t\t: 0x%08" PRIx32 " (0x%08" PRIx32 ")\n",
+		 function,
+		 stored_checksum,
+		 calculated_checksum );
+
+		libnotify_printf(
+		 "\n" );
+	}
+#endif
 	if( stored_checksum != calculated_checksum )
 	{
 		liberror_error_set(
@@ -3858,30 +3901,6 @@ ssize_t libewf_section_session_read(
 
 		return( -1 );
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
-	{
-		libnotify_printf(
-		 "%s: unknown1:\n",
-		 function );
-		libnotify_print_data(
-		 ewf_session.unknown1,
-		 28 );
-	}
-#endif
-	byte_stream_copy_to_uint32_little_endian(
-	 ewf_session.number_of_sessions,
-	 number_of_ewf_sessions );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
-	{
-		libnotify_printf(
-		 "%s: number of sessions: %" PRIu32 "\n",
-		 function,
-		 number_of_ewf_sessions );
-	}
-#endif
 	if( number_of_ewf_sessions > 0 )
 	{
 		ewf_sessions_size = sizeof( ewf_session_entry_t ) * number_of_ewf_sessions;
@@ -3923,6 +3942,17 @@ ssize_t libewf_section_session_read(
 		}
 		section_read_count += read_count;
 
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: session entries data:\n",
+			 function );
+			libnotify_print_data(
+			 (uint8_t *) ewf_sessions,
+			 ewf_sessions_size );
+		}
+#endif
 		calculated_checksum = ewf_checksum_calculate(
 		                       ewf_sessions,
 		                       ewf_sessions_size,
@@ -3955,6 +3985,19 @@ ssize_t libewf_section_session_read(
 		 stored_checksum_buffer,
 		 stored_checksum );
 
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: checksum\t\t\t: 0x%08" PRIx32 " (0x%08" PRIx32 ")\n",
+			 function,
+			 stored_checksum,
+			 calculated_checksum );
+
+			libnotify_printf(
+			 "\n" );
+		}
+#endif
 		if( stored_checksum != calculated_checksum )
 		{
 			liberror_error_set(
@@ -3971,17 +4014,6 @@ ssize_t libewf_section_session_read(
 
 			return( -1 );
 		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
-		{
-			libnotify_printf(
-			 "%s: sessions data:\n",
-			 function );
-			libnotify_print_data(
-			 (uint8_t *) ewf_sessions,
-			 ewf_sessions_size );
-		}
-#endif
 		if( libewf_sector_list_get_number_of_elements(
 		     sessions,
 		     &number_of_elements,
@@ -4002,19 +4034,41 @@ ssize_t libewf_section_session_read(
 		if( number_of_elements == 0 )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 ewf_sessions[ ewf_session_index ].first_sector,
+			 ( ewf_sessions[ ewf_session_index ] ).first_sector,
 			 last_first_sector );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: session: %" PRIu32 " first sector\t: %" PRIu32 "\n",
+				 "%s: session: %" PRIu32 " unknown1:\n",
+				 function,
+				 ewf_session_index );
+				libnotify_print_data(
+				 ( ewf_sessions[ ewf_session_index ] ).unknown1,
+				 4 );
+
+				libnotify_printf(
+				 "%s: session: %" PRIu32 " first sector\t: 0 (%" PRIu32 ")\n",
 				 function,
 				 ewf_session_index,
 				 last_first_sector );
+
+				libnotify_printf(
+				 "%s: session: %" PRIu32 " unknown2:\n",
+				 function,
+				 ewf_session_index );
+				libnotify_print_data(
+				 ( ewf_sessions[ ewf_session_index ] ).unknown2,
+				 24 );
 			}
 #endif
+			/* Note that EnCase says the first session starts at session 16
+			 * This is either some EnCase specific behavior or the value is used for
+			 * other purposes.
+			 */
+			last_first_sector = 0;
+
 			for( ewf_session_index = 1;
 			     ewf_session_index < number_of_ewf_sessions;
 			     ewf_session_index++ )
@@ -4027,10 +4081,26 @@ ssize_t libewf_section_session_read(
 				if( libnotify_verbose != 0 )
 				{
 					libnotify_printf(
+					 "%s: session: %" PRIu32 " unknown1:\n",
+					 function,
+					 ewf_session_index );
+					libnotify_print_data(
+					 ( ewf_sessions[ ewf_session_index ] ).unknown1,
+					 4 );
+
+					libnotify_printf(
 					 "%s: session: %" PRIu32 " first sector\t: %" PRIu32 "\n",
 					 function,
 					 ewf_session_index,
 					 first_sector );
+
+					libnotify_printf(
+					 "%s: session: %" PRIu32 " unknown2:\n",
+					 function,
+					 ewf_session_index );
+					libnotify_print_data(
+					 ( ewf_sessions[ ewf_session_index ] ).unknown2,
+					 24 );
 				}
 #endif
 				if( first_sector < last_first_sector )
@@ -4280,6 +4350,15 @@ ssize_t libewf_section_session_write(
 			 ewf_sessions );
 
 			return( -1 );
+		}
+		/* Note that EnCase says the first session starts at session 16
+		 * This is either some EnCase specific behavior or the value is used for
+		 * other purposes.
+		 */
+		if( ( session_index == 0 )
+		 && ( first_sector == 0 ) )
+		{
+			first_sector = 16;
 		}
 		byte_stream_copy_from_uint32_little_endian(
 		 ewf_sessions[ session_index ].first_sector,

@@ -117,8 +117,9 @@ void usage_fprint(
 	                 "                        [ -l log_filename ] [ -m media_type ]\n"
 	                 "                        [ -M media_flags ] [ -N notes ]\n"
 	                 "                        [ -o offset ] [ -p process_buffer_size ]\n"
-	                 "                        [ -S segment_file_size ] [ -t target ]\n"
-	                 "                        [ -2 secondary_target ] [ -hqsvV ]\n\n" );
+	                 "                        [ -P bytes_per_sector ] [ -S segment_file_size ]\n"
+	                 "                        [ -t target ] [ -2 secondary_target ]\n"
+	                 "                        [ -hqsvV ]\n\n" );
 
 	fprintf( stream, "\tReads data from stdin\n\n" );
 
@@ -146,6 +147,7 @@ void usage_fprint(
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-o: specify the offset to start to acquire (default is 0)\n" );
 	fprintf( stream, "\t-p: specify the process buffer size (default is the chunk size)\n" );
+	fprintf( stream, "\t-P: specify the number of bytes per sector (default is 512)\n" );
 	fprintf( stream, "\t-q: quiet shows minimal status information\n" );
 	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n"
 	                 "\t    (use this for big to little endian conversion and vice versa)\n" );
@@ -802,6 +804,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *calculated_md5_hash_string       = NULL;
 	libcstring_system_character_t *calculated_sha1_hash_string      = NULL;
 	libcstring_system_character_t *log_filename                     = NULL;
+	libcstring_system_character_t *option_bytes_per_sector          = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
 	libcstring_system_character_t *option_compression_level         = NULL;
 	libcstring_system_character_t *option_description               = NULL;
@@ -810,6 +813,8 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_format                    = NULL;
 	libcstring_system_character_t *option_header_codepage           = NULL;
 	libcstring_system_character_t *option_maximum_segment_size      = NULL;
+	libcstring_system_character_t *option_media_flags               = NULL;
+	libcstring_system_character_t *option_media_type                = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
         libcstring_system_character_t *option_secondary_target_filename = NULL;
         libcstring_system_character_t *option_sectors_per_chunk         = NULL;
@@ -826,11 +831,8 @@ int main( int argc, char * const argv[] )
 	uint64_t acquiry_offset                                         = 0;
 	uint64_t acquiry_size                                           = 0;
 	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint32_t bytes_per_sector                                       = 512;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
-	uint8_t media_flags                                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
-	uint8_t media_type                                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                                = 1;
 	uint8_t read_error_retries                                      = 2;
 	uint8_t resume_acquiry                                          = 0;
@@ -892,7 +894,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:qsS:t:vV2:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:P:qsS:t:vV2:" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -999,41 +1001,13 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'm':
-				if( ewfinput_determine_media_type(
-				     optarg,
-				     &media_type,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_media_type = optarg;
 
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
-
-					fprintf(
-					 stderr,
-					 "Unsupported media type defaulting to: fixed.\n" );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'M':
-				if( ewfinput_determine_media_flags(
-				     optarg,
-				     &media_flags,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_media_flags = optarg;
 
-					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
-
-					fprintf(
-					 stderr,
-					 "Unsupported media flags defaulting to: physical.\n" );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'N':
@@ -1093,8 +1067,14 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
+			case (libcstring_system_integer_t) 'P':
+				option_bytes_per_sector = optarg;
+
+				break;
+
 			case (libcstring_system_integer_t) 'q':
 				print_status_information = 0;
+
 				break;
 
 			case (libcstring_system_integer_t) 's':
@@ -1336,28 +1316,6 @@ int main( int argc, char * const argv[] )
 			goto ewfacquirestream_main_on_error;
 		}
 	}
-	if( option_sectors_per_chunk != NULL )
-	{
-		result = imaging_handle_set_sectors_per_chunk(
-			  ewfacquirestream_imaging_handle,
-			  option_sectors_per_chunk,
-			  &error );
-
-		if( result == -1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set sectors per chunk.\n" );
-
-			goto ewfacquirestream_main_on_error;
-		}
-		else if( result == 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Unsuported sectors per chunk defaulting to: 64.\n" );
-		}
-	}
 	if( option_compression_level != NULL )
 	{
 		result = imaging_handle_set_compression_values(
@@ -1407,6 +1365,96 @@ int main( int argc, char * const argv[] )
 			ewfacquirestream_imaging_handle->ewf_format = LIBEWF_FORMAT_ENCASE6;
 		}
 	}
+	if( option_media_type != NULL )
+	{
+		result = imaging_handle_set_media_type(
+			  ewfacquirestream_imaging_handle,
+			  option_media_type,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set media type.\n" );
+
+			goto ewfacquirestream_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported media type defaulting to: fixed.\n" );
+		}
+	}
+	if( option_media_flags != NULL )
+	{
+		result = imaging_handle_set_media_flags(
+			  ewfacquirestream_imaging_handle,
+			  option_media_flags,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set media flags.\n" );
+
+			goto ewfacquirestream_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported media flags defaulting to: physical.\n" );
+		}
+	}
+	if( option_bytes_per_sector != NULL )
+	{
+		result = imaging_handle_set_bytes_per_sector(
+			  ewfacquirestream_imaging_handle,
+			  option_bytes_per_sector,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set bytes per sector.\n" );
+
+			goto ewfacquirestream_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
+			 ewfacquirestream_imaging_handle->bytes_per_sector );
+		}
+	}
+	if( option_sectors_per_chunk != NULL )
+	{
+		result = imaging_handle_set_sectors_per_chunk(
+			  ewfacquirestream_imaging_handle,
+			  option_sectors_per_chunk,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set sectors per chunk.\n" );
+
+			goto ewfacquirestream_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported sectors per chunk defaulting to: %" PRIu32 ".\n",
+			 ewfacquirestream_imaging_handle->sectors_per_chunk );
+		}
+	}
 	if( option_maximum_segment_size != NULL )
 	{
 		result = imaging_handle_set_maximum_segment_size(
@@ -1443,12 +1491,9 @@ int main( int argc, char * const argv[] )
 
 	if( imaging_handle_print_parameters(
 	     ewfacquirestream_imaging_handle,
-	     media_type,
-	     media_flags,
 	     (off64_t) acquiry_offset,
 	     0,
 	     (size64_t) acquiry_size,
-	     bytes_per_sector,
 	     read_error_retries,
 	     0,
 	     0,
@@ -1499,10 +1544,7 @@ int main( int argc, char * const argv[] )
 		     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
 		     NULL,
 		     NULL,
-		     bytes_per_sector,
 		     acquiry_size,
-		     media_type,
-		     media_flags,
 		     &error ) != 1 )
 		{
 			fprintf(
@@ -1655,7 +1697,7 @@ int main( int argc, char * const argv[] )
 		               0,
 		               acquiry_size,
 		               acquiry_offset,
-		               bytes_per_sector,
+		               ewfacquirestream_imaging_handle->bytes_per_sector,
 		               swap_byte_pairs,
 		               read_error_retries,
 		               (size_t) process_buffer_size,

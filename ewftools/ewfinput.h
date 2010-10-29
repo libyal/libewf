@@ -102,9 +102,9 @@ int ewfinput_get_size_variable(
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
      const libcstring_system_character_t *request_string,
-     uint64_t minimum,
-     uint64_t maximum,
-     uint64_t default_value,
+     uint64_t minimum_size,
+     uint64_t maximum_size,
+     uint64_t default_size,
      uint64_t *size_variable,
      liberror_error_t **error );
 
@@ -113,9 +113,9 @@ int ewfinput_get_byte_size_variable(
      libcstring_system_character_t *input_buffer,
      size_t input_buffer_size,
      const libcstring_system_character_t *request_string,
-     uint64_t minimum,
-     uint64_t maximum,
-     uint64_t default_value,
+     uint64_t minimum_size,
+     uint64_t maximum_size,
+     uint64_t default_size,
      uint64_t *byte_size_variable,
      liberror_error_t **error );
 

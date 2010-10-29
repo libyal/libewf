@@ -66,7 +66,7 @@ int ewfacquire_abort                        = 0;
 
 /* Prints the executable usage information to the stream
  */
-void usage_fprint(
+void ewfacquire_usage_fprint(
       FILE *stream )
 {
 	libcstring_system_character_t default_segment_file_size_string[ 16 ];
@@ -288,7 +288,6 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 int ewfacquire_determine_sessions(
      imaging_handle_t *imaging_handle,
      device_handle_t *device_handle,
-     uint32_t bytes_per_sector,
      uint64_t media_size,
      liberror_error_t **error )
 {
@@ -348,7 +347,7 @@ int ewfacquire_determine_sessions(
 		}
 		if( imaging_handle_append_session(
 		     ewfacquire_imaging_handle,
-		     (off64_t) bytes_per_sector,
+		     (off64_t) 0,
 		     (size64_t) media_size,
 		     error ) != 1 )
 		{
@@ -1047,6 +1046,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *calculated_sha1_hash_string      = NULL;
 	libcstring_system_character_t *fixed_string_variable            = NULL;
 	libcstring_system_character_t *log_filename                     = NULL;
+	libcstring_system_character_t *option_bytes_per_sector          = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
 	libcstring_system_character_t *option_compression_level         = NULL;
 	libcstring_system_character_t *option_description               = NULL;
@@ -1056,6 +1056,8 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_header_codepage           = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_maximum_segment_size      = NULL;
+	libcstring_system_character_t *option_media_flags               = NULL;
+	libcstring_system_character_t *option_media_type                = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
 	libcstring_system_character_t *option_sector_error_granularity  = NULL;
 	libcstring_system_character_t *option_sectors_per_chunk         = NULL;
@@ -1076,11 +1078,8 @@ int main( int argc, char * const argv[] )
 	uint64_t input_size_variable                                    = 0;
 	uint64_t media_size                                             = 0;
 	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	uint32_t bytes_per_sector                                       = 512;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
-	uint8_t media_flags                                             = LIBEWF_MEDIA_FLAG_PHYSICAL;
-	uint8_t media_type                                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t print_status_information                                = 1;
 	uint8_t read_error_retries                                      = 2;
 	uint8_t resume_acquiry                                          = 0;
@@ -1088,15 +1087,10 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                                                 = 0;
 	uint8_t wipe_block_on_read_error                                = 0;
 	int8_t acquiry_parameters_confirmed                             = 0;
-	int argument_set_bytes_per_sector                               = 0;
-	int argument_set_media_type                                     = 0;
 	int argument_set_offset                                         = 0;
 	int argument_set_read_error_retries                             = 0;
 	int argument_set_size                                           = 0;
-	int argument_set_media_flags                                    = 0;
 	int argument_set_wipe_block_on_read_error                       = 0;
-	int default_media_flags                                         = 0;
-	int default_media_type                                          = 0;
 	int error_abort                                                 = 0;
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
@@ -1141,7 +1135,7 @@ int main( int argc, char * const argv[] )
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
 				 argv[ optind ] );
 
-				usage_fprint(
+				ewfacquire_usage_fprint(
 				 stdout );
 
 				return( EXIT_FAILURE );
@@ -1233,7 +1227,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'h':
-				usage_fprint(
+				ewfacquire_usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
@@ -1244,49 +1238,13 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'm':
-				if( ewfinput_determine_media_type(
-				     optarg,
-				     &media_type,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_media_type = optarg;
 
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
-
-					fprintf(
-					 stderr,
-					 "Unsupported media type defaulting to: fixed.\n" );
-				}
-				else
-				{
-					argument_set_media_type = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'M':
-				if( ewfinput_determine_media_flags(
-				     optarg,
-				     &media_flags,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_media_flags = optarg;
 
-					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
-
-					fprintf(
-					 stderr,
-					 "Unsupported media flags defaulting to: physical.\n" );
-				}
-				else
-				{
-					argument_set_media_flags = 1;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'N':
@@ -1349,37 +1307,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'P':
-				string_length = libcstring_system_string_length(
-				                 optarg );
-
-				result = byte_size_string_convert(
-				          optarg,
-				          string_length,
-				          &input_size_variable,
-				          &error );
-
-				if( result != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-				}
-				if( ( result != 1 )
-				 || ( input_size_variable > (uint64_t) UINT32_MAX ) )
-				{
-					input_size_variable = 512;
-
-					fprintf(
-					 stderr,
-					 "Unsupported number of bytes per sector defaulting to: %" PRIu64 ".\n",
-					 input_size_variable );
-				}
-				else
-				{
-					argument_set_bytes_per_sector = 1;
-				}
-				bytes_per_sector = (uint32_t) input_size_variable;
+				option_bytes_per_sector = optarg;
 
 				break;
 
@@ -1475,7 +1403,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Missing source file or device.\n" );
 
-		usage_fprint(
+		ewfacquire_usage_fprint(
 		 stdout );
 
 		return( EXIT_FAILURE );
@@ -1583,51 +1511,6 @@ int main( int argc, char * const argv[] )
 		 NULL );
 
 		return( EXIT_FAILURE );
-	}
-	if( argument_set_bytes_per_sector == 0 )
-	{
-		if( device_handle_get_bytes_per_sector(
-		     ewfacquire_device_handle,
-		     &bytes_per_sector,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to retrieve bytes per sector.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			device_handle_close(
-			 ewfacquire_device_handle,
-			 NULL );
-			device_handle_free(
-			 &ewfacquire_device_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
-		}
-	}
-	if( argument_set_media_type == 0 )
-	{
-		 if( device_handle_get_media_type(
-		      ewfacquire_device_handle,
-		      &media_type,
-		      &error ) != 1 )
-		{
-			media_type = LIBEWF_MEDIA_TYPE_FIXED;
-
-			fprintf(
-			 stderr,
-			 "Unable to retrieve media type defaulting to: fixed.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
 	}
 	if( device_handle_media_information_fprint(
 	     ewfacquire_device_handle,
@@ -1856,6 +1739,101 @@ int main( int argc, char * const argv[] )
 			 "Unsupported format type defaulting to: encase6.\n" );
 		}
 	}
+	if( option_media_type != NULL )
+	{
+		result = imaging_handle_set_media_type(
+			  ewfacquire_imaging_handle,
+			  option_media_type,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set media type.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported media type defaulting to: fixed.\n" );
+		}
+	}
+	else
+	{
+		 if( device_handle_get_media_type(
+		      ewfacquire_device_handle,
+		      &( ewfacquire_imaging_handle->media_type ),
+		      &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to retrieve media type from device.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
+	if( option_media_flags != NULL )
+	{
+		result = imaging_handle_set_media_flags(
+			  ewfacquire_imaging_handle,
+			  option_media_flags,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set media flags.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported media flags defaulting to: physical.\n" );
+		}
+	}
+	if( option_bytes_per_sector != NULL )
+	{
+		result = imaging_handle_set_bytes_per_sector(
+			  ewfacquire_imaging_handle,
+			  option_bytes_per_sector,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set bytes per sector.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
+			 ewfacquire_imaging_handle->bytes_per_sector );
+		}
+	}
+	else
+	{
+		if( device_handle_get_bytes_per_sector(
+		     ewfacquire_device_handle,
+		     &( ewfacquire_imaging_handle->bytes_per_sector ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to retrieve bytes per sector from device.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
 	if( option_sectors_per_chunk != NULL )
 	{
 		result = imaging_handle_set_sectors_per_chunk(
@@ -1875,7 +1853,8 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported sectors per chunk defaulting to: 64.\n" );
+			 "Unsuported sectors per chunk defaulting to: %" PRIu32 ".\n",
+			 ewfacquire_imaging_handle->sectors_per_chunk );
 		}
 	}
 	if( option_sector_error_granularity != NULL )
@@ -1897,7 +1876,8 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported sector error granularity defaulting to: 64.\n" );
+			 "Unsuported sector error granularity defaulting to: %" PRIu32 ".\n",
+			 ewfacquire_imaging_handle->sector_error_granularity );
 		}
 	}
 	if( option_maximum_segment_size != NULL )
@@ -2023,10 +2003,7 @@ int main( int argc, char * const argv[] )
 		{
 			if( imaging_handle_get_output_values(
 			     ewfacquire_imaging_handle,
-			     &bytes_per_sector,
 			     &acquiry_size,
-			     &media_type,
-			     &media_flags,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2085,7 +2062,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to set case number.\n" );
+					 "Unable to determine case number.\n" );
 
 					goto ewfacquire_main_on_error;
 				}
@@ -2101,7 +2078,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to set description.\n" );
+					 "Unable to determine description.\n" );
 
 					goto ewfacquire_main_on_error;
 				}
@@ -2117,7 +2094,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to set evidence number.\n" );
+					 "Unable to determine evidence number.\n" );
 
 					goto ewfacquire_main_on_error;
 				}
@@ -2133,7 +2110,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to set examiner name.\n" );
+					 "Unable to determine examiner name.\n" );
 
 					goto ewfacquire_main_on_error;
 				}
@@ -2149,118 +2126,55 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to set notes.\n" );
+					 "Unable to determine notes.\n" );
 
 					goto ewfacquire_main_on_error;
 				}
 			}
-			/* Media type
-			 */
-			if( argument_set_media_type == 0 )
+			if( option_media_type == NULL )
 			{
-				if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-				{
-					default_media_type = 1;
-				}
-				else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
-				{
-					default_media_type = 2;
-				}
-				else if( media_type == LIBEWF_MEDIA_TYPE_MEMORY )
-				{
-					default_media_type = 3;
-				}
-				else
-				{
-					default_media_type = EWFINPUT_MEDIA_TYPES_DEFAULT;
-				}
-				if( ewfinput_get_fixed_string_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Media type" ),
-				     ewfinput_media_types,
-				     EWFINPUT_MEDIA_TYPES_AMOUNT,
-				     (uint8_t) default_media_type,
-				     &fixed_string_variable,
-				     &error ) == -1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				result = imaging_handle_prompt_for_media_type(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Media type" ),
+					  &error );
 
+				if( result == -1 )
+				{
 					fprintf(
-					 stdout,
-					 "Unable to determine media type defaulting to: fixed.\n" );
+					 stderr,
+					 "Unable to determine media type.\n" );
 
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
+					goto ewfacquire_main_on_error;
 				}
-				else if( ewfinput_determine_media_type(
-					  fixed_string_variable,
-					  &media_type,
-					  &error ) != 1 )
+				else if( result == 0 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
+/* TODO determine default media type from imaging handle ? */
 					fprintf(
-					 stdout,
+					 stderr,
 					 "Unsupported media type defaulting to: fixed.\n" );
-
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
 				}
 			}
-			/* Media flags
-			 */
-			if( argument_set_media_flags == 0 )
+			if( option_media_flags == NULL )
 			{
-				default_media_flags = EWFINPUT_MEDIA_FLAGS_DEFAULT;
+				result = imaging_handle_prompt_for_media_flags(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Media characteristics" ),
+					  &error );
 
-				if( ( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-				 || ( media_type == LIBEWF_MEDIA_TYPE_OPTICAL ) )
+				if( result == -1 )
 				{
-					default_media_flags = 0;
-				}
-				if( ewfinput_get_fixed_string_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Media characteristics" ),
-				     ewfinput_media_flags,
-				     EWFINPUT_MEDIA_FLAGS_AMOUNT,
-				     (uint8_t) default_media_flags,
-				     &fixed_string_variable,
-				     &error ) == -1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
 					fprintf(
-					 stdout,
-					 "Unable to determine media flags defaulting to: physical.\n" );
+					 stderr,
+					 "Unable to determine media flags.\n" );
 
-					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
+					goto ewfacquire_main_on_error;
 				}
-				else if( ewfinput_determine_media_flags(
-					  fixed_string_variable,
-					  &media_flags,
-					  &error ) != 1 )
+				else if( result == 0 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
+/* TODO determine default media flags from imaging handle ? */
 					fprintf(
-					 stdout,
+					 stderr,
 					 "Unsupported media flags defaulting to: physical.\n" );
-
-					media_flags = LIBEWF_MEDIA_FLAG_PHYSICAL;
 				}
 			}
 			if( option_compression_level == NULL )
@@ -2400,34 +2314,28 @@ int main( int argc, char * const argv[] )
 					 ewfacquire_imaging_handle->maximum_segment_size );
 				}
 			}
-			/* Bytes per sector
-			 */
-			if( argument_set_bytes_per_sector == 0 )
+			if( option_bytes_per_sector == 0 )
 			{
-				if( ewfinput_get_size_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The number of bytes per sector" ),
-				     0,
-				     UINT32_MAX,
-				     bytes_per_sector,
-				     &input_size_variable,
-				     &error ) == -1 )
+				result = imaging_handle_prompt_for_bytes_per_sector(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "The number of bytes per sector" ),
+					  &error );
+
+				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					input_size_variable = 512;
-
 					fprintf(
-					 stdout,
-					 "Unable to determine bytes per sector defaulting to: %" PRIu64 ".\n",
-					 input_size_variable );
+					 stderr,
+					 "Unable to determine bytes per sector.\n" );
+
+					goto ewfacquire_main_on_error;
 				}
-				bytes_per_sector = (uint32_t) input_size_variable;
+				else if( result == 0 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
+					 ewfacquire_imaging_handle->bytes_per_sector );
+				}
 			}
 			if( option_sectors_per_chunk == NULL )
 			{
@@ -2448,7 +2356,8 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unsupported sectors per chunk defaulting to: 64.\n" );
+					 "Unsupported sectors per chunk defaulting to: %" PRIu32 ".\n",
+					 ewfacquire_imaging_handle->sectors_per_chunk );
 				}
 			}
 			if( option_sector_error_granularity == NULL )
@@ -2470,7 +2379,8 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stderr,
-					 "Unsupported sector error granularity defaulting to: 64.\n" );
+					 "Unsupported sector error granularity defaulting to: %" PRIu32 ".\n",
+					 ewfacquire_imaging_handle->sector_error_granularity );
 				}
 			}
 		}
@@ -2556,12 +2466,9 @@ int main( int argc, char * const argv[] )
 
 		if( imaging_handle_print_parameters(
 		     ewfacquire_imaging_handle,
-		     media_type,
-		     media_flags,
 		     (off64_t) acquiry_offset,
 		     resume_acquiry_offset,
 		     (size64_t) acquiry_size,
-		     bytes_per_sector,
 		     read_error_retries,
 		     wipe_block_on_read_error,
 		     resume_acquiry,
@@ -2600,17 +2507,17 @@ int main( int argc, char * const argv[] )
 			option_evidence_number                = NULL;
 			option_examiner_name                  = NULL;
 			option_notes                          = NULL;
+			option_media_type                     = NULL;
+			option_media_flags                    = NULL;
 			option_compression_level              = NULL;
 			option_format                         = NULL;
 			option_sectors_per_chunk              = NULL;
 			option_sector_error_granularity       = NULL;
 			option_maximum_segment_size           = NULL;
 
-			argument_set_media_type               = 0;
 			argument_set_offset                   = 0;
 			argument_set_read_error_retries       = 0;
 			argument_set_size                     = 0;
-			argument_set_media_flags              = 0;
 			argument_set_wipe_block_on_read_error = 0;
 
 			if( resume_acquiry != 0 )
@@ -2757,7 +2664,7 @@ int main( int argc, char * const argv[] )
 			if( device_handle_set_error_values(
 			     ewfacquire_device_handle,
 			     read_error_retries,
-			     ewfacquire_imaging_handle->sector_error_granularity * bytes_per_sector,
+			     ewfacquire_imaging_handle->sector_error_granularity * ewfacquire_imaging_handle->bytes_per_sector,
 			     wipe_block_on_read_error,
 			     &error ) != 1 )
 			{
@@ -2781,10 +2688,7 @@ int main( int argc, char * const argv[] )
 			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
 			     media_information_model,
 			     media_information_serial_number,
-			     bytes_per_sector,
 			     acquiry_size,
-			     media_type,
-			     media_flags,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2801,12 +2705,11 @@ int main( int argc, char * const argv[] )
 		if( ( ewfacquire_abort == 0 )
 		 && ( error_abort == 0 ) )
 		{
-			if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+			if( ewfacquire_imaging_handle->media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
 			{
 				if( ewfacquire_determine_sessions(
 				     ewfacquire_imaging_handle,
 				     ewfacquire_device_handle,
-				     bytes_per_sector,
 				     media_size,
 				     &error ) != 1 )
 				{
@@ -3000,7 +2903,7 @@ int main( int argc, char * const argv[] )
 		              (size64_t) acquiry_size,
 		              (off64_t) acquiry_offset,
 		              resume_acquiry_offset,
-		              bytes_per_sector,
+		              ewfacquire_imaging_handle->bytes_per_sector,
 		              swap_byte_pairs,
 		              ewfacquire_imaging_handle->sector_error_granularity,
 		              (size_t) process_buffer_size,

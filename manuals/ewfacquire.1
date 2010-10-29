@@ -147,7 +147,7 @@ will ask for the information it requires.
 .Ss To image a floppy:
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20101013
+ewfacquire 20101029
 
 Device information:
 Bus type:		
@@ -172,7 +172,7 @@ Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, en
 Start to acquire at offset (0 >= value >= 1474560) [0]:
 The number of bytes to acquire (0 >= value >= 1474560) [1474560]:
 Evidence segment file size in bytes (1.0 MiB >= value >= 1.9 GiB) [1.4 GiB]:
-The number of bytes per sector (0 >= value >= 4294967295) [512]:
+The number of bytes per sector (1 >= value >= 4294967295) [512]:
 The number of sectors to read at once (64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768) [64]: 
 The number of sectors to be used as error granularity (1 >= value >= 64) [64]: 
 The number of retries when a read error occurs (0 >= value >= 255) [2]: 

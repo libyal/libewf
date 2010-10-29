@@ -1,5 +1,5 @@
 TODO
-* apply xml patch Simson
+* apply xml patch for ewftools (Simson)
 * implement write chunk test
 * implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
@@ -9,7 +9,7 @@ TODO
 * have libewf handle non-sector multitude media size
   - set media_size on write finalize
 * fix todo in write existing chunk
-* disk full check
+* disk full check (windows SetFileInformationByHandle)
 * ewfacquire: make behaviour of -g equal to user input ?
 
 * documentation:
@@ -22,7 +22,6 @@ TODO
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
 * check TODO
-* check into resume write error for 32-bit compile (different zlib sizes)
 * check make distclean
 
 Next stable release:
@@ -98,6 +97,7 @@ Recovery and analysis:
     allocating the necessary disk space
 * recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
+* check into resume write error for 32-bit compile (different zlib sizes)
 
 Additional (integrity) checks:
 * read: check if successive headers match first header
@@ -174,9 +174,9 @@ Tools:
   - for EnCase 6 format request serial number and model if not set ?
   - add support to enter sessions for optical images
   - add support for unattended write resume ?
+  - allow to specify a .cue file for session information
+    compensate for session gaps (leadin/leadout)
 * ewfacquirestream
-  - add parameter to set sector size?
-  - allow user to set bytes per sector for raw file conversion
 * stream handle
   - implement
 * ewfexport
@@ -194,12 +194,6 @@ Tools:
 * ewfrecover
   - create a tool recover ewf files
 
-Windows build
-* windows port
-  - some of the CRT functions are MVC 2005 or later specific
-  - figure out a way to warn about the compiler used
-* add VC_EXTRALEAN to msvscpp config
-
 Tests
 * glob: .ezz, .faa ... .zzz
 * seek: media size 0 instead of < 1024
@@ -208,6 +202,13 @@ Tests
 * ewfexport: export of files
 
 Deployment:
+* add BORLANDC deprecated function support, unable to find suitable macro
+  #pragma deprecated( function )
+  __declspec(deprecated)
+* windows build
+  - some of the CRT functions are MVC 2005 or later specific
+  - figure out a way to warn about the compiler used
+  - add VC_EXTRALEAN to msvscpp config
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -218,10 +219,17 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
-Deprecated functions
-* add BORLANDC deprecated function support, unable to find suitable macro
-  #pragma deprecated( function )
-  __declspec(deprecated)
+20101029
+* worked on file format session section
+* updated debug output
+* libewf now correct the first session sector offset
+  on read to 0
+  on write to 16, only if value is 0, to mimic EnCase like behaviour
+* ewfacquirestream added -P option to set bytes per sector
+* worked on ewfacquire, ewfacquirestream and imaging_handle code clean up
+* worked on write chunk test
+* updated libbfio
+* worked on file pre-allocate support
 
 20101028
 * worked on ewfacquire, ewfacquirestream and imaging_handle code clean up

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101028],
+ [20101029],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -332,7 +332,8 @@ AC_CHECK_FUNCS(
   [Missing function: memset],
   [1]) ])
 
-AC_CHECK_FUNCS([posix_memalign])
+dnl TODO re-enable in the future
+dnl AC_CHECK_FUNCS([posix_memalign])
 
 AC_CHECK_FUNCS(
  [realloc],
@@ -749,6 +750,12 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBBFIO],
  [test "x$ac_libewf_have_libbfio" = xlocal])
 
+AS_IF(
+ [test "x$ac_libewf_have_libbfio" = xlocal],
+ [dnl Functions included in libbfio/libbfio_file.c
+  AC_CHECK_FUNCS([posix_fallocate])
+ ])
+
 dnl Check for enabling libmfdata for multi-file data support
 LIBEWF_CHECK_LIBMFDATA
 
@@ -899,6 +906,40 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMDEV],
  [test "x$ac_libewf_have_libsmdev" = xlocal])
 
+AS_IF(
+ [test "x$ac_libewf_have_libsmdev" = xlocal],
+ [dnl Headers included in libsmdev/libsmdev_metadata.c
+ AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xno],
+  [AC_CHECK_HEADERS([cygwin/fs.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h])
+ ])
+
+ dnl Headers included in libsmdev/libsmdev_ata.c
+ AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xno],
+  [AC_CHECK_HEADERS([cygwin/hdreg.h linux/hdreg.h])
+ ])
+
+ dnl Headers included in libsmdev/libsmdev_scsi.c
+ AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xno],
+  [AC_CHECK_HEADERS([scsi/scsi.h scsi/scsi_ioctl.h scsi/sg.h])
+ ])
+
+ dnl Headers included in libsmdev/libsmdev_optical_disk.c
+ AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xno],
+  [AC_CHECK_HEADERS([linux/cdrom.h])
+ ])
+
+ dnl Headers included in libsmdev/libsmdev_usb.c
+ AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xno],
+  [AC_CHECK_HEADERS([linux/usbdevice_fs.h linux/usb/ch9.h])
+ ])
+
+ LIBEWF_CHECK_FUNC_POSIX_FADVISE])
+
 dnl Check for enabling libsmraw for storage media (split) RAW support
 LIBEWF_CHECK_LIBSMRAW
 
@@ -948,40 +989,6 @@ AS_IF(
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMRAW],
  [test "x$ac_libewf_have_libsmraw" = xlocal])
-
-AS_IF(
- [test "x$ac_libewf_have_libsmdev" = xlocal],
- [dnl Headers included in libsmdev/libsmdev_metadata.c
- AS_IF(
-  [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([cygwin/fs.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h])
- ])
-
- dnl Headers included in libsmdev/libsmdev_ata.c
- AS_IF(
-  [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([cygwin/hdreg.h linux/hdreg.h])
- ])
-
- dnl Headers included in libsmdev/libsmdev_scsi.c
- AS_IF(
-  [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([scsi/scsi.h scsi/scsi_ioctl.h scsi/sg.h])
- ])
-
- dnl Headers included in libsmdev/libsmdev_optical_disk.c
- AS_IF(
-  [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([linux/cdrom.h])
- ])
-
- dnl Headers included in libsmdev/libsmdev_usb.c
- AS_IF(
-  [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([linux/usbdevice_fs.h linux/usb/ch9.h])
- ])
-
- LIBEWF_CHECK_FUNC_POSIX_FADVISE])
 
 dnl Check for enabling crypographic digest hash support
 ac_libewf_have_libcrypto=no

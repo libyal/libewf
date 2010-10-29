@@ -784,10 +784,6 @@ int main( int argc, char * const argv[] )
 	uint8_t ewf_format                                         = LIBEWF_FORMAT_ENCASE6;
 	int argument_set_format                                    = 0;
 
-	uint64_t maximum_segment_file_size                         = 0;
-	uint64_t segment_file_size                                 = 0;
-	int argument_set_segment_file_size                         = 0;
-
 	libcstring_system_character_t *ewfexport_format_types[ 14 ] = \
 	 { _LIBCSTRING_SYSTEM_STRING( "raw" ),
 	   _LIBCSTRING_SYSTEM_STRING( "files" ),
@@ -1668,22 +1664,22 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		if( segment_file_size == 0 )
+		if( ewfexport_export_handle->maximum_segment_size == 0 )
 		{
 			if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 			{
 				if( ewf_format == LIBEWF_FORMAT_ENCASE6 )
 				{
-					segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+					ewfexport_export_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
 				}
 				else
 				{
-					segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+					ewfexport_export_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 				}
 			}
 			else if( export_handle_output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 			{
-				segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+				ewfexport_export_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
 			}
 		}
 	}

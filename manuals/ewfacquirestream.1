@@ -1,4 +1,4 @@
-.Dd October 21, 2010
+.Dd October 29, 2010
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -22,6 +22,7 @@
 .Op Fl N Ar notes
 .Op Fl o Ar offset
 .Op Fl p Ar process_buffer_size
+.Op Fl P Ar bytes_per_sector
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
 .Op Fl 2 Ar secondary_target
@@ -83,6 +84,8 @@ the notes (default is notes)
 the offset to start to acquire (default is 0)
 .It Fl p Ar process_buffer_size
 the process buffer size (default is the chunk size)
+.It Fl P Ar bytes_per_sector
+the number of bytes per sector (default is 512)
 .It Fl q
 quiet shows minimal status information
 .It Fl s
