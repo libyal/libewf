@@ -66,6 +66,7 @@ int ewf_test_write_chunk(
 	ssize_t process_count               = 0;
 	ssize_t write_count                 = 0;
 	uint32_t checksum                   = 0;
+	uint32_t sectors_per_chunk          = 0;
 	int8_t is_compressed                = 0;
 	int8_t process_checksum             = 0;
 	int result                          = 1;
@@ -162,7 +163,21 @@ int ewf_test_write_chunk(
 
 		result = -1;
 	}
-	chunk_buffer_size = 64 * 512;
+	if( libewf_handle_set_sectors_per_chunk(
+	     handle,
+	     sectors_per_chunk,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable set sectors per chunk.",
+		 function );
+
+		result = -1;
+	}
+	chunk_buffer_size = sectors_per_chunk * 512;
 
 	chunk_buffer = (uint8_t *) memory_allocate(
 	                            chunk_buffer_size + 4 );
