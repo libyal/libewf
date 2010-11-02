@@ -292,7 +292,11 @@ enum LIBEWF_RUNTIME_ERROR
  */
 enum LIBEWF_OUTPUT_ERROR
 {
-	LIBEWF_OUTPUT_ERROR_GENERIC			= 0
+	LIBEWF_OUTPUT_ERROR_GENERIC			= 0,
+
+	/* There is insuficient space to write the output
+	 */
+	LIBEWF_OUTPUT_ERROR_INSUFFICIENT_SPACE		= 1
 };
 
 #endif

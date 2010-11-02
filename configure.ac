@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101029],
+ [20101102],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -749,12 +749,6 @@ AS_IF(
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBBFIO],
  [test "x$ac_libewf_have_libbfio" = xlocal])
-
-AS_IF(
- [test "x$ac_libewf_have_libbfio" = xlocal],
- [dnl Functions included in libbfio/libbfio_file.c
-  AC_CHECK_FUNCS([posix_fallocate])
- ])
 
 dnl Check for enabling libmfdata for multi-file data support
 LIBEWF_CHECK_LIBMFDATA

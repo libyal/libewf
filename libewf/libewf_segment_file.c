@@ -165,6 +165,125 @@ ssize_t libewf_segment_file_read_file_header(
 	return( read_count );
 }
 
+/* Writes the segment file header
+ * Returns the number of bytes written if successful, or -1 on errror
+ */
+ssize_t libewf_segment_file_write_file_header(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libbfio_pool_t *file_io_pool,
+         uint16_t segment_number,
+         uint8_t segment_file_type,
+         liberror_error_t **error )
+{
+	ewf_file_header_t file_header;
+
+	static char *function         = "libewf_segment_file_write_file_header";
+	const uint8_t *file_signature = NULL;
+	ssize_t write_count           = 0;
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 "%s: invalid segment number.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_handle->section_list == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section list.",
+		 function );
+
+		return( -1 );
+	}
+	/* Determine the segment file signature
+	 */
+	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+	{
+		file_signature = evf_file_signature;
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
+	{
+		file_signature = lvf_file_signature;
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	{
+		file_signature = dvf_file_signature;
+	}
+	else
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported segment file type.",
+		 function );
+
+		return( -1 );
+	}
+	segment_file_handle->file_type = segment_file_type;
+
+	if( memory_copy(
+	     file_header.signature,
+	     file_signature,
+	     8 ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set file signature.",
+		 function );
+
+		return( -1 );
+	}
+	byte_stream_copy_from_uint16_little_endian(
+	 file_header.fields_segment,
+	 segment_number );
+
+	file_header.fields_start    = 1;
+	file_header.fields_end[ 0 ] = 0;
+	file_header.fields_end[ 1 ] = 0;
+
+	write_count = libbfio_pool_write(
+	               file_io_pool,
+	               segment_file_handle->file_io_pool_entry,
+	               (uint8_t *) &file_header,
+	               sizeof( ewf_file_header_t ),
+	               error );
+
+	if( write_count != (ssize_t) sizeof( ewf_file_header_t ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write file header.",
+		 function );
+
+		return( -1 );
+	}
+	return( write_count );
+}
+
 /* Reads all sections into the section list
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -711,12 +830,15 @@ ssize_t libewf_segment_file_write_start(
          ewf_data_t **cached_data_section,
          liberror_error_t **error )
 {
+	static char *function     = "libewf_segment_file_write_start";
+	ssize_t total_write_count = 0;
+	ssize_t write_count       = 0;
+
+#ifdef REFACTORED
 	ewf_file_header_t file_header;
 
-	static char *function         = "libewf_segment_file_write_start";
 	const uint8_t *file_signature = NULL;
-	ssize_t total_write_count     = 0;
-	ssize_t write_count           = 0;
+#endif
 
 	if( segment_file_handle == NULL )
 	{
@@ -773,6 +895,7 @@ ssize_t libewf_segment_file_write_start(
 
 		return( -1 );
 	}
+#ifdef REFACTORED
 	/* Determine the segment file signature
 	 */
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
@@ -842,6 +965,26 @@ ssize_t libewf_segment_file_write_start(
 
 		return( -1 );
 	}
+#else
+	write_count = libewf_segment_file_write_file_header(
+	               segment_file_handle,
+	               file_io_pool,
+	               segment_number,
+	               segment_file_type,
+	               error );
+
+	if( write_count != (ssize_t) sizeof( ewf_file_header_t ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write file header.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	total_write_count += write_count;
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
@@ -2325,7 +2468,6 @@ int libewf_segment_file_write_sections_correction(
 		 segment_number );	
 	}
 #endif
-
 	while( section_list_element != NULL )
 	{
 		section_list_values = (libewf_section_list_values_t *) section_list_element->value;
@@ -2355,7 +2497,6 @@ int libewf_segment_file_write_sections_correction(
 				 function );
 			}
 #endif
-
 			if( libbfio_pool_seek_offset(
 			     file_io_pool,
 			     segment_file_handle->file_io_pool_entry,

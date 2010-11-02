@@ -55,6 +55,13 @@ ssize_t libewf_segment_file_read_file_header(
          libbfio_pool_t *file_io_pool,
          liberror_error_t **error );
 
+ssize_t libewf_segment_file_write_file_header(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libbfio_pool_t *file_io_pool,
+         uint16_t segment_number,
+         uint8_t segment_file_type,
+         liberror_error_t **error );
+
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,
      libewf_io_handle_t *io_handle,

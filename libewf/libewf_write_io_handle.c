@@ -2043,6 +2043,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	ssize_t write_count                               = 0;
 	uint32_t number_of_chunk_values                   = 0;
 	int chunk_exists                                  = 0;
+	int insufficient_output_space                     = 0;
 	int number_of_segment_file_handles                = 0;
 	int result                                        = 0;
 	int segment_number                                = 0;
@@ -2651,6 +2652,21 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		total_write_count                            += write_count;
 		write_io_handle->remaining_segment_file_size -= write_count;
 	}
+	if( libbfio_pool_get_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     &segment_file_offset,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve current offset in segment file.",
+		 function );
+
+		return( -1 );
+	}
 	/* Write the chunk data
 	 */
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -2663,7 +2679,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 segment_number );
 	}
 #endif
-
 	write_count = libewf_segment_file_write_chunk(
 		       segment_file_handle,
 		       io_handle,
@@ -2687,73 +2702,110 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 "%s: unable to write chunk data.",
 		 function );
 
-		return( -1 );
-	}
-	total_write_count                                    += write_count;
-	write_io_handle->input_write_count                   += chunk_data_size;
-	write_io_handle->chunks_section_write_count          += write_count;
-	write_io_handle->remaining_segment_file_size         -= write_count;
-	write_io_handle->number_of_chunks_written_to_segment += 1;
-	write_io_handle->number_of_chunks_written_to_section += 1;
-	write_io_handle->number_of_chunks_written            += 1;
-
-	if( ( io_handle->ewf_format == EWF_FORMAT_S01 )
-	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
-	{
-		/* Leave space for the chunk offset in the offset table
-		 */
-		write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_offset_t );
+		if( ( error != NULL )
+		 && ( liberror_error_matches(
+		       *error,
+		       LIBERROR_ERROR_DOMAIN_OUTPUT,
+		       LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
+		{
+			return( -1 );
+		}
+		insufficient_output_space = 1;
 	}
 	else
 	{
-		/* Leave space for the chunk offset in the table and table2 sections
+		insufficient_output_space = 0;
+	}
+	if( insufficient_output_space == 0 )
+	{
+		total_write_count                                    += write_count;
+		write_io_handle->input_write_count                   += chunk_data_size;
+		write_io_handle->chunks_section_write_count          += write_count;
+		write_io_handle->remaining_segment_file_size         -= write_count;
+		write_io_handle->number_of_chunks_written_to_segment += 1;
+		write_io_handle->number_of_chunks_written_to_section += 1;
+		write_io_handle->number_of_chunks_written            += 1;
+
+		if( ( io_handle->ewf_format == EWF_FORMAT_S01 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
+		{
+			/* Leave space for the chunk offset in the offset table
+			 */
+			write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_offset_t );
+		}
+		else
+		{
+			/* Leave space for the chunk offset in the table and table2 sections
+			 */
+			write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_offset_t );
+		}
+		if( libbfio_pool_get_offset(
+		     file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     &segment_file_offset,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve current offset in segment file.",
+			 function );
+
+			return( -1 );
+		}
+		/* Check if the current chunks section is full, if so close the current section
 		 */
-		write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_offset_t );
+		result = libewf_write_io_handle_test_chunks_section_full(
+			  write_io_handle->chunks_section_offset,
+			  write_io_handle->remaining_segment_file_size,
+			  media_values,
+			  write_io_handle->input_write_count,
+			  segment_file_offset,
+			  write_io_handle->maximum_chunks_per_section,
+			  write_io_handle->number_of_chunks_written_to_section,
+			  write_io_handle->number_of_chunks_written,
+			  write_io_handle->chunks_per_section,
+			  io_handle->format,
+			  io_handle->ewf_format,
+			  write_io_handle->unrestrict_offset_table,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if chunks section is full.",
+			 function );
+
+			return( -1 );
+		}
 	}
-	if( libbfio_pool_get_offset(
-	     file_io_pool,
-	     segment_file_handle->file_io_pool_entry,
-	     &segment_file_offset,
-	     error ) != 1 )
+	else
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.",
-		 function );
+		if( libbfio_pool_seek_offset(
+		     file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     segment_file_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: cannot find offset: %" PRIi64 ".",
+			 function,
+			 segment_file_offset );
 
-		return( -1 );
+			return( -1 );
+		}
+		result = 0;
 	}
-	/* Check if the current chunks section is full, if so close the current section
-	 */
-	result = libewf_write_io_handle_test_chunks_section_full(
-	          write_io_handle->chunks_section_offset,
-	          write_io_handle->remaining_segment_file_size,
-	          media_values,
-	          write_io_handle->input_write_count,
-	          segment_file_offset,
-	          write_io_handle->maximum_chunks_per_section,
-	          write_io_handle->number_of_chunks_written_to_section,
-	          write_io_handle->number_of_chunks_written,
-	          write_io_handle->chunks_per_section,
-	          io_handle->format,
-	          io_handle->ewf_format,
-	          write_io_handle->unrestrict_offset_table,
-	          error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if chunks section is full.",
-		 function );
-
-		return( -1 );
-	}
-	else if( result == 1 )
+	if( ( insufficient_output_space == 1 )
+	 || ( result == 1 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
@@ -2815,31 +2867,39 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		write_io_handle->create_chunks_section = 1;
 		write_io_handle->chunks_section_offset = 0;
 
-		/* Check if the current segment file is full, if so close the current segment file
-		 */
-		result = libewf_write_io_handle_test_segment_file_full(
-			  write_io_handle->remaining_segment_file_size,
-			  write_io_handle->number_of_chunks_written_to_segment,
-			  media_values,
-			  write_io_handle->input_write_count,
-			  write_io_handle->chunks_per_segment,
-			  write_io_handle->number_of_chunks_written,
-			  io_handle->format,
-			  io_handle->ewf_format,
-		          error );
-
-		if( result == -1 )
+		if( insufficient_output_space == 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if segment file is full.",
-			 function );
+			/* Check if the current segment file is full, if so close the current segment file
+			 */
+			result = libewf_write_io_handle_test_segment_file_full(
+				  write_io_handle->remaining_segment_file_size,
+				  write_io_handle->number_of_chunks_written_to_segment,
+				  media_values,
+				  write_io_handle->input_write_count,
+				  write_io_handle->chunks_per_segment,
+				  write_io_handle->number_of_chunks_written,
+				  io_handle->format,
+				  io_handle->ewf_format,
+				  error );
 
-			return( -1 );
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if segment file is full.",
+				 function );
+
+				return( -1 );
+			}
 		}
-		else if( result == 1 )
+		else
+		{
+			result = 0;
+		}
+		if( ( insufficient_output_space == 1 )
+		 || ( result == 1 ) )
 		{
 			/* Check if this is not the last segment file
 			 */
@@ -2855,7 +2915,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 					 segment_number );
 				}
 #endif
-
 				/* Finish and close the segment file
 				 */
 				write_count = libewf_segment_file_write_close(
@@ -2887,6 +2946,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 				total_write_count += write_count;
 			}
 		}
+	}
+	if( insufficient_output_space == 1 )
+	{
+		return( -1 );
 	}
 	return( total_write_count );
 }

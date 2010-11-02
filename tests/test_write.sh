@@ -53,6 +53,31 @@ function test_write
 	return ${RESULT};
 }
 
+function test_write_chunk
+{ 
+	MEDIA_SIZE=$1;
+	MAXIMUM_SEGMENT_SIZE=$2;
+	COMPRESSION_LEVEL=$3;
+
+	mkdir ${TMP};
+
+	./${EWF_TEST_WRITE_CHUNK} -B ${MEDIA_SIZE} -c `echo ${COMPRESSION_LEVEL} | ${CUT} -c 1` -S ${MAXIMUM_SEGMENT_SIZE} ${TMP}/write;
+
+	RESULT=$?;
+
+	rm -rf ${TMP};
+
+	echo -n "Testing write chunk with media size: ${MEDIA_SIZE}, maximum segment size: ${MAXIMUM_SEGMENT_SIZE} and compression level: ${COMPRESSION_LEVEL} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
+	return ${RESULT};
+}
+
 EWF_TEST_WRITE="ewf_test_write";
 
 if ! test -x ${EWF_TEST_WRITE};
@@ -63,6 +88,20 @@ fi
 if ! test -x ${EWF_TEST_WRITE};
 then
 	echo "Missing executable: ${EWF_TEST_WRITE}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+EWF_TEST_WRITE_CHUNK="ewf_test_write_chunk";
+
+if ! test -x ${EWF_TEST_WRITE_CHUNK};
+then
+	EWF_TEST_WRITE_CHUNK="ewf_test_write_chunk.exe";
+fi
+
+if ! test -x ${EWF_TEST_WRITE_CHUNK};
+then
+	echo "Missing executable: ${EWF_TEST_WRITE_CHUNK}";
 
 	exit ${EXIT_FAILURE};
 fi
@@ -85,6 +124,28 @@ do
 	fi
 
 	if ! test_write 100000 10000 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	echo "";
+
+	if ! test_write_chunk 0 0 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	if ! test_write_chunk 0 10000 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	if ! test_write_chunk 100000 0 ${COMPRESSION_LEVEL}
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	if ! test_write_chunk 100000 10000 ${COMPRESSION_LEVEL}
 	then
 		exit ${EXIT_FAILURE};
 	fi

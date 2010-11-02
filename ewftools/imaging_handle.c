@@ -1125,6 +1125,15 @@ ssize_t imaging_handle_write_buffer(
 		 "%s: unable to write storage media buffer.",
 		 function );
 
+		if( ( error != NULL )
+		 && ( liberror_error_matches(
+		       *error,
+		       LIBERROR_ERROR_DOMAIN_OUTPUT,
+		       LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
+		{
+			return( -1 );
+		}
+/* TODO ask for alternative segment file location and try again */
 		return( -1 );
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
@@ -1157,6 +1166,15 @@ ssize_t imaging_handle_write_buffer(
 			 "%s: unable to write storage media buffer to secondary output handle.",
 			 function );
 
+			if( ( error != NULL )
+			 && ( liberror_error_matches(
+			       *error,
+			       LIBERROR_ERROR_DOMAIN_OUTPUT,
+			       LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
+			{
+				return( -1 );
+			}
+/* TODO ask for alternative segment file location and try again */
 			return( -1 );
 		}
 	}

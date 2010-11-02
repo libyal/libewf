@@ -62,7 +62,6 @@ int ewf_test_write_chunk(
 	static char *function               = "ewf_test_write_chunk";
 	size_t chunk_buffer_size            = 0;
 	size_t compressed_chunk_buffer_size = 0;
-	size_t write_size                   = 0;
 	ssize_t process_count               = 0;
 	ssize_t write_count                 = 0;
 	uint32_t checksum                   = 0;
@@ -163,6 +162,8 @@ int ewf_test_write_chunk(
 
 		result = -1;
 	}
+	sectors_per_chunk = 64;
+
 	if( libewf_handle_set_sectors_per_chunk(
 	     handle,
 	     sectors_per_chunk,
@@ -187,14 +188,14 @@ int ewf_test_write_chunk(
 	compressed_chunk_buffer = (uint8_t *) memory_allocate(
 	                                       chunk_buffer_size * 2 );
 
+	compressed_chunk_buffer_size = chunk_buffer_size * 2;
+
 	if( chunk_buffer != NULL )
 	{
 		checksum_buffer = &( chunk_buffer[ chunk_buffer_size - 1 ] );
 	}
 	if( result != -1 )
 	{
-		write_size = chunk_buffer_size;
-
 		for( sector_iterator = 0;
 		     sector_iterator < 26;
 		     sector_iterator++ )
@@ -202,7 +203,7 @@ int ewf_test_write_chunk(
 			if( memory_set(
 			     chunk_buffer,
 			     (int) 'A' + sector_iterator,
-			     write_size ) == NULL )
+			     chunk_buffer_size ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -245,7 +246,7 @@ int ewf_test_write_chunk(
 					       handle,
 					       chunk_buffer,
 					       chunk_buffer_size,
-					       write_size,
+					       (size_t) process_count,
 					       is_compressed,
 					       checksum_buffer,
 					       checksum,
@@ -258,7 +259,7 @@ int ewf_test_write_chunk(
 					       handle,
 					       compressed_chunk_buffer,
 					       compressed_chunk_buffer_size,
-					       write_size,
+					       (size_t) process_count,
 					       is_compressed,
 					       checksum_buffer,
 					       checksum,
@@ -273,32 +274,23 @@ int ewf_test_write_chunk(
 				 LIBERROR_IO_ERROR_WRITE_FAILED,
 				 "%s: unable write chunk of size: %" PRIzd ".",
 				 function,
-				 write_size );
+				 process_count );
 
 				result = -1;
 
 				break;
 			}
-			if( write_count != (ssize_t) write_size )
+			if( media_size > (size64_t) chunk_buffer_size )
 			{
-				if( (size64_t) write_count != media_size )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable write chunk of size: %" PRIzd ".",
-					 function,
-					 write_size );
-
-					result = -1;
-
-					break;
-				}
+				media_size -= chunk_buffer_size;
 			}
-			if( media_size > 0 )
+			else if( media_size > 0 )
 			{
-				media_size -= write_count;
+				media_size = 0;
+			}
+			if( media_size == 0 )
+			{
+				break;
 			}
 		}
 	}

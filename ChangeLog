@@ -1,15 +1,10 @@
 TODO
 * apply xml patch for ewftools (Simson)
-* implement write chunk test
-* implement read/write chunk test
-  - allow to set maximum delta file size default 4 GiB?
-* implement pyewf tests
 * have libewf write empty ewf file if media size is 0 and no data was written
   - have write finalize create empty file ?
 * have libewf handle non-sector multitude media size
   - set media_size on write finalize
 * fix todo in write existing chunk
-* disk full check (windows SetFileInformationByHandle)
 * ewfacquire: make behaviour of -g equal to user input ?
 
 * documentation:
@@ -87,6 +82,15 @@ Features
 * support missing segment files (chunks)
 * implement low memory usage option
   - trade off IO versus memory use
+* disk full check
+  - how to detect this condition (cross-platform) ?
+  - solution (A) at creation time of the segment file:
+    linux/unix posix_fallocate(), does not provide the desired result
+    windows SetFileInformationByHandle()
+  - solution (B) on write (backtrack last chunk)
+    implemented close segment file on LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE 
+    although if linux write fails (write_count != write_size) before ENOSPC is set
+    there is still room left on the device, but cannot be claimed by libewf
 
 Recovery and analysis:
 * imaging: detect disk full and ask for new segment file location?
@@ -177,8 +181,7 @@ Tools:
   - allow to specify a .cue file for session information
     compensate for session gaps (leadin/leadout)
 * ewfacquirestream
-* stream handle
-  - implement
+  - implement stream handle
 * ewfexport
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
@@ -198,6 +201,9 @@ Tests
 * glob: .ezz, .faa ... .zzz
 * seek: media size 0 instead of < 1024
 * read: media size 0 instead of < 1024
+* implement read/write chunk test
+  - allow to set maximum delta file size default 4 GiB?
+* implement pyewf tests
 * ewfexport: export of split RAW
 * ewfexport: export of files
 
@@ -218,6 +224,12 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20101102
+* updated libbfio
+* worked on file pre-allocate support, posix_fallocate does not provide the
+  desired results
+* updated liberror
 
 20101029
 * worked on file format session section
