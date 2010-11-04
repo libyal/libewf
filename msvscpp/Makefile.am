@@ -4,6 +4,7 @@ EXTRA_DIST = \
 	ewfexport/ewfexport.vcproj \
 	ewfinfo/ewfinfo.vcproj \
 	ewfverify/ewfverify.vcproj \
+	ewf.net/ewf.net_dll.vcproj \
 	libbfio/libbfio.vcproj \
 	libcstring/libcstring.vcproj \
 	liberror/liberror.vcproj \

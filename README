@@ -8,14 +8,6 @@ ewftools require:
 * libuuid (optional)
 
 
-Static compilation
-Creating a static library
-./configure --enable-shared=no
-
-Creating static executables
-./configure --enable-static-executables=yes
-
-
 Creating a DLL
 Multiple methods of creating a DLL are supported:
 * using Borland C++

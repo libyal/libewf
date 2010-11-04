@@ -15,6 +15,7 @@ SUBDIRS = \
 	libsmraw \
 	libsystem \
 	ewftools \
+	ewf.net \
 	pyewf \
 	po \
 	documents \
@@ -32,6 +33,7 @@ SPEC_FILES = \
 EXTRA_DIST = \
 	config.rpath  \
 	README.mingw \
+	README.static \
 	po/Makevars.in \
 	libewf.pc.in \
 	$(SPEC_FILES)

@@ -13,6 +13,21 @@ AC_DEFUN([LIBEWF_TEST_ENABLE],
    [ac_cv_libewf_enable_$2=$4])dnl
  ])
 
+dnl Function to test if the location of a certain feature was provided
+AC_DEFUN([LIBEWF_TEST_WITH],
+ [AC_ARG_WITH(
+  [$1],
+  [AS_HELP_STRING(
+   [--with-$1],
+   [$3 (default is $4)])],
+  [ac_cv_libewf_with_$2=$withval],
+  [ac_cv_libewf_with_$2=$4])dnl
+  AC_CACHE_CHECK(
+   [whether to use $3],
+   [ac_cv_libewf_with_$2],
+   [ac_cv_libewf_with_$2=$4])dnl
+ ])
+
 dnl Function to detect whether nl_langinfo supports CODESET
 AC_DEFUN([LIBEWF_CHECK_FUNC_LANGINFO_CODESET],
  [AC_CHECK_FUNCS([nl_langinfo])

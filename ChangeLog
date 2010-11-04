@@ -225,6 +225,12 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20101104
+* worked on libewf .net wrapper ewf.net, based on smraw.net
+* updated libbfio, libmfdata, libsmraw
+* configure: added option to disable GUID/UUID support for static build
+* added README.static
+
 20101102
 * updated libbfio
 * worked on file pre-allocate support, posix_fallocate does not provide the

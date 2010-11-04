@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101102],
+ [20101104],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -34,6 +34,11 @@ LIBEWF_TEST_ENABLE(
  [static_executables],
  [build the ewftools as static executables],
  [no])
+LIBEWF_TEST_ENABLE(
+ [guid],
+ [guid],
+ [enable GUID/UUID support in the ewftools],
+ [yes])
 LIBEWF_TEST_ENABLE(
  [low-level-functions],
  [low_level_functions],
@@ -1034,7 +1039,7 @@ AS_IF(
   EVP_md5,
   [AC_SUBST(
    [LIBCRYPTO_LIBADD],
-   [-lcrypto])
+   ["-lcrypto -ldl"])
   AC_DEFINE(
    [HAVE_LIBCRYPTO],
    [1],
@@ -1103,7 +1108,7 @@ AS_IF(
    MD5_Init,
    [AC_SUBST(
     [LIBCRYPTO_LIBADD],
-    [-lcrypto])
+    ["-lcrypto -ldl"])
    AC_DEFINE(
     [HAVE_LIBCRYPTO],
     [1],
@@ -1162,44 +1167,48 @@ AS_IF(
 
 dnl Check for enabling GUID/UUID support
 AS_IF(
- [test "x$ac_cv_libewf_enable_winapi" = xyes],
- [AC_SUBST(
-  [LIBUUID_LIBADD],
-  [-lrpcrt4])
-  ac_libewf_have_guid_support=librpcrt4],
- [AC_CHECK_HEADERS(
-  [uuid/uuid.h],
-  [],
-  [ac_libewf_have_guid_support=no])
- AS_IF(
-  [test "x$ac_libewf_have_guid_support" != xno],
-  [ac_libewf_have_guid_support=native
-  AC_CHECK_FUNC(
-   [uuid_generate],
+ [test "x$ac_cv_libewf_enable_guid" = xyes],
+ [AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xyes],
+  [AC_SUBST(
+   [LIBUUID_LIBADD],
+   [-lrpcrt4])
+   ac_libewf_have_guid_support=librpcrt4],
+  [AC_CHECK_HEADERS(
+   [uuid/uuid.h],
    [],
-   [ac_libewf_have_guid_support=libuuid
-    AC_CHECK_LIB(
-    [uuid],
+   [ac_libewf_have_guid_support=no])
+  AS_IF(
+   [test "x$ac_libewf_have_guid_support" != xno],
+   [ac_libewf_have_guid_support=native
+   AC_CHECK_FUNC(
     [uuid_generate],
-    [AC_SUBST(
-     [LIBUUID_LIBADD],
-     [-luuid])
-    AC_DEFINE(
-     [HAVE_LIBUUID],
-     [1],
-     [Define to 1 if you have the 'uuid' library (-luuid).]) ],
-    [ac_libewf_have_guid_support=no])
+    [],
+    [ac_libewf_have_guid_support=libuuid
+     AC_CHECK_LIB(
+     [uuid],
+     [uuid_generate],
+     [AC_SUBST(
+      [LIBUUID_LIBADD],
+      [-luuid])
+     AC_DEFINE(
+      [HAVE_LIBUUID],
+      [1],
+      [Define to 1 if you have the 'uuid' library (-luuid).]) ],
+     [ac_libewf_have_guid_support=no])
+    ])
    ])
   ])
- ])
 
-AS_IF(
- [test "x$ac_libewf_have_guid_support" != xno],
- [AC_DEFINE(
-  [HAVE_GUID_SUPPORT],
-  [1],
-  [Define to 1 if GUID support is available.])
- ])
+ AS_IF(
+  [test "x$ac_libewf_have_guid_support" != xno],
+  [AC_DEFINE(
+   [HAVE_GUID_SUPPORT],
+   [1],
+   [Define to 1 if GUID/UUID support is available.])
+  ])
+ ],
+ [ac_libewf_have_guid_support=disabled])
 
 AS_IF(
  [test "x$ac_libewf_have_guid_support" = xnative],
@@ -1516,6 +1525,7 @@ AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])
 AC_CONFIG_FILES([libsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
+AC_CONFIG_FILES([ewf.net/Makefile])
 AC_CONFIG_FILES([pyewf/Makefile])
 AC_CONFIG_FILES([po/Makefile.in])
 AC_CONFIG_FILES([po/Makevars])
