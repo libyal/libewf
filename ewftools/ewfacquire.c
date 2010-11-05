@@ -1054,14 +1054,18 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_evidence_number           = NULL;
 	libcstring_system_character_t *option_format                    = NULL;
 	libcstring_system_character_t *option_header_codepage           = NULL;
-	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_maximum_segment_size      = NULL;
 	libcstring_system_character_t *option_media_flags               = NULL;
 	libcstring_system_character_t *option_media_type                = NULL;
+	libcstring_system_character_t *option_notes                     = NULL;
+	libcstring_system_character_t *option_number_of_error_retries   = NULL;
+	libcstring_system_character_t *option_offset                    = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
 	libcstring_system_character_t *option_sector_error_granularity  = NULL;
 	libcstring_system_character_t *option_sectors_per_chunk         = NULL;
+	libcstring_system_character_t *option_size                      = NULL;
 	libcstring_system_character_t *option_target_filename           = NULL;
+	libcstring_system_character_t *option_zero_buffer_on_error      = NULL;
 	libcstring_system_character_t *program                          = _LIBCSTRING_SYSTEM_STRING( "ewfacquire" );
 	libcstring_system_character_t *request_string                   = NULL;
 
@@ -1081,20 +1085,18 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
 	uint8_t print_status_information                                = 1;
-	uint8_t read_error_retries                                      = 2;
 	uint8_t resume_acquiry                                          = 0;
 	uint8_t swap_byte_pairs                                         = 0;
 	uint8_t verbose                                                 = 0;
-	uint8_t wipe_block_on_read_error                                = 0;
 	int8_t acquiry_parameters_confirmed                             = 0;
-	int argument_set_offset                                         = 0;
-	int argument_set_read_error_retries                             = 0;
-	int argument_set_size                                           = 0;
-	int argument_set_wipe_block_on_read_error                       = 0;
 	int error_abort                                                 = 0;
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
 	int status                                                      = 0;
+
+/* TODO refactor */
+	int argument_set_offset                                         = 0;
+	int argument_set_size                                           = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -1151,27 +1153,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'B':
-				string_length = libcstring_system_string_length(
-				                 optarg );
-
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &acquiry_size,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					acquiry_size = 0;
-
-					fprintf(
-					 stderr,
-					 "Unsupported acquiry size defaulting to: all bytes.\n" );
-				}
-				argument_set_size = 1;
+				option_size = optarg;
 
 				break;
 
@@ -1253,28 +1235,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'o':
-				string_length = libcstring_system_string_length(
-				                 optarg );
-
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &acquiry_offset,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					acquiry_offset = 0;
-
-					fprintf(
-					 stderr,
-					 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
-					 acquiry_offset );
-				}
-				argument_set_offset = 1;
+				option_offset = optarg;
 
 				break;
 
@@ -1317,35 +1278,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'r':
-				string_length = libcstring_system_string_length(
-				                 optarg );
-
-				result = libsystem_string_to_uint64(
-				          optarg,
-				          string_length + 1,
-				          &input_size_variable,
-				          &error );
-
-				if( result != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-				}
-				if( ( result != 1 )
-				 || ( input_size_variable > 255 ) )
-				{
-					input_size_variable = 2;
-
-					fprintf(
-					 stderr,
-					 "Unsupported number of read error retries defaulting to: %" PRIu64 ".\n",
-					 input_size_variable );
-				}
-				read_error_retries = (uint8_t) input_size_variable;
-
-				argument_set_read_error_retries = 1;
+				option_maximum_segment_size = optarg;
 
 				break;
 
@@ -1386,8 +1319,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_SUCCESS );
 
 			case (libcstring_system_integer_t) 'w':
-				wipe_block_on_read_error              = 1;
-				argument_set_wipe_block_on_read_error = 1;
+				option_zero_buffer_on_error = optarg;
 
 				break;
 
@@ -1526,11 +1458,8 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 	}
-	if( ( acquiry_size == 0 )
-	 || ( acquiry_size > ( media_size - acquiry_offset ) ) )
-	{
-		acquiry_size = media_size - acquiry_offset;
-	}
+	/* Create the imaging handle and set the desired values
+	 */
 	if( imaging_handle_initialize(
 	     &ewfacquire_imaging_handle,
 	     calculate_md5,
@@ -1910,6 +1839,91 @@ int main( int argc, char * const argv[] )
 			 ewfacquire_imaging_handle->maximum_segment_size );
 		}
 	}
+	if( option_number_of_error_retries != NULL )
+	{
+		result = device_handle_set_number_of_error_retries(
+			  ewfacquire_device_handle,
+			  option_sectors_per_chunk,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set number of error retries.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported number of error retries defaulting to: %" PRIu8 ".\n",
+			 ewfacquire_device_handle->number_of_error_retries );
+		}
+	}
+	if( option_zero_buffer_on_error != NULL )
+	{
+		ewfacquire_device_handle->zero_buffer_on_error = 1;
+	}
+	/* Initialize values
+	 */
+/* TODO refactor */
+	if( option_offset != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_offset );
+
+		if( libsystem_string_to_uint64(
+		     option_offset,
+		     string_length + 1,
+		     &acquiry_offset,
+		     &error ) != 1 )
+		{
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			acquiry_offset = 0;
+
+			fprintf(
+			 stderr,
+			 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
+			 acquiry_offset );
+		}
+		argument_set_offset = 1;
+	}
+	if( option_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_size );
+
+		if( libsystem_string_to_uint64(
+		     option_size,
+		     string_length + 1,
+		     &acquiry_size,
+		     &error ) != 1 )
+		{
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			acquiry_size = 0;
+
+			fprintf(
+			 stderr,
+			 "Unsupported acquiry size defaulting to: all bytes.\n" );
+		}
+		argument_set_size = 1;
+	}
+/* TODO refactor */
+	if( ( acquiry_size == 0 )
+	 || ( acquiry_size > ( media_size - acquiry_offset ) ) )
+	{
+		acquiry_size = media_size - acquiry_offset;
+	}
 	/* Request the necessary case data
 	 */
 	while( ( interactive_mode != 0 )
@@ -2194,6 +2208,7 @@ int main( int argc, char * const argv[] )
 				}
 				else if( result == 0 )
 				{
+/* TODO determine default compression level imaging handle ? */
 					fprintf(
 					 stderr,
 					 "Unsupported compression level defaulting to: none.\n" );
@@ -2216,6 +2231,7 @@ int main( int argc, char * const argv[] )
 				}
 				else if( result == 0 )
 				{
+/* TODO determine default format handle ? */
 					fprintf(
 					 stderr,
 					 "Unsupported format defaulting to: encase6.\n" );
@@ -2314,7 +2330,7 @@ int main( int argc, char * const argv[] )
 					 ewfacquire_imaging_handle->maximum_segment_size );
 				}
 			}
-			if( option_bytes_per_sector == 0 )
+			if( option_bytes_per_sector == NULL )
 			{
 				result = imaging_handle_prompt_for_bytes_per_sector(
 					  ewfacquire_imaging_handle,
@@ -2384,76 +2400,49 @@ int main( int argc, char * const argv[] )
 				}
 			}
 		}
-		/* The number of read error retries
-		 */
-		if( argument_set_read_error_retries == 0 )
+		if( option_number_of_error_retries == NULL )
 		{
-			if( ewfinput_get_size_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _LIBCSTRING_SYSTEM_STRING( "The number of retries when a read error occurs" ),
-			     0,
-			     255,
-			     2,
-			     &input_size_variable,
-			     &error ) == -1 )
+			result = device_handle_prompt_for_number_of_error_retries(
+				  ewfacquire_device_handle,
+				  _LIBCSTRING_SYSTEM_STRING( "The number of retries when a read error occurs" ),
+				  &error );
+
+			if( result == -1 )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				input_size_variable = 2;
-
 				fprintf(
-				 stdout,
-				 "Unable to determine read error retry defaulting to: %" PRIu64 ".\n",
-				 input_size_variable );
+				 stderr,
+				 "Unable to determine number of error retries.\n" );
+
+				goto ewfacquire_main_on_error;
 			}
-			read_error_retries = (uint8_t) input_size_variable;
+			else if( result == 0 )
+			{
+				fprintf(
+				 stderr,
+				 "Unsupported number of error retries defaulting to: %" PRIu32 ".\n",
+				 ewfacquire_device_handle->number_of_error_retries );
+			}
 		}
-		/* Wipe the sector on error
-		 */
-		if( argument_set_wipe_block_on_read_error == 0 )
+		if( option_zero_buffer_on_error == NULL )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _LIBCSTRING_SYSTEM_STRING( "Wipe sectors on read error (mimic EnCase like behavior)" ),
-			     ewfinput_yes_no,
-			     2,
-			     1,
-			     &fixed_string_variable,
-			     &error ) == -1 )
+			result = device_handle_prompt_for_number_of_error_retries(
+				  ewfacquire_device_handle,
+			          _LIBCSTRING_SYSTEM_STRING( "Wipe sectors on read error (mimic EnCase like behavior)" ),
+				  &error );
+
+			if( result == -1 )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
 				fprintf(
-				 stdout,
-				 "Unable to determine wipe chunk on error defaulting to: no.\n" );
+				 stderr,
+				 "Unable to determine zero buffer on error.\n" );
 
-				wipe_block_on_read_error = 0;
+				goto ewfacquire_main_on_error;
 			}
-			else if( ewfinput_determine_yes_no(
-				  fixed_string_variable,
-				  &wipe_block_on_read_error,
-				  &error ) != 1 )
+			else if( result == 0 )
 			{
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
 				fprintf(
-				 stdout,
-				 "Unsupported wipe chunk on error defaulting to: no.\n" );
-
-				wipe_block_on_read_error = 0;
+				 stderr,
+				 "Unsupported zero buffer on error retries defaulting to: no.\n" );
 			}
 		}
 		fprintf(
@@ -2469,8 +2458,8 @@ int main( int argc, char * const argv[] )
 		     (off64_t) acquiry_offset,
 		     resume_acquiry_offset,
 		     (size64_t) acquiry_size,
-		     read_error_retries,
-		     wipe_block_on_read_error,
+		     ewfacquire_device_handle->number_of_error_retries,
+		     ewfacquire_device_handle->zero_buffer_on_error,
 		     resume_acquiry,
 		     &error ) != 1 )
 		{
@@ -2502,23 +2491,25 @@ int main( int argc, char * const argv[] )
 		 */
 		else if( acquiry_parameters_confirmed == 0 )
 		{
-			option_case_number                    = NULL;
-			option_description                    = NULL;
-			option_evidence_number                = NULL;
-			option_examiner_name                  = NULL;
-			option_notes                          = NULL;
-			option_media_type                     = NULL;
-			option_media_flags                    = NULL;
-			option_compression_level              = NULL;
-			option_format                         = NULL;
-			option_sectors_per_chunk              = NULL;
-			option_sector_error_granularity       = NULL;
-			option_maximum_segment_size           = NULL;
+			option_case_number              = NULL;
+			option_compression_level        = NULL;
+			option_description              = NULL;
+			option_evidence_number          = NULL;
+			option_examiner_name            = NULL;
+			option_format                   = NULL;
+			option_maximum_segment_size     = NULL;
+			option_media_flags              = NULL;
+			option_media_type               = NULL;
+			option_notes                    = NULL;
+			option_number_of_error_retries  = NULL;
+			option_option                   = NULL;
+			option_sectors_per_chunk        = NULL;
+			option_sector_error_granularity = NULL;
+			option_size                     = NULL;
+			option_zero_buffer_on_error     = NULL;
 
-			argument_set_offset                   = 0;
-			argument_set_read_error_retries       = 0;
-			argument_set_size                     = 0;
-			argument_set_wipe_block_on_read_error = 0;
+			argument_set_offset             = 0;
+			argument_set_size               = 0;
 
 			if( resume_acquiry != 0 )
 			{
@@ -2663,9 +2654,7 @@ int main( int argc, char * const argv[] )
 		{
 			if( device_handle_set_error_values(
 			     ewfacquire_device_handle,
-			     read_error_retries,
 			     ewfacquire_imaging_handle->sector_error_granularity * ewfacquire_imaging_handle->bytes_per_sector,
-			     wipe_block_on_read_error,
 			     &error ) != 1 )
 			{
 				fprintf(

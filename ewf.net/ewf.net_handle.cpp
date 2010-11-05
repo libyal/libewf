@@ -160,6 +160,7 @@ array<System::String^>^ Handle::Glob( System::String^ filename )
 	if( libewf_glob_wide(
 	     ewf_filename,
 	     ewf_filename_length,
+	     LIBEWF_FORMAT_UNKNOWN,
 	     &ewf_filenames,
 	     &ewf_number_of_filenames,
 	     &error ) != 1 )

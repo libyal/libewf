@@ -58,9 +58,12 @@
 
 #include "byte_size_string.h"
 #include "device_handle.h"
+#include "ewfinput.h"
 #include "storage_media_buffer.h"
 
+#define DEVICE_HANDLE_INPUT_BUFFER_SIZE		64
 #define DEVICE_HANDLE_VALUE_SIZE		512
+#define DEVICE_HANDLE_NOTIFY_STREAM		stdout
 
 /* Initializes the device handle
  * Returns 1 if successful or -1 on error
@@ -117,6 +120,48 @@ int device_handle_initialize(
 
 			return( -1 );
 		}
+		( *device_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
+		                                                                      sizeof( libcstring_system_character_t ) * DEVICE_HANDLE_INPUT_BUFFER_SIZE );
+
+		if( ( *device_handle )->input_buffer == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create input buffer.",
+			 function );
+
+			memory_free(
+			 *device_handle );
+
+			*device_handle = NULL;
+
+			return( -1 );
+		}
+		if( memory_set(
+		     ( *device_handle )->input_buffer,
+		     0,
+		     sizeof( libcstring_system_character_t ) * DEVICE_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear device handle.",
+			 function );
+
+			memory_free(
+			 ( *device_handle )->input_buffer );
+			memory_free(
+			 *device_handle );
+
+			*device_handle = NULL;
+
+			return( -1 );
+		}
+		( *device_handle )->number_of_error_retries = 2;
+		( *device_handle )->notify_stream           = DEVICE_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
 }
@@ -144,6 +189,9 @@ int device_handle_free(
 	}
 	if( *device_handle != NULL )
 	{
+		memory_free(
+		 ( *device_handle )->input_buffer );
+
 		if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_DEVICE )
 		{
 			if( ( *device_handle )->dev_input_handle != NULL )
@@ -627,6 +675,125 @@ off64_t device_handle_seek_offset(
 	return( offset );
 }
 
+/* Prompts the user for the number of error retries
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int device_handle_prompt_for_number_of_error_retries(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	static char *function  = "device_handle_prompt_for_number_of_error_retries";
+	uint64_t size_variable = 0;
+	int result             = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_get_size_variable(
+	          device_handle->notify_stream,
+	          device_handle->input_buffer,
+	          DEVICE_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          0,
+	          255,
+	          device_handle->number_of_error_retries,
+	          &size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size variable.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		device_handle->number_of_error_retries = (uint8_t) size_variable;
+	}
+	return( result );
+}
+
+/* Prompts the user for the zero buffer on error
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int device_handle_prompt_for_zero_buffer_on_error(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *fixed_string_variable = NULL;
+	static char *function                                = "device_handle_prompt_for_zero_buffer_on_error";
+	uint8_t default_value                                = 0;
+	int result                                           = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->zero_buffer_on_error == 0 )
+	{
+		default_value = 1;
+	}
+	if( ewfinput_get_fixed_string_variable(
+	     device_handle->notify_stream,
+	     device_handle->input_buffer,
+	     DEVICE_HANDLE_INPUT_BUFFER_SIZE,
+	     request_string,
+	     ewfinput_yes_no,
+	     2,
+	     default_value,
+	     &fixed_string_variable,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_yes_no(
+	          fixed_string_variable,
+	          &( device_handle->zero_buffer_on_error ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine zero buffer on error.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Retrieves the type
  * Returns 1 if successful or -1 on error
  */
@@ -1075,17 +1242,79 @@ int device_handle_get_session(
 	return( 1 );
 }
 
+/* Sets the number of error retries
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_set_number_of_error_retries(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function  = "device_handle_set_number_of_error_retries";
+	size_t string_length   = 0;
+	uint64_t size_variable = 0;
+	int result             = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	result = libsystem_string_to_uint64(
+	          string,
+	          string_length + 1,
+	          &size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine number of error retries.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( size_variable > (uint64_t) UINT8_MAX )
+		{
+			result = 0;
+		}
+		else
+		{
+			device_handle->number_of_error_retries = (uint8_t) size_variable;
+		}
+	}
+	return( result );
+}
+
+int device_handle_set_zero_buffer_on_error(
+     device_handle_t *device_handle,
+     uint8_t zero_buffer_on_error,
+     liberror_error_t **error );
+
+
 /* Sets the error values
  * Returns 1 if successful or -1 on error
  */
 int device_handle_set_error_values(
      device_handle_t *device_handle,
-     uint8_t number_of_error_retries,
      size_t error_granularity,
-     uint8_t zero_buffer_on_error,
      liberror_error_t **error )
 {
-	static char *function = "device_handle_get_information_value";
+	static char *function = "device_handle_set_error_values";
 	uint8_t error_flags   = 0;
 
 	if( device_handle == NULL )
@@ -1103,7 +1332,7 @@ int device_handle_set_error_values(
 	{
 		if( libsmdev_handle_set_number_of_error_retries(
 		     device_handle->dev_input_handle,
-		     number_of_error_retries,
+		     device_handle->number_of_error_retries,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1129,7 +1358,7 @@ int device_handle_set_error_values(
 
 			return( -1 );
 		}
-		if( zero_buffer_on_error != 0 )
+		if( device_handle->zero_buffer_on_error != 0 )
 		{
 			error_flags = LIBSMDEV_ERROR_FLAG_ZERO_ON_ERROR;
 		}

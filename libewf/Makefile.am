@@ -85,7 +85,8 @@ libewf_la_LIBADD = \
 libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
 
 EXTRA_DIST = \
-	libewf_definitions.h.in
+	libewf_definitions.h.in \
+	libewf.rc
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

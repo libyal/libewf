@@ -3096,7 +3096,7 @@ ssize_t libewf_handle_prepare_write_chunk(
  */
 ssize_t libewf_handle_write_chunk(
          libewf_handle_t *handle,
-         void *chunk_buffer,
+         const void *chunk_buffer,
          size_t chunk_buffer_size,
          size_t data_size,
          int8_t is_compressed,
@@ -3349,7 +3349,7 @@ ssize_t libewf_handle_write_chunk(
  */
 ssize_t libewf_handle_write_buffer(
          libewf_handle_t *handle,
-         void *buffer,
+         const void *buffer,
          size_t buffer_size,
          liberror_error_t **error )
 {
@@ -3643,7 +3643,7 @@ ssize_t libewf_handle_write_buffer(
  */
 ssize_t libewf_handle_write_random(
          libewf_handle_t *handle,
-         void *buffer,
+         const void *buffer,
          size_t buffer_size,
          off64_t offset,
          liberror_error_t **error )

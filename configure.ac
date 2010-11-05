@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101104],
+ [20101105],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -1037,7 +1037,8 @@ AS_IF(
  [AC_CHECK_LIB(
   crypto,
   EVP_md5,
-  [AC_SUBST(
+  [dnl Enforce the dynamic loader library to be included after libcrypto
+  AC_SUBST(
    [LIBCRYPTO_LIBADD],
    ["-lcrypto -ldl"])
   AC_DEFINE(
@@ -1106,7 +1107,8 @@ AS_IF(
   AC_CHECK_LIB(
    crypto,
    MD5_Init,
-   [AC_SUBST(
+   [dnl Enforce the dynamic loader library to be included after libcrypto
+   AC_SUBST(
     [LIBCRYPTO_LIBADD],
     ["-lcrypto -ldl"])
    AC_DEFINE(
@@ -1544,6 +1546,8 @@ AC_CONFIG_FILES([include/libewf/types.h])
 AC_CONFIG_FILES([libewf/libewf_definitions.h])
 dnl Have configure make distribution specific files
 AC_CONFIG_FILES([common/types.h])
+AC_CONFIG_FILES([libewf/libewf.rc])
+AC_CONFIG_FILES([ewf.net/ewf.net.rc])
 AC_CONFIG_FILES([macosx/Introduction.rtf])
 AC_CONFIG_FILES([libewf.pc])
 AC_CONFIG_FILES([libewf.spec])

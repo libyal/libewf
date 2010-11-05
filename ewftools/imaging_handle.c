@@ -2717,7 +2717,7 @@ int imaging_handle_set_bytes_per_sector(
 	result = byte_size_string_convert(
 	          string,
 	          string_length,
-	          &( imaging_handle->maximum_segment_size ),
+	          &size_variable,
 	          error );
 
 	if( result == -1 )

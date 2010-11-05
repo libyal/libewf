@@ -1,4 +1,4 @@
-.Dd October 21, 2010
+.Dd November 5, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -83,11 +83,11 @@ File/Handle functions
 .Ft ssize_t
 .Fn libewf_handle_prepare_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_checksum, int8_t *write_checksum, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, size_t data_size, int8_t is_compressed, void *checksum_buffer, uint32_t chunk_checksum, int8_t write_checksum, libewf_error_t **error"
+.Fn libewf_handle_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, size_t data_size, int8_t is_compressed, const void *checksum_buffer, uint32_t chunk_checksum, int8_t write_checksum, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_write_buffer "libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error"
+.Fn libewf_handle_write_buffer "libewf_handle_t *handle, const void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_write_random "libewf_handle_t *handle, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
+.Fn libewf_handle_write_random "libewf_handle_t *handle, const void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_finalize "libewf_handle_t *handle, libewf_error_t **error"
 .Ft off64_t

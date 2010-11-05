@@ -56,6 +56,10 @@ typedef struct device_handle device_handle_t;
 
 struct device_handle
 {
+	/* The user input buffer
+	 */
+	libcstring_system_character_t *input_buffer; 
+
 	/* The device handle type
 	 */
 	uint8_t type;
@@ -67,6 +71,18 @@ struct device_handle
 	/* libsmraw input handle
 	 */
 	libsmdev_handle_t *raw_input_handle;
+
+	/* The number of error retries
+	 */
+	uint8_t number_of_error_retries;
+
+	/* Value to indicate the buffer should be zeroed on error
+	 */
+	uint8_t zero_buffer_on_error;
+
+	/* The nofication output stream
+	 */
+	FILE *notify_stream;
 };
 
 int device_handle_initialize(
@@ -102,6 +118,16 @@ off64_t device_handle_seek_offset(
          off64_t offset,
          int whence,
          liberror_error_t **error );
+
+int device_handle_prompt_for_number_of_error_retries(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int device_handle_prompt_for_zero_buffer_on_error(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
 
 int device_handle_get_type(
      device_handle_t *device_handle,
@@ -143,11 +169,14 @@ int device_handle_get_session(
      size64_t *size,
      liberror_error_t **error );
 
+int device_handle_set_number_of_error_retries(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
 int device_handle_set_error_values(
      device_handle_t *device_handle,
-     uint8_t number_of_error_retries,
      size_t error_granularity,
-     uint8_t zero_buffer_on_error,
      liberror_error_t **error );
 
 int device_handle_get_number_of_read_errors(
