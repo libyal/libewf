@@ -86,13 +86,15 @@ libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
 
 EXTRA_DIST = \
 	libewf_definitions.h.in \
-	libewf.rc
+	libewf.rc \
+	libewf.rc.in
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
 	/bin/rm -f libewf_definitions.h
+	/bin/rm -f libewf.rc
 	/bin/rm -f Makefile
 
 splint:

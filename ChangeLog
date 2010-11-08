@@ -1,23 +1,9 @@
 TODO
-* apply xml patch for ewftools (Simson)
-* have libewf write empty ewf file if media size is 0 and no data was written
-  - have write finalize create empty file ?
-* have libewf handle non-sector multitude media size
-  - set media_size on write finalize
-* fix todo in write existing chunk
-* ewfacquire: make behaviour of -g equal to user input ?
+* clean up of ewftools
+  - apply xml patch for ewftools (Simson)
+  - ewfacquire: make behaviour of -g equal to user input ?
 
-* documentation:
-  - add that error can be NULL
-* libewf: make libewf_convert_date_header_value more strict
-* improve output when encountering a read error
-* improve open file io pool (set basename ?)
-
-* what about header values parsing with preservation of timestamps?
-  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
-  - force set header value to require string formatted in the date format ?
-* check TODO
-* check make distclean
+* check TODO in code, mainly regarding improvements
 
 Next stable release:
 * full test
@@ -25,16 +11,20 @@ Next stable release:
 
 Roadmap:
 * code clean up
-* improve python bindings (partial)
+* bindings
+  - Python (partial)
+  - .Net (partial)
+  - Java/JNI
 * improve device handle (libsmdev)
 * support missing segment files (chunks)
 * libbfio API extensions (partial)
 * low and high level API
   - to allow low level access to sections etc. (for recovery)
+  - ewfdebug
 * lvf support
   - set initial file entry offset
   - add support for permissions
-* internationalisation
+* internationalisation/localization (i18n/l10n)
   - Unicode support (added)
   - locale support (partial)
   - multi language string support (gettext)
@@ -60,6 +50,10 @@ Code clean up:
 * clean up ewfacquire: move imaging preferences into imaging handle
 * make debug output similar to other libraries
   - clean up libewf_section.c
+* make libewf_convert_date_header_value more strict
+
+BFIO support:
+* improve open file io pool (set basename ?)
 
 Further analysis of the EWF format:
 * password hash
@@ -91,6 +85,9 @@ Features
     implemented close segment file on LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE 
     although if linux write fails (write_count != write_size) before ENOSPC is set
     there is still room left on the device, but cannot be claimed by libewf
+* what about header values parsing with preservation of timestamps?
+  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
+  - force set header value to require string formatted in the date format ?
 
 Recovery and analysis:
 * imaging: detect disk full and ask for new segment file location?
@@ -140,6 +137,10 @@ Python bindings (pyewf)
 * add WINAPI wide character support for open() and glob()
 * add more functions
 
+.Net bindings (ewf.net)
+* add more functions
+* mono support ?
+
 API changes
 * add wide character functions definitions by default?
   - not necessary on most platforms
@@ -181,6 +182,7 @@ Tools:
   - allow to specify a .cue file for session information
     compensate for session gaps (leadin/leadout)
     what about detecting .bin/.cue ?
+  - improve output when encountering a read error
 * ewfacquirestream
   - implement stream handle
 * ewfexport
@@ -226,6 +228,12 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20101108
+* write finalize now creates segment file if media size is 0 and no data was
+  written
+* updated libbfio, libsystem
+* fix to format detection for empty EWF file
 
 20101105
 * worked on libewf .net wrapper ewf.net

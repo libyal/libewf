@@ -431,9 +431,6 @@ ssize_t ewfacquirestream_read_chunk(
 ssize64_t ewfacquirestream_read_input(
            imaging_handle_t *imaging_handle,
            int input_file_descriptor,
-           size64_t acquiry_size,
-           off64_t acquiry_offset,
-           uint32_t bytes_per_sector,
            uint8_t swap_byte_pairs,
            uint8_t read_error_retries,
            size_t process_buffer_size,
@@ -546,22 +543,22 @@ ssize64_t ewfacquirestream_read_input(
 		return( -1 );
 	}
 
-	while( ( acquiry_size == 0 )
-	    || ( acquiry_count < (ssize64_t) acquiry_size ) )
+	while( ( imaging_handle->acquiry_size == 0 )
+	    || ( acquiry_count < (ssize64_t) imaging_handle->acquiry_size ) )
 	{
 		read_size = process_buffer_size;
 
 		/* Align with acquiry offset if necessary
 		 */
-		if( ( acquiry_offset != 0 )
-		 && ( acquiry_offset < (off64_t) read_size ) )
+		if( ( imaging_handle->acquiry_offset != 0 )
+		 && ( imaging_handle->acquiry_offset < (off64_t) read_size ) )
 		{
-			read_size = (size_t) acquiry_offset;
+			read_size = (size_t) imaging_handle->acquiry_offset;
 		}
-		else if( ( acquiry_size != 0 )
-		      && ( ( (ssize64_t) acquiry_size - acquiry_count ) < (ssize64_t) read_size ) )
+		else if( ( imaging_handle->acquiry_size != 0 )
+		      && ( ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count ) < (ssize64_t) read_size ) )
 		{
-			read_size = (size_t) ( (ssize64_t) acquiry_size - acquiry_count );
+			read_size = (size_t) ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count );
 		}
 
 		/* Read a chunk from the file descriptor
@@ -602,33 +599,35 @@ ssize64_t ewfacquirestream_read_input(
 
 		/* Skip a certain number of bytes if necessary
 		 */
-		if( acquiry_offset > (off64_t) acquiry_count )
+		if( imaging_handle->acquiry_offset > (off64_t) acquiry_count )
 		{
-			acquiry_offset -= read_count;
+			imaging_handle->acquiry_offset -= read_count;
 
 			continue;
 		}
 		/* Swap byte pairs
 		 */
-		if( ( swap_byte_pairs == 1 )
-		 && ( imaging_handle_swap_byte_pairs(
-		       imaging_handle,
-		       storage_media_buffer,
-		       read_count,
-		       error ) != 1 ) )
+		if( swap_byte_pairs == 1 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to swap byte pairs.",
-			 function );
+			if( imaging_handle_swap_byte_pairs(
+			     imaging_handle,
+			     storage_media_buffer,
+			     read_count,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to swap byte pairs.",
+				 function );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
 
-			return( -1 );
+				return( -1 );
+			}
 		}
 		/* Digest hashes are calcultated after swap
 		 */
@@ -816,8 +815,10 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_media_flags               = NULL;
 	libcstring_system_character_t *option_media_type                = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
+	libcstring_system_character_t *option_offset                    = NULL;
         libcstring_system_character_t *option_secondary_target_filename = NULL;
         libcstring_system_character_t *option_sectors_per_chunk         = NULL;
+	libcstring_system_character_t *option_size                      = NULL;
         libcstring_system_character_t *option_target_filename           = NULL;
 	libcstring_system_character_t *program                          = _LIBCSTRING_SYSTEM_STRING( "ewfacquirestream" );
 
@@ -828,8 +829,6 @@ int main( int argc, char * const argv[] )
 	libcstring_system_integer_t option                              = 0;
 	size_t string_length                                            = 0;
 	int64_t write_count                                             = 0;
-	uint64_t acquiry_offset                                         = 0;
-	uint64_t acquiry_size                                           = 0;
 	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
@@ -921,26 +920,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'B':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_size = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &acquiry_size,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					acquiry_size = 0;
-
-					fprintf(
-					 stderr,
-					 "Unsupported acquiry size defaulting to: all bytes.\n" );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'c':
@@ -1016,27 +997,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'o':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_offset = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &acquiry_offset,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					acquiry_offset = 0;
-
-					fprintf(
-					 stderr,
-					 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
-					 acquiry_offset );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'p':
@@ -1485,15 +1447,60 @@ int main( int argc, char * const argv[] )
 			 ewfacquirestream_imaging_handle->maximum_segment_size );
 		}
 	}
+	if( option_offset != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_offset );
+
+		if( libsystem_string_to_uint64(
+		     option_offset,
+		     string_length + 1,
+		     &( ewfacquirestream_imaging_handle->acquiry_offset ),
+		     &error ) != 1 )
+		{
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			ewfacquirestream_imaging_handle->acquiry_offset = 0;
+
+			fprintf(
+			 stderr,
+			 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
+			 ewfacquirestream_imaging_handle->acquiry_offset );
+		}
+	}
+	if( option_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_size );
+
+		if( libsystem_string_to_uint64(
+		     option_size,
+		     string_length + 1,
+		     &( ewfacquirestream_imaging_handle->acquiry_size ),
+		     &error ) != 1 )
+		{
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			ewfacquirestream_imaging_handle->acquiry_size = 0;
+
+			fprintf(
+			 stderr,
+			 "Unsupported acquiry size defaulting to: all bytes.\n" );
+		}
+	}
 	fprintf(
 	 stdout,
 	 "Using the following acquiry parameters:\n" );
 
 	if( imaging_handle_print_parameters(
 	     ewfacquirestream_imaging_handle,
-	     (off64_t) acquiry_offset,
 	     0,
-	     (size64_t) acquiry_size,
 	     read_error_retries,
 	     0,
 	     0,
@@ -1544,7 +1551,6 @@ int main( int argc, char * const argv[] )
 		     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
 		     NULL,
 		     NULL,
-		     acquiry_size,
 		     &error ) != 1 )
 		{
 			fprintf(
@@ -1695,9 +1701,6 @@ int main( int argc, char * const argv[] )
 		write_count = ewfacquirestream_read_input(
 		               ewfacquirestream_imaging_handle,
 		               0,
-		               acquiry_size,
-		               acquiry_offset,
-		               ewfacquirestream_imaging_handle->bytes_per_sector,
 		               swap_byte_pairs,
 		               read_error_retries,
 		               (size_t) process_buffer_size,

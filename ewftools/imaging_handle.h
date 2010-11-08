@@ -149,6 +149,14 @@ struct imaging_handle
 	 */
 	size64_t maximum_segment_size;
 
+	/* The acquiry offset
+	 */
+	uint64_t acquiry_offset;
+
+	/* The acquiry size
+	 */
+	uint64_t acquiry_size;
+
 	/* The header codepage
 	 */
 	int header_codepage;
@@ -314,7 +322,6 @@ int imaging_handle_prompt_for_maximum_segment_size(
 
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     size64_t *media_size,
      liberror_error_t **error );
 
 int imaging_handle_set_string(
@@ -375,7 +382,6 @@ int imaging_handle_set_output_values(
      libcstring_system_character_t *acquiry_software_version,
      libcstring_system_character_t *model,
      libcstring_system_character_t *serial_number,
-     size64_t media_size,
      liberror_error_t **error );
 
 int imaging_handle_get_header_value(
@@ -423,9 +429,7 @@ ssize_t imaging_handle_finalize(
 
 int imaging_handle_print_parameters(
      imaging_handle_t *imaging_handle,
-     off64_t acquiry_offset,
      off64_t resume_acquiry_offset,
-     size64_t acquiry_size,
      uint8_t read_error_retries,
      uint8_t wipe_block_on_read_error,
      uint8_t resume_acquiry,

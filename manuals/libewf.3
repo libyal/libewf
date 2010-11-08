@@ -1,4 +1,4 @@
-.Dd November 5, 2010
+.Dd November 8, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -460,7 +460,10 @@ The
 .Fn libewf_notify_set_stream
 functions can be used to direct the warning, verbose and debug output from the library.
 .Sh RETURN VALUES
+.Pp
 Most of the functions return NULL or \-1 on error, dependent on the return type. For the actual return values refer to libewf.h
+.Pp
+To determine the cause of an error pass a reference to libewf_error_t *error = NULL. libewf will create an error object that must be freed with the libewf_error_free function. If the error reference is NULL libewf will not create an error object.
 .Sh ENVIRONMENT
 None
 .Sh FILES

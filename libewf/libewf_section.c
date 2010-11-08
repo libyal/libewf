@@ -2341,8 +2341,7 @@ ssize_t libewf_section_volume_read(
 		 media_values->bytes_per_sector );
 	}
 #endif
-
-	if( media_values->number_of_chunks == 0 )
+	if( media_values->media_type == LIBEWF_MEDIA_TYPE_SINGLE_FILES )
 	{
 		*ewf_format = EWF_FORMAT_L01;
 	}

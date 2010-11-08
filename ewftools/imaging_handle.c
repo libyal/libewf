@@ -2181,7 +2181,6 @@ int imaging_handle_prompt_for_maximum_segment_size(
  */
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     size64_t *media_size,
      liberror_error_t **error )
 {
 	static char *function = "imaging_handle_get_output_values";
@@ -2298,7 +2297,7 @@ int imaging_handle_get_output_values(
 	}
 	if( libewf_handle_get_media_size(
 	     imaging_handle->output_handle,
-	     media_size,
+	     &( imaging_handle->acquiry_size ),
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2929,7 +2928,6 @@ int imaging_handle_set_output_values(
      libcstring_system_character_t *acquiry_software_version,
      libcstring_system_character_t *model,
      libcstring_system_character_t *serial_number,
-     size64_t media_size,
      liberror_error_t **error )
 {
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
@@ -3204,7 +3202,7 @@ int imaging_handle_set_output_values(
 	}
 	if( libewf_handle_set_media_size(
 	     imaging_handle->output_handle,
-	     media_size,
+	     imaging_handle->acquiry_size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -3349,7 +3347,7 @@ int imaging_handle_set_output_values(
 		}
 		if( libewf_handle_set_media_size(
 		     imaging_handle->secondary_output_handle,
-		     media_size,
+		     imaging_handle->acquiry_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -4242,9 +4240,7 @@ ssize_t imaging_handle_finalize(
  */
 int imaging_handle_print_parameters(
      imaging_handle_t *imaging_handle,
-     off64_t acquiry_offset,
      off64_t resume_acquiry_offset,
-     size64_t acquiry_size,
      uint8_t read_error_retries,
      uint8_t wipe_block_on_read_error,
      uint8_t resume_acquiry,
@@ -4598,7 +4594,7 @@ int imaging_handle_print_parameters(
 	fprintf(
 	 imaging_handle->notify_stream,
 	 "Acquiry start offset:\t\t%" PRIi64 "\n",
-	 acquiry_offset );
+	 imaging_handle->acquiry_offset );
 
 	if( resume_acquiry != 0 )
 	{
@@ -4611,19 +4607,19 @@ int imaging_handle_print_parameters(
 	 imaging_handle->notify_stream,
 	 "Number of bytes to acquire:\t" );
 
-	if( acquiry_size == 0 )
+	if( imaging_handle->acquiry_size == 0 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "%" PRIu64 " (until end of input)",
-		 acquiry_size );
+		 imaging_handle->acquiry_size );
 	}
 	else
 	{
 		result = byte_size_string_create(
 		          acquiry_size_string,
 		          16,
-		          acquiry_size,
+		          imaging_handle->acquiry_size,
 		          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 		          NULL );
 
@@ -4633,14 +4629,14 @@ int imaging_handle_print_parameters(
 			 imaging_handle->notify_stream,
 			 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
 			 acquiry_size_string,
-			 acquiry_size );
+			 imaging_handle->acquiry_size );
 		}
 		else
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
 			 "%" PRIu64 " bytes",
-			 acquiry_size );
+			 imaging_handle->acquiry_size );
 		}
 	}
 	fprintf(

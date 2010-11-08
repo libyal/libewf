@@ -412,12 +412,8 @@ ssize64_t ewfacquire_read_input(
            imaging_handle_t *imaging_handle,
            device_handle_t *device_handle,
            size64_t media_size,
-           size64_t acquiry_size,
-           off64_t acquiry_offset,
            off64_t resume_acquiry_offset,
-           uint32_t bytes_per_sector,
            uint8_t swap_byte_pairs,
-           uint32_t sector_error_granularity,
            size_t process_buffer_size,
            libcstring_system_character_t *calculated_md5_hash_string,
            size_t calculated_md5_hash_string_size,
@@ -484,7 +480,7 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-        if( acquiry_size > (ssize64_t) INT64_MAX )
+        if( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
 	{
 		liberror_error_set(
 		 error,
@@ -495,7 +491,7 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	if( acquiry_size > media_size )
+	if( imaging_handle->acquiry_size > media_size )
 	{
 		liberror_error_set(
 		 error,
@@ -506,10 +502,10 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	if( acquiry_offset > 0 )
+	if( imaging_handle->acquiry_offset > 0 )
 	{
-		if( ( acquiry_offset > (off64_t) media_size )
-		 || ( ( acquiry_size + acquiry_offset ) > media_size ) )
+		if( ( imaging_handle->acquiry_offset > (off64_t) media_size )
+		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > media_size ) )
 		{
 			liberror_error_set(
 			 error,
@@ -522,7 +518,7 @@ ssize64_t ewfacquire_read_input(
 		}
 		if( device_handle_seek_offset(
 		     device_handle,
-		     acquiry_offset,
+		     imaging_handle->acquiry_offset,
 		     SEEK_SET,
 		     error ) == -1 )
 		{
@@ -538,7 +534,7 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( resume_acquiry_offset > 0 )
 	{
-		if( ( acquiry_offset + resume_acquiry_offset ) > (off64_t) media_size )
+		if( ( imaging_handle->acquiry_offset + resume_acquiry_offset ) > (off64_t) media_size )
 		{
 			liberror_error_set(
 			 error,
@@ -579,7 +575,7 @@ ssize64_t ewfacquire_read_input(
 			return( -1 );
 		}
 	}
-	byte_error_granularity = sector_error_granularity * bytes_per_sector;
+	byte_error_granularity = imaging_handle->sector_error_granularity * imaging_handle->bytes_per_sector;
 
 	if( imaging_handle_get_chunk_size(
 	     imaging_handle,
@@ -628,13 +624,13 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	while( acquiry_count < (ssize64_t) acquiry_size )
+	while( acquiry_count < (ssize64_t) imaging_handle->acquiry_size )
 	{
 		read_size = process_buffer_size;
 
-		if( ( (ssize64_t) acquiry_size - acquiry_count ) < (ssize64_t) read_size )
+		if( ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count ) < (ssize64_t) read_size )
 		{
-			read_size = (size_t) ( (ssize64_t) acquiry_size - acquiry_count );
+			read_size = (size_t) ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count );
 		}
 		if( acquiry_count >= resume_acquiry_offset )
 		{
@@ -863,7 +859,7 @@ ssize64_t ewfacquire_read_input(
 		if( process_status_update(
 		     process_status,
 		     (size64_t) acquiry_count,
-		     acquiry_size,
+		     imaging_handle->acquiry_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1044,7 +1040,6 @@ int main( int argc, char * const argv[] )
 
 	libcstring_system_character_t *calculated_md5_hash_string       = NULL;
 	libcstring_system_character_t *calculated_sha1_hash_string      = NULL;
-	libcstring_system_character_t *fixed_string_variable            = NULL;
 	libcstring_system_character_t *log_filename                     = NULL;
 	libcstring_system_character_t *option_bytes_per_sector          = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
@@ -1077,9 +1072,6 @@ int main( int argc, char * const argv[] )
 	off64_t resume_acquiry_offset                                   = 0;
 	ssize64_t read_count                                            = 0;
 	size_t string_length                                            = 0;
-	uint64_t acquiry_offset                                         = 0;
-	uint64_t acquiry_size                                           = 0;
-	uint64_t input_size_variable                                    = 0;
 	uint64_t media_size                                             = 0;
 	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint8_t calculate_md5                                           = 1;
@@ -1093,10 +1085,6 @@ int main( int argc, char * const argv[] )
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
 	int status                                                      = 0;
-
-/* TODO refactor */
-	int argument_set_offset                                         = 0;
-	int argument_set_size                                           = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -1866,9 +1854,6 @@ int main( int argc, char * const argv[] )
 	{
 		ewfacquire_device_handle->zero_buffer_on_error = 1;
 	}
-	/* Initialize values
-	 */
-/* TODO refactor */
 	if( option_offset != NULL )
 	{
 		string_length = libcstring_system_string_length(
@@ -1877,7 +1862,7 @@ int main( int argc, char * const argv[] )
 		if( libsystem_string_to_uint64(
 		     option_offset,
 		     string_length + 1,
-		     &acquiry_offset,
+		     &( ewfacquire_imaging_handle->acquiry_offset ),
 		     &error ) != 1 )
 		{
 			libsystem_notify_print_error_backtrace(
@@ -1885,14 +1870,13 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 
-			acquiry_offset = 0;
+			ewfacquire_imaging_handle->acquiry_offset = 0;
 
 			fprintf(
 			 stderr,
 			 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
-			 acquiry_offset );
+			 ewfacquire_imaging_handle->acquiry_offset );
 		}
-		argument_set_offset = 1;
 	}
 	if( option_size != NULL )
 	{
@@ -1902,7 +1886,7 @@ int main( int argc, char * const argv[] )
 		if( libsystem_string_to_uint64(
 		     option_size,
 		     string_length + 1,
-		     &acquiry_size,
+		     &( ewfacquire_imaging_handle->acquiry_size ),
 		     &error ) != 1 )
 		{
 			libsystem_notify_print_error_backtrace(
@@ -1910,19 +1894,19 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 
-			acquiry_size = 0;
+			ewfacquire_imaging_handle->acquiry_size = 0;
 
 			fprintf(
 			 stderr,
 			 "Unsupported acquiry size defaulting to: all bytes.\n" );
 		}
-		argument_set_size = 1;
 	}
-/* TODO refactor */
-	if( ( acquiry_size == 0 )
-	 || ( acquiry_size > ( media_size - acquiry_offset ) ) )
+	/* Initialize values
+	 */
+	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
+	 || ( ewfacquire_imaging_handle->acquiry_size > ( media_size - ewfacquire_imaging_handle->acquiry_offset ) ) )
 	{
-		acquiry_size = media_size - acquiry_offset;
+		ewfacquire_imaging_handle->acquiry_size = media_size - ewfacquire_imaging_handle->acquiry_offset;
 	}
 	/* Request the necessary case data
 	 */
@@ -2012,12 +1996,10 @@ int main( int argc, char * const argv[] )
 				goto ewfacquire_main_on_error;
 			}
 		}
-/* TODO refactor */
 		if( resume_acquiry != 0 )
 		{
 			if( imaging_handle_get_output_values(
 			     ewfacquire_imaging_handle,
-			     &acquiry_size,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2239,11 +2221,9 @@ int main( int argc, char * const argv[] )
 			}
 		}
 		if( ( resume_acquiry == 0 )
-		 || ( acquiry_size != media_size ) )
+		 || ( ewfacquire_imaging_handle->acquiry_size != media_size ) )
 		{
-			/* Offset of data to acquire
-			 */
-			if( argument_set_offset == 0 )
+			if( option_offset == NULL )
 			{
 				if( ewfinput_get_size_variable(
 				     stdout,
@@ -2253,7 +2233,7 @@ int main( int argc, char * const argv[] )
 				     0,
 				     media_size,
 				     0,
-				     &acquiry_offset,
+				     &( ewfacquire_imaging_handle->acquiry_offset ),
 				     &error ) == -1 )
 				{
 					libsystem_notify_print_error_backtrace(
@@ -2261,20 +2241,18 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
-					acquiry_offset = 0;
+					ewfacquire_imaging_handle->acquiry_offset = 0;
 
 					fprintf(
 					 stdout,
 					 "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
-					 acquiry_offset );
+					 ewfacquire_imaging_handle->acquiry_offset );
 				}
 			}
 		}
 		if( resume_acquiry == 0 )
 		{
-			/* Size of data to acquire
-			 */
-			if( argument_set_size == 0 )
+			if( option_size == NULL )
 			{
 				if( ewfinput_get_size_variable(
 				     stdout,
@@ -2282,9 +2260,9 @@ int main( int argc, char * const argv[] )
 				     EWFACQUIRE_INPUT_BUFFER_SIZE,
 				     _LIBCSTRING_SYSTEM_STRING( "The number of bytes to acquire" ),
 				     0,
-				     ( media_size - acquiry_offset ),
-				     ( media_size - acquiry_offset ),
-				     &acquiry_size,
+				     media_size - ewfacquire_imaging_handle->acquiry_offset,
+				     media_size - ewfacquire_imaging_handle->acquiry_offset,
+				     &( ewfacquire_imaging_handle->acquiry_size ),
 				     &error ) == -1 )
 				{
 					libsystem_notify_print_error_backtrace(
@@ -2292,12 +2270,12 @@ int main( int argc, char * const argv[] )
 					liberror_error_free(
 					 &error );
 
-					acquiry_size = media_size - acquiry_offset;
+					ewfacquire_imaging_handle->acquiry_size = media_size - ewfacquire_imaging_handle->acquiry_offset;
 
 					fprintf(
 					 stdout,
 					 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
-					 acquiry_size );
+					 ewfacquire_imaging_handle->acquiry_size );
 				}
 			}
 			if( option_maximum_segment_size == NULL )
@@ -2455,9 +2433,7 @@ int main( int argc, char * const argv[] )
 
 		if( imaging_handle_print_parameters(
 		     ewfacquire_imaging_handle,
-		     (off64_t) acquiry_offset,
 		     resume_acquiry_offset,
-		     (size64_t) acquiry_size,
 		     ewfacquire_device_handle->number_of_error_retries,
 		     ewfacquire_device_handle->zero_buffer_on_error,
 		     resume_acquiry,
@@ -2502,14 +2478,11 @@ int main( int argc, char * const argv[] )
 			option_media_type               = NULL;
 			option_notes                    = NULL;
 			option_number_of_error_retries  = NULL;
-			option_option                   = NULL;
+			option_offset                   = NULL;
 			option_sectors_per_chunk        = NULL;
 			option_sector_error_granularity = NULL;
 			option_size                     = NULL;
 			option_zero_buffer_on_error     = NULL;
-
-			argument_set_offset             = 0;
-			argument_set_size               = 0;
 
 			if( resume_acquiry != 0 )
 			{
@@ -2527,7 +2500,7 @@ int main( int argc, char * const argv[] )
 				}
 			}
 		}
-		else if( acquiry_size > EWFACQUIRE_2_TIB )
+		else if( ewfacquire_imaging_handle->acquiry_size > EWFACQUIRE_2_TIB )
 		{
 			if( ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
 			 && ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_EWFX ) )
@@ -2671,13 +2644,13 @@ int main( int argc, char * const argv[] )
 		if( ( ewfacquire_abort == 0 )
 		 && ( error_abort == 0 ) )
 		{
+/* TODO refactor */
 			if( imaging_handle_set_output_values(
 			     ewfacquire_imaging_handle,
 			     program,
 			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
 			     media_information_model,
 			     media_information_serial_number,
-			     acquiry_size,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2889,12 +2862,8 @@ int main( int argc, char * const argv[] )
 		              ewfacquire_imaging_handle,
 		              ewfacquire_device_handle,
 		              media_size,
-		              (size64_t) acquiry_size,
-		              (off64_t) acquiry_offset,
 		              resume_acquiry_offset,
-		              ewfacquire_imaging_handle->bytes_per_sector,
 		              swap_byte_pairs,
-		              ewfacquire_imaging_handle->sector_error_granularity,
 		              (size_t) process_buffer_size,
 		              calculated_md5_hash_string,
 		              DIGEST_HASH_STRING_SIZE_MD5,
