@@ -422,6 +422,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *calculated_sha1_hash_string = NULL;
 	libcstring_system_character_t *log_filename                = NULL;
 	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfverify" );
+	libcstring_system_character_t *option_header_codepage      = NULL;
 	libcstring_system_character_t *stored_md5_hash_string      = NULL;
 	libcstring_system_character_t *stored_sha1_hash_string     = NULL;
 
@@ -442,7 +443,6 @@ int main( int argc, char * const argv[] )
 	uint8_t wipe_chunk_on_error                                = 0;
 	uint8_t verbose                                            = 0;
 	int number_of_filenames                                    = 0;
-	int header_codepage                                        = LIBEWF_CODEPAGE_ASCII;
 	int match_md5_hash                                         = 0;
 	int match_sha1_hash                                        = 0;
 	int result                                                 = 0;
@@ -495,22 +495,8 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (libcstring_system_integer_t) 'A':
-				if( ewfinput_determine_header_codepage(
-				     optarg,
-				     &header_codepage,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_header_codepage = optarg;
 
-					fprintf(
-					 stderr,
-					 "Unsuported header codepage defaulting to: ascii.\n" );
-
-					header_codepage = LIBEWF_CODEPAGE_ASCII;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'd':
@@ -686,33 +672,6 @@ int main( int argc, char * const argv[] )
 		 &glob,
 		 NULL );
 #endif
-
-		return( EXIT_FAILURE );
-	}
-	if( verification_handle_set_header_codepage(
-	     verification_handle,
-	     header_codepage,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to set header codepage in verification handle.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		verification_handle_free(
-		 &verification_handle,
-		 NULL );
-
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
-#endif
-
 		return( EXIT_FAILURE );
 	}
 	result = verification_handle_open_input(
@@ -738,7 +697,6 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 #endif
-
 	if( ( ewfverify_abort == 0 )
 	 && ( result != 1 ) )
 	{
@@ -756,6 +714,28 @@ int main( int argc, char * const argv[] )
 		 NULL );
 
 		return( EXIT_FAILURE );
+	}
+	if( option_header_codepage != NULL )
+	{
+		result = verification_handle_set_header_codepage(
+			  verification_handle,
+		          option_header_codepage,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set header codepage.\n" );
+
+			goto ewfverify_main_on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported header codepage defaulting to: ascii.\n" );
+		}
 	}
 	if( ewfverify_abort == 0 )
 	{
@@ -1419,5 +1399,22 @@ int main( int argc, char * const argv[] )
 		result = EXIT_FAILURE;
 	}
 	return( result );
+
+ewfverify_main_on_error:
+	libsystem_notify_print_error_backtrace(
+	 error );
+	liberror_error_free(
+	 &error );
+
+	if( verification_handle != NULL )
+	{
+		verification_handle_close(
+		 verification_handle,
+		 NULL );
+		verification_handle_free(
+		 &verification_handle,
+		 NULL );
+	}
+	return( EXIT_FAILURE );
 }
 

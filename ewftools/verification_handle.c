@@ -39,6 +39,7 @@
 
 #include "digest_context.h"
 #include "digest_hash.h"
+#include "ewfinput.h"
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
@@ -190,6 +191,7 @@ int verification_handle_initialize(
 
 			return( -1 );
 		}
+		( *verification_handle )->header_codepage = LIBEWF_CODEPAGE_ASCII;
 	}
 	return( 1 );
 }
@@ -965,10 +967,11 @@ int verification_handle_get_number_of_checksum_errors(
  */
 int verification_handle_set_header_codepage(
      verification_handle_t *verification_handle,
-     int header_codepage,
+     const libcstring_system_character_t *string,
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_set_header_codepage";
+	int result            = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -981,32 +984,23 @@ int verification_handle_set_header_codepage(
 
 		return( -1 );
 	}
-	if( verification_handle->input_handle == NULL )
+	result = ewfinput_determine_header_codepage(
+	          string,
+	          &verification_handle->header_codepage,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine header codepage.",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_handle_set_header_codepage(
-	     verification_handle->input_handle,
-	     header_codepage,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header codepage.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+	return( result );
 }
 
 /* Sets the error handling values of the verification handle

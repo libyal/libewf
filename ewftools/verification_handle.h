@@ -71,6 +71,10 @@ struct verification_handle
 	 */
 	libewf_handle_t *input_handle;
 
+	/* The header codepage
+	 */
+	int header_codepage;
+
 	/* The chunk size
 	 */
 	uint32_t chunk_size;
@@ -142,7 +146,7 @@ int verification_handle_get_number_of_checksum_errors(
 
 int verification_handle_set_header_codepage(
      verification_handle_t *verification_handle,
-     int header_codepage,
+     const libcstring_system_character_t *string,
      liberror_error_t **error );
 
 int verification_handle_set_error_handling_values(

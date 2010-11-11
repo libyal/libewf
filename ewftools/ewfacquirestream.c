@@ -837,7 +837,6 @@ int main( int argc, char * const argv[] )
 	uint8_t resume_acquiry                                          = 0;
 	uint8_t swap_byte_pairs                                         = 0;
 	uint8_t verbose                                                 = 0;
-	int error_abort                                                 = 0;
 	int result                                                      = 0;
 	int status                                                      = 0;
 
@@ -1524,58 +1523,36 @@ int main( int argc, char * const argv[] )
 
 		goto ewfacquirestream_main_on_error;
 	}
-	if( ewfacquirestream_abort == 0 )
+	if( ewfacquirestream_imaging_handle->secondary_target_filename != NULL )
 	{
-		if( ewfacquirestream_imaging_handle->secondary_target_filename != NULL )
-		{
-			if( imaging_handle_open_secondary_output(
-			     ewfacquirestream_imaging_handle,
-			     ewfacquirestream_imaging_handle->secondary_target_filename,
-			     resume_acquiry,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to open secondary output.\n" );
-
-				goto ewfacquirestream_main_on_error;
-			}
-		}
-	}
-/* TODO refactor */
-	if( ewfacquirestream_abort == 0 )
-	{
-		if( imaging_handle_set_output_values(
+		if( imaging_handle_open_secondary_output(
 		     ewfacquirestream_imaging_handle,
-		     program,
-		     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
-		     NULL,
-		     NULL,
+		     ewfacquirestream_imaging_handle->secondary_target_filename,
+		     resume_acquiry,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to initialize output settings.\n" );
+			 "Unable to open secondary output.\n" );
 
-			imaging_handle_close(
-			 ewfacquirestream_imaging_handle,
-			 NULL );
-			imaging_handle_free(
-			 &ewfacquirestream_imaging_handle,
-			 NULL );
-
-			error_abort = 1;
+			goto ewfacquirestream_main_on_error;
 		}
 	}
-	if( error_abort != 0 )
+	if( imaging_handle_set_output_values(
+	     ewfacquirestream_imaging_handle,
+	     program,
+	     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
+	     NULL,
+	     NULL,
+	     &error ) != 1 )
 	{
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
+		fprintf(
+		 stderr,
+		 "Unable to initialize output settings.\n" );
 
-		return( EXIT_FAILURE );
+		goto ewfacquirestream_main_on_error;
 	}
+/* TODO refactor */
 	if( calculate_md5 == 1 )
 	{
 		calculated_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
@@ -2022,6 +1999,9 @@ ewfacquirestream_main_on_error:
 
 	if( ewfacquirestream_imaging_handle != NULL )
 	{
+		imaging_handle_close(
+		 ewfacquirestream_imaging_handle,
+		 NULL );
 		imaging_handle_free(
 		 &ewfacquirestream_imaging_handle,
 		 NULL );

@@ -2644,7 +2644,6 @@ int main( int argc, char * const argv[] )
 		if( ( ewfacquire_abort == 0 )
 		 && ( error_abort == 0 ) )
 		{
-/* TODO refactor */
 			if( imaging_handle_set_output_values(
 			     ewfacquire_imaging_handle,
 			     program,

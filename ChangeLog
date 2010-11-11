@@ -229,6 +229,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20101111
+* updated libfvalue
+
 20101108
 * write finalize now creates segment file if media size is 0 and no data was
   written
