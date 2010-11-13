@@ -64,6 +64,14 @@ struct device_handle
 	 */
 	uint8_t type;
 
+	/* The TOC filename
+	 */
+	libcstring_system_character_t *toc_filename;
+
+	/* The TOC filename size
+	 */
+	size_t toc_filename_size;
+
 	/* libsmdev input handle
 	 */
 	libsmdev_handle_t *dev_input_handle;
@@ -119,6 +127,13 @@ off64_t device_handle_seek_offset(
          int whence,
          liberror_error_t **error );
 
+int device_handle_prompt_for_string(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *request_string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error );
+
 int device_handle_prompt_for_number_of_error_retries(
      device_handle_t *device_handle,
      const libcstring_system_character_t *request_string,
@@ -167,6 +182,13 @@ int device_handle_get_session(
      int index,
      off64_t *offset,
      size64_t *size,
+     liberror_error_t **error );
+
+int device_handle_set_string(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
      liberror_error_t **error );
 
 int device_handle_set_number_of_error_retries(

@@ -62,6 +62,7 @@
 #include "storage_media_buffer.h"
 
 #define DEVICE_HANDLE_INPUT_BUFFER_SIZE		64
+#define DEVICE_HANDLE_STRING_SIZE		1024
 #define DEVICE_HANDLE_VALUE_SIZE		512
 #define DEVICE_HANDLE_NOTIFY_STREAM		stdout
 
@@ -192,6 +193,11 @@ int device_handle_free(
 		memory_free(
 		 ( *device_handle )->input_buffer );
 
+		if( ( *device_handle )->toc_filename != NULL )
+		{
+			memory_free(
+			 ( *device_handle )->toc_filename );
+		}
 		if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_DEVICE )
 		{
 			if( ( *device_handle )->dev_input_handle != NULL )
@@ -673,6 +679,125 @@ off64_t device_handle_seek_offset(
 		}
 	}
 	return( offset );
+}
+
+/* Prompts the user for a string
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int device_handle_prompt_for_string(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *request_string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_prompt_for_string";
+	int result            = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_string_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( *internal_string != NULL )
+	{
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+	}
+	*internal_string_size = DEVICE_HANDLE_STRING_SIZE;
+
+	*internal_string = (libcstring_system_character_t *) memory_allocate(
+	                                                      sizeof( libcstring_system_character_t ) * *internal_string_size );
+
+	if( *internal_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create internal string.",
+		 function );
+
+		*internal_string_size = 0;
+
+		return( -1 );
+	}
+	if( memory_set(
+	     *internal_string,
+	     0,
+	     *internal_string_size ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear internal string.",
+		 function );
+
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+
+		return( -1 );
+	}
+	result = ewfinput_get_string_variable(
+	          device_handle->notify_stream,
+	          request_string,
+	          *internal_string,
+	          *internal_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string variable.",
+		 function );
+
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+
+		return( -1 );
+	}
+	return( result );
 }
 
 /* Prompts the user for the number of error retries
@@ -1169,18 +1294,25 @@ int device_handle_get_number_of_sessions(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( number_of_sessions == NULL )
+		if( device_handle->toc_filename != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid number of sessions.",
-			 function );
-
-			return( -1 );
+/* TODO implement libodtoc support */
 		}
-		*number_of_sessions = 0;
+		else
+		{
+			if( number_of_sessions == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: invalid number of sessions.",
+				 function );
+
+				return( -1 );
+			}
+			*number_of_sessions = 0;
+		}
 	}
 	return( 1 );
 }
@@ -1238,6 +1370,116 @@ int device_handle_get_session(
 		 function );
 
 		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets a string
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_set_string(
+     device_handle_t *device_handle,
+     const libcstring_system_character_t *string,
+     libcstring_system_character_t **internal_string,
+     size_t *internal_string_size,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_set_string";
+	size_t string_length  = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_string_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( *internal_string != NULL )
+	{
+		memory_free(
+		 *internal_string );
+
+		*internal_string      = NULL;
+		*internal_string_size = 0;
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length > 0 )
+	{
+		*internal_string = (libcstring_system_character_t *) memory_allocate(
+		                                                      sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
+
+		if( *internal_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create internal string.",
+			 function );
+
+			return( -1 );
+		}
+		if( libcstring_system_string_copy(
+		     *internal_string,
+		     string,
+		     string_length ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy string.",
+			 function );
+
+			memory_free(
+			 *internal_string );
+
+			*internal_string = NULL;
+
+			return( -1 );
+		}
+		( *internal_string )[ string_length ] = 0;
+
+		*internal_string_size = string_length + 1;
 	}
 	return( 1 );
 }

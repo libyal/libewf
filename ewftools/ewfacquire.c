@@ -125,7 +125,7 @@ void ewfacquire_usage_fprint(
 	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
 	                 "                  [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                  [ -P bytes_per_sector ] [ -r read_error_retries ]\n"
-	                 "                  [ -S segment_file_size ] [ -t target ]\n"
+	                 "                  [ -S segment_file_size ] [ -t target ] [ -T toc_file ]\n"
 	                 "                  [ -2 secondary_target ] [ -hqRsuvVw ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file(s) or device\n\n" );
@@ -191,6 +191,8 @@ void ewfacquire_usage_fprint(
 	}
 
 	fprintf( stream, "\t-t:     specify the target file (without extension) to write to\n" );
+	fprintf( stream, "\t-T:     specify the file containing the table of contents (TOC) of\n"
+	                 "\t        an optical disc. The TOC file must be in the CUE format.\n" );
 	fprintf( stream, "\t-u:     unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
@@ -1060,6 +1062,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_sectors_per_chunk         = NULL;
 	libcstring_system_character_t *option_size                      = NULL;
 	libcstring_system_character_t *option_target_filename           = NULL;
+	libcstring_system_character_t *option_toc_filename              = NULL;
 	libcstring_system_character_t *option_zero_buffer_on_error      = NULL;
 	libcstring_system_character_t *program                          = _LIBCSTRING_SYSTEM_STRING( "ewfacquire" );
 	libcstring_system_character_t *request_string                   = NULL;
@@ -1114,7 +1117,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:uvVw2:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:T:uvVw2:" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1287,6 +1290,11 @@ int main( int argc, char * const argv[] )
 
 			case (libcstring_system_integer_t) 't':
 				option_target_filename = optarg;
+
+				break;
+
+			case (libcstring_system_integer_t) 'T':
+				option_toc_filename = optarg;
 
 				break;
 
@@ -1901,6 +1909,22 @@ int main( int argc, char * const argv[] )
 			 "Unsupported acquiry size defaulting to: all bytes.\n" );
 		}
 	}
+	if( option_toc_filename != NULL )
+	{
+		if( device_handle_set_string(
+		     ewfacquire_device_handle,
+		     option_toc_filename,
+		     &( ewfacquire_device_handle->toc_filename ),
+		     &( ewfacquire_device_handle->toc_filename_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set TOC filename.\n" );
+
+			goto ewfacquire_main_on_error;
+		}
+	}
 	/* Initialize values
 	 */
 	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
@@ -2171,6 +2195,23 @@ int main( int argc, char * const argv[] )
 					fprintf(
 					 stderr,
 					 "Unsupported media flags defaulting to: physical.\n" );
+				}
+			}
+			if( ( ewfacquire_imaging_handle->media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+			 && ( option_toc_filename == NULL ) )
+			{
+				if( device_handle_prompt_for_string(
+				     ewfacquire_device_handle,
+				     _LIBCSTRING_SYSTEM_STRING( "File containing table of contents" ),
+				     &( ewfacquire_device_handle->toc_filename ),
+				     &( ewfacquire_device_handle->toc_filename_size ),
+				     &error ) == -1 )
+				{
+					fprintf(
+					 stdout,
+					 "Unable to determine toc file.\n" );
+
+					goto ewfacquire_main_on_error;
 				}
 			}
 			if( option_compression_level == NULL )
@@ -2482,6 +2523,8 @@ int main( int argc, char * const argv[] )
 			option_sectors_per_chunk        = NULL;
 			option_sector_error_granularity = NULL;
 			option_size                     = NULL;
+			option_target_filename          = NULL;
+			option_toc_filename             = NULL;
 			option_zero_buffer_on_error     = NULL;
 
 			if( resume_acquiry != 0 )

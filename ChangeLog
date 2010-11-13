@@ -182,6 +182,7 @@ Tools:
   - allow to specify a .cue file for session information
     compensate for session gaps (leadin/leadout)
     what about detecting .bin/.cue ?
+    what about .toc ?
   - improve output when encountering a read error
 * ewfacquirestream
   - implement stream handle
@@ -228,6 +229,12 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20101113
+* textual changes
+* updated libsmraw, libsmdev
+* ewfacquire: worked on TOC file support for optical discs
+  - added libodtoc
 
 20101111
 * updated libfvalue

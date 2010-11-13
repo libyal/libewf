@@ -13,6 +13,7 @@ SUBDIRS = \
 	libewf \
 	libsmdev \
 	libsmraw \
+	libodtoc \
 	libsystem \
 	ewftools \
 	ewf.net \
@@ -26,16 +27,22 @@ SUBDIRS = \
 	borlandc \
 	msvscpp
 
+GETTEXT_FILES = \
+	config.rpath \
+	po/Makevars.in
+
+PKGCONFIG_FILES = \
+	libewf.pc.in
+
 SPEC_FILES = \
 	libewf.spec \
 	libewf.spec.in
 
 EXTRA_DIST = \
-	config.rpath  \
 	README.mingw \
 	README.static \
-	po/Makevars.in \
-	libewf.pc.in \
+	$(GETTEXT_FILES) \
+	$(PKGCONFIG_FILES) \
 	$(SPEC_FILES)
 
 MAINTAINERCLEANFILES = \
@@ -88,7 +95,9 @@ splint:
 	(cd $(srcdir)/libewf && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsmdev && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsmraw && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libodtoc && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/ewftools && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/tests && $(MAKE) splint $(AM_MAKEFLAGS))
 

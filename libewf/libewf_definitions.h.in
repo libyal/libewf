@@ -33,7 +33,7 @@
 #else
 #define LIBEWF_VERSION				@VERSION@
 
-/* The libewf version string
+/* The version string
  */
 #define LIBEWF_VERSION_STRING			"@VERSION@"
 
@@ -52,7 +52,7 @@ enum LIBEWF_ACCESS_FLAGS
 	LIBEWF_ACCESS_FLAG_RESUME		= 0x10
 };
 
-/* The libewf file access macros
+/* The file access macros
  */
 #define LIBEWF_OPEN_READ			( LIBEWF_ACCESS_FLAG_READ )
 #define LIBEWF_OPEN_READ_WRITE			( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE )
@@ -98,7 +98,7 @@ enum LIBEWF_COMPRESSION_LEVELS
 	LIBEWF_COMPRESSION_BEST			= 2,
 };
 
-/* The libewf compression flags
+/* The compression flags
  * bit 1	set to 1 for emtpy block compression
  * bit 2-8	not used
  */
