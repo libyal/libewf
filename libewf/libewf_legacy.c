@@ -224,8 +224,8 @@ int libewf_handle_get_amount_of_crc_errors(
 	         error ) );
 }
 
-/* Retrieves the information of a CRC error
- * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
+/* Retrieves a CRC error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_crc_error(
      libewf_handle_t *handle,
@@ -2723,8 +2723,8 @@ int libewf_get_amount_of_acquiry_errors(
 	return( 1 );
 }
 
-/* Retrieves the information of an acquiry error
- * Returns 1 if successful, 0 if no acquiry error could be found or -1 on error
+/* Retrieves an acquiry error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_get_acquiry_error(
      libewf_handle_t *handle,
@@ -2865,8 +2865,8 @@ int libewf_get_amount_of_crc_errors(
 	return( 1 );
 }
 
-/* Retrieves the information of a checksum error
- * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
+/* Retrieves a checksum error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_get_crc_error(
      libewf_handle_t *handle,
@@ -3007,8 +3007,8 @@ int libewf_get_amount_of_sessions(
 	return( 1 );
 }
 
-/* Retrieves the information of a session
- * Returns 1 if successful, 0 if no session could be found or -1 on error
+/* Retrieves a session
+ * Returns 1 if successful or -1 on error
  */
 int libewf_get_session(
      libewf_handle_t *handle,

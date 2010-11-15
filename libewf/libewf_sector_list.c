@@ -996,7 +996,7 @@ int libewf_sector_list_append_sector(
 }
 
 /* Retrieves a specific sector
- * Returns 1 if successful, 0 if not available or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_sector_list_get_sector(
      libewf_sector_list_t *sector_list,
@@ -1157,7 +1157,15 @@ int libewf_sector_list_get_sector(
 	}
 	if( sector_list->current_element == NULL )
 	{
-		return( 0 );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing sector list element: %d.",
+		 function,
+		 sector_list->current_element_index );
+
+		return( -1 );
 	}
 	if( sector_list->current_element->value == NULL )
 	{

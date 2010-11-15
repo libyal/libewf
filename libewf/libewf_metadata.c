@@ -2024,8 +2024,8 @@ int libewf_handle_get_number_of_acquiry_errors(
 	return( 1 );
 }
 
-/* Retrieves the information of an acquiry error
- * Returns 1 if successful, 0 if no acquiry error could be found or -1 on error
+/* Retrieves an acquiry error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_acquiry_error(
      libewf_handle_t *handle,
@@ -2036,7 +2036,6 @@ int libewf_handle_get_acquiry_error(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_acquiry_error";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -2051,25 +2050,24 @@ int libewf_handle_get_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	result = libewf_sector_list_get_sector(
-	          internal_handle->acquiry_errors,
-	          (int) index,
-	          first_sector,
-	          number_of_sectors,
-	          error );
-
-	if( result == -1 )
+	if( libewf_sector_list_get_sector(
+	     internal_handle->acquiry_errors,
+	     (int) index,
+	     first_sector,
+	     number_of_sectors,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve acquiry error.",
-		 function );
+		 "%s: unable to retrieve acquiry error: %" PRIu32 ".",
+		 function,
+		 index );
 
 		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Append an acquiry error
@@ -2081,7 +2079,8 @@ int libewf_handle_append_acquiry_error(
      uint64_t number_of_sectors,
      liberror_error_t **error )
 {
-	static char *function = "libewf_handle_append_acquiry_error";
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_append_acquiry_error";
 
 	if( handle == NULL )
 	{
@@ -2094,8 +2093,10 @@ int libewf_handle_append_acquiry_error(
 
 		return( -1 );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
 	if( libewf_sector_list_append_sector(
-	     ( (libewf_internal_handle_t *) handle )->acquiry_errors,
+	     internal_handle->acquiry_errors,
 	     first_sector,
 	     number_of_sectors,
 	     1,
@@ -2190,8 +2191,8 @@ int libewf_handle_get_number_of_checksum_errors(
 	return( 1 );
 }
 
-/* Retrieves the information of a checksum error
- * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
+/* Retrieves a checksum error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
@@ -2202,7 +2203,6 @@ int libewf_handle_get_checksum_error(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_checksum_error";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -2228,25 +2228,24 @@ int libewf_handle_get_checksum_error(
 
 		return( -1 );
 	}
-	result = libewf_sector_list_get_sector(
-	          internal_handle->read_io_handle->checksum_errors,
-	          (int) index,
-	          first_sector,
-	          number_of_sectors,
-	          error );
-
-	if( result == -1 )
+	if( libewf_sector_list_get_sector(
+	     internal_handle->read_io_handle->checksum_errors,
+	     (int) index,
+	     first_sector,
+	     number_of_sectors,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve checksum error.",
-		 function );
+		 "%s: unable to retrieve checksum error: %" PRIu32 ".",
+		 function,
+		 index );
 
 		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Append a checksum error
@@ -2370,8 +2369,8 @@ int libewf_handle_get_number_of_sessions(
 	return( 1 );
 }
 
-/* Retrieves the information of a session
- * Returns 1 if successful, 0 if no session could be found or -1 on error
+/* Retrieves a session
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_session(
      libewf_handle_t *handle,
@@ -2382,7 +2381,6 @@ int libewf_handle_get_session(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_session";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -2397,25 +2395,24 @@ int libewf_handle_get_session(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	result = libewf_sector_list_get_sector(
-	          internal_handle->sessions,
-	          (int) index,
-	          first_sector,
-	          number_of_sectors,
-	          error );
-
-	if( result == -1 )
+	if( libewf_sector_list_get_sector(
+	     internal_handle->sessions,
+	     (int) index,
+	     first_sector,
+	     number_of_sectors,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve session.",
-		 function );
+		 "%s: unable to retrieve session: %" PRIu32 ".",
+		 function,
+		 index );
 
 		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Appends a session
@@ -2427,7 +2424,8 @@ int libewf_handle_append_session(
      uint64_t number_of_sectors,
      liberror_error_t **error )
 {
-	static char *function = "libewf_handle_append_session";
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_append_session";
 
 	if( handle == NULL )
 	{
@@ -2440,8 +2438,10 @@ int libewf_handle_append_session(
 
 		return( -1 );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
 	if( libewf_sector_list_append_sector(
-	     ( (libewf_internal_handle_t *) handle )->sessions,
+	     internal_handle->sessions,
 	     first_sector,
 	     number_of_sectors,
 	     0,

@@ -971,8 +971,8 @@ LIBEWF_EXTERN int libewf_handle_get_number_of_acquiry_errors(
                    uint32_t *number_of_errors,
                    libewf_error_t **error );
 
-/* Retrieves the information of an acquiry error
- * Returns 1 if successful, 0 if no acquiry error could be found or -1 on error
+/* Retrieves an acquiry error
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_acquiry_error(
                    libewf_handle_t *handle,
@@ -998,8 +998,8 @@ LIBEWF_EXTERN int libewf_handle_get_number_of_checksum_errors(
                    uint32_t *number_of_errors,
                    libewf_error_t **error );
 
-/* Retrieves the information of a checksum error
- * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
+/* Retrieves a checksum error
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_checksum_error(
                    libewf_handle_t *handle,
@@ -1025,8 +1025,8 @@ LIBEWF_EXTERN int libewf_handle_get_number_of_sessions(
                    uint32_t *number_of_sessions,
                    libewf_error_t **error );
 
-/* Retrieves the information of a session
- * Returns 1 if successful, 0 if no sessions could be found or -1 on error
+/* Retrieves a session
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_session(
                    libewf_handle_t *handle,
@@ -1517,8 +1517,8 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_crc_errors(
                    uint32_t *amount_of_errors,
                    libewf_error_t **error );
 
-/* Retrieves the information of a checksum error
- * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
+/* Retrieves a checksum error
+ * Returns 1 if successful or -1 on error
  *
  * This function deprecated use libewf_handle_get_checksum_error instead
  */
@@ -2722,8 +2722,8 @@ LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_errors );
 
-/* Retrieves the information of an acquiry error
- * Returns 1 if successful, 0 if no acquiry error could be found or -1 on error
+/* Retrieves an acquiry error
+ * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_acquiry_error instead
  */
@@ -2755,8 +2755,8 @@ LIBEWF_EXTERN int libewf_get_amount_of_crc_errors(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_errors );
 
-/* Retrieves the information of a checksum error
- * Returns 1 if successful, 0 if no checksum error could be found or -1 on error
+/* Retrieves a checksum error
+ * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_checksum_error instead
  */
@@ -2788,8 +2788,8 @@ LIBEWF_EXTERN int libewf_get_amount_of_sessions(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_sessions );
 
-/* Retrieves the information of a session
- * Returns 1 if successful, 0 if no sessions could be found or -1 on error
+/* Retrieves a session
+ * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_session instead
  */
