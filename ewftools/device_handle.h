@@ -40,6 +40,12 @@
 #include <libsmraw.h>
 #endif
 
+#if defined( HAVE_LOCAL_LIBODTOC )
+#include <libodtoc_types.h>
+#elif defined( HAVE_LIBODTOC_H )
+#include <libodtoc.h>
+#endif
+
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -48,8 +54,9 @@ extern "C" {
 
 enum DEVICE_HANDLE_TYPES
 {
-	DEVICE_HANDLE_TYPE_DEVICE	= (uint8_t) 'd',
-	DEVICE_HANDLE_TYPE_FILE		= (uint8_t) 'f'
+	DEVICE_HANDLE_TYPE_DEVICE		= (uint8_t) 'd',
+	DEVICE_HANDLE_TYPE_FILE			= (uint8_t) 'f',
+	DEVICE_HANDLE_TYPE_FILE_WITH_TOC	= (uint8_t) 't'
 };
 
 typedef struct device_handle device_handle_t;
@@ -79,6 +86,10 @@ struct device_handle
 	/* libsmraw input handle
 	 */
 	libsmdev_handle_t *raw_input_handle;
+
+	/* libodtoc input file
+	 */
+	libodtoc_file_t *toc_input_file;
 
 	/* The number of error retries
 	 */
@@ -180,8 +191,8 @@ int device_handle_get_number_of_sessions(
 int device_handle_get_session(
      device_handle_t *device_handle,
      int index,
-     off64_t *offset,
-     size64_t *size,
+     uint64_t *start_sector,
+     uint64_t *number_of_sectors,
      liberror_error_t **error );
 
 int device_handle_set_string(

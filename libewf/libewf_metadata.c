@@ -43,7 +43,7 @@
 
 #include "ewf_definitions.h"
 
-/* Retrieves the number of sectors per chunk from the media information
+/* Retrieves the number of sectors per chunk
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_sectors_per_chunk(
@@ -105,7 +105,7 @@ int libewf_handle_get_sectors_per_chunk(
 	return( 1 );
 }
 
-/* Sets the number of sectors per chunk in the media information
+/* Sets the number of sectors per chunk
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_sectors_per_chunk(
@@ -172,7 +172,7 @@ int libewf_handle_set_sectors_per_chunk(
 	return( 1 );
 }
 
-/* Retrieves the number of bytes per sector from the media information
+/* Retrieves the number of bytes per sector
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_bytes_per_sector(
@@ -234,7 +234,7 @@ int libewf_handle_get_bytes_per_sector(
 	return( 1 );
 }
 
-/* Sets the number of bytes per sector in the media information
+/* Sets the number of bytes per sector
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_bytes_per_sector(
@@ -301,7 +301,7 @@ int libewf_handle_set_bytes_per_sector(
 	return( 1 );
 }
 
-/* Retrieves the number of sectors from the media information
+/* Retrieves the number of sectors
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_number_of_sectors(
@@ -363,7 +363,7 @@ int libewf_handle_get_number_of_sectors(
 	return( 1 );
 }
 
-/* Retrieves the chunk size from the media information
+/* Retrieves the chunk size
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_chunk_size(
@@ -425,7 +425,7 @@ int libewf_handle_get_chunk_size(
 	return( 1 );
 }
 
-/* Retrieves the error granularity from the media information
+/* Retrieves the error granularity
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_error_granularity(

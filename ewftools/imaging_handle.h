@@ -177,6 +177,14 @@ struct imaging_handle
 	 */
 	sha1_context_t sha1_context;
 
+	/* The MD5 digest hash string
+	 */
+	libcstring_system_character_t md5_hash_string[ DIGEST_HASH_STRING_SIZE_MD5 ];
+
+	/* The SHA-1 digest hash string
+	 */
+	libcstring_system_character_t sha1_hash_string[ DIGEST_HASH_STRING_SIZE_SHA1 ];
+
 	/* The libewf output handle
 	 */
 	libewf_handle_t *output_handle;
@@ -415,16 +423,12 @@ int imaging_handle_append_read_error(
 
 int imaging_handle_append_session(
      imaging_handle_t *imaging_handle,
-     off64_t start_offset,
-     size64_t number_of_bytes,
+     uint64_t start_sector,
+     uint64_t number_of_sectors,
      liberror_error_t **error );
 
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
-         libcstring_system_character_t *calculated_md5_hash_string,
-         size_t calculated_md5_hash_string_size,
-         libcstring_system_character_t *calculated_sha1_hash_string,
-         size_t calculated_sha1_hash_string_size,
          liberror_error_t **error );
 
 int imaging_handle_print_parameters(

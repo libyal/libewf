@@ -1366,6 +1366,22 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
   ])
  ])
 
+dnl Function to detect if libodtoc available
+AC_DEFUN([LIBEWF_CHECK_LIBODTOC],
+ [AC_CHECK_HEADERS([libodtoc.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libodtoc_h" = xno],
+  [ac_libewf_have_libodtoc=no],
+  [ac_libewf_have_libodtoc=yes
+  AC_CHECK_LIB(
+   odtoc,
+   libodtoc_get_version,
+   [],
+   [ac_libewf_have_libodtoc=no])
+  ])
+ ])
+
 dnl Function to determine the operating system
 AC_DEFUN([LIBEWF_DETERMINE_OPERATING_SYSTEM],
  [ac_libewf_target_string="$target";

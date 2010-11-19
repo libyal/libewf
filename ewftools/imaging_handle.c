@@ -3985,13 +3985,11 @@ int imaging_handle_append_read_error(
  */
 int imaging_handle_append_session(
      imaging_handle_t *imaging_handle,
-     off64_t start_offset,
-     size64_t number_of_bytes,
+     uint64_t start_sector,
+     uint64_t number_of_sectors,
      liberror_error_t **error )
 {
-	static char *function      = "imaging_handle_append_session";
-	uint64_t number_of_sectors = 0;
-	uint64_t start_sector      = 0;
+	static char *function = "imaging_handle_append_session";
 
 	if( imaging_handle == NULL )
 	{
@@ -4003,24 +4001,6 @@ int imaging_handle_append_session(
 		 function );
 
 		return( -1 );
-	}
-	if( imaging_handle->bytes_per_sector == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid imaging handle - invalid bytes per sector value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	start_sector      = start_offset / imaging_handle->bytes_per_sector;
-	number_of_sectors = number_of_bytes / imaging_handle->bytes_per_sector;
-
-	if( ( number_of_bytes % imaging_handle->bytes_per_sector ) != 0 )
-	{
-		number_of_sectors += 1;
 	}
 	if( libewf_handle_append_session(
 	     imaging_handle->output_handle,
@@ -4063,10 +4043,6 @@ int imaging_handle_append_session(
  */
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
-         libcstring_system_character_t *calculated_md5_hash_string,
-         size_t calculated_md5_hash_string_size,
-         libcstring_system_character_t *calculated_sha1_hash_string,
-         size_t calculated_sha1_hash_string_size,
          liberror_error_t **error )
 {
 #if defined( USE_LIBEWF_GET_MD5_HASH )
@@ -4115,8 +4091,8 @@ ssize_t imaging_handle_finalize(
 		if( digest_hash_copy_to_string(
 		     calculated_md5_hash,
 		     calculated_md5_hash_size,
-		     calculated_md5_hash_string,
-		     calculated_md5_hash_string_size,
+		     imaging_handle->md5_hash_string,
+		     DIGEST_HASH_STRING_SIZE_MD5,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -4132,8 +4108,8 @@ ssize_t imaging_handle_finalize(
 		     imaging_handle,
 		     "MD5",
 		     3,
-		     calculated_md5_hash_string,
-		     calculated_md5_hash_string_size - 1,
+		     imaging_handle->md5_hash_string,
+		     DIGEST_HASH_STRING_SIZE_MD5 - 1,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -4168,8 +4144,8 @@ ssize_t imaging_handle_finalize(
 		if( digest_hash_copy_to_string(
 		     calculated_sha1_hash,
 		     calculated_sha1_hash_size,
-		     calculated_sha1_hash_string,
-		     calculated_sha1_hash_string_size,
+		     imaging_handle->sha1_hash_string,
+		     DIGEST_HASH_STRING_SIZE_SHA1,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -4185,8 +4161,8 @@ ssize_t imaging_handle_finalize(
 		     imaging_handle,
 		     "SHA1",
 		     5,
-		     calculated_sha1_hash_string,
-		     calculated_sha1_hash_string_size - 1,
+		     imaging_handle->sha1_hash_string,
+		     DIGEST_HASH_STRING_SIZE_SHA1 - 1,
 		     error ) != 1 )
 		{
 			liberror_error_set(

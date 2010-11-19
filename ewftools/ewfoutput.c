@@ -75,6 +75,12 @@
 #include <libsmraw.h>
 #endif
 
+#if defined( HAVE_LOCAL_LIBODTOC )
+#include <libodtoc_definitions.h>
+#elif defined( HAVE_LIBODTOC )
+#include <libodtoc.h>
+#endif
+
 #if defined( HAVE_OPENSSL_OPENSSLV_H )
 #include <openssl/opensslv.h>
 #endif
@@ -212,6 +218,13 @@ void ewfoutput_version_detailed_fprint(
 	 stream,
 	 ", libsmraw %s",
 	 LIBSMRAW_VERSION_STRING );
+#endif
+
+#if defined( HAVE_LIBODTOC ) || defined( HAVE_LOCAL_LIBODTOC )
+	fprintf(
+	 stream,
+	 ", libodtoc %s",
+	 LIBODTOC_VERSION_STRING );
 #endif
 
 #if defined( HAVE_LIBCRYPTO )

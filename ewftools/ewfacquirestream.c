@@ -434,10 +434,6 @@ ssize64_t ewfacquirestream_read_input(
            uint8_t swap_byte_pairs,
            uint8_t read_error_retries,
            size_t process_buffer_size,
-           libcstring_system_character_t *calculated_md5_hash_string,
-           size_t calculated_md5_hash_string_size,
-           libcstring_system_character_t *calculated_sha1_hash_string,
-           size_t calculated_sha1_hash_string_size,
            process_status_t *process_status,
            liberror_error_t **error )
 {
@@ -551,7 +547,7 @@ ssize64_t ewfacquirestream_read_input(
 		/* Align with acquiry offset if necessary
 		 */
 		if( ( imaging_handle->acquiry_offset != 0 )
-		 && ( imaging_handle->acquiry_offset < (off64_t) read_size ) )
+		 && ( imaging_handle->acquiry_offset < (uint64_t) read_size ) )
 		{
 			read_size = (size_t) imaging_handle->acquiry_offset;
 		}
@@ -599,7 +595,7 @@ ssize64_t ewfacquirestream_read_input(
 
 		/* Skip a certain number of bytes if necessary
 		 */
-		if( imaging_handle->acquiry_offset > (off64_t) acquiry_count )
+		if( (ssize64_t) imaging_handle->acquiry_offset > acquiry_count )
 		{
 			imaging_handle->acquiry_offset -= read_count;
 
@@ -731,10 +727,6 @@ ssize64_t ewfacquirestream_read_input(
 	}
 	write_count = imaging_handle_finalize(
 	               imaging_handle,
-	               calculated_md5_hash_string,
-	               calculated_md5_hash_string_size,
-	               calculated_sha1_hash_string,
-	               calculated_sha1_hash_string_size,
 	               error );
 
 	if( write_count == -1 )
@@ -800,8 +792,6 @@ int main( int argc, char * const argv[] )
 {
 	liberror_error_t *error                                         = NULL;
 
-	libcstring_system_character_t *calculated_md5_hash_string       = NULL;
-	libcstring_system_character_t *calculated_sha1_hash_string      = NULL;
 	libcstring_system_character_t *log_filename                     = NULL;
 	libcstring_system_character_t *option_bytes_per_sector          = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
@@ -1553,51 +1543,6 @@ int main( int argc, char * const argv[] )
 		goto ewfacquirestream_main_on_error;
 	}
 /* TODO refactor */
-	if( calculate_md5 == 1 )
-	{
-		calculated_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
-		                                                                sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
-
-		if( calculated_md5_hash_string == NULL )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create calculated MD5 hash string.\n" );
-
-			imaging_handle_close(
-			 ewfacquirestream_imaging_handle,
-			 NULL );
-			imaging_handle_free(
-			 &ewfacquirestream_imaging_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
-		}
-	}
-	if( calculate_sha1 == 1 )
-	{
-		calculated_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
-		                                                                 sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_SHA1 );
-
-		if( calculated_sha1_hash_string == NULL )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create calculated SHA1 hash string.\n" );
-
-			memory_free(
-			 calculated_md5_hash_string );
-
-			imaging_handle_close(
-			 ewfacquirestream_imaging_handle,
-			 NULL );
-			imaging_handle_free(
-			 &ewfacquirestream_imaging_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
-		}
-	}
 	if( ewfacquirestream_abort == 0 )
 	{
 		if( process_status_initialize(
@@ -1618,16 +1563,6 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
 			imaging_handle_close(
 			 ewfacquirestream_imaging_handle,
 			 NULL );
@@ -1654,16 +1589,6 @@ int main( int argc, char * const argv[] )
 			 &process_status,
 			 NULL );
 
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
 			imaging_handle_close(
 			 ewfacquirestream_imaging_handle,
 			 NULL );
@@ -1681,10 +1606,6 @@ int main( int argc, char * const argv[] )
 		               swap_byte_pairs,
 		               read_error_retries,
 		               (size_t) process_buffer_size,
-		               calculated_md5_hash_string,
-		               DIGEST_HASH_STRING_SIZE_MD5,
-		               calculated_sha1_hash_string,
-		               DIGEST_HASH_STRING_SIZE_SHA1,
 		               process_status,
 		               &error );
 
@@ -1725,16 +1646,6 @@ int main( int argc, char * const argv[] )
 		 &process_status,
 		 NULL );
 
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		imaging_handle_close(
 		 ewfacquirestream_imaging_handle,
 		 NULL );
@@ -1757,16 +1668,6 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		imaging_handle_close(
 		 ewfacquirestream_imaging_handle,
 		 NULL );
@@ -1813,6 +1714,36 @@ int main( int argc, char * const argv[] )
 				 NULL );
 			}
 		}
+		if( calculate_md5 == 1 )
+		{
+			fprintf(
+			 stdout,
+			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 ewfacquirestream_imaging_handle->md5_hash_string );
+
+			if( log_handle != NULL )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 ewfacquirestream_imaging_handle->md5_hash_string );
+			}
+		}
+		if( calculate_sha1 == 1 )
+		{
+			fprintf(
+			 stdout,
+			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 ewfacquirestream_imaging_handle->sha1_hash_string );
+
+			if( log_handle != NULL )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 ewfacquirestream_imaging_handle->sha1_hash_string );
+			}
+		}
 	}
 	if( imaging_handle_close(
 	     ewfacquirestream_imaging_handle,
@@ -1835,16 +1766,6 @@ int main( int argc, char * const argv[] )
 			log_handle_free(
 			 &log_handle,
 			 NULL );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
 		}
 		imaging_handle_free(
 		 &ewfacquirestream_imaging_handle,
@@ -1874,16 +1795,6 @@ int main( int argc, char * const argv[] )
 			 &log_handle,
 			 NULL );
 		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
 		return( EXIT_FAILURE );
 	}
 	if( libsystem_signal_detach(
@@ -1897,63 +1808,6 @@ int main( int argc, char * const argv[] )
 		 error );
 		liberror_error_free(
 		 &error );
-	}
-        if( status != PROCESS_STATUS_COMPLETED )
-        {
-		if( log_handle != NULL )
-		{
-			log_handle_close(
-			 log_handle,
-			 NULL );
-			log_handle_free(
-			 &log_handle,
-			 NULL );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( calculate_md5 == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 calculated_md5_hash_string );
-
-		if( log_handle != NULL )
-		{
-			log_handle_printf(
-			 log_handle,
-			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 calculated_md5_hash_string );
-		}
-		memory_free(
-		 calculated_md5_hash_string );
-	}
-	if( calculate_sha1 == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 calculated_sha1_hash_string );
-
-		if( log_handle != NULL )
-		{
-			log_handle_printf(
-			 log_handle,
-			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 calculated_sha1_hash_string );
-		}
-		memory_free(
-		 calculated_sha1_hash_string );
 	}
 	if( log_handle != NULL )
 	{
@@ -1988,6 +1842,10 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 		}
+	}
+        if( status != PROCESS_STATUS_COMPLETED )
+        {
+		return( EXIT_FAILURE );
 	}
 	return( EXIT_SUCCESS );
 

@@ -389,12 +389,9 @@ AC_CHECK_FUNCS(
  [AC_CHECK_FUNCS(
   [strncmp],
   [],
-  [AC_CHECK_FUNCS(
-   [strcmp],
-   [],
-   [AC_MSG_FAILURE(
-    [Missing functions: memcmp, strncmp and strcmp],
-    [1]) ]) ]) ])
+  [AC_MSG_FAILURE(
+   [Missing functions: memcmp and strncmp],
+   [1]) ]) ])
 
 AC_CHECK_FUNCS(
  [memcpy],
@@ -402,12 +399,9 @@ AC_CHECK_FUNCS(
  [AC_CHECK_FUNCS(
   [strncpy],
   [],
-  [AC_CHECK_FUNCS(
-   [strcpy],
-   [],
-   [AC_MSG_FAILURE(
-    [Missing functions: memcpy, strncpy and strcpy],
-    [1]) ]) ]) ])
+  [AC_MSG_FAILURE(
+   [Missing functions: memcpy and strncpy],
+   [1]) ]) ])
 
 AC_CHECK_FUNCS(
  [memrchr],
@@ -989,6 +983,61 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMRAW],
  [test "x$ac_libewf_have_libsmraw" = xlocal])
 
+dnl Check for enabling libodtoc for optical disc table of contents support
+LIBEWF_CHECK_LIBODTOC
+
+AS_IF(
+ [test "x$ac_libewf_have_libodtoc" = xyes],
+ [dnl libodtoc is available
+ AC_SUBST(
+  [libewf_spec_requires_libodtoc],
+  [libodtoc])
+ AC_SUBST(
+  [libewf_spec_build_requires_libodtoc],
+  [libodtoc-devel])
+ AC_SUBST(
+  [LIBODTOC_CPPFLAGS],
+  [])
+ AC_SUBST(
+  [LIBODTOC_LIBADD],
+  [])
+ AC_SUBST(
+  [HAVE_LIBODTOC],
+  [1]) ],
+ [dnl libodtoc is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBODTOC],
+  [1],
+  [Define to 1 if the local version of libodtoc is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBODTOC],
+  [1])
+ AC_SUBST(
+  [libewf_spec_requires_libodtoc],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libodtoc],
+  [])
+ AC_SUBST(
+  [LIBODTOC_CPPFLAGS],
+  [-I../libodtoc])
+ AC_SUBST(
+  [LIBODTOC_LIBADD],
+  [../libodtoc/libodtoc.la])
+ AC_SUBST(
+  [HAVE_LIBODTOC],
+  [0])
+ ac_libewf_have_libodtoc=local])
+
+AM_CONDITIONAL(
+ [HAVE_LOCAL_LIBODTOC],
+ [test "x$ac_libewf_have_libodtoc" = xlocal])
+
+AS_IF(
+ [test "x$ac_libewf_have_libodtoc" = xlocal],
+ [AM_PROG_LEX
+ AC_PROG_YACC])
+
 dnl Check for enabling crypographic digest hash support
 ac_libewf_have_libcrypto=no
 
@@ -1320,12 +1369,9 @@ AS_IF(
   [AC_CHECK_FUNCS(
    [wcsncmp],
    [],
-   [AC_CHECK_FUNCS(
-    [wcscmp],
-    [],
-    [AC_MSG_FAILURE(
-     [Missing functions: wmemcmp, wcsncmp and wcscmp],
-     [1]) ]) ]) ])
+   [AC_MSG_FAILURE(
+    [Missing functions: wmemcmp and wcsncmp],
+    [1]) ]) ])
 
  AC_CHECK_FUNCS(
   [wmemcpy],
@@ -1333,12 +1379,9 @@ AS_IF(
   [AC_CHECK_FUNCS(
    [wcsncpy],
    [],
-   [AC_CHECK_FUNCS(
-    [wcscpy],
-    [],
-    [AC_MSG_FAILURE(
-     [Missing functions: wmemcpy, wcsncpy and wcscpy],
-     [1]) ]) ]) ])
+   [AC_MSG_FAILURE(
+    [Missing functions: wmemcpy and wcsncpy],
+    [1]) ]) ])
 
  AC_CHECK_FUNCS(
   [wmemrchr],
@@ -1389,6 +1432,14 @@ AS_IF(
   [],
   [AC_MSG_FAILURE(
    [Missing function: wcstoull],
+   [1]) ])
+
+ dnl Wide character string functions used in liberror/liberror_error.h
+ AC_CHECK_FUNCS(
+  [wcstombs],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: wcstombs],
    [1]) ])
 
  dnl Make the necessary definitions
@@ -1566,6 +1617,7 @@ Building:
    libfvalue support:                               $ac_libewf_have_libfvalue
    libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw
+   libodtoc support:                                $ac_libewf_have_libodtoc
    MD5 support:                                     $ac_libewf_have_libcrypto_md5
    SHA1 support:                                    $ac_libewf_have_libcrypto_sha1
    GUID/UUID support:                               $ac_libewf_have_guid_support

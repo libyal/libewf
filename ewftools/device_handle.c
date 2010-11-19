@@ -54,6 +54,15 @@
 #include <libsmraw.h>
 #endif
 
+#if defined( HAVE_LOCAL_LIBODTOC )
+#include <libodtoc_definitions.h>
+#include <libodtoc_file.h>
+#include <libodtoc_support.h>
+#include <libodtoc_types.h>
+#elif defined( HAVE_LIBODTOC_H )
+#include <libodtoc.h>
+#endif
+
 #include <libsystem.h>
 
 #include "byte_size_string.h"
@@ -217,6 +226,25 @@ int device_handle_free(
 				}
 			}
 		}
+		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+		{
+			if( ( *device_handle )->toc_input_file != NULL )
+			{
+				if( libodtoc_file_free(
+				     &( ( *device_handle )->toc_input_file ),
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free input table of contents file.",
+					 function );
+
+					result = -1;
+				}
+			}
+		}
 		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE )
 		{
 			if( ( *device_handle )->raw_input_handle != NULL )
@@ -362,10 +390,13 @@ int device_handle_open_input(
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_DEVICE;
 	}
+	else if( device_handle->toc_filename != NULL )
+	{
+		device_handle->type = DEVICE_HANDLE_TYPE_FILE_WITH_TOC;
+	}
 	else
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_FILE;
-
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
@@ -424,6 +455,62 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+		if( device_handle->toc_input_file != NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 "%s: invalid device handle - toc input file already set.",
+			 function );
+
+			return( -1 );
+		}
+		if( libodtoc_file_initialize(
+		     &( device_handle->toc_input_file ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create input table of contents file.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libodtoc_file_open_wide(
+			  device_handle->toc_input_file,
+			  device_handle->toc_filename,
+			  LIBODTOC_OPEN_READ,
+			  error );
+#else
+		result = libodtoc_file_open(
+			  device_handle->toc_input_file,
+			  device_handle->toc_filename,
+			  LIBODTOC_OPEN_READ,
+			  error );
+#endif
+		if( result != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open input table of contents file.",
+			 function );
+
+			libodtoc_file_free(
+			 &( device_handle->toc_input_file ),
+			 NULL );
+
+			return( -1 );
+		}
+/* TODO use raw handle for TOC or use libbfio pool ? */
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
@@ -520,6 +607,22 @@ int device_handle_close(
 			return( -1 );
 		}
 	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+		if( libodtoc_file_close(
+		     device_handle->toc_input_file,
+		     error ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close toc input file.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_close(
@@ -593,6 +696,17 @@ ssize_t device_handle_read_buffer(
 			return( -1 );
 		}
 	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+/* TODO */
+/* Determine current session
+ * Determine current track/run-out/lead-out
+ * determine corresponding file
+ * determine track vs requested bytes per sector
+ * merge odcue into odraw library
+ */
+
+	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		read_count = libsmraw_handle_read_buffer(
@@ -657,6 +771,10 @@ off64_t device_handle_seek_offset(
 
 			return( -1 );
 		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+/* TODO */
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
@@ -994,6 +1112,10 @@ int device_handle_get_media_size(
 			return( -1 );
 		}
 	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+/* TODO */
+	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_get_media_size(
@@ -1035,8 +1157,21 @@ int device_handle_get_media_type(
 
 		return( -1 );
 	}
+	if( media_type == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media type.",
+		 function );
+
+		return( -1 );
+	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
+		/* The libsmdev media type is similar to the libewf media type
+		 */
 		if( libsmdev_handle_get_media_type(
 		     device_handle->dev_input_handle,
 		     media_type,
@@ -1052,19 +1187,12 @@ int device_handle_get_media_type(
 			return( -1 );
 		}
 	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+		*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
+	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( media_type == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid media type.",
-			 function );
-
-			return( -1 );
-		}
 		*media_type = 0;
 	}
 	return( 1 );
@@ -1108,20 +1236,43 @@ int device_handle_get_bytes_per_sector(
 			return( -1 );
 		}
 	}
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
-		if( bytes_per_sector == NULL )
+		if( libodtoc_file_get_bytes_per_sector(
+		     device_handle->toc_input_file,
+		     bytes_per_sector,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid bytes per sector.",
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
 			 function );
 
 			return( -1 );
 		}
-		*bytes_per_sector = 512;
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		if( libsmraw_handle_get_bytes_per_sector(
+		     device_handle->raw_input_handle,
+		     bytes_per_sector,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
+
+			return( -1 );
+		}
+		if( *bytes_per_sector == 0 )
+		{
+			*bytes_per_sector = 512;
+		}
 	}
 	return( 1 );
 }
@@ -1173,10 +1324,15 @@ int device_handle_get_information_value(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve information value: %s from device input handle.",
 			 function,
-			 information_value_identifier );
+			 (char *) information_value_identifier );
 
 			return( -1 );
 		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+/* TODO */
+		result = 0;
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
@@ -1196,7 +1352,7 @@ int device_handle_get_information_value(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve information value: %s from raw input handle.",
 			 function,
-			 information_value_identifier );
+			 (char *) information_value_identifier );
 
 			return( -1 );
 		}
@@ -1263,6 +1419,7 @@ int device_handle_get_number_of_sessions(
      liberror_error_t **error )
 {
 	static char *function = "device_handle_get_number_of_sessions";
+	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1292,27 +1449,37 @@ int device_handle_get_number_of_sessions(
 			return( -1 );
 		}
 	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+		if( libodtoc_file_get_number_of_sessions(
+		     device_handle->toc_input_file,
+		     number_of_sessions,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of sessions.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( device_handle->toc_filename != NULL )
+		if( number_of_sessions == NULL )
 		{
-/* TODO implement libodtoc support */
-		}
-		else
-		{
-			if( number_of_sessions == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: invalid number of sessions.",
-				 function );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of sessions.",
+			 function );
 
-				return( -1 );
-			}
-			*number_of_sessions = 0;
+			return( -1 );
 		}
+		*number_of_sessions = 0;
 	}
 	return( 1 );
 }
@@ -1323,11 +1490,12 @@ int device_handle_get_number_of_sessions(
 int device_handle_get_session(
      device_handle_t *device_handle,
      int index,
-     off64_t *offset,
-     size64_t *size,
+     uint64_t *start_sector,
+     uint64_t *number_of_sectors,
      liberror_error_t **error )
 {
 	static char *function = "device_handle_get_session";
+	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1345,8 +1513,28 @@ int device_handle_get_session(
 		if( libsmdev_handle_get_session(
 		     device_handle->dev_input_handle,
 		     index,
-		     offset,
-		     size,
+		     start_sector,
+		     number_of_sectors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve session: %d.",
+			 function,
+			 index );
+
+			return( -1 );
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	{
+		if( libodtoc_file_get_session(
+		     device_handle->toc_input_file,
+		     index,
+		     start_sector,
+		     number_of_sectors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1542,12 +1730,6 @@ int device_handle_set_number_of_error_retries(
 	return( result );
 }
 
-int device_handle_set_zero_buffer_on_error(
-     device_handle_t *device_handle,
-     uint8_t zero_buffer_on_error,
-     liberror_error_t **error );
-
-
 /* Sets the error values
  * Returns 1 if successful or -1 on error
  */
@@ -1660,7 +1842,8 @@ int device_handle_get_number_of_read_errors(
 			return( -1 );
 		}
 	}
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	else if( ( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	      || ( device_handle->type == DEVICE_HANDLE_TYPE_FILE ) )
 	{
 		if( number_of_read_errors == NULL )
 		{
@@ -1721,7 +1904,8 @@ int device_handle_get_read_error(
 			return( -1 );
 		}
 	}
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	else if( ( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	      || ( device_handle->type == DEVICE_HANDLE_TYPE_FILE ) )
 	{
 		liberror_error_set(
 		 error,
@@ -2206,13 +2390,12 @@ int device_handle_sessions_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	static char *function     = "device_handle_sessions_fprint";
-	off64_t session_offset    = 0;
-	size64_t session_size     = 0;
-	uint32_t bytes_per_sector = 0;
-	int number_of_sessions    = 0;
-	int session_index         = 0;
-	int result                = 1;
+	static char *function      = "device_handle_sessions_fprint";
+	uint64_t number_of_sectors = 0;
+	uint64_t start_sector      = 0;
+	int number_of_sessions     = 0;
+	int session_index          = 0;
+	int result                 = 1;
 
 	if( device_handle == NULL )
 	{
@@ -2238,31 +2421,6 @@ int device_handle_sessions_fprint(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->dev_input_handle,
-		     &bytes_per_sector,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve bytes per sector.",
-			 function );
-
-			return( -1 );
-		}
-		if( bytes_per_sector == 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid bytes per sector returned.",
-			 function );
-
-			return( -1 );
-		}
 		if( libsmdev_handle_get_number_of_sessions(
 		     device_handle->dev_input_handle,
 		     &number_of_sessions,
@@ -2295,8 +2453,8 @@ int device_handle_sessions_fprint(
 				if( libsmdev_handle_get_session(
 				     device_handle->dev_input_handle,
 				     session_index,
-				     &session_offset,
-				     &session_size,
+				     &start_sector,
+				     &number_of_sectors,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -2314,9 +2472,9 @@ int device_handle_sessions_fprint(
 					fprintf(
 					 stream,
 					 "\tat sector(s): %" PRIi64 " - %" PRIi64 " number: %" PRIu64 "\n",
-					 session_offset / bytes_per_sector,
-					 ( session_offset + session_size ) / bytes_per_sector,
-					 session_size / bytes_per_sector );
+					 start_sector,
+					 start_sector + number_of_sectors,
+					 number_of_sectors );
 				}
 			}
 			fprintf(

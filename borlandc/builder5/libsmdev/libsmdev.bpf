@@ -28,6 +28,8 @@ USEUNIT("..\..\..\libsmdev\libsmdev_optical_disk.c");
 USE("..\..\..\libsmdev\libsmdev_optical_disk.h", File);
 USEUNIT("..\..\..\libsmdev\libsmdev_scsi.c");
 USE("..\..\..\libsmdev\libsmdev_scsi.h", File);
+USEUNIT("..\..\..\libsmdev\libsmdev_sector_list.c");
+USE("..\..\..\libsmdev\libsmdev_sector_list.h", File);
 USEUNIT("..\..\..\libsmdev\libsmdev_string.c");
 USE("..\..\..\libsmdev\libsmdev_string.h", File);
 USEUNIT("..\..\..\libsmdev\libsmdev_support.c");

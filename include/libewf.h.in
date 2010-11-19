@@ -220,6 +220,7 @@ LIBEWF_EXTERN int libewf_error_fprint(
                    FILE *stream );
 
 /* Prints a descriptive string of the error to the string
+ * The end-of-string character is not included in the return value
  * Returns the number of printed characters if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_error_sprint(
@@ -235,6 +236,7 @@ LIBEWF_EXTERN int libewf_error_backtrace_fprint(
                    FILE *stream );
 
 /* Prints a backtrace of the error to the string
+ * The end-of-string character is not included in the return value
  * Returns the number of printed characters if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_error_backtrace_sprint(
@@ -666,7 +668,7 @@ LIBEWF_EXTERN int libewf_handle_set_maximum_amount_of_open_handles(
                    int maximum_amount_of_open_handles,
                    libewf_error_t **error );
 
-/* Retrieves the amount of sectors from the media information
+/* Retrieves the amount of sectors
  * Returns 1 if successful or -1 on error
  *
  * This function deprecated use libewf_handle_get_number_of_sectors instead
@@ -736,7 +738,7 @@ LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
  * Meta data functions
  * ------------------------------------------------------------------------- */
 
-/* Retrieves the number of sectors per chunk from the media information
+/* Retrieves the number of sectors per chunk
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_sectors_per_chunk(
@@ -744,7 +746,7 @@ LIBEWF_EXTERN int libewf_handle_get_sectors_per_chunk(
                    uint32_t *sectors_per_chunk,
                    libewf_error_t **error );
 
-/* Sets the number of sectors per chunk in the media information
+/* Sets the number of sectors per chunk
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_set_sectors_per_chunk(
@@ -752,7 +754,7 @@ LIBEWF_EXTERN int libewf_handle_set_sectors_per_chunk(
                    uint32_t sectors_per_chunk,
                    libewf_error_t **error );
 
-/* Retrieves the number of bytes per sector from the media information
+/* Retrieves the number of bytes per sector
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_bytes_per_sector(
@@ -760,7 +762,7 @@ LIBEWF_EXTERN int libewf_handle_get_bytes_per_sector(
                    uint32_t *bytes_per_sector,
                    libewf_error_t **error );
 
-/* Sets the number of bytes per sector in the media information
+/* Sets the number of bytes per sector
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_set_bytes_per_sector(
@@ -768,7 +770,7 @@ LIBEWF_EXTERN int libewf_handle_set_bytes_per_sector(
                    uint32_t bytes_per_sector,
                    libewf_error_t **error );
 
-/* Retrieves the number of sectors from the media information
+/* Retrieves the number of sectors
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_number_of_sectors(
@@ -776,7 +778,7 @@ LIBEWF_EXTERN int libewf_handle_get_number_of_sectors(
                    uint64_t *number_of_sectors,
                    libewf_error_t **error );
 
-/* Retrieves the chunk size from the media information
+/* Retrieves the chunk size
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_chunk_size(
@@ -784,7 +786,7 @@ LIBEWF_EXTERN int libewf_handle_get_chunk_size(
                    size32_t *chunk_size,
                    libewf_error_t **error );
 
-/* Retrieves the error granularity from the media information
+/* Retrieves the error granularity
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN int libewf_handle_get_error_granularity(
@@ -2413,7 +2415,7 @@ LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
  * Meta data functions
  * ------------------------------------------------------------------------- */
 
-/* Retrieves the amount of sectors per chunk from the media information
+/* Retrieves the amount of sectors per chunk
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_sectors_per_chunk instead
@@ -2423,7 +2425,7 @@ LIBEWF_EXTERN int libewf_get_sectors_per_chunk(
                    libewf_handle_t *handle,
                    uint32_t *sectors_per_chunk );
 
-/* Sets the amount of sectors per chunk in the media information
+/* Sets the amount of sectors per chunk
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_set_sectors_per_chunk instead
@@ -2433,7 +2435,7 @@ LIBEWF_EXTERN int libewf_set_sectors_per_chunk(
                    libewf_handle_t *handle,
                    uint32_t sectors_per_chunk );
 
-/* Retrieves the amount of bytes per sector from the media information
+/* Retrieves the amount of bytes per sector
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_bytes_per_sector instead
@@ -2443,7 +2445,7 @@ LIBEWF_EXTERN int libewf_get_bytes_per_sector(
                    libewf_handle_t *handle,
                    uint32_t *bytes_per_sector );
 
-/* Sets the amount of bytes per sector in the media information
+/* Sets the amount of bytes per sector
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_set_bytes_per_sector instead
@@ -2453,7 +2455,7 @@ LIBEWF_EXTERN int libewf_set_bytes_per_sector(
                    libewf_handle_t *handle,
                    uint32_t bytes_per_sector );
 
-/* Retrieves the amount of sectors from the media information
+/* Retrieves the amount of sectors
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_number_of_sectors instead
@@ -2463,7 +2465,7 @@ LIBEWF_EXTERN int libewf_get_amount_of_sectors(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_sectors );
 
-/* Retrieves the chunk size from the media information
+/* Retrieves the chunk size
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_chunk_size instead
@@ -2473,7 +2475,7 @@ LIBEWF_EXTERN int libewf_get_chunk_size(
                    libewf_handle_t *handle,
                    size32_t *chunk_size );
 
-/* Retrieves the error granularity from the media information
+/* Retrieves the error granularity
  * Returns 1 if successful or -1 on error
  *
  * This function is deprecated use libewf_handle_get_error_granularity instead
