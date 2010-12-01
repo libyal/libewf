@@ -203,7 +203,7 @@ int libewf_segment_table_resize(
 	return( 1 );
 }
 
-/* Retrieves the size of the basename in the segment table
+/* Retrieves the size of the basename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_segment_table_get_basename_size(
@@ -300,7 +300,7 @@ int libewf_segment_table_get_basename_size(
 	return( 1 );
 }
 
-/* Retrieves the basename in the segment table
+/* Retrieves the basename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_segment_table_get_basename(
@@ -482,7 +482,7 @@ int libewf_segment_table_get_basename(
 	return( 1 );
 }
 
-/* Sets the basename in the segment table
+/* Sets the basename
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_set_basename(
@@ -684,7 +684,7 @@ int libewf_segment_table_set_basename(
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-/* Retrieves the size of the basename in the segment table
+/* Retrieves the size of the basename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_segment_table_get_basename_size_wide(
@@ -780,7 +780,7 @@ int libewf_segment_table_get_basename_size_wide(
 	return( 1 );
 }
 
-/* Retrieves the basename in the segment table
+/* Retrieves the basename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_segment_table_get_basename_wide(
@@ -960,7 +960,7 @@ int libewf_segment_table_get_basename_wide(
 	return( 1 );
 }
 
-/* Sets the basename in the segment table
+/* Sets the basename
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_set_basename_wide(
@@ -1159,7 +1159,7 @@ int libewf_segment_table_set_basename_wide(
 }
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-/* Retrieves the number of handles in the segment table
+/* Retrieves the number of handles
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_get_number_of_handles(
@@ -1238,7 +1238,7 @@ int libewf_segment_table_get_handle(
 	return( 1 );
 }
 
-/* Sets a segment file handle in the segment table
+/* Sets a segment file handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_set_handle(

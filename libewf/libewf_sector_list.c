@@ -918,22 +918,6 @@ int libewf_sector_list_append_sector(
 		}
 		else
 		{
-			if( last_list_element == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing last list element.",
-				 function );
-
-				libewf_list_element_free(
-				 &list_element,
-				 &libewf_sector_list_value_free,
-				 NULL );
-
-				return( -1 );
-			}
 			if( sector_list->first_element == NULL )
 			{
 				liberror_error_set(
@@ -966,29 +950,39 @@ int libewf_sector_list_append_sector(
 
 				return( -1 );
 			}
-			list_element->previous_element = last_list_element;
-			list_element->next_element     = last_list_element->next_element;
-
-			if( last_list_element == sector_list->last_element )
+			if( last_list_element == NULL )
 			{
-				sector_list->last_element = list_element;
-			}
-			else if( last_list_element->next_element == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: corruption detected - missing next in last list element.",
-				 function );
+				sector_list->first_element->previous_element = list_element;
+				list_element->next_element                   = sector_list->first_element;
 
-				return( -1 );
+				sector_list->first_element = list_element;
 			}
 			else
 			{
-				last_list_element->next_element->previous_element = list_element;
+				list_element->previous_element = last_list_element;
+				list_element->next_element     = last_list_element->next_element;
+
+				if( last_list_element == sector_list->last_element )
+				{
+					sector_list->last_element = list_element;
+				}
+				else if( last_list_element->next_element == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 "%s: corruption detected - missing next in last list element.",
+					 function );
+
+					return( -1 );
+				}
+				else
+				{
+					last_list_element->next_element->previous_element = list_element;
+				}
+				last_list_element->next_element = list_element;
 			}
-			last_list_element->next_element = list_element;
 		}
 		sector_list->number_of_elements++;
 	}

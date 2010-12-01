@@ -2,7 +2,6 @@
 
 #include <vcl.h>
 #pragma hdrstop
-USE("..\..\..\libbfio\libbfio_types.h", File);
 USE("..\..\..\libbfio\libbfio_codepage.h", File);
 USE("..\..\..\libbfio\libbfio_definitions.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_error.c");
@@ -29,6 +28,8 @@ USEUNIT("..\..\..\libbfio\libbfio_file_pool.c");
 USE("..\..\..\libbfio\libbfio_file_pool.h", File);
 USEUNIT("..\..\..\libbfio\libbfio_support.c");
 USE("..\..\..\libbfio\libbfio_support.h", File);
+USE("..\..\..\libbfio\libbfio_types.h", File);
+USE("..\..\..\libbfio\libbfio_unused.h", File);
 //---------------------------------------------------------------------------
 #define Library
 

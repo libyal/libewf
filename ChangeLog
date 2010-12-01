@@ -157,6 +157,9 @@ API changes
   - libewf_add/remove_file for LVF
 * file structure API extension (idea)
 
+Debug
+* print offsets of segment files
+
 Tools:
 * locale support
   - print output convert to system string
@@ -229,6 +232,11 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20101201
+* code clean up
+* updated libbfio
+* updated sector list
 
 20101119
 * worked on removing snprintf from liberror

@@ -183,6 +183,10 @@
 				RelativePath="..\..\libbfio\libbfio_types.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libbfio\libbfio_unused.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

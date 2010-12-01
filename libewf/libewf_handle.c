@@ -451,7 +451,7 @@ int libewf_handle_open(
 		 "%s: unable to create file IO pool.",
 		 function );
 
-		return( -1 );
+		goto libewf_handle_open_on_error;
 	}
 	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 || ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
@@ -475,11 +475,7 @@ int libewf_handle_open(
 				 function,
 				 filenames[ filename_iterator ] );
 
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 			if( libbfio_file_initialize(
 			     &file_io_handle,
@@ -492,11 +488,7 @@ int libewf_handle_open(
 				 "%s: unable to create file IO handle.",
 				 function );
 
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libbfio_handle_set_track_offsets_read(
@@ -511,14 +503,7 @@ int libewf_handle_open(
 		                 "%s: unable to set track offsets read in file IO handle.",
 		                 function );
 
-				libbfio_handle_free(
-				 &file_io_handle,
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-		                return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 #endif
 			if( libbfio_file_set_name(
@@ -534,14 +519,7 @@ int libewf_handle_open(
 				 "%s: unable to set name in file IO handle.",
 				 function );
 
-				libbfio_handle_free(
-				 &file_io_handle,
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 			if( libbfio_pool_append_handle(
 			     file_io_pool,
@@ -557,14 +535,7 @@ int libewf_handle_open(
 				 "%s: unable to append file IO handle to pool.",
 				 function );
 
-				libbfio_handle_free(
-				 &file_io_handle,
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 			file_io_handle = NULL;
 
@@ -622,11 +593,7 @@ int libewf_handle_open(
 		 "%s: unable to create segment table.",
 		 function );
 
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
+		goto libewf_handle_open_on_error;
 	}
 	/* The delta segment table is initially filled with a single entry
 	 */
@@ -643,14 +610,7 @@ int libewf_handle_open(
 		 "%s: unable to create delta segment table.",
 		 function );
 
-		libewf_segment_table_free(
-		 &( internal_handle->segment_table ),
-		 NULL );
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
+		goto libewf_handle_open_on_error;
 	}
 	if( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	{
@@ -676,17 +636,7 @@ int libewf_handle_open(
 				 "%s: unable to set basename in segment table.",
 				 function );
 
-				libewf_segment_table_free(
-				 &( internal_handle->delta_segment_table ),
-				 NULL );
-				libewf_segment_table_free(
-				 &( internal_handle->segment_table ),
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 		}
 		/* Get the basename of the first delta segment file
@@ -711,17 +661,7 @@ int libewf_handle_open(
 				 "%s: unable to set basename in delta segment table.",
 				 function );
 
-				libewf_segment_table_free(
-				 &( internal_handle->delta_segment_table ),
-				 NULL );
-				libewf_segment_table_free(
-				 &( internal_handle->segment_table ),
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 		}
 	}
@@ -749,17 +689,7 @@ int libewf_handle_open(
 				 "%s: unable to set basename in segment table.",
 				 function );
 
-				libewf_segment_table_free(
-				 &( internal_handle->delta_segment_table ),
-				 NULL );
-				libewf_segment_table_free(
-				 &( internal_handle->segment_table ),
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_on_error;
 			}
 		}
 	}
@@ -785,17 +715,7 @@ int libewf_handle_open(
 			 "%s: unable to set basename in segment table.",
 			 function );
 
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-			libbfio_pool_free(
-			&file_io_pool,
-			NULL );
-
-			return( -1 );
+			goto libewf_handle_open_on_error;
 		}
 	}
 	if( libewf_handle_open_file_io_pool(
@@ -811,21 +731,38 @@ int libewf_handle_open(
 		 "%s: unable to open handle using a file IO pool.",
 		 function );
 
-		libewf_segment_table_free(
-		 &( internal_handle->delta_segment_table ),
-		 NULL );
-		libewf_segment_table_free(
-		 &( internal_handle->segment_table ),
-		 NULL );
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
+		goto libewf_handle_open_on_error;
 	}
 	internal_handle->file_io_pool_created_in_library = 1;
 
 	return( 1 );
+
+libewf_handle_open_on_error:
+	if( internal_handle->delta_segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &( internal_handle->delta_segment_table ),
+		 NULL );
+	}
+	if( internal_handle->segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &( internal_handle->segment_table ),
+		 NULL );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+	}
+	if( file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+	}
+	return( -1 );
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -922,7 +859,7 @@ int libewf_handle_open_wide(
 		 "%s: unable to create file IO pool.",
 		 function );
 
-		return( -1 );
+		goto libewf_handle_open_wide_on_error;
 	}
 	if( ( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 || ( ( flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
@@ -946,11 +883,7 @@ int libewf_handle_open_wide(
 				 function,
 				 filenames[ filename_iterator ] );
 
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 			if( libbfio_file_initialize(
 			     &file_io_handle,
@@ -963,11 +896,7 @@ int libewf_handle_open_wide(
 				 "%s: unable to create file IO handle.",
 				 function );
 
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libbfio_handle_set_track_offsets_read(
@@ -982,14 +911,7 @@ int libewf_handle_open_wide(
 		                 "%s: unable to set track offsets read in file IO handle.",
 		                 function );
 
-				libbfio_handle_free(
-				 &file_io_handle,
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-		                return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 #endif
 			if( libbfio_file_set_name_wide(
@@ -1005,14 +927,7 @@ int libewf_handle_open_wide(
 				 "%s: unable to set name in file IO handle.",
 				 function );
 
-				libbfio_handle_free(
-				 &file_io_handle,
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 			if( libbfio_pool_append_handle(
 			     file_io_pool,
@@ -1028,14 +943,7 @@ int libewf_handle_open_wide(
 				 "%s: unable to append file IO handle to pool.",
 				 function );
 
-				libbfio_handle_free(
-				 &file_io_handle,
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 			file_io_handle = NULL;
 
@@ -1093,11 +1001,7 @@ int libewf_handle_open_wide(
 		 "%s: unable to create segment table.",
 		 function );
 
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
+		goto libewf_handle_open_wide_on_error;
 	}
 	/* The delta segment table is initially filled with a single entry
 	 */
@@ -1114,14 +1018,7 @@ int libewf_handle_open_wide(
 		 "%s: unable to create delta segment table.",
 		 function );
 
-		libewf_segment_table_free(
-		 &( internal_handle->segment_table ),
-		 NULL );
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
+		goto libewf_handle_open_wide_on_error;
 	}
 	if( ( flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	{
@@ -1147,17 +1044,7 @@ int libewf_handle_open_wide(
 				 "%s: unable to set basename in segment table.",
 				 function );
 
-				libewf_segment_table_free(
-				 &( internal_handle->delta_segment_table ),
-				 NULL );
-				libewf_segment_table_free(
-				 &( internal_handle->segment_table ),
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 		}
 		/* Get the basename of the first delta segment file
@@ -1182,17 +1069,7 @@ int libewf_handle_open_wide(
 				 "%s: unable to set basename in delta segment table.",
 				 function );
 
-				libewf_segment_table_free(
-				 &( internal_handle->delta_segment_table ),
-				 NULL );
-				libewf_segment_table_free(
-				 &( internal_handle->segment_table ),
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 		}
 	}
@@ -1220,17 +1097,7 @@ int libewf_handle_open_wide(
 				 "%s: unable to set basename in segment table.",
 				 function );
 
-				libewf_segment_table_free(
-				 &( internal_handle->delta_segment_table ),
-				 NULL );
-				libewf_segment_table_free(
-				 &( internal_handle->segment_table ),
-				 NULL );
-				libbfio_pool_free(
-				 &file_io_pool,
-				 NULL );
-
-				return( -1 );
+				goto libewf_handle_open_wide_on_error;
 			}
 		}
 	}
@@ -1256,17 +1123,7 @@ int libewf_handle_open_wide(
 			 "%s: unable to set basename in segment table.",
 			 function );
 
-			libewf_segment_table_free(
-			 &( internal_handle->delta_segment_table ),
-			 NULL );
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-			libbfio_pool_free(
-			 &file_io_pool,
-			 NULL );
-
-			return( -1 );
+			goto libewf_handle_open_wide_on_error;
 		}
 	}
 	if( libewf_handle_open_file_io_pool(
@@ -1282,21 +1139,38 @@ int libewf_handle_open_wide(
 		 "%s: unable to open handle using a file IO pool.",
 		 function );
 
-		libewf_segment_table_free(
-		 &( internal_handle->delta_segment_table ),
-		 NULL );
-		libewf_segment_table_free(
-		 &( internal_handle->segment_table ),
-		 NULL );
-		libbfio_pool_free(
-		 &file_io_pool,
-		 NULL );
-
-		return( -1 );
+		goto libewf_handle_open_wide_on_error;
 	}
 	internal_handle->file_io_pool_created_in_library = 1;
 
 	return( 1 );
+
+libewf_handle_open_wide_on_error:
+	if( internal_handle->delta_segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &( internal_handle->delta_segment_table ),
+		 NULL );
+	}
+	if( internal_handle->segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &( internal_handle->segment_table ),
+		 NULL );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+	}
+	if( file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+	}
+	return( -1 );
 }
 #endif
 
@@ -2009,7 +1883,8 @@ int libewf_handle_close(
 			result = -1;
 		}
 	}
-	internal_handle->file_io_pool = NULL;
+	internal_handle->file_io_pool                    = NULL;
+	internal_handle->file_io_pool_created_in_library = 0;
 
 	if( internal_handle->read_io_handle != NULL )
 	{
