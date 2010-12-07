@@ -1,5 +1,5 @@
 /*
- * Error functions
+ * The internal unused definition
  *
  * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,56 +19,25 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_INTERNAL_ERROR_H )
-#define _LIBEWF_INTERNAL_ERROR_H
+#if !defined( _LIBEWF_INTERNAL_UNUSED_H )
+#define _LIBEWF_INTERNAL_UNUSED_H
 
 #include <common.h>
-#include <types.h>
 
-#include <stdio.h>
-
-#if !defined( HAVE_LOCAL_LIBEWF )
-#include <libewf/error.h>
+#if !defined( LIBEWF_ATTRIBUTE_UNUSED )
+#if defined( __GNUC__ ) && __GNUC__ >= 3
+#define LIBEWF_ATTRIBUTE_UNUSED	__attribute__ ((__unused__))
+#else
+#define LIBEWF_ATTRIBUTE_UNUSED
+#endif
 #endif
 
-#include "libewf_extern.h"
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-#if !defined( HAVE_LOCAL_LIBEWF )
-
-LIBEWF_EXTERN \
-void libewf_error_free(
-      libewf_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_error_fprint(
-     libewf_error_t *error,
-     FILE *stream );
-
-LIBEWF_EXTERN \
-int libewf_error_sprint(
-     libewf_error_t *error,
-     char *string,
-     size_t size );
-
-LIBEWF_EXTERN \
-int libewf_error_backtrace_fprint(
-     libewf_error_t *error,
-     FILE *stream );
-
-LIBEWF_EXTERN \
-int libewf_error_backtrace_sprint(
-     libewf_error_t *error,
-     char *string,
-     size_t size );
-
-#endif
-
-#if defined( __cplusplus )
-}
+#if defined( _MSC_VER )
+#define LIBEWF_UNREFERENCED_PARAMETER( parameter ) \
+	UNREFERENCED_PARAMETER( parameter );
+#else
+#define LIBEWF_UNREFERENCED_PARAMETER( parameter ) \
+	/* parameter */
 #endif
 
 #endif

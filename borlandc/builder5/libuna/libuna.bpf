@@ -72,6 +72,7 @@ USE("..\..\..\libuna\libuna_support.h", File);
 USE("..\..\..\libuna\libuna_types.h", File);
 USEUNIT("..\..\..\libuna\libuna_unicode_character.c");
 USE("..\..\..\libuna\libuna_unicode_character.h", File);
+USE("..\..\..\libuna\libuna_unused.h", File);
 USEUNIT("..\..\..\libuna\libuna_url_stream.c");
 USE("..\..\..\libuna\libuna_url_stream.h", File);
 USEUNIT("..\..\..\libuna\libuna_utf7_stream.c");

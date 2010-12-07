@@ -35,6 +35,7 @@ USE("..\..\..\libsmdev\libsmdev_string.h", File);
 USEUNIT("..\..\..\libsmdev\libsmdev_support.c");
 USE("..\..\..\libsmdev\libsmdev_support.h", File);
 USE("..\..\..\libsmdev\libsmdev_types.h", File);
+USE("..\..\..\libsmdev\libsmdev_unused.h", File);
 USEUNIT("..\..\..\libsmdev\libsmdev_usb.c");
 USE("..\..\..\libsmdev\libsmdev_usb.h", File);
 //---------------------------------------------------------------------------

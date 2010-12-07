@@ -87,9 +87,11 @@ struct device_handle
 	 */
 	libsmdev_handle_t *raw_input_handle;
 
+#ifdef TOC_FILE
 	/* libodtoc input file
 	 */
 	libodtoc_file_t *toc_input_file;
+#endif
 
 	/* The number of error retries
 	 */

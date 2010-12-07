@@ -53,12 +53,12 @@
 #include "storage_media_buffer.h"
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
-#define EWFACQUIRE_2_TIB		0x20000000000UL
+#define EWFACQUIRE_2_TIB			0x20000000000UL
 #else
-#define EWFACQUIRE_2_TIB		0x20000000000ULL
+#define EWFACQUIRE_2_TIB			0x20000000000ULL
 #endif
 
-#define EWFACQUIRE_INPUT_BUFFER_SIZE	64
+#define EWFACQUIRE_INPUT_BUFFER_SIZE		64
 
 device_handle_t *ewfacquire_device_handle   = NULL;
 imaging_handle_t *ewfacquire_imaging_handle = NULL;
@@ -191,8 +191,10 @@ void ewfacquire_usage_fprint(
 	}
 
 	fprintf( stream, "\t-t:     specify the target file (without extension) to write to\n" );
+#ifdef TOC_FILE
 	fprintf( stream, "\t-T:     specify the file containing the table of contents (TOC) of\n"
 	                 "\t        an optical disc. The TOC file must be in the CUE format.\n" );
+#endif
 	fprintf( stream, "\t-u:     unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
@@ -211,7 +213,6 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         liberror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
-	static char *function                                = "ewfacquire_confirm_acquiry_parameters";
 	int8_t input_confirmed                               = -1;
 	int result                                           = 0;
 
@@ -534,7 +535,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to acquire beyond media size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( device_handle_seek_offset(
 		     device_handle,
@@ -549,7 +550,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to find acquiry offset.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( resume_acquiry_offset > 0 )
@@ -563,7 +564,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to resume acquire beyond media size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( device_handle_seek_offset(
 		     device_handle,
@@ -578,7 +579,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to find acquiry offset.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( imaging_handle_seek_offset(
 		     imaging_handle,
@@ -592,7 +593,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to seek imaging offset.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	byte_error_granularity = imaging_handle->sector_error_granularity * imaging_handle->bytes_per_sector;
@@ -609,7 +610,7 @@ ssize64_t ewfacquire_read_input(
 		 "%s: unable to retrieve chunk size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( chunk_size == 0 )
 	{
@@ -620,7 +621,7 @@ ssize64_t ewfacquire_read_input(
 		 "%s: invalid chunk size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	process_buffer_size = (size_t) chunk_size;
@@ -642,7 +643,7 @@ ssize64_t ewfacquire_read_input(
 		 "%s: unable to create storage media buffer.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	while( acquiry_count < (ssize64_t) imaging_handle->acquiry_size )
 	{
@@ -669,11 +670,7 @@ ssize64_t ewfacquire_read_input(
 				 "%s: error reading data from input.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 			if( read_count == 0 )
 			{
@@ -684,11 +681,7 @@ ssize64_t ewfacquire_read_input(
 				 "%s: unexpected end of input.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 			storage_media_buffer->data_in_compression_buffer = 0;
@@ -712,11 +705,7 @@ ssize64_t ewfacquire_read_input(
 				 "%s: unable to swap byte pairs.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 		}
 		else
@@ -742,11 +731,7 @@ ssize64_t ewfacquire_read_input(
 				"%s: unable to read data.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 			if( read_count == 0 )
 			{
@@ -757,11 +742,7 @@ ssize64_t ewfacquire_read_input(
 				 "%s: unexpected end of data.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 			process_count = imaging_handle_prepare_read_buffer(
 					 imaging_handle,
@@ -777,11 +758,7 @@ ssize64_t ewfacquire_read_input(
 				"%s: unable to prepare buffer after read.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 			if( process_count > (ssize_t) read_size )
 			{
@@ -794,11 +771,7 @@ ssize64_t ewfacquire_read_input(
 				 process_count,
 				 read_size );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 			read_count = process_count;
 
@@ -824,11 +797,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to update integrity hash(es).",
 			 function );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( acquiry_count >= resume_acquiry_offset )
 		{
@@ -846,11 +815,7 @@ ssize64_t ewfacquire_read_input(
 				"%s: unable to prepare buffer before write.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 			write_count = imaging_handle_write_buffer(
 				       imaging_handle,
@@ -867,11 +832,7 @@ ssize64_t ewfacquire_read_input(
 				 "%s: unable to write data to file.",
 				 function );
 
-				storage_media_buffer_free(
-				 &storage_media_buffer,
-				 NULL );
-
-				return( -1 );
+				goto on_error;
 			}
 		}
 		acquiry_count += read_count;
@@ -889,11 +850,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to update process status.",
 			 function );
 
-			storage_media_buffer_free(
-			 &storage_media_buffer,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( ewfacquire_abort != 0 )
 		{
@@ -911,7 +868,7 @@ ssize64_t ewfacquire_read_input(
 		 "%s: unable to free storage media buffer.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( acquiry_count >= resume_acquiry_offset )
 	{
@@ -927,7 +884,7 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to retrieve number of read errors.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		for( read_error_iterator = 0;
 		     read_error_iterator < number_of_read_errors;
@@ -948,7 +905,7 @@ ssize64_t ewfacquire_read_input(
 				 function,
 				 read_error_iterator );
 
-				return( -1 );
+				goto on_error;
 			}
 			if( imaging_handle_append_read_error(
 			     imaging_handle,
@@ -964,7 +921,7 @@ ssize64_t ewfacquire_read_input(
 				 function,
 				 read_error_iterator );
 
-				return( -1 );
+				goto on_error;
 			}
 		}
 		write_count = imaging_handle_finalize(
@@ -980,11 +937,20 @@ ssize64_t ewfacquire_read_input(
 			 "%s: unable to finalize.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		acquiry_count += write_count;
 	}
 	return( acquiry_count );
+
+on_error:
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Signal handler for ewfacquire
@@ -1096,7 +1062,6 @@ int main( int argc, char * const argv[] )
 	uint8_t swap_byte_pairs                                         = 0;
 	uint8_t verbose                                                 = 0;
 	int8_t acquiry_parameters_confirmed                             = 0;
-	int error_abort                                                 = 0;
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
 	int status                                                      = 0;
@@ -1115,12 +1080,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize system values.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	ewfoutput_version_fprint(
 	 stdout,
@@ -1143,7 +1103,7 @@ int main( int argc, char * const argv[] )
 				ewfacquire_usage_fprint(
 				 stdout );
 
-				return( EXIT_FAILURE );
+				goto on_error;
 
 			case (libcstring_system_integer_t) 'A':
 				option_header_codepage = optarg;
@@ -1346,7 +1306,7 @@ int main( int argc, char * const argv[] )
 		ewfacquire_usage_fprint(
 		 stdout );
 
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	libsystem_notify_set_verbose(
 	 verbose );
@@ -1367,7 +1327,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Reading from stdin not supported.\n" );
 
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( ( option_target_filename != NULL )
 	 && ( option_secondary_target_filename != NULL ) )
@@ -1387,7 +1347,7 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Primary and secondary target cannot be the same.\n" );
 
-				return( EXIT_FAILURE );
+				goto on_error;
 			}
 		}
 	}
@@ -1399,12 +1359,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create device handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Open the input file or device size
 	 */
@@ -1418,16 +1373,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to open file(s) or device.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( device_handle_get_media_size(
 	     ewfacquire_device_handle,
@@ -1438,19 +1384,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve media size.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		device_handle_close(
-		 ewfacquire_device_handle,
-		 NULL );
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( device_handle_media_information_fprint(
 	     ewfacquire_device_handle,
@@ -1478,7 +1412,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create imaging handle.\n" );
 
-		goto ewfacquire_main_on_error;
+		goto on_error;
 	}
 	if( option_header_codepage != NULL )
 	{
@@ -1493,7 +1427,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set header codepage.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1515,7 +1449,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set target filename.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	else if( interactive_mode == 0 )
@@ -1533,7 +1467,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set target filename.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_secondary_target_filename != NULL )
@@ -1549,7 +1483,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set secondary target filename.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_case_number != NULL )
@@ -1565,7 +1499,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set case number.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_description != NULL )
@@ -1581,7 +1515,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set description.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_evidence_number != NULL )
@@ -1597,7 +1531,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set evidence number.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_examiner_name != NULL )
@@ -1613,7 +1547,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set examiner name.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_notes != NULL )
@@ -1629,7 +1563,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set notes.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_compression_level != NULL )
@@ -1645,7 +1579,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set compression values.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1667,7 +1601,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set format.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1689,7 +1623,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set media type.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1709,7 +1643,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to retrieve media type from device.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_media_flags != NULL )
@@ -1725,7 +1659,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set media flags.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1747,7 +1681,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set bytes per sector.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1768,7 +1702,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to retrieve bytes per sector from device.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
 	if( option_sectors_per_chunk != NULL )
@@ -1784,7 +1718,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set sectors per chunk.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1807,7 +1741,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set sector error granularity.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1830,7 +1764,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set maximum segment size.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( ( result == 0 )
 		      || ( ewfacquire_imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
@@ -1860,7 +1794,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set number of error retries.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1921,6 +1855,7 @@ int main( int argc, char * const argv[] )
 			 "Unsupported acquiry size defaulting to: all bytes.\n" );
 		}
 	}
+#ifdef TOC_FILE
 	if( option_toc_filename != NULL )
 	{
 		if( device_handle_set_string(
@@ -1934,9 +1869,10 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to set TOC filename.\n" );
 
-			goto ewfacquire_main_on_error;
+			goto on_error;
 		}
 	}
+#endif
 	/* Initialize values
 	 */
 	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
@@ -1978,7 +1914,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine target.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 				else if( result == 0 )
 				{
@@ -1999,7 +1935,7 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to attach signal handler.\n" );
 
-				goto ewfacquire_main_on_error;
+				goto on_error;
 			}
 			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
@@ -2029,7 +1965,7 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to detach signal handler.\n" );
 
-				goto ewfacquire_main_on_error;
+				goto on_error;
 			}
 		}
 		if( resume_acquiry != 0 )
@@ -2096,7 +2032,7 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Unable to determine case number.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 			}
 			if( option_description == NULL )
@@ -2112,7 +2048,7 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Unable to determine description.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 			}
 			if( option_evidence_number == NULL )
@@ -2128,7 +2064,7 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Unable to determine evidence number.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 			}
 			if( option_examiner_name == NULL )
@@ -2144,7 +2080,7 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Unable to determine examiner name.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 			}
 			if( option_notes == NULL )
@@ -2160,7 +2096,7 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Unable to determine notes.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 			}
 			if( option_media_type == NULL )
@@ -2176,7 +2112,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine media type.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 				else if( result == 0 )
 				{
@@ -2199,7 +2135,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine media flags.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 				else if( result == 0 )
 				{
@@ -2209,6 +2145,7 @@ int main( int argc, char * const argv[] )
 					 "Unsupported media flags defaulting to: physical.\n" );
 				}
 			}
+#ifdef TOC_FILE
 			if( ( ewfacquire_imaging_handle->media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
 			 && ( option_toc_filename == NULL ) )
 			{
@@ -2223,9 +2160,10 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Unable to determine toc file.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 			}
+#endif
 			if( option_compression_level == NULL )
 			{
 				result = imaging_handle_prompt_for_compression_level(
@@ -2239,7 +2177,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine compression level.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 				else if( result == 0 )
 				{
@@ -2262,7 +2200,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine format.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 				else if( result == 0 )
 				{
@@ -2344,14 +2282,13 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine maximum segment size.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
-				else if( ( result == 0 )
-				      || ( ewfacquire_imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-				      || ( ( ewfacquire_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-				       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-				      || ( ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
-				       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+				if( ( ewfacquire_imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				 || ( ( ewfacquire_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+				  &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				 || ( ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+				  &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 				{
 					ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
@@ -2374,7 +2311,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine bytes per sector.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 				else if( result == 0 )
 				{
@@ -2397,7 +2334,7 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine sectors per chunk.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
 				else if( result == 0 )
 				{
@@ -2420,8 +2357,9 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine sector error granularity.\n" );
 
-					goto ewfacquire_main_on_error;
+					goto on_error;
 				}
+/* TODO range check
 				else if( result == 0 )
 				{
 					fprintf(
@@ -2429,6 +2367,7 @@ int main( int argc, char * const argv[] )
 					 "Unsupported sector error granularity defaulting to: %" PRIu32 ".\n",
 					 ewfacquire_imaging_handle->sector_error_granularity );
 				}
+*/
 			}
 		}
 		if( option_number_of_error_retries == NULL )
@@ -2444,7 +2383,7 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to determine number of error retries.\n" );
 
-				goto ewfacquire_main_on_error;
+				goto on_error;
 			}
 			else if( result == 0 )
 			{
@@ -2467,7 +2406,7 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to determine zero buffer on error.\n" );
 
-				goto ewfacquire_main_on_error;
+				goto on_error;
 			}
 			else if( result == 0 )
 			{
@@ -2496,7 +2435,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to print acquiry parameters.\n" );
 
-			error_abort = 1;
+			goto on_error;
 		}
 		/* Check if user is content with the acquiry parameters
 		 */
@@ -2512,9 +2451,7 @@ int main( int argc, char * const argv[] )
 			 stdout,
 			 "Unable to determine if acquiry parameters are correct aborting.\n" );
 
-			ewfacquire_abort = 1;
-
-			break;
+			goto on_error;
 		}
 		/* Reset all parameters provided as command line arguments
 		 */
@@ -2549,9 +2486,7 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Unable to close output file(s).\n" );
 
-					ewfacquire_abort = 1;
-
-					break;
+					goto on_error;
 				}
 			}
 		}
@@ -2582,22 +2517,9 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-	if( libsystem_signal_attach(
-	     ewfacquire_signal_handler,
-	     &error ) != 1 )
+	if( ewfacquire_abort == 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to attach signal handler.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	if( resume_acquiry == 0 )
-	{
-		if( ewfacquire_abort == 0 )
+		if( resume_acquiry == 0 )
 		{
 			if( device_handle_get_information_value(
 			     ewfacquire_device_handle,
@@ -2637,10 +2559,6 @@ int main( int argc, char * const argv[] )
 
 				media_information_serial_number[ 0 ] = 0;
 			}
-		}
-		if( ( ewfacquire_abort == 0 )
-		 && ( error_abort == 0 ) )
-		{
 			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
 			     ewfacquire_imaging_handle->target_filename,
@@ -2651,12 +2569,8 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to open output file(s).\n" );
 
-				error_abort = 1;
+				goto on_error;
 			}
-		}
-		if( ( ewfacquire_abort == 0 )
-		 && ( error_abort == 0 ) )
-		{
 			if( ewfacquire_imaging_handle->secondary_target_filename != NULL )
 			{
 				if( imaging_handle_open_secondary_output(
@@ -2669,17 +2583,9 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to open secondary output file(s).\n" );
 
-					imaging_handle_close(
-					 ewfacquire_imaging_handle,
-					 NULL );
-
-					error_abort = 1;
+					goto on_error;
 				}
 			}
-		}
-		if( ( ewfacquire_abort == 0 )
-		 && ( error_abort == 0 ) )
-		{
 			if( device_handle_set_error_values(
 			     ewfacquire_device_handle,
 			     ewfacquire_imaging_handle->sector_error_granularity * ewfacquire_imaging_handle->bytes_per_sector,
@@ -2689,16 +2595,8 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to initialize output settings.\n" );
 
-				imaging_handle_close(
-				 ewfacquire_imaging_handle,
-				 NULL );
-
-				error_abort = 1;
+				goto on_error;
 			}
-		}
-		if( ( ewfacquire_abort == 0 )
-		 && ( error_abort == 0 ) )
-		{
 			if( imaging_handle_set_output_values(
 			     ewfacquire_imaging_handle,
 			     program,
@@ -2711,16 +2609,8 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to initialize output settings.\n" );
 
-				imaging_handle_close(
-				 ewfacquire_imaging_handle,
-				 NULL );
-
-				error_abort = 1;
+				goto on_error;
 			}
-		}
-		if( ( ewfacquire_abort == 0 )
-		 && ( error_abort == 0 ) )
-		{
 			if( ewfacquire_imaging_handle->media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
 			{
 				if( ewfacquire_determine_sessions(
@@ -2733,37 +2623,10 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine sessions.\n" );
 
-					imaging_handle_close(
-					 ewfacquire_imaging_handle,
-					 NULL );
-
-					error_abort = 1;
+					goto on_error;
 				}
 			}
 		}
-	}
-	if( error_abort != 0 )
-	{
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		imaging_handle_free(
-		 &ewfacquire_imaging_handle,
-		 NULL );
-
-		device_handle_close(
-		 ewfacquire_device_handle,
-		 NULL );
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( ewfacquire_abort == 0 )
-	{
 		if( process_status_initialize(
 		     &process_status,
 		     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
@@ -2777,26 +2640,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to initialize process status.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			imaging_handle_close(
-			 ewfacquire_imaging_handle,
-			 NULL );
-			imaging_handle_free(
-			 &ewfacquire_imaging_handle,
-			 NULL );
-
-			device_handle_close(
-			 ewfacquire_device_handle,
-			 NULL );
-			device_handle_free(
-			 &ewfacquire_device_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 		if( process_status_start(
 		     process_status,
@@ -2806,30 +2650,20 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to start process status.\n" );
 
+			goto on_error;
+		}
+		if( libsystem_signal_attach(
+		     ewfacquire_signal_handler,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to attach signal handler.\n" );
+
 			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
-
-			process_status_free(
-			 &process_status,
-			 NULL );
-
-			imaging_handle_close(
-			 ewfacquire_imaging_handle,
-			 NULL );
-			imaging_handle_free(
-			 &ewfacquire_imaging_handle,
-			 NULL );
-
-			device_handle_close(
-			 ewfacquire_device_handle,
-			 NULL );
-			device_handle_free(
-			 &ewfacquire_device_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
 		}
 		/* Start acquiring data
 		 */
@@ -2856,6 +2690,40 @@ int main( int argc, char * const argv[] )
 		{
 			status = PROCESS_STATUS_COMPLETED;
 		}
+		if( libsystem_signal_detach(
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to detach signal handler.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+		if( process_status_stop(
+		     process_status,
+		     (size64_t) read_count,
+		     status,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to stop process status.\n" );
+
+			goto on_error;
+		}
+		if( process_status_free(
+		     &process_status,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to free process status.\n" );
+
+			goto on_error;
+		}
 	}
 	if( ewfacquire_abort != 0 )
 	{
@@ -2863,70 +2731,6 @@ int main( int argc, char * const argv[] )
 	}
 	/* Done acquiring data
 	 */
-	if( process_status_stop(
-	     process_status,
-	     (size64_t) read_count,
-	     status,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to stop process status.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		process_status_free(
-		 &process_status,
-		 NULL );
-
-		imaging_handle_close(
-		 ewfacquire_imaging_handle,
-		 NULL );
-		imaging_handle_free(
-		 &ewfacquire_imaging_handle,
-		 NULL );
-
-		device_handle_close(
-		 ewfacquire_device_handle,
-		 NULL );
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( process_status_free(
-	     &process_status,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free process status.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		imaging_handle_close(
-		 ewfacquire_imaging_handle,
-		 NULL );
-		imaging_handle_free(
-		 &ewfacquire_imaging_handle,
-		 NULL );
-
-		device_handle_close(
-		 ewfacquire_device_handle,
-		 NULL );
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
 	if( status == PROCESS_STATUS_COMPLETED )
 	{
 		if( log_filename != NULL )
@@ -2939,29 +2743,19 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to create log handle.\n" );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				goto on_error;
 			}
-			else if( log_handle_open(
-			          log_handle,
-			          log_filename,
-			          &error ) != 1 )
+			if( log_handle_open(
+			     log_handle,
+			     log_filename,
+			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
 				 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 				 log_filename );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				log_handle_free(
-				 &log_handle,
-				 NULL );
+				goto on_error;
 			}
 		}
 		if( device_handle_read_errors_fprint(
@@ -2973,10 +2767,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to print device read errors.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			goto on_error;
 		}
 		if( log_handle != NULL )
 		{
@@ -2989,10 +2780,7 @@ int main( int argc, char * const argv[] )
 				 stderr,
 				 "Unable to write device read errors in log file.\n" );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
+				goto on_error;
 			}
 		}
 		if( calculate_md5 == 1 )
@@ -3034,44 +2822,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close output file(s).\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		if( log_handle != NULL )
-		{
-			log_handle_close(
-			 log_handle,
-			 NULL );
-			log_handle_free(
-			 &log_handle,
-			 NULL );
-		}
-		imaging_handle_free(
-		 &ewfacquire_imaging_handle,
-		 NULL );
-
-		device_handle_close(
-		 ewfacquire_device_handle,
-		 NULL );
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( libsystem_signal_detach(
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to detach signal handler.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
+		goto on_error;
 	}
 	if( imaging_handle_free(
 	     &ewfacquire_imaging_handle,
@@ -3081,28 +2832,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free imaging handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		if( log_handle != NULL )
-		{
-			log_handle_close(
-			 log_handle,
-			 NULL );
-			log_handle_free(
-			 &log_handle,
-			 NULL );
-		}
-		device_handle_close(
-		 ewfacquire_device_handle,
-		 NULL );
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( device_handle_close(
 	     ewfacquire_device_handle,
@@ -3112,20 +2842,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close input file or device.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		process_status_free(
-		 &process_status,
-		 NULL );
-
-		device_handle_free(
-		 &ewfacquire_device_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( device_handle_free(
 	     &ewfacquire_device_handle,
@@ -3135,16 +2852,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free device handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		process_status_free(
-		 &process_status,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( log_handle != NULL )
 	{
@@ -3157,27 +2865,17 @@ int main( int argc, char * const argv[] )
 			 "Unable to close log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 			 log_filename );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			log_handle_free(
-			 &log_handle,
-			 NULL );
+			goto on_error;
 		}
-		else if( log_handle_free(
-		          &log_handle,
-		          &error ) != 1 )
+		if( log_handle_free(
+		     &log_handle,
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to free log handle.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			goto on_error;
 		}
 	}
         if( status != PROCESS_STATUS_COMPLETED )
@@ -3186,12 +2884,29 @@ int main( int argc, char * const argv[] )
 	}
 	return( EXIT_SUCCESS );
 
-ewfacquire_main_on_error:
-	libsystem_notify_print_error_backtrace(
-	 error );
-	liberror_error_free(
-	 &error );
-
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	if( log_handle != NULL )
+	{
+		log_handle_close(
+		 log_handle,
+		 NULL );
+		log_handle_free(
+		 &log_handle,
+		 NULL );
+	}
+	if( process_status != NULL )
+	{
+		process_status_free(
+		 &process_status,
+		 NULL );
+	}
 	if( ewfacquire_imaging_handle != NULL )
 	{
 		imaging_handle_close(

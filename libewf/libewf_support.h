@@ -36,63 +36,75 @@ extern "C" {
 
 #if !defined( HAVE_LOCAL_LIBEWF )
 
-LIBEWF_EXTERN const char *libewf_get_version(
-                           void );
+LIBEWF_EXTERN \
+const char *libewf_get_version(
+             void );
 
-LIBEWF_EXTERN uint8_t libewf_get_access_flags_read(
-                       void );
+LIBEWF_EXTERN \
+uint8_t libewf_get_access_flags_read(
+         void );
 
-LIBEWF_EXTERN uint8_t libewf_get_access_flags_read_write(
-                       void );
+LIBEWF_EXTERN \
+uint8_t libewf_get_access_flags_read_write(
+         void );
 
-LIBEWF_EXTERN uint8_t libewf_get_access_flags_write(
-                       void );
+LIBEWF_EXTERN \
+uint8_t libewf_get_access_flags_write(
+         void );
 
-LIBEWF_EXTERN uint8_t libewf_get_access_flags_write_resume(
-                       void );
+LIBEWF_EXTERN \
+uint8_t libewf_get_access_flags_write_resume(
+         void );
 
 #endif
 
-LIBEWF_EXTERN int libewf_check_file_signature(
-                   const char *filename,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_check_file_signature(
+     const char *filename,
+     liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_check_file_signature_wide(
-                   const wchar_t *filename,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_check_file_signature_wide(
+     const wchar_t *filename,
+     liberror_error_t **error );
 #endif
 
-LIBEWF_EXTERN int libewf_check_file_signature_file_io_handle(
-                   libbfio_handle_t *file_io_handle,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_check_file_signature_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_glob(
-                   const char *filename,
-                   size_t length,
-                   uint8_t format,
-                   char **filenames[],
-                   int *number_of_filenames,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_glob(
+     const char *filename,
+     size_t length,
+     uint8_t format,
+     char **filenames[],
+     int *number_of_filenames,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_glob_free(
-                   char *filenames[],
-                   int number_of_filenames,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_glob_free(
+     char *filenames[],
+     int number_of_filenames,
+     liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_glob_wide(
-                   const wchar_t *filename,
-                   size_t length,
-                   uint8_t format,
-                   wchar_t **filenames[],
-                   int *number_of_filenames,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_glob_wide(
+     const wchar_t *filename,
+     size_t length,
+     uint8_t format,
+     wchar_t **filenames[],
+     int *number_of_filenames,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_glob_wide_free(
-                   wchar_t *filenames[],
-                   int number_of_filenames,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_glob_wide_free(
+     wchar_t *filenames[],
+     int number_of_filenames,
+     liberror_error_t **error );
 #endif
 
 #if defined( __cplusplus )

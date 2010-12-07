@@ -158,12 +158,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize system values.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	ewfoutput_version_fprint(
 	 stdout,
@@ -186,7 +181,7 @@ int main( int argc, char * const argv[] )
 				usage_fprint(
 				 stdout );
 
-				return( EXIT_FAILURE );
+				goto on_error;
 
 			case (libcstring_system_integer_t) 'A':
 				if( ewfinput_determine_header_codepage(
@@ -252,7 +247,7 @@ int main( int argc, char * const argv[] )
 					usage_fprint(
 					 stdout );
 
-					return( EXIT_FAILURE );
+					goto on_error;
 				}
 				info_option = 'e';
 
@@ -275,7 +270,7 @@ int main( int argc, char * const argv[] )
 					usage_fprint(
 					 stdout );
 
-					return( EXIT_FAILURE );
+					goto on_error;
 				}
 				info_option = 'i';
 
@@ -292,7 +287,7 @@ int main( int argc, char * const argv[] )
 					usage_fprint(
 					 stdout );
 
-					return( EXIT_FAILURE );
+					goto on_error;
 				}
 				info_option = 'm';
 
@@ -319,7 +314,7 @@ int main( int argc, char * const argv[] )
 		usage_fprint(
 		 stdout );
 
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	libsystem_notify_set_verbose(
 	 verbose );
@@ -351,12 +346,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize glob.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( libsystem_glob_resolve(
 	     glob,
@@ -368,16 +358,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to resolve glob.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	argv_filenames      = glob->result;
 	number_of_filenames = glob->number_of_results;
@@ -395,18 +376,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create info handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
-#endif
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( info_handle_set_header_codepage(
 	     info_handle,
@@ -417,22 +387,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to set header codepage in info handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		info_handle_free(
-		 &info_handle,
-		 NULL );
-
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
-#endif
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	result = info_handle_open_input(
 	          info_handle,
@@ -440,6 +395,18 @@ int main( int argc, char * const argv[] )
 	          number_of_filenames,
 	          &error );
 
+	if( ewfinfo_abort == 0 )
+	{
+		goto on_abort;
+	}
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open EWF file(s).\n" );
+
+		goto on_error;
+	}
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 	if( libsystem_glob_free(
 	     &glob,
@@ -449,36 +416,11 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free glob.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 #endif
-
-	if( ( ewfinfo_abort == 0 )
-	 && ( result != 1 ) )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to open EWF file(s).\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		info_handle_free(
-		 &info_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
-	if( ( ewfinfo_abort == 0 )
-	 && ( ( info_option == 'a' )
-	  || ( info_option == 'i' ) ) )
+	if( ( info_option == 'a' )
+	 || ( info_option == 'i' ) )
 	{
 		if( info_handle_header_values_fprint(
 		     info_handle,
@@ -492,9 +434,8 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 	}
-	if( ( ewfinfo_abort == 0 )
-	 && ( ( info_option == 'a' )
-	  || ( info_option == 'm' ) ) )
+	if( ( info_option == 'a' )
+	 || ( info_option == 'm' ) )
 	{
 		if( info_handle_media_information_fprint(
 		     info_handle,
@@ -539,9 +480,8 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 	}
-	if( ( ewfinfo_abort == 0 )
-	 && ( ( info_option == 'a' )
-	  || ( info_option == 'e' ) ) )
+	if( ( info_option == 'a' )
+	 || ( info_option == 'e' ) )
 	{
 		if( info_handle_acquiry_errors_fprint(
 		     info_handle,
@@ -572,6 +512,17 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 	}
+on_abort:
+	if( info_handle_close(
+	     info_handle,
+	     &error ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to close EWF file(s).\n" );
+
+		goto on_error;
+	}
 	if( libsystem_signal_detach(
 	     &error ) != 1 )
 	{
@@ -584,25 +535,6 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 	}
-	if( info_handle_close(
-	     info_handle,
-	     &error ) != 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to close EWF file(s).\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		info_handle_free(
-		 &info_handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
-	}
 	if( info_handle_free(
 	     &info_handle,
 	     &error ) != 1 )
@@ -611,12 +543,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free info handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( ewfinfo_abort != 0 )
 	{
@@ -627,5 +554,29 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	if( info_handle != NULL )
+	{
+		info_handle_free(
+		 &info_handle,
+		 NULL );
+	}
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( glob != NULL )
+	{
+		libsystem_glob_free(
+		 &glob,
+		 NULL );
+	}
+#endif
+	return( EXIT_FAILURE );
 }
 

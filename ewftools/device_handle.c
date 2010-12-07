@@ -226,6 +226,7 @@ int device_handle_free(
 				}
 			}
 		}
+#ifdef TOC_FILE
 		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 		{
 			if( ( *device_handle )->toc_input_file != NULL )
@@ -245,6 +246,7 @@ int device_handle_free(
 				}
 			}
 		}
+#endif
 		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE )
 		{
 			if( ( *device_handle )->raw_input_handle != NULL )
@@ -390,10 +392,12 @@ int device_handle_open_input(
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_DEVICE;
 	}
+#ifdef TOC_FILE
 	else if( device_handle->toc_filename != NULL )
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_FILE_WITH_TOC;
 	}
+#endif
 	else
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_FILE;
@@ -456,6 +460,7 @@ int device_handle_open_input(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 		if( device_handle->toc_input_file != NULL )
@@ -512,6 +517,7 @@ int device_handle_open_input(
 		}
 /* TODO use raw handle for TOC or use libbfio pool ? */
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( device_handle->raw_input_handle != NULL )
@@ -607,6 +613,7 @@ int device_handle_close(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 		if( libodtoc_file_close(
@@ -623,6 +630,7 @@ int device_handle_close(
 			return( -1 );
 		}
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_close(
@@ -696,6 +704,7 @@ ssize_t device_handle_read_buffer(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 /* TODO */
@@ -707,6 +716,7 @@ ssize_t device_handle_read_buffer(
  */
 
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		read_count = libsmraw_handle_read_buffer(
@@ -772,10 +782,12 @@ off64_t device_handle_seek_offset(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 /* TODO */
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		offset = libsmraw_handle_seek_offset(
@@ -1112,10 +1124,12 @@ int device_handle_get_media_size(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 /* TODO */
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_get_media_size(
@@ -1187,14 +1201,12 @@ int device_handle_get_media_type(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 		*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
 	}
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
-	{
-		*media_type = 0;
-	}
+#endif
 	return( 1 );
 }
 
@@ -1236,6 +1248,7 @@ int device_handle_get_bytes_per_sector(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 		if( libodtoc_file_get_bytes_per_sector(
@@ -1253,6 +1266,7 @@ int device_handle_get_bytes_per_sector(
 			return( -1 );
 		}
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_get_bytes_per_sector(
@@ -1329,11 +1343,13 @@ int device_handle_get_information_value(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 /* TODO */
 		result = 0;
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		result = libsmraw_handle_get_utf8_information_value(
@@ -1419,7 +1435,6 @@ int device_handle_get_number_of_sessions(
      liberror_error_t **error )
 {
 	static char *function = "device_handle_get_number_of_sessions";
-	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1449,6 +1464,7 @@ int device_handle_get_number_of_sessions(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 		if( libodtoc_file_get_number_of_sessions(
@@ -1466,6 +1482,7 @@ int device_handle_get_number_of_sessions(
 			return( -1 );
 		}
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( number_of_sessions == NULL )
@@ -1495,7 +1512,6 @@ int device_handle_get_session(
      liberror_error_t **error )
 {
 	static char *function = "device_handle_get_session";
-	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1528,6 +1544,7 @@ int device_handle_get_session(
 			return( -1 );
 		}
 	}
+#ifdef TOC_FILE
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
 	{
 		if( libodtoc_file_get_session(
@@ -1548,6 +1565,7 @@ int device_handle_get_session(
 			return( -1 );
 		}
 	}
+#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		liberror_error_set(

@@ -37,19 +37,23 @@ extern "C" {
 
 #if !defined( HAVE_LOCAL_LIBEWF )
 
-LIBEWF_EXTERN void libewf_notify_set_verbose(
-                    int verbose );
+LIBEWF_EXTERN \
+void libewf_notify_set_verbose(
+      int verbose );
 
-LIBEWF_EXTERN int libewf_notify_set_stream(
-                   FILE *stream,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_notify_set_stream(
+     FILE *stream,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_notify_stream_open(
-                   const char *filename,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_notify_stream_open(
+     const char *filename,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_notify_stream_close(
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_notify_stream_close(
+     liberror_error_t **error );
 
 #endif
 

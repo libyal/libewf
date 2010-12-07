@@ -49,8 +49,8 @@ int libewf_tree_node_initialize(
 	}
 	if( *node == NULL )
 	{
-		*node = (libewf_tree_node_t *) memory_allocate(
-		                                sizeof( libewf_tree_node_t ) );
+		*node = memory_allocate_structure(
+		         libewf_tree_node_t );
 
 		if( *node == NULL )
 		{
@@ -61,7 +61,7 @@ int libewf_tree_node_initialize(
 			 "%s: unable to create node.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *node,
@@ -75,15 +75,20 @@ int libewf_tree_node_initialize(
 			 "%s: unable to clear node.",
 			 function );
 
-			memory_free(
-			 *node );
-
-			*node = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *node != NULL )
+	{
+		memory_free(
+		 *node );
+
+		*node = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees a tree node, its sub nodes

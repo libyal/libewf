@@ -97,6 +97,13 @@ int libewf_array_empty(
             liberror_error_t **error ),
      liberror_error_t **error );
 
+int libewf_array_clear(
+     libewf_array_t *array,
+     int (*entry_free_function)(
+            intptr_t *entry,
+            liberror_error_t **error ),
+     liberror_error_t **error );
+
 int libewf_array_clone(
      libewf_array_t **destination_array,
      libewf_array_t *source_array,

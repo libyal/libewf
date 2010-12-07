@@ -396,6 +396,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libuna\libuna_unused.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libuna\libuna_unicode_character.h"
 				>
 			</File>

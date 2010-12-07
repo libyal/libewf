@@ -71,6 +71,7 @@ libewf_la_SOURCES = \
 	libewf_support.c libewf_support.h \
 	libewf_tree_type.c libewf_tree_type.h \
 	libewf_types.h \
+	libewf_unused.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h
 
 libewf_la_LIBADD = \

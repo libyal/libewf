@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101201],
+ [20101207],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -82,6 +82,22 @@ AM_GNU_GETTEXT([external])
 dnl Check for compiler language support
 AC_C_CONST
 AC_C_VOLATILE
+
+dnl Automatically enable winapi support for mingw
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" != xyes],
+ [ac_libewf_target_string="$target";
+
+ AS_IF(
+  [test "x$ac_libewf_target_string" = x],
+  [ac_libewf_target_string="$build"])
+
+ AS_CASE(
+  [$ac_libewf_target_string],
+  [*mingw*],[AC_MSG_NOTICE(
+             [Detected MinGW enabling WINAPI support for cross-compilation])
+            ac_cv_libewf_enable_winapi=yes])
+ ])
 
 dnl Check for headers
 dnl Headers included in include/libewf/types.h

@@ -41,6 +41,7 @@
 #include "libewf_sector_list.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
+#include "libewf_unused.h"
 #include "libewf_write_io_handle.h"
 
 #include "ewf_checksum.h"
@@ -2968,7 +2969,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          uint32_t chunk,
          uint8_t *chunk_buffer,
          size_t chunk_size,
-         size_t chunk_data_size,
+         size_t chunk_data_size LIBEWF_ATTRIBUTE_UNUSED,
          int8_t is_compressed,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
@@ -2987,6 +2988,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	int number_of_segment_file_handles                = 0;
 	int result                                        = 0;
 	int segment_number                                = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( chunk_data_size )
 
 	if( write_io_handle == NULL )
 	{
@@ -3535,7 +3538,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          void *buffer,
-         size_t buffer_size,
+         size_t buffer_size LIBEWF_ATTRIBUTE_UNUSED,
          size_t data_size,
          int8_t force_write,
          liberror_error_t **error )
@@ -3555,6 +3558,8 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 	int chunk_cache_data_used         = 0;
 	int8_t is_compressed              = 0;
 	int8_t write_checksum             = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( buffer_size )
 
 	if( write_io_handle == NULL )
 	{
@@ -3853,7 +3858,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
          uint32_t chunk,
          uint32_t chunk_offset,
          void *buffer,
-         size_t buffer_size,
+         size_t buffer_size LIBEWF_ATTRIBUTE_UNUSED,
          size_t data_size,
          liberror_error_t **error )
 {
@@ -3867,6 +3872,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 	ssize_t read_count          = 0;
 	ssize_t write_count         = 0;
 	size_t write_size           = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( buffer_size )
 
 	if( write_io_handle == NULL )
 	{

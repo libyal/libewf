@@ -20,16 +20,12 @@
  */
 
 #include <common.h>
+#include <types.h>
 
 #if defined( WINAPI )
 #include <windows.h>
-#endif
 
-/* Define HAVE_LOCAL_LIBEWF for local use of libewf
- */
-#if !defined( HAVE_LOCAL_LIBEWF )
-
-#if defined( WINAPI )
+#include "libewf_unused.h"
 
 #if defined( _MANAGED )
 #pragma managed( push, off )
@@ -42,6 +38,8 @@ BOOL WINAPI DllMain(
              DWORD fdwReason,
              LPVOID lpvReserved )
 {
+	LIBEWF_UNREFERENCED_PARAMETER( lpvReserved )
+
 	switch( fdwReason )
 	{
 		case DLL_PROCESS_ATTACH:
@@ -61,19 +59,14 @@ BOOL WINAPI DllMain(
 	return( TRUE );
 }
 
-#endif
-
-#if defined( LIBEWF_DLL_EXPORT )
-
 /* Function that indicates the library is a DLL
  * Returns 1
  */
-char libewf_is_dll(
-      void )
+uint8_t libewf_is_dll(
+         void )
 {
 	return( 1 );
 }
-#endif
 
-#endif
+#endif /* defined( WINAPI ) */
 

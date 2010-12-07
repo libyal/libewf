@@ -1,4 +1,7 @@
 TODO
+* clean up
+  - include header continue LIBEWF_EXTERN
+  - libewf allocate structure and goto
 * clean up of ewftools
   - apply xml patch for ewftools (Simson)
   - ewfacquire: make behaviour of -g equal to user input ?
@@ -232,6 +235,12 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20101207
+* fixed inconsistency in media type in device handle for file-based input
+* updated common, array type, list type, sector list, liberror, libnotify,
+  libsystem, libuna, libbfio, libmfdata, libsmraw, libsmdev
+* added automatic detection of mingw and apply --enable-winapi by default
 
 20101201
 * code clean up

@@ -43,6 +43,7 @@
 #include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_single_files.h"
+#include "libewf_unused.h"
 
 #include "ewf_data.h"
 #include "ewf_definitions.h"
@@ -2357,7 +2358,7 @@ ssize_t libewf_section_table_read(
          size_t section_size,
          uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
-         uint8_t format,
+         uint8_t format LIBEWF_ATTRIBUTE_UNUSED,
          uint8_t ewf_format,
          liberror_error_t **error )
 {
@@ -2375,6 +2376,8 @@ ssize_t libewf_section_table_read(
 	uint32_t number_of_chunk_values = 0;
 	uint32_t stored_checksum        = 0;
 	uint8_t offsets_tainted         = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( format )
 
 	if( segment_file_handle == NULL )
 	{
@@ -2740,7 +2743,7 @@ ssize_t libewf_section_table2_read(
          size_t section_size,
          uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
-         uint8_t format,
+         uint8_t format LIBEWF_ATTRIBUTE_UNUSED,
          uint8_t ewf_format,
          liberror_error_t **error )
 {
@@ -2758,6 +2761,8 @@ ssize_t libewf_section_table2_read(
 	uint32_t number_of_chunk_values = 0;
 	uint32_t stored_checksum        = 0;
 	uint8_t offsets_tainted         = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( format )
 
 	if( segment_file_handle == NULL )
 	{
@@ -3126,7 +3131,7 @@ ssize_t libewf_section_table_write(
          uint8_t *section_type,
          size_t section_type_length,
          size_t additional_size,
-         uint8_t format,
+         uint8_t format LIBEWF_ATTRIBUTE_UNUSED,
          uint8_t ewf_format,
          uint8_t no_section_append,
          liberror_error_t **error )
@@ -3142,6 +3147,8 @@ ssize_t libewf_section_table_write(
 	size_t offsets_size          = 0;
 	uint32_t calculated_checksum = 0;
 	uint8_t write_checksum       = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( format )
 
 	if( segment_file_handle == NULL )
 	{
@@ -3353,10 +3360,12 @@ ssize64_t libewf_section_sectors_read(
            libbfio_pool_t *file_io_pool,
            libewf_segment_file_handle_t *segment_file_handle,
            size64_t section_size,
-           uint8_t ewf_format,
+           uint8_t ewf_format LIBEWF_ATTRIBUTE_UNUSED,
            liberror_error_t **error )
 {
 	static char *function = "libewf_section_sectors_read";
+
+	LIBEWF_UNREFERENCED_PARAMETER( ewf_format )
 
 	if( segment_file_handle == NULL )
 	{
@@ -3745,7 +3754,7 @@ ssize_t libewf_section_session_read(
          libewf_media_values_t *media_values,
          libewf_sector_list_t *sessions,
          size_t section_size,
-         uint8_t ewf_format,
+         uint8_t ewf_format LIBEWF_ATTRIBUTE_UNUSED,
          liberror_error_t **error )
 {
 	ewf_session_t ewf_session;
@@ -3764,6 +3773,8 @@ ssize_t libewf_section_session_read(
 	uint32_t number_of_sectors        = 0;
 	uint32_t stored_checksum          = 0;
 	int number_of_elements            = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( ewf_format )
 
 	if( segment_file_handle == NULL )
 	{
@@ -4496,7 +4507,7 @@ ssize_t libewf_section_data_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          libewf_media_values_t *media_values,
-         uint8_t ewf_format,
+         uint8_t ewf_format LIBEWF_ATTRIBUTE_UNUSED,
          liberror_error_t **error )
 {
 	ewf_data_t *data             = NULL;
@@ -4509,6 +4520,8 @@ ssize_t libewf_section_data_read(
 	uint32_t number_of_chunks    = 0;
 	uint32_t sectors_per_chunk   = 0;
 	uint32_t stored_checksum     = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( ewf_format )
 
 	if( segment_file_handle == NULL )
 	{
@@ -5077,7 +5090,7 @@ ssize_t libewf_section_error2_read(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_sector_list_t *acquiry_errors,
          size_t section_size,
-         uint8_t ewf_format,
+         uint8_t ewf_format LIBEWF_ATTRIBUTE_UNUSED,
          liberror_error_t **error )
 {
 	ewf_error2_t error2;
@@ -5095,6 +5108,8 @@ ssize_t libewf_section_error2_read(
 	uint32_t number_of_sectors          = 0;
 	uint32_t stored_checksum            = 0;
 	int number_of_elements              = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( ewf_format )
 
 	if( segment_file_handle == NULL )
 	{

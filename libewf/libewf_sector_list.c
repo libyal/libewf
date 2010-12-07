@@ -50,8 +50,8 @@ int libewf_sector_list_value_initialize(
 	}
 	if( *sector_list_value == NULL )
 	{
-		*sector_list_value = (libewf_sector_list_value_t *) memory_allocate(
-		                                                     sizeof( libewf_sector_list_value_t ) );
+		*sector_list_value = memory_allocate_structure(
+		                      libewf_sector_list_value_t );
 
 		if( *sector_list_value == NULL )
 		{
@@ -62,7 +62,7 @@ int libewf_sector_list_value_initialize(
 			 "%s: unable to create sector list value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *sector_list_value,
@@ -76,15 +76,20 @@ int libewf_sector_list_value_initialize(
 			 "%s: unable to clear sector list value.",
 			 function );
 
-			memory_free(
-			 *sector_list_value );
-
-			*sector_list_value = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *sector_list_value != NULL )
+	{
+		memory_free(
+		 *sector_list_value );
+
+		*sector_list_value = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees a sector list value
@@ -134,8 +139,8 @@ int libewf_sector_list_initialize(
 	}
 	if( *sector_list == NULL )
 	{
-		*sector_list = (libewf_sector_list_t *) memory_allocate(
-		                                         sizeof( libewf_sector_list_t ) );
+		*sector_list = memory_allocate_structure(
+		                libewf_sector_list_t );
 
 		if( *sector_list == NULL )
 		{
@@ -146,7 +151,7 @@ int libewf_sector_list_initialize(
 			 "%s: unable to create sector list.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *sector_list,
@@ -160,15 +165,20 @@ int libewf_sector_list_initialize(
 			 "%s: unable to clear sector list.",
 			 function );
 
-			memory_free(
-			 *sector_list );
-
-			*sector_list = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *sector_list != NULL )
+	{
+		memory_free(
+		 *sector_list );
+
+		*sector_list = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees an sector list including the elements

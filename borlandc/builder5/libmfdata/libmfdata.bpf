@@ -10,6 +10,7 @@ USEUNIT("..\..\..\libmfdata\libmfdata_segment_table.c");
 USEUNIT("..\..\..\libmfdata\libmfdata_support.c");
 USE("..\..\..\libmfdata\libmfdata_support.h", File);
 USE("..\..\..\libmfdata\libmfdata_types.h", File);
+USE("..\..\..\libmfdata\libmfdata_unused.h", File);
 USE("..\..\..\libmfdata\libmfdata_array_type.h", File);
 USE("..\..\..\libmfdata\libmfdata_definitions.h", File);
 USE("..\..\..\libmfdata\libmfdata_error.h", File);

@@ -52,8 +52,8 @@ int libewf_single_file_entry_initialize(
 	}
 	if( *single_file_entry == NULL )
 	{
-		*single_file_entry = (libewf_single_file_entry_t *) memory_allocate(
-		                                                     sizeof( libewf_single_file_entry_t ) );
+		*single_file_entry = memory_allocate_structure(
+		                      libewf_single_file_entry_t );
 
 		if( *single_file_entry == NULL )
 		{
@@ -64,7 +64,7 @@ int libewf_single_file_entry_initialize(
 			 "%s: unable to create single file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *single_file_entry,
@@ -78,15 +78,20 @@ int libewf_single_file_entry_initialize(
 			 "%s: unable to clear single file entry.",
 			 function );
 
-			memory_free(
-			 *single_file_entry );
-
-			*single_file_entry = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *single_file_entry != NULL )
+	{
+		memory_free(
+		 *single_file_entry );
+
+		*single_file_entry = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the single file entry including elements
@@ -133,7 +138,74 @@ int libewf_single_file_entry_clone(
      intptr_t *source_single_file_entry,
      liberror_error_t **error )
 {
-	/* TODO */
+	static char *function = "libewf_single_file_entry_clone";
+
+	if( destination_single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_single_file_entry != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination single file entry value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_single_file_entry == NULL )
+	{
+		*destination_single_file_entry = NULL;
+
+		return( 1 );
+	}
+	*destination_single_file_entry = (intptr_t *) memory_allocate(
+			                               sizeof( libewf_single_file_entry_t ) );
+
+	if( *destination_single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination single file entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_single_file_entry,
+	     source_single_file_entry,
+	     sizeof( libewf_single_file_entry_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination single file entry.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_single_file_entry != NULL )
+	{
+		memory_free(
+		 *destination_single_file_entry );
+
+		*destination_single_file_entry = NULL;
+	}
 	return( -1 );
 }
 

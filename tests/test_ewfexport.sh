@@ -71,7 +71,6 @@ ${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
 ${OUTPUT_FORMAT}
 ${TMP}/export
 none
-no
 
 
 

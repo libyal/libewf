@@ -179,6 +179,10 @@
 				RelativePath="..\..\libsmraw\libsmraw_types.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libsmraw\libsmraw_unused.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

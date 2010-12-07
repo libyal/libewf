@@ -159,6 +159,10 @@
 				RelativePath="..\..\libmfdata\libmfdata_types.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_unused.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

@@ -40,256 +40,174 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1256.h">
-				<BuildOrder>0</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1257.c">
-				<BuildOrder>1</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1256.c">
-				<BuildOrder>2</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1255.c">
-				<BuildOrder>3</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1255.h">
-				<BuildOrder>4</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_definitions.h">
-				<BuildOrder>5</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_error.h">
-				<BuildOrder>6</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1258.h">
-				<BuildOrder>7</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1257.h">
-				<BuildOrder>8</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1258.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1254.h">
-				<BuildOrder>10</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1251.c">
-				<BuildOrder>11</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1251.h">
-				<BuildOrder>12</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1250.h">
-				<BuildOrder>13</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_874.h">
-				<BuildOrder>14</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1250.c">
-				<BuildOrder>15</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1253.h">
-				<BuildOrder>16</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1254.c">
-				<BuildOrder>17</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1253.c">
-				<BuildOrder>18</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_1252.c">
-				<BuildOrder>19</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_windows_1252.h">
-				<BuildOrder>20</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_utf32_string.h">
-				<BuildOrder>21</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_utf7_stream.c">
-				<BuildOrder>22</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_utf32_string.c">
-				<BuildOrder>23</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_utf32_stream.c">
-				<BuildOrder>24</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_utf32_stream.h">
-				<BuildOrder>25</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_utf8_string.c">
-				<BuildOrder>26</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_utf8_string.h">
-				<BuildOrder>27</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_utf8_stream.h">
-				<BuildOrder>28</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_utf7_stream.h">
-				<BuildOrder>29</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_utf8_stream.c">
-				<BuildOrder>30</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_utf16_string.h">
-				<BuildOrder>31</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_support.h">
-				<BuildOrder>32</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_types.h">
-				<BuildOrder>33</BuildOrder>
+			</None>
+			<None Include="..\..\..\libuna\libuna_unused.h">
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_support.c">
-				<BuildOrder>34</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_extern.h">
-				<BuildOrder>35</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_inline.h">
-				<BuildOrder>36</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_utf16_stream.h">
-				<BuildOrder>37</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_utf16_string.c">
-				<BuildOrder>38</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_utf16_stream.c">
-				<BuildOrder>39</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_unicode_character.c">
-				<BuildOrder>40</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_unicode_character.h">
-				<BuildOrder>41</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_4.c">
-				<BuildOrder>42</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_4.h">
-				<BuildOrder>43</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_3.h">
-				<BuildOrder>44</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_2.h">
-				<BuildOrder>45</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_3.c">
-				<BuildOrder>46</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_6.h">
-				<BuildOrder>47</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_7.c">
-				<BuildOrder>48</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_6.c">
-				<BuildOrder>49</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_5.c">
-				<BuildOrder>50</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_5.h">
-				<BuildOrder>51</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_2.c">
-				<BuildOrder>52</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_base64_stream.h">
-				<BuildOrder>53</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_base64url_stream.c">
-				<BuildOrder>54</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_base64_stream.c">
-				<BuildOrder>55</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_base16_stream.c">
-				<BuildOrder>56</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_base16_stream.h">
-				<BuildOrder>57</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_ascii.h">
-				<BuildOrder>58</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_1.h">
-				<BuildOrder>59</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_byte_stream.h">
-				<BuildOrder>60</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_base64url_stream.h">
-				<BuildOrder>61</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_byte_stream.c">
-				<BuildOrder>62</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_16.c">
-				<BuildOrder>63</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_16.h">
-				<BuildOrder>64</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_15.h">
-				<BuildOrder>65</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_14.h">
-				<BuildOrder>66</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_15.c">
-				<BuildOrder>67</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_koi8_u.h">
-				<BuildOrder>68</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_windows_874.c">
-				<BuildOrder>69</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_koi8_u.c">
-				<BuildOrder>70</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_koi8_r.c">
-				<BuildOrder>71</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_koi8_r.h">
-				<BuildOrder>72</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_14.c">
-				<BuildOrder>73</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_9.c">
-				<BuildOrder>74</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_9.h">
-				<BuildOrder>75</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_8.h">
-				<BuildOrder>76</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_7.h">
-				<BuildOrder>77</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_8.c">
-				<BuildOrder>78</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_13.c">
-				<BuildOrder>79</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_13.h">
-				<BuildOrder>80</BuildOrder>
 			</None>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_11.h">
-				<BuildOrder>81</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libuna\libuna_codepage_iso_8859_10.c">
-				<BuildOrder>82</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libuna\libuna_codepage_iso_8859_10.h">
-				<BuildOrder>83</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

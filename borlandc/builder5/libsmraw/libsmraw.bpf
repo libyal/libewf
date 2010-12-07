@@ -24,6 +24,7 @@ USE("..\..\..\libsmraw\libsmraw_notify.h", File);
 USEUNIT("..\..\..\libsmraw\libsmraw_support.c");
 USE("..\..\..\libsmraw\libsmraw_support.h", File);
 USE("..\..\..\libsmraw\libsmraw_types.h", File);
+USE("..\..\..\libsmraw\libsmraw_unused.h", File);
 //---------------------------------------------------------------------------
 #define Library
 

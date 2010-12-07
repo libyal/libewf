@@ -228,6 +228,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmdev\libsmdev_unused.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmdev\libsmdev_usb.h"
 				>
 			</File>

@@ -473,6 +473,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_unused.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_write_io_handle.h"
 				>
 			</File>

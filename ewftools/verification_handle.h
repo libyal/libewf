@@ -67,6 +67,14 @@ struct verification_handle
 	 */
 	sha1_context_t sha1_context;
 
+	/* The MD5 digest hash string
+	 */
+	libcstring_system_character_t md5_hash_string[ DIGEST_HASH_STRING_SIZE_MD5 ];
+
+	/* The SHA-1 digest hash string
+	 */
+	libcstring_system_character_t sha1_hash_string[ DIGEST_HASH_STRING_SIZE_SHA1 ];
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
@@ -162,13 +170,9 @@ int verification_handle_append_read_error(
 
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
-     libcstring_system_character_t *calculated_md5_hash_string,
-     size_t calculated_md5_hash_string_size,
      libcstring_system_character_t *stored_md5_hash_string,
      size_t stored_md5_hash_string_size,
      int *stored_md5_hash_available,
-     libcstring_system_character_t *calculated_sha1_hash_string,
-     size_t calculated_sha1_hash_string_size,
      libcstring_system_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,

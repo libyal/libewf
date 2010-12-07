@@ -70,91 +70,107 @@ int libewf_file_entry_initialize(
      uint8_t flags,
      liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_free(
-                   libewf_file_entry_t **file_entry,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_free(
+     libewf_file_entry_t **file_entry,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_flags(
-                   libewf_file_entry_t *file_entry,
-                   uint32_t *flags,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_flags(
+     libewf_file_entry_t *file_entry,
+     uint32_t *flags,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_utf8_name_size(
-                   libewf_file_entry_t *file_entry,
-                   size_t *utf8_name_size,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_name_size(
+     libewf_file_entry_t *file_entry,
+     size_t *utf8_name_size,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_utf8_name(
-                   libewf_file_entry_t *file_entry,
-                   uint8_t *utf8_name,
-                   size_t utf8_name_size,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_name(
+     libewf_file_entry_t *file_entry,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_utf16_name_size(
-                   libewf_file_entry_t *file_entry,
-                   size_t *utf16_name_size,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_name_size(
+     libewf_file_entry_t *file_entry,
+     size_t *utf16_name_size,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_utf16_name(
-                   libewf_file_entry_t *file_entry,
-                   uint16_t *utf16_name,
-                   size_t utf16_name_size,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_name(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_size(
-                   libewf_file_entry_t *file_entry,
-                   size64_t *size,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_size(
+     libewf_file_entry_t *file_entry,
+     size64_t *size,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_creation_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *creation_time,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_creation_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *creation_time,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_modification_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *modification_time,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_modification_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *modification_time,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_access_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *access_time,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_access_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *access_time,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_entry_modification_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *entry_modification_time,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_entry_modification_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *entry_modification_time,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_number_of_sub_file_entries(
-                   libewf_file_entry_t *file_entry,
-                   int *number_of_sub_entries,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_number_of_sub_file_entries(
+     libewf_file_entry_t *file_entry,
+     int *number_of_sub_entries,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
-                   libewf_file_entry_t *file_entry,
-                   int sub_file_entry_index,
-                   libewf_file_entry_t **sub_file_entry,
-                   liberror_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_sub_file_entry(
+     libewf_file_entry_t *file_entry,
+     int sub_file_entry_index,
+     libewf_file_entry_t **sub_file_entry,
+     liberror_error_t **error );
 
-LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
-                       libewf_file_entry_t *file_entry,
-                       void *buffer,
-                       size_t buffer_size,
-                       liberror_error_t **error );
+LIBEWF_EXTERN \
+ssize_t libewf_file_entry_read_buffer(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         liberror_error_t **error );
 
-LIBEWF_EXTERN ssize_t libewf_file_entry_read_random(
-                       libewf_file_entry_t *file_entry,
-                       void *buffer,
-                       size_t buffer_size,
-                       off64_t offset,
-                       liberror_error_t **error );
+LIBEWF_EXTERN \
+ssize_t libewf_file_entry_read_random(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         liberror_error_t **error );
 
-LIBEWF_EXTERN off64_t libewf_file_entry_seek_offset(
-                       libewf_file_entry_t *file_entry,
-                       off64_t offset,
-                       int whence,
-                       liberror_error_t **error );
+LIBEWF_EXTERN \
+off64_t libewf_file_entry_seek_offset(
+         libewf_file_entry_t *file_entry,
+         off64_t offset,
+         int whence,
+         liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

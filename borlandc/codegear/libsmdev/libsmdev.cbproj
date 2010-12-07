@@ -75,6 +75,8 @@
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_types.h">
 			</None>
+			<None Include="..\..\..\libsmdev\libsmdev_unused.h">
+			</None>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_list_type.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_notify.c">
