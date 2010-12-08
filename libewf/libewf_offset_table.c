@@ -60,8 +60,8 @@ int libewf_offset_table_initialize(
 	}
 	if( *offset_table == NULL )
 	{
-		*offset_table = (libewf_offset_table_t *) memory_allocate(
-		                                           sizeof( libewf_offset_table_t ) );
+		*offset_table = memory_allocate_structure(
+		                 libewf_offset_table_t );
 
 		if( *offset_table == NULL )
 		{
@@ -72,7 +72,7 @@ int libewf_offset_table_initialize(
 			 "%s: unable to create offset table.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *offset_table,
@@ -86,12 +86,7 @@ int libewf_offset_table_initialize(
 			 "%s: unable to clear offset table.",
 			 function );
 
-			memory_free(
-			 *offset_table );
-
-			*offset_table = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_array_initialize(
 		     &( ( *offset_table )->chunk_values ),
@@ -105,15 +100,20 @@ int libewf_offset_table_initialize(
 			 "%s: unable to create chunk values array.",
 			 function );
 
-			memory_free(
-			 *offset_table );
-
-			*offset_table = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *offset_table != NULL )
+	{
+		memory_free(
+		 *offset_table );
+
+		*offset_table = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the offset table including elements

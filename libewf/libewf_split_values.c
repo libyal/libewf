@@ -64,8 +64,8 @@ int libewf_split_values_initialize(
 	}
 	if( *split_values == NULL )
 	{
-		*split_values = (libewf_split_values_t *) memory_allocate(
-		                                           sizeof( libewf_split_values_t ) );
+		*split_values = memory_allocate_structure(
+		                 libewf_split_values_t );
 
 		if( *split_values == NULL )
 		{
@@ -76,7 +76,7 @@ int libewf_split_values_initialize(
 			 "%s: unable to create split values.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *split_values,
@@ -90,12 +90,7 @@ int libewf_split_values_initialize(
 			 "%s: unable to clear split values.",
 			 function );
 
-			memory_free(
-			 *split_values );
-
-			*split_values = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( ( string != NULL )
 		 && ( string_length > 0 ) )
@@ -112,12 +107,7 @@ int libewf_split_values_initialize(
 				 "%s: unable to create string.",
 				 function );
 
-				memory_free(
-				 *split_values );
-
-				*split_values = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 			if( memory_copy(
 			     ( *split_values )->string,
@@ -131,14 +121,7 @@ int libewf_split_values_initialize(
 				 "%s: unable to copy string.",
 				 function );
 
-				memory_free(
-				 ( *split_values )->string );
-				memory_free(
-				 *split_values );
-
-				*split_values = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 			( *split_values )->string[ string_length ] = 0;
 		}
@@ -156,14 +139,7 @@ int libewf_split_values_initialize(
 				 "%s: unable to create values.",
 				 function );
 
-				memory_free(
-				 ( *split_values )->string );
-				memory_free(
-				 *split_values );
-
-				*split_values = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 			if( memory_set(
 			     ( *split_values )->values,
@@ -177,16 +153,7 @@ int libewf_split_values_initialize(
 				 "%s: unable to clear values.",
 				 function );
 
-				memory_free(
-				 ( *split_values )->values );
-				memory_free(
-				 ( *split_values )->string );
-				memory_free(
-				 *split_values );
-
-				*split_values = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 			( *split_values )->sizes = (size_t *) memory_allocate(
 			                                       sizeof( size_t ) * number_of_values );
@@ -200,16 +167,7 @@ int libewf_split_values_initialize(
 				 "%s: unable to create sizes.",
 				 function );
 
-				memory_free(
-				 ( *split_values )->values );
-				memory_free(
-				 ( *split_values )->string );
-				memory_free(
-				 *split_values );
-
-				*split_values = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 			if( memory_set(
 			     ( *split_values )->sizes,
@@ -223,23 +181,37 @@ int libewf_split_values_initialize(
 				 "%s: unable to clear sizes.",
 				 function );
 
-				memory_free(
-				 ( *split_values )->sizes );
-				memory_free(
-				 ( *split_values )->values );
-				memory_free(
-				 ( *split_values )->string );
-				memory_free(
-				 *split_values );
-
-				*split_values = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 		}
 		( *split_values )->number_of_values = number_of_values;
 	}
 	return( 1 );
+
+on_error:
+	if( *split_values != NULL )
+	{
+		if( ( *split_values )->sizes != NULL )
+		{
+			memory_free(
+			 ( *split_values )->sizes );
+		}
+		if( ( *split_values )->values != NULL )
+		{
+			memory_free(
+			 ( *split_values )->values );
+		}
+		if( ( *split_values )->string != NULL )
+		{
+			memory_free(
+			 ( *split_values )->string );
+		}
+		memory_free(
+		 *split_values );
+
+		*split_values = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the split values including elements

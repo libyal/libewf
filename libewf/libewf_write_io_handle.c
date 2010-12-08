@@ -73,8 +73,8 @@ int libewf_write_io_handle_initialize(
 	}
 	if( *write_io_handle == NULL )
 	{
-		*write_io_handle = (libewf_write_io_handle_t *) memory_allocate(
-		                                                 sizeof( libewf_write_io_handle_t ) );
+		*write_io_handle = memory_allocate_structure(
+		                    libewf_write_io_handle_t );
 
 		if( write_io_handle == NULL )
 		{
@@ -85,7 +85,7 @@ int libewf_write_io_handle_initialize(
 			 "%s: unable to create write IO handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *write_io_handle,
@@ -99,12 +99,7 @@ int libewf_write_io_handle_initialize(
 			 "%s: unable to clear write IO handle.",
 			 function );
 
-			memory_free(
-			 *write_io_handle );
-
-			*write_io_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
 		( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
@@ -112,6 +107,16 @@ int libewf_write_io_handle_initialize(
 		( *write_io_handle )->maximum_number_of_segments  = (uint16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
 	}
 	return( 1 );
+
+on_error:
+	if( *write_io_handle != NULL )
+	{
+		memory_free(
+		 *write_io_handle );
+
+		*write_io_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the write IO handle including elements

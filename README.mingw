@@ -6,7 +6,7 @@ To compile a libewf DLL using mingw you'll need:
   * UUID/GUID support (librpcrt4)
 * mingw build of zlib library and headers
 
-If no mingw build of zlib is availble, you'll need to build it from the sources.
+If no mingw build of zlib is available, you'll need to build it from the sources.
 For this you can use a script similar to the following:
 
 #!/bin/sh
@@ -33,7 +33,8 @@ mingw32-make
 It is recommended that you use WINAPI support but it is possible to compile 
 libewf without it (--enable-winapi=no). Without WINAPI support libewf will
 need a mingw build of openssl libcrypto for MD5 and SHA1 support and optionally
-a mingw build of libuuid for GUID/UUID support.
+a mingw build of libuuid for GUID/UUID support. As of version 20101208 the default
+behaviour is that libewf will try to auto-detect MinGW and enable WINAPI support.
 
 If mingw32-configure and mingw32-make are not available you'll need to build
 it by hand. For this you can use a script similar to the following:

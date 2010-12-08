@@ -52,8 +52,8 @@ int libewf_segment_file_handle_initialize(
 	}
 	if( *segment_file_handle == NULL )
 	{
-		*segment_file_handle = (libewf_segment_file_handle_t *) memory_allocate(
-		                                                         sizeof( libewf_segment_file_handle_t ) );
+		*segment_file_handle = memory_allocate_structure(
+		                        libewf_segment_file_handle_t );
 
 		if( *segment_file_handle == NULL )
 		{
@@ -64,7 +64,7 @@ int libewf_segment_file_handle_initialize(
 			 "%s: unable to create segment file handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *segment_file_handle,
@@ -78,12 +78,7 @@ int libewf_segment_file_handle_initialize(
 			 "%s: unable to clear segment file handle.",
 			 function );
 
-			memory_free(
-			 *segment_file_handle );
-
-			*segment_file_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_list_initialize(
 		     &( ( *segment_file_handle )->section_list ),
@@ -96,16 +91,21 @@ int libewf_segment_file_handle_initialize(
 			 "%s: unable to create section list.",
 			 function );
 
-			memory_free(
-			 *segment_file_handle );
-
-			*segment_file_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *segment_file_handle )->file_io_pool_entry = file_io_pool_entry;
 	}
 	return( 1 );
+
+on_error:
+	if( *segment_file_handle != NULL )
+	{
+		memory_free(
+		 *segment_file_handle );
+
+		*segment_file_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the segment file handle including elements

@@ -54,8 +54,8 @@ int libewf_io_handle_initialize(
 	}
 	if( *io_handle == NULL )
 	{
-		*io_handle = (libewf_io_handle_t *) memory_allocate(
-		                                     sizeof( libewf_io_handle_t ) );
+		*io_handle = memory_allocate_structure(
+		              libewf_io_handle_t );
 
 		if( io_handle == NULL )
 		{
@@ -66,7 +66,7 @@ int libewf_io_handle_initialize(
 			 "%s: unable to create write IO handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *io_handle,
@@ -80,12 +80,7 @@ int libewf_io_handle_initialize(
 			 "%s: unable to clear write IO handle.",
 			 function );
 
-			memory_free(
-			 *io_handle );
-
-			*io_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *io_handle )->format            = LIBEWF_FORMAT_ENCASE5;
 		( *io_handle )->ewf_format        = EWF_FORMAT_E01;
@@ -93,6 +88,16 @@ int libewf_io_handle_initialize(
 		( *io_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
 	}
 	return( 1 );
+
+on_error:
+	if( *io_handle != NULL )
+	{
+		memory_free(
+		 *io_handle );
+
+		*io_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the write IO handle including elements

@@ -46,8 +46,8 @@ int libewf_hash_sections_initialize(
 	}
 	if( *hash_sections == NULL )
 	{
-		*hash_sections = (libewf_hash_sections_t *) memory_allocate(
-		                                             sizeof( libewf_hash_sections_t ) );
+		*hash_sections = memory_allocate_structure(
+		                  libewf_hash_sections_t );
 
 		if( *hash_sections == NULL )
 		{
@@ -58,7 +58,7 @@ int libewf_hash_sections_initialize(
 			 "%s: unable to create hash sections.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *hash_sections,
@@ -72,15 +72,20 @@ int libewf_hash_sections_initialize(
 			 "%s: unable to clear hash sections.",
 			 function );
 
-			memory_free(
-			 *hash_sections );
-
-			*hash_sections = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *hash_sections != NULL )
+	{
+		memory_free(
+		 *hash_sections );
+
+		*hash_sections = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the hash sections including elements

@@ -62,8 +62,8 @@ int libewf_read_io_handle_initialize(
 	}
 	if( *read_io_handle == NULL )
 	{
-		*read_io_handle = (libewf_read_io_handle_t *) memory_allocate(
-		                                               sizeof( libewf_read_io_handle_t ) );
+		*read_io_handle = memory_allocate_structure(
+		                   libewf_read_io_handle_t );
 
 		if( *read_io_handle == NULL )
 		{
@@ -74,7 +74,7 @@ int libewf_read_io_handle_initialize(
 			 "%s: unable to create read IO handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *read_io_handle,
@@ -88,12 +88,7 @@ int libewf_read_io_handle_initialize(
 			 "%s: unable to clear read IO handle.",
 			 function );
 
-			memory_free(
-			 *read_io_handle );
-
-			*read_io_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_sector_list_initialize(
 		     &( ( *read_io_handle )->checksum_errors ),
@@ -106,16 +101,21 @@ int libewf_read_io_handle_initialize(
 			 "%s: unable to create checksum errors sector list.",
 			 function );
 
-			memory_free(
-			 *read_io_handle );
-
-			*read_io_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *read_io_handle )->wipe_on_error = 1;
 	}
 	return( 1 );
+
+on_error:
+	if( *read_io_handle != NULL )
+	{
+		memory_free(
+		 *read_io_handle );
+
+		*read_io_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the read IO handle including elements

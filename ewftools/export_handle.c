@@ -225,12 +225,11 @@ int export_handle_initialize(
 
 			return( -1 );
 		}
-		( *export_handle )->compression_level    = LIBEWF_COMPRESSION_NONE;
-		( *export_handle )->ewf_format           = LIBEWF_FORMAT_ENCASE6;
-		( *export_handle )->sectors_per_chunk    = 64;
-		( *export_handle )->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-		( *export_handle )->header_codepage      = LIBEWF_CODEPAGE_ASCII;
-		( *export_handle )->notify_stream        = EXPORT_HANDLE_NOTIFY_STREAM;
+		( *export_handle )->compression_level = LIBEWF_COMPRESSION_NONE;
+		( *export_handle )->ewf_format        = LIBEWF_FORMAT_ENCASE6;
+		( *export_handle )->sectors_per_chunk = 64;
+		( *export_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
+		( *export_handle )->notify_stream     = EXPORT_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
 }
@@ -2359,6 +2358,7 @@ int export_handle_prompt_for_maximum_segment_size(
 	uint64_t default_input_size  = 0;
 	uint64_t input_size_variable = 0;
 	uint64_t maximum_input_size  = 0;
+	uint64_t minimum_input_size  = 0;
 	int result                   = 0;
 
 	if( export_handle == NULL )
@@ -2372,35 +2372,29 @@ int export_handle_prompt_for_maximum_segment_size(
 
 		return( -1 );
 	}
+	maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
-		if( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-		{
-			maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-		}
-		else
+		if( export_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
 		{
 			maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 		}
-	}
-	else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
-	{
-		maximum_input_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-	}
-	default_input_size = export_handle->maximum_segment_size;
+		minimum_input_size = EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE;
 
-       	if( default_input_size == 0 )
-       	{
-		default_input_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-       	}
-	result = ewfinput_get_size_variable(
+	       	if( default_input_size == 0 )
+       		{
+			default_input_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+       		}
+	}
+	result = ewfinput_get_byte_size_variable(
 	          export_handle->notify_stream,
 	          export_handle->input_buffer,
 	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
 	          request_string,
-	          EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-	          default_input_size,
+	          minimum_input_size,
 	          maximum_input_size,
+	          default_input_size,
 	          &input_size_variable,
 	          error );
 
@@ -2415,10 +2409,8 @@ int export_handle_prompt_for_maximum_segment_size(
 
 		return( -1 );
 	}
-	else if( result != 0 )
-	{
-		export_handle->maximum_segment_size = input_size_variable;
-	}
+	export_handle->maximum_segment_size = input_size_variable;
+
 	return( result );
 }
 

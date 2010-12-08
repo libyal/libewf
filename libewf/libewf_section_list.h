@@ -55,8 +55,12 @@ struct libewf_section_list_values
 	off64_t end_offset;
 };
 
+int libewf_section_list_values_initialize(
+     libewf_section_list_values_t **section_list_values,
+     liberror_error_t **error );
+
 int libewf_section_list_values_free(
-     intptr_t *value,
+     intptr_t *section_list_values,
      liberror_error_t **error );
 
 int libewf_section_list_append(

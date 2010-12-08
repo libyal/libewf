@@ -28,16 +28,80 @@
 #include "libewf_list_type.h"
 #include "libewf_section_list.h"
 
+/* Creates section list values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_section_list_values_initialize(
+     libewf_section_list_values_t **section_list_values,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_section_list_values_initialize";
+
+	if( section_list_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section list values.",
+		 function );
+
+		return( -1 );
+	}
+	if( *section_list_values == NULL )
+	{
+		*section_list_values = memory_allocate_structure(
+		                        libewf_section_list_values_t );
+
+		if( *section_list_values == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create section list values.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_set(
+		     *section_list_values,
+		     0,
+		     sizeof( libewf_section_list_values_t ) ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear section list values.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( *section_list_values != NULL )
+	{
+		memory_free(
+		 *section_list_values );
+
+		*section_list_values = NULL;
+	}
+	return( -1 );
+}
+
 /* Frees the section list values
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_list_values_free(
-     intptr_t *value,
+     intptr_t *section_list_values,
      liberror_error_t **error )
 {
 	static char *function = "libewf_section_list_values_free";
 
-	if( value == NULL )
+	if( section_list_values == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -49,7 +113,7 @@ int libewf_section_list_values_free(
 		return( -1 );
 	}
 	memory_free(
-	 value );
+	 section_list_values );
 
 	return( 1 );
 }
@@ -102,36 +166,29 @@ int libewf_section_list_append(
 
 		return( -1 );
 	}
-	section_list_values = (libewf_section_list_values_t *) memory_allocate(
-	                                                        sizeof( libewf_section_list_values_t ) );
+	if( libewf_section_list_values_initialize(
+	     &section_list_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create section list values.",
+		 function );
 
+		goto on_error;
+	}
 	if( section_list_values == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create section list values.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing section list values.",
 		 function );
 
-		return( -1 );
-	}
-	if( memory_set(
-	     section_list_values,
-	     0,
-	     sizeof( libewf_section_list_values_t ) ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear section list values.",
-		 function );
-
-		memory_free(
-		 section_list_values );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( memory_copy(
 	     section_list_values->type,
@@ -145,10 +202,7 @@ int libewf_section_list_append(
 		 "%s: unable to set section list values type.",
 		 function );
 
-		memory_free(
-		 section_list_values );
-
-		return( -1 );
+		goto on_error;
 	}
 	section_list_values->type_size    = type_size;
 	section_list_values->start_offset = start_offset;
@@ -166,11 +220,17 @@ int libewf_section_list_append(
 		 "%s: unable to append section list values.",
 		 function );
 
-		memory_free(
-		 section_list_values );
-
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( section_list_values != NULL )
+	{
+		libewf_section_list_values_free(
+		 (intptr_t *) section_list_values,
+		 NULL );
+	}
+	return( -1 );
 }
 

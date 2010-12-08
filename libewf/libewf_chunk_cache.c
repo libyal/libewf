@@ -61,8 +61,8 @@ int libewf_chunk_cache_initialize(
 	}
 	if( *chunk_cache == NULL )
 	{
-		*chunk_cache = (libewf_chunk_cache_t *) memory_allocate(
-		                                         sizeof( libewf_chunk_cache_t ) );
+		*chunk_cache = memory_allocate_structure(
+		                libewf_chunk_cache_t );
 
 		if( *chunk_cache == NULL )
 		{
@@ -73,7 +73,7 @@ int libewf_chunk_cache_initialize(
 			 "%s: unable to create chunk cache.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *chunk_cache,
@@ -87,12 +87,7 @@ int libewf_chunk_cache_initialize(
 			 "%s: unable to clear chunk cache.",
 			 function );
 
-			memory_free(
-			 *chunk_cache );
-
-			*chunk_cache = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *chunk_cache )->compressed = (uint8_t *) memory_allocate(
 		                                            sizeof( uint8_t ) * size );
@@ -106,12 +101,7 @@ int libewf_chunk_cache_initialize(
 			 "%s: unable to create chunk cache compressed.",
 			 function );
 
-			memory_free(
-			 *chunk_cache );
-
-			*chunk_cache = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *chunk_cache )->data = (uint8_t *) memory_allocate(
 		                                      sizeof( uint8_t ) * size );
@@ -125,18 +115,26 @@ int libewf_chunk_cache_initialize(
 			 "%s: unable to create chunk cache data.",
 			 function );
 
-			memory_free(
-			 ( *chunk_cache )->compressed );
-			memory_free(
-			 *chunk_cache );
-
-			*chunk_cache = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *chunk_cache )->size = size;
 	}
 	return( 1 );
+
+on_error:
+	if( *chunk_cache != NULL )
+	{
+		if( ( *chunk_cache )->compressed != NULL )
+		{
+			memory_free(
+			 ( *chunk_cache )->compressed );
+		}
+		memory_free(
+		 *chunk_cache );
+
+		*chunk_cache = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the chunk cache including elements
@@ -220,8 +218,8 @@ int libewf_chunk_cache_resize(
 	if( size > chunk_cache->size )
 	{
 		reallocation = memory_reallocate(
-				chunk_cache->compressed,
-				sizeof( uint8_t ) * size );
+		                chunk_cache->compressed,
+		                sizeof( uint8_t ) * size );
 
 		if( reallocation == NULL )
 		{
@@ -235,9 +233,10 @@ int libewf_chunk_cache_resize(
 			return( -1 );
 		}
 		chunk_cache->compressed = (uint8_t *) reallocation;
-		reallocation            = memory_reallocate(
-					   chunk_cache->data,
-					   sizeof( uint8_t ) * size );
+
+		reallocation = memory_reallocate(
+		                chunk_cache->data,
+		                sizeof( uint8_t ) * size );
 
 		if( reallocation == NULL )
 		{

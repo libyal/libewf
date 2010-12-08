@@ -50,8 +50,8 @@ int libewf_media_values_initialize(
 	}
 	if( *media_values == NULL )
 	{
-		*media_values = (libewf_media_values_t *) memory_allocate(
-		                                           sizeof( libewf_media_values_t ) );
+		*media_values = memory_allocate_structure(
+		                 libewf_media_values_t );
 
 		if( *media_values == NULL )
 		{
@@ -62,7 +62,7 @@ int libewf_media_values_initialize(
 			 "%s: unable to create media values.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *media_values,
@@ -76,12 +76,7 @@ int libewf_media_values_initialize(
 			 "%s: unable to clear media values.",
 			 function );
 
-			memory_free(
-			 *media_values );
-
-			*media_values = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *media_values )->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
 		( *media_values )->sectors_per_chunk = 64;
@@ -89,6 +84,16 @@ int libewf_media_values_initialize(
 		( *media_values )->media_flags       = 0x01;
 	}
 	return( 1 );
+
+on_error:
+	if( *media_values != NULL )
+	{
+		memory_free(
+		 *media_values );
+
+		*media_values = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the media values including elements

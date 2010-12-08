@@ -1612,10 +1612,11 @@ int libewf_handle_get_root_file_entry(
  * This function deprecated use libewf_handle_get_number_of_acquiry_errors instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_errors,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_amount_of_acquiry_errors(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_errors,
+     libewf_error_t **error );
 
 /* Add an acquiry error
  * Returns 1 if successful or -1 on error
@@ -1623,11 +1624,12 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_acquiry_errors(
  * This function deprecated use libewf_handle_append_acquiry_error instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
-                   libewf_handle_t *handle,
-                   uint64_t first_sector,
-                   uint64_t number_of_sectors,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_add_acquiry_error(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     libewf_error_t **error );
 
 /* Retrieves the number of checksum errors
  * Returns 1 if successful or -1 on error
@@ -1635,10 +1637,11 @@ LIBEWF_EXTERN int libewf_handle_add_acquiry_error(
  * This function deprecated use libewf_handle_get_number_of_checksum_errors instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_number_of_crc_errors(
-                   libewf_handle_t *handle,
-                   uint32_t *number_of_errors,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_number_of_crc_errors(
+     libewf_handle_t *handle,
+     uint32_t *number_of_errors,
+     libewf_error_t **error );
 
 /* Retrieves the amount of checksum errors
  * Returns 1 if successful or -1 on error
@@ -1646,10 +1649,11 @@ LIBEWF_EXTERN int libewf_handle_get_number_of_crc_errors(
  * This function deprecated use libewf_handle_get_number_of_checksum_errors instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_amount_of_crc_errors(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_errors,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_amount_of_crc_errors(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_errors,
+     libewf_error_t **error );
 
 /* Retrieves a checksum error
  * Returns 1 if successful or -1 on error
@@ -1657,12 +1661,13 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_crc_errors(
  * This function deprecated use libewf_handle_get_checksum_error instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_crc_error(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   uint64_t *first_sector,
-                   uint64_t *number_of_sectors,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_crc_error(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint64_t *first_sector,
+     uint64_t *number_of_sectors,
+     libewf_error_t **error );
 
 /* Add a checksum error
  * Returns 1 if successful or -1 on error
@@ -1670,11 +1675,12 @@ LIBEWF_EXTERN int libewf_handle_get_crc_error(
  * This function deprecated use libewf_handle_append_checksum_error instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_add_crc_error(
-                   libewf_handle_t *handle,
-                   uint64_t first_sector,
-                   uint64_t number_of_sectors,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_add_crc_error(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     libewf_error_t **error );
 
 /* Retrieves the amount of sessions
  * Returns 1 if successful or -1 on error
@@ -1682,10 +1688,11 @@ LIBEWF_EXTERN int libewf_handle_add_crc_error(
  * This function deprecated use libewf_handle_get_number_of_sessions instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_sessions,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_amount_of_sessions(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_sessions,
+     libewf_error_t **error );
 
 /* Add a session
  * Returns 1 if successful or -1 on error
@@ -1693,11 +1700,12 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_sessions(
  * This function deprecated use libewf_handle_append_session instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_add_session(
-                   libewf_handle_t *handle,
-                   uint64_t first_sector,
-                   uint64_t number_of_sectors,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_add_session(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     libewf_error_t **error );
 
 /* Retrieves the amount of header values
  * Returns 1 if successful, 0 if no header values are present or -1 on error
@@ -1705,10 +1713,11 @@ LIBEWF_EXTERN int libewf_handle_add_session(
  * This function deprecated use libewf_handle_get_number_of_header_values instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_amount_of_header_values(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_values,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_amount_of_header_values(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_values,
+     libewf_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded header value of an identifier
  * The value size includes the end of string character
@@ -1717,12 +1726,13 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_header_values(
  * This function deprecated use libewf_handle_get_utf8_header_value_size instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_header_value_size(
-                   libewf_handle_t *handle,
-                   const uint8_t *identifier,
-                   size_t identifier_length,
-                   size_t *value_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_header_value_size(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *value_size,
+     libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded header value of an identifier
  * The value size should include the end of string character
@@ -1731,13 +1741,14 @@ LIBEWF_EXTERN int libewf_handle_get_header_value_size(
  * This function deprecated use libewf_handle_get_utf8_header_value instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_header_value(
-                   libewf_handle_t *handle,
-                   const uint8_t *identifier,
-                   size_t identifier_length,
-                   uint8_t *value,
-                   size_t value_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_header_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint8_t *value,
+     size_t value_size,
+     libewf_error_t **error );
 
 /* Retrieves the header value case number
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -1833,13 +1844,14 @@ LIBEWF_EXTERN int libewf_handle_get_header_value(
  * This function deprecated use libewf_handle_set_utf8_header_value instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_set_header_value(
-                   libewf_handle_t *handle,
-                   const uint8_t *identifier,
-                   size_t identifier_length,
-                   const uint8_t *value,
-                   size_t value_length,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_set_header_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *value,
+     size_t value_length,
+     libewf_error_t **error );
 
 /* Sets the header value case number
  * Returns 1 if successful or -1 on error
@@ -1933,10 +1945,11 @@ LIBEWF_EXTERN int libewf_handle_set_header_value(
  * This function deprecated use libewf_handle_get_number_of_hash_values instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_amount_of_hash_values(
-                   libewf_handle_t *handle,
-                   uint32_t *amount_of_values,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_amount_of_hash_values(
+     libewf_handle_t *handle,
+     uint32_t *amount_of_values,
+     libewf_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded hash value of an identifier
  * The value size includes the end of string character
@@ -1945,12 +1958,13 @@ LIBEWF_EXTERN int libewf_handle_get_amount_of_hash_values(
  * This function deprecated use libewf_handle_get_utf8_hash_value_size instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_hash_value_size(
-                   libewf_handle_t *handle,
-                   const uint8_t *identifier,
-                   size_t identifier_length,
-                   size_t *value_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_hash_value_size(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *value_size,
+     libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded hash value of an identifier
  * The value size should include the end of string character
@@ -1959,13 +1973,14 @@ LIBEWF_EXTERN int libewf_handle_get_hash_value_size(
  * This function deprecated use libewf_handle_get_utf8_hash_value instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_get_hash_value(
-                   libewf_handle_t *handle,
-                   const uint8_t *identifier,
-                   size_t identifier_length,
-                   uint8_t *value,
-                   size_t value_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_get_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint8_t *value,
+     size_t value_size,
+     libewf_error_t **error );
 
 /* Retrieves the hash value MD5
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -1985,13 +2000,14 @@ LIBEWF_EXTERN int libewf_handle_get_hash_value(
  * This function deprecated use libewf_handle_set_utf8_hash_value instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_handle_set_hash_value(
-                   libewf_handle_t *handle,
-                   const uint8_t *identifier,
-                   size_t identifier_length,
-                   const uint8_t *value,
-                   size_t value_length,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_handle_set_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *value,
+     size_t value_length,
+     libewf_error_t **error );
 
 /* Sets the hash value MD5
  * Returns 1 if successful or -1 on error
@@ -2012,140 +2028,156 @@ LIBEWF_EXTERN int libewf_handle_set_hash_value(
 /* Frees a file entry
  * REturns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_free(
-                   libewf_file_entry_t **file_entry,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_free(
+     libewf_file_entry_t **file_entry,
+     libewf_error_t **error );
 
 /* Retrieves the flags
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_flags(
-                   libewf_file_entry_t *file_entry,
-                   uint32_t *flags,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_flags(
+     libewf_file_entry_t *file_entry,
+     uint32_t *flags,
+     libewf_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_utf8_name_size(
-                   libewf_file_entry_t *file_entry,
-                   size_t *utf8_string_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_name_size(
+     libewf_file_entry_t *file_entry,
+     size_t *utf8_string_size,
+     libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded name value
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_utf8_name(
-                   libewf_file_entry_t *file_entry,
-                   uint8_t *utf8_string,
-                   size_t utf8_string_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_name(
+     libewf_file_entry_t *file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_utf16_name_size(
-                   libewf_file_entry_t *file_entry,
-                   size_t *utf16_string_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_name_size(
+     libewf_file_entry_t *file_entry,
+     size_t *utf16_string_size,
+     libewf_error_t **error );
 
 /* Retrieves the UTF-16 encoded name value
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_utf16_name(
-                   libewf_file_entry_t *file_entry,
-                   uint16_t *utf16_string,
-                   size_t utf16_string_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_name(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
 
 /* Retrieves the size
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_size(
-                   libewf_file_entry_t *file_entry,
-                   size64_t *size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_size(
+     libewf_file_entry_t *file_entry,
+     size64_t *size,
+     libewf_error_t **error );
 
 /* Retrieves the creation date and time
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_creation_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *creation_time,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_creation_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *creation_time,
+     libewf_error_t **error );
 
 /* Retrieves the modification date and time
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_modification_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *modification_time,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_modification_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *modification_time,
+     libewf_error_t **error );
 
 /* Retrieves the access date and time
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_access_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *access_time,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_access_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *access_time,
+     libewf_error_t **error );
 
 /* Retrieves the entry modification date and time
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_entry_modification_time(
-                   libewf_file_entry_t *file_entry,
-                   uint64_t *entry_modification_time,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_entry_modification_time(
+     libewf_file_entry_t *file_entry,
+     uint64_t *entry_modification_time,
+     libewf_error_t **error );
 
 /* Retrieves the number of sub file entries
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_number_of_sub_file_entries(
-                   libewf_file_entry_t *file_entry,
-                   int *number_of_sub_file_entries,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_number_of_sub_file_entries(
+     libewf_file_entry_t *file_entry,
+     int *number_of_sub_file_entries,
+     libewf_error_t **error );
 
 /* Retrieves the sub file entry for the specific index
  * Returns 1 if successful or -1 on error
  */
-LIBEWF_EXTERN int libewf_file_entry_get_sub_file_entry(
-                   libewf_file_entry_t *file_entry,
-                   int sub_file_entry_index,
-                   libewf_file_entry_t **sub_file_entry,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_sub_file_entry(
+     libewf_file_entry_t *file_entry,
+     int sub_file_entry_index,
+     libewf_file_entry_t **sub_file_entry,
+     libewf_error_t **error );
 
 /* Reads data at the current offset
  * Returns the number of bytes read or -1 on error
  */
-LIBEWF_EXTERN ssize_t libewf_file_entry_read_buffer(
-                       libewf_file_entry_t *file_entry,
-                       void *buffer,
-                       size_t buffer_size,
-                       libewf_error_t **error );
+LIBEWF_EXTERN \
+ssize_t libewf_file_entry_read_buffer(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         libewf_error_t **error );
 
 /* Reads data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
-LIBEWF_EXTERN ssize_t libewf_file_entry_read_random(
-                       libewf_file_entry_t *file_entry,
-                       void *buffer,
-                       size_t buffer_size,
-                       off64_t offset,
-                       libewf_error_t **error );
+LIBEWF_EXTERN \
+ssize_t libewf_file_entry_read_random(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libewf_error_t **error );
 
 /* Seeks a certain offset of the data
  * Returns the offset if seek is successful or -1 on error
  */
-LIBEWF_EXTERN off64_t libewf_file_entry_seek_offset(
-                       libewf_file_entry_t *file_entry,
-                       off64_t offset,
-                       int whence,
-                       libewf_error_t **error );
+LIBEWF_EXTERN \
+off64_t libewf_file_entry_seek_offset(
+         libewf_file_entry_t *file_entry,
+         off64_t offset,
+         int whence,
+         libewf_error_t **error );
 
 /* -------------------------------------------------------------------------
  * Single file entry functions - deprecated
@@ -2158,10 +2190,11 @@ LIBEWF_EXTERN off64_t libewf_file_entry_seek_offset(
  * This function deprecated use libewf_file_entry_get_utf8_name_size instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_file_entry_get_name_size(
-                   libewf_file_entry_t *file_entry,
-                   size_t *name_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_name_size(
+     libewf_file_entry_t *file_entry,
+     size_t *name_size,
+     libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded name value
  * The size should include the end of string character
@@ -2170,11 +2203,12 @@ LIBEWF_EXTERN int libewf_file_entry_get_name_size(
  * This function deprecated use libewf_file_entry_get_utf8_name instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_file_entry_get_name(
-                   libewf_file_entry_t *file_entry,
-                   uint8_t *name,
-                   size_t name_size,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_name(
+     libewf_file_entry_t *file_entry,
+     uint8_t *name,
+     size_t name_size,
+     libewf_error_t **error );
 
 /* Retrieves the amount of sub file entries
  * Returns 1 if successful or -1 on error
@@ -2182,10 +2216,11 @@ LIBEWF_EXTERN int libewf_file_entry_get_name(
  * This function deprecated use libewf_file_entry_get_number_of_sub_file_entries instead
  */
 LIBEWF_DEPRECATED \
-LIBEWF_EXTERN int libewf_file_entry_get_amount_of_sub_file_entries(
-                   libewf_file_entry_t *file_entry,
-                   int *amount_of_sub_file_entries,
-                   libewf_error_t **error );
+LIBEWF_EXTERN \
+int libewf_file_entry_get_amount_of_sub_file_entries(
+     libewf_file_entry_t *file_entry,
+     int *amount_of_sub_file_entries,
+     libewf_error_t **error );
 
 /* -------------------------------------------------------------------------
  * APIv1 functions - deprecated
@@ -3327,7 +3362,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_parse_hash_values(
                    libewf_handle_t *handle );
 
-#endif
+#endif /* defined( HAVE_V1_API ) */
 
 #ifdef __cplusplus
 }

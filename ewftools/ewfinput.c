@@ -948,7 +948,7 @@ int ewfinput_determine_yes_no(
 {
 	static char *function = "ewfinput_determine_yes_no";
 	size_t string_length  = 0;
-	int result            = -1;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -1314,8 +1314,8 @@ int ewfinput_get_byte_size_variable(
 
 	libcstring_system_character_t *end_of_input  = NULL;
 	libcstring_system_character_t *result_string = NULL;
-	static char *function                = "ewfinput_get_byte_size_variable";
-	ssize_t input_length                 = 0;
+	static char *function                        = "ewfinput_get_byte_size_variable";
+	ssize_t input_length                         = 0;
 
 	if( stream == NULL )
 	{

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101207],
+ [20101208],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -28,7 +28,7 @@ LIBEWF_TEST_ENABLE(
  [winapi],
  [winapi],
  [enable WINAPI support for cross-compilation],
- [no])
+ [auto-detect])
 LIBEWF_TEST_ENABLE(
  [static-executables],
  [static_executables],
@@ -85,7 +85,7 @@ AC_C_VOLATILE
 
 dnl Automatically enable winapi support for mingw
 AS_IF(
- [test "x$ac_cv_libewf_enable_winapi" != xyes],
+ [test "x$ac_cv_libewf_enable_winapi" = xauto-detect],
  [ac_libewf_target_string="$target";
 
  AS_IF(
@@ -96,7 +96,8 @@ AS_IF(
   [$ac_libewf_target_string],
   [*mingw*],[AC_MSG_NOTICE(
              [Detected MinGW enabling WINAPI support for cross-compilation])
-            ac_cv_libewf_enable_winapi=yes])
+            ac_cv_libewf_enable_winapi=yes],
+  [*],[ac_cv_libewf_enable_winapi=no])
  ])
 
 dnl Check for headers

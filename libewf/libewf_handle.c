@@ -69,8 +69,8 @@ int libewf_handle_initialize(
 	}
 	if( *handle == NULL )
 	{
-		internal_handle = (libewf_internal_handle_t *) memory_allocate(
-		                                                sizeof( libewf_internal_handle_t ) );
+		internal_handle = memory_allocate_structure(
+		                   libewf_internal_handle_t );
 
 		if( internal_handle == NULL )
 		{
@@ -81,7 +81,7 @@ int libewf_handle_initialize(
 			 "%s: unable to create internal handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     internal_handle,
@@ -95,10 +95,7 @@ int libewf_handle_initialize(
 			 "%s: unable to clear internal handle.",
 			 function );
 
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_io_handle_initialize(
 		     &( internal_handle->io_handle ),
@@ -111,10 +108,7 @@ int libewf_handle_initialize(
 			 "%s: unable to create IO handle.",
 			 function );
 
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_media_values_initialize(
 		     &( internal_handle->media_values ),
@@ -127,13 +121,7 @@ int libewf_handle_initialize(
 			 "%s: unable to create media values.",
 			 function );
 
-			libewf_io_handle_free(
-			 &( internal_handle->io_handle ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_chunk_cache_initialize(
 		     &( internal_handle->chunk_cache ),
@@ -147,16 +135,7 @@ int libewf_handle_initialize(
 			 "%s: unable to create chunk cache.",
 			 function );
 
-			libewf_media_values_free(
-			 &( internal_handle->media_values ),
-			 NULL );
-			libewf_io_handle_free(
-			 &( internal_handle->io_handle ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_sector_list_initialize(
 		     &( internal_handle->sessions ),
@@ -169,19 +148,7 @@ int libewf_handle_initialize(
 			 "%s: unable to create sessions sector list.",
 			 function );
 
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_media_values_free(
-			 &( internal_handle->media_values ),
-			 NULL );
-			libewf_io_handle_free(
-			 &( internal_handle->io_handle ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_sector_list_initialize(
 		     &( internal_handle->acquiry_errors ),
@@ -194,22 +161,7 @@ int libewf_handle_initialize(
 			 "%s: unable to create acquiry errors sector list.",
 			 function );
 
-			libewf_sector_list_free(
-			 &( internal_handle->sessions ),
-			 NULL );
-			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ),
-			 NULL );
-			libewf_media_values_free(
-			 &( internal_handle->media_values ),
-			 NULL );
-			libewf_io_handle_free(
-			 &( internal_handle->io_handle ),
-			 NULL );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
+			goto on_error;
 		}
 		internal_handle->date_format                    = LIBEWF_DATE_FORMAT_CTIME;
 		internal_handle->maximum_number_of_open_handles = LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES;
@@ -217,6 +169,38 @@ int libewf_handle_initialize(
 		*handle = (libewf_handle_t *) internal_handle;
 	}
 	return( 1 );
+
+on_error:
+	if( internal_handle != NULL )
+	{
+		if( internal_handle->sessions != NULL )
+		{
+			libewf_sector_list_free(
+			 &( internal_handle->sessions ),
+			 NULL );
+		}
+		if( internal_handle->chunk_cache != NULL )
+		{
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ),
+			 NULL );
+		}
+		if( internal_handle->media_values != NULL )
+		{
+			libewf_media_values_free(
+			 &( internal_handle->media_values ),
+			 NULL );
+		}
+		if( internal_handle->io_handle != NULL )
+		{
+			libewf_io_handle_free(
+			 &( internal_handle->io_handle ),
+			 NULL );
+		}
+		memory_free(
+		 internal_handle );
+	}
+	return( -1 );
 }
 
 /* Frees the handle including elements

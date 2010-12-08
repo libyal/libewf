@@ -992,7 +992,6 @@ int device_handle_prompt_for_zero_buffer_on_error(
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "device_handle_prompt_for_zero_buffer_on_error";
-	uint8_t default_value                                = 0;
 	int result                                           = 0;
 
 	if( device_handle == NULL )
@@ -1006,10 +1005,6 @@ int device_handle_prompt_for_zero_buffer_on_error(
 
 		return( -1 );
 	}
-	if( device_handle->zero_buffer_on_error == 0 )
-	{
-		default_value = 1;
-	}
 	if( ewfinput_get_fixed_string_variable(
 	     device_handle->notify_stream,
 	     device_handle->input_buffer,
@@ -1017,7 +1012,7 @@ int device_handle_prompt_for_zero_buffer_on_error(
 	     request_string,
 	     ewfinput_yes_no,
 	     2,
-	     default_value,
+	     1,
 	     &fixed_string_variable,
 	     error ) == -1 )
 	{

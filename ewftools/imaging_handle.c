@@ -243,7 +243,6 @@ int imaging_handle_initialize(
 		( *imaging_handle )->bytes_per_sector         = 512;
 		( *imaging_handle )->sectors_per_chunk        = 64;
 		( *imaging_handle )->sector_error_granularity = 64;
-		( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 		( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
 		( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
 	}
@@ -2141,13 +2140,11 @@ int imaging_handle_prompt_for_maximum_segment_size(
        	{
 		maximum_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
        	}
-	default_size = imaging_handle->maximum_segment_size;
-
        	if( default_size == 0 )
        	{
 		default_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
        	}
-	result = ewfinput_get_size_variable(
+	result = ewfinput_get_byte_size_variable(
 	          imaging_handle->notify_stream,
 	          imaging_handle->input_buffer,
 	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
@@ -2169,10 +2166,8 @@ int imaging_handle_prompt_for_maximum_segment_size(
 
 		return( -1 );
 	}
-	else if( result != 0 )
-	{
-		imaging_handle->maximum_segment_size = size_variable;
-	}
+	imaging_handle->maximum_segment_size = size_variable;
+
 	return( result );
 }
 

@@ -58,10 +58,22 @@ int libewf_file_entry_initialize(
 
 		return( -1 );
 	}
+	if( ( flags & ~( LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported flags: 0x%02" PRIx8 ".",
+		 function,
+		 flags );
+
+		return( -1 );
+	}
 	if( *file_entry == NULL )
 	{
-		internal_file_entry = (libewf_internal_file_entry_t *) memory_allocate(
-		                                                        sizeof( libewf_internal_file_entry_t ) );
+		internal_file_entry = memory_allocate_structure(
+		                       libewf_internal_file_entry_t );
 
 		if( internal_file_entry == NULL )
 		{
@@ -72,7 +84,7 @@ int libewf_file_entry_initialize(
 			 "%s: unable to create file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     internal_file_entry,
@@ -86,22 +98,7 @@ int libewf_file_entry_initialize(
 			 "%s: unable to clear file entry.",
 			 function );
 
-			memory_free(
-			 internal_file_entry );
-
-			return( -1 );
-		}
-		if( ( flags & ~( LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported flags: 0x%02" PRIx8 ".",
-			 function,
-			 flags );
-
-			return( -1 );
+			goto on_error;
 		}
 		internal_file_entry->internal_handle = internal_handle;
 		internal_file_entry->flags           = flags;
@@ -126,12 +123,20 @@ int libewf_file_entry_initialize(
 				 "%s: unable to copy file entry tree node.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 		}
 		*file_entry = (libewf_file_entry_t *) internal_file_entry;
 	}
 	return( 1 );
+
+on_error:
+	if( internal_file_entry != NULL )
+	{
+		memory_free(
+		 internal_file_entry );
+	}
+	return( -1 );
 }
 
 /* Frees a file entry

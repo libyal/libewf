@@ -57,8 +57,8 @@ int libewf_segment_table_initialize(
 	}
 	if( *segment_table == NULL )
 	{
-		*segment_table = (libewf_segment_table_t *) memory_allocate(
-		                                             sizeof( libewf_segment_table_t ) );
+		*segment_table = memory_allocate_structure(
+		                  libewf_segment_table_t );
 
 		if( *segment_table == NULL )
 		{
@@ -69,7 +69,7 @@ int libewf_segment_table_initialize(
 			 "%s: unable to create segment table.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *segment_table,
@@ -83,12 +83,7 @@ int libewf_segment_table_initialize(
 			 "%s: unable to clear segment table.",
 			 function );
 
-			memory_free(
-			 *segment_table );
-
-			*segment_table = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_array_initialize(
 		     &( ( *segment_table )->segment_file_handles ),
@@ -102,16 +97,21 @@ int libewf_segment_table_initialize(
 			 "%s: unable to create segment file handles array.",
 			 function );
 
-			memory_free(
-			 *segment_table );
-
-			*segment_table = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *segment_table )->maximum_segment_size = maximum_segment_size;
 	}
 	return( 1 );
+
+on_error:
+	if( *segment_table != NULL )
+	{
+		memory_free(
+		 *segment_table );
+
+		*segment_table = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the segment table including elements

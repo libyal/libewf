@@ -2385,6 +2385,7 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
+/* TODO range check
 			else if( result == 0 )
 			{
 				fprintf(
@@ -2392,10 +2393,11 @@ int main( int argc, char * const argv[] )
 				 "Unsupported number of error retries defaulting to: %" PRIu32 ".\n",
 				 ewfacquire_device_handle->number_of_error_retries );
 			}
+*/
 		}
 		if( option_zero_buffer_on_error == NULL )
 		{
-			result = device_handle_prompt_for_number_of_error_retries(
+			result = device_handle_prompt_for_zero_buffer_on_error(
 				  ewfacquire_device_handle,
 			          _LIBCSTRING_SYSTEM_STRING( "Wipe sectors on read error (mimic EnCase like behavior)" ),
 				  &error );
@@ -2408,12 +2410,14 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
+/* TODO range check
 			else if( result == 0 )
 			{
 				fprintf(
 				 stderr,
 				 "Unsupported zero buffer on error retries defaulting to: no.\n" );
 			}
+*/
 		}
 		fprintf(
 		 stdout,

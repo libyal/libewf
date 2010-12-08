@@ -236,11 +236,17 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20101208
+* code clean up
+* updated libsmraw, fix in segment file extension
+* fix in ewfexport regarding raw output
+
 20101207
 * fixed inconsistency in media type in device handle for file-based input
 * updated common, array type, list type, sector list, liberror, libnotify,
   libsystem, libuna, libbfio, libmfdata, libsmraw, libsmdev
 * added automatic detection of mingw and apply --enable-winapi by default
+* code clean up
 
 20101201
 * code clean up

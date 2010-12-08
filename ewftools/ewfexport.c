@@ -55,7 +55,7 @@
 #include "sha1.h"
 #include "storage_media_buffer.h"
 
-#define EWFEXPORT_INPUT_BUFFER_SIZE	64
+#define EWFEXPORT_INPUT_BUFFER_SIZE		64
 
 export_handle_t *ewfexport_export_handle = NULL;
 int ewfexport_abort                      = 0;
@@ -282,7 +282,7 @@ ssize64_t ewfexport_export_image(
 	if( read_offset > 0 )
 	{
 		if( read_offset >= (off64_t) media_size )
-		{
+			{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
@@ -1520,7 +1520,7 @@ int main( int argc, char * const argv[] )
 			{
 				result = export_handle_prompt_for_maximum_segment_size(
 					  ewfexport_export_handle,
-				          _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes" ),
+				          _LIBCSTRING_SYSTEM_STRING( "Evidence segment file size in bytes (0 is unlimited)" ),
 					  &error );
 
 				if( result == -1 )
@@ -1531,9 +1531,8 @@ int main( int argc, char * const argv[] )
 
 					goto on_error;
 				}
-				else if( ( result == 0 )
-				      || ( ewfexport_export_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-				      || ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				if( ( ewfexport_export_handle->maximum_segment_size != 0 )
+				 && ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
 				{
 					ewfexport_export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 

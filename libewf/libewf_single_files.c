@@ -56,8 +56,8 @@ int libewf_single_files_initialize(
 	}
 	if( *single_files == NULL )
 	{
-		*single_files = (libewf_single_files_t *) memory_allocate(
-		                                           sizeof( libewf_single_files_t ) );
+		*single_files = memory_allocate_structure(
+		                 libewf_single_files_t );
 
 		if( *single_files == NULL )
 		{
@@ -68,7 +68,7 @@ int libewf_single_files_initialize(
 			 "%s: unable to create single files.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *single_files,
@@ -82,15 +82,20 @@ int libewf_single_files_initialize(
 			 "%s: unable to clear single files.",
 			 function );
 
-			memory_free(
-			 *single_files );
-
-			*single_files = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *single_files != NULL )
+	{
+		memory_free(
+		 *single_files );
+
+		*single_files = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the single files including elements
