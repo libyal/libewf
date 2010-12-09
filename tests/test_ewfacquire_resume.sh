@@ -30,7 +30,7 @@ TMP="tmp";
 AWK="awk";
 LS="ls";
 TR="tr";
-TRUNCATE="truncate";
+TRUNCATE="/usr/bin/truncate";
 WC="wc";
 
 function test_write_resume
@@ -105,6 +105,11 @@ EOI
 	fi
 	return ${RESULT};
 }
+
+if ! test -x ${TRUNCATE};
+then
+	exit ${EXIT_IGNORE};
+fi
 
 EWFACQUIRE="../ewftools/ewfacquire";
 

@@ -236,6 +236,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20101209
+* updated ewfacquire resume test to deal with missing truncate
+
 20101208
 * code clean up
 * updated libsmraw, fix in segment file extension
