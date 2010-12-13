@@ -94,8 +94,8 @@ int export_handle_initialize(
 	}
 	if( *export_handle == NULL )
 	{
-		*export_handle = (export_handle_t *) memory_allocate(
-		                                      sizeof( export_handle_t ) );
+		*export_handle = memory_allocate_structure(
+		                  export_handle_t );
 
 		if( *export_handle == NULL )
 		{
@@ -106,7 +106,7 @@ int export_handle_initialize(
 			 "%s: unable to create export handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *export_handle,
@@ -120,12 +120,7 @@ int export_handle_initialize(
 			 "%s: unable to clear export handle.",
 			 function );
 
-			memory_free(
-			 *export_handle );
-
-			*export_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_handle_initialize(
 		     &( ( *export_handle )->input_handle ),
@@ -138,12 +133,7 @@ int export_handle_initialize(
 			 "%s: unable to initialize input handle.",
 			 function );
 
-			memory_free(
-			 *export_handle );
-
-			*export_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *export_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
 		                                                                      sizeof( libcstring_system_character_t ) * EXPORT_HANDLE_INPUT_BUFFER_SIZE );
@@ -157,12 +147,7 @@ int export_handle_initialize(
 			 "%s: unable to create input buffer.",
 			 function );
 
-			memory_free(
-			 *export_handle );
-
-			*export_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     ( *export_handle )->input_buffer,
@@ -176,14 +161,7 @@ int export_handle_initialize(
 			 "%s: unable to clear export handle.",
 			 function );
 
-			memory_free(
-			 ( *export_handle )->input_buffer );
-			memory_free(
-			 *export_handle );
-
-			*export_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( md5_initialize(
 		     &( ( *export_handle )->md5_context ),
@@ -196,14 +174,7 @@ int export_handle_initialize(
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
-			memory_free(
-			 ( *export_handle )->input_buffer );
-			memory_free(
-			 *export_handle );
-
-			*export_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( sha1_initialize(
 		     &( ( *export_handle )->sha1_context ),
@@ -216,22 +187,31 @@ int export_handle_initialize(
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
-			memory_free(
-			 ( *export_handle )->input_buffer );
-			memory_free(
-			 *export_handle );
-
-			*export_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *export_handle )->compression_level = LIBEWF_COMPRESSION_NONE;
+		( *export_handle )->output_format     = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 		( *export_handle )->ewf_format        = LIBEWF_FORMAT_ENCASE6;
 		( *export_handle )->sectors_per_chunk = 64;
 		( *export_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
 		( *export_handle )->notify_stream     = EXPORT_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
+
+on_error:
+	if( *export_handle != NULL )
+	{
+		if( ( *export_handle )->input_buffer != NULL )
+		{
+			memory_free(
+			 ( *export_handle )->input_buffer );
+		}
+		memory_free(
+		 *export_handle );
+
+		*export_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the export handle and its elements
@@ -923,7 +903,6 @@ int export_handle_open_input(
  */
 int export_handle_open_output(
      export_handle_t *export_handle,
-     uint8_t output_format,
      const libcstring_system_character_t *filename,
      liberror_error_t **error )
 {
@@ -942,8 +921,8 @@ int export_handle_open_output(
 
 		return( -1 );
 	}
-	if( ( output_format != EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
-	 && ( output_format != EXPORT_HANDLE_OUTPUT_FORMAT_RAW ) )
+	if( ( export_handle->output_format != EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+	 && ( export_handle->output_format != EXPORT_HANDLE_OUTPUT_FORMAT_RAW ) )
 	{
 		liberror_error_set(
 		 error,
@@ -965,8 +944,6 @@ int export_handle_open_output(
 
 		return( -1 );
 	}
-	export_handle->output_format = output_format;
-
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
 		if( export_handle->ewf_output_handle != NULL )
@@ -2182,16 +2159,18 @@ int export_handle_prompt_for_compression_level(
 
 		return( -1 );
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     export_handle->notify_stream,
-	     export_handle->input_buffer,
-	     EXPORT_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_compression_levels,
-	     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
-	     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          export_handle->notify_stream,
+	          export_handle->input_buffer,
+	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_compression_levels,
+	          EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+	          EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2202,22 +2181,25 @@ int export_handle_prompt_for_compression_level(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_compression_values(
-	          fixed_string_variable,
-	          &( export_handle->compression_level ),
-	          &( export_handle->compression_flags ),
-	          error );
-
-	if( result == -1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine compression values.",
-		 function );
+		result = ewfinput_determine_compression_values(
+			  fixed_string_variable,
+			  &( export_handle->compression_level ),
+			  &( export_handle->compression_flags ),
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine compression values.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }
@@ -2232,7 +2214,24 @@ int export_handle_prompt_for_format(
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "export_handle_prompt_for_format";
+	size_t fixed_string_variable_length                  = 0;
 	int result                                           = 0;
+
+	libcstring_system_character_t *format_types[ 14 ] = \
+	{ _LIBCSTRING_SYSTEM_STRING( "raw" ),
+	  _LIBCSTRING_SYSTEM_STRING( "files" ),
+	  _LIBCSTRING_SYSTEM_STRING( "ewf" ),
+	  _LIBCSTRING_SYSTEM_STRING( "smart" ),
+	  _LIBCSTRING_SYSTEM_STRING( "ftk" ),
+	  _LIBCSTRING_SYSTEM_STRING( "encase1" ),
+	  _LIBCSTRING_SYSTEM_STRING( "encase2" ),
+	  _LIBCSTRING_SYSTEM_STRING( "encase3" ),
+	  _LIBCSTRING_SYSTEM_STRING( "encase4" ),
+	  _LIBCSTRING_SYSTEM_STRING( "encase5" ),
+	  _LIBCSTRING_SYSTEM_STRING( "encase6" ),
+	  _LIBCSTRING_SYSTEM_STRING( "linen5" ),
+	  _LIBCSTRING_SYSTEM_STRING( "linen6" ),
+	  _LIBCSTRING_SYSTEM_STRING( "ewfx" ) };
 
 	if( export_handle == NULL )
 	{
@@ -2245,16 +2244,18 @@ int export_handle_prompt_for_format(
 
 		return( -1 );
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     export_handle->notify_stream,
-	     export_handle->input_buffer,
-	     EXPORT_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_format_types,
-	     EWFINPUT_FORMAT_TYPES_AMOUNT,
-	     EWFINPUT_FORMAT_TYPES_DEFAULT,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          export_handle->notify_stream,
+	          export_handle->input_buffer,
+	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          format_types,
+	          14,
+	          0,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2265,11 +2266,46 @@ int export_handle_prompt_for_format(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_ewf_format(
-	          fixed_string_variable,
-	          &( export_handle->ewf_format ),
-	          error );
+	else if( result != 0 )
+	{
+		fixed_string_variable_length = libcstring_system_string_length(
+		                                fixed_string_variable );
 
+		if( fixed_string_variable_length == 3 )
+		{
+			if( libcstring_system_string_compare(
+			     fixed_string_variable,
+			     _LIBCSTRING_SYSTEM_STRING( "raw" ),
+			     3 ) == 0 )
+			{
+				export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+				result                       = 1;
+			}
+		}
+		else if( fixed_string_variable_length == 5 )
+		{
+			if( libcstring_system_string_compare(
+			     fixed_string_variable,
+			     _LIBCSTRING_SYSTEM_STRING( "files" ),
+				  5 ) == 0 )
+			{
+				export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
+				result                       = 1;
+			}
+		}
+		if( result == 0 )
+		{
+			result = ewfinput_determine_ewf_format(
+				  fixed_string_variable,
+				  &( export_handle->ewf_format ),
+				  error );
+
+			if( result == 1 )
+			{
+				export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
+			}
+		}
+	}
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -2307,16 +2343,18 @@ int export_handle_prompt_for_sectors_per_chunk(
 
 		return( -1 );
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     export_handle->notify_stream,
-	     export_handle->input_buffer,
-	     EXPORT_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_sector_per_block_sizes,
-	     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-	     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          export_handle->notify_stream,
+	          export_handle->input_buffer,
+	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_sector_per_block_sizes,
+	          EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+	          EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2327,21 +2365,24 @@ int export_handle_prompt_for_sectors_per_chunk(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_sectors_per_chunk(
-	          fixed_string_variable,
-	          &( export_handle->sectors_per_chunk ),
-	          error );
-
-	if( result == -1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine sectors per chunk.",
-		 function );
+		result = ewfinput_determine_sectors_per_chunk(
+			  fixed_string_variable,
+			  &( export_handle->sectors_per_chunk ),
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine sectors per chunk.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }
@@ -2575,6 +2616,7 @@ int export_handle_set_format(
      liberror_error_t **error )
 {
 	static char *function = "export_handle_set_format";
+	size_t string_length  = 0;
 	int result            = 0;
 
 	if( export_handle == NULL )
@@ -2588,11 +2630,43 @@ int export_handle_set_format(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_ewf_format(
-	          string,
-	          &( export_handle->ewf_format ),
-	          error );
+	string_length = libcstring_system_string_length(
+	                 string );
 
+	if( string_length == 3 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "raw" ),
+		     3 ) == 0 )
+		{
+			export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+			result                       = 1;
+		}
+	}
+	else if( string_length == 5 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "files" ),
+			  5 ) == 0 )
+		{
+			export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
+			result                       = 1;
+		}
+	}
+	if( result == 0 )
+	{
+		result = ewfinput_determine_ewf_format(
+			  string,
+			  &( export_handle->ewf_format ),
+			  error );
+
+		if( result == 1 )
+		{
+			export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
+		}
+	}
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -2772,7 +2846,6 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
      size64_t media_size,
-     uint8_t libewf_format,
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error )
 {
@@ -3031,7 +3104,7 @@ int export_handle_set_output_values(
 		 */
 		if( libewf_handle_set_format(
 		     export_handle->ewf_output_handle,
-		     libewf_format,
+		     export_handle->ewf_format,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -3072,14 +3145,14 @@ int export_handle_set_output_values(
 			return( -1 );
 		}
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
-		if( ( libewf_format == LIBEWF_FORMAT_ENCASE5 )
-		 || ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
+		if( ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
+		 || ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( export_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
 		{
 			guid_type = GUID_TYPE_RANDOM;
 		}
-		else if( ( libewf_format == LIBEWF_FORMAT_LINEN5 )
-		      || ( libewf_format == LIBEWF_FORMAT_LINEN6 ) )
+		else if( ( export_handle->ewf_format == LIBEWF_FORMAT_LINEN5 )
+		      || ( export_handle->ewf_format == LIBEWF_FORMAT_LINEN6 ) )
 		{
 			guid_type = GUID_TYPE_TIME;
 		}

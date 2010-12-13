@@ -1277,7 +1277,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsupported format type defaulting to: encase6.\n" );
+			 "Unsupported EWF format defaulting to: encase6.\n" );
 
 			ewfacquirestream_imaging_handle->ewf_format = LIBEWF_FORMAT_ENCASE6;
 		}
@@ -1376,7 +1376,7 @@ int main( int argc, char * const argv[] )
 	{
 		result = imaging_handle_set_maximum_segment_size(
 			  ewfacquirestream_imaging_handle,
-			  option_sectors_per_chunk,
+			  option_maximum_segment_size,
 			  &error );
 
 		if( result == -1 )

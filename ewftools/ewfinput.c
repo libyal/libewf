@@ -145,7 +145,7 @@ int ewfinput_determine_ewf_format(
 			result      = 1;
 		}
 	}
-	else if( string_length == 5 )
+	else if( string_length == 4 )
 	{
 		if( libcstring_system_string_compare(
 		     string,

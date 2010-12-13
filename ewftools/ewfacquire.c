@@ -1607,7 +1607,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsupported format type defaulting to: encase6.\n" );
+			 "Unsupported EWF format defaulting to: encase6.\n" );
 		}
 	}
 	if( option_media_type != NULL )
@@ -1755,7 +1755,7 @@ int main( int argc, char * const argv[] )
 	{
 		result = imaging_handle_set_maximum_segment_size(
 			  ewfacquire_imaging_handle,
-			  option_sectors_per_chunk,
+			  option_maximum_segment_size,
 			  &error );
 
 		if( result == -1 )
@@ -2114,13 +2114,6 @@ int main( int argc, char * const argv[] )
 
 					goto on_error;
 				}
-				else if( result == 0 )
-				{
-/* TODO determine default media type from imaging handle ? */
-					fprintf(
-					 stderr,
-					 "Unsupported media type defaulting to: fixed.\n" );
-				}
 			}
 			if( option_media_flags == NULL )
 			{
@@ -2136,13 +2129,6 @@ int main( int argc, char * const argv[] )
 					 "Unable to determine media flags.\n" );
 
 					goto on_error;
-				}
-				else if( result == 0 )
-				{
-/* TODO determine default media flags from imaging handle ? */
-					fprintf(
-					 stderr,
-					 "Unsupported media flags defaulting to: physical.\n" );
 				}
 			}
 #ifdef TOC_FILE
@@ -2179,13 +2165,6 @@ int main( int argc, char * const argv[] )
 
 					goto on_error;
 				}
-				else if( result == 0 )
-				{
-/* TODO determine default compression level imaging handle ? */
-					fprintf(
-					 stderr,
-					 "Unsupported compression level defaulting to: none.\n" );
-				}
 			}
 			if( option_format == NULL )
 			{
@@ -2201,13 +2180,6 @@ int main( int argc, char * const argv[] )
 					 "Unable to determine format.\n" );
 
 					goto on_error;
-				}
-				else if( result == 0 )
-				{
-/* TODO determine default format handle ? */
-					fprintf(
-					 stderr,
-					 "Unsupported format defaulting to: encase6.\n" );
 				}
 			}
 		}
@@ -2313,13 +2285,6 @@ int main( int argc, char * const argv[] )
 
 					goto on_error;
 				}
-				else if( result == 0 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
-					 ewfacquire_imaging_handle->bytes_per_sector );
-				}
 			}
 			if( option_sectors_per_chunk == NULL )
 			{
@@ -2335,13 +2300,6 @@ int main( int argc, char * const argv[] )
 					 "Unable to determine sectors per chunk.\n" );
 
 					goto on_error;
-				}
-				else if( result == 0 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported sectors per chunk defaulting to: %" PRIu32 ".\n",
-					 ewfacquire_imaging_handle->sectors_per_chunk );
 				}
 			}
 			if( option_sector_error_granularity == NULL )
@@ -2359,15 +2317,7 @@ int main( int argc, char * const argv[] )
 
 					goto on_error;
 				}
-/* TODO range check
-				else if( result == 0 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported sector error granularity defaulting to: %" PRIu32 ".\n",
-					 ewfacquire_imaging_handle->sector_error_granularity );
-				}
-*/
+/* TODO add range check */
 			}
 		}
 		if( option_number_of_error_retries == NULL )
@@ -2385,15 +2335,7 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-/* TODO range check
-			else if( result == 0 )
-			{
-				fprintf(
-				 stderr,
-				 "Unsupported number of error retries defaulting to: %" PRIu32 ".\n",
-				 ewfacquire_device_handle->number_of_error_retries );
-			}
-*/
+/* TODO add range check */
 		}
 		if( option_zero_buffer_on_error == NULL )
 		{
@@ -2410,14 +2352,7 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-/* TODO range check
-			else if( result == 0 )
-			{
-				fprintf(
-				 stderr,
-				 "Unsupported zero buffer on error retries defaulting to: no.\n" );
-			}
-*/
+/* TODO add range check */
 		}
 		fprintf(
 		 stdout,
@@ -2525,13 +2460,15 @@ int main( int argc, char * const argv[] )
 	{
 		if( resume_acquiry == 0 )
 		{
-			if( device_handle_get_information_value(
-			     ewfacquire_device_handle,
-			     (uint8_t *) "model",
-			     5,
-			     media_information_model,
-			     64,
-			     &error ) != 1 )
+			result = device_handle_get_information_value(
+			          ewfacquire_device_handle,
+			          (uint8_t *) "model",
+			          5,
+			          media_information_model,
+			          64,
+			          &error );
+
+			if( result == -1 )
 			{
 				fprintf(
 				 stdout,
@@ -2541,16 +2478,20 @@ int main( int argc, char * const argv[] )
 				 error );
 				liberror_error_free(
 				 &error );
-
+			}
+			if( result != 1 )
+			{
 				media_information_model[ 0 ] = 0;
 			}
-			if( device_handle_get_information_value(
-			     ewfacquire_device_handle,
-			     (uint8_t *) "serial_number",
-			     13,
-			     media_information_serial_number,
-			     64,
-			     &error ) != 1 )
+			result = device_handle_get_information_value(
+			          ewfacquire_device_handle,
+			          (uint8_t *) "serial_number",
+			          13,
+			          media_information_serial_number,
+			          64,
+			          &error );
+
+			if( result == -1 )
 			{
 				fprintf(
 				 stdout,
@@ -2560,7 +2501,9 @@ int main( int argc, char * const argv[] )
 				 error );
 				liberror_error_free(
 				 &error );
-
+			}
+			if( result != 1 )
+			{
 				media_information_serial_number[ 0 ] = 0;
 			}
 			if( imaging_handle_open_output(

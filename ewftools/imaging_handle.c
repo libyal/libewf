@@ -1688,16 +1688,18 @@ int imaging_handle_prompt_for_compression_level(
 
 		return( -1 );
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     imaging_handle->notify_stream,
-	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_compression_levels,
-	     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
-	     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_compression_levels,
+	          EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+	          EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1708,22 +1710,25 @@ int imaging_handle_prompt_for_compression_level(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_compression_values(
-	          fixed_string_variable,
-	          &( imaging_handle->compression_level ),
-	          &( imaging_handle->compression_flags ),
-	          error );
-
-	if( result == -1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine compression values.",
-		 function );
+		result = ewfinput_determine_compression_values(
+			  fixed_string_variable,
+			  &( imaging_handle->compression_level ),
+			  &( imaging_handle->compression_flags ),
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine compression values.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }
@@ -1751,16 +1756,18 @@ int imaging_handle_prompt_for_format(
 
 		return( -1 );
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     imaging_handle->notify_stream,
-	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_format_types,
-	     EWFINPUT_FORMAT_TYPES_AMOUNT,
-	     EWFINPUT_FORMAT_TYPES_DEFAULT,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_format_types,
+	          EWFINPUT_FORMAT_TYPES_AMOUNT,
+	          EWFINPUT_FORMAT_TYPES_DEFAULT,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1771,21 +1778,24 @@ int imaging_handle_prompt_for_format(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_ewf_format(
-	          fixed_string_variable,
-	          &( imaging_handle->ewf_format ),
-	          error );
-
-	if( result == -1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine format.",
-		 function );
+		result = ewfinput_determine_ewf_format(
+			  fixed_string_variable,
+			  &( imaging_handle->ewf_format ),
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine format.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }
@@ -1830,16 +1840,18 @@ int imaging_handle_prompt_for_media_type(
 	{
 		default_value = EWFINPUT_MEDIA_TYPES_DEFAULT;
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     imaging_handle->notify_stream,
-	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_media_types,
-	     EWFINPUT_MEDIA_TYPES_AMOUNT,
-	     default_value,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_media_types,
+	          EWFINPUT_MEDIA_TYPES_AMOUNT,
+	          default_value,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1850,21 +1862,24 @@ int imaging_handle_prompt_for_media_type(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_media_type(
-	          fixed_string_variable,
-	          &( imaging_handle->media_type ),
-	          error );
-
-	if( result == -1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine media type.",
-		 function );
+		result = ewfinput_determine_media_type(
+			  fixed_string_variable,
+			  &( imaging_handle->media_type ),
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine media type.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }
@@ -1902,16 +1917,18 @@ int imaging_handle_prompt_for_media_flags(
 	{
 		default_value = 1;
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     imaging_handle->notify_stream,
-	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_media_flags,
-	     EWFINPUT_MEDIA_FLAGS_AMOUNT,
-	     default_value,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_media_flags,
+	          EWFINPUT_MEDIA_FLAGS_AMOUNT,
+	          default_value,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1922,21 +1939,24 @@ int imaging_handle_prompt_for_media_flags(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_media_flags(
-	          fixed_string_variable,
-	          &( imaging_handle->media_flags ),
-	          error );
-
-	if( result == -1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine media flags.",
-		 function );
+		result = ewfinput_determine_media_flags(
+			  fixed_string_variable,
+			  &( imaging_handle->media_flags ),
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine media flags.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }
@@ -2016,16 +2036,18 @@ int imaging_handle_prompt_for_sectors_per_chunk(
 
 		return( -1 );
 	}
-	if( ewfinput_get_fixed_string_variable(
-	     imaging_handle->notify_stream,
-	     imaging_handle->input_buffer,
-	     IMAGING_HANDLE_INPUT_BUFFER_SIZE,
-	     request_string,
-	     ewfinput_sector_per_block_sizes,
-	     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-	     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-	     &fixed_string_variable,
-	     error ) == -1 )
+	result = ewfinput_get_fixed_string_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_sector_per_block_sizes,
+	          EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+	          EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2036,21 +2058,24 @@ int imaging_handle_prompt_for_sectors_per_chunk(
 
 		return( -1 );
 	}
-	result = ewfinput_determine_sectors_per_chunk(
-	          fixed_string_variable,
-	          &( imaging_handle->sectors_per_chunk ),
-	          error );
-
-	if( result == -1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine sectors per chunk.",
-		 function );
+		result = ewfinput_determine_sectors_per_chunk(
+			  fixed_string_variable,
+			  &( imaging_handle->sectors_per_chunk ),
+			  error );
 
-		return( -1 );
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine sectors per chunk.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( result );
 }

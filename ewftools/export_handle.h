@@ -85,6 +85,10 @@ struct export_handle
 	 */
 	uint8_t compression_flags;
 
+	/* The output format
+	 */
+	uint8_t output_format;
+
 	/* The EWF format
 	 */
 	uint8_t ewf_format;
@@ -128,10 +132,6 @@ struct export_handle
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
-
-	/* The output format
-	 */
-	uint8_t output_format;
 
 	/* The libsmraw output handle
 	 */
@@ -214,7 +214,6 @@ int export_handle_open_input(
 
 int export_handle_open_output(
      export_handle_t *export_handle,
-     uint8_t output_format,
      const libcstring_system_character_t *filename,
      liberror_error_t **error );
 
@@ -347,7 +346,6 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
      size64_t media_size,
-     uint8_t libewf_format,
      uint8_t wipe_chunk_on_error,
      liberror_error_t **error );
 
