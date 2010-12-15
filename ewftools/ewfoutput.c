@@ -33,10 +33,6 @@
 #include <string.h>
 #endif
 
-#if defined( HAVE_SYS_UTSNAME_H )
-#include <sys/utsname.h>
-#endif
-
 #include <libewf/features.h>
 
 #if defined( HAVE_LOCAL_LIBUNA )

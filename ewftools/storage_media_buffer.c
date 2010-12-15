@@ -62,8 +62,8 @@ int storage_media_buffer_initialize(
 	}
 	if( *buffer == NULL )
 	{
-		*buffer = (storage_media_buffer_t *) memory_allocate(
-		                                      sizeof( storage_media_buffer_t ) );
+		*buffer = memory_allocate_structure(
+		           storage_media_buffer_t );
 
 		if( *buffer == NULL )
 		{
@@ -74,7 +74,7 @@ int storage_media_buffer_initialize(
 			 "%s: unable to create buffer.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *buffer,
@@ -88,12 +88,7 @@ int storage_media_buffer_initialize(
 			 "%s: unable to clear buffer.",
 			 function );
 
-			memory_free(
-			 *buffer );
-
-			*buffer = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( size > 0 )
 		{
@@ -119,12 +114,7 @@ int storage_media_buffer_initialize(
 				 "%s: unable to create aligned raw buffer.",
 				 function );
 
-				memory_free(
-				 *buffer );
-
-				*buffer = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 #else
 			( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
@@ -139,12 +129,7 @@ int storage_media_buffer_initialize(
 				 "%s: unable to create raw buffer.",
 				 function );
 
-				memory_free(
-				 *buffer );
-
-				*buffer = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 #endif /* defined( memory_allocate_aligned ) */
 
@@ -165,20 +150,28 @@ int storage_media_buffer_initialize(
 				 "%s: unable to create compression buffer.",
 				 function );
 
-				memory_free(
-				 ( *buffer )->raw_buffer );
-				memory_free(
-				 *buffer );
-
-				*buffer = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 			( *buffer )->compression_buffer_size = size * 2;
 #endif
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *buffer != NULL )
+	{
+		if( ( *buffer )->raw_buffer != NULL )
+		{
+			memory_free(
+			 ( *buffer )->raw_buffer );
+		}
+		memory_free(
+		 *buffer );
+
+		*buffer = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees a buffer

@@ -32,7 +32,7 @@
 
 #include "ewf_definitions.h"
 
-/* Initialize the write IO handle
+/* Initialize the IO handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_io_handle_initialize(
@@ -47,7 +47,7 @@ int libewf_io_handle_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write IO handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -63,7 +63,7 @@ int libewf_io_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create write IO handle.",
+			 "%s: unable to create IO handle.",
 			 function );
 
 			goto on_error;
@@ -77,7 +77,7 @@ int libewf_io_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear write IO handle.",
+			 "%s: unable to clear IO handle.",
 			 function );
 
 			goto on_error;
@@ -100,7 +100,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the write IO handle including elements
+/* Frees the IO handle including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_io_handle_free(
@@ -115,7 +115,7 @@ int libewf_io_handle_free(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write IO handle.",
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( 1 );
@@ -128,6 +128,85 @@ int libewf_io_handle_free(
 		*io_handle = NULL;
 	}
 	return( 1 );
+}
+
+/* Clones the IO handle
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_io_handle_clone(
+     libewf_io_handle_t **destination_io_handle,
+     libewf_io_handle_t *source_io_handle,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_io_handle_clone";
+
+	if( destination_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_io_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination IO handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_io_handle == NULL )
+	{
+		*destination_io_handle = NULL;
+
+		return( 1 );
+	}
+	*destination_io_handle = memory_allocate_structure(
+		                  libewf_io_handle_t );
+
+	if( *destination_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_io_handle,
+	     source_io_handle,
+	     sizeof( libewf_io_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_io_handle != NULL )
+	{
+		memory_free(
+		 *destination_io_handle );
+
+		*destination_io_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Retrieves the current chunk and chunk offset

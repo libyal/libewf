@@ -117,6 +117,85 @@ int libewf_sector_list_value_free(
 	return( 1 );
 }
 
+/* Clones the sector list value
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_sector_list_value_clone(
+     intptr_t **destination_sector_list_value,
+     intptr_t *source_sector_list_value,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_sector_list_value_clone";
+
+	if( destination_sector_list_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination sector list value.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_sector_list_value != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination sector list value value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_sector_list_value == NULL )
+	{
+		*destination_sector_list_value = NULL;
+
+		return( 1 );
+	}
+	*destination_sector_list_value = (intptr_t *) memory_allocate(
+			                               sizeof( libewf_sector_list_value_t ) );
+
+	if( *destination_sector_list_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination sector list value.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_sector_list_value,
+	     source_sector_list_value,
+	     sizeof( libewf_sector_list_value_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination sector list value.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_sector_list_value != NULL )
+	{
+		memory_free(
+		 *destination_sector_list_value );
+
+		*destination_sector_list_value = NULL;
+	}
+	return( -1 );
+}
+
 /* Creates a sector list
  * Returns 1 if successful or -1 on error
  */
@@ -303,6 +382,177 @@ int libewf_sector_list_empty(
 		}
 	}
 	return( result );
+}
+
+/* Clones the sector list
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_sector_list_clone(
+     libewf_sector_list_t **destination_sector_list,
+     libewf_sector_list_t *source_sector_list,
+     liberror_error_t **error )
+{
+	libewf_list_element_t *destination_list_element = NULL;
+	libewf_list_element_t *source_list_element      = NULL;
+	intptr_t *destination_value                     = NULL;
+	static char *function                           = "libewf_sector_list_clone";
+	int element_index                               = 0;
+
+	if( destination_sector_list == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination sector list.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_sector_list != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination sector list value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_sector_list == NULL )
+	{
+		*destination_sector_list = NULL;
+
+		return( 1 );
+	}
+	if( libewf_sector_list_initialize(
+	     destination_sector_list,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination sector list.",
+		 function );
+
+		goto on_error;
+	}
+	if( *destination_sector_list == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing destination sector list.",
+		 function );
+
+		goto on_error;
+	}
+	source_list_element = source_sector_list->first_element;
+
+	for( element_index = 0;
+	     element_index < source_sector_list->number_of_elements;
+	     element_index++ )
+	{
+		if( source_list_element == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: corruption detected in source sector list element: %d.",
+			 function,
+			 element_index );
+
+			goto on_error;
+		}
+		if( libewf_list_element_initialize(
+		     &destination_list_element,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create destination list element: %d.",
+			 function,
+			 element_index );
+
+			goto on_error;
+		}
+		if( libewf_sector_list_value_clone(
+		     &destination_value,
+		     source_list_element->value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to clone value of sector list element: %d.",
+			 function,
+			 element_index );
+
+			goto on_error;
+		}
+		if( libewf_list_element_set_value(
+		     destination_list_element,
+		     destination_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to set value of destination list element: %d.",
+			 function,
+			 element_index );
+
+			goto on_error;
+		}
+		destination_value = NULL;
+
+		if( ( *destination_sector_list )->first_element == NULL )
+		{
+			( *destination_sector_list )->first_element = destination_list_element;
+		}
+		if( ( *destination_sector_list )->last_element != NULL )
+		{
+			( *destination_sector_list )->last_element->next_element = destination_list_element;
+			destination_list_element->previous_element               = ( *destination_sector_list )->last_element;
+		}
+		( *destination_sector_list )->last_element        = destination_list_element;
+		( *destination_sector_list )->number_of_elements += 1;
+
+		destination_list_element = NULL;
+
+		source_list_element = source_list_element->next_element;
+	}
+	return( 1 );
+
+on_error:
+	if( destination_value != NULL )
+	{
+		libewf_sector_list_value_free(
+		 destination_value,
+		 NULL );
+	}
+	if( destination_list_element != NULL )
+	{
+		libewf_list_element_free(
+		 &destination_list_element,
+		 &libewf_sector_list_value_free,
+		 NULL );
+	}
+	if( *destination_sector_list != NULL )
+	{
+		libewf_sector_list_free(
+		 destination_sector_list,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves the number of elements in the sector list

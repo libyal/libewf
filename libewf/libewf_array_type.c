@@ -331,7 +331,6 @@ int libewf_array_clone(
 {
 	static char *function = "libewf_array_clone";
 	int entry_iterator    = 0;
-	int result            = 1;
 
 	if( destination_array == NULL )
 	{
@@ -395,7 +394,7 @@ int libewf_array_clone(
 		 "%s: unable to create destination array.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( *destination_array == NULL )
 	{
@@ -406,7 +405,7 @@ int libewf_array_clone(
 		 "%s: missing destination array.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( source_array->entries != NULL )
 	{
@@ -416,12 +415,10 @@ int libewf_array_clone(
 		{
 			if( source_array->entries[ entry_iterator ] != NULL )
 			{
-				result = entry_clone_function(
-					  &( ( *destination_array )->entries[ entry_iterator ] ),
-					  source_array->entries[ entry_iterator ],
-					  error );
-
-				if( result != 1 )
+				if( entry_clone_function(
+				     &( ( *destination_array )->entries[ entry_iterator ] ),
+				     source_array->entries[ entry_iterator ],
+				     error ) != 1 )
 				{
 					liberror_error_set(
 					 error,
@@ -431,29 +428,22 @@ int libewf_array_clone(
 					 function,
 					 entry_iterator );
 
-					break;
+					goto on_error;
 				}
 			}
 		}
-		if( result != 1 )
-		{
-			if( libewf_array_free(
-			     destination_array,
-			     entry_free_function,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free destination array.",
-				 function );
-
-				result = -1;
-			}
-		}
 	}
-	return( result );
+	return( 1 );
+
+on_error:
+	if( *destination_array != NULL )
+	{
+		libewf_array_free(
+		 destination_array,
+		 entry_free_function,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Resizes an array

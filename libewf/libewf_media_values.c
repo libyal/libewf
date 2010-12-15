@@ -126,3 +126,82 @@ int libewf_media_values_free(
 	return( 1 );
 }
 
+/* Clones the media values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_media_values_clone(
+     libewf_media_values_t **destination_media_values,
+     libewf_media_values_t *source_media_values,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_media_values_clone";
+
+	if( destination_media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_media_values != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination media values already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_media_values == NULL )
+	{
+		*destination_media_values = NULL;
+
+		return( 1 );
+	}
+	*destination_media_values = memory_allocate_structure(
+		                     libewf_media_values_t );
+
+	if( *destination_media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination media values.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_media_values,
+	     source_media_values,
+	     sizeof( libewf_media_values_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination media values.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_media_values != NULL )
+	{
+		memory_free(
+		 *destination_media_values );
+
+		*destination_media_values = NULL;
+	}
+	return( -1 );
+}
+

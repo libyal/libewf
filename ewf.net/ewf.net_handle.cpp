@@ -41,12 +41,17 @@ using namespace System::Runtime::InteropServices;
 
 namespace EWF {
 
+Handle::Handle( System::IntPtr ewf_handle )
+{
+	this->ewf_handle = ewf_handle;
+}
+
 Handle::Handle( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error      = NULL;
-	libewf_handle_t *handle    = NULL;
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
 	System::String^ error_string = nullptr;
 	System::String^ function     = "Handle::Handle";
 
@@ -83,8 +88,8 @@ Handle::~Handle( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error      = NULL;
-	libewf_handle_t *handle    = NULL;
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
 	System::String^ error_string = nullptr;
 	System::String^ function     = "Handle::~Handle";
 
@@ -141,12 +146,12 @@ array<System::String^>^ Handle::Glob( System::String^ filename )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	array<System::String^>^ filenames     = nullptr;
+	array<System::String^>^ filenames   = nullptr;
 	libewf_error_t *error               = NULL;
 	wchar_t **ewf_filenames             = NULL;
 	pin_ptr<const wchar_t> ewf_filename = nullptr;
-	System::String^ error_string          = nullptr;
-	System::String^ function              = "EWF::Glob";
+	System::String^ error_string        = nullptr;
+	System::String^ function            = "EWF::Glob";
 	size_t ewf_filename_length          = 0;
 	int ewf_filename_index              = 0;
 	int ewf_number_of_filenames         = 0;
@@ -225,20 +230,64 @@ array<System::String^>^ Handle::Glob( System::String^ filename )
 	return( filenames );
 }
 
+Handle^ Handle::Clone( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error               = NULL;
+	libewf_handle_t *destination_handle = NULL;
+	libewf_handle_t *source_handle      = NULL;
+	System::String^ error_string        = nullptr;
+	System::String^ function            = "Handle::Clone";
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &source_handle,
+	 this->ewf_handle );
+
+	if( libewf_handle_clone(
+	     &desination_handle,
+	     source_handle,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to clone ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	return( gcnew Handle( Marshal::ReadIntPtr(
+	                       (IntPtr) &destination_handle ) ) );
+}
+
 void Handle::Open( array<System::String^>^ filenames,
                    System::Byte access_flags )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_handle_t *handle       = NULL;
-	libewf_error_t *error         = NULL;
+	libewf_handle_t *handle         = NULL;
+	libewf_error_t *error           = NULL;
 	System::String^ error_string    = nullptr;
 	System::String^ function        = "Handle::Open";
-	wchar_t **ewf_filenames       = NULL;
+	wchar_t **ewf_filenames         = NULL;
 	pin_ptr<const wchar_t> filename = nullptr;
-	uint8_t ewf_access_flags      = 0;
-	int ewf_filename_index        = 0;
-	int ewf_number_of_filenames   = 0;
+	uint8_t ewf_access_flags        = 0;
+	int ewf_filename_index          = 0;
+	int ewf_number_of_filenames     = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
@@ -311,8 +360,8 @@ void Handle::Close( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error      = NULL;
-	libewf_handle_t *handle    = NULL;
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
 	System::String^ error_string = nullptr;
 	System::String^ function     = "Handle::Close";
 
@@ -352,12 +401,12 @@ int Handle::ReadBuffer( array<System::Byte>^ buffer,
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error       = NULL;
-	libewf_handle_t *handle     = NULL;
-	System::String^ error_string  = nullptr;
-	System::String^ function      = "Handle::ReadBuffer";
-	pin_ptr<uint8_t> ewf_buffer = nullptr;
-	size_t read_count             = 0;
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
+	System::String^ error_string = nullptr;
+	System::String^ function     = "Handle::ReadBuffer";
+	pin_ptr<uint8_t> ewf_buffer  = nullptr;
+	size_t read_count            = 0;
 
 	if( size < 0 )
 	{
@@ -418,10 +467,10 @@ int Handle::WriteBuffer( array<System::Byte>^ buffer,
 
 	libewf_error_t *error             = NULL;
 	libewf_handle_t *handle           = NULL;
-	System::String^ error_string        = nullptr;
-	System::String^ function            = "Handle::WriteBuffer";
+	System::String^ error_string      = nullptr;
+	System::String^ function          = "Handle::WriteBuffer";
 	pin_ptr<const uint8_t> ewf_buffer = nullptr;
-	size_t write_count                  = 0;
+	size_t write_count                = 0;
 
 	if( size < 0 )
 	{
@@ -480,12 +529,12 @@ System::Int64 Handle::SeekOffset( System::Int64 offset,
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error      = NULL;
-	libewf_handle_t *handle    = NULL;
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
 	System::String^ error_string = nullptr;
 	System::String^ function     = "Handle::SeekOffset";
-	off64_t ewf_offset         = 0;
-	int ewf_whence             = 0;
+	off64_t ewf_offset           = 0;
+	int ewf_whence               = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
@@ -551,11 +600,11 @@ System::Int64 Handle::GetOffset( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error      = NULL;
-	libewf_handle_t *handle    = NULL;
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
 	System::String^ error_string = nullptr;
 	System::String^ function     = "Handle::GetOffset";
-	off64_t ewf_offset         = 0;
+	off64_t ewf_offset           = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
@@ -595,11 +644,11 @@ System::UInt64 Handle::GetMediaSize( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error      = NULL;
-	libewf_handle_t *handle    = NULL;
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
 	System::String^ error_string = nullptr;
 	System::String^ function     = "Handle::GetMediaSize";
-	size64_t ewf_media_size    = 0;
+	size64_t ewf_media_size      = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,

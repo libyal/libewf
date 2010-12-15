@@ -118,6 +118,85 @@ int libewf_section_list_values_free(
 	return( 1 );
 }
 
+/* Clones the section list values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_section_list_values_clone(
+     intptr_t **destination_section_list_values,
+     intptr_t *source_section_list_values,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_section_list_values_clone";
+
+	if( destination_section_list_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination section list values.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_section_list_values != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination section list values value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_section_list_values == NULL )
+	{
+		*destination_section_list_values = NULL;
+
+		return( 1 );
+	}
+	*destination_section_list_values = (intptr_t *) memory_allocate(
+	                                                 sizeof( libewf_section_list_values_t ) );
+
+	if( *destination_section_list_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination section list values.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_section_list_values,
+	     source_section_list_values,
+	     sizeof( libewf_section_list_values_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination section list values.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_section_list_values != NULL )
+	{
+		memory_free(
+		 *destination_section_list_values );
+
+		*destination_section_list_values = NULL;
+	}
+	return( -1 );
+}
+
 /* Append an entry to the section list
  * Returns 1 if successful or -1 on error
  */

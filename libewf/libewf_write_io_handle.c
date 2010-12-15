@@ -159,6 +159,90 @@ int libewf_write_io_handle_free(
 	return( 1 );
 }
 
+/* Clones the write IO handle
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_write_io_handle_clone(
+     libewf_write_io_handle_t **destination_write_io_handle,
+     libewf_write_io_handle_t *source_write_io_handle,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_write_io_handle_clone";
+
+	if( destination_write_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination write IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_write_io_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination write IO handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_write_io_handle == NULL )
+	{
+		*destination_write_io_handle = NULL;
+
+		return( 1 );
+	}
+	*destination_write_io_handle = memory_allocate_structure(
+	                                libewf_write_io_handle_t );
+
+	if( *destination_write_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination write IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_write_io_handle,
+	     source_write_io_handle,
+	     sizeof( libewf_write_io_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination write IO handle.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO clone these values ? */
+	( *destination_write_io_handle )->data_section            = NULL;
+	( *destination_write_io_handle )->table_offsets           = NULL;
+	( *destination_write_io_handle )->number_of_table_offsets = 0;
+
+	return( 1 );
+
+on_error:
+	if( *destination_write_io_handle != NULL )
+	{
+		memory_free(
+		 *destination_write_io_handle );
+
+		*destination_write_io_handle = NULL;
+	}
+	return( -1 );
+}
+
 /* Initializes the write IO handle value to start writing
  * Returns 1 if successful or -1 on error
  */
@@ -4301,8 +4385,8 @@ ssize_t libewf_write_io_handle_finalize(
 	}
 	/* No need for finalization in R or RW mode
 	 */
-	if( ( ( io_handle->flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
-	 && ( ( io_handle->flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
+	if( ( ( io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 	{
 		return( 0 );
 	}

@@ -162,6 +162,101 @@ int libewf_read_io_handle_free(
 	return( result );
 }
 
+/* Clones the read IO handle
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_read_io_handle_clone(
+     libewf_read_io_handle_t **destination_read_io_handle,
+     libewf_read_io_handle_t *source_read_io_handle,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_read_io_handle_clone";
+
+	if( destination_read_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination read IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_read_io_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination read IO handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_read_io_handle == NULL )
+	{
+		*destination_read_io_handle = NULL;
+
+		return( 1 );
+	}
+	*destination_read_io_handle = memory_allocate_structure(
+	                               libewf_read_io_handle_t );
+
+	if( *destination_read_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination read IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *destination_read_io_handle,
+	     0,
+	     sizeof( libewf_read_io_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear source to destination read IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_list_clone(
+	     &( ( *destination_read_io_handle )->checksum_errors ),
+	     source_read_io_handle->checksum_errors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination checksum errors.",
+		 function );
+
+		goto on_error;
+	}
+	( *destination_read_io_handle )->wipe_on_error = source_read_io_handle->wipe_on_error;
+
+	return( 1 );
+
+on_error:
+	if( *destination_read_io_handle != NULL )
+	{
+		memory_free(
+		 *destination_read_io_handle );
+
+		*destination_read_io_handle = NULL;
+	}
+	return( -1 );
+}
+
 /* Processes the chunk data, applies decompression if necessary and validates the checksum
  * Sets the checksum_mismatch value to 1 if the chunk checksum did not match the calculated checksum
  * Returns the number of bytes of the processed chunk data or -1 on error
@@ -474,7 +569,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 	/* Determine if the chunk is compressed or not
 	 */
-	if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != 0 )
+	if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_COMPRESSED ) != 0 )
 	{
 		*is_compressed = 1;
 	}
@@ -515,7 +610,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
-		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK ) != 0 )
+		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK ) != 0 )
 		{
 			chunk_type = "uncompressed delta";
 		}
@@ -800,7 +895,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 				buffer = chunk_cache->data;
 			}
 		}
-		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) == 0 )
+		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_COMPRESSED ) == 0 )
 		{
 			is_compressed = 0;
 		}

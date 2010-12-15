@@ -20,12 +20,18 @@
  */
 
 #include <common.h>
-#include <types.h>
 
 #if defined( WINAPI )
 #include <windows.h>
+#endif
 
 #include "libewf_unused.h"
+
+/* Define HAVE_LOCAL_LIBEWF for local use of libbfio
+ */
+#if !defined( HAVE_LOCAL_LIBEWF )
+
+#if defined( WINAPI )
 
 #if defined( _MANAGED )
 #pragma managed( push, off )
@@ -62,11 +68,13 @@ BOOL WINAPI DllMain(
 /* Function that indicates the library is a DLL
  * Returns 1
  */
-uint8_t libewf_is_dll(
-         void )
+int libewf_is_dll(
+     void )
 {
 	return( 1 );
 }
 
 #endif /* defined( WINAPI ) */
+
+#endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 

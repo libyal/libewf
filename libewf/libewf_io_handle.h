@@ -37,9 +37,9 @@ typedef struct libewf_io_handle libewf_io_handle_t;
 
 struct libewf_io_handle
 {
-	/* The flags
+	/* The access flags
 	 */
-	uint8_t flags;
+	uint8_t access_flags;
 
 	/* The current offset
 	 */
@@ -73,6 +73,10 @@ struct libewf_io_handle
 	/* The header codepage
 	 */
 	int header_codepage;
+
+	/* Value to indicate if abort was signalled
+	 */
+	int abort;
 };
 
 int libewf_io_handle_initialize(
@@ -81,6 +85,11 @@ int libewf_io_handle_initialize(
 
 int libewf_io_handle_free(
      libewf_io_handle_t **io_handle,
+     liberror_error_t **error );
+
+int libewf_io_handle_clone(
+     libewf_io_handle_t **destination_io_handle,
+     libewf_io_handle_t *source_io_handle,
      liberror_error_t **error );
 
 int libewf_io_handle_get_current_chunk(

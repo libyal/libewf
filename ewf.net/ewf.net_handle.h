@@ -31,6 +31,9 @@ public ref class Handle sealed
 	private:
 		System::IntPtr ewf_handle;
 
+	private:
+		Handle( System::IntPtr ewf_handle );
+
 	public:
 		Handle( void );
 		~Handle( void );
@@ -40,6 +43,8 @@ public ref class Handle sealed
 		System::Byte GetAccessFlagsWrite( void );
 
 		array<System::String^>^ Glob( System::String^ filename );
+
+		Handle^ Clone( void );
 
 		void Open( array<System::String^>^ filenames,
 		           System::Byte access_flags );

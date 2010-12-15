@@ -27,7 +27,7 @@
 
 #include "libewf_chunk_value.h"
 
-/* Initialize the segment file handle
+/* Initialize the chunk value
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_value_initialize(
@@ -42,15 +42,15 @@ int libewf_chunk_value_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.",
+		 "%s: invalid chunk value.",
 		 function );
 
 		return( -1 );
 	}
 	if( *chunk_value == NULL )
 	{
-		*chunk_value = (libewf_chunk_value_t *) memory_allocate(
-		                                         sizeof( libewf_chunk_value_t ) );
+		*chunk_value = memory_allocate_structure(
+		                libewf_chunk_value_t );
 
 		if( *chunk_value == NULL )
 		{
@@ -58,10 +58,10 @@ int libewf_chunk_value_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment file handle.",
+			 "%s: unable to create chunk value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *chunk_value,
@@ -72,21 +72,26 @@ int libewf_chunk_value_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear segment file handle.",
+			 "%s: unable to clear chunk value.",
 			 function );
 
-			memory_free(
-			 *chunk_value );
-
-			*chunk_value = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *chunk_value != NULL )
+	{
+		memory_free(
+		 *chunk_value );
+
+		*chunk_value = NULL;
+	}
+	return( -1 );
 }
 
-/* Frees the segment file handle including elements
+/* Frees the chunk value including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_value_free(
@@ -101,7 +106,7 @@ int libewf_chunk_value_free(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.",
+		 "%s: invalid chunk value.",
 		 function );
 
 		return( -1 );
@@ -110,5 +115,87 @@ int libewf_chunk_value_free(
 	 chunk_value );
 
 	return( 1 );
+}
+
+/* Clones the chunk value
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_value_clone(
+     intptr_t **destination_chunk_value,
+     intptr_t *source_chunk_value,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_chunk_value_clone";
+
+	if( destination_chunk_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination chunk value.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_chunk_value != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination chunk value value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_chunk_value == NULL )
+	{
+		*destination_chunk_value = NULL;
+
+		return( 1 );
+	}
+	*destination_chunk_value = (intptr_t *) memory_allocate(
+	                                         sizeof( libewf_chunk_value_t ) );
+
+	if( *destination_chunk_value == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination chunk value.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_chunk_value,
+	     source_chunk_value,
+	     sizeof( libewf_chunk_value_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination chunk value.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO */
+	( (libewf_chunk_value_t *) *destination_chunk_value )->segment_file_handle = NULL;
+
+	return( 1 );
+
+on_error:
+	if( *destination_chunk_value != NULL )
+	{
+		memory_free(
+		 *destination_chunk_value );
+
+		*destination_chunk_value = NULL;
+	}
+	return( -1 );
 }
 

@@ -290,7 +290,16 @@ int libewf_handle_free(
      libewf_handle_t **handle,
      libewf_error_t **error );
 
-/* Signals the libewf handle to abort its current activity
+/* Clones the handle including elements
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_clone(
+     libewf_handle_t **destination_handle,
+     libewf_handle_t *source_handle,
+     libewf_error_t **error );
+
+/* Signals the handle to abort its current activity
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \

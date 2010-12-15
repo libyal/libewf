@@ -486,7 +486,7 @@ on_error:
 }
 
 /* Determines the EWF file format based on known characteristics
- * Returns 1 if the format was determined, 0 if not or -1 on errror
+ * Returns 1 if the format was determined, 0 if not or -1 on error
  */
 int libewf_header_sections_determine_format(
      libewf_header_sections_t *header_sections,

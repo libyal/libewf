@@ -161,6 +161,104 @@ int libewf_offset_table_free(
 	return( result );
 }
 
+/* Clones the offset table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_offset_table_clone(
+     libewf_offset_table_t **destination_offset_table,
+     libewf_offset_table_t *source_offset_table,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_offset_table_clone";
+
+	if( destination_offset_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination offset table.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_offset_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination offset table value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_offset_table == NULL )
+	{
+		*destination_offset_table = NULL;
+
+		return( 1 );
+	}
+	*destination_offset_table = memory_allocate_structure(
+	                             libewf_offset_table_t );
+
+	if( *destination_offset_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination offset table.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *destination_offset_table,
+	     0,
+	     sizeof( libewf_offset_table_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear source to destination offset table.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_array_clone(
+	     &( ( *destination_offset_table )->chunk_values ),
+	     source_offset_table->chunk_values,
+	     &libewf_chunk_value_free,
+	     &libewf_chunk_value_clone,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination chunk values.",
+		 function );
+
+		goto on_error;
+	}
+	( *destination_offset_table )->last_chunk_value_filled   = source_offset_table->last_chunk_value_filled;
+	( *destination_offset_table )->last_chunk_value_compared = source_offset_table->last_chunk_value_compared;
+
+	return( 1 );
+
+on_error:
+	if( *destination_offset_table != NULL )
+	{
+		memory_free(
+		 *destination_offset_table );
+
+		*destination_offset_table = NULL;
+	}
+	return( -1 );
+}
+
 /* Resizes the offset table
  * Returns 1 if successful or -1 on error
  */
@@ -731,11 +829,11 @@ int libewf_offset_table_fill(
 
 		if( corrupted != 0 )
 		{
-			chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED;
+			chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED;
 		}
 		else if( tainted != 0 )
 		{
-			chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_TAINTED;
+			chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_TAINTED;
 		}
 		if( libewf_array_set_entry_by_index(
 		     offset_table->chunk_values,
@@ -857,11 +955,11 @@ int libewf_offset_table_fill(
 
 	if( corrupted != 0 )
 	{
-		chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED;
+		chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED;
 	}
 	else if( tainted != 0 )
 	{
-		chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_TAINTED;
+		chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_TAINTED;
 	}
 	if( libewf_array_set_entry_by_index(
 	     offset_table->chunk_values,
@@ -1061,11 +1159,11 @@ int libewf_offset_table_fill_last_offset(
 
 			if( corrupted != 0 )
 			{
-				chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED;
+				chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED;
 			}
 			else if( tainted != 0 )
 			{
-				chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_TAINTED;
+				chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_TAINTED;
 			}
 			offset_table->last_chunk_value_filled++;
 
@@ -1186,7 +1284,7 @@ int libewf_offset_table_fill_offsets(
 		}
 		offset32_value = (uint32_t) offset64_value;
 
-		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != 0 )
+		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_COMPRESSED ) != 0 )
 		{
 			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
@@ -1455,7 +1553,7 @@ int libewf_offset_table_compare(
 
 			mismatch = 1;
 		}
-		else if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != compressed )
+		else if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_COMPRESSED ) != compressed )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
@@ -1520,7 +1618,7 @@ int libewf_offset_table_compare(
 			chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 			chunk_value->size                = (size_t) chunk_size;
 			chunk_value->flags              |= compressed;
-			chunk_value->flags              &= ~( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
+			chunk_value->flags              &= ~( LIBEWF_CHUNK_VALUE_FLAG_TAINTED | LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED ) ;
 		}
 		offset_table->last_chunk_value_compared++;
 
@@ -1600,7 +1698,7 @@ int libewf_offset_table_compare(
 
 		mismatch = 1;
 	}
-	else if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED ) != compressed )
+	else if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_COMPRESSED ) != compressed )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
@@ -1663,7 +1761,7 @@ int libewf_offset_table_compare(
 		chunk_value->segment_file_handle = segment_file_handle;
 		chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 		chunk_value->flags              |= compressed;
-		chunk_value->flags              &= ~( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
+		chunk_value->flags              &= ~( LIBEWF_CHUNK_VALUE_FLAG_TAINTED | LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED ) ;
 	}
 	return( 1 );
 }
@@ -1860,7 +1958,7 @@ int libewf_offset_table_compare_last_offset(
 			 && ( mismatch == 1 ) )
 			{
 				chunk_value->size   = (size_t) chunk_size;
-				chunk_value->flags &= ~( LIBEWF_CHUNK_VALUE_FLAGS_TAINTED | LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED ) ;
+				chunk_value->flags &= ~( LIBEWF_CHUNK_VALUE_FLAG_TAINTED | LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED ) ;
 			}
 			offset_table->last_chunk_value_compared++;
 

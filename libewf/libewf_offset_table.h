@@ -65,6 +65,11 @@ int libewf_offset_table_free(
      libewf_offset_table_t **offset_table,
      liberror_error_t **error );
 
+int libewf_offset_table_clone(
+     libewf_offset_table_t **destination_offset_table,
+     libewf_offset_table_t *source_offset_table,
+     liberror_error_t **error );
+
 int libewf_offset_table_resize(
      libewf_offset_table_t *offset_table,
      uint32_t number_of_chunk_values,

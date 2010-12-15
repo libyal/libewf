@@ -41,13 +41,35 @@
 extern "C" {
 #endif
 
+enum INFO_HANDLE_OUTPUT_FORMAT_TYPES
+{
+	INFO_HANDLE_OUTPUT_FORMAT_TEXT		= (uint8_t) 't',
+	INFO_HANDLE_OUTPUT_FORMAT_DFXML		= (uint8_t) 'x'
+};
+
 typedef struct info_handle info_handle_t;
 
 struct info_handle
 {
+	/* The output format
+	 */
+	uint8_t output_format;
+
+	/* The date format
+	 */
+	uint8_t date_format;
+
+	/* The header codepage
+	 */
+	int header_codepage;
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
+
+	/* The nofication output stream
+	 */
+	FILE *notify_stream;
 };
 
 int info_handle_initialize(
@@ -72,53 +94,135 @@ int info_handle_close(
      info_handle_t *info_handle,
      liberror_error_t **error );
 
+int info_handle_set_output_format(
+     info_handle_t *info_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int info_handle_set_date_format(
+     info_handle_t *info_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
 int info_handle_set_header_codepage(
      info_handle_t *info_handle,
-     int header_codepage,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int info_handle_section_header_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     liberror_error_t **error );
+
+int info_handle_section_footer_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     liberror_error_t **error );
+
+int info_handle_section_value_string_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     size_t identifier_length,
+     const char *description,
+     size_t description_length,
+     const libcstring_system_character_t *value_string,
+     liberror_error_t **error );
+
+int info_handle_section_value_32bit_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     uint32_t value_32bit,
+     liberror_error_t **error );
+
+int info_handle_section_value_64bit_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     uint64_t value_64bit,
+     liberror_error_t **error );
+
+int info_handle_section_value_size_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     size64_t value_size,
+     liberror_error_t **error );
+
+int info_handle_header_value_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     size_t identifier_length,
+     const char *description,
+     size_t description_length,
      liberror_error_t **error );
 
 int info_handle_header_values_fprint(
      info_handle_t *info_handle,
-     uint8_t date_format,
-     FILE *stream,
+     liberror_error_t **error );
+
+int info_handle_header_value_password_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error );
+
+int info_handle_header_value_compression_level_fprint(
+     info_handle_t *info_handle,
      liberror_error_t **error );
 
 int info_handle_header_value_extents_fprint(
-     libcstring_system_character_t *header_value,
-     size_t header_value_length,
-     FILE *stream,
+     info_handle_t *info_handle,
      liberror_error_t **error );
 
 int info_handle_media_information_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
+     liberror_error_t **error );
+
+int info_handle_hash_value_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     size_t identifier_length,
      liberror_error_t **error );
 
 int info_handle_hash_values_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error );
 
 int info_handle_acquiry_errors_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error );
 
 int info_handle_sessions_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error );
 
 int info_handle_single_files_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error );
 
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
-     FILE *stream,
      int level,
+     liberror_error_t **error );
+
+int info_handle_dfxml_header_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error );
+
+int info_handle_dfxml_build_environment_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error );
+
+int info_handle_dfxml_execution_environment_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error );
+
+int info_handle_dfxml_footer_fprint(
+     info_handle_t *info_handle,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

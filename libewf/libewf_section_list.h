@@ -63,6 +63,11 @@ int libewf_section_list_values_free(
      intptr_t *section_list_values,
      liberror_error_t **error );
 
+int libewf_section_list_values_clone(
+     intptr_t **destination_section_list_values,
+     intptr_t *source_section_list_values,
+     liberror_error_t **error );
+
 int libewf_section_list_append(
      libewf_list_t *section_list,
      uint8_t *type,

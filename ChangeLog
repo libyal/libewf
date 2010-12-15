@@ -1,10 +1,8 @@
 TODO
-* clean up
-  - include header continue LIBEWF_EXTERN
-  - libewf allocate structure and goto
 * clean up of ewftools
-  - apply xml patch for ewftools (Simson)
+  - apply xml patch for ewftools (Simson) (partial)
   - ewfacquire: make behaviour of -g equal to user input ?
+  - move dfxml code to separate code files
 
 * check TODO in code, mainly regarding improvements
 
@@ -236,9 +234,19 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20101215
+* worked on implementing DFXML patch by S. Garfinkel
+* removed parsing of system_date from xheader
+
+20101214
+* code clean up in libewf and ewftools
+* updated libbfio, array type, list type, sector list
+* worked on clone handle
+* worked on implementing DFXML patch by S. Garfinkel
+
 20101213
 * fixes for bugs and anoyances in ewftools
-* code clean up in ewfexport
+* code clean up in ewftools
 
 20101209
 * updated ewfacquire resume test to deal with missing truncate

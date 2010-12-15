@@ -61,6 +61,11 @@ int libewf_read_io_handle_free(
      libewf_read_io_handle_t **read_io_handle,
      liberror_error_t **error );
 
+int libewf_read_io_handle_clone(
+     libewf_read_io_handle_t **destination_read_io_handle,
+     libewf_read_io_handle_t *source_read_io_handle,
+     liberror_error_t **error );
+
 ssize_t libewf_read_io_handle_process_chunk(
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,

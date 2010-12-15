@@ -27,6 +27,10 @@
 #include <libcstring.h>
 #include <liberror.h>
 
+#if defined( HAVE_SYS_UTSNAME_H )
+#include <sys/utsname.h>
+#endif
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
@@ -40,11 +44,13 @@
 
 #include "byte_size_string.h"
 #include "digest_hash.h"
+#include "ewfinput.h"
 #include "guid.h"
 #include "info_handle.h"
 
 #define INFO_HANDLE_VALUE_SIZE			512
 #define INFO_HANDLE_VALUE_IDENTIFIER_SIZE	64
+#define INFO_HANDLE_NOTIFY_STREAM		stdout
 
 #if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
@@ -72,8 +78,8 @@ int info_handle_initialize(
 	}
 	if( *info_handle == NULL )
 	{
-		*info_handle = (info_handle_t *) memory_allocate(
-		                                  sizeof( info_handle_t ) );
+		*info_handle = memory_allocate_structure(
+		                info_handle_t );
 
 		if( *info_handle == NULL )
 		{
@@ -84,7 +90,7 @@ int info_handle_initialize(
 			 "%s: unable to create info handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *info_handle,
@@ -98,12 +104,7 @@ int info_handle_initialize(
 			 "%s: unable to clear info handle.",
 			 function );
 
-			memory_free(
-			 *info_handle );
-
-			*info_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_handle_initialize(
 		     &( ( *info_handle )->input_handle ),
@@ -116,15 +117,24 @@ int info_handle_initialize(
 			 "%s: unable to initialize input handle.",
 			 function );
 
-			memory_free(
-			 *info_handle );
-
-			*info_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
+		( *info_handle )->output_format   = INFO_HANDLE_OUTPUT_FORMAT_TEXT;
+		( *info_handle )->date_format     = LIBEWF_DATE_FORMAT_CTIME;
+		( *info_handle )->header_codepage = LIBEWF_CODEPAGE_ASCII;
+		( *info_handle )->notify_stream   = INFO_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
+
+on_error:
+	if( *info_handle != NULL )
+	{
+		memory_free(
+		 *info_handle );
+
+		*info_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the info handle and its elements
@@ -223,6 +233,7 @@ int info_handle_open_input(
 	libcstring_system_character_t **libewf_filenames = NULL;
 	static char *function                            = "info_handle_open_input";
 	size_t first_filename_length                     = 0;
+	int filename_index                               = 0;
 
 	if( info_handle == NULL )
 	{
@@ -298,7 +309,7 @@ int info_handle_open_input(
 			 "%s: unable to resolve filename(s).",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		filenames = (libcstring_system_character_t * const *) libewf_filenames;
 	}
@@ -325,21 +336,43 @@ int info_handle_open_input(
 		 "%s: unable to open file(s).",
 		 function );
 
-		if( libewf_filenames != NULL )
+		goto on_error;
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t<image_filenames>\n" );
+
+		for( filename_index = 0;
+		     filename_index < number_of_filenames;
+		     filename_index++ )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			libewf_glob_wide_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#else
-			libewf_glob_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#endif
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t\t<image_filename>%" PRIs_LIBCSTRING_SYSTEM "</image_filename>\n",
+			 filenames[ filename_index ] );
 		}
-		return( -1 );
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t</image_filenames>\n" );
+	}
+	if( info_handle->header_codepage != LIBEWF_CODEPAGE_ASCII )
+	{
+		if( libewf_handle_set_header_codepage(
+		     info_handle->input_handle,
+		     info_handle->header_codepage,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header codepage.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( libewf_filenames != NULL )
 	{
@@ -364,8 +397,26 @@ int info_handle_open_input(
 
 			return( -1 );
 		}
+		libewf_filenames = NULL;
 	}
 	return( 1 );
+
+on_error:
+	if( libewf_filenames != NULL )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
+	}
+	return( -1 );
 }
 
 /* Closes the info handle
@@ -415,15 +466,17 @@ int info_handle_close(
 	return( 0 );
 }
 
-/* Sets the header codepage
+/* Sets the output format
  * Returns 1 if successful or -1 on error
  */
-int info_handle_set_header_codepage(
+int info_handle_set_output_format(
      info_handle_t *info_handle,
-     int header_codepage,
+     const libcstring_system_character_t *string,
      liberror_error_t **error )
 {
-	static char *function = "info_handle_set_header_codepage";
+	static char *function = "info_handle_set_output_format";
+	size_t string_length  = 0;
+	int result            = 0;
 
 	if( info_handle == NULL )
 	{
@@ -436,53 +489,666 @@ int info_handle_set_header_codepage(
 
 		return( -1 );
 	}
-	if( info_handle->input_handle == NULL )
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 4 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "text" ),
+		     4 ) == 0 )
+		{
+			info_handle->output_format = INFO_HANDLE_OUTPUT_FORMAT_TEXT;
+			result                     = 1;
+		}
+	}
+	else if( string_length == 5 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "dfxml" ),
+		     5 ) == 0 )
+		{
+			info_handle->output_format = INFO_HANDLE_OUTPUT_FORMAT_DFXML;
+			info_handle->date_format   = LIBEWF_DATE_FORMAT_ISO8601;
+			result                     = 1;
+		}
+	}
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid info handle - missing input handle.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine output format.",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_handle_set_header_codepage(
-	     info_handle->input_handle,
-	     header_codepage,
-	     error ) != 1 )
+	return( result );
+}
+
+/* Sets the date format
+ * Returns 1 if successful, 0 if unsupported values or -1 on error
+ */
+int info_handle_set_date_format(
+     info_handle_t *info_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_set_date_format";
+	size_t string_length  = 0;
+	int result            = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 2 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "dm" ),
+		     2 ) == 0 )
+		{
+			info_handle->date_format = LIBEWF_DATE_FORMAT_DAYMONTH;
+			result                   = 1;
+		}
+		else if( libcstring_system_string_compare(
+			  string,
+			  _LIBCSTRING_SYSTEM_STRING( "md" ),
+			  3 ) == 0 )
+		{
+			info_handle->date_format = LIBEWF_DATE_FORMAT_MONTHDAY;
+			result                   = 1;
+		}
+	}
+	else if( string_length == 5 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "ctime" ),
+		     5 ) == 0 )
+		{
+			info_handle->date_format = LIBEWF_DATE_FORMAT_CTIME;
+			result                   = 1;
+		}
+	}
+	else if( string_length == 7 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "iso8601" ),
+		     7 ) == 0 )
+		{
+			info_handle->date_format = LIBEWF_DATE_FORMAT_ISO8601;
+			result                   = 1;
+		}
+	}
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header codepage.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine date format.",
 		 function );
 
 		return( -1 );
+	}
+	return( result );
+}
+
+/* Sets the header codepage
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_set_header_codepage(
+     info_handle_t *info_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_set_header_codepage";
+	int result            = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_header_codepage(
+	          string,
+	          &( info_handle->header_codepage ),
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine header codepage.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( info_handle->input_handle != NULL )
+		{
+			if( libewf_handle_set_header_codepage(
+			     info_handle->input_handle,
+			     info_handle->header_codepage,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set header codepage.",
+				 function );
+
+				return( -1 );
+			}
+		}
+	}
+	return( result );
+}
+
+/* Prints a section header to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_section_header_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_section_header_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t<%s>\n",
+		 identifier );
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "%s\n",
+		 description );
 	}
 	return( 1 );
 }
 
-/* Print the header values to a stream
+/* Prints a section footer to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_section_footer_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_section_footer_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t</%s>\n",
+		 identifier );
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
+	}
+	return( 1 );
+}
+
+/* Prints a section value string to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_section_value_string_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     size_t identifier_length,
+     const char *description,
+     size_t description_length,
+     const libcstring_system_character_t *value_string,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_section_value_string_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		if( identifier_length == 12 )
+		{
+			if( libcstring_narrow_string_compare(
+			     identifier,
+			     "acquiry_date",
+			     12 ) == 0 )
+			{
+				identifier = "acquisition_date";
+			}
+		}
+		else if( identifier_length == 16 )
+		{
+			if( libcstring_narrow_string_compare(
+			     identifier,
+			     "acquiry_software",
+			     16 ) == 0 )
+			{
+				identifier = "acquisition_software";
+			}
+		}
+		else if( identifier_length == 24 )
+		{
+			if( libcstring_narrow_string_compare(
+			     identifier,
+			     "acquiry_operating_system",
+			     24 ) == 0 )
+			{
+				identifier = "acquisition_system";
+			}
+			else if( libcstring_narrow_string_compare(
+			          identifier,
+			          "acquiry_software_version",
+			          24 ) == 0 )
+			{
+				identifier = "acquisition_version";
+			}
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<%s>%" PRIs_LIBCSTRING_SYSTEM "</%s>\n",
+		 identifier,
+		 value_string,
+		 identifier );
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t%s:",
+		 description );
+
+		description_length += 1;
+
+		while( description_length < 24 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t" );
+
+			description_length += 8;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 value_string );
+	}
+	return( 1 );
+}
+
+/* Prints a section 32-bit value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_section_value_32bit_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     uint32_t value_32bit,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_section_value_32bit_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<%s>%" PRIu32 "</%s>\n",
+		 identifier,
+		 value_32bit,
+		 identifier );
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t%s:",
+		 description );
+
+		description_length += 1;
+
+		while( description_length < 24 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t" );
+
+			description_length += 8;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIu32 "\n",
+		 value_32bit );
+	}
+	return( 1 );
+}
+
+/* Prints a section 64-bit value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_section_value_64bit_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     uint64_t value_64bit,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_section_value_64bit_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<%s>%" PRIu64 "</%s>\n",
+		 identifier,
+		 value_64bit,
+		 identifier );
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t%s:",
+		 description );
+
+		description_length += 1;
+
+		while( description_length < 24 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t" );
+
+			description_length += 8;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIu64 "\n",
+		 value_64bit );
+	}
+	return( 1 );
+}
+
+/* Prints a section 64-bit size value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_section_value_size_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     size64_t value_size,
+     liberror_error_t **error )
+{
+        libcstring_system_character_t value_size_string[ 16 ];
+
+	static char *function = "info_handle_section_value_size_fprint";
+	int result            = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = byte_size_string_create(
+	          value_size_string,
+	          16,
+	          value_size,
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	          NULL );
+
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		if( result == 1 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t\t<%s>%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)</%s>\n",
+			 identifier,
+			 value_size_string,
+			 value_size,
+			 identifier );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t\t<%s>%" PRIu64 " bytes</%s>\n",
+			 identifier,
+			 value_size,
+			 identifier );
+		}
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t%s:",
+		 description );
+
+		description_length += 1;
+
+		while( description_length < 24 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t" );
+
+			description_length += 8;
+		}
+		if( result == 1 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
+			 value_size_string,
+			 value_size );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "%" PRIu64 " bytes\n",
+			 value_size );
+		}
+	}
+	return( 1 );
+}
+
+/* Prints a header value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_header_value_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     size_t identifier_length,
+     const char *description,
+     size_t description_length,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
+
+	static char *function    = "info_handle_header_value_fprint";
+	size_t header_value_size = INFO_HANDLE_VALUE_SIZE;
+	int result               = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) identifier,
+	          identifier_length,
+	          (uint16_t *) header_value,
+	          header_value_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) identifier,
+	          identifier_length,
+	          (uint8_t *) header_value,
+	          header_value_size,
+	          error );
+#endif
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: %s.",
+		 function,
+		 identifier );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( info_handle_section_value_string_fprint(
+		     info_handle,
+		     identifier,
+		     identifier_length,
+		     description,
+		     description_length,
+		     header_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section value string: %s.",
+			 function,
+			 identifier );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Prints the header values to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_header_values_fprint(
      info_handle_t *info_handle,
-     uint8_t date_format,
-     FILE *stream,
      liberror_error_t **error )
 {
 	char header_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
-	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
+	const char *description             = NULL;
 	static char *function               = "info_handle_header_values_fprint";
+	size_t description_length           = 0;
 	size_t header_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
-	size_t header_value_length          = 0;
-	size_t header_value_size            = INFO_HANDLE_VALUE_SIZE;
 	uint32_t header_value_iterator      = 0;
 	uint32_t number_of_values           = 0;
-	int header_value_result             = 0;
 	int result                          = 1;
 
 	if( info_handle == NULL )
@@ -507,35 +1173,9 @@ int info_handle_header_values_fprint(
 
 		return( -1 );
 	}
-	if( stream == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
-	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
-	 && ( date_format != LIBEWF_DATE_FORMAT_CTIME )
-	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported date format: 0x%02" PRIx8 ".",
-		 function,
-		 date_format );
-
-		return( -1 );
-	}
 	if( libewf_handle_set_header_values_date_format(
 	     info_handle->input_handle,
-	     date_format,
+	     info_handle->date_format,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -561,729 +1201,320 @@ int info_handle_header_values_fprint(
 
 		return( -1 );
 	}
-	fprintf(
-	 stream,
-	 "Acquiry information\n" );
+	if( info_handle_section_header_fprint(
+	     info_handle,
+	     "acquiry_information",
+	     "Acquiry information",
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section header: acquiry_information.",
+		 function );
 
+		result = -1;
+	}
 	if( number_of_values == 0 )
 	{
-		fprintf(
-		 stream,
-		 "\tNo information found in file.\n" );
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tNo information found in file.\n" );
+		}
 	}
 	else
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "case_number",
-		                       11,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "case_number",
-		                       11,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-
-		if( header_value_result == -1 )
+		for( header_value_iterator = 0;
+		     header_value_iterator < number_of_values;
+		     header_value_iterator++ )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: case_number.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tCase number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "description",
-		                       11,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "description",
-		                       11,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: description.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tDescription:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "examiner_name",
-		                       13,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "examiner_name",
-		                       13,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: examiner_name.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tExaminer name:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "evidence_number",
-		                       15,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "evidence_number",
-		                       15,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: evidence_number.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tEvidence number:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "notes",
-		                       5,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "notes",
-		                       5,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: notes.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tNotes:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "acquiry_date",
-		                       12,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "acquiry_date",
-		                       12,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: acquiry_date.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tAcquiry date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "system_date",
-		                       11,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "system_date",
-		                       11,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: system_date.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tSystem date:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "acquiry_operating_system",
-		                       24,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "acquiry_operating_system",
-		                       24,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: acquiry_operating_system.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tOperating system used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "acquiry_software_version",
-		                       24,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "acquiry_software_version",
-		                       24,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: acquiry_software_version.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tSoftware version used:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "password",
-		                       8,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "password",
-		                       8,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if(  header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: password.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tPassword:\t\t(hash: %" PRIs_LIBCSTRING_SYSTEM ")\n",
-			 header_value );
-		}
-		else if( header_value_result == 0 )
-		{
-			fprintf(
-			 stream,
-			 "\tPassword:\t\tN/A\n" );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "compression_level",
-		                       16,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "compression_level",
-		                       16,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: compression_level.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tCompression level:\t" );
-
-			if( libcstring_system_string_compare(
-			     header_value,
-			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_NONE ),
-			     1 ) == 0 )
-			{
-				fprintf(
-				 stream,
-				 "no compression\n" );
-			}
-			else if( libcstring_system_string_compare(
-				  header_value,
-				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_FAST ),
-				  1 ) == 0 )
-			{
-				fprintf(
-				 stream,
-				 "good (fast) compression\n" );
-			}
-			else if( libcstring_system_string_compare(
-				  header_value,
-				  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_BEST ),
-				  1 ) == 0 )
-			{
-				fprintf(
-				 stream,
-				 "best compression\n" );
-			}
-			else
-			{
-				fprintf(
-				 stream,
-				 "unknown compression\n" );
-			}
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "model",
-		                       5,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "model",
-		                       5,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: model.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tModel:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "serial_number",
-		                       13,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "serial_number",
-		                       13,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: serial_number.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tSerial number:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "process_identifier",
-		                       18,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "process_identifier",
-		                       18,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: process_identifier.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tProcess identifier:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-		/* TODO figure out what this value represents
-		 */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "unknown_dc",
-		                       10,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "unknown_dc",
-		                       10,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: unknown_dc.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tUnknown value dc:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 header_value );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		header_value_result = libewf_handle_get_utf16_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "extents",
-		                       7,
-		                       (uint16_t *) header_value,
-		                       header_value_size,
-		                       error );
-#else
-		header_value_result = libewf_handle_get_utf8_header_value(
-		                       info_handle->input_handle,
-		                       (uint8_t *) "extents",
-		                       7,
-		                       (uint8_t *) header_value,
-		                       header_value_size,
-		                       error );
-#endif
-		if( header_value_result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: extents.",
-			 function );
-
-			result = -1;
-		}
-		else if( header_value_result == 1 )
-		{
-			header_value_length = libcstring_system_string_length(
-			                       header_value );
-
-			if( info_handle_header_value_extents_fprint(
-			     header_value,
-			     header_value_length,
-			     stream,
+			if( libewf_handle_get_header_value_identifier_size(
+			     info_handle->input_handle,
+			     header_value_iterator,
+			     &header_value_identifier_size,
 			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print header value: extents.",
-				 function );
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve the header identifier size for index: %" PRIu32 ".",
+				 function,
+				 header_value_iterator );
 
 				result = -1;
+
+				continue;
 			}
-		}
-		/* Currently there are 16 default values
-		 */
-		if( number_of_values > 16 )
-		{
-			fprintf(
-			 stream,
-			 "\n\tAdditional values:\n" );
-
-			for( header_value_iterator = 16;
-			     header_value_iterator < number_of_values;
-			     header_value_iterator++ )
+			if( header_value_identifier_size > INFO_HANDLE_VALUE_IDENTIFIER_SIZE )
 			{
-				if( libewf_handle_get_header_value_identifier_size(
-				     info_handle->input_handle,
-				     header_value_iterator,
-				     &header_value_identifier_size,
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: header identifier size value out of bounds for index: %" PRIu32 ".",
+				 function,
+				 header_value_iterator );
+
+				result = -1;
+
+				continue;
+			}
+			if( libewf_handle_get_header_value_identifier(
+			     info_handle->input_handle,
+			     header_value_iterator,
+			     (uint8_t *) header_value_identifier,
+			     header_value_identifier_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve the header identifier for index: %" PRIu32 ".",
+				 function,
+				 header_value_iterator );
+
+				result = -1;
+
+				continue;
+			}
+			description        = NULL;
+			description_length = 0;
+
+			if( header_value_identifier_size == 6 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "model",
+				     5 ) == 0 )
+				{
+					description        = "Model";
+					description_length = 5;
+				}
+				else if( libcstring_narrow_string_compare(
+					  header_value_identifier,
+					  "notes",
+					  5 ) == 0 )
+				{
+					description        = "Notes";
+					description_length = 5;
+				}
+			}
+			else if( header_value_identifier_size == 11 )
+			{
+				/* TODO figure out what this value represents
+				 */
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "unknown_dc",
+				     10 ) == 0 )
+				{
+					description        = "Unknown value dc";
+					description_length = 16;
+				}
+			}
+			else if( header_value_identifier_size == 12 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "case_number",
+				     11 ) == 0 )
+				{
+					description        = "Case number";
+					description_length = 11;
+				}
+				else if( libcstring_narrow_string_compare(
+					  header_value_identifier,
+					  "description",
+					  11 ) == 0 )
+				{
+					description        = "Description";
+					description_length = 11;
+				}
+				else if( libcstring_narrow_string_compare(
+					  header_value_identifier,
+					  "system_date",
+					  11 ) == 0 )
+				{
+					description        = "System date";
+					description_length = 11;
+				}
+			}
+			else if( header_value_identifier_size == 13 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "acquiry_date",
+				     12 ) == 0 )
+				{
+					description        = "Acquisition date";
+					description_length = 16;
+				}
+			}
+			else if( header_value_identifier_size == 14 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "examiner_name",
+				     13 ) == 0 )
+				{
+					description        = "Examiner name";
+					description_length = 13;
+				}
+				else if( libcstring_narrow_string_compare(
+					  header_value_identifier,
+					  "serial_number",
+					  13 ) == 0 )
+				{
+					description        = "Serial number";
+					description_length = 13;
+				}
+			}
+			else if( header_value_identifier_size == 16 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "evidence_number",
+				     15 ) == 0 )
+				{
+					description        = "Evidence number";
+					description_length = 15;
+				}
+			}
+			else if( header_value_identifier_size == 17 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "acquiry_software",
+				     16 ) == 0 )
+				{
+					description        = "Software used";
+					description_length = 13;
+				}
+			}
+			else if( header_value_identifier_size == 19 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "process_identifier",
+				     18 ) == 0 )
+				{
+					description        = "Process identifier";
+					description_length = 18;
+				}
+			}
+			else if( header_value_identifier_size == 25 )
+			{
+				if( libcstring_narrow_string_compare(
+				     header_value_identifier,
+				     "acquiry_operating_system",
+				     24 ) == 0 )
+				{
+					description        = "Operating system used";
+					description_length = 21;
+				}
+				else if( libcstring_narrow_string_compare(
+					  header_value_identifier,
+					  "acquiry_software_version",
+					  24 ) == 0 )
+				{
+					description        = "Software version used";
+					description_length = 21;
+				}
+			}
+			if( description == NULL )
+			{
+				if( header_value_identifier_size == 8 )
+				{
+					if( libcstring_narrow_string_compare(
+					     header_value_identifier,
+					     "extents",
+					     7 ) == 0 )
+					{
+						if( info_handle_header_value_extents_fprint(
+						     info_handle,
+						     error ) != 1 )
+						{
+							liberror_error_set(
+							 error,
+							 LIBERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+							 "%s: unable to print header value: extents.",
+							 function );
+
+							result = -1;
+						}
+					}
+				}
+				else if( header_value_identifier_size == 9 )
+				{
+					if( libcstring_narrow_string_compare(
+					     header_value_identifier,
+					     "password",
+					     8 ) == 0 )
+					{
+						if( info_handle_header_value_password_fprint(
+						     info_handle,
+						     error ) != 1 )
+						{
+							liberror_error_set(
+							 error,
+							 LIBERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+							 "%s: unable to print header value: password.",
+							 function );
+
+							result = -1;
+						}
+					}
+				}
+				else if( header_value_identifier_size == 18 )
+				{
+					if( libcstring_narrow_string_compare(
+					     header_value_identifier,
+					     "compression_level",
+					     17 ) == 0 )
+					{
+						if( info_handle_header_value_compression_level_fprint(
+						     info_handle,
+						     error ) != 1 )
+						{
+							liberror_error_set(
+							 error,
+							 LIBERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+							 "%s: unable to print header value: compression_level.",
+							 function );
+
+							result = -1;
+						}
+					}
+				}
+				else
+				{
+					description        = header_value_identifier;
+					description_length = header_value_identifier_size - 1;
+				}
+			}
+			if( description != NULL )
+			{
+				if( info_handle_header_value_fprint(
+				     info_handle,
+				     header_value_identifier,
+				     header_value_identifier_size - 1,
+				     description,
+				     description_length,
 				     error ) != 1 )
 				{
 					liberror_error_set(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve the header identifier size for index: %" PRIu32 ".",
-					 function,
-					 header_value_iterator );
-
-					result = -1;
-
-					continue;
-				}
-				if( header_value_identifier_size > INFO_HANDLE_VALUE_IDENTIFIER_SIZE )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: header identifier size value out of bounds for index: %" PRIu32 ".",
-					 function,
-					 header_value_iterator );
-
-					result = -1;
-
-					continue;
-				}
-				if( libewf_handle_get_header_value_identifier(
-				     info_handle->input_handle,
-				     header_value_iterator,
-				     (uint8_t *) header_value_identifier,
-				     header_value_identifier_size,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve the header identifier for index: %" PRIu32 ".",
-					 function,
-					 header_value_iterator );
-
-					result = -1;
-
-					continue;
-				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				header_value_result = libewf_handle_get_utf16_header_value(
-				                       info_handle->input_handle,
-				                       (uint8_t *) header_value_identifier,
-				                       header_value_identifier_size - 1,
-				                       (uint16_t *) header_value,
-				                       header_value_size,
-				                       error );
-#else
-				header_value_result = libewf_handle_get_utf8_header_value(
-				                       info_handle->input_handle,
-				                       (uint8_t *) header_value_identifier,
-				                       header_value_identifier_size - 1,
-				                       (uint8_t *) header_value,
-				                       header_value_size,
-				                       error );
-#endif
-				if( header_value_result == 1 )
-				{
-					fprintf(
-					 stream,
-					 "\t%s: %" PRIs_LIBCSTRING_SYSTEM "\n",
-					 header_value_identifier,
-					 header_value );
-				}
-				else if( header_value_result == -1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve the header value for identifier: %s.",
+					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print header value: %s.",
 					 function,
 					 header_value_identifier );
 
@@ -1292,126 +1523,397 @@ int info_handle_header_values_fprint(
 			}
 		}
 	}
-	fprintf(
-	 stream,
-	 "\n" );
+	if( info_handle_section_footer_fprint(
+	     info_handle,
+	     "acquiry_information",
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section footer: acquiry_information.",
+		 function );
 
+		result = -1;
+	}
 	return( result );
 }
 
-/* Print the extents header values to a stream
+/* Prints the password header value to a stream
  * Returns 1 if successful or -1 on error
  */
-int info_handle_header_value_extents_fprint(
-     libcstring_system_character_t *header_value,
-     size_t header_value_length,
-     FILE *stream,
+int info_handle_header_value_password_fprint(
+     info_handle_t *info_handle,
      liberror_error_t **error )
 {
-	libsystem_split_values_t *extents_elements = NULL;
-	static char *function                      = "info_handle_header_value_extents_fprint";
-	int extents_element_iterator               = 0;
+	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
-	if( stream == NULL )
+	static char *function    = "info_handle_header_value_password_fprint";
+	size_t header_value_size = INFO_HANDLE_VALUE_SIZE;
+	int result               = 0;
+
+	if( info_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
+		 "%s: invalid info handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( libsystem_split_values_parse_string(
-	     &extents_elements,
-	     header_value,
-	     header_value_length,
-	     (libcstring_system_character_t) ' ',
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) "password",
+	          8,
+	          (uint16_t *) header_value,
+	          header_value_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) "password",
+	          8,
+	          (uint8_t *) header_value,
+	          header_value_size,
+	          error );
+#endif
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split header value into elements.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: password.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( extents_elements->number_of_values % 4 ) != 1 )
+	else if( result == 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported number of extents elements in header value.",
-		 function );
-
-		libsystem_split_values_free(
-		 &extents_elements,
-		 NULL );
-
-		return( -1 );
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tPassword:\t\tN/A\n" );
+		}
 	}
-	fprintf(
-	 stream,
-	 "\tExtents:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-	 extents_elements->values[ 0 ] );
-
-	for( extents_element_iterator = 1;
-	     extents_element_iterator < extents_elements->number_of_values;
-	     extents_element_iterator += 4 )
+	else
 	{
-		fprintf(
-		 stream,
-		 "\t\t\t\t%" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM "\n",
-		 extents_elements->values[ extents_element_iterator ],
-		 extents_elements->values[ extents_element_iterator + 1 ],
-		 extents_elements->values[ extents_element_iterator + 2 ],
-		 extents_elements->values[ extents_element_iterator + 3 ] );
-	}
-	if( libsystem_split_values_free(
-	     &extents_elements,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split date time elements.",
-		 function );
-
-		return( -1 );
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t\t<password>%" PRIs_LIBCSTRING_SYSTEM "</password>\n",
+			 header_value );
+		}
+		else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tPassword:\t\t(hash: %" PRIs_LIBCSTRING_SYSTEM ")\n",
+			 header_value );
+		}
 	}
 	return( 1 );
 }
 
-/* Print the media information to a stream
+/* Prints the compression level header value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_header_value_compression_level_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
+
+	const libcstring_system_character_t *value_string = NULL;
+	static char *function                             = "info_handle_header_value_compression_level_fprint";
+	size_t header_value_size                          = INFO_HANDLE_VALUE_SIZE;
+	int result                                        = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) "compression_level",
+	          16,
+	          (uint16_t *) header_value,
+	          header_value_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) "compression_level",
+	          16,
+	          (uint8_t *) header_value,
+	          header_value_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: compression_level.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( libcstring_system_string_compare(
+		     header_value,
+		     _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_NONE ),
+		     1 ) == 0 )
+		{
+			value_string = _LIBCSTRING_SYSTEM_STRING( "no compression" );
+		}
+		else if( libcstring_system_string_compare(
+			  header_value,
+			  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_FAST ),
+			  1 ) == 0 )
+		{
+			value_string = _LIBCSTRING_SYSTEM_STRING( "good (fast) compression" );
+		}
+		else if( libcstring_system_string_compare(
+			  header_value,
+			  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_BEST ),
+			  1 ) == 0 )
+		{
+			value_string = _LIBCSTRING_SYSTEM_STRING( "best compression" );
+		}
+		else
+		{
+			value_string = _LIBCSTRING_SYSTEM_STRING( "unknown compression" );
+		}
+		if( info_handle_section_value_string_fprint(
+		     info_handle,
+		     "compression_level",
+		     16,
+		     "Compression level",
+		     16,
+		     value_string,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section value string: compression_level.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Prints the extents header value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_header_value_extents_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
+
+	libsystem_split_values_t *extents_elements = NULL;
+	static char *function                      = "info_handle_header_value_extents_fprint";
+	size_t header_value_length                 = 0;
+	size_t header_value_size                   = INFO_HANDLE_VALUE_SIZE;
+	int extents_element_iterator               = 0;
+	int result                                 = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) "extents",
+	          7,
+	          (uint16_t *) header_value,
+	          header_value_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_header_value(
+	          info_handle->input_handle,
+	          (uint8_t *) "extents",
+	          7,
+	          (uint8_t *) header_value,
+	          header_value_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: extents.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		/* Want the effective length of the string
+		 */
+		header_value_length = libcstring_system_string_length(
+		                       header_value );
+
+		if( libsystem_split_values_parse_string(
+		     &extents_elements,
+		     header_value,
+		     header_value_length,
+		     (libcstring_system_character_t) ' ',
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to split header value into elements.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( extents_elements->number_of_values % 4 ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported number of extents elements in header value.",
+			 function );
+
+			goto on_error;
+		}
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tExtents:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 extents_elements->values[ 0 ] );
+		}
+
+		if( extents_elements->number_of_values > 1 )
+		{
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\t\t<extents>\n" );
+			}
+			for( extents_element_iterator = 1;
+			     extents_element_iterator < extents_elements->number_of_values;
+			     extents_element_iterator += 4 )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\t\t\t" );
+
+				if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+				{
+					fprintf(
+					 info_handle->notify_stream,
+					 "<extent>" );
+				}
+				fprintf(
+				 info_handle->notify_stream,
+				 "%" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM "",
+				 extents_elements->values[ extents_element_iterator ],
+				 extents_elements->values[ extents_element_iterator + 1 ],
+				 extents_elements->values[ extents_element_iterator + 2 ],
+				 extents_elements->values[ extents_element_iterator + 3 ] );
+
+				if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+				{
+					fprintf(
+					 info_handle->notify_stream,
+					 "</extent>" );
+				}
+				fprintf(
+				 info_handle->notify_stream,
+				 "\n" );
+			}
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\t\t</extents>\n" );
+			}
+		}
+		if( libsystem_split_values_free(
+		     &extents_elements,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free split date time elements.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( extents_elements != NULL )
+	{
+		libsystem_split_values_free(
+		 &extents_elements,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Prints the media information to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_media_information_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error )
 {
-        libcstring_system_character_t media_size_string[ 16 ];
         libcstring_system_character_t guid_string[ GUID_STRING_SIZE ];
         uint8_t guid[ GUID_SIZE ];
 
-	char *format_string        = NULL;
-	static char *function      = "info_handle_media_information_fprint";
-	size64_t media_size        = 0;
-	uint64_t number_of_sectors = 0;
-	uint32_t bytes_per_sector  = 0;
-	uint32_t error_granularity = 0;
-	uint32_t sectors_per_chunk = 0;
-	uint8_t compression_flags  = 0;
-	uint8_t media_type         = 0;
-	uint8_t media_flags        = 0;
-	uint8_t format             = 0;
-	int8_t compression_level   = 0;
-	int result                 = 1;
+	const libcstring_system_character_t *value_string = NULL;
+	static char *function                             = "info_handle_media_information_fprint";
+	size64_t media_size                               = 0;
+	uint64_t value_64bit                              = 0;
+	uint32_t value_32bit                              = 0;
+	uint8_t compression_flags                         = 0;
+	uint8_t media_type                                = 0;
+	uint8_t media_flags                               = 0;
+	uint8_t format                                    = 0;
+	int8_t compression_level                          = 0;
+	int result                                        = 1;
 
 	if( info_handle == NULL )
 	{
@@ -1435,21 +1937,21 @@ int info_handle_media_information_fprint(
 
 		return( -1 );
 	}
-	if( stream == NULL )
+	if( info_handle_section_header_fprint(
+	     info_handle,
+	     "ewf_information",
+	     "EWF information",
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section header: ewf_information.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	fprintf(
-	 stream,
-	 "EWF information\n" );
-
 	if( libewf_handle_get_format(
 	     info_handle->input_handle,
 	     &format,
@@ -1467,68 +1969,81 @@ int info_handle_media_information_fprint(
 	switch( format )
 	{
 		case LIBEWF_FORMAT_EWF:
-			format_string = "original EWF";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "original EWF" );
 			break;
 
 		case LIBEWF_FORMAT_SMART:
-			format_string = "SMART";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "SMART" );
 			break;
 
 		case LIBEWF_FORMAT_FTK:
-			format_string = "FTK Imager";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "FTK Imager" );
 			break;
 
 		case LIBEWF_FORMAT_ENCASE1:
-			format_string = "EnCase 1";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 1" );
 			break;
 
 		case LIBEWF_FORMAT_ENCASE2:
-			format_string = "EnCase 2";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 2" );
 			break;
 
 		case LIBEWF_FORMAT_ENCASE3:
-			format_string = "EnCase 3";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 3" );
 			break;
 
 		case LIBEWF_FORMAT_ENCASE4:
-			format_string = "EnCase 4";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 4" );
 			break;
 
 		case LIBEWF_FORMAT_ENCASE5:
-			format_string = "EnCase 5";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 5" );
 			break;
 
 		case LIBEWF_FORMAT_ENCASE6:
-			format_string = "EnCase 6";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 6" );
 			break;
 
 		case LIBEWF_FORMAT_LINEN5:
-			format_string = "linen 5";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 5" );
 			break;
 
 		case LIBEWF_FORMAT_LINEN6:
-			format_string = "linen 6";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 6" );
 			break;
 
 		case LIBEWF_FORMAT_EWFX:
-			format_string = "EWFX (extended EWF)";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EWFX (extended EWF)" );
 			break;
 
 		case LIBEWF_FORMAT_LVF:
-			format_string = "EnCase Logical File Evidence (LVF)";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase Logical File Evidence (LVF)" );
 			break;
 
 		case LIBEWF_FORMAT_UNKNOWN:
 		default:
-			format_string = "unknown";
+			value_string = _LIBCSTRING_SYSTEM_STRING( "unknown" );
 			break;
 
 	}
-	fprintf(
-	 stdout,
-	 "\tFile format:\t\t%s\n",
-	 format_string );
+	if( info_handle_section_value_string_fprint(
+	     info_handle,
+	     "file_format",
+	     11,
+	     "File format",
+	     11,
+	     value_string,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section value string: file_format.",
+		 function );
 
+		result = -1;
+	}
 	if( ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( format == LIBEWF_FORMAT_LINEN5 )
@@ -1537,15 +2052,8 @@ int info_handle_media_information_fprint(
 	{
 		if( libewf_handle_get_sectors_per_chunk(
 		     info_handle->input_handle,
-		     &sectors_per_chunk,
-		     error ) == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tSectors per chunk:\t%" PRIu32 "\n",
-			 sectors_per_chunk );
-		}
-		else
+		     &value_32bit,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1556,17 +2064,30 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
+		else
+		{
+			if( info_handle_section_value_32bit_fprint(
+			     info_handle,
+			     "sectors_per_chunk",
+			     "Sectors per chunk",
+			     16,
+			     value_32bit,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section 32-bit value: sectors_per_chunk.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( libewf_handle_get_error_granularity(
 		     info_handle->input_handle,
-		     &error_granularity,
-		     error ) == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tError granularity:\t%" PRIu32 "\n",
-			 error_granularity );
-		}
-		else
+		     &value_32bit,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1577,42 +2098,31 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
+		else
+		{
+			if( info_handle_section_value_32bit_fprint(
+			     info_handle,
+			     "error_granularity",
+			     "Error granularity",
+			     16,
+			     value_32bit,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section 32-bit value: error_granularity.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( libewf_handle_get_compression_values(
 		     info_handle->input_handle,
 		     &compression_level,
 		     &compression_flags,
-		     error ) == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tCompression level:\t" );
-
-			if( compression_level == LIBEWF_COMPRESSION_NONE )
-			{
-				fprintf(
-				 stream,
-				 "no compression\n" );
-			}
-			else if( compression_level == LIBEWF_COMPRESSION_FAST )
-			{
-				fprintf(
-				 stream,
-				 "good (fast) compression\n" );
-			}
-			else if( compression_level == LIBEWF_COMPRESSION_BEST )
-			{
-				fprintf(
-				 stream,
-				 "best compression\n" );
-			}
-			else
-			{
-				fprintf(
-				 stream,
-				 "unknown compression\n" );
-			}
-		}
-		else
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1622,6 +2132,43 @@ int info_handle_media_information_fprint(
 			 function );
 
 			result = -1;
+		}
+		else
+		{
+			if( compression_level == LIBEWF_COMPRESSION_NONE )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "no compression" );
+			}
+			else if( compression_level == LIBEWF_COMPRESSION_FAST )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "good (fast) compression" );
+			}
+			else if( compression_level == LIBEWF_COMPRESSION_BEST )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "best compression" );
+			}
+			else
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "unknown compression" );
+			}
+			if( info_handle_section_value_string_fprint(
+			     info_handle,
+			     "compression_level",
+			     16,
+			     "Compression level",
+			     16,
+			     value_string,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section value string: compression_level.",
+				 function );
+
+				result = -1;
+			}
 		}
 		if( libewf_handle_get_guid(
 		     info_handle->input_handle,
@@ -1638,85 +2185,84 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
-		else if( guid_to_string(
-		          guid,
-		          GUID_SIZE,
-		          _BYTE_STREAM_ENDIAN_LITTLE,
-		          guid_string,
-		          GUID_STRING_SIZE,
-		          NULL ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to create GUID string.",
-			 function );
-
-			result = -1;
-		}
 		else
 		{
-			fprintf(
-			 stream,
-			 "\tGUID:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 guid_string );
+			if( guid_to_string(
+			     guid,
+			     GUID_SIZE,
+			     _BYTE_STREAM_ENDIAN_LITTLE,
+			     guid_string,
+			     GUID_STRING_SIZE,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to create GUID string.",
+				 function );
+
+				result = -1;
+			}
+			else
+			{
+				if( info_handle_section_value_string_fprint(
+				     info_handle,
+				     "guid",
+				     4,
+				     "GUID",
+				     4,
+				     guid_string,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print section value string: guid.",
+					 function );
+
+					result = -1;
+				}
+			}
 		}
 	}
-	fprintf(
-	 stream,
-	 "\n" );
-	fprintf(
-	 stream,
-	 "Media information\n" );
+	if( info_handle_section_footer_fprint(
+	     info_handle,
+	     "ewf_information",
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section footer: ewf_information.",
+		 function );
 
+		result = -1;
+	}
+	if( info_handle_section_header_fprint(
+	     info_handle,
+	     "media_information",
+	     "Media information",
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section header: media_information.",
+		 function );
+
+		result = -1;
+	}
 	if( ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_SMART ) )
 	{
 		if( libewf_handle_get_media_type(
 		     info_handle->input_handle,
 		     &media_type,
-		     error ) == 1 )
-		{
-			if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tremovable disk\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tfixed disk\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_SINGLE_FILES )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tsingle files\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\toptical disk (CD/DVD/BD)\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_MEMORY )
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tmemory (RAM)\n" );
-			}
-			else
-			{
-				fprintf(
-				 stream,
-				 "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n",
-				 media_type );
-			}
-		}
-		else
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1727,51 +2273,55 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
-		if( libewf_handle_get_media_flags(
-		     info_handle->input_handle,
-		     &media_flags,
-		     error ) == 1 )
+		else
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			fprintf(
-			 stream,
-			 "\tMedia flags:\t\t0x%02" PRIx8 "\n",
-			 media_flags );
-#endif
-			fprintf(
-			 stream,
-			 "\tIs physical:\t\t" );
-
-			if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
+			if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
 			{
-				fprintf(
-				 stream,
-				 "yes" );
+				value_string = _LIBCSTRING_SYSTEM_STRING( "removable disk" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "fixed disk" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_SINGLE_FILES )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "single files" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "optical disk (CD/DVD/BD)" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_MEMORY )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "memory (RAM)" );
 			}
 			else
 			{
-				fprintf(
-				 stream,
-				 "no" );
+				value_string = _LIBCSTRING_SYSTEM_STRING( "unknown" );
 			}
-			fprintf(
-			 stream,
-			 "\n" );
+			if( info_handle_section_value_string_fprint(
+			     info_handle,
+			     "media_type",
+			     10,
+			     "Media type",
+			     10,
+			     value_string,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section value string: media_type.",
+				 function );
 
-			if( ( media_flags & LIBEWF_MEDIA_FLAG_FASTBLOC ) != 0 )
-			{
-				fprintf(
-				 stream,
-				 "\tWrite blocked:\t\tFastbloc\n" );
-			}
-			if( ( media_flags & LIBEWF_MEDIA_FLAG_TABLEAU ) != 0 )
-			{
-				fprintf(
-				 stream,
-				 "\tWrite blocked:\t\tTableau\n" );
+				result = -1;
 			}
 		}
-		else
+		if( libewf_handle_get_media_flags(
+		     info_handle->input_handle,
+		     &media_flags,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1782,20 +2332,93 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
+		else
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\tMedia flags:\t\t0x%02" PRIx8 "\n",
+				 media_flags );
+			}
+#endif
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "yes" );
+			}
+			else
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "no" );
+			}
+			if( info_handle_section_value_string_fprint(
+			     info_handle,
+			     "is_physical",
+			     10,
+			     "Is physical",
+			     10,
+			     value_string,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section value string: media_type.",
+				 function );
+
+				result = -1;
+			}
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_FASTBLOC ) != 0 )
+			{
+				if( info_handle_section_value_string_fprint(
+				     info_handle,
+				     "write_blocked",
+				     13,
+				     "Write blocked",
+				     13,
+				     _LIBCSTRING_SYSTEM_STRING( "Fastbloc" ),
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print section value string: write_blocked.",
+					 function );
+
+					result = -1;
+				}
+			}
+			if( ( media_flags & LIBEWF_MEDIA_FLAG_TABLEAU ) != 0 )
+			{
+				if( info_handle_section_value_string_fprint(
+				     info_handle,
+				     "write_blocked",
+				     13,
+				     "Write blocked",
+				     13,
+				     _LIBCSTRING_SYSTEM_STRING( "Tableau" ),
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print section value string: write_blocked.",
+					 function );
+
+					result = -1;
+				}
+			}
+		}
 	}
 	if( format != LIBEWF_FORMAT_LVF )
 	{
 		if( libewf_handle_get_bytes_per_sector(
 		     info_handle->input_handle,
-		     &bytes_per_sector,
-		     error ) == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tBytes per sector:\t%" PRIu32 "\n",
-			 bytes_per_sector );
-		}
-		else
+		     &value_32bit,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1806,17 +2429,30 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
+		else
+		{
+			if( info_handle_section_value_32bit_fprint(
+			     info_handle,
+			     "bytes_per_sector",
+			     "Bytes per sector",
+			     16,
+			     value_32bit,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section 32-bit value: bytes_per_sector.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( libewf_handle_get_number_of_sectors(
 		     info_handle->input_handle,
-		     &number_of_sectors,
-		     error ) == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tNumber of sectors:\t%" PRIu64 "\n",
-			 number_of_sectors );
-		}
-		else
+		     &value_64bit,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -1827,34 +2463,31 @@ int info_handle_media_information_fprint(
 
 			result = -1;
 		}
+		else
+		{
+			if( info_handle_section_value_64bit_fprint(
+			     info_handle,
+			     "number_of_sectors",
+			     "Number of sectors",
+			     17,
+			     value_64bit,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section 64-bit value: number_of_sectors.",
+				 function );
+
+				result = -1;
+			}
+		}
 	}
 	if( libewf_handle_get_media_size(
 	     info_handle->input_handle,
 	     &media_size,
-	     error ) == 1 )
-	{
-		if( byte_size_string_create(
-		     media_size_string,
-		     16,
-		     media_size,
-		     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-		     NULL ) == 1 )
-		{
-			fprintf(
-			 stream,
-			 "\tMedia size:\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
-			 media_size_string,
-			 media_size );
-		}
-		else
-		{
-			fprintf(
-			 stream,
-			 "\tMedia size:\t\t%" PRIu64 " bytes\n",
-			 media_size );
-		}
-	}
-	else
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1865,30 +2498,155 @@ int info_handle_media_information_fprint(
 
 		result = -1;
 	}
-	fprintf(
-	 stream,
-	 "\n" );
+	else
+	{
+		if( info_handle_section_value_size_fprint(
+		     info_handle,
+		     "media_size",
+		     "Media size",
+		     10,
+		     media_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section 64-bit value: media_size.",
+			 function );
 
+			result = -1;
+		}
+	}
+	if( info_handle_section_footer_fprint(
+	     info_handle,
+	     "media_information",
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section footer: media_information.",
+		 function );
+
+		result = -1;
+	}
 	return( result );
 }
 
-/* Print the hash values to a stream
+/* Prints a hash value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_hash_value_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     size_t identifier_length,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t hash_value[ INFO_HANDLE_VALUE_SIZE ];
+
+	static char *function  = "info_handle_hash_value_fprint";
+	size_t hash_value_size = INFO_HANDLE_VALUE_SIZE;
+	int result             = 0;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_hash_value(
+	          info_handle->input_handle,
+	          (uint8_t *) identifier,
+	          identifier_length,
+	          (uint16_t *) hash_value,
+	          hash_value_size,
+	          error );
+#else
+	result = libewf_handle_get_utf8_hash_value(
+	          info_handle->input_handle,
+	          (uint8_t *) identifier,
+	          identifier_length,
+	          (uint8_t *) hash_value,
+	          hash_value_size,
+	          error );
+#endif
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 identifier );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+		{
+			if( identifier_length == 3 )
+			{
+				if( libcstring_narrow_string_compare(
+				     identifier,
+				     "MD5",
+				     3 ) == 0 )
+				{
+					identifier = "md5";
+				}
+			}
+			else if( identifier_length == 4 )
+			{
+				if( libcstring_narrow_string_compare(
+				     identifier,
+				     "SHA1",
+				     4 ) == 0 )
+				{
+					identifier = "sha1";
+				}
+			}
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t<hashdigest type=\"%s\" coding=\"base16\">%" PRIs_LIBCSTRING_SYSTEM "</hashdigest>\n",
+			 identifier,
+			 hash_value );
+		}
+		else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t%s:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 identifier,
+			 hash_value );
+		}
+	}
+	return( 1 );
+}
+
+/* Prints the hash values to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_hash_values_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error )
 {
 	char hash_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
-	libcstring_system_character_t hash_value[ INFO_HANDLE_VALUE_SIZE ];
 
 	static char *function             = "info_handle_hash_values_fprint";
 	size_t hash_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
-	size_t hash_value_size            = INFO_HANDLE_VALUE_SIZE;
 	uint32_t number_of_values         = 0;
 	uint32_t hash_value_iterator      = 0;
-	uint8_t print_header              = 1;
+	uint8_t print_section_header      = 1;
 	int result                        = 1;
 
 #if defined( USE_LIBEWF_GET_MD5_HASH )
@@ -1915,17 +2673,6 @@ int info_handle_hash_values_fprint(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( stream == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
 		 function );
 
 		return( -1 );
@@ -1983,19 +2730,42 @@ int info_handle_hash_values_fprint(
 
 			return;
 		}
-		if( print_header != 0 )
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			if( print_section_header != 0 )
+			{
+				if( info_handle_section_header_fprint(
+				     info_handle,
+				     "digest_hash_information",
+				     "Digest hash information",
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print section header: digest_hash_information.",
+					 function );
+
+					result = -1;
+				}
+				print_section_header = 0;
+			}
+		}
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 		{
 			fprintf(
-			 stream,
-			 "Digest hash information\n" );
-
-			print_header = 0;
+			 info_handle->notify_stream,
+			 "\t\t<hashdigest type=\"md5\" coding=\"base16\">%" PRIs_LIBCSTRING_SYSTEM "</hashdigest>\n",
+			 stored_md5_hash_string );
 		}
-		fprintf(
-		 stream,
-		 "\tMD5:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 stored_md5_hash_string );
-
+		else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tMD5:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 stored_md5_hash_string );
+		}
 		memory_free(
 		 stored_md5_hash_string );
 	}
@@ -2070,80 +2840,87 @@ int info_handle_hash_values_fprint(
 			continue;
 		}
 #if defined( USE_LIBEWF_GET_MD5_HASH )
-		if( narrow_string_compare(
-		     hash_value_identifier,
-		     "MD5",
-		     3 ) == 0 )
+		if( hash_value_identifier_size == 4 )
 		{
-			continue;
+			if( narrow_string_compare(
+			     hash_value_identifier,
+			     "MD5",
+			     3 ) == 0 )
+			{
+				continue;
+			}
 		}
 #endif
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			if( print_section_header != 0 )
+			{
+				if( info_handle_section_header_fprint(
+				     info_handle,
+				     "digest_hash_information",
+				     "Digest hash information",
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print section header: digest_hash_information.",
+					 function );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		if( libewf_handle_get_utf16_hash_value(
-		     info_handle->input_handle,
-		     (uint8_t *) hash_value_identifier,
+					result = -1;
+				}
+				print_section_header = 0;
+			}
+		}
+		if( info_handle_hash_value_fprint(
+		     info_handle,
+		     hash_value_identifier,
 		     hash_value_identifier_size - 1,
-		     (uint16_t *) hash_value,
-		     hash_value_size,
 		     error ) != 1 )
-#else
-		if( libewf_handle_get_utf8_hash_value(
-		     info_handle->input_handle,
-		     (uint8_t *) hash_value_identifier,
-		     hash_value_identifier_size - 1,
-		     (uint8_t *) hash_value,
-		     hash_value_size,
-		     error ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash value for identifier: %s.",
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print hash value: %s.",
 			 function,
 			 hash_value_identifier );
 
 			result = -1;
 		}
-		else
-		{
-			if( print_header != 0 )
-			{
-				fprintf(
-				 stream,
-				 "Digest hash information\n" );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stream,
-			 "\t%s:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 hash_value_identifier,
-			 hash_value );
-		}
 	}
-	if( print_header == 0 )
+	if( print_section_header == 0 )
 	{
-		fprintf(
-		 stream,
-		 "\n" );
+		if( info_handle_section_footer_fprint(
+		     info_handle,
+		     "digest_hash_information.",
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section footer: digest_hash_information.",
+			 function );
+
+			result = -1;
+		}
 	}
 	return( result );
 }
 
-/* Print the acquiry errors to a stream
+/* Prints the acquiry errors to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_acquiry_errors_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error )
 {
 	static char *function      = "info_handle_acquiry_errors_fprint";
 	uint64_t start_sector      = 0;
 	uint64_t number_of_sectors = 0;
+	uint32_t bytes_per_sector  = 0;
 	uint32_t number_of_errors  = 0;
 	uint32_t error_iterator    = 0;
 	int result                 = 1;
@@ -2170,13 +2947,16 @@ int info_handle_acquiry_errors_fprint(
 
 		return( -1 );
 	}
-	if( stream == NULL )
+	if( libewf_handle_get_bytes_per_sector(
+	     info_handle->input_handle,
+	     &bytes_per_sector,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -2197,14 +2977,28 @@ int info_handle_acquiry_errors_fprint(
 	}
 	if( number_of_errors > 0 )
 	{
-		fprintf(
-		 stream,
-		 "Read errors during acquiry:\n" );
-		fprintf(
-		 stream,
-		 "\ttotal number: %" PRIu32 "\n",
-		 number_of_errors );
-		
+		if( info_handle_section_header_fprint(
+		     info_handle,
+		     "acquisition_read_errors",
+		     "Read errors during acquiry",
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section header: acquisition_read_errors.",
+			 function );
+
+			result = -1;
+		}
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\ttotal number: %" PRIu32 "\n",
+			 number_of_errors );
+		}
 		for( error_iterator = 0;
 		     error_iterator < number_of_errors;
 		     error_iterator++ )
@@ -2229,31 +3023,53 @@ int info_handle_acquiry_errors_fprint(
 
 				result = -1;
 			}
-			fprintf(
-			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
-			 start_sector,
-			 start_sector + number_of_sectors,
-			 number_of_sectors );
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\t\t<run image_offset=\"%" PRIu64 "\" len=\"%" PRIu64 "\"/>\n",
+				 start_sector * bytes_per_sector,
+				 number_of_sectors * bytes_per_sector );
+			}
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+				 start_sector,
+				 start_sector + number_of_sectors,
+				 number_of_sectors );
+			}
 		}
-		fprintf(
-		 stream,
-		 "\n" );
+		if( info_handle_section_footer_fprint(
+		     info_handle,
+		     "acquisition_read_errors",
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section footer: acquisition_read_errors.",
+			 function );
+
+			result = -1;
+		}
 	}
 	return( result );
 }
 
-/* Print the sessions to a stream
+/* Prints the sessions to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_sessions_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error )
 {
 	static char *function       = "info_handle_sessions_fprint";
 	uint64_t start_sector       = 0;
 	uint64_t number_of_sectors  = 0;
+	uint32_t bytes_per_sector   = 0;
 	uint32_t number_of_sessions = 0;
 	uint32_t session_iterator   = 0;
 	int result                  = 1;
@@ -2280,13 +3096,16 @@ int info_handle_sessions_fprint(
 
 		return( -1 );
 	}
-	if( stream == NULL )
+	if( libewf_handle_get_bytes_per_sector(
+	     info_handle->input_handle,
+	     &bytes_per_sector,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -2307,14 +3126,28 @@ int info_handle_sessions_fprint(
 	}
 	if( number_of_sessions > 0 )
 	{
-		fprintf(
-		 stream,
-		 "Sessions:\n" );
-		fprintf(
-		 stream,
-		 "\ttotal number: %" PRIu32 "\n",
-		 number_of_sessions );
+		if( info_handle_section_header_fprint(
+		     info_handle,
+		     "sessions",
+		     "Sessions",
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section header: sessions.",
+			 function );
 
+			result = -1;
+		}
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\ttotal number: %" PRIu32 "\n",
+			 number_of_sessions );
+		}
 		for( session_iterator = 0;
 		     session_iterator < number_of_sessions;
 		     session_iterator++ )
@@ -2339,26 +3172,47 @@ int info_handle_sessions_fprint(
 
 				result = -1;
 			}
-			fprintf(
-			 stream,
-			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
-			 start_sector,
-			 start_sector + number_of_sectors,
-			 number_of_sectors );
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\t\t<run image_offset=\"%" PRIu64 "\" len=\"%" PRIu64 "\"/>\n",
+				 start_sector * bytes_per_sector,
+				 number_of_sectors * bytes_per_sector );
+			}
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+				 start_sector,
+				 start_sector + number_of_sectors,
+				 number_of_sectors );
+			}
 		}
-		fprintf(
-		 stream,
-		 "\n" );
+		if( info_handle_section_footer_fprint(
+		     info_handle,
+		     "sessions",
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section footer: sessions.",
+			 function );
+
+			result = -1;
+		}
 	}
 	return( result );
 }
 
-/* Print the single files to a stream
+/* Prints the single files to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_single_files_fprint(
      info_handle_t *info_handle,
-     FILE *stream,
      liberror_error_t **error )
 {
 	libewf_file_entry_t *file_entry = NULL;
@@ -2387,17 +3241,6 @@ int info_handle_single_files_fprint(
 
 		return( -1 );
 	}
-	if( stream == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_handle_get_root_file_entry(
 	          info_handle->input_handle,
 	          &file_entry,
@@ -2414,60 +3257,76 @@ int info_handle_single_files_fprint(
 
 		return( -1 );
 	}
-	else if( result != 0 )
+	else if( result == 0 )
 	{
-		fprintf(
-		 stream,
-		 "Single files:\n" );
-
-		if( info_handle_file_entry_fprint(
-		     info_handle,
-		     file_entry,
-		     stream,
-		     0,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print root file entry.",
-			 function );
-
-			libewf_file_entry_free(
-			 &file_entry,
-			 NULL );
-
-			return( -1 );
-		}
-		fprintf(
-		 stream,
-		 "\n" );
-
-		if( libewf_file_entry_free(
-		     &file_entry,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free root file entry.",
-			 function );
-
-			return( -1 );
-		}
+		return( 1 );
 	}
-	return( 1 );
+	if( info_handle_section_header_fprint(
+	     info_handle,
+	     "single_files",
+	     "Single files",
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section header: single_files.",
+		 function );
+
+		result = -1;
+	}
+	if( info_handle_file_entry_fprint(
+	     info_handle,
+	     file_entry,
+	     0,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print root file entry.",
+		 function );
+
+		result = -1;
+	}
+	if( info_handle_section_footer_fprint(
+	     info_handle,
+	     "single_files",
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print section footer: single_files.",
+		 function );
+
+		result = -1;
+	}
+	if( libewf_file_entry_free(
+	     &file_entry,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free root file entry.",
+		 function );
+
+		result = -1;
+	}
+	return( result );
 }
 
-/* Print the (single) file entry to a stream
+/* Prints the (single) file entry to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
-     FILE *stream,
      int level,
      liberror_error_t **error )
 {
@@ -2501,16 +3360,11 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	if( stream == NULL )
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stream.",
-		 function );
-
-		return( -1 );
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<file_entry name=\"" );
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_file_entry_get_utf16_name_size(
@@ -2577,25 +3431,40 @@ int info_handle_file_entry_fprint(
 
 			return( -1 );
 		}
-		fprintf(
-		 stream,
-		 "\t" );
-
-		for( iterator = 1;
-		     iterator < level;
-		     iterator++ )
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
 			fprintf(
-			 stream,
-			 " " );
+			 info_handle->notify_stream,
+			 "\t" );
+
+			for( iterator = 1;
+			     iterator < level;
+			     iterator++ )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 " " );
+			}
 		}
 		fprintf(
-		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 info_handle->notify_stream,
+		 "%" PRIs_LIBCSTRING_SYSTEM "",
 		 name );
 
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\n" );
+		}
 		memory_free(
 		 name );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\">\n" );
 	}
 	if( libewf_file_entry_get_number_of_sub_file_entries(
 	     file_entry,
@@ -2634,7 +3503,6 @@ int info_handle_file_entry_fprint(
 		if( info_handle_file_entry_fprint(
 		     info_handle,
 		     sub_file_entry,
-		     stream,
 		     level + 1,
 		     error ) != 1 )
 		{
@@ -2667,6 +3535,243 @@ int info_handle_file_entry_fprint(
 			return( -1 );
 		}
 	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t</file_entry>\n" );
+	}
+	return( 1 );
+}
+
+/* Prints the DFXML header to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_dfxml_header_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_dfxml_header_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
+
+	/* TODO what about DTD or XSD ? */
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "<ewfobjects version=\"0.1\">\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t<metadata xmlns=\"http://libewf.sourceforge.net/\"\n"
+	 "\t          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+	 "\t          xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n"
+	 "\t\t<dc:type>Disk Image</dc:type>\n"
+	 "\t</metadata>\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t<creator>\n"
+	 "\t\t<program>ewfinfo</program>\n"
+	 "\t\t<version>%s</version>\n",
+	 LIBEWF_VERSION_STRING );
+
+	if( info_handle_dfxml_build_environment_fprint(
+	     info_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print build environment.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle_dfxml_execution_environment_fprint(
+	     info_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print execution environment.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t</creator>\n"
+	 "\t<ewfinfo>\n" );
+
+	return( 1 );
+}
+
+/* Prints the DFXML build environment to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_dfxml_build_environment_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_dfxml_build_environment_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t\t<build_environment>\n" );
+
+	/* TODO add MSC and BORLANC support */
+#if defined( _MSC_VER )
+
+#elif defined( __BORLANDC__ )
+
+#elif defined( __GNUC__ ) && defined( __GNUC_MINOR__ )
+#if defined( __MINGW64_VERSION_MAJOR ) && defined( __MINGW64_VERSION_MINOR )
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t\t\t<compiler>MinGW64 %d.%d</compiler>\n",
+	 __MINGW64_VERSION_MAJOR,
+	 __MINGW64_VERSION_MINOR );
+#elif defined( __MINGW32_MAJOR_VERSION ) && defined( __MINGW32_MINOR_VERSION )
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t\t\t<compiler>MinGW32 %d.%d</compiler>\n",
+	 __MINGW32_MAJOR_VERSION,
+	 __MINGW32_MINOR_VERSION );
+#endif
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t\t\t<compiler>GCC %d.%d</compiler>\n",
+	 __GNUC__,
+	 __GNUC_MINOR__ );
+#endif		
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t\t\t<compilation_date>" __DATE__ " " __TIME__ "</compilation_date>\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t\t\t<library name=\"libewf\" version=\"%s\"/>\n",
+	 LIBEWF_VERSION_STRING );
+
+	/* TODO add other libraries
+	 */
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t\t</build_environment>\n" );
+
+	return( 1 );
+}
+
+/* Prints the DFXML execution environment to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_dfxml_execution_environment_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error )
+{
+#if defined( HAVE_UNAME ) && !defined( WINAPI )
+	struct utsname utsname_buffer;
+#endif
+
+	static char *function = "info_handle_dfxml_execution_environment_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	/* TODO what about execution environment on other platforms ? */
+
+#if defined( HAVE_UNAME )
+	if( uname(
+	     &utsname_buffer ) == 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t<execution_environment>\n"
+		 "\t\t\t<os_sysname>%s</os_sysname>\n"
+		 "\t\t\t<os_release>%s</os_release>\n"
+		 "\t\t\t<os_version>%s</os_version>\n"
+		 "\t\t\t<host>%s</host>\n"
+		 "\t\t\t<arch>%s</arch>\n"
+		 "\t\t</execution_environment>\n",
+		 utsname_buffer.sysname,
+		 utsname_buffer.release,
+		 utsname_buffer.version,
+		 utsname_buffer.nodename,
+		 utsname_buffer.machine );
+	}
+#endif
+	/* TODO
+	 * <command_line> X </command_line>
+	 * <uid> getuid() </uid>
+	 * <username> getpwuid( getuid() )->pw_name </username>
+	 */
+
+	return( 1 );
+}
+
+/* Prints the DFXML footer to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_dfxml_footer_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_dfxml_footer_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\t</ewfinfo>\n"
+	 "</ewfobjects>\n"
+	 "\n" );
+
 	return( 1 );
 }
 

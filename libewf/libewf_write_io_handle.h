@@ -140,6 +140,11 @@ int libewf_write_io_handle_free(
      libewf_write_io_handle_t **write_io_handle,
      liberror_error_t **error );
 
+int libewf_write_io_handle_clone(
+     libewf_write_io_handle_t **destination_write_io_handle,
+     libewf_write_io_handle_t *source_write_io_handle,
+     liberror_error_t **error );
+
 int libewf_write_io_handle_initialize_values(
      libewf_write_io_handle_t *write_io_handle,
      libewf_io_handle_t *io_handle,

@@ -1,4 +1,4 @@
-.Dd November 8, 2010
+.Dd December 14, 2010
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -68,6 +68,8 @@ File/Handle functions
 .Fn libewf_handle_initialize "libewf_handle_t **handle, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_free "libewf_handle_t **handle, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_clone "libewf_handle_t **destination_handle, libewf_handle_t *source_handle, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_open "libewf_handle_t *handle, char * const filenames[], int number_of_filenames, uint8_t access_flags, libewf_error_t **error"
 .Ft int

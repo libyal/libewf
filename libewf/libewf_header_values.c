@@ -5763,21 +5763,6 @@ int libewf_header_values_parse_xheader(
 
 		return( -1 );
 	}
-	if( libewf_header_values_parse_xheader_date_value(
-	     header_values,
-	     (uint8_t *) "system_date",
-	     12,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse xheader date value: system_date.",
-		 function );
-
-		return( -1 );
-	}
 	return( 1 );
 }
 

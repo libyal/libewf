@@ -79,6 +79,11 @@ int libewf_sector_list_value_free(
      intptr_t *sector_list_value,
      liberror_error_t **error );
 
+int libewf_sector_list_value_clone(
+     intptr_t **destination_sector_list_value,
+     intptr_t *source_sector_list_value,
+     liberror_error_t **error );
+
 int libewf_sector_list_initialize(
      libewf_sector_list_t **sector_list,
      liberror_error_t **error );
@@ -89,6 +94,11 @@ int libewf_sector_list_free(
 
 int libewf_sector_list_empty(
      libewf_sector_list_t *sector_list,
+     liberror_error_t **error );
+
+int libewf_sector_list_clone(
+     libewf_sector_list_t **destination_sector_list,
+     libewf_sector_list_t *source_sector_list,
      liberror_error_t **error );
 
 int libewf_sector_list_get_number_of_elements(

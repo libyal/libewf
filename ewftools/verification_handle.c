@@ -76,8 +76,8 @@ int verification_handle_initialize(
 	}
 	if( *verification_handle == NULL )
 	{
-		*verification_handle = (verification_handle_t *) memory_allocate(
-								  sizeof( verification_handle_t ) );
+		*verification_handle = memory_allocate_structure(
+		                        verification_handle_t );
 
 		if( *verification_handle == NULL )
 		{
@@ -88,7 +88,7 @@ int verification_handle_initialize(
 			 "%s: unable to create verification handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *verification_handle,
@@ -102,12 +102,7 @@ int verification_handle_initialize(
 			 "%s: unable to clear verification handle.",
 			 function );
 
-			memory_free(
-			 *verification_handle );
-
-			*verification_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_handle_initialize(
 		     &( ( *verification_handle )->input_handle ),
@@ -120,12 +115,7 @@ int verification_handle_initialize(
 			 "%s: unable to initialize input handle.",
 			 function );
 
-			memory_free(
-			 *verification_handle );
-
-			*verification_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 #ifdef TODO
 /* TODO: have application determine limit value and set to value - 4 */
@@ -141,7 +131,7 @@ int verification_handle_initialize(
 			 "%s: unable to set maximum number of open handles.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 #endif
 		( *verification_handle )->calculate_md5  = calculate_md5;
@@ -159,15 +149,7 @@ int verification_handle_initialize(
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
-			libewf_handle_free(
-			 &( ( *verification_handle )->input_handle ),
-			 NULL );
-			memory_free(
-			 *verification_handle );
-
-			*verification_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( ( ( *verification_handle )->calculate_sha1 != 0 )
 		 && ( sha1_initialize(
@@ -181,19 +163,27 @@ int verification_handle_initialize(
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
-			libewf_handle_free(
-			 &( ( *verification_handle )->input_handle ),
-			 NULL );
-			memory_free(
-			 *verification_handle );
-
-			*verification_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *verification_handle )->header_codepage = LIBEWF_CODEPAGE_ASCII;
 	}
 	return( 1 );
+
+on_error:
+	if( *verification_handle != NULL )
+	{
+		if( ( *verification_handle )->input_handle != NULL )
+		{
+			libewf_handle_free(
+			 &( ( *verification_handle )->input_handle ),
+			 NULL );
+		}
+		memory_free(
+		 *verification_handle );
+
+		*verification_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the verification handle and its elements
@@ -367,7 +357,7 @@ int verification_handle_open_input(
 			 "%s: unable to resolve filename(s).",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		filenames = (libcstring_system_character_t * const *) libewf_filenames;
 	}
@@ -394,21 +384,38 @@ int verification_handle_open_input(
 		 "%s: unable to open files.",
 		 function );
 
-		if( libewf_filenames != NULL )
+		goto on_error;
+	}
+	if( verification_handle->header_codepage != LIBEWF_CODEPAGE_ASCII )
+	{
+		if( libewf_handle_set_header_codepage(
+		     verification_handle->input_handle,
+		     verification_handle->header_codepage,
+		     error ) != 1 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			libewf_glob_wide_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#else
-			libewf_glob_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#endif
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header codepage.",
+			 function );
+
+			goto on_error;
 		}
-		return( -1 );
+	}
+	if( libewf_handle_get_chunk_size(
+	     verification_handle->input_handle,
+	     &( verification_handle->chunk_size ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk size.",
+		 function );
+
+		goto on_error;
 	}
 	if( libewf_filenames != NULL )
 	{
@@ -433,22 +440,27 @@ int verification_handle_open_input(
 
 			return( -1 );
 		}
-	}
-	if( libewf_handle_get_chunk_size(
-	     verification_handle->input_handle,
-	     &( verification_handle->chunk_size ),
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunk size.",
-		 function );
-
-		return( -1 );
+		libewf_filenames = NULL;
 	}
 	return( 1 );
+
+on_error:
+	if( libewf_filenames != NULL )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
+		libewf_filenames = NULL;
+	}
+	return( -1 );
 }
 
 /* Closes the verification handle
@@ -986,7 +998,7 @@ int verification_handle_set_header_codepage(
 	}
 	result = ewfinput_determine_header_codepage(
 	          string,
-	          &verification_handle->header_codepage,
+	          &( verification_handle->header_codepage ),
 	          error );
 
 	if( result == -1 )
@@ -999,6 +1011,26 @@ int verification_handle_set_header_codepage(
 		 function );
 
 		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( verification_handle->input_handle != NULL )
+		{
+			if( libewf_handle_set_header_codepage(
+			     verification_handle->input_handle,
+			     verification_handle->header_codepage,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set header codepage.",
+				 function );
+
+				return( -1 );
+			}
+		}
 	}
 	return( result );
 }
@@ -1119,7 +1151,7 @@ int verification_handle_append_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append checksum errror.",
+		 "%s: unable to append checksum error.",
 		 function );
 
 		return( -1 );
@@ -1564,7 +1596,7 @@ int verification_handle_checksum_errors_fprint(
 	uint64_t last_sector                         = 0;
 	uint64_t number_of_sectors                   = 0;
 	uint32_t number_of_errors                    = 0;
-	uint32_t error_iterator                      = 0;
+	uint32_t error_index                         = 0;
 	int result                                   = 1;
 
 	if( verification_handle == NULL )
@@ -1612,7 +1644,7 @@ int verification_handle_checksum_errors_fprint(
 		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( number_of_errors > 0 )
 	{
@@ -1624,13 +1656,13 @@ int verification_handle_checksum_errors_fprint(
 		 "\ttotal number: %" PRIu32 "\n",
 		 number_of_errors );
 
-		for( error_iterator = 0;
-		     error_iterator < number_of_errors;
-		     error_iterator++ )
+		for( error_index = 0;
+		     error_index < number_of_errors;
+		     error_index++ )
 		{
 			if( libewf_handle_get_checksum_error(
 			     verification_handle->input_handle,
-			     error_iterator,
+			     error_index,
 			     &start_sector,
 			     &number_of_sectors,
 			     error ) != 1 )
@@ -1641,7 +1673,7 @@ int verification_handle_checksum_errors_fprint(
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the checksum error: %" PRIu32 ".",
 				 function,
-				 error_iterator );
+				 error_index );
 
 				start_sector      = 0;
 				number_of_sectors = 0;
@@ -1682,12 +1714,7 @@ int verification_handle_checksum_errors_fprint(
 					 function,
 					 start_sector );
 
-					if( last_filename != NULL )
-					{
-						memory_free(
-						 last_filename );
-					}
-					return( -1 );
+					goto on_error;
 				}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 				if( libewf_handle_get_filename_size_wide(
@@ -1708,12 +1735,7 @@ int verification_handle_checksum_errors_fprint(
 					 "%s: unable to retrieve filename size.",
 					 function );
 
-					if( last_filename != NULL )
-					{
-						memory_free(
-						 last_filename );
-					}
-					return( -1 );
+					goto on_error;
 				}
 				filename = (libcstring_system_character_t *) memory_allocate(
 				                                              sizeof( libcstring_system_character_t ) * filename_size ); 
@@ -1728,12 +1750,7 @@ int verification_handle_checksum_errors_fprint(
 					 "%s: unable to create filename.",
 					 function );
 
-					if( last_filename != NULL )
-					{
-						memory_free(
-						 last_filename );
-					}
-					return( -1 );
+					goto on_error;
 				}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 				if( libewf_handle_get_filename_wide(
@@ -1756,15 +1773,7 @@ int verification_handle_checksum_errors_fprint(
 					 "%s: unable to retrieve filename.",
 					 function );
 
-					if( last_filename != NULL )
-					{
-						memory_free(
-						 last_filename );
-					}
-					memory_free(
-					 filename );
-
-					return( -1 );
+					goto on_error;
 				}
 				if( last_filename == NULL )
 				{
@@ -1798,6 +1807,9 @@ int verification_handle_checksum_errors_fprint(
 					memory_free(
 					 filename );
 				}
+				filename      = NULL;
+				filename_size = 0;
+
 				start_sector += verification_handle->chunk_size;
 			}
 			memory_free(
@@ -1815,5 +1827,18 @@ int verification_handle_checksum_errors_fprint(
 		 "\n" );
 	}
 	return( result );
+
+on_error:
+	if( last_filename != NULL )
+	{
+		memory_free(
+		 last_filename );
+	}
+	if( filename != NULL )
+	{
+		memory_free(
+		 filename );
+	}
+	return( -1 );
 }
 

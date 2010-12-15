@@ -7111,7 +7111,7 @@ ssize_t libewf_section_delta_chunk_read(
 	}
 	chunk_value->segment_file_handle = segment_file_handle;
 	chunk_value->size                = chunk_size;
-	chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK;
+	chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK;
 
 	/* Skip the chunk data within the section
 	 */

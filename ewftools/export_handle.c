@@ -447,7 +447,7 @@ int export_handle_sanitize_filename(
      liberror_error_t **error )
 {
 	static char *function = "export_handle_sanitize_filename";
-	size_t iterator       = 0;
+	size_t filename_index = 0;
 
 	if( export_handle == NULL )
 	{
@@ -482,30 +482,30 @@ int export_handle_sanitize_filename(
 
 		return( -1 );
 	}
-	for( iterator = 0;
-	     iterator < filename_size;
-	     iterator++ )
+	for( filename_index = 0;
+	     filename_index < filename_size;
+	     filename_index++ )
 	{
-		if( ( ( filename[ iterator ] >= 0x01 )
-		  && ( filename[ iterator ] <= 0x1f ) )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '!' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '$' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '%' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '&' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '*' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '+' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '/' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) ':' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) ';' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '<' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '>' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '?' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '@' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '\\' )
-		 || ( filename[ iterator ] == (libcstring_system_character_t) '~' )
-		 || ( filename[ iterator ] == 0x7e ) )
+		if( ( ( filename[ filename_index ] >= 0x01 )
+		  &&  ( filename[ filename_index ] <= 0x1f ) )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '!' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '$' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '%' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '&' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '*' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '+' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '/' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) ':' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) ';' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '<' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '>' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '?' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '@' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '\\' )
+		 || ( filename[ filename_index ] == (libcstring_system_character_t) '~' )
+		 || ( filename[ filename_index ] == 0x7e ) )
 		{
-			filename[ iterator ] = (libcstring_system_character_t) '_';
+			filename[ filename_index ] = (libcstring_system_character_t) '_';
 		}
 	}
 	return( 1 );
@@ -641,9 +641,7 @@ int export_handle_create_target_path(
 		 "%s: unable to create target path.",
 		 function );
 
-		*target_path_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	if( libcstring_system_string_copy(
 	     *target_path,
@@ -657,13 +655,7 @@ int export_handle_create_target_path(
 		 "%s: unable to set export path in target path.",
 		 function );
 
-		memory_free(
-		 target_path );
-
-		*target_path      = NULL;
-		*target_path_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	( *target_path )[ export_path_size - 1 ] = (libcstring_system_character_t) LIBSYSTEM_PATH_SEPARATOR;
 
@@ -681,13 +673,7 @@ int export_handle_create_target_path(
 		 "%s: unable to set filename in target path.",
 		 function );
 
-		memory_free(
-		 target_path );
-
-		*target_path      = NULL;
-		*target_path_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	if( export_handle_sanitize_filename(
 	     export_handle,
@@ -702,15 +688,21 @@ int export_handle_create_target_path(
 		 "%s: unable sanitize filename in target path.",
 		 function );
 
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *target_path != NULL )
+	{
 		memory_free(
 		 target_path );
 
-		*target_path      = NULL;
-		*target_path_size = 0;
-
-		return( -1 );
+		*target_path = NULL;
 	}
-	return( 1 );
+	*target_path_size = 0;
+
+	return( -1 );
 }
 
 /* Opens the input of the export handle
@@ -1656,8 +1648,8 @@ int export_handle_swap_byte_pairs(
 {
 	uint8_t *data         = NULL;
 	static char *function = "export_handle_swap_byte_pairs";
+	size_t data_offset    = 0;
 	size_t data_size      = 0;
-	size_t iterator       = 0;
 	uint8_t byte          = 0;
 
 	if( export_handle == NULL )
@@ -1733,13 +1725,13 @@ int export_handle_swap_byte_pairs(
 
 		return( -1 );
 	}
-	for( iterator = 0;
-	     iterator < read_size;
-	     iterator += 2 )
+	for( data_offset = 0;
+	     data_offset < read_size;
+	     data_offset += 2 )
 	{
-		byte                 = data[ iterator ];
-		data[ iterator ]     = data[ iterator + 1 ];
-		data[ iterator + 1 ] = byte;
+		byte                    = data[ data_offset ];
+		data[ data_offset ]     = data[ data_offset + 1 ];
+		data[ data_offset + 1 ] = byte;
 	}
 	return( 1 );
 }
@@ -2085,9 +2077,7 @@ int export_handle_prompt_for_string(
 		 "%s: unable to create internal string.",
 		 function );
 
-		*internal_string_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	if( memory_set(
 	     *internal_string,
@@ -2101,13 +2091,7 @@ int export_handle_prompt_for_string(
 		 "%s: unable to clear internal string.",
 		 function );
 
-		memory_free(
-		 *internal_string );
-
-		*internal_string      = NULL;
-		*internal_string_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	result = ewfinput_get_string_variable(
 	          export_handle->notify_stream,
@@ -2125,15 +2109,21 @@ int export_handle_prompt_for_string(
 		 "%s: unable to retrieve string variable.",
 		 function );
 
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( *internal_string != NULL )
+	{
 		memory_free(
 		 *internal_string );
 
-		*internal_string      = NULL;
-		*internal_string_size = 0;
-
-		return( -1 );
+		*internal_string = NULL;
 	}
-	return( result );
+	*internal_string_size = 0;
+
+	return( -1 );
 }
 
 /* Prompts the user for the compression level
@@ -2537,7 +2527,7 @@ int export_handle_set_string(
 			 "%s: unable to create internal string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libcstring_system_string_copy(
 		     *internal_string,
@@ -2551,18 +2541,25 @@ int export_handle_set_string(
 			 "%s: unable to copy string.",
 			 function );
 
-			memory_free(
-			 *internal_string );
-
-			*internal_string = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *internal_string )[ string_length ] = 0;
 
 		*internal_string_size = string_length + 1;
 	}
 	return( 1 );
+
+on_error:
+	if( *internal_string != NULL )
+	{
+		memory_free(
+		 *internal_string );
+
+		*internal_string = NULL;
+	}
+	*internal_string_size = 0;
+
+	return( -1 );
 }
 
 /* Sets the compression values
@@ -3281,7 +3278,7 @@ int export_handle_set_hash_value(
 		 "%s: unable to create UTF-8 hash value.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libsystem_string_copy_to_utf8_string(
 	     hash_value,
@@ -3297,10 +3294,7 @@ int export_handle_set_hash_value(
 		 "%s: unable to set UTF-8 hash value.",
 		 function );
 
-		memory_free(
-		 utf8_hash_value );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
@@ -3320,10 +3314,7 @@ int export_handle_set_hash_value(
 			 function,
 			 hash_value_identifier );
 
-			memory_free(
-			 utf8_hash_value );
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
@@ -3345,16 +3336,21 @@ int export_handle_set_hash_value(
 			 function,
 			 hash_value_identifier );
 
-			memory_free(
-			 utf8_hash_value );
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	memory_free(
 	 utf8_hash_value );
 
 	return( 1 );
+
+on_error:
+	if( utf8_hash_value != NULL )
+	{
+		memory_free(
+		 utf8_hash_value );
+	}
+	return( -1 );
 }
 
 /* Appends a read error to the output handle
@@ -3423,7 +3419,7 @@ int export_handle_append_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append checksum errror.",
+		 "%s: unable to append checksum error.",
 		 function );
 
 		return( -1 );
@@ -3452,7 +3448,7 @@ int export_handle_append_read_error(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append acquiry errror.",
+			 "%s: unable to append acquiry error.",
 			 function );
 
 			return( -1 );
@@ -3514,7 +3510,7 @@ ssize_t export_handle_finalize(
 			 "%s: invalid calculate MD5 hash string value already set.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		export_handle->calculated_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
 		                                                                               sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
@@ -3528,7 +3524,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to create calculated MD5 digest hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		/* Finalize the MD5 hash calculation
 		 */
@@ -3545,7 +3541,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to finalize MD5 hash.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_md5_hash,
@@ -3561,7 +3557,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to set calculated MD5 hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( export_handle_set_hash_value(
 		     export_handle,
@@ -3578,7 +3574,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to set hash value: MD5.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( export_handle->calculate_sha1 != 0 )
@@ -3592,7 +3588,7 @@ ssize_t export_handle_finalize(
 			 "%s: invalid calculate SHA1 hash string value already set.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		export_handle->calculated_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
 		                                                                                sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_SHA1 );
@@ -3606,7 +3602,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to create calculated sha1 digest hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		/* Finalize the SHA1 hash calculation
 		 */
@@ -3623,7 +3619,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to finalize SHA1 hash.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_sha1_hash,
@@ -3639,7 +3635,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to create calculated SHA1 hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( export_handle_set_hash_value(
 		     export_handle,
@@ -3656,7 +3652,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to set hash value: SHA1.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
@@ -3674,10 +3670,27 @@ ssize_t export_handle_finalize(
 			 "%s: unable to finalize EWF file(s).",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( write_count );
+
+on_error:
+	if( export_handle->calculated_sha1_hash_string != NULL )
+	{
+		memory_free(
+		 export_handle->calculated_sha1_hash_string );
+
+		export_handle->calculated_sha1_hash_string = NULL;
+	}
+	if( export_handle->calculated_md5_hash_string != NULL )
+	{
+		memory_free(
+		 export_handle->calculated_md5_hash_string );
+
+		export_handle->calculated_md5_hash_string = NULL;
+	}
+	return( -1 );
 }
 
 /* Exports the single files
@@ -3744,7 +3757,7 @@ int export_handle_export_single_files(
 		 "%s: unable to retrieve root file entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( export_handle_export_file_entry(
 	     export_handle,
@@ -3761,11 +3774,7 @@ int export_handle_export_single_files(
 		 "%s: unable to export root file entry.",
 		 function );
 
-		libewf_file_entry_free(
-		 &file_entry,
-		 NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_file_entry_free(
 	     &file_entry,
@@ -3778,9 +3787,18 @@ int export_handle_export_single_files(
 		 "%s: unable to free root file entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Exports a (single) file entry
@@ -3806,8 +3824,8 @@ int export_handle_export_file_entry(
 	size_t target_path_size                    = 0;
 	ssize_t read_count                         = 0;
 	uint32_t file_entry_flags                  = 0;
+	int file_entry_index                       = 0;
 	int number_of_sub_file_entries             = 0;
-	int iterator                               = 0;
 	int result                                 = 0;
 
 	if( export_handle == NULL )
@@ -4182,13 +4200,13 @@ int export_handle_export_file_entry(
 			}
 			return( -1 );
 		}
-		for( iterator = 0;
-		     iterator < number_of_sub_file_entries;
-		     iterator++ )
+		for( file_entry_index = 0;
+		     file_entry_index < number_of_sub_file_entries;
+		     file_entry_index++ )
 		{
 			if( libewf_file_entry_get_sub_file_entry(
 			     file_entry,
-			     iterator,
+			     file_entry_index,
 			     &sub_file_entry,
 			     error ) != 1 )
 			{
@@ -4198,7 +4216,7 @@ int export_handle_export_file_entry(
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to free retrieve sub file entry: %d.",
 				 function,
-				 iterator + 1 );
+				 file_entry_index + 1 );
 
 				if( target_path != export_path )
 				{
@@ -4221,7 +4239,7 @@ int export_handle_export_file_entry(
 				 LIBERROR_RUNTIME_ERROR_GENERIC,
 				 "%s: unable to export sub file entry: %d.",
 				 function,
-				 iterator + 1 );
+				 file_entry_index + 1 );
 
 				libewf_file_entry_free(
 				 &sub_file_entry,
@@ -4244,7 +4262,7 @@ int export_handle_export_file_entry(
 				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free sub file entry: %d.",
 				 function,
-				 iterator + 1 );
+				 file_entry_index + 1 );
 
 				if( target_path != export_path )
 				{
@@ -4351,7 +4369,7 @@ int export_handle_checksum_errors_fprint(
 	uint64_t last_sector                         = 0;
 	uint64_t number_of_sectors                   = 0;
 	uint32_t number_of_errors                    = 0;
-	uint32_t error_iterator                      = 0;
+	uint32_t error_index                         = 0;
 	int result                                   = 1;
 
 	if( export_handle == NULL )
@@ -4411,13 +4429,13 @@ int export_handle_checksum_errors_fprint(
 		 "\ttotal number: %" PRIu32 "\n",
 		 number_of_errors );
 		
-		for( error_iterator = 0;
-		     error_iterator < number_of_errors;
-		     error_iterator++ )
+		for( error_index = 0;
+		     error_index < number_of_errors;
+		     error_index++ )
 		{
 			if( libewf_handle_get_checksum_error(
 			     export_handle->input_handle,
-			     error_iterator,
+			     error_index,
 			     &start_sector,
 			     &number_of_sectors,
 			     error ) != 1 )
@@ -4428,7 +4446,7 @@ int export_handle_checksum_errors_fprint(
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the checksum error: %" PRIu32 ".",
 				 function,
-				 error_iterator );
+				 error_index );
 
 				start_sector      = 0;
 				number_of_sectors = 0;

@@ -917,7 +917,7 @@ ssize64_t ewfacquire_read_input(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append read errror: %d to imaging handle.",
+				 "%s: unable to append read error: %d to imaging handle.",
 				 function,
 				 read_error_iterator );
 
@@ -1076,16 +1076,16 @@ int main( int argc, char * const argv[] )
 	     "ewftools",
 	     &error ) != 1 )
 	{
+		ewfoutput_version_fprint(
+		 stdout,
+		 program );
+
 		fprintf(
 		 stderr,
 		 "Unable to initialize system values.\n" );
 
 		goto on_error;
 	}
-	ewfoutput_version_fprint(
-	 stdout,
-	 program );
-
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
@@ -1095,6 +1095,10 @@ int main( int argc, char * const argv[] )
 		{
 			case (libcstring_system_integer_t) '?':
 			default:
+				ewfoutput_version_fprint(
+				 stdout,
+				 program );
+
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
@@ -1172,6 +1176,10 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'h':
+				ewfoutput_version_fprint(
+				 stdout,
+				 program );
+
 				ewfacquire_usage_fprint(
 				 stdout );
 
@@ -1281,6 +1289,10 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'V':
+				ewfoutput_version_fprint(
+				 stdout,
+				 program );
+
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -1299,6 +1311,10 @@ int main( int argc, char * const argv[] )
 	}
 	if( optind == argc )
 	{
+		ewfoutput_version_fprint(
+		 stdout,
+		 program );
+
 		fprintf(
 		 stderr,
 		 "Missing source file or device.\n" );
@@ -1308,6 +1324,10 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+	ewfoutput_version_fprint(
+	 stdout,
+	 program );
+
 	libsystem_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_verbose(

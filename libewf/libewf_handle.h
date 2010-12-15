@@ -143,10 +143,6 @@ struct libewf_internal_handle
 	/* The single files
 	 */
 	libewf_single_files_t *single_files;
-
-	/* Value to indicate if abort was signalled
-	 */
-	int abort;
 };
 
 LIBEWF_EXTERN \
@@ -160,6 +156,12 @@ int libewf_handle_free(
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_handle_clone(
+     libewf_handle_t **destination_handle,
+     libewf_handle_t *source_handle,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_signal_abort(
      libewf_handle_t *handle,
      liberror_error_t **error );
@@ -169,7 +171,7 @@ int libewf_handle_open(
      libewf_handle_t *handle,
      char * const filenames[],
      int number_of_filenames,
-     uint8_t flags,
+     uint8_t access_flags,
      liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -178,7 +180,7 @@ int libewf_handle_open_wide(
      libewf_handle_t *handle,
      wchar_t * const filenames[],
      int number_of_filenames,
-     uint8_t flags,
+     uint8_t access_flags,
      liberror_error_t **error );
 #endif
 
@@ -186,7 +188,7 @@ LIBEWF_EXTERN \
 int libewf_handle_open_file_io_pool(
      libewf_handle_t *handle,
      libbfio_pool_t *file_io_pool,
-     uint8_t flags,
+     uint8_t access_flags,
      liberror_error_t **error );
 
 LIBEWF_EXTERN \

@@ -58,8 +58,8 @@ int process_status_initialize(
 	}
 	if( *process_status == NULL )
 	{
-		*process_status = (process_status_t *) memory_allocate(
-		                                        sizeof( process_status_t ) );
+		*process_status = memory_allocate_structure(
+		                   process_status_t );
 
 		if( *process_status == NULL )
 		{
@@ -70,7 +70,7 @@ int process_status_initialize(
 			 "%s: unable to create process status.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *process_status,
@@ -84,12 +84,7 @@ int process_status_initialize(
 			 "%s: unable to clear process status.",
 			 function );
 
-			memory_free(
-			 *process_status );
-
-			*process_status = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *process_status )->status_process_string    = status_process_string;
 		( *process_status )->status_update_string     = status_update_string;
@@ -98,6 +93,16 @@ int process_status_initialize(
 		( *process_status )->print_status_information = print_status_information;
 	}
 	return( 1 );
+
+on_error:
+	if( *process_status != NULL )
+	{
+		memory_free(
+		 *process_status );
+
+		*process_status = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the process status information

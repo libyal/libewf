@@ -31,11 +31,15 @@
 extern "C" {
 #endif
 
-#define LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED	0x01
-#define LIBEWF_CHUNK_VALUE_FLAGS_TAINTED 	0x02
-#define LIBEWF_CHUNK_VALUE_FLAGS_CORRUPTED 	0x04
-#define LIBEWF_CHUNK_VALUE_FLAGS_MISSING 	0x08
-#define LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK 	0x80
+enum LIBEWF_CHUNK_VALUE_FLAGS
+{
+	LIBEWF_CHUNK_VALUE_FLAG_COMPRESSED	= 0x01,
+	LIBEWF_CHUNK_VALUE_FLAG_TAINTED		= 0x02,
+	LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED	= 0x04,
+	LIBEWF_CHUNK_VALUE_FLAG_MISSING		= 0x08,
+
+	LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK	= 0x80
+};
 
 typedef struct libewf_chunk_value libewf_chunk_value_t;
 
@@ -69,6 +73,11 @@ int libewf_chunk_value_initialize(
 
 int libewf_chunk_value_free(
      intptr_t *chunk_value,
+     liberror_error_t **error );
+
+int libewf_chunk_value_clone(
+     intptr_t **destination_chunk_value,
+     intptr_t *source_chunk_value,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

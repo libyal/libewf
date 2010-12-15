@@ -97,8 +97,8 @@ int device_handle_initialize(
 	}
 	if( *device_handle == NULL )
 	{
-		*device_handle = (device_handle_t *) memory_allocate(
-		                                      sizeof( device_handle_t ) );
+		*device_handle = memory_allocate_structure(
+		                  device_handle_t );
 
 		if( *device_handle == NULL )
 		{
@@ -109,7 +109,7 @@ int device_handle_initialize(
 			 "%s: unable to create device handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *device_handle,
@@ -123,12 +123,7 @@ int device_handle_initialize(
 			 "%s: unable to clear device handle.",
 			 function );
 
-			memory_free(
-			 *device_handle );
-
-			*device_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *device_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
 		                                                                      sizeof( libcstring_system_character_t ) * DEVICE_HANDLE_INPUT_BUFFER_SIZE );
@@ -142,12 +137,7 @@ int device_handle_initialize(
 			 "%s: unable to create input buffer.",
 			 function );
 
-			memory_free(
-			 *device_handle );
-
-			*device_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     ( *device_handle )->input_buffer,
@@ -161,19 +151,27 @@ int device_handle_initialize(
 			 "%s: unable to clear device handle.",
 			 function );
 
-			memory_free(
-			 ( *device_handle )->input_buffer );
-			memory_free(
-			 *device_handle );
-
-			*device_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *device_handle )->number_of_error_retries = 2;
 		( *device_handle )->notify_stream           = DEVICE_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
+
+on_error:
+	if( *device_handle != NULL )
+	{
+		if( ( *device_handle )->input_buffer != NULL )
+		{
+			memory_free(
+			 ( *device_handle )->input_buffer );
+		}
+		memory_free(
+		 *device_handle );
+
+		*device_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the device handle and its elements
@@ -879,9 +877,7 @@ int device_handle_prompt_for_string(
 		 "%s: unable to create internal string.",
 		 function );
 
-		*internal_string_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	if( memory_set(
 	     *internal_string,
@@ -895,13 +891,7 @@ int device_handle_prompt_for_string(
 		 "%s: unable to clear internal string.",
 		 function );
 
-		memory_free(
-		 *internal_string );
-
-		*internal_string      = NULL;
-		*internal_string_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	result = ewfinput_get_string_variable(
 	          device_handle->notify_stream,
@@ -919,15 +909,21 @@ int device_handle_prompt_for_string(
 		 "%s: unable to retrieve string variable.",
 		 function );
 
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( *internal_string != NULL )
+	{
 		memory_free(
 		 *internal_string );
 
-		*internal_string      = NULL;
-		*internal_string_size = 0;
-
-		return( -1 );
+		*internal_string = NULL;
 	}
-	return( result );
+	*internal_string_size = 0;
+
+	return( -1 );
 }
 
 /* Prompts the user for the number of error retries
@@ -1657,7 +1653,7 @@ int device_handle_set_string(
 			 "%s: unable to create internal string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libcstring_system_string_copy(
 		     *internal_string,
@@ -1671,18 +1667,25 @@ int device_handle_set_string(
 			 "%s: unable to copy string.",
 			 function );
 
-			memory_free(
-			 *internal_string );
-
-			*internal_string = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *internal_string )[ string_length ] = 0;
 
 		*internal_string_size = string_length + 1;
 	}
 	return( 1 );
+
+on_error:
+	if( *internal_string != NULL )
+	{
+		memory_free(
+		 *internal_string );
+
+		*internal_string = NULL;
+	}
+	*internal_string_size = 0;
+
+	return( -1 );
 }
 
 /* Sets the number of error retries

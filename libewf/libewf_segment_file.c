@@ -47,7 +47,7 @@ const uint8_t evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0x
 const uint8_t lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
 
 /* Reads the segment file header
- * Returns the number of bytes read if successful, or -1 on errror
+ * Returns the number of bytes read if successful, or -1 on error
  */
 ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -166,7 +166,7 @@ ssize_t libewf_segment_file_read_file_header(
 }
 
 /* Writes the segment file header
- * Returns the number of bytes written if successful, or -1 on errror
+ * Returns the number of bytes written if successful, or -1 on error
  */
 ssize_t libewf_segment_file_write_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -1703,7 +1703,7 @@ ssize_t libewf_segment_file_write_chunk(
 	}
 	else
 	{
-		chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAGS_COMPRESSED;
+		chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_COMPRESSED;
 	}
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1981,7 +1981,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		chunk_value->segment_file_handle = segment_file_handle;
 		chunk_value->file_offset         = segment_file_offset;
 		chunk_value->size                = chunk_size + sizeof( uint32_t );
-		chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAGS_DELTA_CHUNK;
+		chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK;
 	}
 	else if( write_count < 0 )
 	{

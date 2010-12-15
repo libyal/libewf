@@ -797,6 +797,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
    [ac_libewf_have_libbfio=no])
   AC_CHECK_LIB(
    bfio,
+   libbfio_pool_clone,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
    libbfio_pool_open,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])

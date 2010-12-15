@@ -88,8 +88,8 @@ int imaging_handle_initialize(
 	}
 	if( *imaging_handle == NULL )
 	{
-		*imaging_handle = (imaging_handle_t *) memory_allocate(
-		                                        sizeof( imaging_handle_t ) );
+		*imaging_handle = memory_allocate_structure(
+		                   imaging_handle_t );
 
 		if( *imaging_handle == NULL )
 		{
@@ -100,7 +100,7 @@ int imaging_handle_initialize(
 			 "%s: unable to create imaging handle.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     *imaging_handle,
@@ -114,12 +114,7 @@ int imaging_handle_initialize(
 			 "%s: unable to clear imaging handle.",
 			 function );
 
-			memory_free(
-			 *imaging_handle );
-
-			*imaging_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *imaging_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
 		                                                                       sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_INPUT_BUFFER_SIZE );
@@ -133,12 +128,7 @@ int imaging_handle_initialize(
 			 "%s: unable to create input buffer.",
 			 function );
 
-			memory_free(
-			 *imaging_handle );
-
-			*imaging_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_set(
 		     ( *imaging_handle )->input_buffer,
@@ -152,14 +142,7 @@ int imaging_handle_initialize(
 			 "%s: unable to clear imaging handle.",
 			 function );
 
-			memory_free(
-			 ( *imaging_handle )->input_buffer );
-			memory_free(
-			 *imaging_handle );
-
-			*imaging_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_handle_initialize(
 		     &( ( *imaging_handle )->output_handle ),
@@ -172,14 +155,7 @@ int imaging_handle_initialize(
 			 "%s: unable to initialize output handle.",
 			 function );
 
-			memory_free(
-			 ( *imaging_handle )->input_buffer );
-			memory_free(
-			 *imaging_handle );
-
-			*imaging_handle = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *imaging_handle )->calculate_md5  = calculate_md5;
 		( *imaging_handle )->calculate_sha1 = calculate_sha1;
@@ -197,17 +173,7 @@ int imaging_handle_initialize(
 				 "%s: unable to initialize MD5 context.",
 				 function );
 
-				libewf_handle_free(
-				 &( ( *imaging_handle )->output_handle ),
-				 NULL );
-				memory_free(
-				 ( *imaging_handle )->input_buffer );
-				memory_free(
-				 *imaging_handle );
-
-				*imaging_handle = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 		}
 		if( ( *imaging_handle )->calculate_sha1 != 0 )
@@ -223,17 +189,7 @@ int imaging_handle_initialize(
 				 "%s: unable to initialize SHA1 context.",
 				 function );
 
-				libewf_handle_free(
-				 &( ( *imaging_handle )->output_handle ),
-				 NULL );
-				memory_free(
-				 ( *imaging_handle )->input_buffer );
-				memory_free(
-				 *imaging_handle );
-
-				*imaging_handle = NULL;
-
-				return( -1 );
+				goto on_error;
 			}
 		}
 		( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
@@ -247,6 +203,27 @@ int imaging_handle_initialize(
 		( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
+
+on_error:
+	if( *imaging_handle != NULL )
+	{
+		if( ( *imaging_handle )->output_handle != NULL )
+		{
+			libewf_handle_free(
+			 &( ( *imaging_handle )->output_handle ),
+			 NULL );
+		}
+		if( ( *imaging_handle )->input_buffer != NULL )
+		{
+			memory_free(
+			 ( *imaging_handle )->input_buffer );
+		}
+		memory_free(
+		 *imaging_handle );
+
+		*imaging_handle = NULL;
+	}
+	return( -1 );
 }
 
 /* Frees the imaging handle and its elements
@@ -1614,9 +1591,7 @@ int imaging_handle_prompt_for_string(
 		 "%s: unable to create internal string.",
 		 function );
 
-		*internal_string_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	if( memory_set(
 	     *internal_string,
@@ -1630,13 +1605,7 @@ int imaging_handle_prompt_for_string(
 		 "%s: unable to clear internal string.",
 		 function );
 
-		memory_free(
-		 *internal_string );
-
-		*internal_string      = NULL;
-		*internal_string_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	result = ewfinput_get_string_variable(
 	          imaging_handle->notify_stream,
@@ -1654,15 +1623,21 @@ int imaging_handle_prompt_for_string(
 		 "%s: unable to retrieve string variable.",
 		 function );
 
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( *internal_string != NULL )
+	{
 		memory_free(
 		 *internal_string );
 
-		*internal_string      = NULL;
-		*internal_string_size = 0;
-
-		return( -1 );
+		*internal_string = NULL;
 	}
-	return( result );
+	*internal_string_size = 0;
+
+	return( -1 );
 }
 
 /* Prompts the user for the compression level
@@ -2513,7 +2488,7 @@ int imaging_handle_set_string(
 			 "%s: unable to create internal string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libcstring_system_string_copy(
 		     *internal_string,
@@ -2527,18 +2502,25 @@ int imaging_handle_set_string(
 			 "%s: unable to copy string.",
 			 function );
 
-			memory_free(
-			 *internal_string );
-
-			*internal_string = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
 		( *internal_string )[ string_length ] = 0;
 
 		*internal_string_size = string_length + 1;
 	}
 	return( 1 );
+
+on_error:
+	if( *internal_string != NULL )
+	{
+		memory_free(
+		 *internal_string );
+
+		*internal_string = NULL;
+	}
+	*internal_string_size = 0;
+
+	return( -1 );
 }
 
 /* Sets the compression values
@@ -3648,9 +3630,7 @@ int imaging_handle_get_header_value(
 			 function,
 			 (char *) identifier );
 
-			*header_value_size = 0;
-
-			return( -1 );
+			goto on_error;
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_handle_get_utf16_header_value(
@@ -3679,16 +3659,22 @@ int imaging_handle_get_header_value(
 			 function,
 			 (char *) identifier );
 
-			memory_free(
-			 *header_value );
-
-			*header_value      = NULL;
-			*header_value_size = 0;
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *header_value != NULL )
+	{
+		memory_free(
+		 *header_value );
+
+		*header_value = NULL;
+	}
+	*header_value_size = 0;
+
+	return( -1 );
 }
 
 /* Sets the header value in the output handle
@@ -3836,7 +3822,7 @@ int imaging_handle_set_hash_value(
 		 "%s: unable to determine UTF-8 hash value size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	utf8_hash_value = (uint8_t *) memory_allocate(
 	                               sizeof( uint8_t ) * utf8_hash_value_size );
@@ -3850,7 +3836,7 @@ int imaging_handle_set_hash_value(
 		 "%s: unable to create UTF-8 hash value.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libsystem_string_copy_to_utf8_string(
 	     hash_value,
@@ -3866,10 +3852,7 @@ int imaging_handle_set_hash_value(
 		 "%s: unable to set UTF-8 hash value.",
 		 function );
 
-		memory_free(
-		 utf8_hash_value );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_handle_set_utf8_hash_value(
 	     imaging_handle->output_handle,
@@ -3887,10 +3870,7 @@ int imaging_handle_set_hash_value(
 		 function,
 		 hash_value_identifier );
 
-		memory_free(
-		 utf8_hash_value );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
@@ -3910,16 +3890,21 @@ int imaging_handle_set_hash_value(
 			 function,
 			 hash_value_identifier );
 
-			memory_free(
-			 utf8_hash_value );
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	memory_free(
 	 utf8_hash_value );
 
 	return( 1 );
+
+on_error:
+	if( utf8_hash_value != NULL )
+	{
+		memory_free(
+		 utf8_hash_value );
+	}
+	return( -1 );
 }
 
 /* Appends a read error to the output handle
@@ -3974,7 +3959,7 @@ int imaging_handle_append_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append acquiry errror.",
+		 "%s: unable to append acquiry error.",
 		 function );
 
 		return( -1 );
@@ -3991,7 +3976,7 @@ int imaging_handle_append_read_error(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append acquiry errror to secondary output handle.",
+			 "%s: unable to append acquiry error to secondary output handle.",
 			 function );
 
 			return( -1 );

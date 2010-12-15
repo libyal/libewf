@@ -126,6 +126,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t * const *argv_filenames = NULL;
 	libcstring_system_character_t **ewf_filenames         = NULL;
 
+	libcstring_system_character_t *option_header_codepage = NULL;
 	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfdebug" );
 
 	libcstring_system_integer_t option                    = 0;
@@ -145,21 +146,16 @@ int main( int argc, char * const argv[] )
 	     "ewftools",
 	     &error ) != 1 )
 	{
+		ewfoutput_version_fprint(
+		 stdout,
+		 program );
+
 		fprintf(
 		 stderr,
 		 "Unable to initialize system values.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
-	ewfoutput_version_fprint(
-	 stdout,
-	 program );
-
 	while( ( option = libsystem_getopt(
 			   argc,
 			   argv,
@@ -169,6 +165,10 @@ int main( int argc, char * const argv[] )
 		{
 			case (libcstring_system_integer_t) '?':
 			default:
+				ewfoutput_version_fprint(
+				 stdout,
+				 program );
+
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
@@ -180,25 +180,15 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (libcstring_system_integer_t) 'A':
-				if( ewfinput_determine_header_codepage(
-				     optarg,
-				     &header_codepage,
-				     &error ) != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+				option_header_codepage = optarg;
 
-					fprintf(
-					 stderr,
-					 "Unsuported header codepage defaulting to: ascii.\n" );
-
-					header_codepage = LIBEWF_CODEPAGE_ASCII;
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'h':
+				ewfoutput_version_fprint(
+				 stdout,
+				 program );
+
 				usage_fprint(
 				 stdout );
 
@@ -213,6 +203,10 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'V':
+				ewfoutput_version_fprint(
+				 stdout,
+				 program );
+
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -221,6 +215,10 @@ int main( int argc, char * const argv[] )
 	}
 	if( optind == argc )
 	{
+		ewfoutput_version_fprint(
+		 stdout,
+		 program );
+
 		fprintf(
 		 stderr,
 		 "Missing EWF image file(s).\n" );
@@ -228,8 +226,12 @@ int main( int argc, char * const argv[] )
 		usage_fprint(
 		 stdout );
 
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
+	ewfoutput_version_fprint(
+	 stdout,
+	 program );
+
 	libsystem_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_verbose(
@@ -238,6 +240,25 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 
+	if( option_header_codepage != NULL )
+	{
+		if( ewfinput_determine_header_codepage(
+		     option_header_codepage,
+		     &header_codepage,
+		     &error ) != 1 )
+		{
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			fprintf(
+			 stderr,
+			 "Unsuported header codepage defaulting to: ascii.\n" );
+
+			header_codepage = LIBEWF_CODEPAGE_ASCII;
+		}
+	}
 	if( libsystem_signal_attach(
 	     ewfdebug_signal_handler,
 	     &error ) != 1 )
@@ -260,12 +281,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize glob.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( libsystem_glob_resolve(
 	     glob,
@@ -277,16 +293,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to resolve glob.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	argv_filenames      = glob->result;
 	number_of_filenames = glob->number_of_results;
@@ -322,18 +329,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to resolve ewf file(s).\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-			libsystem_glob_free(
-			 &glob,
-			 NULL );
-#endif
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 		argv_filenames = (libcstring_system_character_t * const *) ewf_filenames;
 	}
@@ -345,18 +341,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize input handle.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
-#endif
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	result = libewf_handle_open(
 	          ewfdebug_input_handle,
@@ -374,12 +359,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free glob.\n" );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 #endif
 	if( ewf_filenames != NULL )
@@ -460,5 +440,23 @@ int main( int argc, char * const argv[] )
 	 "Debug completed.\n" );
 
 	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( glob != NULL )
+	{
+		libsystem_glob_free(
+		 &glob,
+		 NULL );
+	}
+#endif
+	return( EXIT_FAILURE );
 }
 

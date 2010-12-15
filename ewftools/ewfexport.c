@@ -772,16 +772,16 @@ int main( int argc, char * const argv[] )
 	     "ewftools",
 	     &error ) != 1 )
 	{
+		ewfoutput_version_fprint(
+		 stderr,
+		 program );
+
 		fprintf(
 		 stderr,
 		 "Unable to initialize system values.\n" );
 
 		goto on_error;
 	}
-	ewfoutput_version_fprint(
-	 stderr,
-	 program );
-
 #if defined( WINAPI )
 #if defined( _MSC_VER )
 	if( _setmode(
@@ -795,6 +795,10 @@ int main( int argc, char * const argv[] )
 	     _O_BINARY ) == -1 )
 #endif
 	{
+		ewfoutput_version_fprint(
+		 stderr,
+		 program );
+
 		fprintf(
 		 stderr,
 		 "Unable to set stdout to binary mode.\n" );
@@ -814,6 +818,10 @@ int main( int argc, char * const argv[] )
 		{
 			case (libcstring_system_integer_t) '?':
 			default:
+				ewfoutput_version_fprint(
+				 stderr,
+				 program );
+
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
@@ -866,6 +874,10 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'h':
+				ewfoutput_version_fprint(
+				 stderr,
+				 program );
+
 				usage_fprint(
 				 stderr );
 
@@ -940,6 +952,10 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'V':
+				ewfoutput_version_fprint(
+				 stderr,
+				 program );
+
 				ewfoutput_copyright_fprint(
 				 stderr );
 
@@ -953,6 +969,10 @@ int main( int argc, char * const argv[] )
 	}
 	if( optind == argc )
 	{
+		ewfoutput_version_fprint(
+		 stderr,
+		 program );
+
 		fprintf(
 		 stderr,
 		 "Missing EWF image file(s).\n" );
@@ -962,6 +982,10 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+	ewfoutput_version_fprint(
+	 stderr,
+	 program );
+
 	libsystem_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_verbose(

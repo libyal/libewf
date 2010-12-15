@@ -164,6 +164,140 @@ int libewf_segment_table_free(
 	return( result );
 }
 
+/* Clones the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_clone(
+     libewf_segment_table_t **destination_segment_table,
+     libewf_segment_table_t *source_segment_table,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_clone";
+
+	if( destination_segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_segment_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination segment table value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_segment_table == NULL )
+	{
+		*destination_segment_table = NULL;
+
+		return( 1 );
+	}
+	*destination_segment_table = memory_allocate_structure(
+	                              libewf_segment_table_t );
+
+	if( *destination_segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination segment table.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *destination_segment_table,
+	     0,
+	     sizeof( libewf_segment_table_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear source to destination segment table.",
+		 function );
+
+		goto on_error;
+	}
+	if( source_segment_table->basename != NULL )
+	{
+		( *destination_segment_table )->basename = memory_allocate(
+					                    sizeof( libcstring_system_character_t ) * source_segment_table->basename_size );
+
+		if( *destination_segment_table == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination segment table.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_segment_table )->basename,
+		     source_segment_table->basename,
+		     sizeof( libcstring_system_character_t ) * source_segment_table->basename_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination basename.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_segment_table )->basename_size = source_segment_table->basename_size;
+	}
+	if( libewf_array_clone(
+	     &( ( *destination_segment_table )->segment_file_handles ),
+	     source_segment_table->segment_file_handles,
+	     &libewf_segment_file_handle_free,
+	     &libewf_segment_file_handle_clone,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination segment file handles.",
+		 function );
+
+		goto on_error;
+	}
+	( *destination_segment_table )->maximum_segment_size = source_segment_table->maximum_segment_size;
+
+	return( 1 );
+
+on_error:
+	if( *destination_segment_table != NULL )
+	{
+		if( ( *destination_segment_table )->basename != NULL )
+		{
+			memory_free(
+			 ( *destination_segment_table )->basename );
+		}
+		memory_free(
+		 *destination_segment_table );
+
+		*destination_segment_table = NULL;
+	}
+	return( -1 );
+}
+
 /* Resizes the segment table
  * Returns 1 if successful or -1 on error
  */

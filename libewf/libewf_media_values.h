@@ -87,6 +87,11 @@ int libewf_media_values_free(
      libewf_media_values_t **media_values,
      liberror_error_t **error );
 
+int libewf_media_values_clone(
+     libewf_media_values_t **destination_media_values,
+     libewf_media_values_t *source_media_values,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
