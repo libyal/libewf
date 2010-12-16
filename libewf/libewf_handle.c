@@ -2726,6 +2726,7 @@ int libewf_handle_open_read(
 		}
 		result = libewf_segment_file_read_sections(
 		          segment_file_handle,
+		          segment_number,
 		          internal_handle->io_handle,
 		          internal_handle->file_io_pool,
 		          &last_segment_file,

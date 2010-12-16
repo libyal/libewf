@@ -77,6 +77,7 @@ int libewf_chunk_value_initialize(
 
 			goto on_error;
 		}
+		( *chunk_value )->segment_table_index = -1;
 	}
 	return( 1 );
 
@@ -183,7 +184,7 @@ int libewf_chunk_value_clone(
 
 		goto on_error;
 	}
-/* TODO */
+/* TODO refactor to allow cloning */
 	( (libewf_chunk_value_t *) *destination_chunk_value )->segment_file_handle = NULL;
 
 	return( 1 );

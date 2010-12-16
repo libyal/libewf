@@ -109,6 +109,7 @@ int libewf_offset_table_fill(
      ewf_table_offset_t *offsets,
      uint32_t number_of_offsets,
      libewf_segment_file_handle_t *segment_file_handle,
+     int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error );
 
@@ -133,6 +134,7 @@ int libewf_offset_table_compare(
      ewf_table_offset_t *offsets,
      uint32_t number_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
+     int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error );
 

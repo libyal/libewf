@@ -289,6 +289,7 @@ ssize_t libewf_segment_file_write_file_header(
  */
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,
+     int segment_table_index,
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      int *last_segment_file,
@@ -351,6 +352,7 @@ int libewf_segment_file_read_sections(
 		result = libewf_section_read(
 		          file_io_pool,
 		          segment_file_handle,
+		          segment_table_index,
 		          header_sections,
 		          hash_sections,
 		          media_values,

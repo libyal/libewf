@@ -163,6 +163,7 @@ ssize_t libewf_section_volume_read(
 ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          size_t section_size,
          uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
@@ -173,6 +174,7 @@ ssize_t libewf_section_table_read(
 ssize_t libewf_section_table2_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          size_t section_size,
          uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
@@ -361,6 +363,7 @@ ssize_t libewf_section_debug_read(
 int libewf_section_read(
      libbfio_pool_t *file_io_pool,
      libewf_segment_file_handle_t *segment_file_handle,
+     int segment_table_index,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,

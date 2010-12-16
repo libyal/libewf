@@ -2355,6 +2355,7 @@ ssize_t libewf_section_volume_read(
 ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          size_t section_size,
          uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
@@ -2641,6 +2642,7 @@ ssize_t libewf_section_table_read(
 		     offsets,
 		     number_of_chunks,
 		     segment_file_handle,
+		     segment_table_index,
 		     offsets_tainted,
 		     error ) != 1 )
 		{
@@ -2740,6 +2742,7 @@ ssize_t libewf_section_table_read(
 ssize_t libewf_section_table2_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          size_t section_size,
          uint32_t media_number_of_chunks,
          libewf_offset_table_t *offset_table,
@@ -3026,6 +3029,7 @@ ssize_t libewf_section_table2_read(
 		     offsets,
 		     number_of_chunks,
 		     segment_file_handle,
+		     segment_table_index,
 		     offsets_tainted,
 		     error ) != 1 )
 		{
@@ -7542,6 +7546,7 @@ ssize_t libewf_section_debug_read(
 int libewf_section_read(
      libbfio_pool_t *file_io_pool,
      libewf_segment_file_handle_t *segment_file_handle,
+     int segment_table_index,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
@@ -7562,6 +7567,7 @@ int libewf_section_read(
 	uint64_t section_size      = 0;
 	uint64_t section_next      = 0;
 	size_t section_type_length = 0;
+	uint8_t section_is_known   = 0;
 	int result                 = 0;
 
 	if( segment_file_handle == NULL )
@@ -7754,335 +7760,361 @@ int libewf_section_read(
 
 		return( -1 );
 	}
-
-	/* Nothing to do for the next and done section
-	 * The \0 byte is included in the compare
-	 */
-	if( ( memory_compare(
-	       section->type,
-	       "next",
-	       5 ) == 0 )
-	 || ( memory_compare(
-	       section->type,
-	       "done",
-	       5 ) == 0 ) )
+	if( section_type_length == 4 )
 	{
-	}
-	/* Read the header2 section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "header2",
-	          8 ) == 0 )
-	{
-		read_count = libewf_section_header2_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              &( header_sections->header2 ),
-		              &( header_sections->header2_size ),
-		              error );
-
-		header_sections->number_of_header_sections++;
-	}
-	/* Read the header section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "header",
-	          7 ) == 0 )
-	{
-		read_count = libewf_section_header_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              &( header_sections->header ),
-		              &( header_sections->header_size ),
-		              error );
-
-		header_sections->number_of_header_sections++;
-	}
-	/* Read the xheader section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "xheader",
-	          8 ) == 0 )
-	{
-		read_count = libewf_section_xheader_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              &( header_sections->xheader ),
-		              &( header_sections->xheader_size ),
-		              error );
-
-		header_sections->number_of_header_sections++;
-	}
-	/* Read the volume or disk section
-	 * The \0 byte is included in the compare
-	 */
-	else if( ( memory_compare(
-	            (void *) section->type,
-	            (void *) "volume",
-	            7 ) == 0 )
-	      || ( memory_compare(
-	            (void *) section->type,
-	            (void *) "disk",
-	            5 ) == 0 ) )
-	{
-		read_count = libewf_section_volume_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              media_values,
-		              compression_level,
-		              format,
-		              ewf_format,
-		              error );
-
-		/* Check if the EWF file format is that of EnCase1
-		 * this allows the table read function to reduce verbose
-		 * output of additional data in table section
-		 */
-		if( ( *ewf_format == EWF_FORMAT_E01 )
-		 && ( header_sections->number_of_header_sections == 1 ) )
+		if( memory_compare(
+		     (void *) section->type,
+		     (void *) "data",
+		     4 ) == 0 )
 		{
-			*format = LIBEWF_FORMAT_ENCASE1;
+			read_count = libewf_section_data_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      media_values,
+				      *ewf_format,
+				      error );
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+		          (void *) section->type,
+		          (void *) "disk",
+		          4 ) == 0 )
+		{
+			read_count = libewf_section_volume_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      media_values,
+				      compression_level,
+				      format,
+				      ewf_format,
+				      error );
+
+			/* Check if the EWF file format is that of EnCase1
+			 * this allows the table read function to reduce verbose
+			 * output of additional data in table section
+			 */
+			if( ( *ewf_format == EWF_FORMAT_E01 )
+			 && ( header_sections->number_of_header_sections == 1 ) )
+			{
+				*format = LIBEWF_FORMAT_ENCASE1;
+			}
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+		          (void *) section->type,
+		          (void *) "done",
+		          4 ) == 0 )
+		{
+			/* Nothing to do for the done section
+			 */
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+			  (void *) section->type,
+			  (void *) "hash",
+			  4 ) == 0 )
+		{
+			read_count = libewf_section_hash_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      hash_sections->md5_hash,
+				      error );
+
+			hash_sections->md5_hash_set = 1;
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+		          (void *) section->type,
+		          (void *) "next",
+		          4 ) == 0 )
+		{
+			/* Nothing to do for the next section
+			 */
+			section_is_known = 1;
 		}
 	}
-	/* Read the table2 section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "table2",
-	          7 ) == 0 )
+	else if( section_type_length == 5 )
 	{
-		read_count = libewf_section_table2_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              media_values->number_of_chunks,
-		              offset_table,
-		              *format,
-		              *ewf_format,
-		              error );
-	}
-	/* Read the table section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "table",
-	          6 ) == 0 )
-	{
-		read_count = libewf_section_table_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              media_values->number_of_chunks,
-		              offset_table,
-		              *format,
-		              *ewf_format,
-		              error );
-	}
-	/* Read the sectors section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "sectors",
-	          8 ) == 0 )
-	{
-		read_count = libewf_section_sectors_read(
-		              file_io_pool,
-		              segment_file_handle,
- 		              (size64_t) section_size,
- 		              *ewf_format,
- 		              error );
-	}
-	/* Read the delta_chunk section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "delta_chunk",
-	          12 ) == 0 )
-	{
-		read_count = libewf_section_delta_chunk_read(
- 		              file_io_pool,
- 		              segment_file_handle,
- 		              (size_t) section_size,
- 		              offset_table,
- 		              error );
-	}
-	/* Read the ltree section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "ltree",
-	          6 ) == 0 )
-	{
-		read_count = libewf_section_ltree_read(
-		              file_io_pool,
-		              segment_file_handle,
- 		              (size_t) section_size,
-		              ewf_format,
-		              &( single_files->ltree_data ),
-		              &( single_files->ltree_data_size ),
- 		              error );
-	}
-	/* Read the session section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "session",
-	          8 ) == 0 )
-	{
-		read_count = libewf_section_session_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              media_values,
-		              sessions,
-		              (size_t) section_size,
-		              *ewf_format,
- 		              error );
-	}
-	/* Read the data section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "data",
-	          5 ) == 0 )
-	{
-		read_count = libewf_section_data_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              media_values,
-		              *ewf_format,
- 		              error );
-	}
-	/* Read the digest section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "digest",
-	          7 ) == 0 )
-	{
-		read_count = libewf_section_digest_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              hash_sections->md5_digest,
-		              hash_sections->sha1_digest,
- 		              error );
+		if( memory_compare(
+		     (void *) section->type,
+		     (void *) "ltree",
+		     5 ) == 0 )
+		{
+			read_count = libewf_section_ltree_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      ewf_format,
+				      &( single_files->ltree_data ),
+				      &( single_files->ltree_data_size ),
+				      error );
 
-		result = libewf_section_test_zero(
-		          hash_sections->md5_digest,
-		          16,
-		          error );
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+		          (void *) section->type,
+		          (void *) "table",
+		          5 ) == 0 )
+		{
+			read_count = libewf_section_table_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      segment_table_index,
+				      (size_t) section_size,
+				      media_values->number_of_chunks,
+				      offset_table,
+				      *format,
+				      *ewf_format,
+				      error );
 
-		if( result == -1 )
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+			  (void *) section->type,
+			  (void *) "xhash",
+			  5 ) == 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if MD5 hash is empty.",
-			 function );
+			read_count = libewf_section_xhash_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      &( hash_sections->xhash ),
+				      &( hash_sections->xhash_size ),
+				      error );
 
-			return( -1 );
-		}
-		else if( result == 0 )
-		{
-			hash_sections->md5_digest_set = 1;
-		}
-		else
-		{
-			hash_sections->md5_digest_set = 0;
-		}
-		result = libewf_section_test_zero(
-		          hash_sections->sha1_digest,
-		          20,
-		          error );
-
-		if( result == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if SHA1 hash is empty.",
-			 function );
-
-			return( -1 );
-		}
-		else if( result == 0 )
-		{
-			hash_sections->sha1_digest_set = 1;
-		}
-		else
-		{
-			hash_sections->sha1_digest_set = 0;
+			section_is_known = 1;
 		}
 	}
-	/* Read the hash section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "hash",
-	          5 ) == 0 )
+	else if( section_type_length == 6 )
 	{
-		read_count = libewf_section_hash_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              hash_sections->md5_hash,
- 		              error );
+		if( memory_compare(
+		     (void *) section->type,
+		     (void *) "digest",
+		     6 ) == 0 )
+		{
+			read_count = libewf_section_digest_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      hash_sections->md5_digest,
+				      hash_sections->sha1_digest,
+				      error );
 
-		hash_sections->md5_hash_set = 1;
+			result = libewf_section_test_zero(
+				  hash_sections->md5_digest,
+				  16,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if MD5 hash is empty.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result == 0 )
+			{
+				hash_sections->md5_digest_set = 1;
+			}
+			else
+			{
+				hash_sections->md5_digest_set = 0;
+			}
+			result = libewf_section_test_zero(
+				  hash_sections->sha1_digest,
+				  20,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if SHA1 hash is empty.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result == 0 )
+			{
+				hash_sections->sha1_digest_set = 1;
+			}
+			else
+			{
+				hash_sections->sha1_digest_set = 0;
+			}
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+			  (void *) section->type,
+			  (void *) "error2",
+			  6 ) == 0 )
+		{
+			read_count = libewf_section_error2_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      acquiry_errors,
+				      (size_t) section_size,
+				      *ewf_format,
+				      error );
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+		          (void *) section->type,
+		          (void *) "header",
+		          6 ) == 0 )
+		{
+			read_count = libewf_section_header_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      &( header_sections->header ),
+				      &( header_sections->header_size ),
+				      error );
+
+			header_sections->number_of_header_sections++;
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+			  (void *) section->type,
+			  (void *) "table2",
+			  6 ) == 0 )
+		{
+			read_count = libewf_section_table2_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      segment_table_index,
+				      (size_t) section_size,
+				      media_values->number_of_chunks,
+				      offset_table,
+				      *format,
+				      *ewf_format,
+				      error );
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+		          (void *) section->type,
+		          (void *) "volume",
+		          6 ) == 0 )
+		{
+			read_count = libewf_section_volume_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      media_values,
+				      compression_level,
+				      format,
+				      ewf_format,
+				      error );
+
+			/* Check if the EWF file format is that of EnCase1
+			 * this allows the table read function to reduce verbose
+			 * output of additional data in table section
+			 */
+			if( ( *ewf_format == EWF_FORMAT_E01 )
+			 && ( header_sections->number_of_header_sections == 1 ) )
+			{
+				*format = LIBEWF_FORMAT_ENCASE1;
+			}
+			section_is_known = 1;
+		}
 	}
-	/* Read the xhash section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "xhash",
-	          6 ) == 0 )
+	else if( section_type_length == 7 )
 	{
-		read_count = libewf_section_xhash_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              (size_t) section_size,
-		              &( hash_sections->xhash ),
-		              &( hash_sections->xhash_size ),
-		              error );
+		if( memory_compare(
+		     (void *) section->type,
+		     (void *) "header2",
+		     7 ) == 0 )
+		{
+			read_count = libewf_section_header2_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      &( header_sections->header2 ),
+				      &( header_sections->header2_size ),
+				      error );
+
+			header_sections->number_of_header_sections++;
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+			  (void *) section->type,
+			  (void *) "sectors",
+			  7 ) == 0 )
+		{
+			read_count = libewf_section_sectors_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size64_t) section_size,
+				      *ewf_format,
+				      error );
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+			  (void *) section->type,
+			  (void *) "session",
+			  7 ) == 0 )
+		{
+			read_count = libewf_section_session_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      media_values,
+				      sessions,
+				      (size_t) section_size,
+				      *ewf_format,
+				      error );
+
+			section_is_known = 1;
+		}
+		else if( memory_compare(
+			  (void *) section->type,
+			  (void *) "xheader",
+			  7 ) == 0 )
+		{
+			read_count = libewf_section_xheader_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      &( header_sections->xheader ),
+				      &( header_sections->xheader_size ),
+				      error );
+
+			header_sections->number_of_header_sections++;
+
+			section_is_known = 1;
+		}
 	}
-	/* Read the error2 section
-	 * The \0 byte is included in the compare
-	 */
-	else if( memory_compare(
-	          (void *) section->type,
-	          (void *) "error2",
-	          7 ) == 0 )
+	else if( section_type_length == 11 )
 	{
-		read_count = libewf_section_error2_read(
-		              file_io_pool,
-		              segment_file_handle,
-		              acquiry_errors,
-		              (size_t) section_size,
-		              *ewf_format,
- 		              error );
+		if( memory_compare(
+		     (void *) section->type,
+		     (void *) "delta_chunk",
+		     11 ) == 0 )
+		{
+			read_count = libewf_section_delta_chunk_read(
+				      file_io_pool,
+				      segment_file_handle,
+				      (size_t) section_size,
+				      offset_table,
+				      error );
+
+			section_is_known = 1;
+		}
 	}
-	else
+	if( section_is_known == 0 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( libnotify_verbose != 0 )

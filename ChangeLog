@@ -239,6 +239,7 @@ Known issues:
 * code clean up
 * worked on clone handle
 * updated libbfio, libfvalue, libsmraw
+* optimization of read loop
 
 20101215
 * worked on implementing DFXML patch by S. Garfinkel

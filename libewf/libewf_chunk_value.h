@@ -49,6 +49,10 @@ struct libewf_chunk_value
 	 */
 	libewf_segment_file_handle_t *segment_file_handle;
 
+	/* The index of the segment file in the segment or delta segment table
+	 */
+	int segment_table_index;
+
 	/* The file offset of the chunk in the segment file
 	 */
 	off64_t file_offset;

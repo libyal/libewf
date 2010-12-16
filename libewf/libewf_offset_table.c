@@ -576,6 +576,7 @@ int libewf_offset_table_fill(
      ewf_table_offset_t *offsets,
      uint32_t number_of_offsets,
      libewf_segment_file_handle_t *segment_file_handle,
+     int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error )
 {
@@ -823,6 +824,7 @@ int libewf_offset_table_fill(
 			return( -1 );
 		}
 		chunk_value->segment_file_handle = segment_file_handle;
+		chunk_value->segment_table_index = segment_table_index;
 		chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 		chunk_value->size                = (size_t) chunk_size;
 		chunk_value->flags              |= compressed;
@@ -950,6 +952,7 @@ int libewf_offset_table_fill(
 		return( -1 );
 	}
 	chunk_value->segment_file_handle = segment_file_handle;
+	chunk_value->segment_table_index = segment_table_index;
 	chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 	chunk_value->flags              |= compressed;
 
@@ -1304,6 +1307,7 @@ int libewf_offset_table_compare(
      ewf_table_offset_t *offsets,
      uint32_t number_of_offsets,
      libewf_segment_file_handle_t *segment_file_handle,
+     int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error )
 {
@@ -1615,6 +1619,7 @@ int libewf_offset_table_compare(
 		 && ( mismatch == 1 ) )
 		{
 			chunk_value->segment_file_handle = segment_file_handle;
+			chunk_value->segment_table_index = segment_table_index;
 			chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 			chunk_value->size                = (size_t) chunk_size;
 			chunk_value->flags              |= compressed;
@@ -1759,6 +1764,7 @@ int libewf_offset_table_compare(
 	 && ( mismatch == 1 ) )
 	{
 		chunk_value->segment_file_handle = segment_file_handle;
+		chunk_value->segment_table_index = segment_table_index;
 		chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 		chunk_value->flags              |= compressed;
 		chunk_value->flags              &= ~( LIBEWF_CHUNK_VALUE_FLAG_TAINTED | LIBEWF_CHUNK_VALUE_FLAG_CORRUPTED ) ;
