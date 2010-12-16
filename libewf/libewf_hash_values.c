@@ -117,7 +117,7 @@ int libewf_hash_values_parse_md5_hash(
 		 "%s: unable to retrieve if hash value: MD5.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result == 0 )
 	{
@@ -161,7 +161,7 @@ int libewf_hash_values_parse_md5_hash(
 			 "%s: unable to create hash value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_value_set_identifier(
 		     hash_value,
@@ -176,11 +176,7 @@ int libewf_hash_values_parse_md5_hash(
 			 "%s: unable to set hash value: MD5 identifier.",
 			 function );
 
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_value_set_data(
 		     hash_value,
@@ -197,11 +193,7 @@ int libewf_hash_values_parse_md5_hash(
 			 "%s: unable to set hash value: MD5 data.",
 			 function );
 
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_table_set_value(
 		     hash_values,
@@ -215,14 +207,20 @@ int libewf_hash_values_parse_md5_hash(
 			 "%s: unable to set hash value: MD5 in table.",
 			 function );
 
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
+		hash_value = NULL;
 	}
 	return( 1 );
+
+on_error:
+	if( hash_value != NULL )
+	{
+		libfvalue_value_free(
+		 &hash_value,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Parses an SHA1 hash for its value
@@ -293,7 +291,7 @@ int libewf_hash_values_parse_sha1_hash(
 		 "%s: unable to retrieve if hash value: SHA1.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result == 0 )
 	{
@@ -337,7 +335,7 @@ int libewf_hash_values_parse_sha1_hash(
 			 "%s: unable to create hash value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_value_set_identifier(
 		     hash_value,
@@ -352,11 +350,7 @@ int libewf_hash_values_parse_sha1_hash(
 			 "%s: unable to set hash value: SHA1 identifier.",
 			 function );
 
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_value_set_data(
 		     hash_value,
@@ -373,11 +367,7 @@ int libewf_hash_values_parse_sha1_hash(
 			 "%s: unable to set hash value: SHA1 data.",
 			 function );
 
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_table_set_value(
 		     hash_values,
@@ -391,14 +381,20 @@ int libewf_hash_values_parse_sha1_hash(
 			 "%s: unable to set hash value: SHA1 in table.",
 			 function );
 
-			libfvalue_value_free(
-			 (intptr_t *) hash_value,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
+		hash_value = NULL;
 	}
 	return( 1 );
+
+on_error:
+	if( hash_value != NULL )
+	{
+		libfvalue_value_free(
+		 &hash_value,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Parse an xhash for the hash values

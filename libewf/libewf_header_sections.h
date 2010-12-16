@@ -76,6 +76,11 @@ int libewf_header_sections_free(
      libewf_header_sections_t **header_sections,
      liberror_error_t **error );
 
+int libewf_header_sections_clone(
+     libewf_header_sections_t **destination_header_sections,
+     libewf_header_sections_t *source_header_sections,
+     liberror_error_t **error );
+
 int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,
      libfvalue_table_t *header_values,

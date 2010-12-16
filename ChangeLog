@@ -1,8 +1,6 @@
 TODO
 * clean up of ewftools
-  - apply xml patch for ewftools (Simson) (partial)
   - ewfacquire: make behaviour of -g equal to user input ?
-  - move dfxml code to separate code files
 
 * check TODO in code, mainly regarding improvements
 
@@ -52,6 +50,9 @@ Code clean up:
 * make debug output similar to other libraries
   - clean up libewf_section.c
 * make libewf_convert_date_header_value more strict
+* ewfinfo
+  - move DFXML code to separate code files, what about separate library ?
+  - implement a statefull XML writer e.g. open/close_section, open/close_value
 
 BFIO support:
 * improve open file io pool (set basename ?)
@@ -233,6 +234,11 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20101216
+* code clean up
+* worked on clone handle
+* updated libbfio, libfvalue, libsmraw
 
 20101215
 * worked on implementing DFXML patch by S. Garfinkel

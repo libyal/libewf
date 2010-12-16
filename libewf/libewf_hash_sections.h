@@ -78,6 +78,11 @@ int libewf_hash_sections_free(
      libewf_hash_sections_t **hash_sections,
      liberror_error_t **error );
 
+int libewf_hash_sections_clone(
+     libewf_hash_sections_t **destination_hash_sections,
+     libewf_hash_sections_t *source_hash_sections,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

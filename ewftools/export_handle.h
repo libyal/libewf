@@ -170,6 +170,10 @@ struct export_handle
 	/* The nofication output stream
 	 */
 	FILE *notify_stream;
+
+	/* Value to indicate if abort was signalled
+	 */
+	int abort;
 };
 
 int export_handle_initialize(

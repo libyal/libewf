@@ -142,6 +142,194 @@ int libewf_header_sections_free(
 	return( 1 );
 }
 
+/* Clones the header sections
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_header_sections_clone(
+     libewf_header_sections_t **destination_header_sections,
+     libewf_header_sections_t *source_header_sections,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_header_sections_clone";
+
+	if( destination_header_sections == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination header sections.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_header_sections != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination header sections already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_header_sections == NULL )
+	{
+		*destination_header_sections = NULL;
+
+		return( 1 );
+	}
+	if( libewf_header_sections_initialize(
+	     destination_header_sections,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination header sections.",
+		 function );
+
+		goto on_error;
+	}
+	if( *destination_header_sections == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing destination header sections.",
+		 function );
+
+		goto on_error;
+	}
+	if( source_header_sections->header != NULL )
+	{
+		( *destination_header_sections )->header = (uint8_t *) memory_allocate(
+		                                                        sizeof( uint8_t ) * source_header_sections->header_size );
+
+		if( ( *destination_header_sections )->header == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination header.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_header_sections )->header,
+		     source_header_sections->header,
+		     sizeof( uint8_t ) * source_header_sections->header_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination header.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_header_sections )->header_size = source_header_sections->header_size;
+	}
+	if( source_header_sections->header2 != NULL )
+	{
+		( *destination_header_sections )->header2 = (uint8_t *) memory_allocate(
+		                                                         sizeof( uint8_t ) * source_header_sections->header2_size );
+
+		if( ( *destination_header_sections )->header2 == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination header2.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_header_sections )->header2,
+		     source_header_sections->header2,
+		     sizeof( uint8_t ) * source_header_sections->header2_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination header2.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_header_sections )->header2_size = source_header_sections->header2_size;
+	}
+	if( source_header_sections->xheader != NULL )
+	{
+		( *destination_header_sections )->xheader = (uint8_t *) memory_allocate(
+		                                                         sizeof( uint8_t ) * source_header_sections->xheader_size );
+
+		if( ( *destination_header_sections )->xheader == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination xheader.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_header_sections )->xheader,
+		     source_header_sections->xheader,
+		     sizeof( uint8_t ) * source_header_sections->xheader_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination xheader.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_header_sections )->xheader_size = source_header_sections->xheader_size;
+	}
+	( *destination_header_sections )->number_of_header_sections = source_header_sections->number_of_header_sections;
+
+	return( 1 );
+
+on_error:
+	if( *destination_header_sections != NULL )
+	{
+		if( ( *destination_header_sections )->xheader != NULL )
+		{
+			memory_free(
+			 ( *destination_header_sections )->xheader );
+		}
+		if( ( *destination_header_sections )->header2 != NULL )
+		{
+			memory_free(
+			 ( *destination_header_sections )->header2 );
+		}
+		if( ( *destination_header_sections )->header != NULL )
+		{
+			memory_free(
+			 ( *destination_header_sections )->header );
+		}
+		memory_free(
+		 *destination_header_sections );
+
+		*destination_header_sections = NULL;
+	}
+	return( -1 );
+}
+
 /* Create the header sections from the header values
  * Returns 1 on success or -1 on error
  */
@@ -471,16 +659,16 @@ on_error:
 		memory_free(
 		 header_sections->header2 );
 
-		header_sections->header2       = NULL;
-		header_sections->header2_size  = 0;
+		header_sections->header2      = NULL;
+		header_sections->header2_size = 0;
 	}
 	if( header_sections->header != NULL )
 	{
 		memory_free(
 		 header_sections->header );
 
-		header_sections->header       = NULL;
-		header_sections->header_size  = 0;
+		header_sections->header      = NULL;
+		header_sections->header_size = 0;
 	}
 	return( -1 );
 }

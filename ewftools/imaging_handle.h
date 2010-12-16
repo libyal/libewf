@@ -196,10 +196,6 @@ struct imaging_handle
 	/* The nofication output stream
 	 */
 	FILE *notify_stream;
-
-	/* Value to indicate if abort was signalled
-	 */
-	int abort;
 };
 
 int imaging_handle_initialize(

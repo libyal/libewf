@@ -3473,7 +3473,7 @@ int libewf_handle_set_utf8_header_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) header_value,
+			 &header_value,
 			 NULL );
 
 			return( -1 );
@@ -3492,7 +3492,7 @@ int libewf_handle_set_utf8_header_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) header_value,
+			 &header_value,
 			 NULL );
 
 			return( -1 );
@@ -4034,7 +4034,7 @@ int libewf_handle_set_utf16_header_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) header_value,
+			 &header_value,
 			 NULL );
 
 			return( -1 );
@@ -4053,7 +4053,7 @@ int libewf_handle_set_utf16_header_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) header_value,
+			 &header_value,
 			 NULL );
 
 			return( -1 );
@@ -5038,7 +5038,7 @@ int libewf_handle_set_utf8_hash_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) hash_value,
+			 &hash_value,
 			 NULL );
 
 			return( -1 );
@@ -5057,7 +5057,7 @@ int libewf_handle_set_utf8_hash_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) hash_value,
+			 &hash_value,
 			 NULL );
 
 			return( -1 );
@@ -5525,7 +5525,7 @@ int libewf_handle_set_utf16_hash_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) hash_value,
+			 &hash_value,
 			 NULL );
 
 			return( -1 );
@@ -5544,7 +5544,7 @@ int libewf_handle_set_utf16_hash_value(
 			 (char *) identifier );
 
 			libfvalue_value_free(
-			 (intptr_t *) hash_value,
+			 &hash_value,
 			 NULL );
 
 			return( -1 );
@@ -5826,12 +5826,11 @@ int libewf_handle_get_root_file_entry(
 	{
 		return( 0 );
 	}
-	/* TODO pass LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_IO_HANDLE */
 	if( libewf_file_entry_initialize(
 	     root_file_entry,
 	     internal_handle,
 	     internal_handle->single_files->root_file_entry_node,
-	     0,
+	     LIBEWF_FILE_ENTRY_FLAGS_DEFAULT,
 	     error ) != 1 )
 	{
 		liberror_error_set(

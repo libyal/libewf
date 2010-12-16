@@ -28,6 +28,8 @@
 #include <libcstring.h>
 #include <liberror.h>
 
+#include <stdio.h>
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
@@ -213,16 +215,16 @@ int info_handle_dfxml_header_fprint(
      info_handle_t *info_handle,
      liberror_error_t **error );
 
-int info_handle_dfxml_build_environment_fprint(
-     info_handle_t *info_handle,
-     liberror_error_t **error );
-
-int info_handle_dfxml_execution_environment_fprint(
-     info_handle_t *info_handle,
-     liberror_error_t **error );
-
 int info_handle_dfxml_footer_fprint(
      info_handle_t *info_handle,
+     liberror_error_t **error );
+
+int dfxml_build_environment_fprint(
+     FILE *stream,
+     liberror_error_t **error );
+
+int dfxml_execution_environment_fprint(
+     FILE *stream,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

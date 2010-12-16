@@ -1339,8 +1339,8 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	volume = (ewf_volume_smart_t *) memory_allocate(
-	                                 sizeof( ewf_volume_smart_t ) );
+	volume = memory_allocate_structure(
+	          ewf_volume_smart_t );
 
 	if( volume == NULL )
 	{
@@ -1533,8 +1533,8 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
-	volume = (ewf_volume_smart_t *) memory_allocate(
-	                                 sizeof( ewf_volume_smart_t ) );
+	volume = memory_allocate_structure(
+	          ewf_volume_smart_t );
 
 	if( volume == NULL )
 	{
@@ -1733,8 +1733,8 @@ ssize_t libewf_section_volume_e01_read(
 
 		return( -1 );
 	}
-	volume = (ewf_volume_t *) memory_allocate(
-	                           sizeof( ewf_volume_t ) );
+	volume = memory_allocate_structure(
+	          ewf_volume_t );
 
 	if( volume == NULL )
 	{
@@ -1997,8 +1997,8 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
-	volume = (ewf_volume_t *) memory_allocate(
-	                           sizeof( ewf_volume_t ) );
+	volume = memory_allocate_structure(
+	          ewf_volume_t );
 
 	if( volume == NULL )
 	{
@@ -3596,8 +3596,8 @@ ssize_t libewf_section_ltree_read(
 #endif
 	*ewf_format = EWF_FORMAT_L01;
 
-	ltree = (ewf_ltree_t *) memory_allocate(
-	                         sizeof( ewf_ltree_t ) );
+	ltree = memory_allocate_structure(
+	         ewf_ltree_t );
 
 	if( ltree == NULL )
 	{
@@ -4567,8 +4567,8 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	data = (ewf_data_t *) memory_allocate(
-	                       sizeof( ewf_data_t ) );
+	data = memory_allocate_structure(
+	        ewf_data_t );
 
 	if( data == NULL )
 	{
@@ -4924,8 +4924,8 @@ ssize_t libewf_section_data_write(
 	 */
 	if( *cached_data_section == NULL )
 	{
-		*cached_data_section = (ewf_data_t *) memory_allocate(
-		                                       sizeof( ewf_data_t ) );
+		*cached_data_section = memory_allocate_structure(
+		                        ewf_data_t );
 
 		if( *cached_data_section == NULL )
 		{

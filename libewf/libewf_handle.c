@@ -585,20 +585,72 @@ int libewf_handle_clone(
 	}
 	if( internal_source_handle->header_sections != NULL )
 	{
-/* TODO */
+		if( libewf_header_sections_clone(
+		     &( internal_destination_handle->header_sections ),
+		     internal_source_handle->header_sections,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create destination header sections.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( internal_source_handle->hash_sections != NULL )
 	{
-/* TODO */
+		if( libewf_hash_sections_clone(
+		     &( internal_destination_handle->hash_sections ),
+		     internal_source_handle->hash_sections,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create destination hash sections.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( internal_source_handle->header_values != NULL )
 	{
-/* TODO */
+		if( libfvalue_table_clone(
+		     &( internal_destination_handle->header_values ),
+		     internal_source_handle->header_values,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create destination header values.",
+			 function );
+
+			goto on_error;
+		}
 		internal_destination_handle->header_values_parsed = internal_source_handle->header_values_parsed;
 	}
 	if( internal_source_handle->hash_values != NULL )
 	{
-/* TODO */
+		if( libfvalue_table_clone(
+		     &( internal_destination_handle->hash_values ),
+		     internal_source_handle->hash_values,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create destination hash values.",
+			 function );
+
+			goto on_error;
+		}
 		internal_destination_handle->hash_values_parsed = internal_source_handle->hash_values_parsed;
 	}
 	internal_destination_handle->maximum_number_of_open_handles = internal_source_handle->maximum_number_of_open_handles;
@@ -609,7 +661,30 @@ int libewf_handle_clone(
 on_error:
 	if( internal_destination_handle != NULL )
 	{
-/* TODO */
+		if( internal_destination_handle->hash_values != NULL )
+		{
+			libfvalue_table_free(
+			 &( internal_destination_handle->hash_values ),
+			 NULL );
+		}
+		if( internal_destination_handle->header_values != NULL )
+		{
+			libfvalue_table_free(
+			 &( internal_destination_handle->header_values ),
+			 NULL );
+		}
+		if( internal_destination_handle->hash_sections != NULL )
+		{
+			libewf_hash_sections_free(
+			 &( internal_destination_handle->hash_sections ),
+			 NULL );
+		}
+		if( internal_destination_handle->header_sections != NULL )
+		{
+			libewf_header_sections_free(
+			 &( internal_destination_handle->header_sections ),
+			 NULL );
+		}
 		if( internal_destination_handle->offset_table != NULL )
 		{
 			libewf_offset_table_free(
@@ -2363,7 +2438,7 @@ int libewf_handle_close(
 	if( internal_handle->header_values != NULL )
 	{
 		if( libfvalue_table_free(
-		     (intptr_t *) internal_handle->header_values,
+		     &( internal_handle->header_values ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2379,7 +2454,7 @@ int libewf_handle_close(
 	if( internal_handle->hash_values != NULL )
 	{
 		if( libfvalue_table_free(
-		     (intptr_t *) internal_handle->hash_values,
+		     &( internal_handle->hash_values ),
 		     error ) != 1 )
 		{
 			liberror_error_set(

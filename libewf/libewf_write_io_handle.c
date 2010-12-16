@@ -168,6 +168,7 @@ int libewf_write_io_handle_clone(
      liberror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_clone";
+	size_t offsets_size   = 0;
 
 	if( destination_write_io_handle == NULL )
 	{
@@ -225,16 +226,89 @@ int libewf_write_io_handle_clone(
 
 		goto on_error;
 	}
-/* TODO clone these values ? */
 	( *destination_write_io_handle )->data_section            = NULL;
 	( *destination_write_io_handle )->table_offsets           = NULL;
 	( *destination_write_io_handle )->number_of_table_offsets = 0;
 
+	if( source_write_io_handle->data_section != NULL )
+	{
+		( *destination_write_io_handle )->data_section = memory_allocate_structure(
+		                                                  ewf_data_t );
+
+		if( ( *destination_write_io_handle )->data_section == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination data section.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_write_io_handle )->data_section,
+		     source_write_io_handle->data_section,
+		     sizeof( ewf_data_t ) ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination data section.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( source_write_io_handle->table_offsets != NULL )
+	{
+		offsets_size = sizeof( ewf_table_offset_t ) * ( *destination_write_io_handle )->number_of_table_offsets;
+
+		( *destination_write_io_handle )->table_offsets = (ewf_table_offset_t *) memory_allocate(
+		                                                                          offsets_size );
+
+		if( ( *destination_write_io_handle )->table_offsets == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination table offsets.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_write_io_handle )->table_offsets,
+		     source_write_io_handle->table_offsets,
+		     offsets_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination table offsets.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	return( 1 );
 
 on_error:
 	if( *destination_write_io_handle != NULL )
 	{
+		if( ( *destination_write_io_handle )->table_offsets != NULL )
+		{
+			memory_free(
+			 ( *destination_write_io_handle )->table_offsets );
+		}
+		if( ( *destination_write_io_handle )->data_section != NULL )
+		{
+			memory_free(
+			 ( *destination_write_io_handle )->data_section );
+		}
 		memory_free(
 		 *destination_write_io_handle );
 

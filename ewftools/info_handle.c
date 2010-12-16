@@ -3589,8 +3589,8 @@ int info_handle_dfxml_header_fprint(
 	 "\t\t<version>%s</version>\n",
 	 LIBEWF_VERSION_STRING );
 
-	if( info_handle_dfxml_build_environment_fprint(
-	     info_handle,
+	if( dfxml_build_environment_fprint(
+	     info_handle->notify_stream,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -3602,8 +3602,8 @@ int info_handle_dfxml_header_fprint(
 
 		return( -1 );
 	}
-	if( info_handle_dfxml_execution_environment_fprint(
-	     info_handle,
+	if( dfxml_execution_environment_fprint(
+	     info_handle->notify_stream,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -3619,129 +3619,6 @@ int info_handle_dfxml_header_fprint(
 	 info_handle->notify_stream,
 	 "\t</creator>\n"
 	 "\t<ewfinfo>\n" );
-
-	return( 1 );
-}
-
-/* Prints the DFXML build environment to a stream
- * Returns 1 if successful or -1 on error
- */
-int info_handle_dfxml_build_environment_fprint(
-     info_handle_t *info_handle,
-     liberror_error_t **error )
-{
-	static char *function = "info_handle_dfxml_build_environment_fprint";
-
-	if( info_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid info handle.",
-		 function );
-
-		return( -1 );
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\t\t<build_environment>\n" );
-
-	/* TODO add MSC and BORLANC support */
-#if defined( _MSC_VER )
-
-#elif defined( __BORLANDC__ )
-
-#elif defined( __GNUC__ ) && defined( __GNUC_MINOR__ )
-#if defined( __MINGW64_VERSION_MAJOR ) && defined( __MINGW64_VERSION_MINOR )
-	fprintf(
-	 info_handle->notify_stream,
-	 "\t\t\t<compiler>MinGW64 %d.%d</compiler>\n",
-	 __MINGW64_VERSION_MAJOR,
-	 __MINGW64_VERSION_MINOR );
-#elif defined( __MINGW32_MAJOR_VERSION ) && defined( __MINGW32_MINOR_VERSION )
-	fprintf(
-	 info_handle->notify_stream,
-	 "\t\t\t<compiler>MinGW32 %d.%d</compiler>\n",
-	 __MINGW32_MAJOR_VERSION,
-	 __MINGW32_MINOR_VERSION );
-#endif
-	fprintf(
-	 info_handle->notify_stream,
-	 "\t\t\t<compiler>GCC %d.%d</compiler>\n",
-	 __GNUC__,
-	 __GNUC_MINOR__ );
-#endif		
-	fprintf(
-	 info_handle->notify_stream,
-	 "\t\t\t<compilation_date>" __DATE__ " " __TIME__ "</compilation_date>\n" );
-
-	fprintf(
-	 info_handle->notify_stream,
-	 "\t\t\t<library name=\"libewf\" version=\"%s\"/>\n",
-	 LIBEWF_VERSION_STRING );
-
-	/* TODO add other libraries
-	 */
-
-	fprintf(
-	 info_handle->notify_stream,
-	 "\t\t</build_environment>\n" );
-
-	return( 1 );
-}
-
-/* Prints the DFXML execution environment to a stream
- * Returns 1 if successful or -1 on error
- */
-int info_handle_dfxml_execution_environment_fprint(
-     info_handle_t *info_handle,
-     liberror_error_t **error )
-{
-#if defined( HAVE_UNAME ) && !defined( WINAPI )
-	struct utsname utsname_buffer;
-#endif
-
-	static char *function = "info_handle_dfxml_execution_environment_fprint";
-
-	if( info_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid info handle.",
-		 function );
-
-		return( -1 );
-	}
-	/* TODO what about execution environment on other platforms ? */
-
-#if defined( HAVE_UNAME )
-	if( uname(
-	     &utsname_buffer ) == 0 )
-	{
-		fprintf(
-		 info_handle->notify_stream,
-		 "\t\t<execution_environment>\n"
-		 "\t\t\t<os_sysname>%s</os_sysname>\n"
-		 "\t\t\t<os_release>%s</os_release>\n"
-		 "\t\t\t<os_version>%s</os_version>\n"
-		 "\t\t\t<host>%s</host>\n"
-		 "\t\t\t<arch>%s</arch>\n"
-		 "\t\t</execution_environment>\n",
-		 utsname_buffer.sysname,
-		 utsname_buffer.release,
-		 utsname_buffer.version,
-		 utsname_buffer.nodename,
-		 utsname_buffer.machine );
-	}
-#endif
-	/* TODO
-	 * <command_line> X </command_line>
-	 * <uid> getuid() </uid>
-	 * <username> getpwuid( getuid() )->pw_name </username>
-	 */
 
 	return( 1 );
 }
@@ -3771,6 +3648,129 @@ int info_handle_dfxml_footer_fprint(
 	 "\t</ewfinfo>\n"
 	 "</ewfobjects>\n"
 	 "\n" );
+
+	return( 1 );
+}
+
+/* Prints the DFXML build environment to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int dfxml_build_environment_fprint(
+     FILE *stream,
+     liberror_error_t **error )
+{
+	static char *function = "dfxml_build_environment_fprint";
+
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 stream,
+	 "\t\t<build_environment>\n" );
+
+	/* TODO add MSC and BORLANC support */
+#if defined( _MSC_VER )
+
+#elif defined( __BORLANDC__ )
+
+#elif defined( __GNUC__ ) && defined( __GNUC_MINOR__ )
+#if defined( __MINGW64_VERSION_MAJOR ) && defined( __MINGW64_VERSION_MINOR )
+	fprintf(
+	 stream,
+	 "\t\t\t<compiler>MinGW64 %d.%d</compiler>\n",
+	 __MINGW64_VERSION_MAJOR,
+	 __MINGW64_VERSION_MINOR );
+#elif defined( __MINGW32_MAJOR_VERSION ) && defined( __MINGW32_MINOR_VERSION )
+	fprintf(
+	 stream,
+	 "\t\t\t<compiler>MinGW32 %d.%d</compiler>\n",
+	 __MINGW32_MAJOR_VERSION,
+	 __MINGW32_MINOR_VERSION );
+#endif
+	fprintf(
+	 stream,
+	 "\t\t\t<compiler>GCC %d.%d</compiler>\n",
+	 __GNUC__,
+	 __GNUC_MINOR__ );
+#endif		
+	fprintf(
+	 stream,
+	 "\t\t\t<compilation_date>" __DATE__ " " __TIME__ "</compilation_date>\n" );
+
+	fprintf(
+	 stream,
+	 "\t\t\t<library name=\"libewf\" version=\"%s\"/>\n",
+	 LIBEWF_VERSION_STRING );
+
+	/* TODO add other libraries
+	 */
+
+	fprintf(
+	 stream,
+	 "\t\t</build_environment>\n" );
+
+	return( 1 );
+}
+
+/* Prints the DFXML execution environment to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int dfxml_execution_environment_fprint(
+     FILE *stream,
+     liberror_error_t **error )
+{
+#if defined( HAVE_UNAME ) && !defined( WINAPI )
+	struct utsname utsname_buffer;
+#endif
+
+	static char *function = "dfxml_execution_environment_fprint";
+
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	/* TODO what about execution environment on other platforms ? */
+
+#if defined( HAVE_UNAME )
+	if( uname(
+	     &utsname_buffer ) == 0 )
+	{
+		fprintf(
+		 stream,
+		 "\t\t<execution_environment>\n"
+		 "\t\t\t<os_sysname>%s</os_sysname>\n"
+		 "\t\t\t<os_release>%s</os_release>\n"
+		 "\t\t\t<os_version>%s</os_version>\n"
+		 "\t\t\t<host>%s</host>\n"
+		 "\t\t\t<arch>%s</arch>\n"
+		 "\t\t</execution_environment>\n",
+		 utsname_buffer.sysname,
+		 utsname_buffer.release,
+		 utsname_buffer.version,
+		 utsname_buffer.nodename,
+		 utsname_buffer.machine );
+	}
+#endif
+	/* TODO
+	 * <command_line> X </command_line>
+	 * <uid> getuid() </uid>
+	 * <username> getpwuid( getuid() )->pw_name </username>
+	 */
 
 	return( 1 );
 }

@@ -58,7 +58,7 @@ int libewf_file_entry_initialize(
 
 		return( -1 );
 	}
-	if( ( flags & ~( LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
+	if( ( flags & ~( LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -103,7 +103,7 @@ int libewf_file_entry_initialize(
 		internal_file_entry->internal_handle = internal_handle;
 		internal_file_entry->flags           = flags;
 
-		if( ( flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
+		if( ( flags & LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
 		{
 			internal_file_entry->file_entry_tree_node = file_entry_tree_node;
 		}
@@ -170,7 +170,7 @@ int libewf_file_entry_free(
 		 */
 		/* If not managed the file_entry_tree_node reference is freed elsewhere
 		 */
-		if( ( internal_file_entry->flags & LIBEWF_INTERNAL_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) != 0 )
+		if( ( internal_file_entry->flags & LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) != 0 )
 		{
 			if( internal_file_entry->file_entry_tree_node != NULL )
 			{
@@ -850,12 +850,11 @@ int libewf_file_entry_get_sub_file_entry(
 
 		return( -1 );
 	}
-	/* TODO pass LIBEWF_FILE_ENTRY_FLAG_MANAGED_FILE_IO_HANDLE */
 	if( libewf_file_entry_initialize(
 	     sub_file_entry,
 	     internal_file_entry->internal_handle,
 	     sub_file_entry_tree_node,
-	     0,
+	     LIBEWF_FILE_ENTRY_FLAGS_DEFAULT,
 	     error ) != 1 )
 	{
 		liberror_error_set(
