@@ -1547,6 +1547,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
  */
 ssize_t libewf_segment_file_write_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
@@ -1691,7 +1692,7 @@ ssize_t libewf_segment_file_write_chunk(
 	}
 	/* Set the values in the offset table
 	 */
-	chunk_value->segment_file_handle = segment_file_handle;
+	chunk_value->segment_table_index = segment_table_index;
 	chunk_value->file_offset         = segment_file_offset;
 	chunk_value->size                = chunk_size;
 
@@ -1833,6 +1834,7 @@ ssize_t libewf_segment_file_write_chunk(
  */
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
@@ -1980,7 +1982,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 			return( -1 );
 		}
-		chunk_value->segment_file_handle = segment_file_handle;
+		chunk_value->segment_table_index = segment_table_index;
 		chunk_value->file_offset         = segment_file_offset;
 		chunk_value->size                = chunk_size + sizeof( uint32_t );
 		chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK;

@@ -31,7 +31,6 @@
 #include "libewf_chunk_value.h"
 #include "libewf_libbfio.h"
 #include "libewf_list_type.h"
-#include "libewf_segment_file_handle.h"
 
 #include "ewf_table.h"
 
@@ -91,12 +90,6 @@ int libewf_offset_table_get_chunk_value(
      libewf_chunk_value_t **chunk_value,
      liberror_error_t **error );
 
-int libewf_offset_table_get_segment_file_handle(
-     libewf_offset_table_t *offset_table,
-     uint32_t chunk,
-     libewf_segment_file_handle_t **segment_file_handle,
-     liberror_error_t **error );
-
 int libewf_offset_table_set_chunk_value(
      libewf_offset_table_t *offset_table,
      uint32_t chunk,
@@ -108,7 +101,6 @@ int libewf_offset_table_fill(
      off64_t base_offset,
      ewf_table_offset_t *offsets,
      uint32_t number_of_offsets,
-     libewf_segment_file_handle_t *segment_file_handle,
      int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error );
@@ -133,7 +125,6 @@ int libewf_offset_table_compare(
      off64_t base_offset,
      ewf_table_offset_t *offsets,
      uint32_t number_of_chunks,
-     libewf_segment_file_handle_t *segment_file_handle,
      int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error );
@@ -143,12 +134,6 @@ int libewf_offset_table_compare_last_offset(
      libewf_list_t *section_list,
      uint8_t tainted,
      liberror_error_t **error );
-
-off64_t libewf_offset_table_seek_chunk_offset(
-         libewf_offset_table_t *offset_table,
-         uint32_t chunk,
-         libbfio_pool_t *file_io_pool,
-         liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

@@ -131,6 +131,10 @@
 				RelativePath="..\..\ewftools\info_handle.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\ewftools\platform.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -159,6 +163,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\info_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\platform.h"
 				>
 			</File>
 		</Filter>

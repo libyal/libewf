@@ -2,8 +2,6 @@ TODO
 * clean up of ewftools
   - ewfacquire: make behaviour of -g equal to user input ?
 
-* check TODO in code, mainly regarding improvements
-
 Next stable release:
 * full test
 * disable ewfdebug
@@ -53,6 +51,7 @@ Code clean up:
 * ewfinfo
   - move DFXML code to separate code files, what about separate library ?
   - implement a statefull XML writer e.g. open/close_section, open/close_value
+* check TODO in code, mainly regarding improvements
 
 BFIO support:
 * improve open file io pool (set basename ?)
@@ -72,6 +71,7 @@ Further analysis of the EWF format:
 * does newer linen6 has sha1 support?
 * LVF: single file entry:
   - are flags similar to file attribute flags ?
+* FTK Imager: support for "Use AD Encryption"
 
 Features
 * resume write support for ENCASE1/SMART table sections ?
@@ -240,6 +240,7 @@ Known issues:
 * worked on clone handle
 * updated libbfio, libfvalue, libsmraw
 * optimization of read loop
+* ewfx added safeguard for long WINAPI timezone names
 
 20101215
 * worked on implementing DFXML patch by S. Garfinkel

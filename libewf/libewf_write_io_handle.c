@@ -2844,6 +2844,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 #endif
 	write_count = libewf_segment_file_write_chunk(
 		       segment_file_handle,
+		       segment_number,
 		       io_handle,
 		       file_io_pool,
 		       offset_table,
@@ -3127,6 +3128,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
          libewf_segment_table_t *delta_segment_table,
          libewf_header_sections_t *header_sections,
          uint32_t chunk,
@@ -3270,19 +3272,72 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		return( -1 );
 	}
-	if( chunk_value->segment_file_handle == NULL )
+	if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK ) != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid chunk value - missing segment file handle.",
-		 function );
+		if( libewf_segment_table_get_handle(
+		     delta_segment_table,
+		     chunk_value->segment_table_index,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve delta segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
 
-		return( -1 );
+			return( -1 );
+		}
+		if( segment_file_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing delta segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
+
+			return( -1 );
+		}
 	}
-	segment_file_handle = chunk_value->segment_file_handle;
+	else
+	{
+		if( libewf_segment_table_get_handle(
+		     segment_table,
+		     chunk_value->segment_table_index,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
 
+			return( -1 );
+		}
+		if( segment_file_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
+
+			return( -1 );
+		}
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
@@ -3628,6 +3683,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	 */
 	write_count = libewf_segment_file_write_delta_chunk(
 		       segment_file_handle,
+		       segment_number,
 		       io_handle,
 		       file_io_pool,
 		       offset_table,
@@ -4015,6 +4071,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
          libewf_segment_table_t *delta_segment_table,
          libewf_header_sections_t *header_sections,
          libewf_chunk_cache_t *chunk_cache,
@@ -4151,6 +4208,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 		              file_io_pool,
 		              media_values,
 		              offset_table,
+		              segment_table,
+		              delta_segment_table,
 		              chunk_cache,
 		              chunk,
 		              0,
@@ -4233,6 +4292,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 	               file_io_pool,
 	               media_values,
 	               offset_table,
+	               segment_table,
 	               delta_segment_table,
 	               header_sections,
 	               chunk,

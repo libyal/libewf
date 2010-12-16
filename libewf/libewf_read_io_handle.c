@@ -36,6 +36,7 @@
 #include "libewf_read_io_handle.h"
 #include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_segment_table.h"
 
 #include "ewf_checksum.h"
 #include "ewf_file_header.h"
@@ -415,6 +416,8 @@ ssize_t libewf_read_io_handle_read_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
+         libewf_segment_table_t *delta_segment_table,
          uint32_t chunk,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
@@ -424,15 +427,16 @@ ssize_t libewf_read_io_handle_read_chunk(
          int8_t *read_checksum,
          liberror_error_t **error )
 {
-	libewf_chunk_value_t *chunk_value = NULL;
-	static char *function             = "libewf_read_io_handle_read_chunk";
-	ssize_t read_count                = 0;
-	ssize_t total_read_count          = 0;
-	size_t chunk_size                 = 0;
-	uint32_t number_of_chunk_values   = 0;
+	libewf_chunk_value_t *chunk_value                 = NULL;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_read_io_handle_read_chunk";
+	ssize_t read_count                                = 0;
+	ssize_t total_read_count                          = 0;
+	size_t chunk_size                                 = 0;
+	uint32_t number_of_chunk_values                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-        char *chunk_type                  = NULL;
+        char *chunk_type                                  = NULL;
 #endif
 	if( io_handle == NULL )
 	{
@@ -563,6 +567,72 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 		return( -1 );
 	}
+	if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK ) != 0 )
+	{
+		if( libewf_segment_table_get_handle(
+		     delta_segment_table,
+		     chunk_value->segment_table_index,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve delta segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
+
+			return( -1 );
+		}
+		if( segment_file_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing delta segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( libewf_segment_table_get_handle(
+		     segment_table,
+		     chunk_value->segment_table_index,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
+
+			return( -1 );
+		}
+		if( segment_file_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 chunk );
+
+			return( -1 );
+		}
+	}
 	/* Determine the size of the chunk including the checksum
 	 */
 	chunk_size = chunk_value->size;
@@ -578,22 +648,11 @@ ssize_t libewf_read_io_handle_read_chunk(
 		chunk_size    -= sizeof( uint32_t );
 		*read_checksum = 1;
 	}
-	if( chunk_value->segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid chunk value - missing segment file handle.",
-		 function );
-
-		return( -1 );
-	}
 	/* Make sure the segment file offset is in the right place
 	 */
 	if( libbfio_pool_seek_offset(
 	     file_io_pool,
-	     chunk_value->segment_file_handle->file_io_pool_entry,
+	     segment_file_handle->file_io_pool_entry,
 	     chunk_value->file_offset,
 	     SEEK_SET,
 	     error ) <= -1 )
@@ -645,7 +704,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 	 */
 	read_count = libbfio_pool_read(
 	              file_io_pool,
-	              chunk_value->segment_file_handle->file_io_pool_entry,
+	              segment_file_handle->file_io_pool_entry,
 	              chunk_buffer,
 	              chunk_size,
 	              error );
@@ -685,7 +744,7 @@ ssize_t libewf_read_io_handle_read_chunk(
 			}
 			read_count = libbfio_pool_read(
 			              file_io_pool,
-			              chunk_value->segment_file_handle->file_io_pool_entry,
+			              segment_file_handle->file_io_pool_entry,
 			              checksum_buffer,
 			              sizeof( uint32_t ),
 			              error );
@@ -721,6 +780,8 @@ ssize_t libewf_read_io_handle_read_chunk_data(
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
+         libewf_segment_table_t *delta_segment_table,
          libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          uint32_t chunk_offset,
@@ -949,6 +1010,8 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		              io_handle,
 		              file_io_pool,
 		              offset_table,
+		              segment_table,
+		              delta_segment_table,
 		              chunk,
 		              chunk_read_buffer,
 		              chunk_size,

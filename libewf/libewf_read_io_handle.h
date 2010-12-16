@@ -33,6 +33,7 @@
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_sector_list.h"
+#include "libewf_segment_table.h"
 
 #include "ewf_checksum.h"
 
@@ -81,6 +82,8 @@ ssize_t libewf_read_io_handle_read_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
+         libewf_segment_table_t *delta_segment_table,
          uint32_t chunk,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
@@ -96,6 +99,8 @@ ssize_t libewf_read_io_handle_read_chunk_data(
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
+         libewf_segment_table_t *delta_segment_table,
          libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          uint32_t chunk_offset,

@@ -129,6 +129,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 ssize_t libewf_segment_file_write_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
@@ -143,6 +144,7 @@ ssize_t libewf_segment_file_write_chunk(
 
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,

@@ -47,6 +47,7 @@
 #include "ewfinput.h"
 #include "guid.h"
 #include "info_handle.h"
+#include "platform.h"
 
 #define INFO_HANDLE_VALUE_SIZE			512
 #define INFO_HANDLE_VALUE_IDENTIFIER_SIZE	64
@@ -3659,7 +3660,12 @@ int dfxml_build_environment_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	static char *function = "dfxml_build_environment_fprint";
+	static char *function      = "dfxml_build_environment_fprint";
+
+#if defined( _MSC_VER ) || defined( __BORLANDC__ )
+	const char *compiler_name  = NULL;
+	const char *version_string = NULL;
+#endif
 
 	if( stream == NULL )
 	{
@@ -3676,10 +3682,94 @@ int dfxml_build_environment_fprint(
 	 stream,
 	 "\t\t<build_environment>\n" );
 
-	/* TODO add MSC and BORLANC support */
 #if defined( _MSC_VER )
+#if _MSC_VER == 600
+	compiler_name = "Microsoft C";
 
+	version_string = "6.0";
+#elif _MSC_VER == 700
+	compiler_name = "Microsoft C/C++";
+
+	version_string = "7.0";
+
+#elif _MSC_VER >= 800
+	compiler_name = "Microsoft Visual C/C++";
+
+#if _MSC_VER == 800
+	version_string = "1.0";
+#elif _MSC_VER == 900
+	version_string = "2.0";
+/* TODO what about 3.0 ? */
+#elif _MSC_VER == 1000
+	version_string = "4.0";
+#elif _MSC_VER == 1100
+	version_string = "5.0";
+#elif _MSC_VER == 1200
+	version_string = "6.0";
+#elif _MSC_VER == 1300
+	version_string = "7.0";
+#elif _MSC_VER == 1310
+	version_string = "7.1";
+#elif _MSC_VER == 1400
+	version_string = "8.0";
+#elif _MSC_VER == 1500
+	version_string = "9.0";
+#endif
+
+#endif
+	if( ( compiler_name == NULL )
+	 || ( version_string == NULL ) )
+	{
+		fprintf(
+		 stream,
+		 "\t\t\t<compiler>MSC %d</compiler>\n",
+		 _MSC_VER );
+	}
+	else
+	{
+		fprintf(
+		 stream,
+		 "\t\t\t<compiler>%s %s (MSC %d)</compiler>\n",
+		 compiler_name,
+		 version_string,
+		 _MSC_VER );
+	}
 #elif defined( __BORLANDC__ )
+#if __BORLANDC__ >= 0x0520
+	compiler_name = "Borland C++ Builder";
+
+#if __BORLANDC__ == 0x0520
+	version_string = "1.0";
+/* TODO what about 2.0 ? */
+#elif __BORLANDC__ == 0x0530
+	version_string = "3.0";
+#elif __BORLANDC__ == 0x0540
+	version_string = "4.0";
+#elif __BORLANDC__ == 0x0550
+	version_string = "5.0";
+#elif __BORLANDC__ == 0x0560
+	version_string = "6.0";
+#endif
+
+/* TODO what about codegear ? */
+#endif
+	if( ( compiler_name == NULL )
+	 || ( version_string == NULL ) )
+	{
+		fprintf(
+		 stream,
+		 "\t\t\t<compiler>BORLANDC 0x%04x</compiler>\n",
+		 __BORLANDC__ );
+	}
+	else
+	{
+		fprintf(
+		 stream,
+		 "\t\t\t<compiler>%s %s (BORLANDC 0x%04x)</compiler>\n",
+		 compiler_name,
+		 version_string,
+		 __BORLANDC__ );
+	}
 
 #elif defined( __GNUC__ ) && defined( __GNUC_MINOR__ )
 #if defined( __MINGW64_VERSION_MAJOR ) && defined( __MINGW64_VERSION_MINOR )
@@ -3730,6 +3820,9 @@ int dfxml_execution_environment_fprint(
 #if defined( HAVE_UNAME ) && !defined( WINAPI )
 	struct utsname utsname_buffer;
 #endif
+#if defined( WINAPI )
+	libcstring_system_character_t operating_system[ 32 ];
+#endif
 
 	static char *function = "dfxml_execution_environment_fprint";
 
@@ -3746,19 +3839,32 @@ int dfxml_execution_environment_fprint(
 	}
 	/* TODO what about execution environment on other platforms ? */
 
-#if defined( HAVE_UNAME )
+	fprintf(
+	 stream,
+	 "\t\t<execution_environment>\n" );
+
+#if defined( WINAPI )
+	if( platform_get_operating_system(
+	     operating_system,
+	     32,
+	     NULL ) == 1 )
+	{
+		fprintf(
+		 stream,
+		 "\t\t\t<os_sysname>%" PRIs_LIBCSTRING_SYSTEM "</os_sysname>\n",
+		 operating_system );
+	}
+#elif defined( HAVE_UNAME )
 	if( uname(
 	     &utsname_buffer ) == 0 )
 	{
 		fprintf(
 		 stream,
-		 "\t\t<execution_environment>\n"
 		 "\t\t\t<os_sysname>%s</os_sysname>\n"
 		 "\t\t\t<os_release>%s</os_release>\n"
 		 "\t\t\t<os_version>%s</os_version>\n"
 		 "\t\t\t<host>%s</host>\n"
-		 "\t\t\t<arch>%s</arch>\n"
-		 "\t\t</execution_environment>\n",
+		 "\t\t\t<arch>%s</arch>\n",
 		 utsname_buffer.sysname,
 		 utsname_buffer.release,
 		 utsname_buffer.version,
@@ -3771,6 +3877,9 @@ int dfxml_execution_environment_fprint(
 	 * <uid> getuid() </uid>
 	 * <username> getpwuid( getuid() )->pw_name </username>
 	 */
+	fprintf(
+	 stream,
+	 "\t\t</execution_environment>\n" );
 
 	return( 1 );
 }

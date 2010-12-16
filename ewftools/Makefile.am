@@ -127,7 +127,8 @@ ewfinfo_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	guid.c guid.h \
-	info_handle.c info_handle.h
+	info_handle.c info_handle.h \
+	platform.c platform.h
 
 ewfinfo_LDADD = \
 	../libcstring/libcstring.la \

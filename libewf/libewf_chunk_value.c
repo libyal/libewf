@@ -184,9 +184,6 @@ int libewf_chunk_value_clone(
 
 		goto on_error;
 	}
-/* TODO refactor to allow cloning */
-	( (libewf_chunk_value_t *) *destination_chunk_value )->segment_file_handle = NULL;
-
 	return( 1 );
 
 on_error:

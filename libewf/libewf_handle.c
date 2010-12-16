@@ -2965,6 +2965,8 @@ ssize_t libewf_handle_read_chunk(
 	              internal_handle->io_handle,
 	              internal_handle->file_io_pool,
 	              internal_handle->offset_table,
+	              internal_handle->segment_table,
+	              internal_handle->delta_segment_table,
 	              internal_handle->io_handle->current_chunk,
 	              (uint8_t *) chunk_buffer,
 	              chunk_buffer_size,
@@ -3158,6 +3160,8 @@ ssize_t libewf_handle_read_buffer(
 		                    internal_handle->file_io_pool,
 		                    internal_handle->media_values,
 		                    internal_handle->offset_table,
+		                    internal_handle->segment_table,
+		                    internal_handle->delta_segment_table,
 		                    internal_handle->chunk_cache,
 		                    internal_handle->io_handle->current_chunk,
 		                    internal_handle->io_handle->current_chunk_offset,
@@ -3610,6 +3614,7 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->file_io_pool,
 		               internal_handle->media_values,
 		               internal_handle->offset_table,
+		               internal_handle->segment_table,
 		               internal_handle->delta_segment_table,
 		               internal_handle->header_sections,
 		               internal_handle->io_handle->current_chunk,
@@ -3882,6 +3887,7 @@ ssize_t libewf_handle_write_buffer(
 			               internal_handle->file_io_pool,
 			               internal_handle->media_values,
 			               internal_handle->offset_table,
+			               internal_handle->segment_table,
 			               internal_handle->delta_segment_table,
 			               internal_handle->header_sections,
 			               internal_handle->chunk_cache,
@@ -4074,10 +4080,12 @@ off64_t libewf_handle_seek_offset(
          int whence,
          liberror_error_t **error )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_seek_offset";
-	uint64_t chunk                            = 0;
-	uint64_t chunk_offset                     = 0;
+	libewf_chunk_value_t *chunk_value                 = NULL;
+	libewf_internal_handle_t *internal_handle         = NULL;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_handle_seek_offset";
+	uint64_t chunk                                    = 0;
+	uint64_t chunk_offset                             = 0;
 
 	if( handle == NULL )
 	{
@@ -4187,18 +4195,114 @@ off64_t libewf_handle_seek_offset(
 	}
 	if( offset < (off64_t) internal_handle->media_values->media_size )
 	{
-		if( libewf_offset_table_seek_chunk_offset(
+		if( libewf_offset_table_get_chunk_value(
 		     internal_handle->offset_table,
 		     (uint32_t) chunk,
+		     &chunk_value,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve chunk value: %" PRIu64 ".",
+			 function,
+			 chunk );
+
+			return( -1 );
+		}
+		if( chunk_value == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunk value: %" PRIu64 ".",
+			 function,
+			 chunk );
+
+			return( -1 );
+		}
+		if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK ) != 0 )
+		{
+			if( libewf_segment_table_get_handle(
+			     internal_handle->delta_segment_table,
+			     chunk_value->segment_table_index,
+			     &segment_file_handle,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve delta segment file handle: %d (chunk: %" PRIu64 ").",
+				 function,
+				 chunk_value->segment_table_index,
+				 chunk );
+
+				return( -1 );
+			}
+			if( segment_file_handle == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing delta segment file handle: %d (chunk: %" PRIu64 ").",
+				 function,
+				 chunk_value->segment_table_index,
+				 chunk );
+
+				return( -1 );
+			}
+		}
+		else
+		{
+			if( libewf_segment_table_get_handle(
+			     internal_handle->segment_table,
+			     chunk_value->segment_table_index,
+			     &segment_file_handle,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve segment file handle: %d (chunk: %" PRIu64 ").",
+				 function,
+				 chunk_value->segment_table_index,
+				 chunk );
+
+				return( -1 );
+			}
+			if( segment_file_handle == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing segment file handle: %d (chunk: %" PRIu64 ").",
+				 function,
+				 chunk_value->segment_table_index,
+				 chunk );
+
+				return( -1 );
+			}
+		}
+		if( libbfio_pool_seek_offset(
 		     internal_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     chunk_value->file_offset,
+		     SEEK_SET,
 		     error ) == -1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek chunk offset.",
-			 function );
+			 "%s: unable to seek chunk offset: %" PRIi64 ".",
+			 function,
+			 chunk_value->file_offset );
 
 			return( -1 );
 		}
@@ -5515,10 +5619,10 @@ int libewf_handle_get_file_io_handle(
      libbfio_handle_t **file_io_handle,
      liberror_error_t **error )
 {
+	libewf_chunk_value_t *chunk_value                 = NULL;
 	libewf_internal_handle_t *internal_handle         = NULL;
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_handle_get_file_io_handle";
-	int file_io_pool_entry                            = 0;
 
 	if( handle == NULL )
 	{
@@ -5544,39 +5648,103 @@ int libewf_handle_get_file_io_handle(
 
 		return( -1 );
 	}
-	if( libewf_offset_table_get_segment_file_handle(
+	if( libewf_offset_table_get_chunk_value(
 	     internal_handle->offset_table,
 	     internal_handle->io_handle->current_chunk,
-	     &segment_file_handle,
+	     &chunk_value,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment file handle of chunk: %" PRIu32 ".",
+		 "%s: unable to retrieve chunk value: %" PRIu32 ".",
 		 function,
 		 internal_handle->io_handle->current_chunk );
 
 		return( -1 );
 	}
-	if( segment_file_handle == NULL )
+	if( chunk_value == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing segment file handle of chunk: %" PRIu32 ".",
+		 "%s: missing chunk value: %" PRIu32 ".",
 		 function,
 		 internal_handle->io_handle->current_chunk );
 
 		return( -1 );
 	}
-	file_io_pool_entry = segment_file_handle->file_io_pool_entry;
+	if( ( chunk_value->flags & LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK ) != 0 )
+	{
+		if( libewf_segment_table_get_handle(
+		     internal_handle->delta_segment_table,
+		     chunk_value->segment_table_index,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve delta segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 internal_handle->io_handle->current_chunk );
 
+			return( -1 );
+		}
+		if( segment_file_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing delta segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 internal_handle->io_handle->current_chunk );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( libewf_segment_table_get_handle(
+		     internal_handle->segment_table,
+		     chunk_value->segment_table_index,
+		     &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 internal_handle->io_handle->current_chunk );
+
+			return( -1 );
+		}
+		if( segment_file_handle == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing segment file handle: %d (chunk: %" PRIu32 ").",
+			 function,
+			 chunk_value->segment_table_index,
+			 internal_handle->io_handle->current_chunk );
+
+			return( -1 );
+		}
+	}
 	if( libbfio_pool_get_handle(
 	     internal_handle->file_io_pool,
-	     file_io_pool_entry,
+	     segment_file_handle->file_io_pool_entry,
 	     file_io_handle,
 	     error ) != 1 )
 	{
@@ -5586,7 +5754,7 @@ int libewf_handle_get_file_io_handle(
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for pool entry: %d (chunk: %" PRIu32 ").",
 		 function,
-		 file_io_pool_entry,
+		 segment_file_handle->file_io_pool_entry,
 		 internal_handle->io_handle->current_chunk );
 
 		return( -1 );
@@ -5813,6 +5981,8 @@ int libewf_internal_handle_get_media_values(
 				              internal_handle->file_io_pool,
 				              internal_handle->media_values,
 				              internal_handle->offset_table,
+				              internal_handle->segment_table,
+				              internal_handle->delta_segment_table,
 				              internal_handle->chunk_cache,
 				              number_of_chunk_values - 1,
 				              0,

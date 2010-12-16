@@ -336,6 +336,7 @@ ssize_t libewf_section_xhash_write(
 ssize_t libewf_section_delta_chunk_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          size_t section_size,
          libewf_offset_table_t *offset_table,
          liberror_error_t **error );

@@ -245,7 +245,7 @@ Handle^ Handle::Clone( void )
 	 this->ewf_handle );
 
 	if( libewf_handle_clone(
-	     &desination_handle,
+	     &destination_handle,
 	     source_handle,
 	     &error ) != 1 )
 	{

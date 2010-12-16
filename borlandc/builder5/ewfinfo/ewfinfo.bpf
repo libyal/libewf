@@ -11,6 +11,8 @@ USEUNIT("..\..\..\ewftools\guid.c");
 USE("..\..\..\ewftools\guid.h", File);
 USEUNIT("..\..\..\ewftools\info_handle.c");
 USE("..\..\..\ewftools\info_handle.h", File);
+USEUNIT("..\..\..\ewftools\platform.c");
+USE("..\..\..\ewftools\platform.h", File);
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 

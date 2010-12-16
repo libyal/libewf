@@ -2641,7 +2641,6 @@ ssize_t libewf_section_table_read(
 		     (off64_t) base_offset,
 		     offsets,
 		     number_of_chunks,
-		     segment_file_handle,
 		     segment_table_index,
 		     offsets_tainted,
 		     error ) != 1 )
@@ -3028,7 +3027,6 @@ ssize_t libewf_section_table2_read(
 		     (off64_t) base_offset,
 		     offsets,
 		     number_of_chunks,
-		     segment_file_handle,
 		     segment_table_index,
 		     offsets_tainted,
 		     error ) != 1 )
@@ -6899,6 +6897,7 @@ ssize_t libewf_section_xhash_write(
 ssize_t libewf_section_delta_chunk_read(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
+         int segment_table_index,
          size_t section_size,
          libewf_offset_table_t *offset_table,
          liberror_error_t **error )
@@ -7113,7 +7112,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	chunk_value->segment_file_handle = segment_file_handle;
+	chunk_value->segment_table_index = segment_table_index;
 	chunk_value->size                = chunk_size;
 	chunk_value->flags               = LIBEWF_CHUNK_VALUE_FLAG_DELTA_CHUNK;
 
@@ -8107,6 +8106,7 @@ int libewf_section_read(
 			read_count = libewf_section_delta_chunk_read(
 				      file_io_pool,
 				      segment_file_handle,
+				      segment_table_index,
 				      (size_t) section_size,
 				      offset_table,
 				      error );

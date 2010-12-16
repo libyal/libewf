@@ -25,8 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libewf_segment_file_handle.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -45,10 +43,6 @@ typedef struct libewf_chunk_value libewf_chunk_value_t;
 
 struct libewf_chunk_value
 {
-	/* A reference to the segment file handle
-	 */
-	libewf_segment_file_handle_t *segment_file_handle;
-
 	/* The index of the segment file in the segment or delta segment table
 	 */
 	int segment_table_index;

@@ -5328,6 +5328,10 @@ int libewf_generate_date_xheader_value(
 	size_t date_time_values_string_index = 0;
 	int print_count                      = 0;
 
+#if defined( WINAPI )
+	size_t tzname_length                 = 0;
+#endif
+
 	if( date_time_values_string == NULL )
 	{
 		liberror_error_set(
@@ -5539,13 +5543,24 @@ int libewf_generate_date_xheader_value(
 	               time_elements.tm_gmtoff % 60,
 		       time_elements.tm_zone );
 
-#elif defined( __BORLANDC__ )
-	print_count = libcstring_narrow_string_snprintf(
-	               (char *) &( ( ( *date_time_values_string )[ date_time_values_string_index ] ) ),
-		       *date_time_values_string_size - date_time_values_string_index,
-		       "%s",
-		       _tzname[ time_elements.tm_isdst ] );
+#elif defined( WINAPI )
+	/* WINAPI sometimes uses long timezone names
+	 */
+	tzname_length = libcstring_narrow_string_length(
+	                 _tzname[ time_elements.tm_isdst ] );
 
+	if( tzname_length <= 4 )
+	{
+		print_count = libcstring_narrow_string_snprintf(
+			       (char *) &( ( ( *date_time_values_string )[ date_time_values_string_index ] ) ),
+			       *date_time_values_string_size - date_time_values_string_index,
+			       "%s",
+			       _tzname[ time_elements.tm_isdst ] );
+	}
+	else
+	{
+		print_count = 0;
+	}
 #else
 	print_count = libcstring_narrow_string_snprintf(
 	               (char *) &( ( ( *date_time_values_string )[ date_time_values_string_index ] ) ),

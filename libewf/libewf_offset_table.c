@@ -411,7 +411,7 @@ int libewf_offset_table_chunk_exists(
 	{
 		return( 0 );
 	}
-	if( chunk_value->segment_file_handle == NULL )
+	if( chunk_value->segment_table_index < 0 )
 	{
 		return( 0 );
 	}
@@ -456,73 +456,6 @@ int libewf_offset_table_get_chunk_value(
 
 		return( -1 );
 	}
-	return( 1 );
-}
-
-/* Retrieves the segment file handle of a specific chunk
- * Returns 1 if the succesful or -1 on error
- */
-int libewf_offset_table_get_segment_file_handle(
-     libewf_offset_table_t *offset_table,
-     uint32_t chunk,
-     libewf_segment_file_handle_t **segment_file_handle,
-     liberror_error_t **error )
-{
-	libewf_chunk_value_t *chunk_value = NULL;
-	static char *function             = "libewf_offset_table_get_segment_file_handle";
-
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_array_get_entry_by_index(
-	     offset_table->chunk_values,
-	     (int) chunk,
-	     (intptr_t **) &chunk_value,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry: %" PRIu32 " from chunk values array.",
-		 function,
-		 chunk );
-
-		return( -1 );
-	}
-	if( chunk_value == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing chunk value: %" PRIu32 ".",
-		 function,
-		 chunk );
-
-		return( -1 );
-	}
-	*segment_file_handle = chunk_value->segment_file_handle;
-
 	return( 1 );
 }
 
@@ -575,7 +508,6 @@ int libewf_offset_table_fill(
      off64_t base_offset,
      ewf_table_offset_t *offsets,
      uint32_t number_of_offsets,
-     libewf_segment_file_handle_t *segment_file_handle,
      int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error )
@@ -626,17 +558,6 @@ int libewf_offset_table_fill(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offsets.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file.",
 		 function );
 
 		return( -1 );
@@ -823,7 +744,6 @@ int libewf_offset_table_fill(
 
 			return( -1 );
 		}
-		chunk_value->segment_file_handle = segment_file_handle;
 		chunk_value->segment_table_index = segment_table_index;
 		chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 		chunk_value->size                = (size_t) chunk_size;
@@ -951,7 +871,6 @@ int libewf_offset_table_fill(
 
 		return( -1 );
 	}
-	chunk_value->segment_file_handle = segment_file_handle;
 	chunk_value->segment_table_index = segment_table_index;
 	chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 	chunk_value->flags              |= compressed;
@@ -1088,7 +1007,6 @@ int libewf_offset_table_fill_last_offset(
 			 last_offset );
 		}
 #endif
-
 		if( ( section_list_values->start_offset < last_offset )
 		 && ( last_offset < section_list_values->end_offset ) )
 		{
@@ -1117,7 +1035,6 @@ int libewf_offset_table_fill_last_offset(
 					 function );
 				}
 #endif
-
 				corrupted = 1;
 			}
 			if( chunk_size > (off64_t) INT32_MAX )
@@ -1130,7 +1047,6 @@ int libewf_offset_table_fill_last_offset(
 					 function );
 				}
 #endif
-
 				corrupted = 1;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1157,7 +1073,6 @@ int libewf_offset_table_fill_last_offset(
 				 remarks );
 			}
 #endif
-
 			chunk_value->size = (size_t) chunk_size;
 
 			if( corrupted != 0 )
@@ -1306,7 +1221,6 @@ int libewf_offset_table_compare(
      off64_t base_offset,
      ewf_table_offset_t *offsets,
      uint32_t number_of_offsets,
-     libewf_segment_file_handle_t *segment_file_handle,
      int segment_table_index,
      uint8_t tainted,
      liberror_error_t **error )
@@ -1358,17 +1272,6 @@ int libewf_offset_table_compare(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offsets.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file.",
 		 function );
 
 		return( -1 );
@@ -1456,7 +1359,6 @@ int libewf_offset_table_compare(
 					 stored_offset );
 				}
 #endif
-
 				corrupted = 1;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1469,7 +1371,6 @@ int libewf_offset_table_compare(
 				 next_offset );
 			}
 #endif
-
 			chunk_size = stored_offset - current_offset;
 		}
 		else
@@ -1499,7 +1400,6 @@ int libewf_offset_table_compare(
 				 function );
 			}
 #endif
-
 			corrupted = 1;
 		}
 		if( libewf_array_get_entry_by_index(
@@ -1540,7 +1440,6 @@ int libewf_offset_table_compare(
 				 offset_table->last_chunk_value_compared );
 			}
 #endif
-
 			mismatch = 1;
 		}
 		else if( chunk_value->size != (size_t) chunk_size )
@@ -1568,7 +1467,6 @@ int libewf_offset_table_compare(
 				 offset_table->last_chunk_value_compared );
 			}
 #endif
-
 			mismatch = 1;
 		}
 		else
@@ -1613,12 +1511,10 @@ int libewf_offset_table_compare(
 			 remarks );
 		}
 #endif
-
 		if( ( corrupted == 0 )
 		 && ( tainted == 0 )
 		 && ( mismatch == 1 ) )
 		{
-			chunk_value->segment_file_handle = segment_file_handle;
 			chunk_value->segment_table_index = segment_table_index;
 			chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 			chunk_value->size                = (size_t) chunk_size;
@@ -1714,7 +1610,6 @@ int libewf_offset_table_compare(
 			 offset_table->last_chunk_value_compared );
 		}
 #endif
-
 		mismatch = 1;
 	}
 	else
@@ -1758,12 +1653,10 @@ int libewf_offset_table_compare(
 		 remarks );
 	}
 #endif
-
 	if( ( corrupted == 0 )
 	 && ( tainted == 0 )
 	 && ( mismatch == 1 ) )
 	{
-		chunk_value->segment_file_handle = segment_file_handle;
 		chunk_value->segment_table_index = segment_table_index;
 		chunk_value->file_offset         = (off64_t) ( base_offset + current_offset );
 		chunk_value->flags              |= compressed;
@@ -1875,7 +1768,6 @@ int libewf_offset_table_compare_last_offset(
 			 last_offset );
 		}
 #endif
-
 		if( ( section_list_values->start_offset < last_offset )
 		 && ( last_offset < section_list_values->end_offset ) )
 		{
@@ -1923,7 +1815,6 @@ int libewf_offset_table_compare_last_offset(
 					 offset_table->last_chunk_value_compared );
 				}
 #endif
-
 				mismatch = 1;
 			}
 			else
@@ -1958,7 +1849,6 @@ int libewf_offset_table_compare_last_offset(
 				 remarks );
 			}
 #endif
-
 			if( ( corrupted == 0 )
 			 && ( tainted == 0 )
 			 && ( mismatch == 1 ) )
@@ -1973,87 +1863,5 @@ int libewf_offset_table_compare_last_offset(
 		list_element = list_element->next_element;
 	}
 	return( 1 );
-}
-
-/* Seeks a certain chunk offset within the offset table
- * Returns the chunk segment file offset if the seek is successful or -1 on error
- */
-off64_t libewf_offset_table_seek_chunk_offset(
-         libewf_offset_table_t *offset_table,
-         uint32_t chunk,
-         libbfio_pool_t *file_io_pool,
-         liberror_error_t **error )
-{
-	libewf_chunk_value_t *chunk_value = NULL;
-	static char *function             = "libewf_segment_table_seek_chunk_offset";
-
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_array_get_entry_by_index(
-	     offset_table->chunk_values,
-	     (int) chunk,
-	     (intptr_t **) &chunk_value,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry: %" PRIu32 " from chunk values array.",
-		 function,
-		 chunk );
-
-		return( -1 );
-	}
-	if( chunk_value == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing chunk value.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_value->segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing segment file handle for chunk: %" PRIu32 ".",
-		 function,
-		 chunk );
-
-		return( -1 );
-	}
-	if( libbfio_pool_seek_offset(
-	     file_io_pool,
-	     chunk_value->segment_file_handle->file_io_pool_entry,
-	     chunk_value->file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to find chunk offset: %" PRIi64 ".",
-		 function,
-		 chunk_value->file_offset );
-
-		return( -1 );
-	}
-	return( chunk_value->file_offset );
 }
 
