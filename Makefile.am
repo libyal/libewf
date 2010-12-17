@@ -11,9 +11,9 @@ SUBDIRS = \
 	libmfdata \
 	libfvalue \
 	libewf \
+	libodraw \
 	libsmdev \
 	libsmraw \
-	libodtoc \
 	libsystem \
 	ewftools \
 	ewf.net \
@@ -93,9 +93,9 @@ splint:
 	(cd $(srcdir)/libmfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfvalue && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libewf && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libodraw && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsmdev && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsmraw && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libodtoc && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/ewftools && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))

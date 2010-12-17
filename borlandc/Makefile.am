@@ -24,6 +24,8 @@ BUILDER5_FILES = \
 	builder5/libfvalue/libfvalue.bpr \
 	builder5/libnotify/libnotify.bpf \
 	builder5/libnotify/libnotify.bpr \
+	builder5/libodraw/libodraw.bpf \
+	builder5/libodraw/libodraw.bpr \
 	builder5/libsmdev/libsmdev.bpf \
 	builder5/libsmdev/libsmdev.bpr \
 	builder5/libsmraw/libsmraw.bpf \
@@ -57,6 +59,7 @@ CODEGEAR_FILES = \
 	codegear/libfvalue/libfvalue.cbproj \
 	codegear/libmfdata/libmfdata.cbproj \
 	codegear/libnotify/libnotify.cbproj \
+	codegear/libodraw/libodraw.cbproj \
 	codegear/libsmdev/libsmdev.cbproj \
 	codegear/libsmraw/libsmraw.cbproj \
 	codegear/libsystem/libsystem.cbproj \

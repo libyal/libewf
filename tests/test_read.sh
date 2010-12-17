@@ -35,7 +35,7 @@ SORT="sort";
 UNIQ="uniq";
 WC="wc";
 
-function test_read
+test_read()
 { 
 	echo "Testing read of input:" $*;
 

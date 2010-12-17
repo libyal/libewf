@@ -27,14 +27,34 @@ EXIT_IGNORE=77;
 TMP="tmp";
 
 CMP="cmp";
-SEQ="seq";
 
-function chr
+chr()
 {
 	printf \\$(( ( ( $1 / 64 ) * 100 ) + ( ( ( $1 % 64 ) / 8 ) * 10 ) + ( $1 % 8 ) ))
 } 
 
-function test_glob
+seq()
+{
+	VALUE=$1;
+	SEQUENCE="";
+
+	while [ ${VALUE} -le $2 ];
+	do
+
+		if [ ${VALUE} -le 9 ];
+		then
+			SEQUENCE="${SEQUENCE} 0${VALUE}";
+		else
+			SEQUENCE="${SEQUENCE} ${VALUE}";
+		fi
+
+		VALUE=$(( ${VALUE} + 1 ));
+	done
+
+	echo ${SEQUENCE};
+}
+
+test_glob()
 { 
 	BASENAME=$1;
 	SCHEMA=$2;
@@ -73,7 +93,7 @@ function test_glob
 	return ${RESULT};
 }
 
-function test_glob_sequence
+test_glob_sequence()
 { 
 	BASENAME=$1;
 	SCHEMA=$2;
@@ -106,9 +126,9 @@ function test_glob_sequence
 	then
 		LAST=`echo ${LAST} | cut -c '2 3'`;
 
-		SEQUENCE=`${SEQ} -w 1 ${LAST}`;
+		SEQUENCE=`seq 1 ${LAST}`;
 	else
-		SEQUENCE=`${SEQ} -w 1 99`;
+		SEQUENCE=`seq 1 99`;
 	fi
 
 	FILENAMES=`for NUMBER in ${SEQUENCE}; do echo -n "${FILENAME}.${FIRST_LETTER}${NUMBER} "; echo $FILE; done`;

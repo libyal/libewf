@@ -28,6 +28,12 @@
 #include <libcstring.h>
 #include <liberror.h>
 
+#if defined( HAVE_LOCAL_LIBODRAW )
+#include <libodraw_types.h>
+#elif defined( HAVE_LIBODRAW_H )
+#include <libodraw.h>
+#endif
+
 #if defined( HAVE_LOCAL_LIBSMDEV )
 #include <libsmdev_types.h>
 #elif defined( HAVE_LIBSMDEV_H )
@@ -40,12 +46,6 @@
 #include <libsmraw.h>
 #endif
 
-#if defined( HAVE_LOCAL_LIBODTOC )
-#include <libodtoc_types.h>
-#elif defined( HAVE_LIBODTOC_H )
-#include <libodtoc.h>
-#endif
-
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -56,7 +56,7 @@ enum DEVICE_HANDLE_TYPES
 {
 	DEVICE_HANDLE_TYPE_DEVICE		= (uint8_t) 'd',
 	DEVICE_HANDLE_TYPE_FILE			= (uint8_t) 'f',
-	DEVICE_HANDLE_TYPE_FILE_WITH_TOC	= (uint8_t) 't'
+	DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE	= (uint8_t) 'o'
 };
 
 typedef struct device_handle device_handle_t;
@@ -79,6 +79,10 @@ struct device_handle
 	 */
 	size_t toc_filename_size;
 
+	/* libodraw input handle
+	 */
+	libodraw_handle_t *odraw_input_handle;
+
 	/* libsmdev input handle
 	 */
 	libsmdev_handle_t *dev_input_handle;
@@ -86,12 +90,6 @@ struct device_handle
 	/* libsmraw input handle
 	 */
 	libsmdev_handle_t *raw_input_handle;
-
-#ifdef TOC_FILE
-	/* libodtoc input file
-	 */
-	libodtoc_file_t *toc_input_file;
-#endif
 
 	/* The number of error retries
 	 */

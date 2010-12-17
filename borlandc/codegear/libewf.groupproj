@@ -30,6 +30,9 @@
 			<Projects Include="libewf\libewf.cbproj">
 				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib.cbproj</Dependencies>
 			</Projects>
+			<Projects Include="libodraw\libodraw.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj</Dependencies>
+			</Projects>
 			<Projects Include="libsmdev\libsmdev.cbproj">
 				<Dependencies>liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libcstring\libcstring.cbproj</Dependencies>
 			</Projects>
@@ -40,7 +43,7 @@
 				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libcstring\libcstring.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfacquire\ewfacquire.cbproj">
-				<Dependencies>liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf.cbproj;libsmdev\libsmdev.cbproj;libsmraw\libsmraw.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf.cbproj;libsmdev\libsmdev.cbproj;libsmraw\libsmraw.cbproj;libsystem\libsystem.cbproj;libodraw\libodraw.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfacquirestream\ewfacquirestream.cbproj">
 				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
@@ -143,6 +146,15 @@
 		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libfvalue:Make;zlib:Make" Name="libewf:Make">
 			<MSBuild Targets="Make" Projects="libewf\libewf.cbproj"/>
 		</Target>
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna;libbfio;libfvalue" Name="libodraw">
+			<MSBuild Projects="libodraw\libodraw.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libfvalue:Clean" Name="libodraw:Clean">
+			<MSBuild Targets="Clean" Projects="libodraw\libodraw.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libfvalue:Make" Name="libodraw:Make">
+			<MSBuild Targets="Make" Projects="libodraw\libodraw.cbproj"/>
+		</Target>
 		<Target DependsOnTargets="liberror;libnotify;libuna;libcstring" Name="libsmdev">
 			<MSBuild Projects="libsmdev\libsmdev.cbproj"/>
 		</Target>
@@ -170,13 +182,13 @@
 		<Target DependsOnTargets="liberror:Make;libuna:Make;libcstring:Make" Name="libsystem:Make">
 			<MSBuild Targets="Make" Projects="libsystem\libsystem.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror;libnotify;libuna;libbfio;libewf;libsmdev;libsmraw;libsystem;libcstring" Name="ewfacquire">
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna;libbfio;libewf;libsmdev;libsmraw;libsystem;libodraw" Name="ewfacquire">
 			<MSBuild Projects="ewfacquire\ewfacquire.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libewf:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;libcstring:Clean" Name="ewfacquire:Clean">
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libewf:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;libodraw:Clean" Name="ewfacquire:Clean">
 			<MSBuild Targets="Clean" Projects="ewfacquire\ewfacquire.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libewf:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;libcstring:Make" Name="ewfacquire:Make">
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libewf:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;libodraw:Make" Name="ewfacquire:Make">
 			<MSBuild Targets="Make" Projects="ewfacquire\ewfacquire.cbproj"/>
 		</Target>
 		<Target DependsOnTargets="liberror;libuna;libewf;libsystem;libcstring" Name="ewfacquirestream">
@@ -216,13 +228,13 @@
 			<MSBuild Targets="Make" Projects="ewfverify\ewfverify.cbproj"/>
 		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="libcstring;liberror;libnotify;libuna;libbfio;libmfdata;libfvalue;zlib;libewf;libsmdev;libsmraw;libsystem;ewfacquire;ewfacquirestream;ewfexport;ewfinfo;ewfverify"/>
+			<CallTarget Targets="libcstring;liberror;libnotify;libuna;libbfio;libmfdata;libfvalue;zlib;libewf;libodraw;libsmdev;libsmraw;libsystem;ewfacquire;ewfacquirestream;ewfexport;ewfinfo;ewfverify"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libmfdata:Clean;libfvalue:Clean;zlib:Clean;libewf:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;ewfacquire:Clean;ewfacquirestream:Clean;ewfexport:Clean;ewfinfo:Clean;ewfverify:Clean"/>
+			<CallTarget Targets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libmfdata:Clean;libfvalue:Clean;zlib:Clean;libewf:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;ewfacquire:Clean;ewfacquirestream:Clean;ewfexport:Clean;ewfinfo:Clean;ewfverify:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libmfdata:Make;libfvalue:Make;zlib:Make;libewf:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;ewfacquire:Make;ewfacquirestream:Make;ewfexport:Make;ewfinfo:Make;ewfverify:Make"/>
+			<CallTarget Targets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libmfdata:Make;libfvalue:Make;zlib:Make;libewf:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;ewfacquire:Make;ewfacquirestream:Make;ewfexport:Make;ewfinfo:Make;ewfverify:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>

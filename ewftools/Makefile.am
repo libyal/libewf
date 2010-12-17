@@ -8,9 +8,9 @@ AM_CPPFLAGS = \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBMFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
+	@LIBODRAW_CPPFLAGS@ \
 	@LIBSMDEV_CPPFLAGS@ \
 	@LIBSMRAW_CPPFLAGS@ \
-	@LIBODTOC_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
@@ -47,11 +47,12 @@ ewfacquire_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBODRAW_LIBADD@ \
 	@LIBSMDEV_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
-	@LIBODTOC_LIBADD@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
+	@LIBDL_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfacquirestream_SOURCES = \
@@ -78,6 +79,7 @@ ewfacquirestream_LDADD = \
 	../libsystem/libsystem.la \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
+	@LIBDL_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfdebug_SOURCES = \
@@ -118,6 +120,7 @@ ewfexport_LDADD = \
 	@LIBSMRAW_LIBADD@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
+	@LIBDL_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfinfo_SOURCES = \
@@ -159,6 +162,7 @@ ewfverify_LDADD = \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
 	@LIBCRYPTO_LIBADD@ \
+	@LIBDL_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 MAINTAINERCLEANFILES = \

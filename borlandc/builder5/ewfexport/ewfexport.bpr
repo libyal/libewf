@@ -37,8 +37,9 @@
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0x32w.obj $(OBJFILES)"/>
-    <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib libmfdata.lib libfvalue.lib
-      libewf.lib libsmraw.lib libsystem.lib import32.lib cw32i.lib"/>
+    <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib 
+      libmfdata.lib libfvalue.lib libewf.lib libsmraw.lib libsystem.lib 
+      import32.lib cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]

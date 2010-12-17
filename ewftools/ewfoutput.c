@@ -59,6 +59,12 @@
 
 #include <libewf.h>
 
+#if defined( HAVE_LOCAL_LIBODRAW )
+#include <libodraw_definitions.h>
+#elif defined( HAVE_LIBODRAW )
+#include <libodraw.h>
+#endif
+
 #if defined( HAVE_LOCAL_LIBSMDEV )
 #include <libsmdev_definitions.h>
 #elif defined( HAVE_LIBSMDEV )
@@ -69,12 +75,6 @@
 #include <libsmraw_definitions.h>
 #elif defined( HAVE_LIBSMRAW )
 #include <libsmraw.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBODTOC )
-#include <libodtoc_definitions.h>
-#elif defined( HAVE_LIBODTOC )
-#include <libodtoc.h>
 #endif
 
 #if defined( HAVE_OPENSSL_OPENSSLV_H )
@@ -202,6 +202,13 @@ void ewfoutput_version_detailed_fprint(
 	 ZLIB_VERSION );
 #endif
 
+#if defined( HAVE_LIBODRAW ) || defined( HAVE_LOCAL_LIBODRAW )
+	fprintf(
+	 stream,
+	 ", libodraw %s",
+	 LIBODRAW_VERSION_STRING );
+#endif
+
 #if defined( HAVE_LIBSMDEV ) || defined( HAVE_LOCAL_LIBSMDEV )
 	fprintf(
 	 stream,
@@ -214,13 +221,6 @@ void ewfoutput_version_detailed_fprint(
 	 stream,
 	 ", libsmraw %s",
 	 LIBSMRAW_VERSION_STRING );
-#endif
-
-#if defined( HAVE_LIBODTOC ) || defined( HAVE_LOCAL_LIBODTOC )
-	fprintf(
-	 stream,
-	 ", libodtoc %s",
-	 LIBODTOC_VERSION_STRING );
 #endif
 
 #if defined( HAVE_LIBCRYPTO )

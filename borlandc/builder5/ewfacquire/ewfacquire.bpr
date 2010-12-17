@@ -21,10 +21,10 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBSMDEV;HAVE_LOCAL_LIBSMRAW"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBODRAW;HAVE_LOCAL_LIBSMDEV;HAVE_LOCAL_LIBSMRAW"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="ewfacquire.bpf"/>
-    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmdev;..\..\..\libsmraw;..\..\..\libewf;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libsmraw;..\..\..\libsmdev;..\..\..\libodraw;..\..\..\libewf;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\ewftools;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -37,8 +37,9 @@
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0x32w.obj $(OBJFILES)"/>
-    <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib libmfdata.lib libfvalue.lib
-      libewf.lib libsmdev.lib libsmraw.lib libsystem.lib import32.lib cw32i.lib"/>
+    <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib 
+      libmfdata.lib libfvalue.lib libewf.lib libodraw.lib libsmdev.lib 
+      libsmraw.lib libsystem.lib import32.lib cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]

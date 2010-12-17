@@ -35,6 +35,15 @@
 
 #include <libewf.h>
 
+#if defined( HAVE_LOCAL_LIBODRAW )
+#include <libodraw_definitions.h>
+#include <libodraw_handle.h>
+#include <libodraw_support.h>
+#include <libodraw_types.h>
+#elif defined( HAVE_LIBODRAW_H )
+#include <libodraw.h>
+#endif
+
 #if defined( HAVE_LOCAL_LIBSMDEV )
 #include <libsmdev_definitions.h>
 #include <libsmdev_handle.h>
@@ -52,15 +61,6 @@
 #include <libsmraw_types.h>
 #elif defined( HAVE_LIBSMRAW_H )
 #include <libsmraw.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBODTOC )
-#include <libodtoc_definitions.h>
-#include <libodtoc_file.h>
-#include <libodtoc_support.h>
-#include <libodtoc_types.h>
-#elif defined( HAVE_LIBODTOC_H )
-#include <libodtoc.h>
 #endif
 
 #include <libsystem.h>
@@ -224,13 +224,12 @@ int device_handle_free(
 				}
 			}
 		}
-#ifdef TOC_FILE
-		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 		{
-			if( ( *device_handle )->toc_input_file != NULL )
+			if( ( *device_handle )->odraw_input_handle != NULL )
 			{
-				if( libodtoc_file_free(
-				     &( ( *device_handle )->toc_input_file ),
+				if( libodraw_handle_free(
+				     &( ( *device_handle )->odraw_input_handle ),
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -244,7 +243,6 @@ int device_handle_free(
 				}
 			}
 		}
-#endif
 		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE )
 		{
 			if( ( *device_handle )->raw_input_handle != NULL )
@@ -390,12 +388,10 @@ int device_handle_open_input(
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_DEVICE;
 	}
-#ifdef TOC_FILE
 	else if( device_handle->toc_filename != NULL )
 	{
-		device_handle->type = DEVICE_HANDLE_TYPE_FILE_WITH_TOC;
+		device_handle->type = DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE;
 	}
-#endif
 	else
 	{
 		device_handle->type = DEVICE_HANDLE_TYPE_FILE;
@@ -458,10 +454,9 @@ int device_handle_open_input(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( device_handle->toc_input_file != NULL )
+		if( device_handle->odraw_input_handle != NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -472,8 +467,8 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
-		if( libodtoc_file_initialize(
-		     &( device_handle->toc_input_file ),
+		if( libodraw_handle_initialize(
+		     &( device_handle->odraw_input_handle ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -486,16 +481,16 @@ int device_handle_open_input(
 			return( -1 );
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libodtoc_file_open_wide(
-			  device_handle->toc_input_file,
+		result = libodraw_handle_open_wide(
+			  device_handle->odraw_input_handle,
 			  device_handle->toc_filename,
-			  LIBODTOC_OPEN_READ,
+			  LIBODRAW_OPEN_READ,
 			  error );
 #else
-		result = libodtoc_file_open(
-			  device_handle->toc_input_file,
+		result = libodraw_handle_open(
+			  device_handle->odraw_input_handle,
 			  device_handle->toc_filename,
-			  LIBODTOC_OPEN_READ,
+			  LIBODRAW_OPEN_READ,
 			  error );
 #endif
 		if( result != 1 )
@@ -507,15 +502,14 @@ int device_handle_open_input(
 			 "%s: unable to open input table of contents file.",
 			 function );
 
-			libodtoc_file_free(
-			 &( device_handle->toc_input_file ),
+			libodraw_handle_free(
+			 &( device_handle->odraw_input_handle ),
 			 NULL );
 
 			return( -1 );
 		}
 /* TODO use raw handle for TOC or use libbfio pool ? */
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( device_handle->raw_input_handle != NULL )
@@ -611,11 +605,10 @@ int device_handle_close(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( libodtoc_file_close(
-		     device_handle->toc_input_file,
+		if( libodraw_handle_close(
+		     device_handle->odraw_input_handle,
 		     error ) != 0 )
 		{
 			liberror_error_set(
@@ -628,7 +621,6 @@ int device_handle_close(
 			return( -1 );
 		}
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_close(
@@ -702,8 +694,7 @@ ssize_t device_handle_read_buffer(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
 /* TODO */
 /* Determine current session
@@ -714,7 +705,6 @@ ssize_t device_handle_read_buffer(
  */
 
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		read_count = libsmraw_handle_read_buffer(
@@ -780,12 +770,10 @@ off64_t device_handle_seek_offset(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
 /* TODO */
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		offset = libsmraw_handle_seek_offset(
@@ -1115,12 +1103,10 @@ int device_handle_get_media_size(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
 /* TODO */
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_get_media_size(
@@ -1192,12 +1178,10 @@ int device_handle_get_media_type(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
 		*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
 	}
-#endif
 	return( 1 );
 }
 
@@ -1239,11 +1223,10 @@ int device_handle_get_bytes_per_sector(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( libodtoc_file_get_bytes_per_sector(
-		     device_handle->toc_input_file,
+		if( libodraw_handle_get_bytes_per_sector(
+		     device_handle->odraw_input_handle,
 		     bytes_per_sector,
 		     error ) != 1 )
 		{
@@ -1257,7 +1240,6 @@ int device_handle_get_bytes_per_sector(
 			return( -1 );
 		}
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_get_bytes_per_sector(
@@ -1334,13 +1316,11 @@ int device_handle_get_information_value(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
 /* TODO */
 		result = 0;
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		result = libsmraw_handle_get_utf8_information_value(
@@ -1455,11 +1435,10 @@ int device_handle_get_number_of_sessions(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( libodtoc_file_get_number_of_sessions(
-		     device_handle->toc_input_file,
+		if( libodraw_handle_get_number_of_sessions(
+		     device_handle->odraw_input_handle,
 		     number_of_sessions,
 		     error ) != 1 )
 		{
@@ -1473,7 +1452,6 @@ int device_handle_get_number_of_sessions(
 			return( -1 );
 		}
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( number_of_sessions == NULL )
@@ -1535,11 +1513,10 @@ int device_handle_get_session(
 			return( -1 );
 		}
 	}
-#ifdef TOC_FILE
-	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( libodtoc_file_get_session(
-		     device_handle->toc_input_file,
+		if( libodraw_handle_get_session(
+		     device_handle->odraw_input_handle,
 		     index,
 		     start_sector,
 		     number_of_sectors,
@@ -1556,7 +1533,6 @@ int device_handle_get_session(
 			return( -1 );
 		}
 	}
-#endif
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		liberror_error_set(
@@ -1858,7 +1834,7 @@ int device_handle_get_number_of_read_errors(
 			return( -1 );
 		}
 	}
-	else if( ( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( ( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	      || ( device_handle->type == DEVICE_HANDLE_TYPE_FILE ) )
 	{
 		if( number_of_read_errors == NULL )
@@ -1920,7 +1896,7 @@ int device_handle_get_read_error(
 			return( -1 );
 		}
 	}
-	else if( ( device_handle->type == DEVICE_HANDLE_TYPE_FILE_WITH_TOC )
+	else if( ( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	      || ( device_handle->type == DEVICE_HANDLE_TYPE_FILE ) )
 	{
 		liberror_error_set(

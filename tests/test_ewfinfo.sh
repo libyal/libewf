@@ -30,7 +30,7 @@ LS="ls";
 TR="tr";
 WC="wc";
 
-function test_info
+test_info()
 { 
 	INPUT_FILE=$1;
 

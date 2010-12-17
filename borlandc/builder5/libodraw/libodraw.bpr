@@ -3,28 +3,28 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\Release\libsmdev.lib"/>
-    <OBJFILES value="libsmdev_ata.obj libsmdev_error.obj libsmdev_error_string.obj 
-      libsmdev_handle.obj libsmdev_legacy.obj libsmdev_list_type.obj 
-      libsmdev_metadata.obj libsmdev_notify.obj libsmdev_offset_list.obj 
-      libsmdev_optical_disk.obj libsmdev_scsi.obj libsmdev_sector_list.obj 
-      libsmdev_string.obj libsmdev_support.obj libsmdev_usb.obj"/>
+    <PROJECT value="..\Release\libodraw.lib"/>
+    <OBJFILES value="libodraw_array_type.obj libodraw_cue_parser.obj libodraw_cue_scanner.obj 
+      libodraw_debug.obj libodraw_error.obj libodraw_file_value.obj 
+      libodraw_handle.obj libodraw_io_handle.obj libodraw_list_type.obj 
+      libodraw_notify.obj libodraw_sector_list.obj libodraw_support.obj 
+      libodraw_track_value.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;..\..\..\libsmdev"/>
+    <PATHCPP value=".;..\..\..\libodraw"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBODRAW"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
-    <MAINSOURCE value="libsmdev.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <MAINSOURCE value="libodraw.bpf"/>
+    <INCLUDEPATH value="..\..\..\libodraw;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\..\libodraw;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
@@ -67,17 +67,15 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=4
-Item0=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libsmdev;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item2=..\..\..\libsmdev;$(BCB)\include;$(BCB)\include\vcl
-Item3=$(BCB)\include;$(BCB)\include\vcl
+Count=3
+Item0=..\..\..\libodraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libodraw;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libodraw;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
-Count=3
-Item0=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib
-Item1=..\..\..\libsmdev;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
-Item2=$(BCB)\lib\obj;$(BCB)\lib
+Count=2
+Item0=..\..\..\libodraw;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\libodraw;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 
 [HistoryLists\hlDebugSourcePath]
 Count=1
@@ -85,8 +83,8 @@ Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
 Count=3
-Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBSMDEV
-Item1=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO
+Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBODRAW
+Item1=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBODRAW
 Item2=_DEBUG
 
 [HistoryLists\hlIntOutputDir]

@@ -10,9 +10,9 @@ DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
 PROJECTS = libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib \
-  libmfdata.lib libfvalue.lib zlib.lib libewf.dll libsmdev.lib libsmraw.lib \
-  libsystem.lib ewfacquire.exe ewfacquirestream.exe ewfexport.exe ewfinfo.exe \
-  ewfverify.exe
+  libmfdata.lib libfvalue.lib zlib.lib libewf.dll libodraw.lib libsmdev.lib \
+  libsmraw.lib libsystem.lib ewfacquire.exe ewfacquirestream.exe ewfexport.exe \
+  ewfinfo.exe ewfverify.exe
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -82,6 +82,10 @@ libfvalue.lib: libfvalue\libfvalue.bpr
   $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
 
 libmfdata.lib: libmfdata\libmfdata.bpr
+  $(ROOT)\bin\bpr2mak -t$(ROOT)\bin\deflib.bmk $**
+  $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
+
+libodraw.lib: libodraw\libodraw.bpr
   $(ROOT)\bin\bpr2mak -t$(ROOT)\bin\deflib.bmk $**
   $(ROOT)\bin\make -$(MAKEFLAGS) -f$*.mak
 

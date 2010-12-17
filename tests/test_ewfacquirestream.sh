@@ -31,7 +31,7 @@ LS="ls";
 TR="tr";
 WC="wc";
 
-function test_acquire_file
+test_acquire_file()
 { 
 	INPUT_FILE=$1;
 	OUTPUT_FORMAT=$2;

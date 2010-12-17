@@ -1371,19 +1371,19 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
   ])
  ])
 
-dnl Function to detect if libodtoc available
-AC_DEFUN([LIBEWF_CHECK_LIBODTOC],
- [AC_CHECK_HEADERS([libodtoc.h])
+dnl Function to detect if libodraw available
+AC_DEFUN([LIBEWF_CHECK_LIBODRAW],
+ [AC_CHECK_HEADERS([libodraw.h])
 
  AS_IF(
-  [test "x$ac_cv_header_libodtoc_h" = xno],
-  [ac_libewf_have_libodtoc=no],
-  [ac_libewf_have_libodtoc=yes
+  [test "x$ac_cv_header_libodraw_h" = xno],
+  [ac_libewf_have_libodraw=no],
+  [ac_libewf_have_libodraw=yes
   AC_CHECK_LIB(
-   odtoc,
-   libodtoc_get_version,
+   odraw,
+   libodraw_get_version,
    [],
-   [ac_libewf_have_libodtoc=no])
+   [ac_libewf_have_libodraw=no])
   ])
  ])
 

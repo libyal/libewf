@@ -33,7 +33,7 @@ TR="tr";
 TRUNCATE="/usr/bin/truncate";
 WC="wc";
 
-function test_write_resume
+test_write_resume()
 { 
 	INPUT_FILE=$1;
 	RESUME_OFFSET=$2;

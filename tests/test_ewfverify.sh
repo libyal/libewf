@@ -32,7 +32,7 @@ LS="ls";
 TR="tr";
 WC="wc";
 
-function test_verify
+test_verify()
 { 
 	INPUT_FILE=$1;
 

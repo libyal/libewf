@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20101216],
+ [20101217],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -640,7 +640,8 @@ AC_CHECK_LIB(
  [],
  [AC_MSG_FAILURE(
   [Missing function: adler32 in library: zlib.],
-  [1])])
+  [1])
+ ])
 
 AC_CHECK_LIB(
  z,
@@ -648,7 +649,8 @@ AC_CHECK_LIB(
  [ac_libewf_dummy=yes],
  [AC_MSG_FAILURE(
   [Missing function: compress2 in library: zlib.],
-  [1])])
+  [1])
+ ])
 
 AC_CHECK_LIB(
  z,
@@ -656,7 +658,8 @@ AC_CHECK_LIB(
  [AC_DEFINE(
   [HAVE_COMPRESS_BOUND],
   [1],
-  [Define to 1 if compressBound funtion is available in zlib.])])
+  [Define to 1 if compressBound funtion is available in zlib.])
+ ])
 
 AC_CHECK_LIB(
  z,
@@ -664,7 +667,8 @@ AC_CHECK_LIB(
  [ac_libewf_dummy=yes],
  [AC_MSG_FAILURE(
   [Missing function: uncompress in library: zlib.],
-  [1])])
+  [1])
+ ])
 
 dnl Check for enabling libuna for Unicode string support
 LIBEWF_CHECK_LIBUNA
@@ -1000,58 +1004,58 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMRAW],
  [test "x$ac_libewf_have_libsmraw" = xlocal])
 
-dnl Check for enabling libodtoc for optical disc table of contents support
-LIBEWF_CHECK_LIBODTOC
+dnl Check for enabling libodraw for optical disc (split) RAW support support
+LIBEWF_CHECK_LIBODRAW
 
 AS_IF(
- [test "x$ac_libewf_have_libodtoc" = xyes],
- [dnl libodtoc is available
+ [test "x$ac_libewf_have_libodraw" = xyes],
+ [dnl libodraw is available
  AC_SUBST(
-  [libewf_spec_requires_libodtoc],
-  [libodtoc])
+  [libewf_spec_requires_libodraw],
+  [libodraw])
  AC_SUBST(
-  [libewf_spec_build_requires_libodtoc],
-  [libodtoc-devel])
+  [libewf_spec_build_requires_libodraw],
+  [libodraw-devel])
  AC_SUBST(
-  [LIBODTOC_CPPFLAGS],
+  [LIBODRAW_CPPFLAGS],
   [])
  AC_SUBST(
-  [LIBODTOC_LIBADD],
+  [LIBODRAW_LIBADD],
   [])
  AC_SUBST(
-  [HAVE_LIBODTOC],
+  [HAVE_LIBODRAW],
   [1]) ],
- [dnl libodtoc is not available, using the (local) version that came with the source package
+ [dnl libodraw is not available, using the (local) version that came with the source package
  AC_DEFINE(
-  [HAVE_LOCAL_LIBODTOC],
+  [HAVE_LOCAL_LIBODRAW],
   [1],
-  [Define to 1 if the local version of libodtoc is used.])
+  [Define to 1 if the local version of libodraw is used.])
  AC_SUBST(
-  [HAVE_LOCAL_LIBODTOC],
+  [HAVE_LOCAL_LIBODRAW],
   [1])
  AC_SUBST(
-  [libewf_spec_requires_libodtoc],
+  [libewf_spec_requires_libodraw],
   [])
  AC_SUBST(
-  [libewf_spec_build_requires_libodtoc],
+  [libewf_spec_build_requires_libodraw],
   [])
  AC_SUBST(
-  [LIBODTOC_CPPFLAGS],
-  [-I../libodtoc])
+  [LIBODRAW_CPPFLAGS],
+  [-I../libodraw])
  AC_SUBST(
-  [LIBODTOC_LIBADD],
-  [../libodtoc/libodtoc.la])
+  [LIBODRAW_LIBADD],
+  [../libodraw/libodraw.la])
  AC_SUBST(
-  [HAVE_LIBODTOC],
+  [HAVE_LIBODRAW],
   [0])
- ac_libewf_have_libodtoc=local])
+ ac_libewf_have_libodraw=local])
 
 AM_CONDITIONAL(
- [HAVE_LOCAL_LIBODTOC],
- [test "x$ac_libewf_have_libodtoc" = xlocal])
+ [HAVE_LOCAL_LIBODRAW],
+ [test "x$ac_libewf_have_libodraw" = xlocal])
 
 AS_IF(
- [test "x$ac_libewf_have_libodtoc" = xlocal],
+ [test "x$ac_libewf_have_libodraw" = xlocal],
  [AM_PROG_LEX
  AC_PROG_YACC])
 
@@ -1103,14 +1107,7 @@ AS_IF(
  [AC_CHECK_LIB(
   crypto,
   EVP_md5,
-  [dnl Enforce the dynamic loader library to be included after libcrypto
-  AC_SUBST(
-   [LIBCRYPTO_LIBADD],
-   ["-lcrypto -ldl"])
-  AC_DEFINE(
-   [HAVE_LIBCRYPTO],
-   [1],
-   [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
+  [ac_libewf_dummy=yes],
   [ac_libewf_have_libcrypto=no])
  AC_CHECK_LIB(
   crypto,
@@ -1155,7 +1152,8 @@ AS_IF(
  ac_libewf_have_libcrypto_sha1=libcrypto_evp],
  [AC_SUBST(
   [HAVE_OPENSSL_EVP_H],
-  [0]) ])
+  [0])
+ ])
 
 AS_IF(
  [test "x$ac_libewf_have_libcrypto" = xno],
@@ -1173,14 +1171,7 @@ AS_IF(
   AC_CHECK_LIB(
    crypto,
    MD5_Init,
-   [dnl Enforce the dynamic loader library to be included after libcrypto
-   AC_SUBST(
-    [LIBCRYPTO_LIBADD],
-    ["-lcrypto -ldl"])
-   AC_DEFINE(
-    [HAVE_LIBCRYPTO],
-    [1],
-    [Define to 1 if you have the 'crypto' library (-lcrypto).]) ],
+   [ac_libewf_dummy=yes],
    [ac_libewf_have_libcrypto_md5=no])
   AC_CHECK_LIB(
    crypto,
@@ -1231,6 +1222,25 @@ AS_IF(
  [test "x$ac_libewf_have_libcrypto_sha1" = xno],
  [AC_MSG_NOTICE(
   [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support or Windows Crypto API.])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_libcrypto_md5" = xlibcrypto_evp || test "x$ac_libewf_have_libcrypto_md5" = xlibcrypto],
+ [AC_SUBST(
+  [LIBCRYPTO_LIBADD],
+  ["-lcrypto"])
+ AC_DEFINE(
+  [HAVE_LIBCRYPTO],
+  [1],
+  [Define to 1 if you have the 'crypto' library (-lcrypto).])
+ dnl Enforce the dynamic loader library to be included if available
+ AC_CHECK_LIB(
+  dl,
+  dlopen,
+  [AC_SUBST(
+   [LIBDL_LIBADD],
+   ["-ldl"])],
+  [])
  ])
 
 dnl Check for enabling GUID/UUID support
@@ -1591,9 +1601,9 @@ AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libmfdata/Makefile])
 AC_CONFIG_FILES([libfvalue/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
+AC_CONFIG_FILES([libodraw/Makefile])
 AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])
-AC_CONFIG_FILES([libodtoc/Makefile])
 AC_CONFIG_FILES([libsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([ewf.net/Makefile])
@@ -1632,9 +1642,9 @@ Building:
    libbfio support:                                 $ac_libewf_have_libbfio
    libmfdata support:                               $ac_libewf_have_libmfdata
    libfvalue support:                               $ac_libewf_have_libfvalue
+   libodraw support:                                $ac_libewf_have_libodraw
    libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw
-   libodtoc support:                                $ac_libewf_have_libodtoc
    MD5 support:                                     $ac_libewf_have_libcrypto_md5
    SHA1 support:                                    $ac_libewf_have_libcrypto_sha1
    GUID/UUID support:                               $ac_libewf_have_guid_support

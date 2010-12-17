@@ -31,7 +31,7 @@ LS="ls";
 TR="tr";
 WC="wc";
 
-function test_export_raw
+test_export_raw()
 { 
 	INPUT_FILE=$1;
 
@@ -60,7 +60,7 @@ EOI
 	return ${RESULT};
 }
 
-function test_export_ewf
+test_export_ewf()
 { 
 	OUTPUT_FORMAT=$1;
 	INPUT_FILE=$2;
@@ -92,7 +92,7 @@ EOI
 	return ${RESULT};
 }
 
-function test_export_unattended
+test_export_unattended()
 { 
 	OUTPUT_FORMAT=$1;
 	INPUT_FILE=$2;

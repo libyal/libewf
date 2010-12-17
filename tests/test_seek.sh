@@ -35,7 +35,7 @@ SORT="sort";
 UNIQ="uniq";
 WC="wc";
 
-function test_seek
+test_seek()
 { 
 	echo "Testing seek offset of input:" $*;
 

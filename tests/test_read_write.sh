@@ -32,7 +32,7 @@ CUT="cut";
 LS="ls";
 TR="tr";
 
-function test_read_write
+test_read_write()
 { 
 	MEDIA_SIZE=$1;
 	CHUNK_SIZE=$2;

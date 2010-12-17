@@ -28,7 +28,7 @@ TMP="tmp";
 
 CUT="cut";
 
-function test_write
+test_write()
 { 
 	MEDIA_SIZE=$1;
 	MAXIMUM_SEGMENT_SIZE=$2;
@@ -53,7 +53,7 @@ function test_write
 	return ${RESULT};
 }
 
-function test_write_chunk
+test_write_chunk()
 { 
 	MEDIA_SIZE=$1;
 	MAXIMUM_SEGMENT_SIZE=$2;
