@@ -2698,8 +2698,8 @@ int info_handle_hash_values_fprint(
 	}
 	else if( result == 1 )
 	{
-		stored_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
-		                                                            sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
+		stored_md5_hash_string = libcstring_system_string_allocate(
+		                          DIGEST_HASH_STRING_SIZE_MD5 );
 
 		if( stored_md5_hash_string == NULL )
 		{
@@ -3391,8 +3391,8 @@ int info_handle_file_entry_fprint(
 	}
 	if( name_size > 0 )
 	{
-		name = (libcstring_system_character_t *) memory_allocate(
-		                                          sizeof( libcstring_system_character_t ) * name_size );
+		name = libcstring_system_string_allocate(
+		        name_size );
 
 		if( name == NULL )
 		{

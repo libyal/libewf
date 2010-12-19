@@ -239,6 +239,11 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20101219
+* updated libcstring, libbfio, libfvalue, libmfdata, libsystem, libsmraw,
+  libsmdev, libodraw
+* code clean up
+
 20101218
 * updated libodraw
 

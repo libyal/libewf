@@ -56,7 +56,7 @@ LIBEWF_EXTERN \
 uint8_t libewf_get_access_flags_write_resume(
          void );
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 
 LIBEWF_EXTERN \
 int libewf_check_file_signature(

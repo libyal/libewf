@@ -168,8 +168,8 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	string = (libcstring_system_character_t *) memory_allocate(
-	                                            sizeof( libcstring_system_character_t ) * string_size );
+	string = libcstring_system_string_allocate(
+	          string_size );
 
 	if( string == NULL )
 	{
@@ -285,8 +285,8 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	string = (libcstring_system_character_t *) memory_allocate(
-	                                            sizeof( libcstring_system_character_t ) * string_size );
+	string = libcstring_system_string_allocate(
+	          string_size );
 
 	if( string == NULL )
 	{
@@ -402,8 +402,8 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	string = (libcstring_system_character_t *) memory_allocate(
-	                                            sizeof( libcstring_system_character_t ) * string_size );
+	string = libcstring_system_string_allocate(
+	          string_size );
 
 	if( string == NULL )
 	{

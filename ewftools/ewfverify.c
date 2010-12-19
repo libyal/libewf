@@ -756,8 +756,8 @@ int main( int argc, char * const argv[] )
 	{
 		if( calculate_md5 == 1 )
 		{
-			stored_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
-			                                                            sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
+			stored_md5_hash_string = libcstring_system_string_allocate(
+			                          DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( stored_md5_hash_string == NULL )
 			{
@@ -770,8 +770,8 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
-			                                                             sizeof( libcstring_system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
+			stored_sha1_hash_string = libcstring_system_string_allocate(
+			                           DIGEST_HASH_STRING_SIZE_SHA1 );
 
 			if( stored_sha1_hash_string == NULL )
 			{

@@ -88,7 +88,12 @@ int storage_media_buffer_initialize(
 			 "%s: unable to clear buffer.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *buffer );
+
+			*buffer = NULL;
+
+			return( -1 );
 		}
 		if( size > 0 )
 		{

@@ -232,8 +232,8 @@ int libewf_segment_table_clone(
 	}
 	if( source_segment_table->basename != NULL )
 	{
-		( *destination_segment_table )->basename = memory_allocate(
-					                    sizeof( libcstring_system_character_t ) * source_segment_table->basename_size );
+		( *destination_segment_table )->basename = libcstring_system_string_allocate(
+					                    source_segment_table->basename_size );
 
 		if( *destination_segment_table == NULL )
 		{
@@ -714,8 +714,8 @@ int libewf_segment_table_set_basename(
 #else
 	segment_table->basename_size = basename_length + 1;
 #endif
-	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
-	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
+	segment_table->basename = libcstring_system_string_allocate(
+	                           segment_table->basename_size );
 
 	if( segment_table->basename == NULL )
 	{
@@ -1192,8 +1192,8 @@ int libewf_segment_table_set_basename_wide(
 		return( -1 );
 	}
 #endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
-	segment_table->basename = (libcstring_system_character_t *) memory_allocate(
-	                                                             sizeof( libcstring_system_character_t ) * segment_table->basename_size );
+	segment_table->basename = libcstring_system_string_allocate(
+	                           segment_table->basename_size );
 
 	if( segment_table->basename == NULL )
 	{

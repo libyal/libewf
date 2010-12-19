@@ -87,7 +87,12 @@ int libewf_chunk_cache_initialize(
 			 "%s: unable to clear chunk cache.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *chunk_cache );
+
+			*chunk_cache = NULL;
+
+			return( -1 );
 		}
 		( *chunk_cache )->compressed = (uint8_t *) memory_allocate(
 		                                            sizeof( uint8_t ) * size );

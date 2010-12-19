@@ -114,10 +114,15 @@ int imaging_handle_initialize(
 			 "%s: unable to clear imaging handle.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *imaging_handle );
+
+			*imaging_handle = NULL;
+
+			return( -1 );
 		}
-		( *imaging_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
-		                                                                       sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_INPUT_BUFFER_SIZE );
+		( *imaging_handle )->input_buffer = libcstring_system_string_allocate(
+		                                     IMAGING_HANDLE_INPUT_BUFFER_SIZE );
 
 		if( ( *imaging_handle )->input_buffer == NULL )
 		{
@@ -1579,8 +1584,8 @@ int imaging_handle_prompt_for_string(
 	}
 	*internal_string_size = IMAGING_HANDLE_STRING_SIZE;
 
-	*internal_string = (libcstring_system_character_t *) memory_allocate(
-	                                                      sizeof( libcstring_system_character_t ) * *internal_string_size );
+	*internal_string = libcstring_system_string_allocate(
+	                    *internal_string_size );
 
 	if( *internal_string == NULL )
 	{
@@ -2476,8 +2481,8 @@ int imaging_handle_set_string(
 
 	if( string_length > 0 )
 	{
-		*internal_string = (libcstring_system_character_t *) memory_allocate(
-		                                                      sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
+		*internal_string = libcstring_system_string_allocate(
+		                    string_length + 1 );
 
 		if( *internal_string == NULL )
 		{
@@ -3617,8 +3622,8 @@ int imaging_handle_get_header_value(
 	if( ( result != 0 )
 	 && ( *header_value_size > 0 ) )
 	{
-		*header_value = (libcstring_system_character_t *) memory_allocate(
-		                                                   sizeof( libcstring_system_character_t ) * *header_value_size );
+		*header_value = libcstring_system_string_allocate(
+		                 *header_value_size );
 
 		if( *header_value == NULL )
 		{

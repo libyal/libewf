@@ -88,7 +88,12 @@ int libewf_array_initialize(
 			 "%s: unable to clear array.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *array );
+
+			*array = NULL;
+
+			return( -1 );
 		}
 		if( number_of_entries > 0 )
 		{

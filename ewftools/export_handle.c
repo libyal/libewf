@@ -120,7 +120,12 @@ int export_handle_initialize(
 			 "%s: unable to clear export handle.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *export_handle );
+
+			*export_handle = NULL;
+
+			return( -1 );
 		}
 		if( libewf_handle_initialize(
 		     &( ( *export_handle )->input_handle ),
@@ -135,8 +140,8 @@ int export_handle_initialize(
 
 			goto on_error;
 		}
-		( *export_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
-		                                                                      sizeof( libcstring_system_character_t ) * EXPORT_HANDLE_INPUT_BUFFER_SIZE );
+		( *export_handle )->input_buffer = libcstring_system_string_allocate(
+		                                    EXPORT_HANDLE_INPUT_BUFFER_SIZE );
 
 		if( ( *export_handle )->input_buffer == NULL )
 		{
@@ -629,8 +634,8 @@ int export_handle_create_target_path(
 	 */
 	*target_path_size = export_path_size + filename_size;
 
-	*target_path = (libcstring_system_character_t *) memory_allocate(
-	                                                  sizeof( libcstring_system_character_t ) * *target_path_size );
+	*target_path = libcstring_system_string_allocate(
+	                *target_path_size );
 
 	if( *target_path == NULL )
 	{
@@ -2065,8 +2070,8 @@ int export_handle_prompt_for_string(
 	}
 	*internal_string_size = EXPORT_HANDLE_STRING_SIZE;
 
-	*internal_string = (libcstring_system_character_t *) memory_allocate(
-	                                                      sizeof( libcstring_system_character_t ) * *internal_string_size );
+	*internal_string = libcstring_system_string_allocate(
+	                    *internal_string_size );
 
 	if( *internal_string == NULL )
 	{
@@ -2515,8 +2520,8 @@ int export_handle_set_string(
 
 	if( string_length > 0 )
 	{
-		*internal_string = (libcstring_system_character_t *) memory_allocate(
-		                                                      sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
+		*internal_string = libcstring_system_string_allocate(
+		                    string_length + 1 );
 
 		if( *internal_string == NULL )
 		{
@@ -3512,8 +3517,8 @@ ssize_t export_handle_finalize(
 
 			goto on_error;
 		}
-		export_handle->calculated_md5_hash_string = (libcstring_system_character_t *) memory_allocate(
-		                                                                               sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
+		export_handle->calculated_md5_hash_string = libcstring_system_string_allocate(
+		                                             DIGEST_HASH_STRING_SIZE_MD5 );
 
 		if( export_handle->calculated_md5_hash_string == NULL )
 		{
@@ -3590,8 +3595,8 @@ ssize_t export_handle_finalize(
 
 			goto on_error;
 		}
-		export_handle->calculated_sha1_hash_string = (libcstring_system_character_t *) memory_allocate(
-		                                                                                sizeof( libcstring_system_character_t ) * DIGEST_HASH_STRING_SIZE_SHA1 );
+		export_handle->calculated_sha1_hash_string = libcstring_system_string_allocate(
+		                                              DIGEST_HASH_STRING_SIZE_SHA1 );
 
 		if( export_handle->calculated_sha1_hash_string == NULL )
 		{
@@ -4518,8 +4523,8 @@ int export_handle_checksum_errors_fprint(
 					}
 					return( -1 );
 				}
-				filename = (libcstring_system_character_t *) memory_allocate(
-				                                              sizeof( libcstring_system_character_t ) * filename_size ); 
+				filename = libcstring_system_string_allocate(
+				            filename_size ); 
 
 
 				if( filename == NULL )

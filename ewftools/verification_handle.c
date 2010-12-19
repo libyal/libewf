@@ -102,7 +102,12 @@ int verification_handle_initialize(
 			 "%s: unable to clear verification handle.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *verification_handle );
+
+			*verification_handle = NULL;
+
+			return( -1 );
 		}
 		if( libewf_handle_initialize(
 		     &( ( *verification_handle )->input_handle ),
@@ -1737,8 +1742,8 @@ int verification_handle_checksum_errors_fprint(
 
 					goto on_error;
 				}
-				filename = (libcstring_system_character_t *) memory_allocate(
-				                                              sizeof( libcstring_system_character_t ) * filename_size ); 
+				filename = libcstring_system_string_allocate(
+				            filename_size ); 
 
 
 				if( filename == NULL )

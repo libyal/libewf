@@ -90,7 +90,12 @@ int libewf_split_values_initialize(
 			 "%s: unable to clear split values.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *split_values );
+
+			*split_values = NULL;
+
+			return( -1 );
 		}
 		if( ( string != NULL )
 		 && ( string_length > 0 ) )

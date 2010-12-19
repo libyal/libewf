@@ -20,6 +20,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define TOC_FILE
+
 #include <common.h>
 #include <memory.h>
 #include <types.h>
@@ -1381,6 +1383,51 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#ifdef TOC_FILE
+	if( option_toc_filename != NULL )
+	{
+		if( device_handle_set_string(
+		     ewfacquire_device_handle,
+		     option_toc_filename,
+		     &( ewfacquire_device_handle->toc_filename ),
+		     &( ewfacquire_device_handle->toc_filename_size ),
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set TOC filename.\n" );
+
+			goto on_error;
+		}
+	}
+#endif
+	if( option_number_of_error_retries != NULL )
+	{
+		result = device_handle_set_number_of_error_retries(
+			  ewfacquire_device_handle,
+			  option_sectors_per_chunk,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set number of error retries.\n" );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsuported number of error retries defaulting to: %" PRIu8 ".\n",
+			 ewfacquire_device_handle->number_of_error_retries );
+		}
+	}
+	if( option_zero_buffer_on_error != NULL )
+	{
+		ewfacquire_device_handle->zero_buffer_on_error = 1;
+	}
 	/* Open the input file or device size
 	 */
 	if( device_handle_open_input(
@@ -1801,33 +1848,6 @@ int main( int argc, char * const argv[] )
 			 ewfacquire_imaging_handle->maximum_segment_size );
 		}
 	}
-	if( option_number_of_error_retries != NULL )
-	{
-		result = device_handle_set_number_of_error_retries(
-			  ewfacquire_device_handle,
-			  option_sectors_per_chunk,
-			  &error );
-
-		if( result == -1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set number of error retries.\n" );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Unsuported number of error retries defaulting to: %" PRIu8 ".\n",
-			 ewfacquire_device_handle->number_of_error_retries );
-		}
-	}
-	if( option_zero_buffer_on_error != NULL )
-	{
-		ewfacquire_device_handle->zero_buffer_on_error = 1;
-	}
 	if( option_offset != NULL )
 	{
 		string_length = libcstring_system_string_length(
@@ -1875,24 +1895,6 @@ int main( int argc, char * const argv[] )
 			 "Unsupported acquiry size defaulting to: all bytes.\n" );
 		}
 	}
-#ifdef TOC_FILE
-	if( option_toc_filename != NULL )
-	{
-		if( device_handle_set_string(
-		     ewfacquire_device_handle,
-		     option_toc_filename,
-		     &( ewfacquire_device_handle->toc_filename ),
-		     &( ewfacquire_device_handle->toc_filename_size ),
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set TOC filename.\n" );
-
-			goto on_error;
-		}
-	}
-#endif
 	/* Initialize values
 	 */
 	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
@@ -2152,6 +2154,8 @@ int main( int argc, char * const argv[] )
 				}
 			}
 #ifdef TOC_FILE
+/* TODO how to deal with this, because device handle is already open at this point
+ */
 			if( ( ewfacquire_imaging_handle->media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
 			 && ( option_toc_filename == NULL ) )
 			{

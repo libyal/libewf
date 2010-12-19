@@ -49,15 +49,17 @@
 			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_data_file.c">
 			</CppCompile>
+			<CppCompile Include="..\..\..\libodraw\libodraw_data_file_descriptor.c">
+			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_debug.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_error.c">
 			</CppCompile>
-			<CppCompile Include="..\..\..\libodraw\libodraw_file_value.c">
-			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_handle.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_io_handle.c">
+			</CppCompile>
+			<CppCompile Include="..\..\..\libodraw\libodraw_metadata.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_list_type.c">
 			</CppCompile>
@@ -77,6 +79,8 @@
 			</None>
 			<None Include="..\..\..\libodraw\libodraw_data_file.h">
 			</None>
+			<None Include="..\..\..\libodraw\libodraw_data_file_descriptor.h">
+			</None>
 			<None Include="..\..\..\libodraw\libodraw_debug.h">
 			</None>
 			<None Include="..\..\..\libodraw\libodraw_definitions.h">
@@ -85,11 +89,11 @@
 			</None>
 			<None Include="..\..\..\libodraw\libodraw_extern.h">
 			</None>
-			<None Include="..\..\..\libodraw\libodraw_file_value.h">
-			</None>
 			<None Include="..\..\..\libodraw\libodraw_handle.h">
 			</None>
 			<None Include="..\..\..\libodraw\libodraw_io_handle.h">
+			</None>
+			<None Include="..\..\..\libodraw\libodraw_metadata.h">
 			</None>
 			<None Include="..\..\..\libodraw\libodraw_libbfio.h">
 			</None>

@@ -95,7 +95,10 @@ int libewf_handle_initialize(
 			 "%s: unable to clear handle.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
 		}
 		if( libewf_io_handle_initialize(
 		     &( internal_handle->io_handle ),

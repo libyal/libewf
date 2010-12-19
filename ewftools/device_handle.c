@@ -38,6 +38,7 @@
 #if defined( HAVE_LOCAL_LIBODRAW )
 #include <libodraw_definitions.h>
 #include <libodraw_handle.h>
+#include <libodraw_metadata.h>
 #include <libodraw_support.h>
 #include <libodraw_types.h>
 #elif defined( HAVE_LIBODRAW_H )
@@ -123,10 +124,15 @@ int device_handle_initialize(
 			 "%s: unable to clear device handle.",
 			 function );
 
-			goto on_error;
+			memory_free(
+			 *device_handle );
+
+			*device_handle = NULL;
+
+			return( -1 );
 		}
-		( *device_handle )->input_buffer = (libcstring_system_character_t *) memory_allocate(
-		                                                                      sizeof( libcstring_system_character_t ) * DEVICE_HANDLE_INPUT_BUFFER_SIZE );
+		( *device_handle )->input_buffer = libcstring_system_string_allocate(
+		                                    DEVICE_HANDLE_INPUT_BUFFER_SIZE );
 
 		if( ( *device_handle )->input_buffer == NULL )
 		{
@@ -207,10 +213,10 @@ int device_handle_free(
 		}
 		if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_DEVICE )
 		{
-			if( ( *device_handle )->dev_input_handle != NULL )
+			if( ( *device_handle )->smdev_input_handle != NULL )
 			{
 				if( libsmdev_handle_free(
-				     &( ( *device_handle )->dev_input_handle ),
+				     &( ( *device_handle )->smdev_input_handle ),
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -236,7 +242,7 @@ int device_handle_free(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free input table of contents file.",
+					 "%s: unable to free optical disc raw input handle.",
 					 function );
 
 					result = -1;
@@ -245,10 +251,10 @@ int device_handle_free(
 		}
 		else if( ( *device_handle )->type == DEVICE_HANDLE_TYPE_FILE )
 		{
-			if( ( *device_handle )->raw_input_handle != NULL )
+			if( ( *device_handle )->smraw_input_handle != NULL )
 			{
 				if( libsmraw_handle_free(
-				     &( ( *device_handle )->raw_input_handle ),
+				     &( ( *device_handle )->smraw_input_handle ),
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -293,7 +299,7 @@ int device_handle_signal_abort(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_signal_abort(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -309,7 +315,7 @@ int device_handle_signal_abort(
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_signal_abort(
-		     device_handle->raw_input_handle,
+		     device_handle->smraw_input_handle,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -398,7 +404,7 @@ int device_handle_open_input(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( device_handle->dev_input_handle != NULL )
+		if( device_handle->smdev_input_handle != NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -410,7 +416,7 @@ int device_handle_open_input(
 			return( -1 );
 		}
 		if( libsmdev_handle_initialize(
-		     &( device_handle->dev_input_handle ),
+		     &( device_handle->smdev_input_handle ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -426,14 +432,14 @@ int device_handle_open_input(
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libsmdev_handle_open_wide(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     (wchar_t * const *) filenames,
 		     number_of_filenames,
 		     libsmdev_flags,
 		     error ) != 1 )
 #else
 		if( libsmdev_handle_open(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     (char * const *) filenames,
 		     number_of_filenames,
 		     libsmdev_flags,
@@ -448,7 +454,7 @@ int device_handle_open_input(
 			 function );
 
 			libsmdev_handle_free(
-			 &( device_handle->dev_input_handle ),
+			 &( device_handle->smdev_input_handle ),
 			 NULL );
 
 			return( -1 );
@@ -462,7 +468,7 @@ int device_handle_open_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid device handle - toc input file already set.",
+			 "%s: invalid device handle - optical disc raw input handle already set.",
 			 function );
 
 			return( -1 );
@@ -475,7 +481,7 @@ int device_handle_open_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create input table of contents file.",
+			 "%s: unable to create optical disc raw input handle.",
 			 function );
 
 			return( -1 );
@@ -499,7 +505,7 @@ int device_handle_open_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open input table of contents file.",
+			 "%s: unable to open optical disc raw input handle table of contents file.",
 			 function );
 
 			libodraw_handle_free(
@@ -508,11 +514,28 @@ int device_handle_open_input(
 
 			return( -1 );
 		}
-/* TODO use raw handle for TOC or use libbfio pool ? */
+/* TODO pass filenames or file IO pool here instead of using build-in open */
+		if( libodraw_handle_open_data_files(
+		     device_handle->odraw_input_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open optical disc raw input handle data files.",
+			 function );
+
+			libodraw_handle_free(
+			 &( device_handle->odraw_input_handle ),
+			 NULL );
+
+			return( -1 );
+		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( device_handle->raw_input_handle != NULL )
+		if( device_handle->smraw_input_handle != NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -524,7 +547,7 @@ int device_handle_open_input(
 			return( -1 );
 		}
 		if( libsmraw_handle_initialize(
-		     &( device_handle->raw_input_handle ),
+		     &( device_handle->smraw_input_handle ),
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -538,14 +561,14 @@ int device_handle_open_input(
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libsmraw_handle_open_wide(
-		     device_handle->raw_input_handle,
+		     device_handle->smraw_input_handle,
 		     (wchar_t * const *) filenames,
 		     number_of_filenames,
 		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
 #else
 		if( libsmraw_handle_open(
-		     device_handle->raw_input_handle,
+		     device_handle->smraw_input_handle,
 		     (char * const *) filenames,
 		     number_of_filenames,
 		     LIBSMDEV_OPEN_READ,
@@ -560,7 +583,7 @@ int device_handle_open_input(
 			 function );
 
 			libsmraw_handle_free(
-			 &( device_handle->raw_input_handle ),
+			 &( device_handle->smraw_input_handle ),
 			 NULL );
 
 			return( -1 );
@@ -592,7 +615,7 @@ int device_handle_close(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_close(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     error ) != 0 )
 		{
 			liberror_error_set(
@@ -615,7 +638,7 @@ int device_handle_close(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close toc input file.",
+			 "%s: unable to close optical disc raw input handle.",
 			 function );
 
 			return( -1 );
@@ -624,7 +647,7 @@ int device_handle_close(
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_close(
-		     device_handle->raw_input_handle,
+		     device_handle->smraw_input_handle,
 		     error ) != 0 )
 		{
 			liberror_error_set(
@@ -677,7 +700,7 @@ ssize_t device_handle_read_buffer(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		read_count = libsmdev_handle_read_buffer(
-			      device_handle->dev_input_handle,
+			      device_handle->smdev_input_handle,
 			      buffer,
 			      read_size,
 		              error );
@@ -696,19 +719,28 @@ ssize_t device_handle_read_buffer(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-/* TODO */
-/* Determine current session
- * Determine current track/run-out/lead-out
- * determine corresponding file
- * determine track vs requested bytes per sector
- * merge odcue into odraw library
- */
+		read_count = libodraw_handle_read_buffer(
+			      device_handle->odraw_input_handle,
+			      buffer,
+			      read_size,
+		              error );
 
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read buffer from optical disc raw input handle.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		read_count = libsmraw_handle_read_buffer(
-			      device_handle->raw_input_handle,
+			      device_handle->smraw_input_handle,
 			      buffer,
 			      read_size,
 		              error );
@@ -753,7 +785,7 @@ off64_t device_handle_seek_offset(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		offset = libsmdev_handle_seek_offset(
-		          device_handle->dev_input_handle,
+		          device_handle->smdev_input_handle,
 		          offset,
 		          whence,
 		          error );
@@ -772,12 +804,28 @@ off64_t device_handle_seek_offset(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-/* TODO */
+		offset = libodraw_handle_seek_offset(
+		          device_handle->odraw_input_handle,
+		          offset,
+		          whence,
+		          error );
+
+		if( offset < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset in optical disc raw input handle.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		offset = libsmraw_handle_seek_offset(
-		          device_handle->raw_input_handle,
+		          device_handle->smraw_input_handle,
 		          offset,
 		          whence,
 		          error );
@@ -853,8 +901,8 @@ int device_handle_prompt_for_string(
 	}
 	*internal_string_size = DEVICE_HANDLE_STRING_SIZE;
 
-	*internal_string = (libcstring_system_character_t *) memory_allocate(
-	                                                      sizeof( libcstring_system_character_t ) * *internal_string_size );
+	*internal_string = libcstring_system_string_allocate(
+	                    *internal_string_size );
 
 	if( *internal_string == NULL )
 	{
@@ -1089,7 +1137,7 @@ int device_handle_get_media_size(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_media_size(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     media_size,
 		     error ) != 1 )
 		{
@@ -1105,12 +1153,25 @@ int device_handle_get_media_size(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-/* TODO */
+		if( libodraw_handle_get_media_size(
+		     device_handle->odraw_input_handle,
+		     media_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve media size from optical disc raw input handle.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_get_media_size(
-		     device_handle->raw_input_handle,
+		     device_handle->smraw_input_handle,
 		     media_size,
 		     error ) != 1 )
 		{
@@ -1164,7 +1225,7 @@ int device_handle_get_media_type(
 		/* The libsmdev media type is similar to the libewf media type
 		 */
 		if( libsmdev_handle_get_media_type(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     media_type,
 		     error ) != 1 )
 		{
@@ -1209,7 +1270,7 @@ int device_handle_get_bytes_per_sector(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     bytes_per_sector,
 		     error ) != 1 )
 		{
@@ -1217,7 +1278,7 @@ int device_handle_get_bytes_per_sector(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve bytes per sector.",
+			 "%s: unable to retrieve bytes per sector from device input handle.",
 			 function );
 
 			return( -1 );
@@ -1234,7 +1295,7 @@ int device_handle_get_bytes_per_sector(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve bytes per sector.",
+			 "%s: unable to retrieve bytes per sector from optical disc raw input handle.",
 			 function );
 
 			return( -1 );
@@ -1243,7 +1304,7 @@ int device_handle_get_bytes_per_sector(
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		if( libsmraw_handle_get_bytes_per_sector(
-		     device_handle->raw_input_handle,
+		     device_handle->smraw_input_handle,
 		     bytes_per_sector,
 		     error ) != 1 )
 		{
@@ -1251,7 +1312,7 @@ int device_handle_get_bytes_per_sector(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve bytes per sector.",
+			 "%s: unable to retrieve bytes per sector from raw input handle.",
 			 function );
 
 			return( -1 );
@@ -1296,7 +1357,7 @@ int device_handle_get_information_value(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		result = libsmdev_handle_get_information_value(
-		          device_handle->dev_input_handle,
+		          device_handle->smdev_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
 		          utf8_information_value,
@@ -1324,7 +1385,7 @@ int device_handle_get_information_value(
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
 		result = libsmraw_handle_get_utf8_information_value(
-		          device_handle->raw_input_handle,
+		          device_handle->smraw_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
 		          utf8_information_value,
@@ -1421,7 +1482,7 @@ int device_handle_get_number_of_sessions(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_number_of_sessions(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     number_of_sessions,
 		     error ) != 1 )
 		{
@@ -1429,7 +1490,7 @@ int device_handle_get_number_of_sessions(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of sessions.",
+			 "%s: unable to retrieve number of sessions from device input handle.",
 			 function );
 
 			return( -1 );
@@ -1446,7 +1507,7 @@ int device_handle_get_number_of_sessions(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of sessions.",
+			 "%s: unable to retrieve number of sessions from optical disc raw input handle.",
 			 function );
 
 			return( -1 );
@@ -1460,7 +1521,7 @@ int device_handle_get_number_of_sessions(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid number of sessions.",
+			 "%s: invalid number of sessions raw input handle.",
 			 function );
 
 			return( -1 );
@@ -1496,7 +1557,7 @@ int device_handle_get_session(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_session(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     index,
 		     start_sector,
 		     number_of_sectors,
@@ -1506,7 +1567,7 @@ int device_handle_get_session(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve session: %d.",
+			 "%s: unable to retrieve session: %d from device input handle.",
 			 function,
 			 index );
 
@@ -1526,7 +1587,7 @@ int device_handle_get_session(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve session: %d.",
+			 "%s: unable to retrieve session: %d from optical disc raw input handle.",
 			 function,
 			 index );
 
@@ -1617,8 +1678,8 @@ int device_handle_set_string(
 
 	if( string_length > 0 )
 	{
-		*internal_string = (libcstring_system_character_t *) memory_allocate(
-		                                                      sizeof( libcstring_system_character_t ) * ( string_length + 1 ) );
+		*internal_string = libcstring_system_string_allocate(
+		                    string_length + 1 );
 
 		if( *internal_string == NULL )
 		{
@@ -1747,7 +1808,7 @@ int device_handle_set_error_values(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_set_number_of_error_retries(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     device_handle->number_of_error_retries,
 		     error ) != 1 )
 		{
@@ -1761,7 +1822,7 @@ int device_handle_set_error_values(
 			return( -1 );
 		}
 		if( libsmdev_handle_set_error_granularity(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     error_granularity,
 		     error ) != 1 )
 		{
@@ -1779,7 +1840,7 @@ int device_handle_set_error_values(
 			error_flags = LIBSMDEV_ERROR_FLAG_ZERO_ON_ERROR;
 		}
 		if( libsmdev_handle_set_error_flags(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     error_flags,
 		     error ) != 1 )
 		{
@@ -1820,7 +1881,7 @@ int device_handle_get_number_of_read_errors(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_number_of_errors(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     number_of_read_errors,
 		     error ) != 1 )
 		{
@@ -1879,7 +1940,7 @@ int device_handle_get_read_error(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_error(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     index,
 		     offset,
 		     size,
@@ -1959,7 +2020,7 @@ int device_handle_media_information_fprint(
 		 "Device information:\n" );
 
 		if( libsmdev_handle_get_bus_type(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     &bus_type,
 		     error ) != 1 )
 		{
@@ -2007,7 +2068,7 @@ int device_handle_media_information_fprint(
 		 "\n" );
 
 		result = libsmdev_handle_get_information_value(
-		          device_handle->dev_input_handle,
+		          device_handle->smdev_input_handle,
 		          (uint8_t *) "vendor",
 		          6,
 		          media_information_value,
@@ -2035,7 +2096,7 @@ int device_handle_media_information_fprint(
 		 (char *) media_information_value );
 
 		result = libsmdev_handle_get_information_value(
-		          device_handle->dev_input_handle,
+		          device_handle->smdev_input_handle,
 		          (uint8_t *) "model",
 		          5,
 		          media_information_value,
@@ -2063,7 +2124,7 @@ int device_handle_media_information_fprint(
 		 (char *) media_information_value );
 
 		result = libsmdev_handle_get_information_value(
-		          device_handle->dev_input_handle,
+		          device_handle->smdev_input_handle,
 		          (uint8_t *) "serial_number",
 		          13,
 		          media_information_value,
@@ -2101,7 +2162,7 @@ int device_handle_media_information_fprint(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_media_type(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     &media_type,
 		     error ) != 1 )
 		{
@@ -2187,7 +2248,7 @@ int device_handle_media_information_fprint(
 	if( media_type == LIBSMDEV_MEDIA_TYPE_OPTICAL )
 	{
 		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     &bytes_per_sector,
 		     error ) != 1 )
 		{
@@ -2285,7 +2346,7 @@ int device_handle_read_errors_fprint(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     &bytes_per_sector,
 		     error ) != 1 )
 		{
@@ -2310,7 +2371,7 @@ int device_handle_read_errors_fprint(
 			return( -1 );
 		}
 		if( libsmdev_handle_get_number_of_errors(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     &number_of_read_errors,
 		     error ) != 1 )
 		{
@@ -2338,7 +2399,7 @@ int device_handle_read_errors_fprint(
 			     read_error_index++ )
 			{
 				if( libsmdev_handle_get_error(
-				     device_handle->dev_input_handle,
+				     device_handle->smdev_input_handle,
 				     read_error_index,
 				     &read_error_offset,
 				     &read_error_size,
@@ -2414,7 +2475,7 @@ int device_handle_sessions_fprint(
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
 		if( libsmdev_handle_get_number_of_sessions(
-		     device_handle->dev_input_handle,
+		     device_handle->smdev_input_handle,
 		     &number_of_sessions,
 		     error ) != 1 )
 		{
@@ -2443,7 +2504,7 @@ int device_handle_sessions_fprint(
 			     session_index++ )
 			{
 				if( libsmdev_handle_get_session(
-				     device_handle->dev_input_handle,
+				     device_handle->smdev_input_handle,
 				     session_index,
 				     &start_sector,
 				     &number_of_sectors,

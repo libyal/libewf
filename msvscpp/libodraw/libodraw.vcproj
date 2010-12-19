@@ -102,6 +102,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libodraw\libodraw_data_file_descriptor.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libodraw\libodraw_debug.c"
 				>
 			</File>
@@ -110,15 +114,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libodraw\libodraw_file_value.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libodraw\libodraw_handle.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libodraw\libodraw_io_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libodraw\libodraw_metadata.c"
 				>
 			</File>
 			<File
@@ -164,6 +168,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libodraw\libodraw_data_file_descriptor.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libodraw\libodraw_debug.h"
 				>
 			</File>
@@ -180,15 +188,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libodraw\libodraw_file_value.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libodraw\libodraw_handle.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libodraw\libodraw_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libodraw\libodraw_metadata.h"
 				>
 			</File>
 			<File

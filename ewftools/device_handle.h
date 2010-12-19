@@ -85,11 +85,11 @@ struct device_handle
 
 	/* libsmdev input handle
 	 */
-	libsmdev_handle_t *dev_input_handle;
+	libsmdev_handle_t *smdev_input_handle;
 
 	/* libsmraw input handle
 	 */
-	libsmdev_handle_t *raw_input_handle;
+	libsmdev_handle_t *smraw_input_handle;
 
 	/* The number of error retries
 	 */

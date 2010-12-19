@@ -357,8 +357,8 @@ int libewf_filename_create(
 	}
 	/* The actual filename also contains a '.', 3 character extension and a end of string byte
 	 */
-	new_filename = memory_allocate(
-	                sizeof( libcstring_system_character_t ) * ( basename_length + 5 ) );
+	new_filename = libcstring_system_string_allocate(
+	                basename_length + 5 );
 
 	if( new_filename == NULL )
 	{
