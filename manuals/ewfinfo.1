@@ -1,4 +1,4 @@
-.Dd September 29, 2010
+.Dd December 20, 2010
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -8,6 +8,7 @@
 .Nm ewfinfo
 .Op Fl A Ar codepage
 .Op Fl d Ar date_format
+.Op Fl f Ar formar
 .Op Fl ehimvV
 .Ar ewf_files
 .Sh DESCRIPTION
@@ -38,6 +39,8 @@ the codepage of header section, options: ascii (default), windows-874, windows-1
 the date format, options: ctime (default), dm (day/month), md (month/day), iso8601
 .It Fl e
 only show EWF read error information
+.It Fl f Ar format
+specify the output format, options: text (default), dfxml
 .It Fl h
 shows this help
 .It Fl i

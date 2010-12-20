@@ -61,11 +61,9 @@
 			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_metadata.c">
 			</CppCompile>
-			<CppCompile Include="..\..\..\libodraw\libodraw_list_type.c">
-			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_notify.c">
 			</CppCompile>
-			<CppCompile Include="..\..\..\libodraw\libodraw_sector_list.c">
+			<CppCompile Include="..\..\..\libodraw\libodraw_sector_range.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libodraw\libodraw_support.c">
 			</CppCompile>
@@ -101,11 +99,9 @@
 			</None>
 			<None Include="..\..\..\libodraw\libodraw_libuna.h">
 			</None>
-			<None Include="..\..\..\libodraw\libodraw_list_type.h">
-			</None>
 			<None Include="..\..\..\libodraw\libodraw_notify.h">
 			</None>
-			<None Include="..\..\..\libodraw\libodraw_sector_list.h">
+			<None Include="..\..\..\libodraw\libodraw_sector_range.h">
 			</None>
 			<None Include="..\..\..\libodraw\libodraw_support.h">
 			</None>

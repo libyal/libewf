@@ -126,15 +126,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libodraw\libodraw_list_type.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libodraw\libodraw_notify.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libodraw\libodraw_sector_list.c"
+				RelativePath="..\..\libodraw\libodraw_sector_range.c"
 				>
 			</File>
 			<File
@@ -212,15 +208,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libodraw\libodraw_list_type.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libodraw\libodraw_notify.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libodraw\libodraw_sector_list.h"
+				RelativePath="..\..\libodraw\libodraw_sector_range.h"
 				>
 			</File>
 			<File
