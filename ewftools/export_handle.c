@@ -4458,7 +4458,7 @@ int export_handle_checksum_errors_fprint(
 
 				result = -1;
 			}
-			last_sector = start_sector + number_of_sectors;
+			last_sector = start_sector + number_of_sectors - 1;
 
 			fprintf(
 			 stream,
@@ -4474,7 +4474,7 @@ int export_handle_checksum_errors_fprint(
 			start_sector *= export_handle->bytes_per_sector;
 			last_sector  *= export_handle->bytes_per_sector;
 
-			while( start_sector < last_sector )
+			while( start_sector <= last_sector )
 			{
 				if( libewf_handle_seek_offset(
 				     export_handle->input_handle,

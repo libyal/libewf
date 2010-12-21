@@ -73,8 +73,10 @@ libcstring_system_character_t *ewfinput_media_flags[ 2 ] = \
 {  _LIBCSTRING_SYSTEM_STRING( "logical" ),
    _LIBCSTRING_SYSTEM_STRING( "physical" ) };
 
-libcstring_system_character_t *ewfinput_sector_per_block_sizes[ 10 ] = \
-{  _LIBCSTRING_SYSTEM_STRING( "64" ),
+libcstring_system_character_t *ewfinput_sector_per_block_sizes[ 12 ] = \
+{  _LIBCSTRING_SYSTEM_STRING( "16" ),
+   _LIBCSTRING_SYSTEM_STRING( "32" ),
+   _LIBCSTRING_SYSTEM_STRING( "64" ),
    _LIBCSTRING_SYSTEM_STRING( "128" ),
    _LIBCSTRING_SYSTEM_STRING( "256" ),
    _LIBCSTRING_SYSTEM_STRING( "512" ),
@@ -281,8 +283,24 @@ int ewfinput_determine_sectors_per_chunk(
 	{
 		if( libcstring_system_string_compare(
 		     string,
-		     _LIBCSTRING_SYSTEM_STRING( "64" ),
+		     _LIBCSTRING_SYSTEM_STRING( "16" ),
 		     2 ) == 0 )
+		{
+			*sectors_per_chunk = 16;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+		          string,
+		          _LIBCSTRING_SYSTEM_STRING( "32" ),
+		          2 ) == 0 )
+		{
+			*sectors_per_chunk = 32;
+			result             = 1;
+		}
+		else if( libcstring_system_string_compare(
+		          string,
+		          _LIBCSTRING_SYSTEM_STRING( "64" ),
+		          2 ) == 0 )
 		{
 			*sectors_per_chunk = 64;
 			result             = 1;

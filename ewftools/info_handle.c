@@ -3038,7 +3038,7 @@ int info_handle_acquiry_errors_fprint(
 				 info_handle->notify_stream,
 				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
 				 start_sector,
-				 start_sector + number_of_sectors,
+				 start_sector + number_of_sectors - 1,
 				 number_of_sectors );
 			}
 		}
@@ -3187,7 +3187,7 @@ int info_handle_sessions_fprint(
 				 info_handle->notify_stream,
 				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
 				 start_sector,
-				 start_sector + number_of_sectors,
+				 start_sector + number_of_sectors - 1,
 				 number_of_sectors );
 			}
 		}

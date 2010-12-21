@@ -44,14 +44,14 @@ extern "C" {
 #define EWFINPUT_MEDIA_FLAGS_AMOUNT			2
 #define EWFINPUT_MEDIA_FLAGS_DEFAULT			1
 
-#define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
-#define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		0
+#define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		12
+#define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		2
 
 extern libcstring_system_character_t *ewfinput_compression_levels[ 4 ];
 extern libcstring_system_character_t *ewfinput_format_types[ 12 ];
 extern libcstring_system_character_t *ewfinput_media_types[ 4 ];
 extern libcstring_system_character_t *ewfinput_media_flags[ 2 ];
-extern libcstring_system_character_t *ewfinput_sector_per_block_sizes[ 10 ];
+extern libcstring_system_character_t *ewfinput_sector_per_block_sizes[ 12 ];
 extern libcstring_system_character_t *ewfinput_yes_no[ 2 ];
 
 int ewfinput_determine_ewf_format(

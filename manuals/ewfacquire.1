@@ -1,4 +1,4 @@
-.Dd November 13, 2010
+.Dd December 21, 2010
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -64,7 +64,7 @@ The options are as follows:
 .It Fl A Ar codepage
 the codepage of header section, options: ascii (default), windows-874, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
 .It Fl b Ar number_of_sectors
-the number of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+the number of sectors to read at once (per chunk), options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl B Ar number_of_bytes
 the number of bytes to acquire
 .It Fl c Ar compression_level
@@ -82,7 +82,7 @@ the evidence number (default is evidence_number)
 .It Fl f Ar format
 the EWF file format to write to, options: ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6 (default), linen5, linen6, ewfx.
 .It Fl g Ar number_of_sectors
-the number of sectors to be used as error granularity, options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+the number of sectors to be used as error granularity, options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl h
 shows this help
 .It Fl l Ar log_filename
@@ -150,7 +150,7 @@ will ask for the information it requires.
 .Ss To image a floppy:
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20101029
+ewfacquire 20101221
 
 Device information:
 Bus type:		
@@ -176,7 +176,7 @@ Start to acquire at offset (0 >= value >= 1474560) [0]:
 The number of bytes to acquire (0 >= value >= 1474560) [1474560]:
 Evidence segment file size in bytes (1.0 MiB >= value >= 1.9 GiB) [1.4 GiB]:
 The number of bytes per sector (1 >= value >= 4294967295) [512]:
-The number of sectors to read at once (64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768) [64]: 
+The number of sectors to read at once (16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768) [64]: 
 The number of sectors to be used as error granularity (1 >= value >= 64) [64]: 
 The number of retries when a read error occurs (0 >= value >= 255) [2]: 
 Wipe sectors on read error (mimic EnCase like behavior) (yes, no) [no]:

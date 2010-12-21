@@ -20,7 +20,9 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
 #define TOC_FILE
+*/
 
 #include <common.h>
 #include <memory.h>
@@ -137,8 +139,8 @@ void ewfacquire_usage_fprint(
 	                 "\t        windows-1253, windows-1254, windows-1255, windows-1256,\n"
 	                 "\t        windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-b:     specify the number of sectors to read at once (per chunk),\n"
-	                 "\t        options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192,\n"
-	                 "\t        16384 or 32768\n" );
+	                 "\t        options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096,\n"
+	                 "\t        8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-B:     specify the number of bytes to acquire (default is all bytes)\n" );
 	fprintf( stream, "\t-c:     specify the compression level, options: none (default),\n"
 	                 "\t        empty-block, fast or best\n" );
@@ -149,8 +151,8 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-e:     specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );
 	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity,\n"
-	                 "\t        options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192,\n"
-	                 "\t        16384 or 32768\n" );
+	                 "\t        options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096,\n"
+	                 "\t        8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart,\n"
 	                 "\t        ftk, encase2, encase3, encase4, encase5, encase6 (default),\n"
 	                 "\t        linen5, linen6, ewfx\n" );

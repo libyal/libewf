@@ -1,4 +1,4 @@
-.Dd October 22, 2010
+.Dd December 21, 2010
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -44,7 +44,7 @@ The options are as follows:
 .It Fl A Ar codepage
 the codepage of header section, options: ascii (default), windows-874, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
 .It Fl b Ar number_of_sectors
-the number of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+the number of sectors to read at once (per chunk), options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl B Ar number_of_bytes
 the number of bytes to export
 .It Fl c Ar compression_level
@@ -86,7 +86,7 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfexport floppy.E01
-ewfexport 20100929
+ewfexport 20101221
 
 Information for export required, please provide the necessary input
 Export to format (raw, files, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:

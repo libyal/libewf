@@ -2526,7 +2526,7 @@ int device_handle_sessions_fprint(
 					 stream,
 					 "\tat sector(s): %" PRIi64 " - %" PRIi64 " number: %" PRIu64 "\n",
 					 start_sector,
-					 start_sector + number_of_sectors,
+					 start_sector + number_of_sectors - 1,
 					 number_of_sectors );
 				}
 			}
