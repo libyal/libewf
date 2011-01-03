@@ -1,4 +1,5 @@
 TODO
+* fix for file entry support
 * fixes from beta tests
   - check acquire-resume on FreeBSD, corruption in table 2 offsets table ?
   - write truncate equivalent
@@ -139,6 +140,7 @@ Error handling/tollerance
 * improve offset table correction
   - if not correctable skip chunk while reading and mark as crc error
     or try to determine offset/size of chunk somehow
+* check section size/next offset
 
 Python bindings (pyewf)
 * add WINAPI wide character support for open() and glob()
@@ -240,8 +242,11 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
-20110102
+20110103
+* added restriction for calculated section header next to match stored
 * 2011 update
+
+20110102
 * worked on error tollerance
 
 20101221

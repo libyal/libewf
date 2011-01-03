@@ -7729,6 +7729,20 @@ int libewf_section_read(
 
 		return( -1 );
 	}
+	/* Make sure to check if the section next value is sane
+	 */
+	if( ( (off64_t) section_next != *section_start_offset )
+	 && ( (off64_t) section_next != section_end_offset ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: mismatch in calculated and stored next section offset.",
+		 function );
+
+		return( -1 );
+	}
 	section_type_length = libcstring_narrow_string_length(
 	                       (char *) section->type );
 
