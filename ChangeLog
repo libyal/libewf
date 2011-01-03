@@ -240,6 +240,10 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110102
+* 2011 update
+* worked on error tollerance
+
 20101221
 * updated libodraw, libsmraw
 * ewftools: adjustment of last sector value in output, no longer included in range

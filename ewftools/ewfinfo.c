@@ -2,7 +2,7 @@
  * ewfinfo
  * Shows information stored in an EWF file
  *
- * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *

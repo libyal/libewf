@@ -1,7 +1,7 @@
 /*
  * Section reading/writing functions
  *
- * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -7690,6 +7690,15 @@ int libewf_section_read(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: reading section start of offset: %" PRIi64 "\n",
+		 function,
+		 *section_start_offset );
+	}
+#endif
 	if( libewf_section_start_read(
 	     file_io_pool,
 	     segment_file_handle,
