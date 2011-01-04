@@ -1,5 +1,4 @@
 TODO
-* fix for file entry support
 * fixes from beta tests
   - check acquire-resume on FreeBSD, corruption in table 2 offsets table ?
   - write truncate equivalent
@@ -242,9 +241,14 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110104
+* updated libfvalue
+* fixed issue in file entry introduced in 20101025
+
 20110103
 * added restriction for calculated section header next to match stored
 * 2011 update
+* bug fix in clone single file entry
 
 20110102
 * worked on error tollerance

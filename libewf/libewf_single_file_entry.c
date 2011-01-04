@@ -194,13 +194,95 @@ int libewf_single_file_entry_clone(
 		 "%s: unable to copy source to destination single file entry.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *destination_single_file_entry );
+
+		*destination_single_file_entry = NULL;
+
+		return( -1 );
+	}
+	( (libewf_single_file_entry_t *) *destination_single_file_entry )->name     = NULL;
+	( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash = NULL;
+
+	if( ( (libewf_single_file_entry_t *) source_single_file_entry )->name != NULL )
+	{
+		( (libewf_single_file_entry_t *) *destination_single_file_entry )->name = (uint8_t *) memory_allocate(
+		                                                                                       sizeof( uint8_t ) * ( (libewf_single_file_entry_t *) source_single_file_entry )->name_size );
+
+		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination name.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name,
+		     ( (libewf_single_file_entry_t *) source_single_file_entry )->name,
+		     ( (libewf_single_file_entry_t *) source_single_file_entry )->name_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination name.",
+			 function );
+
+			goto on_error;
+		}
+		( (libewf_single_file_entry_t *) *destination_single_file_entry )->name_size = ( (libewf_single_file_entry_t *) source_single_file_entry )->name_size;
+	}
+	if( ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash != NULL )
+	{
+		( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash = (uint8_t *) memory_allocate(
+		                                                                                           sizeof( uint8_t ) * ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash_size );
+
+		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination MD5 hash.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash,
+		     ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash,
+		     ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination MD5 hash.",
+			 function );
+
+			goto on_error;
+		}
+		( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash_size = ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash_size;
 	}
 	return( 1 );
 
 on_error:
 	if( *destination_single_file_entry != NULL )
 	{
+		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash != NULL )
+		{
+			memory_free(
+			 ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash );
+		}
+		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name != NULL )
+		{
+			memory_free(
+			 ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name );
+		}
 		memory_free(
 		 *destination_single_file_entry );
 
