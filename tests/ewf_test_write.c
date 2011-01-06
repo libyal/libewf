@@ -1,7 +1,7 @@
 /*
  * Expert Witness Compression Format (EWF) library write testing program
  *
- * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -74,7 +74,7 @@ int ewf_test_write(
 		 "%s: unable to create handle.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -99,11 +99,7 @@ int ewf_test_write(
 		 "%s: unable to open handle.",
 		 function );
 
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( media_size > 0 )
 	{
@@ -136,7 +132,7 @@ int ewf_test_write(
 			 "%s: unable set maximum segment size.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( libewf_handle_set_compression_values(
@@ -152,11 +148,22 @@ int ewf_test_write(
 		 "%s: unable set compression values.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	buffer = (uint8_t *) memory_allocate(
 	                      EWF_TEST_BUFFER_SIZE );
 
+	if( buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable created buffer.",
+		 function );
+
+		goto on_error;
+	}
 	if( result != -1 )
 	{
 		write_size = 512;
@@ -177,9 +184,7 @@ int ewf_test_write(
 				 "%s: unable set value in buffer.",
 				 function );
 
-				result = -1;
-
-				break;
+				goto on_error;
 			}
 			write_count = libewf_handle_write_buffer(
 				       handle,
@@ -197,9 +202,7 @@ int ewf_test_write(
 				 function,
 				 write_size );
 
-				result = -1;
-
-				break;
+				goto on_error;
 			}
 			if( write_count != (ssize_t) write_size )
 			{
@@ -213,9 +216,7 @@ int ewf_test_write(
 					 function,
 					 write_size );
 
-					result = -1;
-
-					break;
+					goto on_error;
 				}
 			}
 			if( media_size > 0 )
@@ -244,9 +245,7 @@ int ewf_test_write(
 				 "%s: unable set value in buffer.",
 				 function );
 
-				result = -1;
-
-				break;
+				goto on_error;
 			}
 			write_count = libewf_handle_write_buffer(
 				       handle,
@@ -264,9 +263,7 @@ int ewf_test_write(
 				 function,
 				 write_size );
 
-				result = -1;
-
-				break;
+				goto on_error;
 			}
 			if( write_count != (ssize_t) write_size )
 			{
@@ -280,9 +277,7 @@ int ewf_test_write(
 					 function,
 					 write_size );
 
-					result = -1;
-
-					break;
+					goto on_error;
 				}
 			}
 			if( media_size > 0 )
@@ -293,6 +288,8 @@ int ewf_test_write(
 	}
 	memory_free(
 	 buffer );
+
+	buffer = NULL;
 	
 	if( libewf_handle_close(
 	     handle,
@@ -305,7 +302,7 @@ int ewf_test_write(
 		 "%s: unable to close handle.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	if( libewf_handle_free(
 	     &handle,
@@ -318,9 +315,26 @@ int ewf_test_write(
 		 "%s: unable to free handle.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	return( result );
+
+on_error:
+	if( buffer != NULL )
+	{
+		memory_free(
+		 buffer );
+	}
+	if( handle != NULL )
+	{
+		libewf_handle_close(
+		 handle,
+		 NULL );
+		libewf_handle_free(
+		 &handle,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* The main program
@@ -331,15 +345,19 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error            = NULL;
-	libcstring_system_integer_t option = 0;
-	size64_t chunk_size                = 0;
-	size64_t maximum_segment_size      = 0;
-	size64_t media_size                = 0;
-	size_t string_length               = 0;
-	uint8_t compression_flags          = 0;
-	int8_t compression_level           = LIBEWF_COMPRESSION_NONE;
-	int result                         = 0;
+	libcstring_system_character_t *option_chunk_size           = NULL;
+	libcstring_system_character_t *option_compression_level    = NULL;
+	libcstring_system_character_t *option_maximum_segment_size = NULL;
+	libcstring_system_character_t *option_media_size           = NULL;
+	liberror_error_t *error                                    = NULL;
+	libcstring_system_integer_t option                         = 0;
+	size64_t chunk_size                                        = 0;
+	size64_t maximum_segment_size                              = 0;
+	size64_t media_size                                        = 0;
+	size_t string_length                                       = 0;
+	uint8_t compression_flags                                  = 0;
+	int8_t compression_level                                   = LIBEWF_COMPRESSION_NONE;
+	int result                                                 = 0;
 
 	while( ( option = libsystem_getopt(
 	                   argc,
@@ -358,114 +376,23 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (libcstring_system_integer_t) 'b':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_chunk_size = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &chunk_size,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported chunk size.\n" );
-
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					return( EXIT_FAILURE );
-				}
-				break;
-
-			case (libcstring_system_integer_t) 'c':
-				string_length = libcstring_system_string_length(
-				                 optarg );
-
-				if( string_length != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported compression level.\n" );
-
-					return( EXIT_FAILURE );
-				}
-				if( optarg[ 0 ] == (libcstring_system_integer_t) 'n' )
-				{
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
-				}
-				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'e' )
-				{
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
-				}
-				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'f' )
-				{
-					compression_level = LIBEWF_COMPRESSION_FAST;
-					compression_flags = 0;
-				}
-				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'b' )
-				{
-					compression_level = LIBEWF_COMPRESSION_BEST;
-					compression_flags = 0;
-				}
-				else
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported compression level.\n" );
-
-					return( EXIT_FAILURE );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'B':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_media_size = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &media_size,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported media size.\n" );
+				break;
 
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
+			case (libcstring_system_integer_t) 'c':
+				option_compression_level = optarg;
 
-					return( EXIT_FAILURE );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'S':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_maximum_segment_size = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &maximum_segment_size,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported maximum segment size.\n" );
-
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					return( EXIT_FAILURE );
-				}
 				break;
 		}
 	}
@@ -476,6 +403,102 @@ int main( int argc, char * const argv[] )
 		 "Missing EWF image filename.\n" );
 
 		return( EXIT_FAILURE );
+	}
+	if( option_chunk_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_chunk_size );
+
+		if( libsystem_string_to_uint64(
+		     option_chunk_size,
+		     string_length + 1,
+		     &chunk_size,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported chunk size.\n" );
+
+			goto on_error;
+		}
+	}
+	if( option_compression_level != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_compression_level );
+
+		if( string_length != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression level.\n" );
+
+			goto on_error;
+		}
+		if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'n' )
+		{
+			compression_level = LIBEWF_COMPRESSION_NONE;
+			compression_flags = 0;
+		}
+		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'e' )
+		{
+			compression_level = LIBEWF_COMPRESSION_NONE;
+			compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+		}
+		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'f' )
+		{
+			compression_level = LIBEWF_COMPRESSION_FAST;
+			compression_flags = 0;
+		}
+		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'b' )
+		{
+			compression_level = LIBEWF_COMPRESSION_BEST;
+			compression_flags = 0;
+		}
+		else
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression level.\n" );
+
+			goto on_error;
+		}
+	}
+	if( option_maximum_segment_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_maximum_segment_size );
+
+		if( libsystem_string_to_uint64(
+		     option_maximum_segment_size,
+		     string_length + 1,
+		     &maximum_segment_size,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported maximum segment size.\n" );
+
+			goto on_error;
+		}
+	}
+	if( option_media_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_media_size );
+
+		if( libsystem_string_to_uint64(
+		     option_media_size,
+		     string_length + 1,
+		     &media_size,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported media size.\n" );
+
+			goto on_error;
+		}
 	}
 	result = ewf_test_write(
 	          argv[ optind ],
@@ -503,5 +526,16 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libewf_error_free(
+		 &error );
+	}
+	return( EXIT_FAILURE );
 }
 

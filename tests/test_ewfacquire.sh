@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# ewfacquire testing script
+# ewfacquire testing script for (split) RAW image input
 #
-# Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+# Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -68,7 +68,7 @@ EOI
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q -d sha1 ${TMP}/acquire.*
+		${EWFVERIFY} -q -d sha1 ${TMP}/acquire.*
 
 		RESULT=$?;
 	fi
@@ -117,7 +117,7 @@ test_acquire_unattended_file()
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q -d sha1 ${TMP}/unattended_acquire.*
+		${EWFVERIFY} -q -d sha1 ${TMP}/unattended_acquire.*
 
 		RESULT=$?;
 	fi
@@ -204,7 +204,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_file "${FILENAME}" encase6 none 650MB "${CHUNK_SIZE}";
 		then
@@ -227,7 +227,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_file "${FILENAME}" smart none 650MB "${CHUNK_SIZE}";
 		then
@@ -276,7 +276,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_unattended_file "${FILENAME}" encase6 none 650MB "${CHUNK_SIZE}";
 		then
@@ -299,7 +299,7 @@ do
 		fi
 	done
 
-	for CHUNK_SIZE in 128 256 512 1024 2048 4096 8192 16384 32768;
+	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
 		if ! test_acquire_unattended_file "${FILENAME}" smart none 650MB "${CHUNK_SIZE}";
 		then

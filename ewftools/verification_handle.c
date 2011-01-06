@@ -123,7 +123,7 @@ int verification_handle_initialize(
 			goto on_error;
 		}
 #ifdef TODO
-/* TODO: have application determine limit value and set to value - 4 */
+		/* TODO: have application determine limit value and set to value - 4 */
 		if( libewf_handle_set_maximum_number_of_open_handles(
 		     ( *verification_handle )->input_handle,
 		     1000,

@@ -2,7 +2,7 @@
 #
 # ewfacquire resume testing script
 #
-# Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+# Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -30,7 +30,6 @@ TMP="tmp";
 AWK="awk";
 LS="ls";
 TR="tr";
-TRUNCATE="/usr/bin/truncate";
 WC="wc";
 
 test_write_resume()
@@ -59,14 +58,14 @@ test_write_resume()
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q ${TMP}/resume.E01
+		${EWFVERIFY} -q ${TMP}/resume.E01
 
 		RESULT=$?;
 	fi
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		${TRUNCATE} -s ${RESUME_OFFSET} ${TMP}/resume.E01
+		${EWFTRUNCATE} ${RESUME_OFFSET} ${TMP}/resume.E01
 
 		RESULT=$?;
 	fi
@@ -85,7 +84,7 @@ EOI
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		./${EWFVERIFY} -q ${TMP}/resume.E01
+		${EWFVERIFY} -q ${TMP}/resume.E01
 
 		RESULT=$?;
 	fi
@@ -106,9 +105,13 @@ EOI
 	return ${RESULT};
 }
 
-if ! test -x ${TRUNCATE};
+EWFTRUNCATE="./ewf_test_truncate";
+
+if ! test -x ${EWFTRUNCATE};
 then
-	exit ${EXIT_IGNORE};
+	echo "Missing executable: ${EWFTRUNCATE}";
+
+	exit ${EXIT_FAILURE};
 fi
 
 EWFACQUIRE="../ewftools/ewfacquire";

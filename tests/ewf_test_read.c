@@ -1,7 +1,7 @@
 /*
  * Expert Witness Compression Format (EWF) library read testing program
  *
- * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -495,14 +495,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create handle.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -524,17 +517,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to open file(s).\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( libewf_handle_get_media_size(
 	     handle,
@@ -545,20 +528,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve media size.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( media_size > (size64_t) INT64_MAX )
 	{
@@ -566,20 +536,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Media size exceeds maximum.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( libewf_handle_get_chunk_size(
 	     handle,
@@ -590,20 +547,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve chunk size.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( chunk_size == 0 )
 	{
@@ -611,20 +555,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Invalid chunk size.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	fprintf(
 	 stdout,
@@ -652,14 +583,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read buffer.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( ewf_test_read_buffer_at_offset(
 	     handle,
@@ -673,14 +597,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read buffer.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 
 	/* Case 1: test random read
@@ -704,14 +621,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read buffer.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( ewf_test_read_buffer_at_offset(
 	     handle,
@@ -725,14 +635,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read buffer.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 
 	/* Case 3: test read buffer beyond media size
@@ -757,14 +660,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read buffer.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 		if( ewf_test_read_buffer_at_offset(
 		     handle,
@@ -778,14 +674,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read buffer.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 	}
 	else
@@ -808,14 +697,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read buffer.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 		if( ewf_test_read_buffer_at_offset(
 		     handle,
@@ -829,14 +711,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read buffer.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 	}
 	fprintf(
@@ -866,14 +741,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read chunk.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( ewf_test_read_chunk_at_offset(
 	     handle,
@@ -888,14 +756,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read chunk.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 
 	/* Case 1: test random read
@@ -920,14 +781,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read chunk.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( ewf_test_read_chunk_at_offset(
 	     handle,
@@ -942,14 +796,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test read chunk.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 
 	/* Case 3: test read chunk beyond media size
@@ -975,14 +822,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read chunk.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 		if( ewf_test_read_chunk_at_offset(
 		     handle,
@@ -997,14 +837,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read chunk.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 	}
 	else
@@ -1028,14 +861,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read chunk.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 		if( ewf_test_read_chunk_at_offset(
 		     handle,
@@ -1050,14 +876,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test read chunk.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 	}
 	/* Clean up
@@ -1070,17 +889,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close file(s).\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( libewf_handle_free(
 	     &handle,
@@ -1090,15 +899,28 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free handle.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libewf_error_free(
+		 &error );
+	}
+	if( handle != NULL )
+	{
+		libewf_handle_close(
+		 handle,
+		 NULL );
+		libewf_handle_free(
+		 &handle,
+		 NULL );
+	}
+	return( EXIT_FAILURE );
 }
 

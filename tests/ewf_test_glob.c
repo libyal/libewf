@@ -1,7 +1,7 @@
 /*
  * Expert Witness Compression Format (EWF) library glob testing program
  *
- * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -80,14 +80,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to glob filenames.\n" );
 
-		libewf_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		libewf_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( number_of_filenames < 0 )
 	{
@@ -149,15 +142,19 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free glob.\n" );
 
+		goto on_error;
+	}
+	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
 		libewf_error_backtrace_fprint(
 		 error,
 		 stderr );
-
 		libewf_error_free(
 		 &error );
-
-		return( EXIT_FAILURE );
 	}
-	return( EXIT_SUCCESS );
+	return( EXIT_FAILURE );
 }
 

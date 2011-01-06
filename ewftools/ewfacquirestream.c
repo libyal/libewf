@@ -1121,7 +1121,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported header codepage defaulting to: ascii.\n" );
+			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
 	if( option_target_filename != NULL )
@@ -1389,7 +1389,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported sectors per chunk defaulting to: %" PRIu32 ".\n",
+			 "Unsupported sectors per chunk defaulting to: %" PRIu32 ".\n",
 			 ewfacquirestream_imaging_handle->sectors_per_chunk );
 		}
 	}
@@ -1419,7 +1419,7 @@ int main( int argc, char * const argv[] )
 
 			fprintf(
 			 stderr,
-			 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+			 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
 			 ewfacquirestream_imaging_handle->maximum_segment_size );
 		}
 	}

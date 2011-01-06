@@ -9,8 +9,8 @@ This code is derived from information and software contributed by:
   (http://pyflag.sourceforge.net/)
 - Zlib for the implementation of the Zlib compression and optimized
   Adler32 function
-- Open SSL for the implementation of the MD5 hash algorithm
-- libuuid for the implementation of GUID (UUID) calculation
+- OpenSSL for the implementation of the MD5 and SHA1 hash algorithm
+- libuuid for the implementation of GUID/UUID calculation
 - Wietse Venema for an example of the initial error handling code
 
 Additional credits go to:

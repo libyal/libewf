@@ -104,7 +104,7 @@ int byte_size_string_create(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: factor size greater than 8 unsuported.",
+		 "%s: factor size greater than 8 unsupported.",
 		 function );
 
 		return( -1 );

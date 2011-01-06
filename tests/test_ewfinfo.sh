@@ -2,7 +2,7 @@
 #
 # ewfinfo testing script
 #
-# Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+# Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -34,7 +34,7 @@ test_info()
 { 
 	INPUT_FILE=$1;
 
-	./${EWFINFO} ${INPUT_FILE};
+	${EWFINFO} ${INPUT_FILE};
 
 	RESULT=$?;
 

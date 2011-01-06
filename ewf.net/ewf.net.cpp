@@ -1,7 +1,7 @@
 /*
  * Library function of libewf .net managed wrapper
  *
- * Copyright (c) 2010, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -42,7 +42,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
 [assembly:AssemblyProductAttribute("ewf.net")];
-[assembly:AssemblyCopyrightAttribute("Copyright (c) 2010 Joachim Metz <jbmetz@users.sourceforge.net>")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c) 2010-2011 Joachim Metz <jbmetz@users.sourceforge.net>")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 

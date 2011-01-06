@@ -1107,7 +1107,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported header codepage defaulting to: ascii.\n" );
+			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
 	if( option_target_filename != NULL )
@@ -1207,7 +1207,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported sectors per chunk defaulting to: 64.\n" );
+			 "Unsupported sectors per chunk defaulting to: 64.\n" );
 		}
 	}
 	if( option_maximum_segment_size != NULL )
@@ -1238,7 +1238,7 @@ int main( int argc, char * const argv[] )
 
 				fprintf(
 				 stderr,
-				 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+				 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
 				 ewfexport_export_handle->maximum_segment_size );
 			}
 		}
@@ -1252,7 +1252,7 @@ int main( int argc, char * const argv[] )
 
 				fprintf(
 				 stderr,
-				 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+				 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
 				 ewfexport_export_handle->maximum_segment_size );
 			}
 		}
@@ -1433,7 +1433,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "C. Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+					 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
 					 ewfexport_export_handle->maximum_segment_size );
 				}
 			}
@@ -1484,7 +1484,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+					 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
 					 ewfexport_export_handle->maximum_segment_size );
 				}
 			}

@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsystem\libsystem_i18n.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsystem\libsystem_libuna.h"
 				>
 			</File>

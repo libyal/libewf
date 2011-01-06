@@ -464,7 +464,7 @@ int main( int argc, char * const argv[] )
 			}
 			fprintf(
 			 stderr,
-			 "Unsuported header codepage defaulting to: ascii.\n" );
+			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
 #if !defined( LIBSYSTEM_HAVE_GLOB )

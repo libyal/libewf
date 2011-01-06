@@ -1,39 +1,44 @@
 TODO
+* check behaviour or ewfacquire -S
 * fixes from beta tests
   - check acquire-resume on FreeBSD, corruption in table 2 offsets table ?
-  - write truncate equivalent
 * clean up of ewftools
   - ewfacquire: make behaviour of -g equal to user input ?
-* ewfacquire/device handle
-  - pass abort to libsmdev, libsmraw or libodraw
+* single file entry
+  - add API function to retrieve stored MD5 hash
+* add tests
+  - ewfexport of single file entries
 
 Next stable release:
 * full test
 * disable ewfdebug
 
 Roadmap:
+* lvf support
+  - add support for MD5 hash
+  - add support for permissions
+  - thread aware support (check)
 * code clean up
+  - integrate libmfdata (before working on segment file error tollerance)
+* error tollerance
+  - allow for missing segment file(s)
+  - allow for missing chunk(s)
 * bindings
   - Python (partial)
   - .Net (partial)
   - Java/JNI
 * improve device handle (libsmdev)
-* support missing segment files (chunks)
 * libbfio API extensions (partial)
 * low and high level API
   - to allow low level access to sections etc. (for recovery)
+  - allow access to segment table
+  - allow access to offset/chunk table
   - ewfdebug
-* lvf support
-  - set initial file entry offset
-  - add support for permissions
 * internationalisation/localization (i18n/l10n)
   - Unicode support (added)
   - locale support (partial)
   - multi language string support (gettext)
     need WINAPI version of gettext without libiconv dependency
-* thread aware lvf support
-  - implement libewf_single_file_entry_clone
-  - what about current offset and IO back-end ?
 * enhance thread safety
   - protect writing to internal data structures
   - protect reading when writing to internal data structures
@@ -46,7 +51,7 @@ Roadmap:
 
 Code clean up:
 * clean up configure.ac and acinclude.m4
-* implement libmfdata
+* integrate libmfdata
 * move sections into separate objects ?
 * refactor section_list to list_type and section_value ?
 * clean up ewfacquire: move imaging preferences into imaging handle
@@ -57,6 +62,9 @@ Code clean up:
   - move DFXML code to separate code files, what about separate library ?
   - implement a statefull XML writer e.g. open/close_section, open/close_value
 * check TODO in code, mainly regarding improvements
+* tests:
+  - ewf_test_read_write.c
+  - ewf_test_write_chunk.c
 
 BFIO support:
 * improve open file io pool (set basename ?)
@@ -72,15 +80,15 @@ Further analysis of the EWF format:
 * values in ltree strings (EWF-L01 LVF)
 * values in session section (+/-)
 * number of sectors in volume/data section has changed to a 64-bit value
-  but what about error2/sessions ?
+  but what about error2/sessions ? (sessions can be 32-bit)
 * does newer linen6 has sha1 support?
 * LVF: single file entry:
   - are flags similar to file attribute flags ?
 * FTK Imager: support for "Use AD Encryption"
+  - requires support for ADCRYPT file format
 
 Features
 * resume write support for ENCASE1/SMART table sections ?
-* support missing segment files (chunks)
 * implement low memory usage option
   - trade off IO versus memory use
 * disk full check
@@ -127,7 +135,6 @@ Possible performance improvements:
 * reduce alloc, realloc and free (this reduces breaks) use strace to analyze
   - pass values as parameters or use of handle
   - what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
-* optimize empty block test
 * optimize string functions
   - pass length/size as much as possible
 * pass zero byte empty block compressed data cache as a pointer
@@ -139,7 +146,6 @@ Error handling/tollerance
 * improve offset table correction
   - if not correctable skip chunk while reading and mark as crc error
     or try to determine offset/size of chunk somehow
-* check section size/next offset
 
 Python bindings (pyewf)
 * add WINAPI wide character support for open() and glob()
@@ -190,10 +196,6 @@ Tools:
   - for EnCase 6 format request serial number and model if not set ?
   - add support to enter sessions for optical images
   - add support for unattended write resume ?
-  - allow to specify a .cue file for session information
-    compensate for session gaps (leadin/leadout)
-    what about detecting .bin/.cue ?
-    what about .toc ?
   - improve output when encountering a read error
 * ewfacquirestream
   - implement stream handle
@@ -241,9 +243,20 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110106
+* updated libodraw, libsmdev, libsmraw
+* ewftools: code clean up
+* ewftools: fixed spelling error in unsuported => unsupported
+* ewfacquire: worked on optical disc RAW image support
+* ewfacquire: bug fix for setting number of error retries
+* test: worked on truncate equivalent
+* test: code clean up
+* test: added acquire of optical disc RAW images test
+
 20110104
-* updated libfvalue
+* updated libfvalue, libsmdev, libsmraw, libodraw
 * fixed issue in file entry introduced in 20101025
+* device handle added abort for libodraw
 
 20110103
 * added restriction for calculated section header next to match stored

@@ -19,6 +19,7 @@ TESTS = \
 	test_read_write.sh \
 	test_ewfverify.sh \
 	test_ewfacquire.sh \
+	test_ewfacquire_optical.sh \
 	test_ewfacquirestream.sh \
 	test_ewfacquire_resume.sh \
 	test_ewfinfo.sh \
@@ -27,6 +28,7 @@ TESTS = \
 
 check_SCRIPTS = \
 	test_ewfacquire.sh \
+	test_ewfacquire_optical.sh \
 	test_ewfacquire_resume.sh \
 	test_ewfacquirestream.sh \
 	test_ewfinfo.sh \
@@ -47,6 +49,7 @@ check_PROGRAMS = \
 	ewf_test_read \
 	ewf_test_read_write \
 	ewf_test_seek \
+	ewf_test_truncate \
 	ewf_test_write \
 	ewf_test_write_chunk
 
@@ -86,6 +89,15 @@ ewf_test_seek_LDADD = \
 	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
+        @MEMWATCH_LIBADD@
+
+ewf_test_truncate_SOURCES = \
+	ewf_test_truncate.c
+
+ewf_test_truncate_LDADD = \
+	../libcstring/libcstring.la \
+	../liberror/liberror.la \
+	../libsystem/libsystem.la \
         @MEMWATCH_LIBADD@
 
 ewf_test_write_SOURCES = \

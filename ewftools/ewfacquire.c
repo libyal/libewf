@@ -20,10 +20,6 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-#define TOC_FILE
-*/
-
 #include <common.h>
 #include <memory.h>
 #include <types.h>
@@ -35,15 +31,6 @@
 #include <stdlib.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
@@ -51,6 +38,7 @@
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewftools_libewf.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
 #include "process_status.h"
@@ -195,10 +183,8 @@ void ewfacquire_usage_fprint(
 	}
 
 	fprintf( stream, "\t-t:     specify the target file (without extension) to write to\n" );
-#ifdef TOC_FILE
 	fprintf( stream, "\t-T:     specify the file containing the table of contents (TOC) of\n"
 	                 "\t        an optical disc. The TOC file must be in the CUE format.\n" );
-#endif
 	fprintf( stream, "\t-u:     unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
@@ -1253,7 +1239,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'r':
-				option_maximum_segment_size = optarg;
+				option_number_of_error_retries = optarg;
 
 				break;
 
@@ -1385,7 +1371,6 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#ifdef TOC_FILE
 	if( option_toc_filename != NULL )
 	{
 		if( device_handle_set_string(
@@ -1397,12 +1382,11 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to set TOC filename.\n" );
+			 "Unable to set table of contents (TOC) filename.\n" );
 
 			goto on_error;
 		}
 	}
-#endif
 	if( option_number_of_error_retries != NULL )
 	{
 		result = device_handle_set_number_of_error_retries(
@@ -1422,7 +1406,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported number of error retries defaulting to: %" PRIu8 ".\n",
+			 "Unsupported number of error retries defaulting to: %" PRIu8 ".\n",
 			 ewfacquire_device_handle->number_of_error_retries );
 		}
 	}
@@ -1502,7 +1486,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported header codepage defaulting to: ascii.\n" );
+			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
 	if( option_target_filename != NULL )
@@ -1793,7 +1777,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported sectors per chunk defaulting to: %" PRIu32 ".\n",
+			 "Unsupported sectors per chunk defaulting to: %" PRIu32 ".\n",
 			 ewfacquire_imaging_handle->sectors_per_chunk );
 		}
 	}
@@ -1816,7 +1800,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsuported sector error granularity defaulting to: %" PRIu32 ".\n",
+			 "Unsupported sector error granularity defaulting to: %" PRIu32 ".\n",
 			 ewfacquire_imaging_handle->sector_error_granularity );
 		}
 	}
@@ -1846,7 +1830,7 @@ int main( int argc, char * const argv[] )
 
 			fprintf(
 			 stderr,
-			 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+			 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
 			 ewfacquire_imaging_handle->maximum_segment_size );
 		}
 	}
@@ -1977,8 +1961,6 @@ int main( int argc, char * const argv[] )
 #endif
 				liberror_error_free(
 				 &error );
-
-				/* TODO what about extension in target filename ? */
 
 				resume_acquiry = 0;
 			}
@@ -2155,10 +2137,10 @@ int main( int argc, char * const argv[] )
 					goto on_error;
 				}
 			}
-#ifdef TOC_FILE
-/* TODO how to deal with this, because device handle is already open at this point
- */
-			if( ( ewfacquire_imaging_handle->media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+#ifdef TODO_TOC_FILE
+			/* TODO how to deal with this, because device handle is already open at this point
+			 */
+			if( ( ewfacquire_imaging_handle->media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
 			 && ( option_toc_filename == NULL ) )
 			{
 				if( device_handle_prompt_for_string(
@@ -2170,7 +2152,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf(
 					 stdout,
-					 "Unable to determine toc file.\n" );
+					 "Unable to determine table of contents (TOC) file.\n" );
 
 					goto on_error;
 				}
@@ -2292,7 +2274,7 @@ int main( int argc, char * const argv[] )
 
 					fprintf(
 					 stderr,
-					 "Unsuported maximum segment size defaulting to: %" PRIu64 ".\n",
+					 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
 					 ewfacquire_imaging_handle->maximum_segment_size );
 				}
 			}
@@ -2343,7 +2325,6 @@ int main( int argc, char * const argv[] )
 
 					goto on_error;
 				}
-/* TODO add range check */
 			}
 		}
 		if( option_number_of_error_retries == NULL )
@@ -2361,7 +2342,6 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-/* TODO add range check */
 		}
 		if( option_zero_buffer_on_error == NULL )
 		{
@@ -2378,7 +2358,6 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-/* TODO add range check */
 		}
 		fprintf(
 		 stdout,
@@ -2584,7 +2563,7 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-			if( ewfacquire_imaging_handle->media_type == LIBEWF_MEDIA_TYPE_OPTICAL )
+			if( ewfacquire_imaging_handle->media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
 			{
 				if( ewfacquire_determine_sessions(
 				     ewfacquire_imaging_handle,

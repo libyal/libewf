@@ -40,88 +40,62 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<None Include="..\..\..\libsystem\libsystem_support.h">
-				<BuildOrder>0</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsystem\libsystem.h">
-				<BuildOrder>1</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_date_time.c">
-				<BuildOrder>2</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_date_time.h">
-				<BuildOrder>3</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_directory.h">
-				<BuildOrder>4</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_directory_io.h">
-				<BuildOrder>5</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_error_string.c">
-				<BuildOrder>6</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_error_string.h">
-				<BuildOrder>7</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_file.c">
-				<BuildOrder>8</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_file.h">
-				<BuildOrder>9</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_file_io.h">
-				<BuildOrder>10</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_file_stream.h">
-				<BuildOrder>11</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_find.h">
-				<BuildOrder>12</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_getopt.c">
-				<BuildOrder>13</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_getopt.h">
-				<BuildOrder>14</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_glob.c">
-				<BuildOrder>15</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_glob.h">
-				<BuildOrder>16</BuildOrder>
+			</None>
+			<None Include="..\..\..\libsystem\libsystem_i18n.h">
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_libuna.h">
-				<BuildOrder>17</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_notify.c">
-				<BuildOrder>18</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_notify.h">
-				<BuildOrder>19</BuildOrder>
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_path.h">
-				<BuildOrder>20</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_signal.c">
-				<BuildOrder>21</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_signal.h">
-				<BuildOrder>22</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_split_values.c">
-				<BuildOrder>23</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_split_values.h">
-				<BuildOrder>24</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_string.c">
-				<BuildOrder>25</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_string.h">
-				<BuildOrder>26</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_support.c">
-				<BuildOrder>27</BuildOrder>
 			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

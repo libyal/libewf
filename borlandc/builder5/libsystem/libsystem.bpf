@@ -18,6 +18,7 @@ USEUNIT("..\..\..\libsystem\libsystem_getopt.c");
 USE("..\..\..\libsystem\libsystem_getopt.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_glob.c");
 USE("..\..\..\libsystem\libsystem_glob.h", File);
+USE("..\..\..\libsystem\libsystem_i18n.h", File);
 USE("..\..\..\libsystem\libsystem_libuna.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_notify.c");
 USE("..\..\..\libsystem\libsystem_notify.h", File);

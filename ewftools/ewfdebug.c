@@ -254,7 +254,7 @@ int main( int argc, char * const argv[] )
 
 			fprintf(
 			 stderr,
-			 "Unsuported header codepage defaulting to: ascii.\n" );
+			 "Unsupported header codepage defaulting to: ascii.\n" );
 
 			header_codepage = LIBEWF_CODEPAGE_ASCII;
 		}

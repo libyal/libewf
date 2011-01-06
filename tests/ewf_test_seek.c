@@ -1,7 +1,7 @@
 /*
  * Expert Witness Compression Format (EWF) library seek offset testing program
  *
- * Copyright (c) 2006-2010, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -172,14 +172,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to create handle.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -201,18 +194,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to open file(s).\n" );
 
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( libewf_handle_get_media_size(
 	     handle,
@@ -223,20 +205,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to retrieve media size.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( media_size > (size64_t) INT64_MAX )
 	{
@@ -244,20 +213,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Media size exceeds maximum.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_SET offset: 0
 	 * Expected result: 0
@@ -272,14 +228,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_SET offset: <media_size>
 	 * Expected result: <media_size>
@@ -294,14 +243,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_SET offset: <media_size / 5>
 	 * Expected result: <media_size / 5>
@@ -316,14 +258,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_SET offset: <media_size + 987>
 	 * Expected result: <media_size + 987>
@@ -338,14 +273,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_SET offset: -987
 	 * Expected result: -1
@@ -360,14 +288,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_CUR offset: 0
 	 * Expected result: <media_size + 987>
@@ -382,14 +303,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_CUR offset: <-1 * (media_size + 987)>
 	 * Expected result: 0
@@ -404,14 +318,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_CUR offset: <media_size / 3>
 	 * Expected result: <media_size / 3>
@@ -426,14 +333,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( media_size == 0 )
 	{
@@ -450,14 +350,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test seek offset.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 	}
 	else
@@ -475,14 +368,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test seek offset.\n" );
 
-			libewf_handle_close(
-			 handle,
-			 NULL );
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+			goto on_error;
 		}
 	}
 	/* Test: SEEK_END offset: 0
@@ -498,14 +384,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_END offset: <-1 * media_size>
 	 * Expected result: 0
@@ -520,14 +399,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_END offset: <-1 * (media_size / 4)>
 	 * Expected result: <media_size - (media_size / 4)>
@@ -542,14 +414,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_END offset: 542
 	 * Expected result: <media_size + 542>
@@ -564,14 +429,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: SEEK_END offset: <-1 * (media_size + 542)>
 	 * Expected result: -1
@@ -586,14 +444,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Test: UNKNOWN (88) offset: 0
 	 * Expected result: -1
@@ -608,14 +459,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		libewf_handle_close(
-		 handle,
-		 NULL );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	/* Clean up
 	 */
@@ -627,17 +471,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to close file(s).\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	if( libewf_handle_free(
 	     &handle,
@@ -647,15 +481,28 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to free handle.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libewf_error_free(
+		 &error );
+	}
+	if( handle != NULL )
+	{
+		libewf_handle_close(
+		 handle,
+		 NULL );
+		libewf_handle_free(
+		 &handle,
+		 NULL );
+	}
+	return( EXIT_FAILURE );
 }
 

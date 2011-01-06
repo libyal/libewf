@@ -26,49 +26,15 @@
 #include <libcstring.h>
 #include <liberror.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
-#if defined( HAVE_LOCAL_LIBODRAW )
-#include <libodraw_definitions.h>
-#include <libodraw_handle.h>
-#include <libodraw_metadata.h>
-#include <libodraw_support.h>
-#include <libodraw_types.h>
-#elif defined( HAVE_LIBODRAW_H )
-#include <libodraw.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBSMDEV )
-#include <libsmdev_definitions.h>
-#include <libsmdev_handle.h>
-#include <libsmdev_metadata.h>
-#include <libsmdev_support.h>
-#include <libsmdev_types.h>
-#elif defined( HAVE_LIBSMDEV_H )
-#include <libsmdev.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBSMRAW )
-#include <libsmraw_definitions.h>
-#include <libsmraw_handle.h>
-#include <libsmraw_metadata.h>
-#include <libsmraw_types.h>
-#elif defined( HAVE_LIBSMRAW_H )
-#include <libsmraw.h>
-#endif
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "device_handle.h"
 #include "ewfinput.h"
+#include "ewftools_libewf.h"
+#include "ewftools_libodraw.h"
+#include "ewftools_libsmdev.h"
+#include "ewftools_libsmraw.h"
 #include "storage_media_buffer.h"
 
 #define DEVICE_HANDLE_INPUT_BUFFER_SIZE		64
@@ -298,34 +264,59 @@ int device_handle_signal_abort(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_signal_abort(
-		     device_handle->smdev_input_handle,
-		     error ) != 1 )
+		if( device_handle->smdev_input_handle != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to signal device input handle to abort.",
-			 function );
+			if( libsmdev_handle_signal_abort(
+			     device_handle->smdev_input_handle,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to signal device input handle to abort.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
+	{
+		if( device_handle->odraw_input_handle != NULL )
+		{
+			if( libodraw_handle_signal_abort(
+			     device_handle->odraw_input_handle,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to signal optical disc raw input handle to abort.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( libsmraw_handle_signal_abort(
-		     device_handle->smraw_input_handle,
-		     error ) != 1 )
+		if( device_handle->smraw_input_handle != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to signal raw input handle to abort.",
-			 function );
+			if( libsmraw_handle_signal_abort(
+			     device_handle->smraw_input_handle,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to signal raw input handle to abort.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
 		}
 	}
 	return( 1 );
@@ -340,9 +331,8 @@ int device_handle_open_input(
      int number_of_filenames,
      liberror_error_t **error )
 {
-	static char *function  = "device_handle_open_input";
-	uint8_t libsmdev_flags = 0;
-	int result             = 0;
+	static char *function = "device_handle_open_input";
+	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -404,192 +394,461 @@ int device_handle_open_input(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( device_handle->smdev_input_handle != NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid device handle - device input handle already set.",
-			 function );
-
-			return( -1 );
-		}
-		if( libsmdev_handle_initialize(
-		     &( device_handle->smdev_input_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create device input handle.",
-			 function );
-
-			return( -1 );
-		}
-		libsmdev_flags = LIBSMDEV_OPEN_READ;
-
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		if( libsmdev_handle_open_wide(
-		     device_handle->smdev_input_handle,
-		     (wchar_t * const *) filenames,
+		if( device_handle_open_smdev_input(
+		     device_handle,
+		     filenames,
 		     number_of_filenames,
-		     libsmdev_flags,
 		     error ) != 1 )
-#else
-		if( libsmdev_handle_open(
-		     device_handle->smdev_input_handle,
-		     (char * const *) filenames,
-		     number_of_filenames,
-		     libsmdev_flags,
-		     error ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open device input handle.",
+			 "%s: unable to open device input.",
 			 function );
-
-			libsmdev_handle_free(
-			 &( device_handle->smdev_input_handle ),
-			 NULL );
 
 			return( -1 );
 		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( device_handle->odraw_input_handle != NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid device handle - optical disc raw input handle already set.",
-			 function );
-
-			return( -1 );
-		}
-		if( libodraw_handle_initialize(
-		     &( device_handle->odraw_input_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create optical disc raw input handle.",
-			 function );
-
-			return( -1 );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libodraw_handle_open_wide(
-			  device_handle->odraw_input_handle,
-			  device_handle->toc_filename,
-			  LIBODRAW_OPEN_READ,
-			  error );
-#else
-		result = libodraw_handle_open(
-			  device_handle->odraw_input_handle,
-			  device_handle->toc_filename,
-			  LIBODRAW_OPEN_READ,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open optical disc raw input handle table of contents file.",
-			 function );
-
-			libodraw_handle_free(
-			 &( device_handle->odraw_input_handle ),
-			 NULL );
-
-			return( -1 );
-		}
-/* TODO pass filenames or file IO pool here instead of using build-in open */
-		if( libodraw_handle_open_data_files(
-		     device_handle->odraw_input_handle,
+		if( device_handle_open_odraw_input(
+		     device_handle,
+		     filenames,
+		     number_of_filenames,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open optical disc raw input handle data files.",
+			 "%s: unable to open optical disc raw input.",
 			 function );
-
-			libodraw_handle_free(
-			 &( device_handle->odraw_input_handle ),
-			 NULL );
 
 			return( -1 );
 		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( device_handle->smraw_input_handle != NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid device handle - raw input handle already set.",
-			 function );
-
-			return( -1 );
-		}
-		if( libsmraw_handle_initialize(
-		     &( device_handle->smraw_input_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create raw input handle.",
-			 function );
-
-			return( -1 );
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		if( libsmraw_handle_open_wide(
-		     device_handle->smraw_input_handle,
-		     (wchar_t * const *) filenames,
+		if( device_handle_open_smraw_input(
+		     device_handle,
+		     filenames,
 		     number_of_filenames,
-		     LIBSMDEV_OPEN_READ,
 		     error ) != 1 )
-#else
-		if( libsmraw_handle_open(
-		     device_handle->smraw_input_handle,
-		     (char * const *) filenames,
-		     number_of_filenames,
-		     LIBSMDEV_OPEN_READ,
-		     error ) != 1 )
-#endif
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open raw input handle.",
+			 "%s: unable to open raw input.",
 			 function );
-
-			libsmraw_handle_free(
-			 &( device_handle->smraw_input_handle ),
-			 NULL );
 
 			return( -1 );
 		}
 	}
 	return( 1 );
+}
+
+/* Opens the device input of the device handle
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_open_smdev_input(
+     device_handle_t *device_handle,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_open_smdev_input";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( filenames == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->smdev_input_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid device handle - device input handle already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libsmdev_handle_initialize(
+	     &( device_handle->smdev_input_handle ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create device input handle.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libsmdev_handle_open_wide(
+	     device_handle->smdev_input_handle,
+	     (wchar_t * const *) filenames,
+	     number_of_filenames,
+	     LIBSMDEV_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libsmdev_handle_open(
+	     device_handle->smdev_input_handle,
+	     (char * const *) filenames,
+	     number_of_filenames,
+	     LIBSMDEV_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open device input handle.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( device_handle->smdev_input_handle != NULL )
+	{
+		libsmdev_handle_free(
+		 &( device_handle->smdev_input_handle ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Opens the optical disc raw input of the device handle
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_open_odraw_input(
+     device_handle_t *device_handle,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
+     liberror_error_t **error )
+{
+	libodraw_data_file_t *data_file = NULL;
+	static char *function           = "device_handle_open_odraw_input";
+	size_t filename_length          = 0;
+	int data_file_index             = 0;
+	int number_of_data_files        = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( filenames == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->odraw_input_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid device handle - optical disc raw input handle already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libodraw_handle_initialize(
+	     &( device_handle->odraw_input_handle ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create optical disc raw input handle.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libodraw_handle_open_wide(
+	     device_handle->odraw_input_handle,
+	     device_handle->toc_filename,
+	     LIBODRAW_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libodraw_handle_open(
+	     device_handle->odraw_input_handle,
+	     device_handle->toc_filename,
+	     LIBODRAW_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open optical disc raw table of contents file.",
+		 function );
+
+		goto on_error;
+	}
+	if( libodraw_handle_get_number_of_data_files(
+	     device_handle->odraw_input_handle,
+	     &number_of_data_files,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of optical disc raw data files.",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_filenames != number_of_data_files )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: number of filenames does not match number of data files.",
+		 function );
+
+		goto on_error;
+	}
+	for( data_file_index = 0;
+	     data_file_index < number_of_data_files;
+	     data_file_index++ )
+	{
+		if( filenames[ data_file_index ] == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing filename: %d.",
+			 function,
+			 data_file_index );
+
+			return( -1 );
+		}
+		filename_length = libcstring_system_string_length(
+		                   filenames[ data_file_index ] );
+
+		if( libodraw_handle_get_data_file(
+		     device_handle->odraw_input_handle,
+		     data_file_index,
+		     &data_file,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve optical disc raw data file: %d.",
+			 function,
+			 data_file_index );
+
+			goto on_error;
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libodraw_data_file_set_filename_wide(
+		     data_file,
+		     filenames[ data_file_index ],
+		     filename_length,
+		     error ) != 1 )
+#else
+		if( libodraw_data_file_set_filename(
+		     data_file,
+		     filenames[ data_file_index ],
+		     filename_length,
+		     error ) != 1 )
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set filename in optical disc raw data file: %d.",
+			 function,
+			 data_file_index );
+
+			goto on_error;
+		}
+		if( libodraw_data_file_free(
+		     &data_file,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free optical disc raw data file: %d.",
+			 function,
+			 data_file_index );
+
+			goto on_error;
+		}
+	}
+	if( libodraw_handle_open_data_files(
+	     device_handle->odraw_input_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open optical disc raw data files.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( data_file != NULL )
+	{
+		libodraw_data_file_free(
+		 &data_file,
+		 error );
+	}
+	if( device_handle->odraw_input_handle != NULL )
+	{
+		libodraw_handle_free(
+		 &( device_handle->odraw_input_handle ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Opens the raw input of the device handle
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_open_smraw_input(
+     device_handle_t *device_handle,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_open_smraw_input";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( filenames == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->smraw_input_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid device handle - raw input handle already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libsmraw_handle_initialize(
+	     &( device_handle->smraw_input_handle ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create raw input handle.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libsmraw_handle_open_wide(
+	     device_handle->smraw_input_handle,
+	     (wchar_t * const *) filenames,
+	     number_of_filenames,
+	     LIBSMDEV_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libsmraw_handle_open(
+	     device_handle->smraw_input_handle,
+	     (char * const *) filenames,
+	     number_of_filenames,
+	     LIBSMDEV_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open raw input handle.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( device_handle->smraw_input_handle != NULL )
+	{
+		libsmraw_handle_free(
+		 &( device_handle->smraw_input_handle ),
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Closes the device handle
@@ -1196,7 +1455,8 @@ int device_handle_get_media_type(
      uint8_t *media_type,
      liberror_error_t **error )
 {
-	static char *function = "device_handle_get_media_type";
+	static char *function    = "device_handle_get_media_type";
+	uint8_t smdev_media_type = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1222,11 +1482,9 @@ int device_handle_get_media_type(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		/* The libsmdev media type is similar to the libewf media type
-		 */
 		if( libsmdev_handle_get_media_type(
 		     device_handle->smdev_input_handle,
-		     media_type,
+		     &smdev_media_type,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1238,10 +1496,32 @@ int device_handle_get_media_type(
 
 			return( -1 );
 		}
+		switch( smdev_media_type )
+		{
+			case LIBSMDEV_MEDIA_TYPE_REMOVABLE:
+				*media_type = DEVICE_HANDLE_MEDIA_TYPE_REMOVABLE;
+
+				break;
+
+			case LIBSMDEV_MEDIA_TYPE_FIXED:
+				*media_type = DEVICE_HANDLE_MEDIA_TYPE_FIXED;
+
+				break;
+
+			case LIBSMDEV_MEDIA_TYPE_OPTICAL:
+				*media_type = DEVICE_HANDLE_MEDIA_TYPE_OPTICAL;
+
+				break;
+
+			case LIBSMDEV_MEDIA_TYPE_MEMORY:
+				*media_type = DEVICE_HANDLE_MEDIA_TYPE_MEMORY;
+
+				break;
+		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
+		*media_type = DEVICE_HANDLE_MEDIA_TYPE_OPTICAL;
 	}
 	return( 1 );
 }
@@ -1356,7 +1636,10 @@ int device_handle_get_information_value(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		result = libsmdev_handle_get_information_value(
+		/* TODO add UTF-16 information value function
+		 * requires libsmdev UTF-16 support
+		 */
+		result = libsmdev_handle_get_utf8_information_value(
 		          device_handle->smdev_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
@@ -1376,22 +1659,80 @@ int device_handle_get_information_value(
 
 			return( -1 );
 		}
+		if( result == 1 )
+		{
+			/* Determine the header value size
+			 */
+			utf8_information_value_size = 1 + libcstring_narrow_string_length(
+			                                   (char *) utf8_information_value );
+
+			if( libsystem_string_size_from_utf8_string(
+			     utf8_information_value,
+			     utf8_information_value_size,
+			     &calculated_information_value_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to determine header value size.",
+				 function );
+
+				return( -1 );
+			}
+			if( information_value_size < calculated_information_value_size )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 "%s: header value too small.",
+				 function );
+
+				return( -1 );
+			}
+			if( libsystem_string_copy_from_utf8_string(
+			     information_value,
+			     information_value_size,
+			     utf8_information_value,
+			     utf8_information_value_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to set header value.",
+				 function );
+
+				return( -1 );
+			}
+		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-/* TODO */
 		result = 0;
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libsmraw_handle_get_utf16_information_value(
+		          device_handle->smraw_input_handle,
+		          information_value_identifier,
+		          information_value_identifier_length,
+		          (uint16_t *) information_value,
+		          information_value_size,
+		          error );
+#else
 		result = libsmraw_handle_get_utf8_information_value(
 		          device_handle->smraw_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
-		          utf8_information_value,
-		          utf8_information_value_size,
+		          (uint8_t *) information_value,
+		          information_value_size,
 		          error );
-
+#endif
 		if( result == -1 )
 		{
 			liberror_error_set(
@@ -1401,56 +1742,6 @@ int device_handle_get_information_value(
 			 "%s: unable to retrieve information value: %s from raw input handle.",
 			 function,
 			 (char *) information_value_identifier );
-
-			return( -1 );
-		}
-	}
-	if( result == 1 )
-	{
-		/* Determine the header value size
-		 */
-		utf8_information_value_size = 1 + libcstring_narrow_string_length(
-		                                   (char *) utf8_information_value );
-
-		if( libsystem_string_size_from_utf8_string(
-		     utf8_information_value,
-		     utf8_information_value_size,
-		     &calculated_information_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to determine header value size.",
-			 function );
-
-			return( -1 );
-		}
-		if( information_value_size < calculated_information_value_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: header value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( libsystem_string_copy_from_utf8_string(
-		     information_value,
-		     information_value_size,
-		     utf8_information_value,
-		     utf8_information_value_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
-			 "%s: unable to set header value.",
-			 function );
 
 			return( -1 );
 		}
@@ -2067,7 +2358,7 @@ int device_handle_media_information_fprint(
 		 stream,
 		 "\n" );
 
-		result = libsmdev_handle_get_information_value(
+		result = libsmdev_handle_get_utf8_information_value(
 		          device_handle->smdev_input_handle,
 		          (uint8_t *) "vendor",
 		          6,
@@ -2095,7 +2386,7 @@ int device_handle_media_information_fprint(
 		 "Vendor:\t\t\t%s\n",
 		 (char *) media_information_value );
 
-		result = libsmdev_handle_get_information_value(
+		result = libsmdev_handle_get_utf8_information_value(
 		          device_handle->smdev_input_handle,
 		          (uint8_t *) "model",
 		          5,
@@ -2123,7 +2414,7 @@ int device_handle_media_information_fprint(
 		 "Model:\t\t\t%s\n",
 		 (char *) media_information_value );
 
-		result = libsmdev_handle_get_information_value(
+		result = libsmdev_handle_get_utf8_information_value(
 		          device_handle->smdev_input_handle,
 		          (uint8_t *) "serial_number",
 		          13,
@@ -2159,50 +2450,95 @@ int device_handle_media_information_fprint(
 	 stream,
 	 "Storage media information:\n" );
 
+	fprintf(
+	 stream,
+	 "Type:\t\t\t" );
+
+	switch( device_handle->type )
+	{
+		case DEVICE_HANDLE_TYPE_DEVICE:
+			fprintf(
+			 stream,
+			 "Device" );
+			break;
+
+		case DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE:
+			fprintf(
+			 stream,
+			 "Optical disc RAW image" );
+			break;
+
+		case DEVICE_HANDLE_TYPE_FILE:
+			fprintf(
+			 stream,
+			 "RAW image" );
+			break;
+
+		default:
+			fprintf(
+			 stream,
+			 "unknown" );
+			break;
+	}
+	fprintf(
+	 stream,
+	 "\n" );
+
+	if( device_handle_get_media_type(
+	     device_handle,
+	     &media_type,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media type.",
+		 function );
+
+		return( -1 );
+	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_media_type(
-		     device_handle->smdev_input_handle,
-		     &media_type,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media type.",
-			 function );
-
-			return( -1 );
-		}
 		fprintf(
 		 stream,
 		 "Media type:\t\t" );
 
 		switch( media_type )
 		{
-			case LIBSMDEV_MEDIA_TYPE_REMOVABLE:
+			case DEVICE_HANDLE_MEDIA_TYPE_REMOVABLE:
 				fprintf(
 				 stream,
 				 "Removable" );
+
 				break;
 
-			case LIBSMDEV_MEDIA_TYPE_FIXED:
+			case DEVICE_HANDLE_MEDIA_TYPE_FIXED:
 				fprintf(
 				 stream,
 				 "Fixed" );
+
 				break;
 
-			case LIBSMDEV_MEDIA_TYPE_OPTICAL:
+			case DEVICE_HANDLE_MEDIA_TYPE_OPTICAL:
 				fprintf(
 				 stream,
 				 "Optical" );
+
 				break;
 
-			case LIBSMDEV_MEDIA_TYPE_MEMORY:
+			case DEVICE_HANDLE_MEDIA_TYPE_MEMORY:
 				fprintf(
 				 stream,
 				 "Memory" );
+
+				break;
+
+			default:
+				fprintf(
+				 stream,
+				 "unknown" );
+
 				break;
 		}
 		fprintf(
@@ -2245,44 +2581,27 @@ int device_handle_media_information_fprint(
 		 "Media size:\t\t%" PRIu64 " bytes\n",
 		 media_size );
 	}
-	if( media_type == LIBSMDEV_MEDIA_TYPE_OPTICAL )
+	if( device_handle_get_bytes_per_sector(
+	     device_handle,
+	     &bytes_per_sector,
+	     error ) != 1 )
 	{
-		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->smdev_input_handle,
-		     &bytes_per_sector,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve bytes per sector.",
-			 function );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
 
-			return( -1 );
-		}
-		result = byte_size_string_create(
-			  byte_size_string,
-			  16,
-			  (uint64_t) bytes_per_sector,
-			  BYTE_SIZE_STRING_UNIT_MEGABYTE,
-			  NULL );
+		return( -1 );
+	}
+	fprintf(
+	 stream,
+	 "Bytes per sector:\t%" PRIu32 "\n",
+	 bytes_per_sector );
 
-		if( result == 1 )
-		{
-			fprintf(
-			 stream,
-			 "Bytes per sector:\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu32 " bytes)\n",
-			 byte_size_string,
-			 bytes_per_sector );
-		}
-		else
-		{
-			fprintf(
-			 stream,
-			 "Bytes per sector:\t%" PRIu32 " bytes\n",
-			 bytes_per_sector );
-		}
+	if( media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
+	{
 		if( device_handle_sessions_fprint(
 		     device_handle,
 		     stream,
@@ -2298,10 +2617,12 @@ int device_handle_media_information_fprint(
 			return( -1 );
 		}
 	}
-	fprintf(
-	 stream,
-	 "\n" );
-
+	else
+	{
+		fprintf(
+		 stream,
+		 "\n" );
+	}
 	return( 1 );
 }
 
@@ -2343,94 +2664,91 @@ int device_handle_read_errors_fprint(
 
 		return( -1 );
 	}
-	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	if( device_handle_get_bytes_per_sector(
+	     device_handle,
+	     &bytes_per_sector,
+	     error ) != 1 )
 	{
-		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->smdev_input_handle,
-		     &bytes_per_sector,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve bytes per sector.",
-			 function );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
 
-			return( -1 );
-		}
-		if( bytes_per_sector == 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid bytes per sector returned.",
-			 function );
+		return( -1 );
+	}
+	if( bytes_per_sector == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid bytes per sector returned.",
+		 function );
 
-			return( -1 );
-		}
-		if( libsmdev_handle_get_number_of_errors(
-		     device_handle->smdev_input_handle,
-		     &number_of_read_errors,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of read errors.",
-			 function );
+		return( -1 );
+	}
+	if( device_handle_get_number_of_read_errors(
+	     device_handle,
+	     &number_of_read_errors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of read errors.",
+		 function );
 
-			return( -1 );
-		}
-		if( number_of_read_errors > 0 )
+		return( -1 );
+	}
+	if( number_of_read_errors > 0 )
+	{
+		fprintf(
+		 stream,
+		 "Errors reading device:\n" );
+		fprintf(
+		 stream,
+		 "\ttotal number: %d\n",
+		 number_of_read_errors );
+		
+		for( read_error_index = 0;
+		     read_error_index < number_of_read_errors;
+		     read_error_index++ )
 		{
-			fprintf(
-			 stream,
-			 "Errors reading device:\n" );
-			fprintf(
-			 stream,
-			 "\ttotal number: %d\n",
-			 number_of_read_errors );
-			
-			for( read_error_index = 0;
-			     read_error_index < number_of_read_errors;
-			     read_error_index++ )
+			if( device_handle_get_read_error(
+			     device_handle,
+			     read_error_index,
+			     &read_error_offset,
+			     &read_error_size,
+			     error ) != 1 )
 			{
-				if( libsmdev_handle_get_error(
-				     device_handle->smdev_input_handle,
-				     read_error_index,
-				     &read_error_offset,
-				     &read_error_size,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve read error: %d.",
-					 function,
-					 read_error_index );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve read error: %d.",
+				 function,
+				 read_error_index );
 
-					result = -1;
-				}
-				else
-				{
-					fprintf(
-					 stream,
-					 "\tat sector(s): %" PRIi64 " - %" PRIi64 " number: %" PRIu64 " (offset: 0x%08" PRIx64 " of size: %" PRIu64 ")\n",
-					 read_error_offset / bytes_per_sector,
-					 ( read_error_offset + read_error_size ) / bytes_per_sector,
-					 read_error_size / bytes_per_sector,
-					 read_error_offset,
-					 read_error_size );
-				}
+				result = -1;
 			}
-			fprintf(
-			 stream,
-			 "\n" );
+			else
+			{
+				fprintf(
+				 stream,
+				 "\tat sector(s): %" PRIi64 " - %" PRIi64 " number: %" PRIu64 " (offset: 0x%08" PRIx64 " of size: %" PRIu64 ")\n",
+				 read_error_offset / bytes_per_sector,
+				 ( read_error_offset + read_error_size ) / bytes_per_sector,
+				 read_error_size / bytes_per_sector,
+				 read_error_offset,
+				 read_error_size );
+			}
 		}
+		fprintf(
+		 stream,
+		 "\n" );
 	}
 	return( result );
 }
@@ -2472,68 +2790,65 @@ int device_handle_sessions_fprint(
 
 		return( -1 );
 	}
-	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	if( device_handle_get_number_of_sessions(
+	     device_handle,
+	     &number_of_sessions,
+	     error ) != 1 )
 	{
-		if( libsmdev_handle_get_number_of_sessions(
-		     device_handle->smdev_input_handle,
-		     &number_of_sessions,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of sessions.",
-			 function );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of sessions.",
+		 function );
 
-			return( -1 );
-		}
-		if( number_of_sessions > 0 )
-		{
-			fprintf(
-			 stream,
-			 "Sessions:\n" );
-			
-			fprintf(
-			 stream,
-			 "\ttotal number: %d\n",
-			 number_of_sessions );
+		return( -1 );
+	}
+	if( number_of_sessions > 0 )
+	{
+		fprintf(
+		 stream,
+		 "Sessions:\n" );
+		
+		fprintf(
+		 stream,
+		 "\ttotal number: %d\n",
+		 number_of_sessions );
 
-			for( session_index = 0;
-			     session_index < number_of_sessions;
-			     session_index++ )
+		for( session_index = 0;
+		     session_index < number_of_sessions;
+		     session_index++ )
+		{
+			if( device_handle_get_session(
+			     device_handle,
+			     session_index,
+			     &start_sector,
+			     &number_of_sectors,
+			     error ) != 1 )
 			{
-				if( libsmdev_handle_get_session(
-				     device_handle->smdev_input_handle,
-				     session_index,
-				     &start_sector,
-				     &number_of_sectors,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve session: %d.",
-					 function,
-					 session_index );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve session: %d.",
+				 function,
+				 session_index );
 
-					result = -1;
-				}
-				else
-				{
-					fprintf(
-					 stream,
-					 "\tat sector(s): %" PRIi64 " - %" PRIi64 " number: %" PRIu64 "\n",
-					 start_sector,
-					 start_sector + number_of_sectors - 1,
-					 number_of_sectors );
-				}
+				result = -1;
 			}
-			fprintf(
-			 stream,
-			 "\n" );
+			else
+			{
+				fprintf(
+				 stream,
+				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+				 start_sector,
+				 start_sector + number_of_sectors - 1,
+				 number_of_sectors );
+			}
 		}
+		fprintf(
+		 stream,
+		 "\n" );
 	}
 	return( result );
 }

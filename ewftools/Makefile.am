@@ -33,6 +33,10 @@ ewfacquire_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
+	ewftools_libsmraw.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \

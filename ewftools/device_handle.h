@@ -52,11 +52,23 @@
 extern "C" {
 #endif
 
+/* The device handle type definitions
+ */
 enum DEVICE_HANDLE_TYPES
 {
-	DEVICE_HANDLE_TYPE_DEVICE		= (uint8_t) 'd',
-	DEVICE_HANDLE_TYPE_FILE			= (uint8_t) 'f',
-	DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE	= (uint8_t) 'o'
+	DEVICE_HANDLE_TYPE_DEVICE			= (uint8_t) 'd',
+	DEVICE_HANDLE_TYPE_FILE				= (uint8_t) 'f',
+	DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE		= (uint8_t) 'o'
+};
+
+/* The media type definitions
+ */
+enum DEVICE_HANDLE_MEDIA_TYPES
+{
+	DEVICE_HANDLE_MEDIA_TYPE_REMOVABLE		= 0x00,
+	DEVICE_HANDLE_MEDIA_TYPE_FIXED			= 0x01,
+	DEVICE_HANDLE_MEDIA_TYPE_OPTICAL		= 0x03,
+	DEVICE_HANDLE_MEDIA_TYPE_MEMORY			= 0x10
 };
 
 typedef struct device_handle device_handle_t;
@@ -117,6 +129,24 @@ int device_handle_signal_abort(
      liberror_error_t **error );
 
 int device_handle_open_input(
+     device_handle_t *device_handle,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
+     liberror_error_t **error );
+
+int device_handle_open_smdev_input(
+     device_handle_t *device_handle,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
+     liberror_error_t **error );
+
+int device_handle_open_odraw_input(
+     device_handle_t *device_handle,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
+     liberror_error_t **error );
+
+int device_handle_open_smraw_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
