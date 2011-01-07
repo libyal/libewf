@@ -213,6 +213,8 @@ Tools:
   - implement low and high level api separation
 * ewfrecover
   - create a tool recover ewf files
+* process status
+  - improve and remove "This could take a while."
 
 Tests
 * glob: .ezz, .faa ... .zzz
