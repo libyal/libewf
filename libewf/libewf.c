@@ -27,7 +27,7 @@
 
 #include "libewf_unused.h"
 
-/* Define HAVE_LOCAL_LIBEWF for local use of libbfio
+/* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */
 #if !defined( HAVE_LOCAL_LIBEWF )
 

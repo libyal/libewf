@@ -155,8 +155,8 @@ int libewf_sector_list_value_clone(
 
 		return( 1 );
 	}
-	*destination_sector_list_value = (intptr_t *) memory_allocate(
-			                               sizeof( libewf_sector_list_value_t ) );
+	*destination_sector_list_value = memory_allocate_structure_as_value(
+	                                  libewf_sector_list_value_t );
 
 	if( *destination_sector_list_value == NULL )
 	{
