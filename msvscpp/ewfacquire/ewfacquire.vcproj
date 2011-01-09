@@ -190,19 +190,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewftools_libewf.h.h"
+				RelativePath="..\..\ewftools\ewftools_libewf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewftools_libodraw.h.h"
+				RelativePath="..\..\ewftools\ewftools_libodraw.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewftools_libsmdev.h.h"
+				RelativePath="..\..\ewftools\ewftools_libsmdev.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewftools_libsmraw.h.h"
+				RelativePath="..\..\ewftools\ewftools_libsmraw.h"
 				>
 			</File>
 			<File
