@@ -784,18 +784,18 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		if( offset_table->last_chunk_value_compared >= offset_table->last_chunk_value_filled )
+		if( offset_table->previous_last_chunk_value_filled > offset_table->last_chunk_value_filled )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: last chunk offset compared cannot be greater than last chunk offset filled.",
+			 "%s: previous last chunk offset filled cannot be greater than current.",
 			 function );
 
 			return( -1 );
 		}
-		number_of_unusable_chunk_values = offset_table->last_chunk_value_filled - offset_table->last_chunk_value_compared;
+		number_of_unusable_chunk_values = offset_table->last_chunk_value_filled - offset_table->previous_last_chunk_value_filled;
 
 		if( libewf_offset_table_get_number_of_chunk_values(
 		     offset_table,
@@ -841,7 +841,8 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		offset_table->last_chunk_value_filled = offset_table->last_chunk_value_compared;
+		offset_table->last_chunk_value_filled   = offset_table->previous_last_chunk_value_filled;
+		offset_table->last_chunk_value_compared = offset_table->previous_last_chunk_value_filled;
 
 		reopen_segment_file                         = 1;
 		write_io_handle->resume_segment_file_offset = section_list_values->start_offset;
@@ -852,33 +853,6 @@ int libewf_write_io_handle_initialize_resume(
 	          (void *) "table2",
 	          7 ) == 0 )
 	{
-#ifdef OLD
-		/* The sections containing the chunks and offsets were read entirely
-		 */
-		reopen_segment_file                         = 1;
-		write_io_handle->resume_segment_file_offset = section_list_values->end_offset;
-
-		if( libewf_offset_table_get_number_of_chunk_values(
-		     offset_table,
-		     &number_of_chunk_values,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the number of chunk values in the offset table.",
-			 function );
-
-			return( -1 );
-		}
-		/* Write a new chunks section if necessary
-		 */
-		if( offset_table->last_chunk_value_compared < number_of_chunk_values )
-		{
-			write_io_handle->create_chunks_section = 1;
-		}
-#endif
 		/* Determine if the table section also contains chunks
 		 */
 		if( section_list_element->previous_element == NULL )
@@ -904,7 +878,7 @@ int libewf_write_io_handle_initialize_resume(
 			return( -1 );
 		}
 		if( memory_compare(
-		     (void *) ( (libewf_section_list_values_t *) section_list_element->previous_element->previous_element->value )->type,
+		     (void *) ( (libewf_section_list_values_t *) section_list_element->previous_element->value )->type,
 		     (void *) "table",
 		     6 ) != 0 )
 		{
@@ -955,18 +929,18 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		if( offset_table->last_chunk_value_compared >= offset_table->last_chunk_value_filled )
+		if( offset_table->previous_last_chunk_value_filled > offset_table->last_chunk_value_filled )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: last chunk offset compared cannot be greater than last chunk offset filled.",
+			 "%s: previous last chunk offset filled cannot be greater than current.",
 			 function );
 
 			return( -1 );
 		}
-		number_of_unusable_chunk_values = offset_table->last_chunk_value_filled - offset_table->last_chunk_value_compared;
+		number_of_unusable_chunk_values = offset_table->last_chunk_value_filled - offset_table->previous_last_chunk_value_filled;
 
 		if( libewf_offset_table_get_number_of_chunk_values(
 		     offset_table,
@@ -1012,7 +986,8 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		offset_table->last_chunk_value_filled = offset_table->last_chunk_value_compared;
+		offset_table->last_chunk_value_filled   = offset_table->previous_last_chunk_value_filled;
+		offset_table->last_chunk_value_compared = offset_table->previous_last_chunk_value_filled;
 
 		reopen_segment_file                         = 1;
 		write_io_handle->resume_segment_file_offset = section_list_values->start_offset;

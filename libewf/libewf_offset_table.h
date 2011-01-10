@@ -42,6 +42,10 @@ typedef struct libewf_offset_table libewf_offset_table_t;
 
 struct libewf_offset_table
 {
+	/* The previous last chunk value that was filled
+	 */
+	uint32_t previous_last_chunk_value_filled;
+
 	/* The last chunk value that was filled
 	 */
 	uint32_t last_chunk_value_filled;

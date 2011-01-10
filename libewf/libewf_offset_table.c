@@ -243,8 +243,9 @@ int libewf_offset_table_clone(
 
 		goto on_error;
 	}
-	( *destination_offset_table )->last_chunk_value_filled   = source_offset_table->last_chunk_value_filled;
-	( *destination_offset_table )->last_chunk_value_compared = source_offset_table->last_chunk_value_compared;
+	( *destination_offset_table )->previous_last_chunk_value_filled = source_offset_table->previous_last_chunk_value_filled;
+	( *destination_offset_table )->last_chunk_value_filled          = source_offset_table->last_chunk_value_filled;
+	( *destination_offset_table )->last_chunk_value_compared        = source_offset_table->last_chunk_value_compared;
 
 	return( 1 );
 
@@ -597,6 +598,8 @@ int libewf_offset_table_fill(
 			return( -1 );
 		}
 	}
+	offset_table->previous_last_chunk_value_filled = offset_table->last_chunk_value_filled;
+
 	byte_stream_copy_to_uint32_little_endian(
 	 offsets[ offset_iterator ].offset,
 	 stored_offset );
@@ -775,7 +778,7 @@ int libewf_offset_table_fill(
 		}
 		chunk_value = NULL;
 
-		offset_table->last_chunk_value_filled++;
+		offset_table->last_chunk_value_filled += 1;
 
 		/* This is to compensate for the crappy > 2 GiB segment file
 		 * solution in EnCase 6.7
@@ -1083,7 +1086,7 @@ int libewf_offset_table_fill_last_offset(
 			{
 				chunk_value->flags |= LIBEWF_CHUNK_VALUE_FLAG_TAINTED;
 			}
-			offset_table->last_chunk_value_filled++;
+			offset_table->last_chunk_value_filled += 1;
 
 			break;
 		}
