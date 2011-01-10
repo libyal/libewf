@@ -171,7 +171,7 @@ int libewf_handle_open(
      libewf_handle_t *handle,
      char * const filenames[],
      int number_of_filenames,
-     uint8_t access_flags,
+     int access_flags,
      liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -180,7 +180,7 @@ int libewf_handle_open_wide(
      libewf_handle_t *handle,
      wchar_t * const filenames[],
      int number_of_filenames,
-     uint8_t access_flags,
+     int access_flags,
      liberror_error_t **error );
 #endif
 
@@ -188,7 +188,7 @@ LIBEWF_EXTERN \
 int libewf_handle_open_file_io_pool(
      libewf_handle_t *handle,
      libbfio_pool_t *file_io_pool,
-     uint8_t access_flags,
+     int access_flags,
      liberror_error_t **error );
 
 LIBEWF_EXTERN \

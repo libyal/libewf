@@ -918,7 +918,7 @@ ssize_t libewf_read_buffer(
 	return( read_count );
 }
 
-/* Reads media data at the current offset
+/* Reads media data at a specific offset
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_read_random(

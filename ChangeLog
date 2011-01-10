@@ -244,6 +244,18 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110110
+* updated libuna, libbfio, libfvalue, libsmraw
+* code clean up
+* export handle fixed memory leak for MD5/SHA1 context
+* cariage return fixes in single files
+* remove ewfalter from spec file
+* libcstring fix for FreeBSD
+* correction for access flags
+* added system codepage functions
+* worked on write resume improvements
+  - resume in table2 section
+
 20110109
 * updated libodraw
 

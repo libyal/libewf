@@ -124,22 +124,22 @@ Handle::~Handle( void )
 	}
 }
 
-System::Byte Handle::GetAccessFlagsRead( void )
+System::Int Handle::GetAccessFlagsRead( void )
 {
-	return( System::Byte(
-	         (unsigned char) libewf_get_access_flags_read() ) );
+	return( System::Int(
+	         libewf_get_access_flags_read() ) );
 }
 
-System::Byte Handle::GetAccessFlagsReadWrite( void )
+System::Int Handle::GetAccessFlagsReadWrite( void )
 {
-	return( System::Byte(
-	         (unsigned char) libewf_get_access_flags_read_write() ) );
+	return( System::Int(
+	         libewf_get_access_flags_read_write() ) );
 }
 
-System::Byte Handle::GetAccessFlagsWrite( void )
+System::Int Handle::GetAccessFlagsWrite( void )
 {
-	return( System::Byte(
-	         (unsigned char) libewf_get_access_flags_write() ) );
+	return( System::Int(
+	         libewf_get_access_flags_write() ) );
 }
 
 array<System::String^>^ Handle::Glob( System::String^ filename )
@@ -275,7 +275,7 @@ Handle^ Handle::Clone( void )
 }
 
 void Handle::Open( array<System::String^>^ filenames,
-                   System::Byte access_flags )
+                   System::Int access_flags )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
@@ -285,7 +285,7 @@ void Handle::Open( array<System::String^>^ filenames,
 	System::String^ function        = "Handle::Open";
 	wchar_t **ewf_filenames         = NULL;
 	pin_ptr<const wchar_t> filename = nullptr;
-	uint8_t ewf_access_flags        = 0;
+	int ewf_access_flags            = 0;
 	int ewf_filename_index          = 0;
 	int ewf_number_of_filenames     = 0;
 
@@ -317,7 +317,7 @@ void Handle::Open( array<System::String^>^ filenames,
 
 		ewf_filenames[ ewf_filename_index ] = (wchar_t *) filename;
 	}
-	Marshal::WriteByte(
+	Marshal::WriteInt(
 	 (IntPtr) &ewf_access_flags,
 	 access_flags );
 

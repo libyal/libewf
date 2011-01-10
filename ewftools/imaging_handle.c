@@ -394,8 +394,8 @@ int imaging_handle_open_output(
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
 	static char *function                            = "imaging_handle_open_output";
 	size_t first_filename_length                     = 0;
+	int access_flags                                 = 0;
 	int number_of_filenames                          = 0;
-	uint8_t access_flags                             = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -540,8 +540,8 @@ int imaging_handle_open_secondary_output(
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
 	static char *function                            = "imaging_handle_open_secondary_output";
 	size_t first_filename_length                     = 0;
+	int access_flags                                 = 0;
 	int number_of_filenames                          = 0;
-	uint8_t access_flags                             = 0;
 
 	if( imaging_handle == NULL )
 	{

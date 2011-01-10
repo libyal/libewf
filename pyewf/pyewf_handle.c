@@ -616,7 +616,7 @@ PyObject *pyewf_handle_open(
 	     pyewf_handle->handle,
              filenames,
              number_of_filenames,
-             (uint8_t) access_flags,
+             access_flags,
 	     &error ) != 1 )
 	{
 		if( liberror_error_backtrace_sprint(

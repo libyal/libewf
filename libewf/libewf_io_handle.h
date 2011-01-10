@@ -39,9 +39,9 @@ struct libewf_io_handle
 {
 	/* The access flags
 	 */
-	uint8_t access_flags;
+	int access_flags;
 
-	/* The current offset
+	/* The current (storage media) offset
 	 */
 	off64_t current_offset;
 

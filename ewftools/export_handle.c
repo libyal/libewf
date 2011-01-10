@@ -168,32 +168,6 @@ int export_handle_initialize(
 
 			goto on_error;
 		}
-		if( md5_initialize(
-		     &( ( *export_handle )->md5_context ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize MD5 context.",
-			 function );
-
-			goto on_error;
-		}
-		if( sha1_initialize(
-		     &( ( *export_handle )->sha1_context ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize SHA1 context.",
-			 function );
-
-			goto on_error;
-		}
 		( *export_handle )->compression_level = LIBEWF_COMPRESSION_NONE;
 		( *export_handle )->output_format     = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 		( *export_handle )->ewf_format        = LIBEWF_FORMAT_ENCASE6;
@@ -2833,6 +2807,38 @@ int export_handle_set_processing_values(
 
 		return( -1 );
 	}
+	if( calculate_md5 != 0 )
+	{
+		if( md5_initialize(
+		     &( export_handle->md5_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize MD5 context.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( calculate_sha1 != 0 )
+	{
+		if( sha1_initialize(
+		     &( export_handle->sha1_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize SHA1 context.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	export_handle->calculate_md5  = calculate_md5;
 	export_handle->calculate_sha1 = calculate_sha1;
 
@@ -3241,9 +3247,8 @@ int export_handle_set_hash_value(
      size_t hash_value_length,
      liberror_error_t **error )
 {
-	uint8_t *utf8_hash_value    = NULL;
-	static char *function       = "export_handle_set_hash_value";
-	size_t utf8_hash_value_size = 0;
+	static char *function = "export_handle_set_hash_value";
+	int result            = 0;
 
 	if( export_handle == NULL )
 	{
@@ -3256,60 +3261,26 @@ int export_handle_set_hash_value(
 
 		return( -1 );
 	}
-	if( libsystem_string_size_to_utf8_string(
-	     hash_value,
-	     hash_value_length + 1,
-	     &utf8_hash_value_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine UTF-8 hash value size.",
-		 function );
-
-		return( -1 );
-	}
-	utf8_hash_value = (uint8_t *) memory_allocate(
-	                               sizeof( uint8_t ) * utf8_hash_value_size );
-
-	if( utf8_hash_value == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create UTF-8 hash value.",
-		 function );
-
-		goto on_error;
-	}
-	if( libsystem_string_copy_to_utf8_string(
-	     hash_value,
-	     hash_value_length + 1,
-	     utf8_hash_value,
-	     utf8_hash_value_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-8 hash value.",
-		 function );
-
-		goto on_error;
-	}
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
-		if( libewf_handle_set_utf8_hash_value(
-		     export_handle->ewf_output_handle,
-		     (uint8_t *) hash_value_identifier,
-		     hash_value_identifier_length,
-		     utf8_hash_value,
-		     utf8_hash_value_size - 1,
-		     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_handle_set_utf16_hash_value(
+		          export_handle->ewf_output_handle,
+		          (uint8_t *) hash_value_identifier,
+		          hash_value_identifier_length,
+		          (uint16_t *) hash_value,
+		          hash_value_length,
+		          error );
+#else
+		result = libewf_handle_set_utf8_hash_value(
+		          export_handle->ewf_output_handle,
+		          (uint8_t *) hash_value_identifier,
+		          hash_value_identifier_length,
+		          (uint8_t *) hash_value,
+		          hash_value_length,
+		          error );
+#endif
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -3319,19 +3290,31 @@ int export_handle_set_hash_value(
 			 function,
 			 hash_value_identifier );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	      && ( export_handle->use_stdout == 0 ) )
 	{
-		if( libsmraw_handle_set_utf8_integrity_hash_value(
-		     export_handle->raw_output_handle,
-		     (uint8_t *) hash_value_identifier,
-		     hash_value_identifier_length,
-		     utf8_hash_value,
-		     utf8_hash_value_size - 1,
-		     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libsmraw_handle_set_utf16_integrity_hash_value(
+		          export_handle->raw_output_handle,
+		          (uint8_t *) hash_value_identifier,
+		          hash_value_identifier_length,
+		          (uint16_t *) hash_value,
+		          hash_value_length,
+		          error );
+#else
+		result = libsmraw_handle_set_utf8_integrity_hash_value(
+		          export_handle->raw_output_handle,
+		          (uint8_t *) hash_value_identifier,
+		          hash_value_identifier_length,
+		          (uint8_t *) hash_value,
+		          hash_value_length,
+		          error );
+#endif
+
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -3341,21 +3324,10 @@ int export_handle_set_hash_value(
 			 function,
 			 hash_value_identifier );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
-	memory_free(
-	 utf8_hash_value );
-
 	return( 1 );
-
-on_error:
-	if( utf8_hash_value != NULL )
-	{
-		memory_free(
-		 utf8_hash_value );
-	}
-	return( -1 );
 }
 
 /* Appends a read error to the output handle

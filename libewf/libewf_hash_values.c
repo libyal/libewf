@@ -1017,9 +1017,7 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( -1 );
 	}
-	for( md5_hash_string_index = 0;
-	     md5_hash_string_index < 33;
-	     md5_hash_string_index++ )
+	while( md5_hash_string_index < 33 )
 	{
 		if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) '0' )
 		 && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) '9' ) )
@@ -1055,6 +1053,8 @@ int libewf_hash_values_generate_md5_hash(
 		{
 			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) 'a' );
 		}
+		md5_hash_string_index++;
+
 		md5_hash[ md5_hash_index++ ] = md5_digit;
 	}
 	*md5_hash_set = 1;
@@ -1168,9 +1168,7 @@ int libewf_hash_values_generate_sha1_hash(
 
 		return( -1 );
 	}
-	for( sha1_hash_string_index = 0;
-	     sha1_hash_string_index < 41;
-	     sha1_hash_string_index++ )
+	while( sha1_hash_string_index < 41 )
 	{
 		if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) '0' )
 		 && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) '9' ) )
@@ -1206,6 +1204,8 @@ int libewf_hash_values_generate_sha1_hash(
 		{
 			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) 'a' );
 		}
+		sha1_hash_string_index++;
+
 		sha1_hash[ sha1_hash_index++ ] = sha1_digit;
 	}
 	*sha1_hash_set = 1;

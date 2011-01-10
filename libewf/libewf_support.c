@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 
+#include "libewf_codepage.h"
 #include "libewf_definitions.h"
 #include "libewf_filename.h"
 #include "libewf_error.h"
@@ -49,34 +50,113 @@ const char *libewf_get_version(
 
 /* Returns the access flags for reading
  */
-uint8_t libewf_get_access_flags_read(
-         void )
+int libewf_get_access_flags_read(
+     void )
 {
-	return( (uint8_t) LIBEWF_ACCESS_FLAG_READ );
+	return( (int) LIBEWF_ACCESS_FLAG_READ );
 }
 
 /* Returns the access flags for reading and writing
  */
-uint8_t libewf_get_access_flags_read_write(
-         void )
+int libewf_get_access_flags_read_write(
+     void )
 {
-	return( (uint8_t) ( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE ) );
+	return( (int) ( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE ) );
 }
 
 /* Returns the access flags for writing
  */
-uint8_t libewf_get_access_flags_write(
-         void )
+int libewf_get_access_flags_write(
+     void )
 {
-	return( (uint8_t) LIBEWF_ACCESS_FLAG_WRITE );
+	return( (int) LIBEWF_ACCESS_FLAG_WRITE );
 }
 
 /* Returns the access flags for resume writing
  */
-uint8_t libewf_get_access_flags_write_resume(
-         void )
+int libewf_get_access_flags_write_resume(
+     void )
 {
-	return( (uint8_t) LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME );
+	return( (int) LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME );
+}
+
+/* Retrieves the narrow system string codepage
+ * A value of 0 represents no codepage, UTF-8 encoding is used instead
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_get_codepage(
+     int *codepage,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_get_codepage";
+
+	if( codepage == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid codepage.",
+		 function );
+
+		return( -1 );
+	}
+	*codepage = libcstring_narrow_system_string_codepage;
+
+	return( 1 );
+}
+
+/* Sets the narrow system string codepage
+ * A value of 0 represents no codepage, UTF-8 encoding is used instead
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_codepage(
+     int codepage,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_set_codepage";
+
+	if( ( codepage != LIBEWF_CODEPAGE_ASCII )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_1 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_2 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_3 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_4 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_5 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_6 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_7 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_8 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_9 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_10 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_11 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_13 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_14 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_15 )
+	 && ( codepage != LIBEWF_CODEPAGE_ISO_8859_16 )
+	 && ( codepage != LIBEWF_CODEPAGE_KOI8_R )
+	 && ( codepage != LIBEWF_CODEPAGE_KOI8_U )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_874 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1250 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1251 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1252 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1253 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1254 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1256 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1257 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1258 )
+	 && ( codepage != 0 ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported codepage.",
+		 function );
+
+		return( -1 );
+	}
+	libcstring_narrow_system_string_codepage = codepage;
+
+	return( 1 );
 }
 
 #endif

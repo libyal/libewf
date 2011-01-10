@@ -808,7 +808,7 @@ int libewf_handle_open(
      libewf_handle_t *handle,
      char * const filenames[],
      int number_of_filenames,
-     uint8_t access_flags,
+     int access_flags,
      liberror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle          = NULL;
@@ -1216,7 +1216,7 @@ int libewf_handle_open_wide(
      libewf_handle_t *handle,
      wchar_t * const filenames[],
      int number_of_filenames,
-     uint8_t access_flags,
+     int access_flags,
      liberror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle          = NULL;
@@ -1620,7 +1620,7 @@ libewf_handle_open_wide_on_error:
 int libewf_handle_open_file_io_pool(
      libewf_handle_t *handle,
      libbfio_pool_t *file_io_pool,
-     uint8_t access_flags,
+     int access_flags,
      liberror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle                  = NULL;
@@ -3217,7 +3217,7 @@ ssize_t libewf_handle_read_buffer(
 	return( total_read_count );
 }
 
-/* Reads (media) data at the current offset
+/* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_handle_read_random(
@@ -3674,7 +3674,7 @@ ssize_t libewf_handle_write_chunk(
 	return( (ssize_t) chunk_buffer_size );
 }
 
-/* Writes (media) data in EWF format at the current offset
+/* Writes (media) data at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -3969,7 +3969,7 @@ ssize_t libewf_handle_write_buffer(
 	return( total_write_count );
 }
 
-/* Writes (media) data in EWF format at a specific offset,
+/* Writes (media) data at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error

@@ -38,16 +38,16 @@ public ref class Handle sealed
 		Handle( void );
 		~Handle( void );
 
-		System::Byte GetAccessFlagsRead( void );
-		System::Byte GetAccessFlagsReadWrite( void );
-		System::Byte GetAccessFlagsWrite( void );
+		System::Int GetAccessFlagsRead( void );
+		System::Int GetAccessFlagsReadWrite( void );
+		System::Int GetAccessFlagsWrite( void );
 
 		array<System::String^>^ Glob( System::String^ filename );
 
 		Handle^ Clone( void );
 
 		void Open( array<System::String^>^ filenames,
-		           System::Byte access_flags );
+		           System::Int access_flags );
 
 		void Close( void );
 

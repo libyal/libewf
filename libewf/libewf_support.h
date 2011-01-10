@@ -41,20 +41,30 @@ const char *libewf_get_version(
              void );
 
 LIBEWF_EXTERN \
-uint8_t libewf_get_access_flags_read(
-         void );
+int libewf_get_access_flags_read(
+     void );
 
 LIBEWF_EXTERN \
-uint8_t libewf_get_access_flags_read_write(
-         void );
+int libewf_get_access_flags_read_write(
+     void );
 
 LIBEWF_EXTERN \
-uint8_t libewf_get_access_flags_write(
-         void );
+int libewf_get_access_flags_write(
+     void );
 
 LIBEWF_EXTERN \
-uint8_t libewf_get_access_flags_write_resume(
-         void );
+int libewf_get_access_flags_write_resume(
+     void );
+
+LIBEWF_EXTERN \
+int libewf_get_codepage(
+     int *codepage,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_set_codepage(
+     int codepage,
+     liberror_error_t **error );
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 

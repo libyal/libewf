@@ -621,7 +621,7 @@ int libewf_single_files_parse_record_values(
 			type_string_length -= 1;
 		}
 		if( ( value_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
+		 && ( ( values->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
 		{
 			value_string_length -= 1;
 		}
@@ -923,7 +923,7 @@ int libewf_single_files_parse_file_entry(
 			type_string_length -= 1;
 		}
 		if( ( value_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
+		 && ( ( values->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
 		{
 			value_string_length -= 1;
 		}
