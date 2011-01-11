@@ -3452,14 +3452,15 @@ int info_handle_file_entry_fprint(
 		 "%" PRIs_LIBCSTRING_SYSTEM "",
 		 name );
 
+		memory_free(
+		 name );
+
 		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
 			fprintf(
 			 info_handle->notify_stream,
 			 "\n" );
 		}
-		memory_free(
-		 name );
 	}
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{

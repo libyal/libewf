@@ -188,7 +188,7 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-u:     unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
-	fprintf( stream, "\t-w:     wipe sectors on read error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-w:     zero sectors on read error (mimic EnCase like behavior)\n" );
 	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write\n"
 	                 "\t        to\n" );
 }

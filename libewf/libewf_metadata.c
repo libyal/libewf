@@ -1841,17 +1841,17 @@ int libewf_handle_get_number_of_chunks_written(
 	return( 1 );
 }
 
-/* Sets the read wipe chunk on error
- * The chunk is not wiped if read raw is used
+/* Sets the read zero chunk on error
+ * The chunk is not zeroed if read raw is used
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_set_read_wipe_chunk_on_error(
+int libewf_handle_set_read_zero_chunk_on_error(
      libewf_handle_t *handle,
-     uint8_t wipe_on_error,
+     uint8_t zero_on_error,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_read_wipe_chunk_on_error";
+	static char *function                     = "libewf_handle_set_read_zero_chunk_on_error";
 
 	if( handle == NULL )
 	{
@@ -1877,7 +1877,7 @@ int libewf_handle_set_read_wipe_chunk_on_error(
 
 		return( -1 );
 	}
-	internal_handle->read_io_handle->wipe_on_error = wipe_on_error;
+	internal_handle->read_io_handle->zero_on_error = zero_on_error;
 
 	return( 1 );
 }

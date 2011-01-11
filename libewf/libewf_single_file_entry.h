@@ -165,6 +165,12 @@ int libewf_single_file_entry_get_entry_modification_time(
      uint64_t *entry_modification_time,
      liberror_error_t **error );
 
+int libewf_single_file_entry_get_utf8_hash_value_md5(
+     libewf_single_file_entry_t *single_file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

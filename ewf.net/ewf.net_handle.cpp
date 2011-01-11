@@ -124,22 +124,19 @@ Handle::~Handle( void )
 	}
 }
 
-System::Int Handle::GetAccessFlagsRead( void )
+int Handle::GetAccessFlagsRead( void )
 {
-	return( System::Int(
-	         libewf_get_access_flags_read() ) );
+	return( libewf_get_access_flags_read() );
 }
 
-System::Int Handle::GetAccessFlagsReadWrite( void )
+int Handle::GetAccessFlagsReadWrite( void )
 {
-	return( System::Int(
-	         libewf_get_access_flags_read_write() ) );
+	return( libewf_get_access_flags_read_write() );
 }
 
-System::Int Handle::GetAccessFlagsWrite( void )
+int Handle::GetAccessFlagsWrite( void )
 {
-	return( System::Int(
-	         libewf_get_access_flags_write() ) );
+	return( libewf_get_access_flags_write() );
 }
 
 array<System::String^>^ Handle::Glob( System::String^ filename )
@@ -275,7 +272,7 @@ Handle^ Handle::Clone( void )
 }
 
 void Handle::Open( array<System::String^>^ filenames,
-                   System::Int access_flags )
+                   int access_flags )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
@@ -285,7 +282,6 @@ void Handle::Open( array<System::String^>^ filenames,
 	System::String^ function        = "Handle::Open";
 	wchar_t **ewf_filenames         = NULL;
 	pin_ptr<const wchar_t> filename = nullptr;
-	int ewf_access_flags            = 0;
 	int ewf_filename_index          = 0;
 	int ewf_number_of_filenames     = 0;
 
@@ -317,15 +313,11 @@ void Handle::Open( array<System::String^>^ filenames,
 
 		ewf_filenames[ ewf_filename_index ] = (wchar_t *) filename;
 	}
-	Marshal::WriteInt(
-	 (IntPtr) &ewf_access_flags,
-	 access_flags );
-
 	if( libewf_handle_open_wide(
 	     handle,
 	     (wchar_t * const *) ewf_filenames,
 	     ewf_number_of_filenames,
-	     ewf_access_flags,
+	     access_flags,
 	     &error ) != 1 )
 	{
 		error_string = gcnew System::String(

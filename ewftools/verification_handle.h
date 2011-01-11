@@ -95,9 +95,9 @@ struct verification_handle
 	 */
 	off64_t last_offset_read;
 
-	/* Value to indicate if the chunk should be wiped on error
+	/* Value to indicate if the chunk should be zeroed on error
 	 */
-	int wipe_chunk_on_error;
+	int zero_chunk_on_error;
 };
 
 int verification_handle_initialize(
@@ -159,7 +159,7 @@ int verification_handle_set_header_codepage(
 
 int verification_handle_set_error_handling_values(
      verification_handle_t *verification_handle,
-     int wipe_chunk_on_error,
+     int zero_chunk_on_error,
      liberror_error_t **error );
 
 int verification_handle_append_read_error(

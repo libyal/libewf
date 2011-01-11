@@ -1072,14 +1072,14 @@ int libewf_handle_get_number_of_chunks_written(
      uint32_t *number_of_chunks,
      libewf_error_t **error );
 
-/* Sets the read wipe chunk on error
- * The chunk is not wiped if read raw is used
+/* Sets the read zero chunk on error
+ * The chunk is not zeroed if read raw is used
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
-int libewf_handle_set_read_wipe_chunk_on_error(
+int libewf_handle_set_read_zero_chunk_on_error(
      libewf_handle_t *handle,
-     uint8_t wipe_on_error,
+     uint8_t zero_on_error,
      libewf_error_t **error );
 
 /* Copies the media values from the source to the destination handle
@@ -1633,6 +1633,19 @@ int libewf_handle_get_root_file_entry(
  * Meta data functions - deprecated
  * ------------------------------------------------------------------------- */
 
+/* Sets the read wipe chunk on error
+ * The chunk is not wiped if read raw is used
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_read_zero_chunk_on_error instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN \
+int libewf_handle_set_read_wipe_chunk_on_error(
+     libewf_handle_t *handle,
+     uint8_t wipe_on_error,
+     libewf_error_t **error );
+
 /* Retrieves the amount of acquiry errors
  * Returns 1 if successful or -1 on error
  *
@@ -2154,6 +2167,16 @@ LIBEWF_EXTERN \
 int libewf_file_entry_get_entry_modification_time(
      libewf_file_entry_t *file_entry,
      uint64_t *entry_modification_time,
+     libewf_error_t **error );
+
+/* Retrieves the the UTF-8 encoded MD5 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_hash_value_md5(
+     libewf_file_entry_t *file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libewf_error_t **error );
 
 /* Retrieves the number of sub file entries
@@ -2891,7 +2914,7 @@ LIBEWF_EXTERN int libewf_get_write_amount_of_chunks(
  * The chunk is not wiped if read raw is used
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_set_read_wipe_chunk_on_error instead
+ * This function is deprecated use libewf_handle_set_read_zero_chunk_on_error instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(

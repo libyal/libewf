@@ -163,9 +163,9 @@ struct export_handle
 	 */
 	int write_compressed;
 
-	/* Value to indicate if the chunk should be wiped on error
+	/* Value to indicate if the chunk should be zeroed on error
 	 */
-	int wipe_chunk_on_error;
+	int zero_chunk_on_error;
 
 	/* The nofication output stream
 	 */
@@ -350,7 +350,7 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
      size64_t media_size,
-     uint8_t wipe_chunk_on_error,
+     uint8_t zero_chunk_on_error,
      liberror_error_t **error );
 
 int export_handle_set_hash_value(

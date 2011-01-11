@@ -95,6 +95,12 @@ int libewf_handle_get_write_amount_of_chunks(
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_handle_set_read_wipe_chunk_on_error(
+     libewf_handle_t *handle,
+     uint8_t wipe_on_error,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_get_amount_of_acquiry_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors,

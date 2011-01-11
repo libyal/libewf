@@ -49,9 +49,9 @@ struct libewf_read_io_handle
 	 */
 	libewf_sector_list_t *checksum_errors;
 
-	/* A value to indicate if a chunk should be wiped on error
+	/* A value to indicate if a chunk should be zeroed on error
 	 */
-	uint8_t wipe_on_error;
+	uint8_t zero_on_error;
 };
 
 int libewf_read_io_handle_initialize(

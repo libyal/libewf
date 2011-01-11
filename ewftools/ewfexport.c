@@ -175,7 +175,7 @@ void usage_fprint(
 	fprintf( stream, "\t-u:        unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
-	fprintf( stream, "\t-w:        wipe sectors on checksum error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-w:        zero sectors on checksum error (mimic EnCase like behavior)\n" );
 }
 
 /* Reads the media data and exports it
@@ -752,7 +752,7 @@ int main( int argc, char * const argv[] )
 	uint8_t print_status_information                           = 1;
 	uint8_t swap_byte_pairs                                    = 0;
 	uint8_t verbose                                            = 0;
-	uint8_t wipe_chunk_on_error                                = 0;
+	uint8_t zero_chunk_on_error                                = 0;
 	int interactive_mode                                       = 1;
 	int number_of_filenames                                    = 0;
 	int result                                                 = 1;
@@ -962,7 +962,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_SUCCESS );
 
 			case (libcstring_system_integer_t) 'w':
-				wipe_chunk_on_error = 1;
+				zero_chunk_on_error = 1;
 
 				break;
 		}
@@ -1682,7 +1682,7 @@ int main( int argc, char * const argv[] )
 		     program,
 		     acquiry_software_version,
 		     export_size,
-		     wipe_chunk_on_error,
+		     zero_chunk_on_error,
 		     &error ) != 1 )
 		{
 			fprintf(

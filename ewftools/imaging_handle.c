@@ -4228,7 +4228,7 @@ int imaging_handle_print_parameters(
      imaging_handle_t *imaging_handle,
      off64_t resume_acquiry_offset,
      uint8_t read_error_retries,
-     uint8_t wipe_block_on_read_error,
+     uint8_t zero_block_on_read_error,
      uint8_t resume_acquiry,
      liberror_error_t **error )
 {
@@ -4681,9 +4681,9 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Wipe sectors on read error:\t" );
+	 "Zero sectors on read error:\t" );
 
-	if( wipe_block_on_read_error == 0 )
+	if( zero_block_on_read_error == 0 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,

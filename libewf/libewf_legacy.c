@@ -166,6 +166,21 @@ int libewf_handle_get_write_amount_of_chunks(
 	         error ) );
 }
 
+/* Sets the read wipe chunk on error
+ * The chunk is not wiped if read raw is used
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_read_wipe_chunk_on_error(
+     libewf_handle_t *handle,
+     uint8_t wipe_on_error,
+     liberror_error_t **error )
+{
+	return( libewf_handle_set_read_zero_chunk_on_error(
+	         handle,
+	         wipe_on_error,
+	         error ) );
+}
+
 /* Retrieves the amount of acquiry errors
  * Returns 1 if successful or -1 on error
  */

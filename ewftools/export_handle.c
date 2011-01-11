@@ -1194,7 +1194,7 @@ ssize_t export_handle_prepare_read_buffer(
 
 		/* Wipe the chunk if nescessary
 		 */
-		if( export_handle->wipe_chunk_on_error != 0 )
+		if( export_handle->zero_chunk_on_error != 0 )
 		{
 			if( ( storage_media_buffer->is_compressed != 0 )
 			 && ( memory_set(
@@ -1206,7 +1206,7 @@ ssize_t export_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe compression buffer.",
+				 "%s: unable to zero compression buffer.",
 				 function );
 
 				return( -1 );
@@ -1220,7 +1220,7 @@ ssize_t export_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe raw buffer.",
+				 "%s: unable to zero raw buffer.",
 				 function );
 
 				return( -1 );
@@ -2854,7 +2854,7 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
      size64_t media_size,
-     uint8_t wipe_chunk_on_error,
+     uint8_t zero_chunk_on_error,
      liberror_error_t **error )
 {
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
@@ -2903,16 +2903,16 @@ int export_handle_set_output_values(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_read_wipe_chunk_on_error(
+	if( libewf_handle_set_read_zero_chunk_on_error(
 	     export_handle->input_handle,
-	     wipe_chunk_on_error,
+	     zero_chunk_on_error,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set wipe chunk on error in input handle.",
+		 "%s: unable to set zero chunk on error in input handle.",
 		 function );
 
 		return( -1 );

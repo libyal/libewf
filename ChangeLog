@@ -1,10 +1,6 @@
 TODO
-* fixes from beta tests
-  - check acquire-resume on FreeBSD, corruption in table 2 offsets table ?
 * clean up of ewftools
   - ewfacquire: make behaviour of -g equal to user input ?
-* single file entry
-  - add API function to retrieve stored MD5 hash
 * add tests
   - ewfexport of single file entries
 
@@ -14,7 +10,7 @@ Next stable release:
 
 Roadmap:
 * lvf support
-  - add support for MD5 hash
+  - add support for MD5 hash (add libewf_file_entry_get_utf16_hash_value_md5)
   - add support for permissions
   - thread aware support (check)
 * code clean up
@@ -123,7 +119,7 @@ Additional (integrity) checks:
 
 Possible performance improvements:
 * create a offset table per segment file
-  - create it on demand
+  - create it on demand (e.g. libqcow)
   - map offset table start entry from segment table as a pointer or index number ?
 * fill offset table while reading ?
   - only read first and last segment file for index build?
@@ -178,7 +174,6 @@ Tools:
   - print output convert to system string
   - reduce string conversions, use as much as possible the system string type in the tools
 * check char/wchar in/output
-* rename wipe/clean buffer to zero buffer
 * add getoptlong support
 * make compilation resilient for missing crypto library
   - compile on system without libcrypto
@@ -205,7 +200,6 @@ Tools:
   - handle ewf/raw like in smioexport
   - creates write only raw export file with msvscpp compilation
   - limit output formats for input types (lvf vs ewf)
-  - does export handle require finalize of md5 and sha1 context?
   - add information and media values to raw output
 * ewfdebug
   - create a tool to analyse a single segment file
@@ -243,6 +237,13 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20110111
+* updated libsmraw, libodraw
+* updated ewf.net
+* single file entry:
+  - added get MD5 hash function
+* renamed wipe/clean buffer to zero buffer
 
 20110110
 * updated libuna, libbfio, libfvalue, libsmraw

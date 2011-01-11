@@ -1,4 +1,4 @@
-.Dd January 9, 2011
+.Dd January 11, 2011
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -120,7 +120,7 @@ verbose output to stderr
 .It Fl V
 print version
 .It Fl w
-wipe sectors on read error (mimic EnCase like behavior)
+zero sectors on read error (mimic EnCase like behavior)
 .It Fl 2 Ar secondary_target
 the secondary target file (without extension) to write to
 .El
@@ -130,7 +130,7 @@ will read from a file or device until it encounters a read error. On read error 
 .Nm ewfacquire
 still is unable to read and, if specified, it will zero (wipe) the the remainder of the number of sectors specified as error granularity. If
 .Nm ewfacquire
-should mimic EnCase it will wipe all of sectors specified as error granularity.
+should mimic EnCase it will zero all of sectors specified as error granularity.
 .Pp
 Empty block compression detects blocks of sectors with entirely the same byte data and compresses them using the default compression level.
 .Pp
@@ -181,7 +181,7 @@ The number of bytes per sector (1 >= value >= 4294967295) [512]:
 The number of sectors to read at once (16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768) [64]: 
 The number of sectors to be used as error granularity (1 >= value >= 64) [64]: 
 The number of retries when a read error occurs (0 >= value >= 255) [2]: 
-Wipe sectors on read error (mimic EnCase like behavior) (yes, no) [no]:
+Zero sectors on read error (mimic EnCase like behavior) (yes, no) [no]:
 
 The following information was provided:
 Image path and filename:        floppy.E01
@@ -201,7 +201,7 @@ Bytes per sector:		512
 Block size:                     64 sectors
 Error granularity:              64 sectors
 Retries on read error:          2
-Wipe sectors on read error:     no
+Zero sectors on read error:     no
 
 Continue acquiry with these values (yes, no) [yes]:
 

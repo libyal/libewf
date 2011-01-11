@@ -104,7 +104,7 @@ int libewf_read_io_handle_initialize(
 
 			goto on_error;
 		}
-		( *read_io_handle )->wipe_on_error = 1;
+		( *read_io_handle )->zero_on_error = 1;
 	}
 	return( 1 );
 
@@ -243,7 +243,7 @@ int libewf_read_io_handle_clone(
 
 		goto on_error;
 	}
-	( *destination_read_io_handle )->wipe_on_error = source_read_io_handle->wipe_on_error;
+	( *destination_read_io_handle )->zero_on_error = source_read_io_handle->zero_on_error;
 
 	return( 1 );
 
@@ -1065,7 +1065,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		{
 			/* Wipe the chunk if nescessary
 			 */
-			if( read_io_handle->wipe_on_error != 0 )
+			if( read_io_handle->zero_on_error != 0 )
 			{
 				if( memory_set(
 				     chunk_read_buffer,
@@ -1076,7 +1076,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_MEMORY,
 					 LIBERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to wipe chunk data.",
+					 "%s: unable to zero chunk data.",
 					 function );
 
 					return( -1 );

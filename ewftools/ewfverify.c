@@ -87,7 +87,7 @@ void usage_fprint(
 	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
-	fprintf( stream, "\t-w:        wipe sectors on checksum error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-w:        zero sectors on checksum error (mimic EnCase like behavior)\n" );
 }
 
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
@@ -95,7 +95,7 @@ void usage_fprint(
  */
 ssize64_t ewfverify_read_input(
            verification_handle_t *verification_handle,
-           uint8_t wipe_chunk_on_error,
+           uint8_t zero_chunk_on_error,
            size_t process_buffer_size,
            process_status_t *process_status,
            liberror_error_t **error )
@@ -181,7 +181,7 @@ ssize64_t ewfverify_read_input(
 	}
 	if( verification_handle_set_error_handling_values(
 	     verification_handle,
-	     wipe_chunk_on_error,
+	     zero_chunk_on_error,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -422,7 +422,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                                  = 1;
 	uint8_t calculate_sha1                                 = 0;
 	uint8_t print_status_information                       = 1;
-	uint8_t wipe_chunk_on_error                            = 0;
+	uint8_t zero_chunk_on_error                            = 0;
 	uint8_t verbose                                        = 0;
 	int number_of_filenames                                = 0;
 	int match_md5_hash                                     = 0;
@@ -548,7 +548,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_SUCCESS );
 
 			case (libcstring_system_integer_t) 'w':
-				wipe_chunk_on_error = 1;
+				zero_chunk_on_error = 1;
 
 				break;
 		}
@@ -708,7 +708,7 @@ int main( int argc, char * const argv[] )
 	 */
 	verify_count = ewfverify_read_input(
 			verification_handle,
-			wipe_chunk_on_error,
+			zero_chunk_on_error,
 			(size_t) process_buffer_size,
 			process_status,
 			&error );

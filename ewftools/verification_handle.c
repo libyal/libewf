@@ -580,7 +580,7 @@ ssize_t verification_handle_prepare_read_buffer(
 
 		/* Wipe the chunk if nescessary
 		 */
-		if( verification_handle->wipe_chunk_on_error != 0 )
+		if( verification_handle->zero_chunk_on_error != 0 )
 		{
 			if( ( storage_media_buffer->is_compressed != 0 )
 			 && ( memory_set(
@@ -592,7 +592,7 @@ ssize_t verification_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe raw buffer.",
+				 "%s: unable to zero raw buffer.",
 				 function );
 
 				return( -1 );
@@ -606,7 +606,7 @@ ssize_t verification_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe compression buffer.",
+				 "%s: unable to zero compression buffer.",
 				 function );
 
 				return( -1 );
@@ -1045,7 +1045,7 @@ int verification_handle_set_header_codepage(
  */
 int verification_handle_set_error_handling_values(
      verification_handle_t *verification_handle,
-     int wipe_chunk_on_error,
+     int zero_chunk_on_error,
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_set_error_handling_values";
@@ -1072,21 +1072,21 @@ int verification_handle_set_error_handling_values(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_read_wipe_chunk_on_error(
+	if( libewf_handle_set_read_zero_chunk_on_error(
 	     verification_handle->input_handle,
-	     (uint8_t) wipe_chunk_on_error,
+	     (uint8_t) zero_chunk_on_error,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set wipe chunk on error in input handle.",
+		 "%s: unable to set zero chunk on error in input handle.",
 		 function );
 
 		return( -1 );
 	}
-	verification_handle->wipe_chunk_on_error = wipe_chunk_on_error;
+	verification_handle->zero_chunk_on_error = zero_chunk_on_error;
 
 	return( 1 );
 }

@@ -1,4 +1,4 @@
-.Dd January 10, 2011
+.Dd January 11, 2011
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -205,7 +205,7 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_number_of_chunks_written "libewf_handle_t *handle, uint32_t *number_of_chunks, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_read_wipe_chunk_on_error "libewf_handle_t *handle, uint8_t wipe_on_error, libewf_error_t **error"
+.Fn libewf_handle_set_read_zero_chunk_on_error "libewf_handle_t *handle, uint8_t zero_on_error, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_copy_media_values "libewf_handle_t *destination_handle, libewf_handle_t *source_handle, libewf_error_t **error"
 .Ft int
@@ -352,6 +352,8 @@ Single file entry functions
 .Fn libewf_file_entry_get_access_time "libewf_file_entry_t *file_entry, uint64_t *access_time, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_entry_modification_time "libewf_file_entry_t *file_entry, uint64_t *entry_modification_time, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf8_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf8_string, size_t utf8_string_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_number_of_sub_file_entries "libewf_file_entry_t *file_entry, int *number_of_sub_file_entries, libewf_error_t **error"
 .Ft int
