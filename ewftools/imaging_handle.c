@@ -205,6 +205,7 @@ int imaging_handle_initialize(
 		( *imaging_handle )->sectors_per_chunk        = 64;
 		( *imaging_handle )->sector_error_granularity = 64;
 		( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
+		( *imaging_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
 		( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
@@ -2529,7 +2530,7 @@ on_error:
 }
 
 /* Sets the compression values
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_compression_values(
      imaging_handle_t *imaging_handle,
@@ -2571,7 +2572,7 @@ int imaging_handle_set_compression_values(
 }
 
 /* Sets the format
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_format(
      imaging_handle_t *imaging_handle,
@@ -2612,7 +2613,7 @@ int imaging_handle_set_format(
 }
 
 /* Sets the media type
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_media_type(
      imaging_handle_t *imaging_handle,
@@ -2653,7 +2654,7 @@ int imaging_handle_set_media_type(
 }
 
 /* Sets the media flags
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_media_flags(
      imaging_handle_t *imaging_handle,
@@ -2694,7 +2695,7 @@ int imaging_handle_set_media_flags(
 }
 
 /* Sets the bytes per sector
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_bytes_per_sector(
      imaging_handle_t *imaging_handle,
@@ -2732,7 +2733,7 @@ int imaging_handle_set_bytes_per_sector(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine maximum segment size.",
+		 "%s: unable to determine bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -2752,7 +2753,7 @@ int imaging_handle_set_bytes_per_sector(
 }
 
 /* Sets the number of sectors per chunk
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
@@ -2793,7 +2794,7 @@ int imaging_handle_set_sectors_per_chunk(
 }
 
 /* Sets the sector error granularity
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_sector_error_granularity(
      imaging_handle_t *imaging_handle,
@@ -2835,7 +2836,7 @@ int imaging_handle_set_sector_error_granularity(
 }
 
 /* Sets the maximum segment file size
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_maximum_segment_size(
      imaging_handle_t *imaging_handle,
@@ -2917,6 +2918,64 @@ int imaging_handle_set_header_codepage(
 		 function );
 
 		return( -1 );
+	}
+	return( result );
+}
+
+/* Sets the process buffer size
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
+ */
+int imaging_handle_set_process_buffer_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function  = "imaging_handle_set_process_buffer_size";
+	size_t string_length   = 0;
+	uint64_t size_variable = 0;
+	int result             = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	result = byte_size_string_convert(
+	          string,
+	          string_length,
+	          &size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine process buffer size.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( size_variable > (uint64_t) SSIZE_MAX )
+		{
+			result = 0;
+		}
+		else
+		{
+			imaging_handle->process_buffer_size = (size_t) size_variable;
+		}
 	}
 	return( result );
 }

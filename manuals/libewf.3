@@ -355,6 +355,8 @@ Single file entry functions
 .Ft int
 .Fn libewf_file_entry_get_utf8_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf8_string, size_t utf8_string_size, libewf_error_t **error"
 .Ft int
+.Fn libewf_file_entry_get_utf16_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf16_string, size_t utf16_string_size, libewf_error_t **error"
+.Ft int
 .Fn libewf_file_entry_get_number_of_sub_file_entries "libewf_file_entry_t *file_entry, int *number_of_sub_file_entries, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_sub_file_entry "libewf_file_entry_t *file_entry, int sub_file_entry_index, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"

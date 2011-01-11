@@ -2169,7 +2169,7 @@ int libewf_file_entry_get_entry_modification_time(
      uint64_t *entry_modification_time,
      libewf_error_t **error );
 
-/* Retrieves the the UTF-8 encoded MD5 hash value
+/* Retrieves the UTF-8 encoded MD5 hash value
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 LIBEWF_EXTERN \
@@ -2177,6 +2177,16 @@ int libewf_file_entry_get_utf8_hash_value_md5(
      libewf_file_entry_t *file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded MD5 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_hash_value_md5(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libewf_error_t **error );
 
 /* Retrieves the number of sub file entries

@@ -152,6 +152,13 @@ int libewf_file_entry_get_utf8_hash_value_md5(
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_hash_value_md5(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_file_entry_get_number_of_sub_file_entries(
      libewf_file_entry_t *file_entry,
      int *number_of_sub_entries,

@@ -724,7 +724,7 @@ int libewf_file_entry_get_entry_modification_time(
 	return( 1 );
 }
 
-/* Retrieves the the UTF-8 encoded MD5 hash value
+/* Retrieves the UTF-8 encoded MD5 hash value
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_file_entry_get_utf8_hash_value_md5(
@@ -765,6 +765,64 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 	          (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
 	          utf8_string,
 	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: MD5.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+
+}
+
+/* Retrieves the UTF-16 encoded MD5 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_file_entry_get_utf16_hash_value_md5(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_utf16_hash_value_md5";
+	int result                                        = 0;
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_single_file_entry_get_utf16_hash_value_md5(
+	          (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	          utf16_string,
+	          utf16_string_size,
 	          error );
 
 	if( result == -1 )

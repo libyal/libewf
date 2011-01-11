@@ -31,20 +31,12 @@
 #include <stdlib.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewftools_libewf.h"
 #include "guid.h"
 #include "info_handle.h"
 
@@ -87,10 +79,12 @@ void usage_fprint(
 /* Signal handler for ewfinfo
  */
 void ewfinfo_signal_handler(
-      libsystem_signal_t signal )
+      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfinfo_signal_handler";
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfinfo_abort = 1;
 
@@ -107,8 +101,6 @@ void ewfinfo_signal_handler(
 		 error );
 		liberror_error_free(
 		 &error );
-
-		return;
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
@@ -212,7 +204,8 @@ int main( int argc, char * const argv[] )
 					fprintf(
 					 stderr,
 					 "Conflicting options: %" PRIc_LIBCSTRING_SYSTEM " and %c\n",
-					 option, info_option );
+					 option,
+					 info_option );
 
 					usage_fprint(
 					 stdout );
@@ -248,7 +241,8 @@ int main( int argc, char * const argv[] )
 					fprintf(
 					 stderr,
 					 "Conflicting options: %" PRIc_LIBCSTRING_SYSTEM " and %c\n",
-					 option, info_option );
+					 option,
+					 info_option );
 
 					usage_fprint(
 					 stdout );
@@ -269,7 +263,8 @@ int main( int argc, char * const argv[] )
 					fprintf(
 					 stderr,
 					 "Conflicting options: %" PRIc_LIBCSTRING_SYSTEM " and %c\n",
-					 option, info_option );
+					 option,
+					 info_option );
 
 					usage_fprint(
 					 stdout );
@@ -513,7 +508,6 @@ int main( int argc, char * const argv[] )
 	number_of_filenames = argc - optind;
 
 #endif
-
 	if( libsystem_signal_attach(
 	     ewfinfo_signal_handler,
 	     &error ) != 1 )

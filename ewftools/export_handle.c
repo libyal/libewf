@@ -168,12 +168,13 @@ int export_handle_initialize(
 
 			goto on_error;
 		}
-		( *export_handle )->compression_level = LIBEWF_COMPRESSION_NONE;
-		( *export_handle )->output_format     = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
-		( *export_handle )->ewf_format        = LIBEWF_FORMAT_ENCASE6;
-		( *export_handle )->sectors_per_chunk = 64;
-		( *export_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
-		( *export_handle )->notify_stream     = EXPORT_HANDLE_NOTIFY_STREAM;
+		( *export_handle )->compression_level   = LIBEWF_COMPRESSION_NONE;
+		( *export_handle )->output_format       = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+		( *export_handle )->ewf_format          = LIBEWF_FORMAT_ENCASE6;
+		( *export_handle )->sectors_per_chunk   = 64;
+		( *export_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
+		( *export_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
+		( *export_handle )->notify_stream       = EXPORT_HANDLE_NOTIFY_STREAM;
 	}
 	return( 1 );
 
@@ -359,6 +360,8 @@ int export_handle_signal_abort(
 			return( -1 );
 		}
 	}
+	export_handle->abort = 1;
+
 	return( 1 );
 }
 
@@ -495,16 +498,16 @@ int export_handle_sanitize_filename(
  */
 int export_handle_create_target_path(
      export_handle_t *export_handle,
-     libcstring_system_character_t *export_path,
+     const libcstring_system_character_t *filename,
+     size_t filename_size,
+     const libcstring_system_character_t *export_path,
      size_t export_path_size,
-     uint8_t *utf8_filename,
-     size_t utf8_filename_size,
      libcstring_system_character_t **target_path,
      size_t *target_path_size,
      liberror_error_t **error )
 {
-	static char *function = "export_handle_create_target_path";
-	size_t filename_size  = 0;
+	static char *function           = "export_handle_create_target_path";
+	size_t calculated_filename_size = 0;
 
 	if( export_handle == NULL )
 	{
@@ -513,6 +516,28 @@ int export_handle_create_target_path(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	if( filename_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid filename size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -528,24 +553,13 @@ int export_handle_create_target_path(
 
 		return( -1 );
 	}
-	if( utf8_filename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 filename.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_filename_size > (size_t) SSIZE_MAX )
+	if( export_path_size > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 filename size value exceeds maximum.",
+		 "%s: invalid export path size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -583,23 +597,20 @@ int export_handle_create_target_path(
 
 		return( -1 );
 	}
-	/* Make sure to check the UTF-8 filename length
+/* TODO is this check still required ? */
+	/* Make sure to check the filename length
 	 * the conversion routines are very strict about the string size
 	 */
-	utf8_filename_size = 1 + libcstring_narrow_string_length(
-	                          (char *) utf8_filename );
+	calculated_filename_size = 1 + libcstring_system_string_length(
+	                                filename );
 
-	if( libsystem_string_size_from_utf8_string(
-	     utf8_filename,
-	     utf8_filename_size,
-	     &filename_size,
-	     error ) != 1 )
+	if( filename_size != calculated_filename_size )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine UTF-8 filename size.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid filename size value does not match calculated size.",
 		 function );
 
 		return( -1 );
@@ -638,18 +649,16 @@ int export_handle_create_target_path(
 	}
 	( *target_path )[ export_path_size - 1 ] = (libcstring_system_character_t) LIBSYSTEM_PATH_SEPARATOR;
 
-	if( libsystem_string_copy_from_utf8_string(
+	if( libcstring_system_string_copy(
 	     &( ( *target_path )[ export_path_size ] ),
-	     filename_size,
-	     utf8_filename,
-	     utf8_filename_size,
-	     error ) != 1 )
+	     filename,
+	     filename_size ) == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set filename in target path.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy filename in target path.",
 		 function );
 
 		goto on_error;
@@ -2256,7 +2265,7 @@ int export_handle_prompt_for_format(
 			if( libcstring_system_string_compare(
 			     fixed_string_variable,
 			     _LIBCSTRING_SYSTEM_STRING( "files" ),
-				  5 ) == 0 )
+			     5 ) == 0 )
 			{
 				export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
 				result                       = 1;
@@ -2269,22 +2278,22 @@ int export_handle_prompt_for_format(
 				  &( export_handle->ewf_format ),
 				  error );
 
-			if( result == 1 )
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine format.",
+				 function );
+
+				return( -1 );
+			}
+			else if( result != 0 )
 			{
 				export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
 			}
 		}
-	}
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine format.",
-		 function );
-
-		return( -1 );
 	}
 	return( result );
 }
@@ -2542,7 +2551,7 @@ on_error:
 }
 
 /* Sets the compression values
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int export_handle_set_compression_values(
      export_handle_t *export_handle,
@@ -2584,7 +2593,7 @@ int export_handle_set_compression_values(
 }
 
 /* Sets the format
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int export_handle_set_format(
      export_handle_t *export_handle,
@@ -2625,7 +2634,7 @@ int export_handle_set_format(
 		if( libcstring_system_string_compare(
 		     string,
 		     _LIBCSTRING_SYSTEM_STRING( "files" ),
-			  5 ) == 0 )
+		     5 ) == 0 )
 		{
 			export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_FILES;
 			result                       = 1;
@@ -2638,27 +2647,27 @@ int export_handle_set_format(
 			  &( export_handle->ewf_format ),
 			  error );
 
-		if( result == 1 )
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine format.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
 		{
 			export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
 		}
-	}
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine format.",
-		 function );
-
-		return( -1 );
 	}
 	return( result );
 }
 
 /* Sets the number of sectors per chunk
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int export_handle_set_sectors_per_chunk(
      export_handle_t *export_handle,
@@ -2699,7 +2708,7 @@ int export_handle_set_sectors_per_chunk(
 }
 
 /* Sets the maximum segment file size
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int export_handle_set_maximum_segment_size(
      export_handle_t *export_handle,
@@ -2785,6 +2794,64 @@ int export_handle_set_header_codepage(
 	return( result );
 }
 
+/* Sets the process buffer size
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
+ */
+int export_handle_set_process_buffer_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function  = "export_handle_set_process_buffer_size";
+	size_t string_length   = 0;
+	uint64_t size_variable = 0;
+	int result             = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	result = byte_size_string_convert(
+	          string,
+	          string_length,
+	          &size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine process buffer size.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( size_variable > (uint64_t) SSIZE_MAX )
+		{
+			result = 0;
+		}
+		else
+		{
+			export_handle->process_buffer_size = (size_t) size_variable;
+		}
+	}
+	return( result );
+}
+
 /* Sets the processing values
  * Returns 1 if successful or -1 on error
  */
@@ -2853,7 +2920,6 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_operating_system,
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
-     size64_t media_size,
      uint8_t zero_chunk_on_error,
      liberror_error_t **error )
 {
@@ -3072,7 +3138,7 @@ int export_handle_set_output_values(
 		}
 		if( libewf_handle_set_media_size(
 		     export_handle->ewf_output_handle,
-		     media_size,
+		     (size64_t) export_handle->export_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -3206,7 +3272,7 @@ int export_handle_set_output_values(
 	{
 		if( libsmraw_handle_set_media_size(
 		     export_handle->raw_output_handle,
-		     media_size,
+		     (size64_t) export_handle->export_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -3484,7 +3550,7 @@ ssize_t export_handle_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid calculate MD5 hash string value already set.",
+			 "%s: invalid calculated MD5 hash string value already set.",
 			 function );
 
 			goto on_error;
@@ -3562,7 +3628,7 @@ ssize_t export_handle_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid calculate SHA1 hash string value already set.",
+			 "%s: invalid calculated SHA1 hash string value already set.",
 			 function );
 
 			goto on_error;
@@ -3790,10 +3856,10 @@ int export_handle_export_file_entry(
      liberror_error_t **error )
 {
 	libewf_file_entry_t *sub_file_entry        = NULL;
+	libcstring_system_character_t *name        = NULL;
 	libcstring_system_character_t *target_path = NULL;
 	FILE *file_entry_data_file_stream          = NULL;
 	uint8_t *file_entry_data                   = NULL;
-	uint8_t *name                              = NULL;
 	static char *function                      = "export_handle_export_file_entry";
 	size64_t file_entry_data_size              = 0;
 	size_t name_size                           = 0;
@@ -3827,10 +3893,18 @@ int export_handle_export_file_entry(
 
 		return( -1 );
 	}
-	if( libewf_file_entry_get_utf8_name_size(
-	     file_entry,
-	     &name_size,
-	     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_file_entry_get_utf16_name_size(
+	          file_entry,
+	          &name_size,
+	          error );
+#else
+	result = libewf_file_entry_get_utf8_name_size(
+	          file_entry,
+	          &name_size,
+	          error );
+#endif
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -3843,8 +3917,8 @@ int export_handle_export_file_entry(
 	}
 	if( name_size > 0 )
 	{
-		name = (uint8_t *) memory_allocate(
-				    sizeof( uint8_t ) * name_size );
+		name = libcstring_system_string_allocate(
+		        name_size );
 
 		if( name == NULL )
 		{
@@ -3857,11 +3931,20 @@ int export_handle_export_file_entry(
 
 			return( -1 );
 		}
-		if( libewf_file_entry_get_utf8_name(
-		     file_entry,
-		     name,
-		     name_size,
-		     error ) != 1 )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_file_entry_get_utf16_name(
+		          file_entry,
+		          (uint16_t *) name,
+		          name_size,
+		          error );
+#else
+		result = libewf_file_entry_get_utf8_name(
+		          file_entry,
+		          (uint8_t *) name,
+		          name_size,
+		          error );
+#endif
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -3877,10 +3960,10 @@ int export_handle_export_file_entry(
 		}
 		if( export_handle_create_target_path(
 		     export_handle,
-		     export_path,
-		     export_path_size,
 		     name,
 		     name_size,
+		     export_path,
+		     export_path_size,
 		     &target_path,
 		     &target_path_size,
 		     error ) != 1 )

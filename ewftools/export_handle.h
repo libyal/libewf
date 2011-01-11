@@ -101,6 +101,14 @@ struct export_handle
 	 */
 	size64_t maximum_segment_size;
 
+	/* The export offset
+	 */
+	uint64_t export_offset;
+
+	/* The export size
+	 */
+	uint64_t export_size;
+
 	/* The header codepage
 	 */
 	int header_codepage;
@@ -167,6 +175,10 @@ struct export_handle
 	 */
 	int zero_chunk_on_error;
 
+	/* The process buffer size
+	 */
+	size_t process_buffer_size;
+
 	/* The nofication output stream
 	 */
 	FILE *notify_stream;
@@ -202,10 +214,10 @@ int export_handle_sanitize_filename(
 
 int export_handle_create_target_path(
      export_handle_t *export_handle,
-     libcstring_system_character_t *export_path,
+     const libcstring_system_character_t *filename,
+     size_t filename_size,
+     const libcstring_system_character_t *export_path,
      size_t export_path_size,
-     uint8_t *utf8_filename,
-     size_t utf8_filename_size,
      libcstring_system_character_t **target_path,
      size_t *target_path_size,
      liberror_error_t **error );
@@ -338,6 +350,11 @@ int export_handle_set_header_codepage(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
+int export_handle_set_process_buffer_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
 int export_handle_set_processing_values(
      export_handle_t *export_handle,
      uint8_t calculate_md5,
@@ -349,7 +366,6 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_operating_system,
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
-     size64_t media_size,
      uint8_t zero_chunk_on_error,
      liberror_error_t **error );
 

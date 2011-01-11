@@ -33,21 +33,13 @@
 #include <stdlib.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewftools_libewf.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
 #include "process_status.h"
@@ -426,22 +418,24 @@ ssize_t ewfacquirestream_read_chunk(
 	return( buffer_offset );
 }
 
-/* Reads data from a file descriptor and writes it in EWF format
- * Returns the number of bytes written or -1 on error
+/* Reads the input
+ * Returns 1 if successful or -1 on error
  */
-ssize64_t ewfacquirestream_read_input(
-           imaging_handle_t *imaging_handle,
-           int input_file_descriptor,
-           uint8_t swap_byte_pairs,
-           uint8_t read_error_retries,
-           size_t process_buffer_size,
-           process_status_t *process_status,
-           liberror_error_t **error )
+int ewfacquirestream_read_input(
+     imaging_handle_t *imaging_handle,
+     int input_file_descriptor,
+     uint8_t swap_byte_pairs,
+     uint8_t read_error_retries,
+     uint8_t print_status_information,
+     log_handle_t *log_handle,
+     liberror_error_t **error )
 {
+	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	static char *function                        = "ewfacquirestream_read_input";
-	ssize64_t acquiry_count                      = 0;
+	size64_t acquiry_count                       = 0;
 	size32_t chunk_size                          = 0;
+	size_t process_buffer_size                   = 0;
 	size_t read_size                             = 0;
 	ssize_t read_count                           = 0;
 	ssize_t process_count                        = 0;
@@ -458,6 +452,17 @@ ssize64_t ewfacquirestream_read_input(
 
 		return( -1 );
 	}
+	if( imaging_handle->process_buffer_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid imaging handle - process buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( input_file_descriptor == -1 )
 	{
 		liberror_error_set(
@@ -465,28 +470,6 @@ ssize64_t ewfacquirestream_read_input(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file descriptor.",
-		 function );
-
-		return( -1 );
-	}
-	if( process_buffer_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid process buffer size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( process_status == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid process status.",
 		 function );
 
 		return( -1 );
@@ -509,9 +492,9 @@ ssize64_t ewfacquirestream_read_input(
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid chunk size.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunk size.",
 		 function );
 
 		return( -1 );
@@ -519,12 +502,15 @@ ssize64_t ewfacquirestream_read_input(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	process_buffer_size = (size_t) chunk_size;
 #else
-	if( process_buffer_size == 0 )
+	if( imaging_handle->process_buffer_size == 0 )
 	{
 		process_buffer_size = (size_t) chunk_size;
 	}
+	else
+	{
+		process_buffer_size = imaging_handle->process_buffer_size;
+	}
 #endif
-
 	if( storage_media_buffer_initialize(
 	     &storage_media_buffer,
 	     process_buffer_size,
@@ -539,8 +525,39 @@ ssize64_t ewfacquirestream_read_input(
 
 		goto on_error;
 	}
+	if( process_status_initialize(
+	     &process_status,
+	     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
+	     _LIBCSTRING_SYSTEM_STRING( "acquired" ),
+	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
+	     stdout,
+	     print_status_information,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_start(
+	     process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to start process status.",
+		 function );
+
+		goto on_error;
+	}
 	while( ( imaging_handle->acquiry_size == 0 )
-	    || ( acquiry_count < (ssize64_t) imaging_handle->acquiry_size ) )
+	    || ( acquiry_count < (size64_t) imaging_handle->acquiry_size ) )
 	{
 		read_size = process_buffer_size;
 
@@ -552,11 +569,10 @@ ssize64_t ewfacquirestream_read_input(
 			read_size = (size_t) imaging_handle->acquiry_offset;
 		}
 		else if( ( imaging_handle->acquiry_size != 0 )
-		      && ( ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count ) < (ssize64_t) read_size ) )
+		      && ( ( (size64_t) imaging_handle->acquiry_size - acquiry_count ) < (size64_t) read_size ) )
 		{
 			read_size = (size_t) ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count );
 		}
-
 		/* Read a chunk from the file descriptor
 		 */
 		read_count = ewfacquirestream_read_chunk(
@@ -591,7 +607,7 @@ ssize64_t ewfacquirestream_read_input(
 
 		/* Skip a certain number of bytes if necessary
 		 */
-		if( (ssize64_t) imaging_handle->acquiry_offset > acquiry_count )
+		if( (size64_t) imaging_handle->acquiry_offset > acquiry_count )
 		{
 			imaging_handle->acquiry_offset -= read_count;
 
@@ -671,7 +687,7 @@ ssize64_t ewfacquirestream_read_input(
 
 		 if( process_status_update_unknown_total(
 		      process_status,
-		      (size64_t) acquiry_count,
+		      acquiry_count,
 		      error ) != 1 )
 		{
 			liberror_error_set(
@@ -718,9 +734,79 @@ ssize64_t ewfacquirestream_read_input(
 	}
 	acquiry_count += write_count;
 
-	return( acquiry_count );
+	if( process_status_stop(
+	     process_status,
+	     acquiry_count,
+	     PROCESS_STATUS_COMPLETED,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to stop process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_free(
+	     &process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( imaging_handle->calculate_md5 == 1 )
+	{
+		fprintf(
+		 imaging_handle->notify_stream,
+		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 imaging_handle->md5_hash_string );
+	}
+	if( imaging_handle->calculate_sha1 == 1 )
+	{
+		fprintf(
+		 imaging_handle->notify_stream,
+		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 imaging_handle->sha1_hash_string );
+	}
+	if( log_handle != NULL )
+	{
+		if( imaging_handle->calculate_md5 == 1 )
+		{
+			log_handle_printf(
+			 log_handle,
+			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 imaging_handle->md5_hash_string );
+		}
+		if( imaging_handle->calculate_sha1 == 1 )
+		{
+			log_handle_printf(
+			 log_handle,
+			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 imaging_handle->sha1_hash_string );
+		}
+	}
+	return( 1 );
 
 on_error:
+	if( process_status != NULL )
+	{
+		process_status_stop(
+		 process_status,
+		 (size64_t) write_count,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &process_status,
+		 NULL );
+	}
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
@@ -733,28 +819,30 @@ on_error:
 /* Signal handler for ewfacquire
  */
 void ewfacquirestream_signal_handler(
-      libsystem_signal_t signal )
+      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfacquirestream_signal_handler";
 
+	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
+
 	ewfacquirestream_abort = 1;
 
-	if( ( ewfacquirestream_imaging_handle != NULL )
-	 && ( imaging_handle_signal_abort(
-	       ewfacquirestream_imaging_handle,
-	       &error ) != 1 ) )
+	if( ewfacquirestream_imaging_handle != NULL )
 	{
-		libsystem_notify_printf(
-		 "%s: unable to signal imaging handle to abort.\n",
-		 function );
+		if( imaging_handle_signal_abort(
+		     ewfacquirestream_imaging_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal imaging handle to abort.\n",
+			 function );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return;
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
@@ -791,6 +879,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_media_type                = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_offset                    = NULL;
+	libcstring_system_character_t *option_process_buffer_size       = NULL;
         libcstring_system_character_t *option_secondary_target_filename = NULL;
         libcstring_system_character_t *option_sectors_per_chunk         = NULL;
 	libcstring_system_character_t *option_size                      = NULL;
@@ -799,12 +888,8 @@ int main( int argc, char * const argv[] )
 
 	log_handle_t *log_handle                                        = NULL;
 
-	process_status_t *process_status                                = NULL;
-
 	libcstring_system_integer_t option                              = 0;
 	size_t string_length                                            = 0;
-	int64_t write_count                                             = 0;
-	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
 	uint8_t print_status_information                                = 1;
@@ -862,7 +947,6 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 #endif
-
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
@@ -983,31 +1067,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'p':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_process_buffer_size = optarg;
 
-				result = byte_size_string_convert(
-				          optarg,
-				          string_length,
-				          &process_buffer_size,
-				          &error );
-
-				if( result != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-				}
-				if( ( result != 1 )
-				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
-				{
-					process_buffer_size = 0;
-
-					fprintf(
-					 stderr,
-					 "Unsupported process buffer size defaulting to: chunk size.\n" );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'P':
@@ -1470,6 +1531,31 @@ int main( int argc, char * const argv[] )
 			 "Unsupported acquiry size defaulting to: all bytes.\n" );
 		}
 	}
+	if( option_process_buffer_size != NULL )
+	{
+		result = imaging_handle_set_process_buffer_size(
+			  ewfacquirestream_imaging_handle,
+			  option_process_buffer_size,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set process buffer size.\n" );
+
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfacquirestream_imaging_handle->process_buffer_size > (size_t) SSIZE_MAX ) )
+		{
+			ewfacquirestream_imaging_handle->process_buffer_size = 0;
+
+			fprintf(
+			 stderr,
+			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
 	fprintf(
 	 stdout,
 	 "Using the following acquiry parameters:\n" );
@@ -1529,166 +1615,111 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( ewfacquirestream_abort == 0 )
+	if( libsystem_signal_attach(
+	     ewfacquirestream_signal_handler,
+	     &error ) != 1 )
 	{
-		if( process_status_initialize(
-		     &process_status,
-		     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
-		     _LIBCSTRING_SYSTEM_STRING( "acquired" ),
-		     _LIBCSTRING_SYSTEM_STRING( "Written" ),
-		     stdout,
-		     print_status_information,
+		fprintf(
+		 stderr,
+		 "Unable to attach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	if( log_filename != NULL )
+	{
+		if( log_handle_initialize(
+		     &log_handle,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to initialize process status.\n" );
+			 "Unable to create log handle.\n" );
 
 			goto on_error;
 		}
-		if( process_status_start(
-		     process_status,
+		if( log_handle_open(
+		     log_handle,
+		     log_filename,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to start process status.\n" );
+			 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+			 log_filename );
 
 			goto on_error;
 		}
-		if( libsystem_signal_attach(
-		     ewfacquirestream_signal_handler,
-		     &error ) != 1 )
+	}
+	result = ewfacquirestream_read_input(
+	          ewfacquirestream_imaging_handle,
+	          0,
+	          swap_byte_pairs,
+	          read_error_retries,
+	          print_status_information,
+	          log_handle,
+	          &error );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to read input.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	if( log_handle != NULL )
+	{
+		if( log_handle_close(
+		     log_handle,
+		     &error ) != 0 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to attach signal handler.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		/* Start acquiring data
-		 */
-		write_count = ewfacquirestream_read_input(
-		               ewfacquirestream_imaging_handle,
-		               0,
-		               swap_byte_pairs,
-		               read_error_retries,
-		               (size_t) process_buffer_size,
-		               process_status,
-		               &error );
-
-		if( write_count <= -1 )
-		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			status = PROCESS_STATUS_FAILED;
-		}
-		else
-		{
-			status = PROCESS_STATUS_COMPLETED;
-		}
-		if( libsystem_signal_detach(
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to detach signal handler.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		if( process_status_stop(
-		     process_status,
-		     (size64_t) write_count,
-		     status,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to stop process status.\n" );
+			 "Unable to close log handle.\n" );
 
 			goto on_error;
 		}
-		if( process_status_free(
-		     &process_status,
+		if( log_handle_free(
+		     &log_handle,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to free process status.\n" );
+			 "Unable to free log handle.\n" );
 
 			goto on_error;
 		}
 	}
 	if( ewfacquirestream_abort != 0 )
 	{
-		status = PROCESS_STATUS_ABORTED;
+		goto on_abort;
 	}
-	if( status == PROCESS_STATUS_COMPLETED )
+	if( result != 1 )
 	{
-		if( log_filename != NULL )
-		{
-			if( log_handle_initialize(
-			     &log_handle,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create log handle.\n" );
+		status = PROCESS_STATUS_FAILED;
+	}
+	else
+	{
+		status = PROCESS_STATUS_COMPLETED;
+	}
+on_abort:
+	if( libsystem_signal_detach(
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to detach signal handler.\n" );
 
-				goto on_error;
-			}
-			if( log_handle_open(
-			     log_handle,
-			     log_filename,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-				 log_filename );
-
-				goto on_error;
-			}
-		}
-		if( calculate_md5 == 1 )
-		{
-			fprintf(
-			 stdout,
-			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 ewfacquirestream_imaging_handle->md5_hash_string );
-
-			if( log_handle != NULL )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 ewfacquirestream_imaging_handle->md5_hash_string );
-			}
-		}
-		if( calculate_sha1 == 1 )
-		{
-			fprintf(
-			 stdout,
-			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 ewfacquirestream_imaging_handle->sha1_hash_string );
-
-			if( log_handle != NULL )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 ewfacquirestream_imaging_handle->sha1_hash_string );
-			}
-		}
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 	if( imaging_handle_close(
 	     ewfacquirestream_imaging_handle,
@@ -1710,29 +1741,14 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( log_handle != NULL )
+	if( ewfacquirestream_abort != 0 )
 	{
-		if( log_handle_close(
-		     log_handle,
-		     &error ) != 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to close log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-			 log_filename );
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
+		 program );
 
-			goto on_error;
-		}
-		if( log_handle_free(
-		     &log_handle,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free log handle.\n" );
-
-			goto on_error;
-		}
+		return( EXIT_FAILURE );
 	}
         if( status != PROCESS_STATUS_COMPLETED )
         {
@@ -1755,12 +1771,6 @@ on_error:
 		 NULL );
 		log_handle_free(
 		 &log_handle,
-		 NULL );
-	}
-	if( process_status != NULL )
-	{
-		process_status_free(
-		 &process_status,
 		 NULL );
 	}
 	if( ewfacquirestream_imaging_handle != NULL )

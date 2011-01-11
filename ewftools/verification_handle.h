@@ -39,6 +39,7 @@
 
 #include "digest_context.h"
 #include "digest_hash.h"
+#include "log_handle.h"
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
@@ -47,10 +48,28 @@
 extern "C" {
 #endif
 
+enum VERIFICATION_HANDLE_INPUT_FORMATS
+{
+	VERIFICATION_HANDLE_INPUT_FORMAT_FILES	= (int) 'f',
+	VERIFICATION_HANDLE_INPUT_FORMAT_RAW	= (int) 'r'
+};
+
 typedef struct verification_handle verification_handle_t;
 
 struct verification_handle
 {
+	/* The input format
+	 */
+	uint8_t input_format;
+
+	/* The header codepage
+	 */
+	int header_codepage;
+
+	/* Value to indicate if the chunk should be zeroed on error
+	 */
+	uint8_t zero_chunk_on_error;
+
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
 	uint8_t calculate_md5;
@@ -67,21 +86,33 @@ struct verification_handle
 	 */
 	sha1_context_t sha1_context;
 
-	/* The MD5 digest hash string
+	/* Value to indicate a stored MD5 digest hash is available
 	 */
-	libcstring_system_character_t md5_hash_string[ DIGEST_HASH_STRING_SIZE_MD5 ];
+	int stored_md5_hash_available;
 
-	/* The SHA-1 digest hash string
+	/* Value to indicate a stored SHA1 digest hash is available
 	 */
-	libcstring_system_character_t sha1_hash_string[ DIGEST_HASH_STRING_SIZE_SHA1 ];
+	int stored_sha1_hash_available;
+
+	/* The calculated MD5 digest hash string
+	 */
+	libcstring_system_character_t *calculated_md5_hash_string;
+
+	/* The stored MD5 digest hash string
+	 */
+	libcstring_system_character_t *stored_md5_hash_string;
+
+	/* The calculated SHA-1 digest hash string
+	 */
+	libcstring_system_character_t *calculated_sha1_hash_string;
+
+	/* The stored SHA-1 digest hash string
+	 */
+	libcstring_system_character_t *stored_sha1_hash_string;
 
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
-
-	/* The header codepage
-	 */
-	int header_codepage;
 
 	/* The chunk size
 	 */
@@ -95,9 +126,17 @@ struct verification_handle
 	 */
 	off64_t last_offset_read;
 
-	/* Value to indicate if the chunk should be zeroed on error
+	/* The process buffer size
 	 */
-	int zero_chunk_on_error;
+	size_t process_buffer_size;
+
+	/* The nofication output stream
+	 */
+	FILE *notify_stream;
+
+	/* Value to indicate if abort was signalled
+	 */
+	int abort;
 };
 
 int verification_handle_initialize(
@@ -135,21 +174,50 @@ ssize_t verification_handle_read_buffer(
          size_t read_size,
          liberror_error_t **error );
 
+int verification_handle_initialize_integrity_hash(
+     verification_handle_t *verification_handle,
+     liberror_error_t **error );
+
 int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
+     uint8_t *buffer,
+     size_t buffer_size,
      liberror_error_t **error );
 
-int verification_handle_get_values(
+int verification_handle_finalize_integrity_hash(
      verification_handle_t *verification_handle,
-     size64_t *media_size,
-     uint32_t *chunk_size,
      liberror_error_t **error );
 
-int verification_handle_get_number_of_checksum_errors(
+int verification_handle_verify_input(
      verification_handle_t *verification_handle,
-     uint32_t *number_of_errors,
+     uint8_t print_status_information,
+     log_handle_t *log_handle,
+     liberror_error_t **error );
+
+int verification_handle_verify_single_files(
+     verification_handle_t *verification_handle,
+     log_handle_t *log_handle,
+     liberror_error_t **error );
+
+int verification_handle_verify_file_entry(
+     verification_handle_t *verification_handle,
+     libewf_file_entry_t *file_entry,
+     log_handle_t *log_handle,
+     liberror_error_t **error );
+
+int verification_handle_verify_sub_file_entries(
+     verification_handle_t *verification_handle,
+     libewf_file_entry_t *file_entry,
+     log_handle_t *log_handle,
+     liberror_error_t **error );
+
+int verification_handle_get_integrity_hash_from_input(
+     verification_handle_t *verification_handle,
+     liberror_error_t **error );
+
+int verification_handle_get_integrity_hash_from_file_entry(
+     verification_handle_t *verification_handle,
+     libewf_file_entry_t *file_entry,
      liberror_error_t **error );
 
 int verification_handle_set_header_codepage(
@@ -157,9 +225,19 @@ int verification_handle_set_header_codepage(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
-int verification_handle_set_error_handling_values(
+int verification_handle_set_format(
      verification_handle_t *verification_handle,
-     int zero_chunk_on_error,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int verification_handle_set_process_buffer_size(
+     verification_handle_t *verification_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int verification_handle_set_zero_chunk_on_error(
+     verification_handle_t *verification_handle,
+     uint8_t zero_chunk_on_error,
      liberror_error_t **error );
 
 int verification_handle_append_read_error(
@@ -168,14 +246,9 @@ int verification_handle_append_read_error(
       size_t number_of_bytes,
       liberror_error_t **error );
 
-int verification_handle_finalize(
+int verification_handle_hash_values_fprint(
      verification_handle_t *verification_handle,
-     libcstring_system_character_t *stored_md5_hash_string,
-     size_t stored_md5_hash_string_size,
-     int *stored_md5_hash_available,
-     libcstring_system_character_t *stored_sha1_hash_string,
-     size_t stored_sha1_hash_string_size,
-     int *stored_sha1_hash_available,
+     FILE *stream,
      liberror_error_t **error );
 
 int verification_handle_additional_hash_values_fprint(

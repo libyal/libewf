@@ -1,4 +1,13 @@
 TODO
+* ewfacquire
+  - refactor ewfacquire_read_input
+* ewfexport/export_handle
+  - move ewfexport_export_image function into export handle
+  - clean up code
+* ewfverify/verification_handle
+  - complete libewf_single_file_entry_get_utf16_hash_value_md5
+  - match output of manual
+  - print filename with path
 * clean up of ewftools
   - ewfacquire: make behaviour of -g equal to user input ?
 * add tests
@@ -10,7 +19,6 @@ Next stable release:
 
 Roadmap:
 * lvf support
-  - add support for MD5 hash (add libewf_file_entry_get_utf16_hash_value_md5)
   - add support for permissions
   - thread aware support (check)
 * code clean up
@@ -207,7 +215,9 @@ Tools:
 * ewfrecover
   - create a tool recover ewf files
 * process status
-  - improve and remove "This could take a while."
+  - improve and remove "This could take a while." ?
+* ewfverify
+  - notify about mismatch in single file entry MD5 hash
 
 Tests
 * glob: .ezz, .faa ... .zzz
@@ -244,6 +254,9 @@ Known issues:
 * single file entry:
   - added get MD5 hash function
 * renamed wipe/clean buffer to zero buffer
+* ewftools: code clean up
+* ewfverify: worked on L01 verification
+* MD5 hash of single file entry is now turned into lower case by library
 
 20110110
 * updated libuna, libbfio, libfvalue, libsmraw

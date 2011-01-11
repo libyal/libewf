@@ -75,6 +75,8 @@
 			</LibFiles>
 			<None Include="..\..\..\ewftools\ewfoutput.h">
 			</None>
+			<None Include="..\..\..\ewftools\ewftools_libewf.h">
+			</None>
 			<CppCompile Include="..\..\..\ewftools\info_handle.c">
 			</CppCompile>
 			<None Include="..\..\..\ewftools\info_handle.h">

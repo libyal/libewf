@@ -18,6 +18,7 @@ TESTS = \
 	test_write.sh \
 	test_read_write.sh \
 	test_ewfverify.sh \
+	test_ewfverify_logical.sh \
 	test_ewfacquire.sh \
 	test_ewfacquire_optical.sh \
 	test_ewfacquirestream.sh \
@@ -34,6 +35,7 @@ check_SCRIPTS = \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
 	test_ewfverify.sh \
+	test_ewfverify_logical.sh \
 	test_glob.sh \
 	test_pyewf.sh \
 	test_read.sh \

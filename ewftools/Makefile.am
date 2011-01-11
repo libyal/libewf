@@ -152,6 +152,7 @@ ewfverify_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h \
 	ewfverify.c \
 	log_handle.c log_handle.h \
 	md5.h \

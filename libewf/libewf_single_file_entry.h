@@ -171,6 +171,12 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
      size_t utf8_string_size,
      liberror_error_t **error );
 
+int libewf_single_file_entry_get_utf16_hash_value_md5(
+     libewf_single_file_entry_t *single_file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

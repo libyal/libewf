@@ -771,7 +771,7 @@ int libewf_single_file_entry_get_entry_modification_time(
 	return( 1 );
 }
 
-/* Retrieves the (file system entry) MD5 hash
+/* Retrieves the UTF-8 encoded MD5 hash value
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_single_file_entry_get_utf8_hash_value_md5(
@@ -845,5 +845,69 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded MD5 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_single_file_entry_get_utf16_hash_value_md5(
+     libewf_single_file_entry_t *single_file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_utf16_hash_value_md5";
+
+	if( single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-16 string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string_size < single_file_entry->md5_hash_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: UTF-16 string too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( single_file_entry->md5_hash_size == 0 )
+	{
+		return( 0 );
+	}
+	/* TODO */
+
+	return( -1 );
 }
 

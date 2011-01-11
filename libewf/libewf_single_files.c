@@ -735,6 +735,7 @@ int libewf_single_files_parse_file_entry(
 	libewf_tree_node_t *file_entry_node           = NULL;
 	static char *function                         = "libewf_single_files_parse_file_entry";
 	size_t type_string_length                     = 0;
+	size_t value_string_index                     = 0;
 	size_t value_string_length                    = 0;
 	uint64_t number_of_child_entries              = 0;
 	uint64_t value_64bit                          = 0;
@@ -1152,19 +1153,36 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				if( libcstring_narrow_string_copy(
-				     single_file_entry->md5_hash,
-				     values->values[ value_iterator ],
-				     value_string_length ) == NULL )
+				for( value_string_index = 0;
+				     value_string_index < value_string_length;
+				     value_string_index++ )
 				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set MD5 hash.",
-					 function );
+					if( ( ( values->values[ value_iterator ] )[ value_string_index ] >= (uint8_t) '0' )
+					 && ( ( values->values[ value_iterator ] )[ value_string_index ] <= (uint8_t) '9' ) )
+					{
+						single_file_entry->md5_hash[ value_string_index ] = ( values->values[ value_iterator ] )[ value_string_index ];
+					}
+					else if( ( ( values->values[ value_iterator ] )[ value_string_index ] >= (uint8_t) 'A' )
+					      && ( ( values->values[ value_iterator ] )[ value_string_index ] <= (uint8_t) 'F' ) )
+					{
+						single_file_entry->md5_hash[ value_string_index ] = (uint8_t) ( 'a' - 'A' ) + ( values->values[ value_iterator ] )[ value_string_index ];
+					}
+					else if( ( ( values->values[ value_iterator ] )[ value_string_index ] >= (uint8_t) 'a' )
+					      && ( ( values->values[ value_iterator ] )[ value_string_index ] <= (uint8_t) 'f' ) )
+					{
+						single_file_entry->md5_hash[ value_string_index ] = ( values->values[ value_iterator ] )[ value_string_index ];
+					}
+					else
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+						 "%s: unsupported character in MD5 hash.",
+						 function );
 
-					goto on_error;
+						goto on_error;
+					}
 				}
 				single_file_entry->md5_hash[ value_string_length ] = 0;
 

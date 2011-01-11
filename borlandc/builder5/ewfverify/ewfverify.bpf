@@ -10,6 +10,7 @@ USEUNIT("..\..\..\ewftools\ewfinput.c");
 USE("..\..\..\ewftools\ewfinput.h", File);
 USEUNIT("..\..\..\ewftools\ewfoutput.c");
 USE("..\..\..\ewftools\ewfoutput.h", File);
+USE("..\..\..\ewftools\ewftools_libewf.h", File);
 USEUNIT("..\..\..\ewftools\log_handle.c");
 USE("..\..\..\ewftools\log_handle.h", File);
 USE("..\..\..\ewftools\md5.h", File);

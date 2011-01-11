@@ -208,6 +208,10 @@
 				RelativePath="..\..\libsystem\libsystem_support.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libsystem\libsystem_unused.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

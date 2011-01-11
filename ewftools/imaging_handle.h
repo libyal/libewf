@@ -73,6 +73,10 @@ struct imaging_handle
 	 */
 	size_t secondary_target_filename_size;
 
+	/* The header codepage
+	 */
+	int header_codepage;
+
 	/* The case number
 	 */
 	libcstring_system_character_t *case_number;
@@ -157,10 +161,6 @@ struct imaging_handle
 	 */
 	uint64_t acquiry_size;
 
-	/* The header codepage
-	 */
-	int header_codepage;
-
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
 	uint8_t calculate_md5;
@@ -193,9 +193,17 @@ struct imaging_handle
 	 */
 	libewf_handle_t *secondary_output_handle;
 
+	/* The process buffer size
+	 */
+	size_t process_buffer_size;
+
 	/* The nofication output stream
 	 */
 	FILE *notify_stream;
+
+	/* Value to indicate if abort was signalled
+	 */
+	int abort;
 };
 
 int imaging_handle_initialize(
@@ -376,6 +384,11 @@ int imaging_handle_set_maximum_segment_size(
      liberror_error_t **error );
 
 int imaging_handle_set_header_codepage(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_process_buffer_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );

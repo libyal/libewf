@@ -31,6 +31,7 @@ USEUNIT("..\..\..\libsystem\libsystem_string.c");
 USE("..\..\..\libsystem\libsystem_string.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_support.c");
 USE("..\..\..\libsystem\libsystem_support.h", File);
+USE("..\..\..\libsystem\libsystem_unused.h", File);
 //---------------------------------------------------------------------------
 #define Library
 

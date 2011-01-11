@@ -158,6 +158,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libewf.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\guid.h"
 				>
 			</File>

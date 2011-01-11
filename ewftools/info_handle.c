@@ -531,7 +531,7 @@ int info_handle_set_output_format(
 }
 
 /* Sets the date format
- * Returns 1 if successful, 0 if unsupported values or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int info_handle_set_date_format(
      info_handle_t *info_handle,

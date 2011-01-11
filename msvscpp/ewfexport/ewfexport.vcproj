@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libewf.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\export_handle.h"
 				>
 			</File>

@@ -429,7 +429,6 @@ ssize64_t ewfacquire_read_input(
            size64_t media_size,
            off64_t resume_acquiry_offset,
            uint8_t swap_byte_pairs,
-           size_t process_buffer_size,
            process_status_t *process_status,
            liberror_error_t **error )
 {
@@ -438,6 +437,7 @@ ssize64_t ewfacquire_read_input(
 	off64_t read_error_offset                    = 0;
 	size64_t read_error_size                     = 0;
 	ssize64_t acquiry_count                      = 0;
+	size_t process_buffer_size                   = 0;
 	size_t read_size                             = 0;
 	ssize_t read_count                           = 0;
 	ssize_t process_count                        = 0;
@@ -458,6 +458,28 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
+	if( imaging_handle->process_buffer_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid imaging handle - process buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+        if( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid imaging handle - acquire size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( device_handle == NULL )
 	{
 		liberror_error_set(
@@ -465,17 +487,6 @@ ssize64_t ewfacquire_read_input(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( process_buffer_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid process buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -491,24 +502,13 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-        if( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid write size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( imaging_handle->acquiry_size > media_size )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid write size value out of bounds.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid acquire size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -606,9 +606,9 @@ ssize64_t ewfacquire_read_input(
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid chunk size.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunk size.",
 		 function );
 
 		goto on_error;
@@ -616,9 +616,13 @@ ssize64_t ewfacquire_read_input(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	process_buffer_size = (size_t) chunk_size;
 #else
-	if( process_buffer_size == 0 )
+	if( imaging_handle->process_buffer_size == 0 )
 	{
 		process_buffer_size = (size_t) chunk_size;
+	}
+	else
+	{
+		process_buffer_size = imaging_handle->process_buffer_size;
 	}
 #endif
 	if( storage_media_buffer_initialize(
@@ -946,10 +950,12 @@ on_error:
 /* Signal handler for ewfacquire
  */
 void ewfacquire_signal_handler(
-      libsystem_signal_t signal )
+      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfacquire_signal_handler";
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfacquire_abort = 1;
 
@@ -1025,6 +1031,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_number_of_error_retries   = NULL;
 	libcstring_system_character_t *option_offset                    = NULL;
+	libcstring_system_character_t *option_process_buffer_size       = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
 	libcstring_system_character_t *option_sector_error_granularity  = NULL;
 	libcstring_system_character_t *option_sectors_per_chunk         = NULL;
@@ -1044,7 +1051,6 @@ int main( int argc, char * const argv[] )
 	ssize64_t read_count                                            = 0;
 	size_t string_length                                            = 0;
 	uint64_t media_size                                             = 0;
-	uint64_t process_buffer_size                                    = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
 	uint8_t print_status_information                                = 1;
@@ -1201,31 +1207,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'p':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_process_buffer_size = optarg;
 
-				result = byte_size_string_convert(
-				          optarg,
-				          string_length,
-				          &process_buffer_size,
-				          &error );
-
-				if( result != 1 )
-				{
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-				}
-				if( ( result != 1 )
-				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
-				{
-					process_buffer_size = 0;
-
-					fprintf(
-					 stderr,
-					 "Unsupported process buffer size defaulting to: chunk size.\n" );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'P':
@@ -1881,6 +1864,31 @@ int main( int argc, char * const argv[] )
 			 "Unsupported acquiry size defaulting to: all bytes.\n" );
 		}
 	}
+	if( option_process_buffer_size != NULL )
+	{
+		result = imaging_handle_set_process_buffer_size(
+			  ewfacquire_imaging_handle,
+			  option_process_buffer_size,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set process buffer size.\n" );
+
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfacquire_imaging_handle->process_buffer_size > (size_t) SSIZE_MAX ) )
+		{
+			ewfacquire_imaging_handle->process_buffer_size = 0;
+
+			fprintf(
+			 stderr,
+			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
 	/* Initialize values
 	 */
 	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
@@ -2137,27 +2145,6 @@ int main( int argc, char * const argv[] )
 					goto on_error;
 				}
 			}
-#ifdef TODO_TOC_FILE
-			/* TODO how to deal with this, because device handle is already open at this point
-			 */
-			if( ( ewfacquire_imaging_handle->media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
-			 && ( option_toc_filename == NULL ) )
-			{
-				if( device_handle_prompt_for_string(
-				     ewfacquire_device_handle,
-				     _LIBCSTRING_SYSTEM_STRING( "File containing table of contents" ),
-				     &( ewfacquire_device_handle->toc_filename ),
-				     &( ewfacquire_device_handle->toc_filename_size ),
-				     &error ) == -1 )
-				{
-					fprintf(
-					 stdout,
-					 "Unable to determine table of contents (TOC) file.\n" );
-
-					goto on_error;
-				}
-			}
-#endif
 			if( option_compression_level == NULL )
 			{
 				result = imaging_handle_prompt_for_compression_level(
@@ -2625,7 +2612,6 @@ int main( int argc, char * const argv[] )
 		              media_size,
 		              resume_acquiry_offset,
 		              swap_byte_pairs,
-		              (size_t) process_buffer_size,
 		              process_status,
 		              &error );
 
