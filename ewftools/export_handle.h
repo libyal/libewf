@@ -206,22 +206,6 @@ int export_handle_make_directory(
      log_handle_t *log_handle,
      liberror_error_t **error );
 
-int export_handle_sanitize_filename(
-     export_handle_t *export_handle,
-     libcstring_system_character_t *filename,
-     size_t filename_size,
-     liberror_error_t **error );
-
-int export_handle_create_target_path(
-     export_handle_t *export_handle,
-     const libcstring_system_character_t *filename,
-     size_t filename_size,
-     const libcstring_system_character_t *export_path,
-     size_t export_path_size,
-     libcstring_system_character_t **target_path,
-     size_t *target_path_size,
-     liberror_error_t **error );
-
 int export_handle_open_input(
      export_handle_t *export_handle,
      libcstring_system_character_t * const * filenames,
@@ -389,17 +373,33 @@ ssize_t export_handle_finalize(
          export_handle_t *export_handle,
          liberror_error_t **error );
 
+int export_handle_export_input(
+     export_handle_t *export_handle,
+     uint8_t swap_byte_pairs,
+     uint8_t print_status_information,
+     log_handle_t *log_handle,
+     liberror_error_t **error );
+
 int export_handle_export_single_files(
      export_handle_t *export_handle,
      const libcstring_system_character_t *export_path,
+     uint8_t print_status_information,
      log_handle_t *log_handle,
      liberror_error_t **error );
 
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
-     libcstring_system_character_t *export_path,
-     size_t export_path_size,
+     const libcstring_system_character_t *export_path,
+     size_t export_path_length,
+     log_handle_t *log_handle,
+     liberror_error_t **error );
+
+int export_handle_export_file_entry_sub_file_entries(
+     export_handle_t *export_handle,
+     libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *export_path,
+     size_t export_path_length,
      log_handle_t *log_handle,
      liberror_error_t **error );
 

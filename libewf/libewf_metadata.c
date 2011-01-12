@@ -2957,7 +2957,7 @@ int libewf_handle_get_header_value_identifier(
 }
 
 /* Retrieves the size of the UTF-8 encoded header value of an identifier
- * The value size includes the end of string character
+ * The string size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf8_header_value_size(
@@ -3162,7 +3162,7 @@ int libewf_handle_get_utf8_header_value_size(
 }
 
 /* Retrieves the UTF-8 encoded header value of an identifier
- * The value size should include the end of string character
+ * The string size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf8_header_value(
@@ -3518,7 +3518,7 @@ int libewf_handle_set_utf8_header_value(
 }
 
 /* Retrieves the size of the UTF-16 encoded header value of an identifier
- * The value size includes the end of string character
+ * The string size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf16_header_value_size(
@@ -3723,7 +3723,7 @@ int libewf_handle_get_utf16_header_value_size(
 }
 
 /* Retrieves the UTF-16 encoded header value of an identifier
- * The value size should include the end of string character
+ * The string size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf16_header_value(
@@ -4661,7 +4661,7 @@ int libewf_handle_get_hash_value_identifier(
 }
 
 /* Retrieves the size of the UTF-8 encoded hash value of an identifier
- * The value size includes the end of string character
+ * The string size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf8_hash_value_size(
@@ -4783,7 +4783,7 @@ int libewf_handle_get_utf8_hash_value_size(
 }
 
 /* Retrieves the UTF-8 encoded hash value of an identifier
- * The value size should include the end of string character
+ * The string size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf8_hash_value(
@@ -5148,7 +5148,7 @@ int libewf_handle_set_utf8_hash_value(
 }
 
 /* Retrieves the size of the UTF-16 encoded hash value of an identifier
- * The value size includes the end of string character
+ * The string size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf16_hash_value_size(
@@ -5270,7 +5270,7 @@ int libewf_handle_get_utf16_hash_value_size(
 }
 
 /* Retrieves the UTF-16 encoded hash value of an identifier
- * The value size should include the end of string character
+ * The string size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_handle_get_utf16_hash_value(

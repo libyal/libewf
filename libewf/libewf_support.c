@@ -159,7 +159,7 @@ int libewf_set_codepage(
 	return( 1 );
 }
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 
 /* Determines if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error

@@ -68,6 +68,8 @@
 			</None>
 			<None Include="..\..\..\ewftools\ewftools_libewf.h">
 			</None>
+			<None Include="..\..\..\ewftools\ewftools_libsmraw.h">
+			</None>
 			<LibFiles Include="..\Release\libfvalue.lib">
 				<IgnorePath>true</IgnorePath>
 			</LibFiles>

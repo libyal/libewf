@@ -67,6 +67,7 @@ ewfacquirestream_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
@@ -107,6 +108,8 @@ ewfexport_SOURCES = \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h \
+	ewftools_libsmraw.h \
 	export_handle.c export_handle.h \
 	guid.c guid.h \
 	log_handle.c log_handle.h \
@@ -133,6 +136,7 @@ ewfinfo_SOURCES = \
 	ewfinfo.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h \
 	guid.c guid.h \
 	info_handle.c info_handle.h \
 	platform.c platform.h

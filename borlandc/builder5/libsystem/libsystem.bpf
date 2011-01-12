@@ -22,6 +22,7 @@ USE("..\..\..\libsystem\libsystem_i18n.h", File);
 USE("..\..\..\libsystem\libsystem_libuna.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_notify.c");
 USE("..\..\..\libsystem\libsystem_notify.h", File);
+USEUNIT("..\..\..\libsystem\libsystem_path.c");
 USE("..\..\..\libsystem\libsystem_path.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_signal.c");
 USE("..\..\..\libsystem\libsystem_signal.h", File);

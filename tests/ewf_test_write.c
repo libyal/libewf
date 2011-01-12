@@ -60,7 +60,6 @@ int ewf_test_write(
 	static char *function   = "ewf_test_write";
 	size_t write_size       = 0;
 	ssize_t write_count     = 0;
-	int result              = 1;
 	int sector_iterator     = 0;
 
 	if( libewf_handle_initialize(
@@ -115,7 +114,7 @@ int ewf_test_write(
 			 "%s: unable set media size.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( maximum_segment_size > 0 )
@@ -164,35 +163,47 @@ int ewf_test_write(
 
 		goto on_error;
 	}
-	if( result != -1 )
+	write_size = 512;
+
+	for( sector_iterator = 0;
+	     sector_iterator < 26;
+	     sector_iterator++ )
 	{
-		write_size = 512;
-
-		for( sector_iterator = 0;
-		     sector_iterator < 26;
-		     sector_iterator++ )
+		if( memory_set(
+		     buffer,
+		     (int) 'A' + sector_iterator,
+		     write_size ) == NULL )
 		{
-			if( memory_set(
-			     buffer,
-			     (int) 'A' + sector_iterator,
-			     write_size ) == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable set value in buffer.",
-				 function );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable set value in buffer.",
+			 function );
 
-				goto on_error;
-			}
-			write_count = libewf_handle_write_buffer(
-				       handle,
-				       buffer,
-				       write_size,
-				       error );
+			goto on_error;
+		}
+		write_count = libewf_handle_write_buffer(
+			       handle,
+			       buffer,
+			       write_size,
+			       error );
 
-			if( write_count < 0 )
+		if( write_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable write buffer of size: %" PRIzd ".",
+			 function,
+			 write_size );
+
+			goto on_error;
+		}
+		if( write_count != (ssize_t) write_size )
+		{
+			if( (size64_t) write_count != media_size )
 			{
 				liberror_error_set(
 				 error,
@@ -203,57 +214,54 @@ int ewf_test_write(
 				 write_size );
 
 				goto on_error;
-			}
-			if( write_count != (ssize_t) write_size )
-			{
-				if( (size64_t) write_count != media_size )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable write buffer of size: %" PRIzd ".",
-					 function,
-					 write_size );
-
-					goto on_error;
-				}
-			}
-			if( media_size > 0 )
-			{
-				media_size -= write_count;
 			}
 		}
-	}
-	if( result != -1 )
-	{
-		write_size = 3751;
-
-		for( sector_iterator = 0;
-		     sector_iterator < 26;
-		     sector_iterator++ )
+		if( media_size > 0 )
 		{
-			if( memory_set(
-			     buffer,
-			     (int) 'a' + sector_iterator,
-			     write_size ) == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable set value in buffer.",
-				 function );
+			media_size -= write_count;
+		}
+	}
+	write_size = 3751;
 
-				goto on_error;
-			}
-			write_count = libewf_handle_write_buffer(
-				       handle,
-				       buffer,
-				       write_size,
-				       error );
+	for( sector_iterator = 0;
+	     sector_iterator < 26;
+	     sector_iterator++ )
+	{
+		if( memory_set(
+		     buffer,
+		     (int) 'a' + sector_iterator,
+		     write_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable set value in buffer.",
+			 function );
 
-			if( write_count < 0 )
+			goto on_error;
+		}
+		write_count = libewf_handle_write_buffer(
+			       handle,
+			       buffer,
+			       write_size,
+			       error );
+
+		if( write_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable write buffer of size: %" PRIzd ".",
+			 function,
+			 write_size );
+
+			goto on_error;
+		}
+		if( write_count != (ssize_t) write_size )
+		{
+			if( (size64_t) write_count != media_size )
 			{
 				liberror_error_set(
 				 error,
@@ -265,25 +273,10 @@ int ewf_test_write(
 
 				goto on_error;
 			}
-			if( write_count != (ssize_t) write_size )
-			{
-				if( (size64_t) write_count != media_size )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable write buffer of size: %" PRIzd ".",
-					 function,
-					 write_size );
-
-					goto on_error;
-				}
-			}
-			if( media_size > 0 )
-			{
-				media_size -= write_count;
-			}
+		}
+		if( media_size > 0 )
+		{
+			media_size -= write_count;
 		}
 	}
 	memory_free(
@@ -317,7 +310,7 @@ int ewf_test_write(
 
 		goto on_error;
 	}
-	return( result );
+	return( 1 );
 
 on_error:
 	if( buffer != NULL )
@@ -357,7 +350,6 @@ int main( int argc, char * const argv[] )
 	size_t string_length                                       = 0;
 	uint8_t compression_flags                                  = 0;
 	int8_t compression_level                                   = LIBEWF_COMPRESSION_NONE;
-	int result                                                 = 0;
 
 	while( ( option = libsystem_getopt(
 	                   argc,
@@ -500,30 +492,19 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	result = ewf_test_write(
-	          argv[ optind ],
-	          media_size,
-	          maximum_segment_size,
-	          compression_level,
-	          compression_flags,
-	          &error );
-
-	if( result == -1 )
+	if( ewf_test_write(
+	     argv[ optind ],
+	     media_size,
+	     maximum_segment_size,
+	     compression_level,
+	     compression_flags,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to test write.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-	}
-	if( result != 1 )
-	{
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	return( EXIT_SUCCESS );
 

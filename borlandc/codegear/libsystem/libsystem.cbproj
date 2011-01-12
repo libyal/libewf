@@ -83,6 +83,8 @@
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_notify.h">
 			</None>
+			<CppCompile Include="..\..\..\libsystem\libsystem_path.c">
+			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_path.h">
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_signal.c">

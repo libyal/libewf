@@ -33,24 +33,6 @@
 #include <uuid/uuid.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
-#if defined( HAVE_LOCAL_LIBSMRAW )
-#include <libsmraw_definitions.h>
-#include <libsmraw_handle.h>
-#include <libsmraw_metadata.h>
-#include <libsmraw_types.h>
-#elif defined( HAVE_LIBSMRAW_H )
-#include <libsmraw.h>
-#endif
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
@@ -58,9 +40,12 @@
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
+#include "ewftools_libewf.h"
+#include "ewftools_libsmraw.h"
 #include "export_handle.h"
 #include "guid.h"
 #include "md5.h"
+#include "process_status.h"
 #include "sha1.h"
 
 #if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
@@ -70,7 +55,7 @@
 #define EXPORT_HANDLE_BUFFER_SIZE		8192
 #define EXPORT_HANDLE_INPUT_BUFFER_SIZE		64
 #define EXPORT_HANDLE_STRING_SIZE		1024
-#define EXPORT_HANDLE_NOTIFY_STREAM		stdout
+#define EXPORT_HANDLE_NOTIFY_STREAM		stderr
 
 /* Initializes the export handle
  * Returns 1 if successful or -1 on error
@@ -419,280 +404,6 @@ int export_handle_make_directory(
 	return( 1 );
 }
 
-/* Sanitizes the filename
- * Returns 1 if successful or -1 on error
- */
-int export_handle_sanitize_filename(
-     export_handle_t *export_handle,
-     libcstring_system_character_t *filename,
-     size_t filename_size,
-     liberror_error_t **error )
-{
-	static char *function = "export_handle_sanitize_filename";
-	size_t filename_index = 0;
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( filename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
-		 function );
-
-		return( -1 );
-	}
-	if( filename_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid filename size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	for( filename_index = 0;
-	     filename_index < filename_size;
-	     filename_index++ )
-	{
-		if( ( ( filename[ filename_index ] >= 0x01 )
-		  &&  ( filename[ filename_index ] <= 0x1f ) )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '!' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '$' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '%' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '&' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '*' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '+' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '/' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) ':' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) ';' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '<' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '>' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '?' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '@' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '\\' )
-		 || ( filename[ filename_index ] == (libcstring_system_character_t) '~' )
-		 || ( filename[ filename_index ] == 0x7e ) )
-		{
-			filename[ filename_index ] = (libcstring_system_character_t) '_';
-		}
-	}
-	return( 1 );
-}
-
-/* Creates the target path
- * Returns 1 if successful or -1 on error
- */
-int export_handle_create_target_path(
-     export_handle_t *export_handle,
-     const libcstring_system_character_t *filename,
-     size_t filename_size,
-     const libcstring_system_character_t *export_path,
-     size_t export_path_size,
-     libcstring_system_character_t **target_path,
-     size_t *target_path_size,
-     liberror_error_t **error )
-{
-	static char *function           = "export_handle_create_target_path";
-	size_t calculated_filename_size = 0;
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( filename == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.",
-		 function );
-
-		return( -1 );
-	}
-	if( filename_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid filename size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_path == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export path.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_path_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid export path size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( target_path == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid target path.",
-		 function );
-
-		return( -1 );
-	}
-	if( *target_path != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid target path already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( target_path_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid target path size.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO is this check still required ? */
-	/* Make sure to check the filename length
-	 * the conversion routines are very strict about the string size
-	 */
-	calculated_filename_size = 1 + libcstring_system_string_length(
-	                                filename );
-
-	if( filename_size != calculated_filename_size )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid filename size value does not match calculated size.",
-		 function );
-
-		return( -1 );
-	}
-	/* Include space for the separator and the end of string character
-	 */
-	*target_path_size = export_path_size + filename_size;
-
-	*target_path = libcstring_system_string_allocate(
-	                *target_path_size );
-
-	if( *target_path == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create target path.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcstring_system_string_copy(
-	     *target_path,
-	     export_path,
-	     export_path_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set export path in target path.",
-		 function );
-
-		goto on_error;
-	}
-	( *target_path )[ export_path_size - 1 ] = (libcstring_system_character_t) LIBSYSTEM_PATH_SEPARATOR;
-
-	if( libcstring_system_string_copy(
-	     &( ( *target_path )[ export_path_size ] ),
-	     filename,
-	     filename_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy filename in target path.",
-		 function );
-
-		goto on_error;
-	}
-	if( export_handle_sanitize_filename(
-	     export_handle,
-	     &( ( *target_path )[ export_path_size ] ),
-	     filename_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable sanitize filename in target path.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( *target_path != NULL )
-	{
-		memory_free(
-		 target_path );
-
-		*target_path = NULL;
-	}
-	*target_path_size = 0;
-
-	return( -1 );
-}
-
 /* Opens the input of the export handle
  * Returns 1 if successful or -1 on error
  */
@@ -713,17 +424,6 @@ int export_handle_open_input(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -1079,17 +779,6 @@ int export_handle_close(
 
 		return( -1 );
 	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_handle_close(
 	     export_handle->input_handle,
 	     error ) != 0 )
@@ -1156,17 +845,6 @@ ssize_t export_handle_prepare_read_buffer(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -1289,17 +967,6 @@ ssize_t export_handle_read_buffer(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -1596,17 +1263,6 @@ off64_t export_handle_seek_offset(
 
 		return( -1 );
 	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_handle_seek_offset(
 	     export_handle->input_handle,
 	     offset,
@@ -1854,17 +1510,6 @@ int export_handle_get_input_media_size(
 
 		return( -1 );
 	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_handle_get_media_size(
 	     export_handle->input_handle,
 	     media_size,
@@ -1899,17 +1544,6 @@ int export_handle_get_input_chunk_size(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -2944,17 +2578,6 @@ int export_handle_set_output_values(
 
 		return( -1 );
 	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_handle_get_bytes_per_sector(
 	     export_handle->input_handle,
 	     &( export_handle->bytes_per_sector ),
@@ -3420,19 +3043,6 @@ int export_handle_append_read_error(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( export_handle->bytes_per_sector == 0 )
 	{
 		liberror_error_set(
@@ -3736,19 +3346,34 @@ on_error:
 	return( -1 );
 }
 
-/* Exports the single files
+/* Exports the input
  * Returns 1 if successful or -1 on error
  */
-int export_handle_export_single_files(
+int export_handle_export_input(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *export_path,
+     uint8_t swap_byte_pairs,
+     uint8_t print_status_information,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
-	libewf_file_entry_t *file_entry = NULL;
-	static char *function           = "export_handle_export_single_files";
-	size_t export_path_length       = 0;
-	int result                      = 0;
+	process_status_t *process_status                    = NULL;
+	storage_media_buffer_t *storage_media_buffer        = NULL;
+	static char *function                               = "export_handle_export_input";
+	size64_t export_count                               = 0;
+	size64_t media_size                                 = 0;
+	size_t process_buffer_size                          = 0;
+	size_t read_size                                    = 0;
+	ssize_t read_count                                  = 0;
+	ssize_t read_process_count                          = 0;
+	ssize_t write_count                                 = 0;
+	ssize_t write_process_count                         = 0;
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	storage_media_buffer_t *output_storage_media_buffer = NULL;
+	uint8_t *input_buffer                               = NULL;
+	size32_t output_chunk_size                          = 0;
+	size_t write_size                                   = 0;
+#endif
 
 	if( export_handle == NULL )
 	{
@@ -3761,13 +3386,593 @@ int export_handle_export_single_files(
 
 		return( -1 );
 	}
-	if( export_handle->input_handle == NULL )
+	if( export_handle->input_chunk_size == 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
+		 "%s: missing input chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_chunk_size > (size32_t) INT32_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid input chunk size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( export_handle->process_buffer_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid export handle - process buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_handle_get_media_size(
+	     export_handle->input_handle,
+	     &media_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( export_handle->export_size == 0 )
+	 || ( export_handle->export_size > media_size )
+	 || ( export_handle->export_size > (ssize64_t) INT64_MAX ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid export handle - export size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->export_offset > 0 )
+	{
+		if( export_handle->export_offset >= (uint64_t) media_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid offset.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( export_handle->export_size + export_handle->export_offset ) > (uint64_t) media_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: unable to export beyond size of media.",
+			 function );
+
+			goto on_error;
+		}
+		if( export_handle_seek_offset(
+		     export_handle,
+		     export_handle->export_offset,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset.",
+			 function );
+
+			goto on_error;
+		}
+	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( export_handle_get_output_chunk_size(
+	     export_handle,
+	     &output_chunk_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the output chunk size.",
+		 function );
+
+		goto on_error;
+	}
+	if( output_chunk_size == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid output chunk size.",
+		 function );
+
+		goto on_error;
+	}
+#endif
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	process_buffer_size = (size_t) export_handle->input_chunk_size;
+#else
+	if( export_handle->process_buffer_size == 0 )
+	{
+		process_buffer_size = (size_t) export_handle->input_chunk_size;
+	}
+	else
+	{
+		process_buffer_size = export_handle->process_buffer_size;
+	}
+#endif
+	if( storage_media_buffer_initialize(
+	     &storage_media_buffer,
+	     process_buffer_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( storage_media_buffer_initialize(
+	     &output_storage_media_buffer,
+	     output_chunk_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create output storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+#endif
+	if( process_status_initialize(
+	     &process_status,
+	     _LIBCSTRING_SYSTEM_STRING( "Export" ),
+	     _LIBCSTRING_SYSTEM_STRING( "exported" ),
+	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
+	     stderr,
+	     print_status_information,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_start(
+	     process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to start process status.",
+		 function );
+
+		goto on_error;
+	}
+	while( export_count < (size64_t) export_handle->export_size )
+	{
+		read_size = process_buffer_size;
+
+		if( ( media_size - export_count ) < read_size )
+		{
+			read_size = (size_t) ( media_size - export_count );
+		}
+		read_count = export_handle_read_buffer(
+		              export_handle,
+		              storage_media_buffer,
+		              read_size,
+		              error );
+
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read data.",
+			 function );
+
+			goto on_error;
+		}
+		if( read_count == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unexpected end of data.",
+			 function );
+
+			goto on_error;
+		}
+		read_process_count = export_handle_prepare_read_buffer(
+		                      export_handle,
+		                      storage_media_buffer,
+		                      error );
+
+		if( read_process_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to prepare buffer after read.",
+			 function );
+
+			goto on_error;
+		}
+		if( read_process_count > (ssize_t) read_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: more bytes read than requested.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* Set the chunk data size in the compression buffer
+		 */
+		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		{
+			storage_media_buffer->compression_buffer_data_size = (size_t) read_process_count;
+		}
+#endif
+		/* Swap byte pairs
+		 */
+		if( swap_byte_pairs == 1 )
+		{
+			if( export_handle_swap_byte_pairs(
+			     export_handle,
+			     storage_media_buffer,
+			     read_process_count,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to swap byte pairs.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		/* Digest hashes are calcultated after swap
+		 */
+		if( export_handle_update_integrity_hash(
+		     export_handle,
+		     storage_media_buffer,
+		     read_process_count,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to update integrity hash(es).",
+			 function );
+
+			goto on_error;
+		}
+		export_count += read_process_count;
+
+		while( read_process_count > 0 )
+		{
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			if( read_process_count > output_chunk_size )
+			{
+				write_size = output_chunk_size;
+			}
+			else
+			{
+				write_size = (size_t) read_process_count;
+			}
+			if( ( output_storage_media_buffer->raw_buffer_data_size + write_size ) > output_chunk_size )
+			{
+				write_size = output_chunk_size -  output_storage_media_buffer->raw_buffer_data_size;
+			}
+			if( storage_media_buffer->data_in_compression_buffer == 1 )
+			{
+				input_buffer = storage_media_buffer->compression_buffer;
+			}
+			else
+			{
+				input_buffer = storage_media_buffer->raw_buffer;
+			}
+			if( memory_copy(
+			     &( output_storage_media_buffer->raw_buffer[ output_storage_media_buffer->raw_buffer_data_size ] ),
+			     input_buffer,
+			     write_size ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy data from input buffer to output raw buffer.",
+				 function );
+
+				goto on_error;
+			}
+			output_storage_media_buffer->raw_buffer_data_size += write_size;
+
+			/* Make sure the output chunk is filled upto the output chunk size
+			 */
+			if( ( export_count < (size64_t) export_handle->export_size )
+			 && ( output_storage_media_buffer->raw_buffer_data_size < output_chunk_size ) )
+			{
+				continue;
+			}
+#endif
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			write_process_count = export_handle_prepare_write_buffer(
+			                       export_handle,
+			                       output_storage_media_buffer,
+			                       error );
+#else
+			write_process_count = export_handle_prepare_write_buffer(
+			                       export_handle,
+			                       storage_media_buffer,
+			                       error );
+#endif
+
+			if( write_process_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				"%s: unable to prepare buffer before write.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			write_count = export_handle_write_buffer(
+				       export_handle,
+				       output_storage_media_buffer,
+				       write_process_count,
+				       error );
+#else
+			write_count = export_handle_write_buffer(
+				       export_handle,
+				       storage_media_buffer,
+				       write_process_count,
+				       error );
+#endif
+
+			if( write_count < 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to write data to file.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			output_storage_media_buffer->raw_buffer_data_size = 0;
+#endif
+			read_process_count -= write_process_count;
+		}
+		if( process_status_update(
+		     process_status,
+		     export_count,
+		     export_handle->export_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			goto on_error;
+		}
+		if( export_handle->abort != 0 )
+		{
+			break;
+		}
+  	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( storage_media_buffer_free(
+	     &output_storage_media_buffer,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free output storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+#endif
+	if( storage_media_buffer_free(
+	     &storage_media_buffer,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free input storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	write_count = export_handle_finalize(
+	               export_handle,
+	               error );
+
+	if( write_count == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to finalize.",
+		 function );
+
+		goto on_error;
+	}
+	if( export_handle_hash_values_fprint(
+	     export_handle,
+	     export_handle->notify_stream,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print export hash values.",
+		 function );
+
+		goto on_error;
+	}
+	if( export_handle_checksum_errors_fprint(
+	     export_handle,
+	     export_handle->notify_stream,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print export errors.",
+		 function );
+
+		goto on_error;
+	}
+	if( log_handle != NULL )
+	{
+		if( export_handle_hash_values_fprint(
+		     export_handle,
+		     log_handle->log_stream,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print export has values in log handle.",
+			 function );
+
+			goto on_error;
+		}
+		if( export_handle_checksum_errors_fprint(
+		     export_handle,
+		     log_handle->log_stream,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print export errors in log handle.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( process_status != NULL )
+	{
+		process_status_stop(
+		 process_status,
+		 export_count,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &process_status,
+		 NULL );
+	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( output_storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &output_storage_media_buffer,
+		 NULL );
+	}
+#endif
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Exports the single files
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_export_single_files(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *export_path,
+     uint8_t print_status_information,
+     log_handle_t *log_handle,
+     liberror_error_t **error )
+{
+	libewf_file_entry_t *file_entry  = NULL;
+	process_status_t *process_status = NULL;
+	static char *function            = "export_handle_export_single_files";
+	size_t export_path_length        = 0;
+	int result                       = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
 		 function );
 
 		return( -1 );
@@ -3786,6 +3991,20 @@ int export_handle_export_single_files(
 	export_path_length = libcstring_system_string_length(
 	                      export_handle->target_filename );
 
+	if( libsystem_path_sanitize(
+	     export_handle->target_filename,
+	     export_path_length,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable sanitize export path.",
+		 function );
+
+		goto on_error;
+	}
 	result = libewf_handle_get_root_file_entry(
 	          export_handle->input_handle,
 	          &file_entry,
@@ -3802,11 +4021,42 @@ int export_handle_export_single_files(
 
 		goto on_error;
 	}
+	if( process_status_initialize(
+	     &process_status,
+	     _LIBCSTRING_SYSTEM_STRING( "Export" ),
+	     _LIBCSTRING_SYSTEM_STRING( "exported" ),
+	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
+	     stderr,
+	     print_status_information,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_start(
+	     process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to start process status.",
+		 function );
+
+		goto on_error;
+	}
 	if( export_handle_export_file_entry(
 	     export_handle,
 	     file_entry,
 	     export_handle->target_filename,
-	     export_path_length + 1,
+	     export_path_length,
 	     log_handle,
 	     error ) != 1 )
 	{
@@ -3815,6 +4065,34 @@ int export_handle_export_single_files(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GENERIC,
 		 "%s: unable to export root file entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_stop(
+	     process_status,
+	     0,
+	     PROCESS_STATUS_COMPLETED,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to stop process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_free(
+	     &process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free process status.",
 		 function );
 
 		goto on_error;
@@ -3835,6 +4113,17 @@ int export_handle_export_single_files(
 	return( 1 );
 
 on_error:
+	if( process_status != NULL )
+	{
+		process_status_stop(
+		 process_status,
+		 0,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &process_status,
+		 NULL );
+	}
 	if( file_entry != NULL )
 	{
 		libewf_file_entry_free(
@@ -3850,12 +4139,11 @@ on_error:
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
-     libcstring_system_character_t *export_path,
-     size_t export_path_size,
+     const libcstring_system_character_t *export_path,
+     size_t export_path_length,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
-	libewf_file_entry_t *sub_file_entry        = NULL;
 	libcstring_system_character_t *name        = NULL;
 	libcstring_system_character_t *target_path = NULL;
 	FILE *file_entry_data_file_stream          = NULL;
@@ -3863,12 +4151,11 @@ int export_handle_export_file_entry(
 	static char *function                      = "export_handle_export_file_entry";
 	size64_t file_entry_data_size              = 0;
 	size_t name_size                           = 0;
+	size_t process_buffer_size                 = EXPORT_HANDLE_BUFFER_SIZE;
 	size_t read_size                           = 0;
 	size_t target_path_size                    = 0;
 	ssize_t read_count                         = 0;
 	uint32_t file_entry_flags                  = 0;
-	int file_entry_index                       = 0;
-	int number_of_sub_file_entries             = 0;
 	int result                                 = 0;
 
 	if( export_handle == NULL )
@@ -3878,6 +4165,39 @@ int export_handle_export_file_entry(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_chunk_size == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing input chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_chunk_size > (size32_t) INT32_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid input chunk size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->process_buffer_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid export handle - process buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -3913,7 +4233,7 @@ int export_handle_export_file_entry(
 		 "%s: unable to retrieve the name.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( name_size > 0 )
 	{
@@ -3929,7 +4249,7 @@ int export_handle_export_file_entry(
 			 "%s: unable to create name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_file_entry_get_utf16_name(
@@ -3956,14 +4276,30 @@ int export_handle_export_file_entry(
 			memory_free(
 			 name );
 
-			return( -1 );
+			goto on_error;
 		}
-		if( export_handle_create_target_path(
-		     export_handle,
+		if( libsystem_path_sanitize_filename(
 		     name,
-		     name_size,
+		     name_size - 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable sanitize name.",
+			 function );
+
+			memory_free(
+			 name );
+
+			goto on_error;
+		}
+		if( libsystem_path_create(
+		     name,
+		     name_size - 1,
 		     export_path,
-		     export_path_size,
+		     export_path_length,
 		     &target_path,
 		     &target_path_size,
 		     error ) != 1 )
@@ -3978,7 +4314,7 @@ int export_handle_export_file_entry(
 			memory_free(
 			 name );
 
-			return( -1 );
+			goto on_error;
 		}
 		memory_free(
 		 name );
@@ -3992,13 +4328,13 @@ int export_handle_export_file_entry(
 			 "%s: invalid target path.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	else
 	{
-		target_path      = export_path;
-		target_path_size = export_path_size;
+		target_path      = (libcstring_system_character_t *) export_path;
+		target_path_size = export_path_length + 1;
 	}
 	result = libsystem_file_exists(
 		  target_path,
@@ -4014,12 +4350,7 @@ int export_handle_export_file_entry(
 		 function,
 		 target_path );
 
-		if( target_path != export_path )
-		{
-			memory_free(
-			 target_path );
-		}
-		return( -1 );
+		goto on_error;
 	}
 	else if( result == 1 )
 	{
@@ -4027,12 +4358,7 @@ int export_handle_export_file_entry(
 		 log_handle,
 		 "Skipping file entry it already exists.\n" );
 
-		if( target_path != export_path )
-		{
-			memory_free(
-			 target_path );
-		}
-		return( 1 );
+		goto on_error;
 	}
 	if( libewf_file_entry_get_flags(
 	     file_entry,
@@ -4046,12 +4372,7 @@ int export_handle_export_file_entry(
 		 "%s: unable to retrieve file entry flags.",
 		 function );
 
-		if( target_path != export_path )
-		{
-			memory_free(
-			 target_path );
-		}
-		return( -1 );
+		goto on_error;
 	}
 	/* TODO what about NTFS streams ?
 	 */
@@ -4073,17 +4394,7 @@ int export_handle_export_file_entry(
 			 function,
 			 target_path );
 
-			if( target_path != export_path )
-			{
-				memory_free(
-				 target_path );
-			}
-			return( -1 );
-		}
-		if( target_path != export_path )
-		{
-			memory_free(
-			 target_path );
+			goto on_error;
 		}
 		/* Export the file entry data
 		 */
@@ -4099,15 +4410,20 @@ int export_handle_export_file_entry(
 			 "%s: unable to retrieve file entry data size.",
 			 function );
 
-			libsystem_file_stream_close(
-			 file_entry_data_file_stream );
-
-			return( -1 );
+			goto on_error;
 		}
 		/* If there is no file entry data an empty file is written
 		 */
 		if( file_entry_data_size > 0 )
 		{
+			if( export_handle->process_buffer_size == 0 )
+			{
+				process_buffer_size = export_handle->input_chunk_size;
+			}
+			else
+			{
+				process_buffer_size = export_handle->process_buffer_size;
+			}
 			/* This function in not necessary for normal use
 			 * but it was added for testing
 			 */
@@ -4124,13 +4440,10 @@ int export_handle_export_file_entry(
 				 "%s: unable to seek the start of the file entry data.",
 				 function );
 
-				libsystem_file_stream_close(
-				 file_entry_data_file_stream );
-
-				return( -1 );
+				goto on_error;
 			}
 			file_entry_data = (uint8_t *) memory_allocate(
-			                               sizeof( uint8_t ) * EXPORT_HANDLE_BUFFER_SIZE );
+			                               sizeof( uint8_t ) * process_buffer_size );
 
 			if( file_entry_data == NULL )
 			{
@@ -4141,10 +4454,7 @@ int export_handle_export_file_entry(
 				 "%s: unable to create file entry data.",
 				 function );
 
-				libsystem_file_stream_close(
-				 file_entry_data_file_stream );
-
-				return( -1 );
+				goto on_error;
 			}
 			while( file_entry_data_size > 0 )
 			{
@@ -4173,12 +4483,7 @@ int export_handle_export_file_entry(
 					 "%s: unable to read file entry data.",
 					 function );
 
-					libsystem_file_stream_close(
-					 file_entry_data_file_stream );
-					memory_free(
-					 file_entry_data );
-
-					return( -1 );
+					goto on_error;
 				}
 				if( libsystem_file_stream_write(
 				     file_entry_data_file_stream,
@@ -4192,16 +4497,13 @@ int export_handle_export_file_entry(
 					 "%s: unable to write file entry data.",
 					 function );
 
-					libsystem_file_stream_close(
-					 file_entry_data_file_stream );
-					memory_free(
-					 file_entry_data );
-
-					return( -1 );
+					goto on_error;
 				}
 			}
 			memory_free(
 			 file_entry_data );
+
+			file_entry_data = NULL;
 		}
 		/* Close the file entry data file
 		 */
@@ -4215,8 +4517,9 @@ int export_handle_export_file_entry(
 			 "%s: unable to close file entry data file.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
+		file_entry_data_file_stream = NULL;
 	}
 	else
 	{
@@ -4234,111 +4537,157 @@ int export_handle_export_file_entry(
 			 function,
 			 target_path );
 
-			if( target_path != export_path )
-			{
-				memory_free(
-				 target_path );
-			}
-			return( -1 );
+			goto on_error;
 		}
-		if( libewf_file_entry_get_number_of_sub_file_entries(
+		if( export_handle_export_file_entry_sub_file_entries(
+		     export_handle,
 		     file_entry,
-		     &number_of_sub_file_entries,
+		     target_path,
+		     target_path_size - 1,
+		     log_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to export sub file entries.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( target_path != export_path )
+	{
+		memory_free(
+		 target_path );
+	}
+	return( 1 );
+
+on_error:
+	if( file_entry_data != NULL )
+	{
+		memory_free(
+		 file_entry_data );
+	}
+	if( file_entry_data_file_stream != NULL )
+	{
+		libsystem_file_stream_close(
+		 file_entry_data_file_stream );
+	}
+	if( ( target_path != NULL )
+	 && ( target_path != export_path ) )
+	{
+		memory_free(
+		 target_path );
+	}
+	return( -1 );
+}
+
+/* Exports a (single) file entry sub file entries
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_export_file_entry_sub_file_entries(
+     export_handle_t *export_handle,
+     libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *export_path,
+     size_t export_path_length,
+     log_handle_t *log_handle,
+     liberror_error_t **error )
+{
+	libewf_file_entry_t *sub_file_entry = NULL;
+	static char *function               = "export_handle_export_file_entry_sub_file_entries";
+	int number_of_sub_file_entries      = 0;
+	int sub_file_entry_index            = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_file_entry_get_number_of_sub_file_entries(
+	     file_entry,
+	     &number_of_sub_file_entries,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of sub file entries.",
+		 function );
+
+		goto on_error;
+	}
+	for( sub_file_entry_index = 0;
+	     sub_file_entry_index < number_of_sub_file_entries;
+	     sub_file_entry_index++ )
+	{
+		if( libewf_file_entry_get_sub_file_entry(
+		     file_entry,
+		     sub_file_entry_index,
+		     &sub_file_entry,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of sub file entries.",
-			 function );
+			 "%s: unable to free retrieve sub file entry: %d.",
+			 function,
+			 sub_file_entry_index + 1 );
 
-			if( target_path != export_path )
-			{
-				memory_free(
-				 target_path );
-			}
-			return( -1 );
+			goto on_error;
 		}
-		for( file_entry_index = 0;
-		     file_entry_index < number_of_sub_file_entries;
-		     file_entry_index++ )
+		if( export_handle_export_file_entry(
+		     export_handle,
+		     sub_file_entry,
+		     export_path,
+		     export_path_length,
+		     log_handle,
+		     error ) != 1 )
 		{
-			if( libewf_file_entry_get_sub_file_entry(
-			     file_entry,
-			     file_entry_index,
-			     &sub_file_entry,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to free retrieve sub file entry: %d.",
-				 function,
-				 file_entry_index + 1 );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to export sub file entry: %d.",
+			 function,
+			 sub_file_entry_index + 1 );
 
-				if( target_path != export_path )
-				{
-					memory_free(
-					 target_path );
-				}
-				return( -1 );
-			}
-			if( export_handle_export_file_entry(
-			     export_handle,
-			     sub_file_entry,
-			     target_path,
-			     target_path_size,
-			     log_handle,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to export sub file entry: %d.",
-				 function,
-				 file_entry_index + 1 );
-
-				libewf_file_entry_free(
-				 &sub_file_entry,
-				 NULL );
-
-				if( target_path != export_path )
-				{
-					memory_free(
-					 target_path );
-				}
-				return( -1 );
-			}
-			if( libewf_file_entry_free(
-			     &sub_file_entry,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free sub file entry: %d.",
-				 function,
-				 file_entry_index + 1 );
-
-				if( target_path != export_path )
-				{
-					memory_free(
-					 target_path );
-				}
-				return( -1 );
-			}
+			goto on_error;
 		}
-		if( target_path != export_path )
+		if( libewf_file_entry_free(
+		     &sub_file_entry,
+		     error ) != 1 )
 		{
-			memory_free(
-			 target_path );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sub file entry: %d.",
+			 function,
+			 sub_file_entry_index + 1 );
+
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( sub_file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &sub_file_entry,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Print the hash values to a stream
@@ -4439,17 +4788,6 @@ int export_handle_checksum_errors_fprint(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
 		 function );
 
 		return( -1 );

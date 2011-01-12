@@ -906,8 +906,22 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 	{
 		return( 0 );
 	}
-	/* TODO */
+	if( libuna_utf16_string_copy_from_utf8(
+	     utf16_string,
+	     utf16_string_size,
+	     single_file_entry->md5_hash,
+	     single_file_entry->md5_hash_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy MD5 hash to UTF-16 string.",
+		 function );
 
-	return( -1 );
+		return( -1 );
+	}
+	return( 1 );
 }
 

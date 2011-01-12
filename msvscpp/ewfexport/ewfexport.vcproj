@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libsmraw.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\export_handle.h"
 				>
 			</File>

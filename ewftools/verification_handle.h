@@ -116,7 +116,7 @@ struct verification_handle
 
 	/* The chunk size
 	 */
-	uint32_t chunk_size;
+	size32_t chunk_size;
 
 	/* The number of bytes per sector
 	 */
@@ -196,18 +196,23 @@ int verification_handle_verify_input(
 
 int verification_handle_verify_single_files(
      verification_handle_t *verification_handle,
+     uint8_t print_status_information,
      log_handle_t *log_handle,
      liberror_error_t **error );
 
 int verification_handle_verify_file_entry(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *file_entry_path,
+     size_t file_entry_path_length,
      log_handle_t *log_handle,
      liberror_error_t **error );
 
 int verification_handle_verify_sub_file_entries(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *file_entry_path,
+     size_t file_entry_path_length,
      log_handle_t *log_handle,
      liberror_error_t **error );
 

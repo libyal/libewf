@@ -470,6 +470,7 @@ int main( int argc, char * const argv[] )
 	{
 		result = verification_handle_verify_single_files(
 		          ewfverify_verification_handle,
+		          print_status_information,
 		          log_handle,
 		          &error );
 
@@ -505,6 +506,14 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 	}
+	if( result != 1 )
+	{
+		status = PROCESS_STATUS_FAILED;
+	}
+	else
+	{
+		status = PROCESS_STATUS_COMPLETED;
+	}
 	if( log_handle != NULL )
 	{
 		if( log_handle_close(
@@ -527,18 +536,6 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-	}
-	if( ewfverify_abort != 0 )
-	{
-		goto on_abort;
-	}
-	if( result != 1 )
-	{
-		status = PROCESS_STATUS_FAILED;
-	}
-	else
-	{
-		status = PROCESS_STATUS_COMPLETED;
 	}
 on_abort:
 	if( libsystem_signal_detach(
@@ -583,25 +580,21 @@ on_abort:
 
 		return( EXIT_FAILURE );
 	}
-	if( status == PROCESS_STATUS_COMPLETED )
-	{
-		fprintf(
-		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
-		 program );
-
-		result = EXIT_SUCCESS;
-	}
-	else
+	if( status != PROCESS_STATUS_COMPLETED )
 	{
 		fprintf(
 		 stdout,
 		 "%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
 		 program );
 
-		result = EXIT_FAILURE;
+		return( EXIT_FAILURE );
 	}
-	return( result );
+	fprintf(
+	 stdout,
+	 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
+	 program );
+
+	return( EXIT_SUCCESS );
 
 on_error:
 	if( error != NULL )

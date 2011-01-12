@@ -170,497 +170,6 @@ void usage_fprint(
 	fprintf( stream, "\t-w:        zero sectors on checksum error (mimic EnCase like behavior)\n" );
 }
 
-/* Reads the media data and exports it
- * Returns the number of bytes read on success or -1 on error
- */
-ssize64_t ewfexport_export_image(
-           export_handle_t *export_handle,
-           size64_t media_size,
-           uint8_t swap_byte_pairs,
-           process_status_t *process_status,
-	   liberror_error_t **error )
-{
-	storage_media_buffer_t *storage_media_buffer        = NULL;
-	static char *function                               = "ewfexport_export_image";
-	ssize64_t export_count                              = 0;
-	size32_t input_chunk_size                           = 0;
-	size_t process_buffer_size                          = 0;
-	size_t read_size                                    = 0;
-	ssize_t read_count                                  = 0;
-	ssize_t read_process_count                          = 0;
-	ssize_t write_count                                 = 0;
-	ssize_t write_process_count                         = 0;
-
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer_t *output_storage_media_buffer = NULL;
-	uint8_t *input_buffer                               = NULL;
-	size32_t output_chunk_size                          = 0;
-	size_t write_size                                   = 0;
-#endif
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->process_buffer_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid export handle - process buffer size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle_get_input_chunk_size(
-	     export_handle,
-	     &input_chunk_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine the input chunk size.",
-		 function );
-
-		return( -1 );
-	}
-	if( input_chunk_size == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid input chunk size.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ewfexport_export_handle->export_size == 0 )
-	 || ( ewfexport_export_handle->export_size > media_size )
-	 || ( ewfexport_export_handle->export_size > (ssize64_t) INT64_MAX ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( process_status == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid process status.",
-		 function );
-
-		return( -1 );
-	}
-	if( ewfexport_export_handle->export_offset > 0 )
-	{
-		if( ewfexport_export_handle->export_offset >= (uint64_t) media_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid offset.",
-			 function );
-
-			goto on_error;
-		}
-		if( ( ewfexport_export_handle->export_size + ewfexport_export_handle->export_offset ) > (uint64_t) media_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: unable to export beyond size of media.",
-			 function );
-
-			goto on_error;
-		}
-		if( export_handle_seek_offset(
-		     export_handle,
-		     ewfexport_export_handle->export_offset,
-		     error ) == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset.",
-			 function );
-
-			goto on_error;
-		}
-	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( export_handle_get_output_chunk_size(
-	     export_handle,
-	     &output_chunk_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine the output chunk size.",
-		 function );
-
-		goto on_error;
-	}
-	if( output_chunk_size == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid output chunk size.",
-		 function );
-
-		goto on_error;
-	}
-	process_buffer_size = (size_t) input_chunk_size;
-#else
-	if( export_handle->process_buffer_size == 0 )
-	{
-		process_buffer_size = (size_t) input_chunk_size;
-	}
-	else
-	{
-		process_buffer_size = export_handle->process_buffer_size;
-	}
-#endif
-	if( storage_media_buffer_initialize(
-	     &storage_media_buffer,
-	     process_buffer_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create storage media buffer.",
-		 function );
-
-		goto on_error;
-	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( storage_media_buffer_initialize(
-	     &output_storage_media_buffer,
-	     output_chunk_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create output storage media buffer.",
-		 function );
-
-		goto on_error;
-	}
-#endif
-	while( export_count < (int64_t) ewfexport_export_handle->export_size )
-	{
-		read_size = process_buffer_size;
-
-		if( ( media_size - export_count ) < read_size )
-		{
-			read_size = (size_t) ( media_size - export_count );
-		}
-		read_count = export_handle_read_buffer(
-		              export_handle,
-		              storage_media_buffer,
-		              read_size,
-		              error );
-
-		if( read_count < 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read data.",
-			 function );
-
-			goto on_error;
-		}
-		if( read_count == 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unexpected end of data.",
-			 function );
-
-			goto on_error;
-		}
-		read_process_count = export_handle_prepare_read_buffer(
-		                      export_handle,
-		                      storage_media_buffer,
-		                      error );
-
-		if( read_process_count < 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to prepare buffer after read.",
-			 function );
-
-			goto on_error;
-		}
-		if( read_process_count > (ssize_t) read_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: more bytes read than requested.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		/* Set the chunk data size in the compression buffer
-		 */
-		if( storage_media_buffer->data_in_compression_buffer == 1 )
-		{
-			storage_media_buffer->compression_buffer_data_size = (size_t) read_process_count;
-		}
-#endif
-		/* Swap byte pairs
-		 */
-		if( swap_byte_pairs == 1 )
-		{
-			if( export_handle_swap_byte_pairs(
-			     export_handle,
-			     storage_media_buffer,
-			     read_process_count,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBERROR_CONVERSION_ERROR_GENERIC,
-				 "%s: unable to swap byte pairs.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		/* Digest hashes are calcultated after swap
-		 */
-		if( export_handle_update_integrity_hash(
-		     export_handle,
-		     storage_media_buffer,
-		     read_process_count,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to update integrity hash(es).",
-			 function );
-
-			goto on_error;
-		}
-		export_count += read_process_count;
-
-		while( read_process_count > 0 )
-		{
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			if( read_process_count > output_chunk_size )
-			{
-				write_size = output_chunk_size;
-			}
-			else
-			{
-				write_size = (size_t) read_process_count;
-			}
-			if( ( output_storage_media_buffer->raw_buffer_data_size + write_size ) > output_chunk_size )
-			{
-				write_size = output_chunk_size -  output_storage_media_buffer->raw_buffer_data_size;
-			}
-			if( storage_media_buffer->data_in_compression_buffer == 1 )
-			{
-				input_buffer = storage_media_buffer->compression_buffer;
-			}
-			else
-			{
-				input_buffer = storage_media_buffer->raw_buffer;
-			}
-			if( memory_copy(
-			     &( output_storage_media_buffer->raw_buffer[ output_storage_media_buffer->raw_buffer_data_size ] ),
-			     input_buffer,
-			     write_size ) == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy data from input buffer to output raw buffer.",
-				 function );
-
-				goto on_error;
-			}
-			output_storage_media_buffer->raw_buffer_data_size += write_size;
-
-			/* Make sure the output chunk is filled upto the output chunk size
-			 */
-			if( ( export_count < (int64_t) ewfexport_export_handle->export_size )
-			 && ( output_storage_media_buffer->raw_buffer_data_size < output_chunk_size ) )
-			{
-				continue;
-			}
-#endif
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			write_process_count = export_handle_prepare_write_buffer(
-			                       export_handle,
-			                       output_storage_media_buffer,
-			                       error );
-#else
-			write_process_count = export_handle_prepare_write_buffer(
-			                       export_handle,
-			                       storage_media_buffer,
-			                       error );
-#endif
-
-			if( write_process_count < 0 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				"%s: unable to prepare buffer before write.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			write_count = export_handle_write_buffer(
-				       export_handle,
-				       output_storage_media_buffer,
-				       write_process_count,
-				       error );
-#else
-			write_count = export_handle_write_buffer(
-				       export_handle,
-				       storage_media_buffer,
-				       write_process_count,
-				       error );
-#endif
-
-			if( write_count < 0 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write data to file.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			output_storage_media_buffer->raw_buffer_data_size = 0;
-#endif
-			read_process_count -= write_process_count;
-		}
-		if( process_status_update(
-		     process_status,
-		     (size64_t) export_count,
-		     ewfexport_export_handle->export_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to update process status.",
-			 function );
-
-			goto on_error;
-		}
-		if( ewfexport_abort != 0 )
-		{
-			break;
-		}
-  	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( storage_media_buffer_free(
-	     &output_storage_media_buffer,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free output storage media buffer.",
-		 function );
-
-		goto on_error;
-	}
-#endif
-	if( storage_media_buffer_free(
-	     &storage_media_buffer,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free input storage media buffer.",
-		 function );
-
-		goto on_error;
-	}
-	write_count = export_handle_finalize(
-	               export_handle,
-	               error );
-
-	if( write_count == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to finalize.",
-		 function );
-
-		goto on_error;
-	}
-	return( export_count );
-
-on_error:
-	if( storage_media_buffer != NULL )
-	{
-		storage_media_buffer_free(
-		 &storage_media_buffer,
-		 NULL );
-	}
-	return( -1 );
-
-}
-
 /* Signal handler for ewfexport
  */
 void ewfexport_signal_handler(
@@ -735,11 +244,8 @@ int main( int argc, char * const argv[] )
 
 	log_handle_t *log_handle                                   = NULL;
 
-	process_status_t *process_status                           = NULL;
-
 	libcstring_system_integer_t option                         = 0;
 	size64_t media_size                                        = 0;
-	ssize64_t export_count                                     = 0;
 	size_t string_length                                       = 0;
 	uint8_t calculate_md5                                      = 1;
 	uint8_t calculate_sha1                                     = 0;
@@ -1576,38 +1082,41 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 "\n" );
 
-	if( process_status_initialize(
-	     &process_status,
-	     _LIBCSTRING_SYSTEM_STRING( "Export" ),
-	     _LIBCSTRING_SYSTEM_STRING( "exported" ),
-	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
-	     stderr,
-	     print_status_information,
-	     &error ) != 1 )
+	if( log_filename != NULL )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to initialize process status.\n" );
+		if( log_handle_initialize(
+		     &log_handle,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to create log handle.\n" );
 
-		goto on_error;
-	}
-	if( process_status_start(
-	     process_status,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to start process status.\n" );
+			goto on_error;
+		}
+		if( log_handle_open(
+		     log_handle,
+		     log_filename,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+			 log_filename );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
 	if( ewfexport_export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
 	{
-		if( export_handle_export_single_files(
-		     ewfexport_export_handle,
-		     ewfexport_export_handle->target_filename,
-		     NULL,
-		     &error ) != 1 )
+		result = export_handle_export_single_files(
+		          ewfexport_export_handle,
+		          ewfexport_export_handle->target_filename,
+		          print_status_information,
+		          log_handle,
+		          &error );
+
+		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -1617,12 +1126,6 @@ int main( int argc, char * const argv[] )
 			 error );
 			liberror_error_free(
 			 &error );
-
-			status = PROCESS_STATUS_FAILED;
-		}
-		else
-		{
-			status = PROCESS_STATUS_COMPLETED;
 		}
 	}
 	else
@@ -1682,135 +1185,32 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		/* Exports image media data
-		 */
-		export_count = ewfexport_export_image(
-				ewfexport_export_handle,
-				media_size,
-				swap_byte_pairs,
-				process_status,
-				&error );
+		result = export_handle_export_input(
+		          ewfexport_export_handle,
+		          swap_byte_pairs,
+		          print_status_information,
+		          log_handle,
+		          &error );
 
-		if( export_count <= -1 )
+		if( result != 1 )
 		{
+			fprintf(
+			 stderr,
+			 "Unable to export input.\n" );
+
 			libsystem_notify_print_error_backtrace(
 			 error );
 			liberror_error_free(
 			 &error );
-
-			status = PROCESS_STATUS_FAILED;
-		}
-		else
-		{
-			status = PROCESS_STATUS_COMPLETED;
 		}
 	}
-	if( process_status_stop(
-	     process_status,
-	     (size64_t) export_count,
-	     status,
-	     &error ) != 1 )
+	if( result != 1 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to stop process status.\n" );
-
-		goto on_error;
+		status = PROCESS_STATUS_FAILED;
 	}
-	if( process_status_free(
-	     &process_status,
-	     &error ) != 1 )
+	else
 	{
-		fprintf(
-		 stderr,
-		 "Unable to free process status.\n" );
-
-		goto on_error;
-	}
-	if( ewfexport_abort != 0 )
-	{
-		status = PROCESS_STATUS_ABORTED;
-	}
-	if( status == PROCESS_STATUS_COMPLETED )
-	{
-		if( ewfexport_export_handle->output_format != EXPORT_HANDLE_OUTPUT_FORMAT_FILES )
-		{
-			if( log_filename != NULL )
-			{
-				if( log_handle_initialize(
-				     &log_handle,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to create log handle.\n" );
-
-					goto on_error;
-				}
-				if( log_handle_open(
-				     log_handle,
-				     log_filename,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-					 log_filename );
-
-					goto on_error;
-				}
-			}
-			if( export_handle_hash_values_fprint(
-			     ewfexport_export_handle,
-			     stdout,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to print export hash values.\n" );
-
-				goto on_error;
-			}
-			if( log_handle != NULL )
-			{
-				if( export_handle_hash_values_fprint(
-				     ewfexport_export_handle,
-				     log_handle->log_stream,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to write export hash values in log file.\n" );
-
-					goto on_error;
-				}
-			}
-			if( export_handle_checksum_errors_fprint(
-			     ewfexport_export_handle,
-			     stdout,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to print export errors.\n" );
-
-				goto on_error;
-			}
-			if( log_handle != NULL )
-			{
-				if( export_handle_checksum_errors_fprint(
-				     ewfexport_export_handle,
-				     log_handle->log_stream,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to write export errors in log file.\n" );
-
-					goto on_error;
-				}
-			}
-		}
+		status = PROCESS_STATUS_COMPLETED;
 	}
 	if( log_handle != NULL )
 	{
@@ -1869,10 +1269,29 @@ on_abort:
 
 		goto on_error;
 	}
-	if( status != PROCESS_STATUS_COMPLETED )
+	if( ewfexport_abort != 0 )
 	{
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
+		 program );
+
 		return( EXIT_FAILURE );
 	}
+	if( status != PROCESS_STATUS_COMPLETED )
+	{
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
+		 program );
+
+		return( EXIT_FAILURE );
+	}
+	fprintf(
+	 stdout,
+	 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
+	 program );
+
 	return( EXIT_SUCCESS );
 
 on_error:
@@ -1890,12 +1309,6 @@ on_error:
 		 NULL );
 		log_handle_free(
 		 &log_handle,
-		 NULL );
-	}
-	if( process_status != NULL )
-	{
-		process_status_free(
-		 &process_status,
 		 NULL );
 	}
 	if( ewfexport_export_handle != NULL )

@@ -68,7 +68,6 @@ int ewf_test_write_chunk(
 	uint32_t sectors_per_chunk          = 0;
 	int8_t is_compressed                = 0;
 	int8_t process_checksum             = 0;
-	int result                          = 1;
 	int sector_iterator                 = 0;
 
 	if( libewf_handle_initialize(
@@ -82,7 +81,7 @@ int ewf_test_write_chunk(
 		 "%s: unable to create handle.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -107,11 +106,7 @@ int ewf_test_write_chunk(
 		 "%s: unable to open handle.",
 		 function );
 
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( media_size > 0 )
 	{
@@ -127,7 +122,7 @@ int ewf_test_write_chunk(
 			 "%s: unable set media size.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( maximum_segment_size > 0 )
@@ -144,7 +139,7 @@ int ewf_test_write_chunk(
 			 "%s: unable set maximum segment size.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( libewf_handle_set_compression_values(
@@ -160,7 +155,7 @@ int ewf_test_write_chunk(
 		 "%s: unable set compression values.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	sectors_per_chunk = 64;
 
@@ -176,7 +171,7 @@ int ewf_test_write_chunk(
 		 "%s: unable set sectors per chunk.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	chunk_buffer_size = sectors_per_chunk * 512;
 
@@ -194,111 +189,106 @@ int ewf_test_write_chunk(
 	{
 		checksum_buffer = &( chunk_buffer[ chunk_buffer_size - 1 ] );
 	}
-	if( result != -1 )
+	for( sector_iterator = 0;
+	     sector_iterator < 26;
+	     sector_iterator++ )
 	{
-		for( sector_iterator = 0;
-		     sector_iterator < 26;
-		     sector_iterator++ )
+		if( memory_set(
+		     chunk_buffer,
+		     (int) 'A' + sector_iterator,
+		     chunk_buffer_size ) == NULL )
 		{
-			if( memory_set(
-			     chunk_buffer,
-			     (int) 'A' + sector_iterator,
-			     chunk_buffer_size ) == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable set value in chunk buffer.",
-				 function );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable set value in chunk buffer.",
+			 function );
 
-				result = -1;
+			goto on_error;
+		}
+		process_count = libewf_handle_prepare_write_chunk(
+				 handle,
+				 chunk_buffer,
+				 chunk_buffer_size,
+				 compressed_chunk_buffer,
+				 &compressed_chunk_buffer_size,
+				 &is_compressed,
+				 &checksum,
+				 &process_checksum,
+				 error );
 
-				break;
-			}
-			process_count = libewf_handle_prepare_write_chunk(
-					 handle,
-					 chunk_buffer,
-					 chunk_buffer_size,
-					 compressed_chunk_buffer,
-					 &compressed_chunk_buffer_size,
-					 &is_compressed,
-					 &checksum,
-					 &process_checksum,
-					 error );
+		if( process_count == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to prepare chunk buffer before writing.",
+			 function );
 
-			if( process_count == -1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to prepare chunk buffer before writing.",
-				 function );
+			goto on_error;
+		}
+		if( is_compressed == 0 )
+		{
+			write_count = libewf_handle_write_chunk(
+				       handle,
+				       chunk_buffer,
+				       chunk_buffer_size,
+				       (size_t) process_count,
+				       is_compressed,
+				       checksum_buffer,
+				       checksum,
+				       process_checksum,
+				       error );
+		}
+		else
+		{
+			write_count = libewf_handle_write_chunk(
+				       handle,
+				       compressed_chunk_buffer,
+				       compressed_chunk_buffer_size,
+				       (size_t) process_count,
+				       is_compressed,
+				       checksum_buffer,
+				       checksum,
+				       process_checksum,
+				       error );
+		}
+		if( write_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable write chunk of size: %" PRIzd ".",
+			 function,
+			 process_count );
 
-				result = -1;
-
-				break;
-			}
-			if( is_compressed == 0 )
-			{
-				write_count = libewf_handle_write_chunk(
-					       handle,
-					       chunk_buffer,
-					       chunk_buffer_size,
-					       (size_t) process_count,
-					       is_compressed,
-					       checksum_buffer,
-					       checksum,
-					       process_checksum,
-					       error );
-			}
-			else
-			{
-				write_count = libewf_handle_write_chunk(
-					       handle,
-					       compressed_chunk_buffer,
-					       compressed_chunk_buffer_size,
-					       (size_t) process_count,
-					       is_compressed,
-					       checksum_buffer,
-					       checksum,
-					       process_checksum,
-					       error );
-			}
-			if( write_count < 0 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable write chunk of size: %" PRIzd ".",
-				 function,
-				 process_count );
-
-				result = -1;
-
-				break;
-			}
-			if( media_size > (size64_t) chunk_buffer_size )
-			{
-				media_size -= chunk_buffer_size;
-			}
-			else if( media_size > 0 )
-			{
-				media_size = 0;
-			}
-			if( media_size == 0 )
-			{
-				break;
-			}
+			goto on_error;
+		}
+		if( media_size > (size64_t) chunk_buffer_size )
+		{
+			media_size -= chunk_buffer_size;
+		}
+		else if( media_size > 0 )
+		{
+			media_size = 0;
+		}
+		if( media_size == 0 )
+		{
+			break;
 		}
 	}
 	memory_free(
 	 compressed_chunk_buffer );
+
+	compressed_chunk_buffer = NULL;
 	
 	memory_free(
 	 chunk_buffer );
+
+	chunk_buffer = NULL;
 	
 	if( libewf_handle_close(
 	     handle,
@@ -311,7 +301,7 @@ int ewf_test_write_chunk(
 		 "%s: unable to close handle.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	if( libewf_handle_free(
 	     &handle,
@@ -324,9 +314,31 @@ int ewf_test_write_chunk(
 		 "%s: unable to free handle.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	return( result );
+	return( 1 );
+
+on_error:
+	if( compressed_chunk_buffer != NULL )
+	{
+		memory_free(
+		 compressed_chunk_buffer );
+	}
+	if( chunk_buffer != NULL )
+	{
+		memory_free(
+		 chunk_buffer );
+	}
+	if( handle != NULL )
+	{
+		libewf_handle_close(
+		 handle,
+		 NULL );
+		libewf_handle_free(
+		 &handle,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* The main program
@@ -337,15 +349,18 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error            = NULL;
-	libcstring_system_integer_t option = 0;
-	size64_t chunk_size                = 0;
-	size64_t maximum_segment_size      = 0;
-	size64_t media_size                = 0;
-	size_t string_length               = 0;
-	uint8_t compression_flags          = 0;
-	int8_t compression_level           = LIBEWF_COMPRESSION_NONE;
-	int result                         = 0;
+	libcstring_system_character_t *option_chunk_size           = NULL;
+	libcstring_system_character_t *option_compression_level    = NULL;
+	libcstring_system_character_t *option_maximum_segment_size = NULL;
+	libcstring_system_character_t *option_media_size           = NULL;
+	liberror_error_t *error                                     = NULL;
+	libcstring_system_integer_t option                          = 0;
+	size64_t chunk_size                                         = 0;
+	size64_t maximum_segment_size                               = 0;
+	size64_t media_size                                         = 0;
+	size_t string_length                                        = 0;
+	uint8_t compression_flags                                   = 0;
+	int8_t compression_level                                    = LIBEWF_COMPRESSION_NONE;
 
 	while( ( option = libsystem_getopt(
 	                   argc,
@@ -364,114 +379,23 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (libcstring_system_integer_t) 'b':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_chunk_size = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &chunk_size,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported chunk size.\n" );
-
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					return( EXIT_FAILURE );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'c':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_compression_level = optarg;
 
-				if( string_length != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported compression level.\n" );
-
-					return( EXIT_FAILURE );
-				}
-				if( optarg[ 0 ] == (libcstring_system_integer_t) 'n' )
-				{
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = 0;
-				}
-				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'e' )
-				{
-					compression_level = LIBEWF_COMPRESSION_NONE;
-					compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
-				}
-				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'f' )
-				{
-					compression_level = LIBEWF_COMPRESSION_FAST;
-					compression_flags = 0;
-				}
-				else if( optarg[ 0 ] == (libcstring_system_integer_t) 'b' )
-				{
-					compression_level = LIBEWF_COMPRESSION_BEST;
-					compression_flags = 0;
-				}
-				else
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported compression level.\n" );
-
-					return( EXIT_FAILURE );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'B':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_media_size = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &media_size,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported media size.\n" );
-
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					return( EXIT_FAILURE );
-				}
 				break;
 
 			case (libcstring_system_integer_t) 'S':
-				string_length = libcstring_system_string_length(
-				                 optarg );
+				option_maximum_segment_size = optarg;
 
-				if( libsystem_string_to_uint64(
-				     optarg,
-				     string_length + 1,
-				     &maximum_segment_size,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported maximum segment size.\n" );
-
-					libsystem_notify_print_error_backtrace(
-					 error );
-					liberror_error_free(
-					 &error );
-
-					return( EXIT_FAILURE );
-				}
 				break;
 		}
 	}
@@ -483,31 +407,127 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	result = ewf_test_write_chunk(
-	          argv[ optind ],
-	          media_size,
-	          maximum_segment_size,
-	          compression_level,
-	          compression_flags,
-	          &error );
+	if( option_chunk_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_chunk_size );
 
-	if( result == -1 )
+		if( libsystem_string_to_uint64(
+		     option_chunk_size,
+		     string_length + 1,
+		     &chunk_size,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported chunk size.\n" );
+
+			goto on_error;
+		}
+	}
+	if( option_compression_level != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_compression_level );
+
+		if( string_length != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression level.\n" );
+
+			goto on_error;
+		}
+		if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'n' )
+		{
+			compression_level = LIBEWF_COMPRESSION_NONE;
+			compression_flags = 0;
+		}
+		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'e' )
+		{
+			compression_level = LIBEWF_COMPRESSION_NONE;
+			compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+		}
+		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'f' )
+		{
+			compression_level = LIBEWF_COMPRESSION_FAST;
+			compression_flags = 0;
+		}
+		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'b' )
+		{
+			compression_level = LIBEWF_COMPRESSION_BEST;
+			compression_flags = 0;
+		}
+		else
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression level.\n" );
+
+			goto on_error;
+		}
+	}
+	if( option_maximum_segment_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_maximum_segment_size );
+
+		if( libsystem_string_to_uint64(
+		     option_maximum_segment_size,
+		     string_length + 1,
+		     &maximum_segment_size,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported maximum segment size.\n" );
+
+			goto on_error;
+		}
+	}
+	if( option_media_size != NULL )
+	{
+		string_length = libcstring_system_string_length(
+				 option_media_size );
+
+		if( libsystem_string_to_uint64(
+		     option_media_size,
+		     string_length + 1,
+		     &media_size,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported media size.\n" );
+
+			goto on_error;
+		}
+	}
+	if( ewf_test_write_chunk(
+	     argv[ optind ],
+	     media_size,
+	     maximum_segment_size,
+	     compression_level,
+	     compression_flags,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to test write.\n" );
 
-		liberror_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		liberror_error_free(
-		 &error );
-	}
-	if( result != 1 )
-	{
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libewf_error_free(
+		 &error );
+	}
+	return( EXIT_FAILURE );
 }
 

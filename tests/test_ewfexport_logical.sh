@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ewfexport testing script
+# ewfexport testing script for logical evidence files
 #
 # Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
 #
@@ -24,64 +24,29 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
+INPUT="input_logical";
 TMP="tmp";
 
 LS="ls";
 TR="tr";
 WC="wc";
 
-test_export_raw()
+test_export_logical()
 { 
 	INPUT_FILE=$1;
 
 	mkdir ${TMP};
 
-${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
-raw
-${TMP}/export.raw
-
-
-
-EOI
-
-	RESULT=$?;
-
-	rm -rf ${TMP};
-
-	echo -n "Testing ewfexport to raw of input: ${INPUT_FILE} ";
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
-	return ${RESULT};
-}
-
-test_export_ewf()
-{ 
-	OUTPUT_FORMAT=$1;
-	INPUT_FILE=$2;
-
-	mkdir ${TMP};
-
-${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
-${OUTPUT_FORMAT}
+${EWFEXPORT} -q ${INPUT_FILE} <<EOI
+files
 ${TMP}/export
-none
-
-
-
-
 EOI
 
 	RESULT=$?;
 
 	rm -rf ${TMP};
 
-	echo -n "Testing ewfexport to ewf format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE} ";
+	echo -n "Testing ewfexport to files of input: ${INPUT_FILE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -92,23 +57,23 @@ EOI
 	return ${RESULT};
 }
 
-test_export_unattended()
+test_export_logical_unattended()
 { 
 	OUTPUT_FORMAT=$1;
 	INPUT_FILE=$2;
 
 	mkdir ${TMP};
 
-	${EWFEXPORT} -q -u -d sha1 \
+	${EWFEXPORT} -q -u \
 	-t ${TMP}/unattended_export \
-	-f ${OUTPUT_FORMAT} \
+	-f files \
 	${INPUT_FILE}
 
 	RESULT=$?;
 
 	rm -rf ${TMP};
 
-	echo -n "Testing unattended ewfexport to format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE} ";
+	echo -n "Testing unattended ewfexport to files of input: ${INPUT_FILE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -140,7 +105,7 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-RESULT=`${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+RESULT=`${LS} ${INPUT}/*.L01 | ${TR} ' ' '\n' | ${WC} -l`;
 
 if test ${RESULT} -eq 0;
 then
@@ -149,31 +114,20 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
+for FILENAME in `${LS} ${INPUT}/*.L01 | ${TR} ' ' '\n'`;
 do
-	if ! test_export_raw "${FILENAME}";
+	if ! test_export_logical "${FILENAME}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
-
-	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk smart ewfx;
-	do
-		if ! test_export_ewf "${FORMAT}" "${FILENAME}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
-	done
 done
 
-for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
+for FILENAME in `${LS} ${INPUT}/*.L01 | ${TR} ' ' '\n'`;
 do
-	for FORMAT in raw ewf encase1 encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk smart ewfx;
-	do
-		if ! test_export_unattended "${FORMAT}" "${FILENAME}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
-	done
+	if ! test_export_logical_unattended "${FORMAT}" "${FILENAME}";
+	then
+		exit ${EXIT_FAILURE};
+	fi
 done
 
 exit ${EXIT_SUCCESS};

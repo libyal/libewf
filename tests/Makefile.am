@@ -25,6 +25,7 @@ TESTS = \
 	test_ewfacquire_resume.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
+	test_ewfexport_logical.sh \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
@@ -34,6 +35,7 @@ check_SCRIPTS = \
 	test_ewfacquirestream.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
+	test_ewfexport_logical.sh \
 	test_ewfverify.sh \
 	test_ewfverify_logical.sh \
 	test_glob.sh \

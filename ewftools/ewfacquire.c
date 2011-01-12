@@ -458,6 +458,7 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
+#if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( imaging_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
@@ -469,6 +470,7 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
+#endif
         if( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
 	{
 		liberror_error_set(

@@ -452,6 +452,7 @@ int ewfacquirestream_read_input(
 
 		return( -1 );
 	}
+#if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( imaging_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
@@ -463,6 +464,7 @@ int ewfacquirestream_read_input(
 
 		return( -1 );
 	}
+#endif
 	if( input_file_descriptor == -1 )
 	{
 		liberror_error_set(

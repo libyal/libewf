@@ -1088,7 +1088,7 @@ int verification_handle_verify_input(
 
 		return( -1 );
 	}
-	if( verification_handle->chunk_size > (uint32_t) INT32_MAX )
+	if( verification_handle->chunk_size > (size32_t) INT32_MAX )
 	{
 		liberror_error_set(
 		 error,
@@ -1099,6 +1099,7 @@ int verification_handle_verify_input(
 
 		return( -1 );
 	}
+#if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( verification_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
@@ -1110,6 +1111,7 @@ int verification_handle_verify_input(
 
 		return( -1 );
 	}
+#endif
 	if( verification_handle_initialize_integrity_hash(
 	     verification_handle,
 	     error ) != 1 )
@@ -1547,10 +1549,12 @@ on_error:
  */
 int verification_handle_verify_single_files(
      verification_handle_t *verification_handle,
+     uint8_t print_status_information,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
 	libewf_file_entry_t *file_entry    = NULL;
+	process_status_t *process_status   = NULL;
 	static char *function              = "verification_handle_verify_single_files";
 	uint32_t number_of_checksum_errors = 0;
 	int result                         = 0;
@@ -1566,8 +1570,6 @@ int verification_handle_verify_single_files(
 
 		return( -1 );
 	}
-/* TODO print verify started at */
-
 	if( libewf_handle_get_root_file_entry(
 	     verification_handle->input_handle,
 	     &file_entry,
@@ -1582,12 +1584,54 @@ int verification_handle_verify_single_files(
 
 		goto on_error;
 	}
+	if( process_status_initialize(
+	     &process_status,
+	     _LIBCSTRING_SYSTEM_STRING( "Verify" ),
+	     _LIBCSTRING_SYSTEM_STRING( "verified" ),
+	     _LIBCSTRING_SYSTEM_STRING( "Read" ),
+	     verification_handle->notify_stream,
+	     print_status_information,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_start(
+	     process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to start process status.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( WINAPI )
 	result = verification_handle_verify_file_entry(
 	          verification_handle,
 	          file_entry,
+	          _LIBCSTRING_SYSTEM_STRING( "\\" ),
+	          1,
 	          log_handle,
 	          error );
-
+#else
+	result = verification_handle_verify_file_entry(
+	          verification_handle,
+	          file_entry,
+	          _LIBCSTRING_SYSTEM_STRING( "/" ),
+	          1,
+	          log_handle,
+	          error );
+#endif
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -1595,6 +1639,34 @@ int verification_handle_verify_single_files(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GENERIC,
 		 "%s: unable to verify root file entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_stop(
+	     process_status,
+	     0,
+	     PROCESS_STATUS_COMPLETED,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to stop process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_free(
+	     &process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free process status.",
 		 function );
 
 		goto on_error;
@@ -1612,8 +1684,6 @@ int verification_handle_verify_single_files(
 
 		goto on_error;
 	}
-/* TODO print verify stoped at */
-
 	if( libewf_handle_get_number_of_checksum_errors(
 	     verification_handle->input_handle,
 	     &number_of_checksum_errors,
@@ -1636,6 +1706,17 @@ int verification_handle_verify_single_files(
 	return( 0 );
 
 on_error:
+	if( process_status != NULL )
+	{
+		process_status_stop(
+		 process_status,
+		 0,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &process_status,
+		 NULL );
+	}
 	if( file_entry != NULL )
 	{
 		libewf_file_entry_free(
@@ -1651,21 +1732,25 @@ on_error:
 int verification_handle_verify_file_entry(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *file_entry_path,
+     size_t file_entry_path_length,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
-	libcstring_system_character_t *name = NULL;
-	uint8_t *file_entry_data            = NULL;
-	static char *function               = "verification_handle_verify_file_entry";
-	size64_t file_entry_data_size       = 0;
-	size_t name_size                    = 0;
-	size_t process_buffer_size          = 0;
-	size_t read_size                    = 0;
-	ssize_t read_count                  = 0;
-	uint32_t file_entry_flags           = 0;
-	int md5_hash_compare                = 0;
-	int result                          = 0;
-	int sha1_hash_compare               = 0;
+	libcstring_system_character_t *name        = NULL;
+	libcstring_system_character_t *target_path = NULL;
+	uint8_t *file_entry_data                   = NULL;
+	static char *function                      = "verification_handle_verify_file_entry";
+	size64_t file_entry_data_size              = 0;
+	size_t name_size                           = 0;
+	size_t process_buffer_size                 = 0;
+	size_t read_size                           = 0;
+	size_t target_path_size                    = 0;
+	ssize_t read_count                         = 0;
+	uint32_t file_entry_flags                  = 0;
+	int md5_hash_compare                       = 0;
+	int result                                 = 0;
+	int sha1_hash_compare                      = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -1689,7 +1774,7 @@ int verification_handle_verify_file_entry(
 
 		return( -1 );
 	}
-	if( verification_handle->chunk_size > (uint32_t) INT32_MAX )
+	if( verification_handle->chunk_size > (size32_t) INT32_MAX )
 	{
 		liberror_error_set(
 		 error,
@@ -1711,6 +1796,100 @@ int verification_handle_verify_file_entry(
 
 		return( -1 );
 	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_file_entry_get_utf16_name_size(
+		  file_entry,
+		  &name_size,
+		  error );
+#else
+	result = libewf_file_entry_get_utf8_name_size(
+		  file_entry,
+		  &name_size,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the name.",
+		 function );
+
+		goto on_error;
+	}
+	if( name_size > 0 )
+	{
+		name = libcstring_system_string_allocate(
+			name_size );
+
+		if( name == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create name.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_file_entry_get_utf16_name(
+			  file_entry,
+			  (uint16_t *) name,
+			  name_size,
+			  error );
+#else
+		result = libewf_file_entry_get_utf8_name(
+			  file_entry,
+			  (uint8_t *) name,
+			  name_size,
+			  error );
+#endif
+		if( result != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve the name.",
+			 function );
+
+			memory_free(
+			 name );
+
+			goto on_error;
+		}
+		if( libsystem_path_create(
+		     name,
+		     name_size - 1,
+		     file_entry_path,
+		     file_entry_path_length,
+		     &target_path,
+		     &target_path_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create target path.",
+			 function );
+
+			memory_free(
+			 name );
+
+			goto on_error;
+		}
+		memory_free(
+		 name );
+	}
+	else
+	{
+		target_path      = (libcstring_system_character_t *) file_entry_path;
+		target_path_size = file_entry_path_length + 1;
+	}
 	if( libewf_file_entry_get_flags(
 	     file_entry,
 	     &file_entry_flags,
@@ -1729,87 +1908,17 @@ int verification_handle_verify_file_entry(
 	 */
 	if( ( file_entry_flags & LIBEWF_FILE_ENTRY_FLAG_IS_FILE ) != 0 )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libewf_file_entry_get_utf16_name_size(
-		          file_entry,
-		          &name_size,
-		          error );
-#else
-		result = libewf_file_entry_get_utf8_name_size(
-		          file_entry,
-		          &name_size,
-		          error );
-#endif
-		if( result != 1 )
+		fprintf(
+		 verification_handle->notify_stream,
+		 "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 target_path );
+
+		if( log_handle != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the name.",
-			 function );
-
-			goto on_error;
-		}
-		if( name_size > 0 )
-		{
-			name = libcstring_system_string_allocate(
-			        name_size );
-
-			if( name == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create name.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libewf_file_entry_get_utf16_name(
-			          file_entry,
-			          (uint16_t *) name,
-			          name_size,
-			          error );
-#else
-			result = libewf_file_entry_get_utf8_name(
-			          file_entry,
-			          (uint8_t *) name,
-			          name_size,
-			          error );
-#endif
-			if( result != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve the name.",
-				 function );
-
-				memory_free(
-				 name );
-
-				goto on_error;
-			}
-/* TODO determine full path */
-
-			fprintf(
-			 verification_handle->notify_stream,
+			log_handle_printf(
+			 log_handle,
 			 "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
-			 name );
-
-			if( log_handle != NULL )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
-				 name );
-			}
-			memory_free(
-			 name );
+			 target_path );
 		}
 		if( libewf_file_entry_get_size(
 		     file_entry,
@@ -1971,10 +2080,6 @@ int verification_handle_verify_file_entry(
 
 				goto on_error;
 			}
-			fprintf(
-			 verification_handle->notify_stream,
-			 "\n" );
-
 			if( log_handle != NULL )
 			{
 				if( verification_handle_hash_values_fprint(
@@ -2013,6 +2118,22 @@ int verification_handle_verify_file_entry(
 			{
 				result = 1;
 			}
+			else
+			{
+				fprintf(
+				 verification_handle->notify_stream,
+				 "FAILED\n" );
+
+				if( log_handle != NULL )
+				{
+					log_handle_printf(
+					 log_handle,
+				 	 "FAILED\n" );
+				}
+			}
+			fprintf(
+			 verification_handle->notify_stream,
+			 "\n" );
 		}
 	}
 	else
@@ -2020,6 +2141,8 @@ int verification_handle_verify_file_entry(
 		result = verification_handle_verify_sub_file_entries(
 		          verification_handle,
 		          file_entry,
+		          target_path,
+		          target_path_size - 1,
 		          log_handle,
 		          error );
 
@@ -2035,6 +2158,11 @@ int verification_handle_verify_file_entry(
 			return( -1 );
 		}
 	}
+	if( target_path != file_entry_path )
+	{
+		memory_free(
+		 target_path );
+	}
 	return( result );
 
 on_error:
@@ -2045,6 +2173,12 @@ on_error:
 	}
 	/* TODO flush md5 and sha1 contexts */
 
+	if( ( target_path != NULL )
+	 && ( target_path != file_entry_path ) )
+	{
+		memory_free(
+		 target_path );
+	}
 	return( -1 );
 }
 
@@ -2054,6 +2188,8 @@ on_error:
 int verification_handle_verify_sub_file_entries(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *file_entry_path,
+     size_t file_entry_path_length,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
@@ -2112,6 +2248,8 @@ int verification_handle_verify_sub_file_entries(
 		sub_file_entry_result = verification_handle_verify_file_entry(
 		                         verification_handle,
 		                         sub_file_entry,
+		                         file_entry_path,
+		                         file_entry_path_length,
 		                         log_handle,
 		                         error );
 

@@ -172,7 +172,7 @@ int process_status_start(
 		     NULL ) == 1 )
 		{
 			fprintf(
-			 stderr,
+			 process_status->output_stream,
 			 "%" PRIs_LIBCSTRING_SYSTEM " started at: %" PRIs_LIBCSTRING_SYSTEM "\n",
 			 process_status->status_process_string,
 			 time_string );
@@ -180,12 +180,12 @@ int process_status_start(
 		else
 		{
 			fprintf(
-			 stderr,
+			 process_status->output_stream,
 			 "%" PRIs_LIBCSTRING_SYSTEM " started.\n",
 			 process_status->status_process_string );
 		}
 		fprintf(
-		 stderr,
+		 process_status->output_stream,
 		 "This could take a while.\n\n" );
 	}
 	return( 1 );
