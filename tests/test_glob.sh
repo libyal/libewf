@@ -27,10 +27,13 @@ EXIT_IGNORE=77;
 TMP="tmp";
 
 CMP="cmp";
+EGREP="egrep";
 
 chr()
 {
-	printf \\$(( ( ( $1 / 64 ) * 100 ) + ( ( ( $1 % 64 ) / 8 ) * 10 ) + ( $1 % 8 ) ))
+	CHR_VALUE=`expr \( \( $1 / 64 \) \* 100 \) + \( \( \( $1 % 64 \) / 8 \) \* 10 \) + \( $1 % 8 \)`;
+
+	printf \\${CHR_VALUE};
 } 
 
 seq()
@@ -48,7 +51,7 @@ seq()
 			SEQUENCE="${SEQUENCE} ${VALUE}";
 		fi
 
-		VALUE=$(( ${VALUE} + 1 ));
+		VALUE=`expr ${VALUE} + 1`;
 	done
 
 	echo ${SEQUENCE};
@@ -100,7 +103,7 @@ test_glob_sequence()
 	FILENAME=$3;
 	LAST=$4;
 
-	RESULT=`echo ${LAST} | grep -e "^[esEL][0-9a-zA-Z][0-9a-zA-Z]$"`;
+	RESULT=`echo ${LAST} | ${EGREP} "^[esEL][0-9a-zA-Z][0-9a-zA-Z]$"`;
 	LAST_IS_VALID=$?;
 
 	if [ ${LAST_IS_VALID} -ne 0 ];
@@ -119,7 +122,7 @@ test_glob_sequence()
 		exit ${EXIT_FAILURE};
 	fi
 
-	RESULT=`echo ${LAST} | grep -e "^[esEL][0-9][0-9]$"`;
+	RESULT=`echo ${LAST} | ${EGREP} "^[esEL][0-9][0-9]$"`;
 	LAST_IS_NUMERIC=$?;
 
 	if [ ${LAST_IS_NUMERIC} -eq 0 ];
@@ -135,7 +138,7 @@ test_glob_sequence()
 
 	if [ ${LAST_IS_NUMERIC} -ne 0 ];
 	then
-		RESULT=`echo ${LAST} | grep -e "^[esEL][A-Z][A-Z]$"`;
+		RESULT=`echo ${LAST} | ${EGREP} "^[esEL][A-Z][A-Z]$"`;
 		LAST_IS_UPPER_CASE=$?;
 
 		SECOND_ITERATOR=0;
@@ -143,12 +146,15 @@ test_glob_sequence()
 
 		if [ ${LAST_IS_UPPER_CASE} -eq 0 ];
 		then
-			SECOND_LETTER=`chr $(( 0x41 + ${SECOND_ITERATOR} ))`;
-			THIRD_LETTER=`chr $(( 0x41 + ${THIRD_ITERATOR} ))`;
+			SECOND_BYTE_VALUE=`expr 65 + ${SECOND_ITERATOR}`;
+			THIRD_BYTE_VALUE=`expr 65 + ${THIRD_ITERATOR}`;
 		else
-			SECOND_LETTER=`chr $(( 0x61 + ${SECOND_ITERATOR} ))`;
-			THIRD_LETTER=`chr $(( 0x61 + ${THIRD_ITERATOR} ))`;
+			SECOND_BYTE_VALUE=`expr 97 + ${SECOND_ITERATOR}`;
+			THIRD_BYTE_VALUE=`expr 97 + ${THIRD_ITERATOR}`;
 		fi
+
+		SECOND_LETTER=`chr ${SECOND_BYTE_VALUE}`;
+		THIRD_LETTER=`chr ${THIRD_BYTE_VALUE}`;
 
 		EXTENSION="${FIRST_LETTER}${SECOND_LETTER}${THIRD_LETTER}";
 
@@ -156,23 +162,26 @@ test_glob_sequence()
 		do
 			FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
 
-			THIRD_ITERATOR=$(( ${THIRD_ITERATOR} + 1 ));
+			THIRD_ITERATOR=`expr ${THIRD_ITERATOR} + 1`;
 
 			if [ ${THIRD_ITERATOR} -ge 26 ];
 			then
-				SECOND_ITERATOR=$(( ${SECOND_ITERATOR} + 1 ));
+				SECOND_ITERATOR=`expr ${SECOND_ITERATOR} + 1`;
 
 				THIRD_ITERATOR=0;
 			fi
 
 			if [ ${LAST_IS_UPPER_CASE} -eq 0 ];
 			then
-				SECOND_LETTER=`chr $(( 0x41 + ${SECOND_ITERATOR} ))`;
-				THIRD_LETTER=`chr $(( 0x41 + ${THIRD_ITERATOR} ))`;
+				SECOND_BYTE_VALUE=`expr 65 + ${SECOND_ITERATOR}`;
+				THIRD_BYTE_VALUE=`expr 65 + ${THIRD_ITERATOR}`;
 			else
-				SECOND_LETTER=`chr $(( 0x61 + ${SECOND_ITERATOR} ))`;
-				THIRD_LETTER=`chr $(( 0x61 + ${THIRD_ITERATOR} ))`;
+				SECOND_BYTE_VALUE=`expr 97 + ${SECOND_ITERATOR}`;
+				THIRD_BYTE_VALUE=`expr 97 + ${THIRD_ITERATOR}`;
 			fi
+
+			SECOND_LETTER=`chr ${SECOND_BYTE_VALUE}`;
+			THIRD_LETTER=`chr ${THIRD_BYTE_VALUE}`;
 
 			EXTENSION="${FIRST_LETTER}${SECOND_LETTER}${THIRD_LETTER}";
 		done

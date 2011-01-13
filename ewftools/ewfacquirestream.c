@@ -1698,19 +1698,17 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	if( ewfacquirestream_abort != 0 )
+	if( ewfacquirestream_abort == 0 )
 	{
-		goto on_abort;
+		if( result != 1 )
+		{
+			status = PROCESS_STATUS_FAILED;
+		}
+		else
+		{
+			status = PROCESS_STATUS_COMPLETED;
+		}
 	}
-	if( result != 1 )
-	{
-		status = PROCESS_STATUS_FAILED;
-	}
-	else
-	{
-		status = PROCESS_STATUS_COMPLETED;
-	}
-on_abort:
 	if( libsystem_signal_detach(
 	     &error ) != 1 )
 	{
@@ -1752,10 +1750,20 @@ on_abort:
 
 		return( EXIT_FAILURE );
 	}
-        if( status != PROCESS_STATUS_COMPLETED )
-        {
+	if( status != PROCESS_STATUS_COMPLETED )
+	{
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
+		 program );
+
 		return( EXIT_FAILURE );
 	}
+	fprintf(
+	 stdout,
+	 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
+	 program );
+
 	return( EXIT_SUCCESS );
 
 on_error:

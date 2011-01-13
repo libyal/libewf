@@ -3450,24 +3450,14 @@ int export_handle_export_input(
 	}
 	if( export_handle->export_offset > 0 )
 	{
-		if( export_handle->export_offset >= (uint64_t) media_size )
+		if( ( export_handle->export_offset >= (uint64_t) media_size )
+		 || ( ( export_handle->export_size + export_handle->export_offset ) > (uint64_t) media_size ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid offset.",
-			 function );
-
-			goto on_error;
-		}
-		if( ( export_handle->export_size + export_handle->export_offset ) > (uint64_t) media_size )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: unable to export beyond size of media.",
+			 "%s: invalid offset value out of bounds.",
 			 function );
 
 			goto on_error;

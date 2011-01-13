@@ -420,23 +420,25 @@ int ewfacquire_determine_sessions(
 	return( 1 );
 }
 
-/* Reads data from a file descriptor and writes it in EWF format
- * Returns the number of bytes written or -1 on error
+/* Reads the input
+ * Returns 1 if successful or -1 on error
  */
-ssize64_t ewfacquire_read_input(
-           imaging_handle_t *imaging_handle,
-           device_handle_t *device_handle,
-           size64_t media_size,
-           off64_t resume_acquiry_offset,
-           uint8_t swap_byte_pairs,
-           process_status_t *process_status,
-           liberror_error_t **error )
+int ewfacquire_read_input(
+     imaging_handle_t *imaging_handle,
+     device_handle_t *device_handle,
+     size64_t media_size,
+     off64_t resume_acquiry_offset,
+     uint8_t swap_byte_pairs,
+     uint8_t print_status_information,
+     log_handle_t *log_handle,
+     liberror_error_t **error )
 {
+	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	static char *function                        = "ewfacquire_read_input";
 	off64_t read_error_offset                    = 0;
+	size64_t acquiry_count                       = 0;
 	size64_t read_error_size                     = 0;
-	ssize64_t acquiry_count                      = 0;
 	size_t process_buffer_size                   = 0;
 	size_t read_size                             = 0;
 	ssize_t read_count                           = 0;
@@ -493,18 +495,9 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	if( process_status == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid process status.",
-		 function );
-
-		return( -1 );
-	}
-	if( imaging_handle->acquiry_size > media_size )
+	if( ( imaging_handle->acquiry_size == 0 )
+	 || ( imaging_handle->acquiry_size > media_size )
+	 || ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX ) )
 	{
 		liberror_error_set(
 		 error,
@@ -517,8 +510,8 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( imaging_handle->acquiry_offset > 0 )
 	{
-		if( ( imaging_handle->acquiry_offset > media_size )
-		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > media_size ) )
+		if( ( imaging_handle->acquiry_offset > (uint64_t) media_size )
+		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > (uint64_t) media_size ) )
 		{
 			liberror_error_set(
 			 error,
@@ -547,7 +540,7 @@ ssize64_t ewfacquire_read_input(
 	}
 	if( resume_acquiry_offset > 0 )
 	{
-		if( ( imaging_handle->acquiry_offset + resume_acquiry_offset ) > media_size )
+		if( ( imaging_handle->acquiry_offset + (uint64_t) resume_acquiry_offset ) > (uint64_t) media_size )
 		{
 			liberror_error_set(
 			 error,
@@ -641,15 +634,46 @@ ssize64_t ewfacquire_read_input(
 
 		goto on_error;
 	}
-	while( acquiry_count < (ssize64_t) imaging_handle->acquiry_size )
+	if( process_status_initialize(
+	     &process_status,
+	     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
+	     _LIBCSTRING_SYSTEM_STRING( "acquired" ),
+	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
+	     stdout,
+	     print_status_information,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create process status",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_start(
+	     process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to start process status",
+		 function );
+
+		goto on_error;
+	}
+	while( acquiry_count < (size64_t) imaging_handle->acquiry_size )
 	{
 		read_size = process_buffer_size;
 
-		if( ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count ) < (ssize64_t) read_size )
+		if( ( (size64_t) imaging_handle->acquiry_size - acquiry_count ) < (size64_t) read_size )
 		{
 			read_size = (size_t) ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count );
 		}
-		if( acquiry_count >= resume_acquiry_offset )
+		if( (off64_t) acquiry_count >= resume_acquiry_offset )
 		{
 			read_count = device_handle_read_buffer(
 				      device_handle,
@@ -795,7 +819,7 @@ ssize64_t ewfacquire_read_input(
 
 			goto on_error;
 		}
-		if( acquiry_count >= resume_acquiry_offset )
+		if( (off64_t) acquiry_count >= resume_acquiry_offset )
 		{
 			process_count = imaging_handle_prepare_write_buffer(
 					 imaging_handle,
@@ -835,7 +859,7 @@ ssize64_t ewfacquire_read_input(
 
 		if( process_status_update(
 		     process_status,
-		     (size64_t) acquiry_count,
+		     acquiry_count,
 		     imaging_handle->acquiry_size,
 		     error ) != 1 )
 		{
@@ -866,7 +890,7 @@ ssize64_t ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( acquiry_count >= resume_acquiry_offset )
+	if( (off64_t) acquiry_count >= resume_acquiry_offset )
 	{
 		if( device_handle_get_number_of_read_errors(
 		     device_handle,
@@ -937,9 +961,107 @@ ssize64_t ewfacquire_read_input(
 		}
 		acquiry_count += write_count;
 	}
-	return( acquiry_count );
+	if( process_status_stop(
+	     process_status,
+	     acquiry_count,
+	     PROCESS_STATUS_COMPLETED,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to stop process status",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_free(
+	     &process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free process status",
+		 function );
+
+		goto on_error;
+	}
+	if( device_handle_read_errors_fprint(
+	     device_handle,
+	     stdout,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to device read errors.",
+		 function );
+
+		goto on_error;
+	}
+	if( imaging_handle->calculate_md5 == 1 )
+	{
+		fprintf(
+		 stdout,
+		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 imaging_handle->md5_hash_string );
+	}
+	if( imaging_handle->calculate_sha1 == 1 )
+	{
+		fprintf(
+		 stdout,
+		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 imaging_handle->sha1_hash_string );
+	}
+	if( log_handle != NULL )
+	{
+		if( device_handle_read_errors_fprint(
+		    device_handle,
+		    log_handle->log_stream,
+		    error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to device read errors in log handle.",
+			 function );
+
+			goto on_error;
+		}
+		if( imaging_handle->calculate_md5 == 1 )
+		{
+			log_handle_printf(
+			 log_handle,
+			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 imaging_handle->md5_hash_string );
+		}
+		if( imaging_handle->calculate_sha1 == 1 )
+		{
+			log_handle_printf(
+			 log_handle,
+			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 imaging_handle->sha1_hash_string );
+		}
+	}
+	return( 1 );
 
 on_error:
+	if( process_status != NULL )
+	{
+		process_status_stop(
+		 process_status,
+		 (size64_t) write_count,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &process_status,
+		 NULL );
+	}
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
@@ -1046,11 +1168,8 @@ int main( int argc, char * const argv[] )
 
 	log_handle_t *log_handle                                        = NULL;
 
-	process_status_t *process_status                                = NULL;
-
 	libcstring_system_integer_t option                              = 0;
 	off64_t resume_acquiry_offset                                   = 0;
-	ssize64_t read_count                                            = 0;
 	size_t string_length                                            = 0;
 	uint64_t media_size                                             = 0;
 	uint8_t calculate_md5                                           = 1;
@@ -2450,309 +2569,231 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-	if( ewfacquire_abort == 0 )
+	if( ewfacquire_abort != 0 )
 	{
-		if( resume_acquiry == 0 )
+		goto on_abort;
+	}
+	if( resume_acquiry == 0 )
+	{
+		result = device_handle_get_information_value(
+			  ewfacquire_device_handle,
+			  (uint8_t *) "model",
+			  5,
+			  media_information_model,
+			  64,
+			  &error );
+
+		if( result == -1 )
 		{
-			result = device_handle_get_information_value(
-			          ewfacquire_device_handle,
-			          (uint8_t *) "model",
-			          5,
-			          media_information_model,
-			          64,
-			          &error );
+			fprintf(
+			 stdout,
+			 "Unable to retrieve model.\n" );
 
-			if( result == -1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unable to retrieve model.\n" );
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+		if( result != 1 )
+		{
+			media_information_model[ 0 ] = 0;
+		}
+		result = device_handle_get_information_value(
+			  ewfacquire_device_handle,
+			  (uint8_t *) "serial_number",
+			  13,
+			  media_information_serial_number,
+			  64,
+			  &error );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-			}
-			if( result != 1 )
-			{
-				media_information_model[ 0 ] = 0;
-			}
-			result = device_handle_get_information_value(
-			          ewfacquire_device_handle,
-			          (uint8_t *) "serial_number",
-			          13,
-			          media_information_serial_number,
-			          64,
-			          &error );
+		if( result == -1 )
+		{
+			fprintf(
+			 stdout,
+			 "Unable to retrieve serial number.\n" );
 
-			if( result == -1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unable to retrieve serial number.\n" );
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+		if( result != 1 )
+		{
+			media_information_serial_number[ 0 ] = 0;
+		}
+		if( imaging_handle_open_output(
+		     ewfacquire_imaging_handle,
+		     ewfacquire_imaging_handle->target_filename,
+		     resume_acquiry,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to open output file(s).\n" );
 
-				libsystem_notify_print_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-			}
-			if( result != 1 )
-			{
-				media_information_serial_number[ 0 ] = 0;
-			}
-			if( imaging_handle_open_output(
+			goto on_error;
+		}
+		if( ewfacquire_imaging_handle->secondary_target_filename != NULL )
+		{
+			if( imaging_handle_open_secondary_output(
 			     ewfacquire_imaging_handle,
-			     ewfacquire_imaging_handle->target_filename,
+			     ewfacquire_imaging_handle->secondary_target_filename,
 			     resume_acquiry,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to open output file(s).\n" );
+				 "Unable to open secondary output file(s).\n" );
 
 				goto on_error;
 			}
-			if( ewfacquire_imaging_handle->secondary_target_filename != NULL )
-			{
-				if( imaging_handle_open_secondary_output(
-				     ewfacquire_imaging_handle,
-				     ewfacquire_imaging_handle->secondary_target_filename,
-				     resume_acquiry,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to open secondary output file(s).\n" );
+		}
+		if( device_handle_set_error_values(
+		     ewfacquire_device_handle,
+		     ewfacquire_imaging_handle->sector_error_granularity * ewfacquire_imaging_handle->bytes_per_sector,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to initialize output settings.\n" );
 
-					goto on_error;
-				}
-			}
-			if( device_handle_set_error_values(
-			     ewfacquire_device_handle,
-			     ewfacquire_imaging_handle->sector_error_granularity * ewfacquire_imaging_handle->bytes_per_sector,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to initialize output settings.\n" );
+			goto on_error;
+		}
+		if( imaging_handle_set_output_values(
+		     ewfacquire_imaging_handle,
+		     program,
+		     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
+		     media_information_model,
+		     media_information_serial_number,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to initialize output settings.\n" );
 
-				goto on_error;
-			}
-			if( imaging_handle_set_output_values(
+			goto on_error;
+		}
+		if( ewfacquire_imaging_handle->media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
+		{
+			if( ewfacquire_determine_sessions(
 			     ewfacquire_imaging_handle,
-			     program,
-			     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
-			     media_information_model,
-			     media_information_serial_number,
+			     ewfacquire_device_handle,
+			     media_size,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to initialize output settings.\n" );
+				 "Unable to determine sessions.\n" );
 
 				goto on_error;
 			}
-			if( ewfacquire_imaging_handle->media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
-			{
-				if( ewfacquire_determine_sessions(
-				     ewfacquire_imaging_handle,
-				     ewfacquire_device_handle,
-				     media_size,
-				     &error ) != 1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to determine sessions.\n" );
-
-					goto on_error;
-				}
-			}
 		}
-		if( process_status_initialize(
-		     &process_status,
-		     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
-		     _LIBCSTRING_SYSTEM_STRING( "acquired" ),
-		     _LIBCSTRING_SYSTEM_STRING( "Written" ),
-		     stdout,
-		     print_status_information,
+	}
+	if( libsystem_signal_attach(
+	     ewfacquire_signal_handler,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to attach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	if( log_filename != NULL )
+	{
+		if( log_handle_initialize(
+		     &log_handle,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to initialize process status.\n" );
+			 "Unable to create log handle.\n" );
 
 			goto on_error;
 		}
-		if( process_status_start(
-		     process_status,
+		if( log_handle_open(
+		     log_handle,
+		     log_filename,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to start process status.\n" );
+			 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+			 log_filename );
 
 			goto on_error;
 		}
-		if( libsystem_signal_attach(
-		     ewfacquire_signal_handler,
+	}
+	result = ewfacquire_read_input(
+		  ewfacquire_imaging_handle,
+		  ewfacquire_device_handle,
+		  media_size,
+		  resume_acquiry_offset,
+		  swap_byte_pairs,
+		  print_status_information,
+		  log_handle,
+		  &error );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to read input.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	if( log_handle != NULL )
+	{
+		if( log_handle_close(
+		     log_handle,
+		     &error ) != 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to close log handle.\n" );
+
+			goto on_error;
+		}
+		if( log_handle_free(
+		     &log_handle,
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to attach signal handler.\n" );
+			 "Unable to free log handle.\n" );
 
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			goto on_error;
 		}
-		/* Start acquiring data
-		 */
-		read_count = ewfacquire_read_input(
-		              ewfacquire_imaging_handle,
-		              ewfacquire_device_handle,
-		              media_size,
-		              resume_acquiry_offset,
-		              swap_byte_pairs,
-		              process_status,
-		              &error );
-
-		if( read_count <= -1 )
+	}
+	if( ewfacquire_abort == 0 )
+	{
+		if( result != 1 )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
 			status = PROCESS_STATUS_FAILED;
 		}
 		else
 		{
 			status = PROCESS_STATUS_COMPLETED;
 		}
-		if( libsystem_signal_detach(
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to detach signal handler.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		if( process_status_stop(
-		     process_status,
-		     (size64_t) read_count,
-		     status,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to stop process status.\n" );
-
-			goto on_error;
-		}
-		if( process_status_free(
-		     &process_status,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free process status.\n" );
-
-			goto on_error;
-		}
 	}
-	if( ewfacquire_abort != 0 )
+on_abort:
+	if( libsystem_signal_detach(
+	     &error ) != 1 )
 	{
-		status = PROCESS_STATUS_ABORTED;
-	}
-	/* Done acquiring data
-	 */
-	if( status == PROCESS_STATUS_COMPLETED )
-	{
-		if( log_filename != NULL )
-		{
-			if( log_handle_initialize(
-			     &log_handle,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to create log handle.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to detach signal handler.\n" );
 
-				goto on_error;
-			}
-			if( log_handle_open(
-			     log_handle,
-			     log_filename,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-				 log_filename );
-
-				goto on_error;
-			}
-		}
-		if( device_handle_read_errors_fprint(
-		     ewfacquire_device_handle,
-		     stdout,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to print device read errors.\n" );
-
-			goto on_error;
-		}
-		if( log_handle != NULL )
-		{
-			if( device_handle_read_errors_fprint(
-			    ewfacquire_device_handle,
-			    log_handle->log_stream,
-			    &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to write device read errors in log file.\n" );
-
-				goto on_error;
-			}
-		}
-		if( calculate_md5 == 1 )
-		{
-			fprintf(
-			 stdout,
-			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 ewfacquire_imaging_handle->md5_hash_string );
-
-			if( log_handle != NULL )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 ewfacquire_imaging_handle->md5_hash_string );
-			}
-		}
-		if( calculate_sha1 == 1 )
-		{
-			fprintf(
-			 stdout,
-			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 ewfacquire_imaging_handle->sha1_hash_string );
-
-			if( log_handle != NULL )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 ewfacquire_imaging_handle->sha1_hash_string );
-			}
-		}
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 	}
 	if( imaging_handle_close(
 	     ewfacquire_imaging_handle,
@@ -2794,34 +2835,29 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( log_handle != NULL )
+	if( ewfacquire_abort != 0 )
 	{
-		if( log_handle_close(
-		     log_handle,
-		     &error ) != 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to close log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-			 log_filename );
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
+		 program );
 
-			goto on_error;
-		}
-		if( log_handle_free(
-		     &log_handle,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free log handle.\n" );
-
-			goto on_error;
-		}
-	}
-        if( status != PROCESS_STATUS_COMPLETED )
-        {
 		return( EXIT_FAILURE );
 	}
+	if( status != PROCESS_STATUS_COMPLETED )
+	{
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
+		 program );
+
+		return( EXIT_FAILURE );
+	}
+	fprintf(
+	 stdout,
+	 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
+	 program );
+
 	return( EXIT_SUCCESS );
 
 on_error:
@@ -2839,12 +2875,6 @@ on_error:
 		 NULL );
 		log_handle_free(
 		 &log_handle,
-		 NULL );
-	}
-	if( process_status != NULL )
-	{
-		process_status_free(
-		 &process_status,
 		 NULL );
 	}
 	if( ewfacquire_imaging_handle != NULL )
