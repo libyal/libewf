@@ -432,9 +432,11 @@ int ewfacquirestream_read_input(
 {
 	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
+	uint8_t *data                                = NULL;
 	static char *function                        = "ewfacquirestream_read_input";
 	size64_t acquiry_count                       = 0;
 	size32_t chunk_size                          = 0;
+	size_t data_size                             = 0;
 	size_t process_buffer_size                   = 0;
 	size_t read_size                             = 0;
 	ssize_t read_count                           = 0;
@@ -527,6 +529,19 @@ int ewfacquirestream_read_input(
 
 		goto on_error;
 	}
+	if( imaging_handle_initialize_integrity_hash(
+	     imaging_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize integrity hash(es).",
+		 function );
+
+		goto on_error;
+        }
 	if( process_status_initialize(
 	     &process_status,
 	     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
@@ -637,9 +652,24 @@ int ewfacquirestream_read_input(
 		}
 		/* Digest hashes are calcultated after swap
 		 */
+		if( storage_media_buffer_get_data(
+		     storage_media_buffer,
+		     &data,
+		     &data_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve storage media buffer data.",
+			 function );
+
+			goto on_error;
+		}
 		if( imaging_handle_update_integrity_hash(
 		     imaging_handle,
-		     storage_media_buffer,
+		     data,
 		     read_count,
 		     error ) != 1 )
 		{
@@ -719,6 +749,19 @@ int ewfacquirestream_read_input(
 
 		goto on_error;
 	}
+	if( imaging_handle_finalize_integrity_hash(
+	     imaging_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to finalize integrity hash(es).",
+		 function );
+
+		goto on_error;
+	}
 	write_count = imaging_handle_finalize(
 	               imaging_handle,
 	               error );
@@ -769,14 +812,14 @@ int ewfacquirestream_read_input(
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 imaging_handle->md5_hash_string );
+		 imaging_handle->calculated_md5_hash_string );
 	}
 	if( imaging_handle->calculate_sha1 == 1 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 imaging_handle->sha1_hash_string );
+		 imaging_handle->calculated_sha1_hash_string );
 	}
 	if( log_handle != NULL )
 	{
@@ -785,14 +828,14 @@ int ewfacquirestream_read_input(
 			log_handle_printf(
 			 log_handle,
 			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 imaging_handle->md5_hash_string );
+			 imaging_handle->calculated_md5_hash_string );
 		}
 		if( imaging_handle->calculate_sha1 == 1 )
 		{
 			log_handle_printf(
 			 log_handle,
 			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 imaging_handle->sha1_hash_string );
+			 imaging_handle->calculated_sha1_hash_string );
 		}
 	}
 	return( 1 );
@@ -809,6 +852,10 @@ on_error:
 		 &process_status,
 		 NULL );
 	}
+	imaging_handle_finalize_integrity_hash_on_error(
+	 imaging_handle,
+	 NULL );
+
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(

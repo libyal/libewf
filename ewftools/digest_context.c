@@ -284,27 +284,19 @@ int digest_context_finalize(
 
 		return( -1 );
 	}
-	if( digest_hash == NULL )
+	if( size != NULL )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid digest hash.",
-		 function );
+		if( *size > (size_t) SSIZE_MAX )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid size value exceeds maximum.",
+			 function );
 
-		return( -1 );
-	}
-	if( *size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.",
-		 function );
-
-		return( -1 );
+			return( -1 );
+		}
 	}
 #if defined( WINAPI )
 	if( digest_context->hash == 0 )
@@ -318,21 +310,25 @@ int digest_context_finalize(
 
 		return( -1 );
 	}
-	if( CryptGetHashParam(
-	     digest_context->hash,
-	     HP_HASHVAL,
-	     (BYTE *) digest_hash,
-	     (DWORD *) size,
-	     0 ) != 1 )
+	if( ( digest_hash != NULL )
+	 && ( size != NULL ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to finalize digest hash.",
-		 function );
+		if( CryptGetHashParam(
+		     digest_context->hash,
+		     HP_HASHVAL,
+		     (BYTE *) digest_hash,
+		     (DWORD *) size,
+		     0 ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize digest hash.",
+			 function );
 
-		return( 0 );
+			return( 0 );
+		}
 	}
 	if( digest_context->crypt_provider != 0 )
 	{
@@ -347,19 +343,23 @@ int digest_context_finalize(
 	}
 
 #elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-	if( EVP_DigestFinal_ex(
-	     digest_context,
-	     (unsigned char *) digest_hash,
-	     (unsigned int *) size ) != 1 )
+	if( ( digest_hash != NULL )
+	 && ( size != NULL ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to finalize digest hash.",
-		 function );
+		if( EVP_DigestFinal_ex(
+		     digest_context,
+		     (unsigned char *) digest_hash,
+		     (unsigned int *) size ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize digest hash.",
+			 function );
 
-		return( 0 );
+			return( 0 );
+		}
 	}
 	if( EVP_MD_CTX_cleanup(
 	     digest_context ) != 1 )

@@ -74,37 +74,45 @@ struct verification_handle
 	 */
 	uint8_t calculate_md5;
 
-	/* Value to indicate if the SHA1 digest hash should be calculated
-	 */
-	uint8_t calculate_sha1;
-
 	/* The MD5 digest context
 	 */
 	md5_context_t md5_context;
 
-	/* The SHA1 digest context
+	/* Value to indicate the MD5 digest context was initialized
 	 */
-	sha1_context_t sha1_context;
-
-	/* Value to indicate a stored MD5 digest hash is available
-	 */
-	int stored_md5_hash_available;
-
-	/* Value to indicate a stored SHA1 digest hash is available
-	 */
-	int stored_sha1_hash_available;
+	uint8_t md5_context_initialized;
 
 	/* The calculated MD5 digest hash string
 	 */
 	libcstring_system_character_t *calculated_md5_hash_string;
 
+	/* Value to indicate a stored MD5 digest hash is available
+	 */
+	int stored_md5_hash_available;
+
 	/* The stored MD5 digest hash string
 	 */
 	libcstring_system_character_t *stored_md5_hash_string;
 
+	/* Value to indicate if the SHA1 digest hash should be calculated
+	 */
+	uint8_t calculate_sha1;
+
+	/* The SHA1 digest context
+	 */
+	sha1_context_t sha1_context;
+
+	/* Value to indicate the SHA-1 digest context was initialized
+	 */
+	uint8_t sha1_context_initialized;
+
 	/* The calculated SHA-1 digest hash string
 	 */
 	libcstring_system_character_t *calculated_sha1_hash_string;
+
+	/* Value to indicate a stored SHA1 digest hash is available
+	 */
+	int stored_sha1_hash_available;
 
 	/* The stored SHA-1 digest hash string
 	 */
@@ -185,6 +193,10 @@ int verification_handle_update_integrity_hash(
      liberror_error_t **error );
 
 int verification_handle_finalize_integrity_hash(
+     verification_handle_t *verification_handle,
+     liberror_error_t **error );
+
+int verification_handle_finalize_integrity_hash_on_error(
      verification_handle_t *verification_handle,
      liberror_error_t **error );
 

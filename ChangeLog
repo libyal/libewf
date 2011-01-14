@@ -1,4 +1,5 @@
 TODO
+* imaging handle: flush md5 and sha1 contexts on error
 
 Next stable release:
 * full test
@@ -236,6 +237,8 @@ Known issues:
 * updated libuna, libbfio, libodraw, libsmdev, libsmraw
 * updated check for dependent functions
 * ewfacquire: corrected behaviour of -g
+* ewftoos: worked on flush of md5 and sha1 contexts on error
+* worked on ewf.net
 
 20110113
 * updated macosx files

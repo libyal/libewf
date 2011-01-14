@@ -121,6 +121,10 @@ struct export_handle
 	 */
 	md5_context_t md5_context;
 
+	/* Value to indicate the MD5 digest context was initialized
+	 */
+	uint8_t md5_context_initialized;
+
 	/* The calculated MD5 digest hash string
 	 */
 	libcstring_system_character_t *calculated_md5_hash_string;
@@ -132,6 +136,10 @@ struct export_handle
 	/* The SHA1 digest context
 	 */
 	sha1_context_t sha1_context;
+
+	/* Value to indicate the SHA-1 digest context was initialized
+	 */
+	uint8_t sha1_context_initialized;
 
 	/* The calculated SHA1 digest hash string
 	 */
@@ -190,6 +198,8 @@ struct export_handle
 
 int export_handle_initialize(
      export_handle_t **export_handle,
+     uint8_t calculate_md5,
+     uint8_t calculate_sha1,
      liberror_error_t **error );
 
 int export_handle_free(
@@ -254,10 +264,22 @@ int export_handle_swap_byte_pairs(
      size_t read_size,
      liberror_error_t **error );
 
+int export_handle_initialize_integrity_hash(
+     export_handle_t *export_handle,
+     liberror_error_t **error );
+
 int export_handle_update_integrity_hash(
      export_handle_t *export_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
+     uint8_t *buffer,
+     size_t buffer_size,
+     liberror_error_t **error );
+
+int export_handle_finalize_integrity_hash(
+     export_handle_t *export_handle,
+     liberror_error_t **error );
+
+int export_handle_finalize_integrity_hash_on_error(
+     export_handle_t *export_handle,
      liberror_error_t **error );
 
 int export_handle_get_input_media_size(
@@ -337,12 +359,6 @@ int export_handle_set_header_codepage(
 int export_handle_set_process_buffer_size(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
-
-int export_handle_set_processing_values(
-     export_handle_t *export_handle,
-     uint8_t calculate_md5,
-     uint8_t calculate_sha1,
      liberror_error_t **error );
 
 int export_handle_set_output_values(

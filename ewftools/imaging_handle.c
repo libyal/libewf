@@ -56,10 +56,6 @@
 #include "sha1.h"
 #include "storage_media_buffer.h"
 
-#if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
-#define USE_LIBEWF_GET_HASH_VALUE_MD5
-#endif
-
 #define IMAGING_HANDLE_INPUT_BUFFER_SIZE	64
 #define IMAGING_HANDLE_STRING_SIZE		1024
 #define IMAGING_HANDLE_NOTIFY_STREAM		stdout
@@ -162,41 +158,42 @@ int imaging_handle_initialize(
 
 			goto on_error;
 		}
-		( *imaging_handle )->calculate_md5  = calculate_md5;
-		( *imaging_handle )->calculate_sha1 = calculate_sha1;
-
-		if( ( *imaging_handle )->calculate_md5 != 0 )
+		if( calculate_md5 != 0 )
 		{
-			if( md5_initialize(
-			     &( ( *imaging_handle )->md5_context ),
-			     error ) != 1 )
+			( *imaging_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
+			                                                   DIGEST_HASH_STRING_SIZE_MD5 );
+
+			if( ( *imaging_handle )->calculated_md5_hash_string == NULL )
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to initialize MD5 context.",
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create calculated MD5 digest hash string.",
 				 function );
 
 				goto on_error;
 			}
 		}
-		if( ( *imaging_handle )->calculate_sha1 != 0 )
+		if( calculate_sha1 != 0 )
 		{
-			if( sha1_initialize(
-			     &( ( *imaging_handle )->sha1_context ),
-			     error ) != 1 )
+			( *imaging_handle )->calculated_sha1_hash_string = libcstring_system_string_allocate(
+			                                                    DIGEST_HASH_STRING_SIZE_SHA1 );
+
+			if( ( *imaging_handle )->calculated_sha1_hash_string == NULL )
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to initialize SHA1 context.",
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create calculated SHA1 digest hash string.",
 				 function );
 
 				goto on_error;
 			}
 		}
+		( *imaging_handle )->calculate_md5            = calculate_md5;
+		( *imaging_handle )->calculate_sha1           = calculate_sha1;
 		( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
 		( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
 		( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
@@ -292,6 +289,16 @@ int imaging_handle_free(
 		{
 			memory_free(
 			 ( *imaging_handle )->notes );
+		}
+		if( ( *imaging_handle )->calculated_md5_hash_string != NULL )
+		{
+			memory_free(
+			 ( *imaging_handle )->calculated_md5_hash_string );
+		}
+		if( ( *imaging_handle )->calculated_sha1_hash_string != NULL )
+		{
+			memory_free(
+			 ( *imaging_handle )->calculated_sha1_hash_string );
 		}
 		if( libewf_handle_free(
 		     &( ( *imaging_handle )->output_handle ),
@@ -1371,18 +1378,14 @@ int imaging_handle_swap_byte_pairs(
 	return( 1 );
 }
 
-/* Updates the integrity hash(es)
+/* Initializes the integrity hash(es)
  * Returns 1 if successful or -1 on error
  */
-int imaging_handle_update_integrity_hash(
+int imaging_handle_initialize_integrity_hash(
      imaging_handle_t *imaging_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
      liberror_error_t **error )
 {
-	uint8_t *data         = NULL;
-	static char *function = "imaging_handle_update_integrity_hash";
-	size_t data_size      = 0;
+	static char *function = "imaging_handle_initialize_integrity_hash";
 
 	if( imaging_handle == NULL )
 	{
@@ -1395,51 +1398,101 @@ int imaging_handle_update_integrity_hash(
 
 		return( -1 );
 	}
-	if( storage_media_buffer == NULL )
+	if( imaging_handle->calculate_md5 != 0 )
+	{
+		if( md5_initialize(
+		     &( imaging_handle->md5_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize MD5 context.",
+			 function );
+
+			goto on_error;
+		}
+		imaging_handle->md5_context_initialized = 1;
+	}
+	if( imaging_handle->calculate_sha1 != 0 )
+	{
+		if( sha1_initialize(
+		     &( imaging_handle->sha1_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize SHA1 context.",
+			 function );
+
+			goto on_error;
+		}
+		imaging_handle->sha1_context_initialized = 1;
+	}
+	return( 1 );
+
+on_error:
+	imaging_handle_finalize_integrity_hash_on_error(
+	 imaging_handle,
+	 NULL );
+
+	return( -1 );
+}
+
+/* Updates the integrity hash(es)
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_update_integrity_hash(
+     imaging_handle_t *imaging_handle,
+     uint8_t *buffer,
+     size_t buffer_size,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_update_integrity_hash";
+
+	if( imaging_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
+		 "%s: invalid imaging handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( read_size == 0 )
-	 || ( read_size > (size_t) SSIZE_MAX ) )
+	if( buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( buffer_size == 0 )
+	 || ( buffer_size > (size_t) SSIZE_MAX ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( storage_media_buffer_get_data(
-	     storage_media_buffer,
-	     &data,
-	     &data_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve storage media buffer data.",
+		 "%s: invalid buffer size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
 	if( imaging_handle->calculate_md5 != 0 )
 	{
-		/* TODO check for return value */
 		md5_update(
 		 &( imaging_handle->md5_context ),
-		 data,
-		 read_size,
+		 buffer,
+		 buffer_size,
 		 error );
 
 		if( ( error != NULL )
@@ -1457,11 +1510,10 @@ int imaging_handle_update_integrity_hash(
 	}
 	if( imaging_handle->calculate_sha1 != 0 )
 	{
-		/* TODO check for return value */
 		sha1_update(
 		 &( imaging_handle->sha1_context ),
-		 data,
-		 read_size,
+		 buffer,
+		 buffer_size,
 		 error );
 
 		if( ( error != NULL )
@@ -1478,6 +1530,192 @@ int imaging_handle_update_integrity_hash(
 		}
 	}
 	return( 1 );
+}
+
+/* Finalizes the integrity hash(es)
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_finalize_integrity_hash(
+     imaging_handle_t *imaging_handle,
+     liberror_error_t **error )
+{
+	digest_hash_t calculated_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t calculated_sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
+
+	static char *function            = "imaging_handle_finalize_integrity_hash";
+	size_t calculated_md5_hash_size  = DIGEST_HASH_SIZE_MD5;
+	size_t calculated_sha1_hash_size = DIGEST_HASH_SIZE_SHA1;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->calculate_md5 != 0 )
+	{
+		if( imaging_handle->calculated_md5_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid imaging handle - missing calculated MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
+		if( md5_finalize(
+		     &( imaging_handle->md5_context ),
+		     calculated_md5_hash,
+		     &calculated_md5_hash_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize MD5 hash.",
+			 function );
+
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     calculated_md5_hash,
+		     calculated_md5_hash_size,
+		     imaging_handle->calculated_md5_hash_string,
+		     DIGEST_HASH_STRING_SIZE_MD5,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set calculated MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( imaging_handle->calculate_sha1 != 0 )
+	{
+		if( imaging_handle->calculated_sha1_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid imaging handle - missing calculated SHA1 hash string.",
+			 function );
+
+			return( -1 );
+		}
+		if( sha1_finalize(
+		     &( imaging_handle->sha1_context ),
+		     calculated_sha1_hash,
+		     &calculated_sha1_hash_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize SHA1 hash.",
+			 function );
+
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     calculated_sha1_hash,
+		     calculated_sha1_hash_size,
+		     imaging_handle->calculated_sha1_hash_string,
+		     DIGEST_HASH_STRING_SIZE_SHA1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create calculated SHA1 hash string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Finalizes the integrity hash(es) on error
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_finalize_integrity_hash_on_error(
+     imaging_handle_t *imaging_handle,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_finalize_integrity_hash_on_error";
+	int result            = 1;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->calculate_md5 != 0 )
+	{
+		if( imaging_handle->md5_context_initialized != 0 )
+		{
+			if( md5_finalize(
+			     &( imaging_handle->md5_context ),
+			     NULL,
+			     NULL,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to finalize MD5 hash.",
+				 function );
+
+				result = -1;
+			}
+			imaging_handle->md5_context_initialized = 0;
+		}
+	}
+	if( imaging_handle->calculate_sha1 != 0 )
+	{
+		if( imaging_handle->md5_context_initialized != 0 )
+		{
+			if( sha1_finalize(
+			     &( imaging_handle->sha1_context ),
+			     NULL,
+			     NULL,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to finalize SHA1 hash.",
+				 function );
+
+				result = -1;
+			}
+			imaging_handle->sha1_context_initialized = 0;
+		}
+	}
+	return( result );
 }
 
 /* Retrieves the chunk size
@@ -4130,18 +4368,9 @@ ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
          liberror_error_t **error )
 {
-#if defined( USE_LIBEWF_GET_MD5_HASH )
-        digest_hash_t stored_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
-#endif
-
-	digest_hash_t calculated_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
-	digest_hash_t calculated_sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
-
-	static char *function            = "imaging_handle_finalize";
-	size_t calculated_md5_hash_size  = DIGEST_HASH_SIZE_MD5;
-	size_t calculated_sha1_hash_size = DIGEST_HASH_SIZE_SHA1;
-	ssize_t secondary_write_count    = 0;
-	ssize_t write_count              = 0;
+	static char *function         = "imaging_handle_finalize";
+	ssize_t secondary_write_count = 0;
+	ssize_t write_count           = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -4156,44 +4385,11 @@ ssize_t imaging_handle_finalize(
 	}
 	if( imaging_handle->calculate_md5 != 0 )
 	{
-		/* Finalize the MD5 hash calculation
-		 */
-		if( md5_finalize(
-		     &( imaging_handle->md5_context ),
-		     calculated_md5_hash,
-		     &calculated_md5_hash_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to finalize MD5 hash.",
-			 function );
-
-			return( -1 );
-		}
-		if( digest_hash_copy_to_string(
-		     calculated_md5_hash,
-		     calculated_md5_hash_size,
-		     imaging_handle->md5_hash_string,
-		     DIGEST_HASH_STRING_SIZE_MD5,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set calculated MD5 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( imaging_handle_set_hash_value(
 		     imaging_handle,
 		     "MD5",
 		     3,
-		     imaging_handle->md5_hash_string,
+		     imaging_handle->calculated_md5_hash_string,
 		     DIGEST_HASH_STRING_SIZE_MD5 - 1,
 		     error ) != 1 )
 		{
@@ -4209,44 +4405,11 @@ ssize_t imaging_handle_finalize(
 	}
 	if( imaging_handle->calculate_sha1 != 0 )
 	{
-		/* Finalize the SHA1 hash calculation
-		 */
-		if( sha1_finalize(
-		     &( imaging_handle->sha1_context ),
-		     calculated_sha1_hash,
-		     &calculated_sha1_hash_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to finalize SHA1 hash.",
-			 function );
-
-			return( -1 );
-		}
-		if( digest_hash_copy_to_string(
-		     calculated_sha1_hash,
-		     calculated_sha1_hash_size,
-		     imaging_handle->sha1_hash_string,
-		     DIGEST_HASH_STRING_SIZE_SHA1,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create calculated SHA1 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( imaging_handle_set_hash_value(
 		     imaging_handle,
 		     "SHA1",
 		     5,
-		     imaging_handle->sha1_hash_string,
+		     imaging_handle->calculated_sha1_hash_string,
 		     DIGEST_HASH_STRING_SIZE_SHA1 - 1,
 		     error ) != 1 )
 		{

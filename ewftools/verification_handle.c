@@ -807,6 +807,7 @@ int verification_handle_initialize_integrity_hash(
 
 			goto on_error;
 		}
+		verification_handle->md5_context_initialized = 1;
 	}
 	if( verification_handle->calculate_sha1 != 0 )
 	{
@@ -823,11 +824,14 @@ int verification_handle_initialize_integrity_hash(
 
 			goto on_error;
 		}
+		verification_handle->sha1_context_initialized = 1;
 	}
 	return( 1 );
 
 on_error:
-	/* TODO flush md5 and sha1 contexts */
+	verification_handle_finalize_integrity_hash_on_error(
+	 verification_handle,
+	 NULL );
 
 	return( -1 );
 }
@@ -879,7 +883,6 @@ int verification_handle_update_integrity_hash(
 	}
 	if( verification_handle->calculate_md5 != 0 )
 	{
-		/* TODO check for return value */
 		md5_update(
 		 &( verification_handle->md5_context ),
 		 buffer,
@@ -901,7 +904,6 @@ int verification_handle_update_integrity_hash(
 	}
 	if( verification_handle->calculate_sha1 != 0 )
 	{
-		/* TODO check for return value */
 		sha1_update(
 		 &( verification_handle->sha1_context ),
 		 buffer,
@@ -1042,6 +1044,74 @@ int verification_handle_finalize_integrity_hash(
 	return( 1 );
 }
 
+/* Finalizes the integrity hash(es) on error
+ * Returns 1 if successful or -1 on error
+ */
+int verification_handle_finalize_integrity_hash_on_error(
+     verification_handle_t *verification_handle,
+     liberror_error_t **error )
+{
+	static char *function = "verification_handle_finalize_integrity_hash_on_error";
+	int result            = 1;
+
+	if( verification_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( verification_handle->calculate_md5 != 0 )
+	{
+		if( verification_handle->md5_context_initialized != 0 )
+		{
+			if( md5_finalize(
+			     &( verification_handle->md5_context ),
+			     NULL,
+			     NULL,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to finalize MD5 hash.",
+				 function );
+
+				result = -1;
+			}
+			verification_handle->md5_context_initialized = 0;
+		}
+	}
+	if( verification_handle->calculate_sha1 != 0 )
+	{
+		if( verification_handle->md5_context_initialized != 0 )
+		{
+			if( sha1_finalize(
+			     &( verification_handle->sha1_context ),
+			     NULL,
+			     NULL,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to finalize SHA1 hash.",
+				 function );
+
+				result = -1;
+			}
+			verification_handle->sha1_context_initialized = 0;
+		}
+	}
+	return( result );
+}
+
 /* Verifies the input
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -1112,19 +1182,6 @@ int verification_handle_verify_input(
 		return( -1 );
 	}
 #endif
-	if( verification_handle_initialize_integrity_hash(
-	     verification_handle,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize integrity hash(es).",
-		 function );
-
-		goto on_error;
-	}
 	if( libewf_handle_get_media_size(
 	     verification_handle->input_handle,
 	     &media_size,
@@ -1161,6 +1218,19 @@ int verification_handle_verify_input(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( verification_handle_initialize_integrity_hash(
+	     verification_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize integrity hash(es).",
 		 function );
 
 		goto on_error;
@@ -1533,14 +1603,16 @@ on_error:
 		 &process_status,
 		 NULL );
 	}
+	verification_handle_finalize_integrity_hash_on_error(
+	 verification_handle,
+	 NULL );
+
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
 		 &storage_media_buffer,
 		 NULL );
 	}
-	/* TODO flush md5 and sha1 contexts */
-
 	return( -1 );
 }
 
@@ -1615,23 +1687,14 @@ int verification_handle_verify_single_files(
 
 		goto on_error;
 	}
-#if defined( WINAPI )
 	result = verification_handle_verify_file_entry(
 	          verification_handle,
 	          file_entry,
-	          _LIBCSTRING_SYSTEM_STRING( "\\" ),
-	          1,
+	          _LIBCSTRING_SYSTEM_STRING( "" ),
+	          0,
 	          log_handle,
 	          error );
-#else
-	result = verification_handle_verify_file_entry(
-	          verification_handle,
-	          file_entry,
-	          _LIBCSTRING_SYSTEM_STRING( "/" ),
-	          1,
-	          log_handle,
-	          error );
-#endif
+
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -2171,7 +2234,9 @@ on_error:
 		memory_free(
 		 file_entry_data );
 	}
-	/* TODO flush md5 and sha1 contexts */
+	verification_handle_finalize_integrity_hash_on_error(
+	 verification_handle,
+	 NULL );
 
 	if( ( target_path != NULL )
 	 && ( target_path != file_entry_path ) )

@@ -41,6 +41,11 @@ public ref class Handle sealed
 		int GetAccessFlagsRead( void );
 		int GetAccessFlagsReadWrite( void );
 		int GetAccessFlagsWrite( void );
+		int GetAccessFlagsWriteResume( void );
+
+		/* TODO add codepage functions ? */
+
+		bool CheckFileSignature( System::String^ filename );
 
 		array<System::String^>^ Glob( System::String^ filename );
 
@@ -51,15 +56,109 @@ public ref class Handle sealed
 
 		void Close( void );
 
-		int ReadBuffer( array<System::Byte>^ buffer, int size );
+		/* TODO add read write chunk functions ? */
 
-		int WriteBuffer( array<System::Byte>^ buffer, int size );
+		int ReadBuffer( array<System::Byte>^ buffer,
+		                int size );
 
-		System::Int64 SeekOffset( System::Int64 offset, System::IO::SeekOrigin origin );
+		int ReadRandom( array<System::Byte>^ buffer,
+		                int size,
+		                System::Int64 offset );
+
+		int WriteBuffer( array<System::Byte>^ buffer,
+		                 int size );
+
+		int WriteRandom( array<System::Byte>^ buffer,
+		                 int size,
+		                 System::Int64 offset );
+
+		System::Int64 SeekOffset( System::Int64 offset,
+		                          System::IO::SeekOrigin origin );
 
 		System::Int64 GetOffset( void );
 
+		/* TODO add segment file functions ? */
+
+		System::UInt32 GetSectorsPerChunk( void );
+
+		void SetSectorsPerChunk( System::UInt32 sectors_per_chunk );
+
+		System::UInt32 GetBytesPerSector( void );
+
+		void SetBytesPerSector( System::UInt32 bytes_per_sector );
+
+		System::UInt64 GetNumberOfSectors( void );
+
+		System::UInt32 GetChunkSize( void );
+
+		System::UInt32 GetErrorGranularity( void );
+
+		void SetErrorGranularity( System::UInt32 error_granularity );
+
+		/* TODO add compression values functions ? */
+
 		System::UInt64 GetMediaSize( void );
+
+		void SetMediaSize( System::UInt64 media_size );
+
+		System::Byte GetMediaType( void );
+
+		void SetMediaType( System::Byte media_type );
+
+		System::Byte GetMediaFlags( void );
+
+		void SetMediaFlags( System::Byte media_flags );
+
+		System::Byte GetFormat( void );
+
+		void SetFormat( System::Byte format );
+
+		/* TODO add GUID functions ? */
+
+		/* TODO add MD5 hash functions ? why bother when Get/SetHash value are available ? */
+
+		/* TODO add SHA1 hash functions ? why bother when Get/SetHash value are available ? */
+
+		/* TODO add other functions ? */
+
+		/* TODO add aquiry error functions ? */
+
+		/* TODO add read error functions ? */
+
+		/* TODO add session functions ? */
+
+		/* TODO add header codepage functions ? */
+
+		/* TODO add header date format functions ? */
+
+		int GetNumberOfHeaderValues( void );
+
+		/* TODO add header values functions ?
+
+		System::String^ GetHeaderValueIdentifier( int index );
+
+		System::String^ GetHeaderValue( System::String^ identifier );
+
+		void SetHeaderValue( System::String^ identifier,
+		                     System::String^ header_value );
+
+		 */
+		/* TODO add hash values functions ?
+
+		int GetNumberOfHashValues( void );
+
+		System::String^ GetHashValueIdentifier( int index );
+
+		System::String^ GetHashValue( System::String^ identifier );
+
+		void SetHashValue( System::String^ identifier,
+		                   System::String^ hash_value );
+
+		 */
+
+		/* TODO add single file entry root functions ?
+		 * create separate class for single file entry
+		 */
 };
 
 } // namespace EWF

@@ -48,10 +48,6 @@
 #include "process_status.h"
 #include "sha1.h"
 
-#if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
-#define USE_LIBEWF_GET_HASH_VALUE_MD5
-#endif
-
 #define EXPORT_HANDLE_BUFFER_SIZE		8192
 #define EXPORT_HANDLE_INPUT_BUFFER_SIZE		64
 #define EXPORT_HANDLE_STRING_SIZE		1024
@@ -62,6 +58,8 @@
  */
 int export_handle_initialize(
      export_handle_t **export_handle,
+     uint8_t calculate_md5,
+     uint8_t calculate_sha1,
      liberror_error_t **error )
 {
 	static char *function = "export_handle_initialize";
@@ -153,6 +151,42 @@ int export_handle_initialize(
 
 			goto on_error;
 		}
+		if( calculate_md5 != 0 )
+		{
+			( *export_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
+			                                                  DIGEST_HASH_STRING_SIZE_MD5 );
+
+			if( ( *export_handle )->calculated_md5_hash_string == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create calculated MD5 digest hash string.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( calculate_sha1 != 0 )
+		{
+			( *export_handle )->calculated_sha1_hash_string = libcstring_system_string_allocate(
+			                                                   DIGEST_HASH_STRING_SIZE_SHA1 );
+
+			if( ( *export_handle )->calculated_sha1_hash_string == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create calculated SHA1 digest hash string.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		( *export_handle )->calculate_md5       = calculate_md5;
+		( *export_handle )->calculate_sha1      = calculate_sha1;
 		( *export_handle )->compression_level   = LIBEWF_COMPRESSION_NONE;
 		( *export_handle )->output_format       = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 		( *export_handle )->ewf_format          = LIBEWF_FORMAT_ENCASE6;
@@ -166,6 +200,16 @@ int export_handle_initialize(
 on_error:
 	if( *export_handle != NULL )
 	{
+		if( ( *export_handle )->calculated_sha1_hash_string != NULL )
+		{
+			memory_free(
+			 ( *export_handle )->calculated_sha1_hash_string );
+		}
+		if( ( *export_handle )->calculated_md5_hash_string != NULL )
+		{
+			memory_free(
+			 ( *export_handle )->calculated_md5_hash_string );
+		}
 		if( ( *export_handle )->input_buffer != NULL )
 		{
 			memory_free(
@@ -1380,18 +1424,14 @@ int export_handle_swap_byte_pairs(
 	return( 1 );
 }
 
-/* Updates the integrity hash(es)
+/* Initializes the integrity hash(es)
  * Returns 1 if successful or -1 on error
  */
-int export_handle_update_integrity_hash(
+int export_handle_initialize_integrity_hash(
      export_handle_t *export_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
      liberror_error_t **error )
 {
-	uint8_t *data         = NULL;
-	static char *function = "export_handle_update_integrity_hash";
-	size_t data_size      = 0;
+	static char *function = "export_handle_initialize_integrity_hash";
 
 	if( export_handle == NULL )
 	{
@@ -1404,51 +1444,101 @@ int export_handle_update_integrity_hash(
 
 		return( -1 );
 	}
-	if( storage_media_buffer == NULL )
+	if( export_handle->calculate_md5 != 0 )
+	{
+		if( md5_initialize(
+		     &( export_handle->md5_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize MD5 context.",
+			 function );
+
+			goto on_error;
+		}
+		export_handle->md5_context_initialized = 1;
+	}
+	if( export_handle->calculate_sha1 != 0 )
+	{
+		if( sha1_initialize(
+		     &( export_handle->sha1_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize SHA1 context.",
+			 function );
+
+			goto on_error;
+		}
+		export_handle->sha1_context_initialized = 1;
+	}
+	return( 1 );
+
+on_error:
+	export_handle_finalize_integrity_hash_on_error(
+	 export_handle,
+	 NULL );
+
+	return( -1 );
+}
+
+/* Updates the integrity hash(es)
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_update_integrity_hash(
+     export_handle_t *export_handle,
+     uint8_t *buffer,
+     size_t buffer_size,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_update_integrity_hash";
+
+	if( export_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
+		 "%s: invalid export handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( read_size == 0 )
-	 || ( read_size > (size_t) SSIZE_MAX ) )
+	if( buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( buffer_size == 0 )
+	 || ( buffer_size > (size_t) SSIZE_MAX ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( storage_media_buffer_get_data(
-	     storage_media_buffer,
-	     &data,
-	     &data_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve storage media buffer data.",
+		 "%s: invalid buffer size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
 	if( export_handle->calculate_md5 != 0 )
 	{
-		/* TODO check for return value */
 		md5_update(
 		 &( export_handle->md5_context ),
-		 data,
-		 read_size,
+		 buffer,
+		 buffer_size,
 		 error );
 
 		if( ( error != NULL )
@@ -1466,11 +1556,10 @@ int export_handle_update_integrity_hash(
 	}
 	if( export_handle->calculate_sha1 != 0 )
 	{
-		/* TODO check for return value */
 		sha1_update(
 		 &( export_handle->sha1_context ),
-		 data,
-		 read_size,
+		 buffer,
+		 buffer_size,
 		 error );
 
 		if( ( error != NULL )
@@ -1487,6 +1576,192 @@ int export_handle_update_integrity_hash(
 		}
 	}
 	return( 1 );
+}
+
+/* Finalizes the integrity hash(es)
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_finalize_integrity_hash(
+     export_handle_t *export_handle,
+     liberror_error_t **error )
+{
+	digest_hash_t calculated_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t calculated_sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
+
+	static char *function            = "export_handle_finalize_integrity_hash";
+	size_t calculated_md5_hash_size  = DIGEST_HASH_SIZE_MD5;
+	size_t calculated_sha1_hash_size = DIGEST_HASH_SIZE_SHA1;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->calculate_md5 != 0 )
+	{
+		if( export_handle->calculated_md5_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing calculated MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
+		if( md5_finalize(
+		     &( export_handle->md5_context ),
+		     calculated_md5_hash,
+		     &calculated_md5_hash_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize MD5 hash.",
+			 function );
+
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     calculated_md5_hash,
+		     calculated_md5_hash_size,
+		     export_handle->calculated_md5_hash_string,
+		     DIGEST_HASH_STRING_SIZE_MD5,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set calculated MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( export_handle->calculate_sha1 != 0 )
+	{
+		if( export_handle->calculated_sha1_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing calculated SHA1 hash string.",
+			 function );
+
+			return( -1 );
+		}
+		if( sha1_finalize(
+		     &( export_handle->sha1_context ),
+		     calculated_sha1_hash,
+		     &calculated_sha1_hash_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize SHA1 hash.",
+			 function );
+
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     calculated_sha1_hash,
+		     calculated_sha1_hash_size,
+		     export_handle->calculated_sha1_hash_string,
+		     DIGEST_HASH_STRING_SIZE_SHA1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create calculated SHA1 hash string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Finalizes the integrity hash(es) on error
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_finalize_integrity_hash_on_error(
+     export_handle_t *export_handle,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_finalize_integrity_hash_on_error";
+	int result            = 1;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->calculate_md5 != 0 )
+	{
+		if( export_handle->md5_context_initialized != 0 )
+		{
+			if( md5_finalize(
+			     &( export_handle->md5_context ),
+			     NULL,
+			     NULL,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to finalize MD5 hash.",
+				 function );
+
+				result = -1;
+			}
+			export_handle->md5_context_initialized = 0;
+		}
+	}
+	if( export_handle->calculate_sha1 != 0 )
+	{
+		if( export_handle->md5_context_initialized != 0 )
+		{
+			if( sha1_finalize(
+			     &( export_handle->sha1_context ),
+			     NULL,
+			     NULL,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to finalize SHA1 hash.",
+				 function );
+
+				result = -1;
+			}
+			export_handle->sha1_context_initialized = 0;
+		}
+	}
+	return( result );
 }
 
 /* Retrieves the input media size
@@ -2486,66 +2761,6 @@ int export_handle_set_process_buffer_size(
 	return( result );
 }
 
-/* Sets the processing values
- * Returns 1 if successful or -1 on error
- */
-int export_handle_set_processing_values(
-     export_handle_t *export_handle,
-     uint8_t calculate_md5,
-     uint8_t calculate_sha1,
-     liberror_error_t **error )
-{
-	static char *function = "export_handle_set_processing_values";
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( calculate_md5 != 0 )
-	{
-		if( md5_initialize(
-		     &( export_handle->md5_context ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize MD5 context.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( calculate_sha1 != 0 )
-	{
-		if( sha1_initialize(
-		     &( export_handle->sha1_context ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize SHA1 context.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	export_handle->calculate_md5  = calculate_md5;
-	export_handle->calculate_sha1 = calculate_sha1;
-
-	return( 1 );
-}
-
 /* Sets the output values of the export handle
  * Returns 1 if successful or -1 on error
  */
@@ -3117,17 +3332,8 @@ ssize_t export_handle_finalize(
          export_handle_t *export_handle,
          liberror_error_t **error )
 {
-#if defined( USE_LIBEWF_GET_MD5_HASH )
-        digest_hash_t stored_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
-#endif
-
-	digest_hash_t calculated_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
-	digest_hash_t calculated_sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
-
-	static char *function            = "export_handle_finalize";
-	size_t calculated_md5_hash_size  = DIGEST_HASH_SIZE_MD5;
-	size_t calculated_sha1_hash_size = DIGEST_HASH_SIZE_SHA1;
-	ssize_t write_count              = 0;
+	static char *function = "export_handle_finalize";
+	ssize_t write_count   = 0;
 
 	if( export_handle == NULL )
 	{
@@ -3140,78 +3346,8 @@ ssize_t export_handle_finalize(
 
 		return( -1 );
 	}
-	if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
-	 && ( export_handle->ewf_output_handle == NULL ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing ewf output handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( export_handle->calculate_md5 != 0 )
 	{
-		if( export_handle->calculated_md5_hash_string != NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid calculated MD5 hash string value already set.",
-			 function );
-
-			goto on_error;
-		}
-		export_handle->calculated_md5_hash_string = libcstring_system_string_allocate(
-		                                             DIGEST_HASH_STRING_SIZE_MD5 );
-
-		if( export_handle->calculated_md5_hash_string == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create calculated MD5 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
-		/* Finalize the MD5 hash calculation
-		 */
-		if( md5_finalize(
-		     &( export_handle->md5_context ),
-		     calculated_md5_hash,
-		     &calculated_md5_hash_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to finalize MD5 hash.",
-			 function );
-
-			goto on_error;
-		}
-		if( digest_hash_copy_to_string(
-		     calculated_md5_hash,
-		     calculated_md5_hash_size,
-		     export_handle->calculated_md5_hash_string,
-		     DIGEST_HASH_STRING_SIZE_MD5,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set calculated MD5 hash string.",
-			 function );
-
-			goto on_error;
-		}
 		if( export_handle_set_hash_value(
 		     export_handle,
 		     "MD5",
@@ -3227,69 +3363,11 @@ ssize_t export_handle_finalize(
 			 "%s: unable to set hash value: MD5.",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
 	if( export_handle->calculate_sha1 != 0 )
 	{
-		if( export_handle->calculated_sha1_hash_string != NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid calculated SHA1 hash string value already set.",
-			 function );
-
-			goto on_error;
-		}
-		export_handle->calculated_sha1_hash_string = libcstring_system_string_allocate(
-		                                              DIGEST_HASH_STRING_SIZE_SHA1 );
-
-		if( export_handle->calculated_sha1_hash_string == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create calculated sha1 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
-		/* Finalize the SHA1 hash calculation
-		 */
-		if( sha1_finalize(
-		     &( export_handle->sha1_context ),
-		     calculated_sha1_hash,
-		     &calculated_sha1_hash_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to finalize SHA1 hash.",
-			 function );
-
-			goto on_error;
-		}
-		if( digest_hash_copy_to_string(
-		     calculated_sha1_hash,
-		     calculated_sha1_hash_size,
-		     export_handle->calculated_sha1_hash_string,
-		     DIGEST_HASH_STRING_SIZE_SHA1,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create calculated SHA1 hash string.",
-			 function );
-
-			goto on_error;
-		}
 		if( export_handle_set_hash_value(
 		     export_handle,
 		     "SHA1",
@@ -3305,7 +3383,7 @@ ssize_t export_handle_finalize(
 			 "%s: unable to set hash value: SHA1.",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
@@ -3323,27 +3401,10 @@ ssize_t export_handle_finalize(
 			 "%s: unable to finalize EWF file(s).",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
 	return( write_count );
-
-on_error:
-	if( export_handle->calculated_sha1_hash_string != NULL )
-	{
-		memory_free(
-		 export_handle->calculated_sha1_hash_string );
-
-		export_handle->calculated_sha1_hash_string = NULL;
-	}
-	if( export_handle->calculated_md5_hash_string != NULL )
-	{
-		memory_free(
-		 export_handle->calculated_md5_hash_string );
-
-		export_handle->calculated_md5_hash_string = NULL;
-	}
-	return( -1 );
 }
 
 /* Exports the input
@@ -3358,10 +3419,12 @@ int export_handle_export_input(
 {
 	process_status_t *process_status                    = NULL;
 	storage_media_buffer_t *storage_media_buffer        = NULL;
+	uint8_t *data                                       = NULL;
 	static char *function                               = "export_handle_export_input";
 	size64_t export_count                               = 0;
 	size64_t media_size                                 = 0;
 	size_t process_buffer_size                          = 0;
+	size_t data_size                                    = 0;
 	size_t read_size                                    = 0;
 	ssize_t read_count                                  = 0;
 	ssize_t read_process_count                          = 0;
@@ -3546,6 +3609,19 @@ int export_handle_export_input(
 		goto on_error;
 	}
 #endif
+	if( export_handle_initialize_integrity_hash(
+	     export_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize integrity hash(es).",
+		 function );
+
+		goto on_error;
+        }
 	if( process_status_initialize(
 	     &process_status,
 	     _LIBCSTRING_SYSTEM_STRING( "Export" ),
@@ -3668,11 +3744,26 @@ int export_handle_export_input(
 				goto on_error;
 			}
 		}
+		if( storage_media_buffer_get_data(
+		     storage_media_buffer,
+		     &data,
+		     &data_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve storage media buffer data.",
+			 function );
+
+			goto on_error;
+		}
 		/* Digest hashes are calcultated after swap
 		 */
 		if( export_handle_update_integrity_hash(
 		     export_handle,
-		     storage_media_buffer,
+		     data,
 		     read_process_count,
 		     error ) != 1 )
 		{
@@ -3835,6 +3926,19 @@ int export_handle_export_input(
 
 		goto on_error;
 	}
+	if( export_handle_finalize_integrity_hash(
+	     export_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to finalize integrity hash(es).",
+		 function );
+
+		goto on_error;
+	}
 	write_count = export_handle_finalize(
 	               export_handle,
 	               error );
@@ -3931,6 +4035,10 @@ on_error:
 		 NULL );
 	}
 #endif
+	export_handle_finalize_integrity_hash_on_error(
+	 export_handle,
+	 NULL );
+
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(

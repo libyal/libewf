@@ -165,25 +165,33 @@ struct imaging_handle
 	 */
 	uint8_t calculate_md5;
 
-	/* Value to indicate if the SHA1 digest hash should be calculated
-	 */
-	uint8_t calculate_sha1;
-
 	/* The MD5 digest context
 	 */
 	md5_context_t md5_context;
+
+	/* Value to indicate the MD5 digest context was initialized
+	 */
+	uint8_t md5_context_initialized;
+
+	/* The calculated MD5 digest hash string
+	 */
+	libcstring_system_character_t *calculated_md5_hash_string;
+
+	/* Value to indicate if the SHA1 digest hash should be calculated
+	 */
+	uint8_t calculate_sha1;
 
 	/* The SHA1 digest context
 	 */
 	sha1_context_t sha1_context;
 
-	/* The MD5 digest hash string
+	/* Value to indicate the SHA-1 digest context was initialized
 	 */
-	libcstring_system_character_t md5_hash_string[ DIGEST_HASH_STRING_SIZE_MD5 ];
+	uint8_t sha1_context_initialized;
 
-	/* The SHA-1 digest hash string
+	/* The calculated SHA-1 digest hash string
 	 */
-	libcstring_system_character_t sha1_hash_string[ DIGEST_HASH_STRING_SIZE_SHA1 ];
+	libcstring_system_character_t *calculated_sha1_hash_string;
 
 	/* The libewf output handle
 	 */
@@ -274,10 +282,22 @@ int imaging_handle_swap_byte_pairs(
      size_t read_size,
      liberror_error_t **error );
 
+int imaging_handle_initialize_integrity_hash(
+     imaging_handle_t *imaging_handle,
+     liberror_error_t **error );
+
 int imaging_handle_update_integrity_hash(
      imaging_handle_t *imaging_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
+     uint8_t *buffer,
+     size_t buffer_size,
+     liberror_error_t **error );
+
+int imaging_handle_finalize_integrity_hash(
+     imaging_handle_t *imaging_handle,
+     liberror_error_t **error );
+
+int imaging_handle_finalize_integrity_hash_on_error(
+     imaging_handle_t *imaging_handle,
      liberror_error_t **error );
 
 int imaging_handle_get_chunk_size(

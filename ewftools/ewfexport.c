@@ -499,6 +499,8 @@ int main( int argc, char * const argv[] )
 
 	if( export_handle_initialize(
 	     &ewfexport_export_handle,
+	     calculate_md5,
+	     calculate_sha1,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -1130,18 +1132,6 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		if( export_handle_set_processing_values(
-		     ewfexport_export_handle,
-		     calculate_md5,
-		     calculate_sha1,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set processing values.\n" );
-
-			goto on_error;
-		}
 		if( export_handle_open_output(
 		     ewfexport_export_handle,
 		     ewfexport_export_handle->target_filename,
