@@ -138,12 +138,10 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-D:     specify the description (default is description).\n" );
 	fprintf( stream, "\t-e:     specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );
-	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity,\n"
-	                 "\t        options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096,\n"
-	                 "\t        8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart,\n"
 	                 "\t        ftk, encase2, encase3, encase4, encase5, encase6 (default),\n"
 	                 "\t        linen5, linen6, ewfx\n" );
+	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m:     specify the media type, options: fixed (default), removable,\n"
@@ -581,7 +579,8 @@ int ewfacquire_read_input(
 			goto on_error;
 		}
 	}
-	byte_error_granularity = imaging_handle->sector_error_granularity * imaging_handle->bytes_per_sector;
+	byte_error_granularity = imaging_handle->sector_error_granularity
+	                       * imaging_handle->bytes_per_sector;
 
 	if( imaging_handle_get_chunk_size(
 	     imaging_handle,
@@ -1900,8 +1899,11 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		else if( result == 0 )
+		else if( ( result == 0 )
+		      && ( ewfacquire_imaging_handle->sector_error_granularity > ewfacquire_imaging_handle->sectors_per_chunk ) )
 		{
+			ewfacquire_imaging_handle->sector_error_granularity = ewfacquire_imaging_handle->sectors_per_chunk;
+
 			fprintf(
 			 stderr,
 			 "Unsupported sector error granularity defaulting to: %" PRIu32 ".\n",
@@ -2432,6 +2434,15 @@ int main( int argc, char * const argv[] )
 					 "Unable to determine sector error granularity.\n" );
 
 					goto on_error;
+				}
+				if( ewfacquire_imaging_handle->sector_error_granularity > ewfacquire_imaging_handle->sectors_per_chunk )
+				{
+					ewfacquire_imaging_handle->sector_error_granularity = ewfacquire_imaging_handle->sectors_per_chunk;
+
+					fprintf(
+					 stderr,
+					 "Unsupported sector error granularity defaulting to: %" PRIu32 ".\n",
+					 ewfacquire_imaging_handle->sector_error_granularity );
 				}
 			}
 		}

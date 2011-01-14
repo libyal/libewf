@@ -2801,8 +2801,10 @@ int imaging_handle_set_sector_error_granularity(
      const libcstring_system_character_t *string,
      liberror_error_t **error )
 {
-	static char *function = "imaging_handle_set_sector_error_granularity";
-	int result            = 0;
+	static char *function  = "imaging_handle_set_sector_error_granularity";
+	size_t string_length   = 0;
+	uint64_t size_variable = 0;
+	int result             = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -2815,10 +2817,13 @@ int imaging_handle_set_sector_error_granularity(
 
 		return( -1 );
 	}
-	/* TODO this behavior does not match prompt function */
-	result = ewfinput_determine_sectors_per_chunk(
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	result = byte_size_string_convert(
 	          string,
-	          &( imaging_handle->sector_error_granularity ),
+	          string_length,
+	          &size_variable,
 	          error );
 
 	if( result == -1 )
@@ -2827,10 +2832,21 @@ int imaging_handle_set_sector_error_granularity(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine sectors per chunk.",
+		 "%s: unable to determine sector error granularity.",
 		 function );
 
 		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( size_variable > (uint64_t) UINT32_MAX )
+		{
+			result = 0;
+		}
+		else
+		{
+			imaging_handle->sector_error_granularity = (uint32_t) size_variable;
+		}
 	}
 	return( result );
 }

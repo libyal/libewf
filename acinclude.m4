@@ -722,6 +722,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
    libbfio_handle_write,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_seek_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
 
   AC_CHECK_LIB(
    bfio,
@@ -741,6 +746,16 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
   AC_CHECK_LIB(
    bfio,
    libbfio_handle_set_track_offsets_read,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_get_number_of_offsets_read,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
+   libbfio_handle_get_offset_read,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])
  
@@ -782,7 +797,8 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
     bfio,
     libbfio_file_set_name_wide,
     [ac_libewf_dummy=yes],
-    [ac_libewf_have_libbfio=no]) ])
+    [ac_libewf_have_libbfio=no])
+   ])
  
   dnl Pool functions
   AC_CHECK_LIB(
@@ -848,6 +864,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
    [ac_libewf_have_libbfio=no])
   AC_CHECK_LIB(
    bfio,
+   libbfio_pool_set_handle,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libbfio=no])
+  AC_CHECK_LIB(
+   bfio,
    libbfio_pool_append_handle,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])
@@ -863,7 +884,7 @@ AC_DEFUN([LIBEWF_CHECK_LIBBFIO],
    [ac_libewf_have_libbfio=no])
   AC_CHECK_LIB(
    bfio,
-   libbfio_pool_get_maximum_number_of_open_handles,
+   libbfio_pool_set_maximum_number_of_open_handles,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libbfio=no])
   ])
@@ -1023,6 +1044,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBFVALUE],
    [ac_libewf_have_libfvalue=no])
   AC_CHECK_LIB(
    fvalue,
+   libfvalue_table_clone,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
    libfvalue_table_get_number_of_values,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libfvalue=no])
@@ -1044,6 +1070,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBFVALUE],
   AC_CHECK_LIB(
    fvalue,
    libfvalue_table_set_value_by_index,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libfvalue=no])
+  AC_CHECK_LIB(
+   fvalue,
+   libfvalue_table_copy_from_utf8_xml_string,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libfvalue=no])
  
@@ -1165,7 +1196,8 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
     smdev,
     libsmdev_check_device_wide,
     [ac_libewf_dummy=yes],
-    [ac_libewf_have_libsmdev=no]) ])
+    [ac_libewf_have_libsmdev=no])
+   ])
 
   dnl Handle functions
   AC_CHECK_LIB(
@@ -1178,6 +1210,12 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
    libsmdev_handle_free,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_signal_abort,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+
   AC_CHECK_LIB(
    smdev,
    libsmdev_handle_open,
@@ -1205,13 +1243,8 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
     smdev,
     libsmdev_handle_open_wide,
     [ac_libewf_dummy=yes],
-    [ac_libewf_have_libsmdev=no]) ])
-
-  AC_CHECK_LIB(
-   smdev,
-   libsmdev_handle_signal_abort,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libsmdev=no])
+    [ac_libewf_have_libsmdev=no])
+   ])
 
   AC_CHECK_LIB(
    smdev,
@@ -1230,7 +1263,7 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
    [ac_libewf_have_libsmdev=no])
   AC_CHECK_LIB(
    smdev,
-   libsmdev_handle_get_information_value,
+   libsmdev_handle_get_utf8_information_value,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmdev=no])
   AC_CHECK_LIB(
@@ -1304,6 +1337,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
    [ac_libewf_have_libsmraw=no])
   AC_CHECK_LIB(
    smraw,
+   libsmraw_handle_signal_abort,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
    libsmraw_handle_open,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmraw=no])
@@ -1334,13 +1372,8 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
     smraw,
     libsmraw_handle_open_wide,
     [ac_libewf_dummy=yes],
-    [ac_libewf_have_libsmraw=no]) ])
-
-  AC_CHECK_LIB(
-   smraw,
-   libsmraw_handle_signal_abort,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_libsmraw=no])
+    [ac_libewf_have_libsmraw=no])
+   ])
 
   AC_CHECK_LIB(
    smraw,
@@ -1349,7 +1382,17 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
    [ac_libewf_have_libsmraw=no])
   AC_CHECK_LIB(
    smraw,
+   libsmraw_handle_get_bytes_per_sector,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
    libsmraw_handle_get_utf8_information_value
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_get_utf16_information_value
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmraw=no])
 
@@ -1368,6 +1411,11 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMRAW],
    libsmraw_handle_set_utf8_integrity_hash_value
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmraw=no])
+  AC_CHECK_LIB(
+   smraw,
+   libsmraw_handle_set_utf16_integrity_hash_value
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmraw=no])
   ])
  ])
 
@@ -1384,6 +1432,109 @@ AC_DEFUN([LIBEWF_CHECK_LIBODRAW],
    libodraw_get_version,
    [],
    [ac_libewf_have_libodraw=no])
+
+  dnl Handle functions
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_initialize,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_signal_abort,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_open,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_open_data_files,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_close,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_read_buffer,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_seek_offset,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_enable_wide_character_type" != xno],
+   [AC_CHECK_LIB(
+    odraw,
+    libodraw_handle_open_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libodraw=no])
+   ])
+
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_bytes_per_sector,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_data_file,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_media_size,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_number_of_data_files,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_number_of_sessions,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_session,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+
+  dnl Data file functions
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_data_file_free,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_data_file_set_filename,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+
+  AS_IF(
+   [test "x$ac_cv_libewf_enable_wide_character_type" != xno],
+   [AC_CHECK_LIB(
+    odraw,
+    libodraw_data_file_set_filename_wide,
+    [ac_libewf_dummy=yes],
+    [ac_libewf_have_libodraw=no])
+   ])
   ])
  ])
 
