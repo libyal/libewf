@@ -233,6 +233,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110117
+* updated libsystem, libuna, libbfio, libsmdev, libsmraw, libodraw
+
 20110114
 * updated libuna, libbfio, libodraw, libsmdev, libsmraw
 * updated check for dependent functions
