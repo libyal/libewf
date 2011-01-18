@@ -31,6 +31,8 @@
 
 #include <vcclr.h>
 
+#include <msclr/marshal.h>
+
 #include "ewf.net.h"
 #include "ewf.net_handle.h"
 
@@ -38,6 +40,7 @@
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
+using namespace msclr::interop;
 
 namespace EWF {
 
@@ -240,15 +243,26 @@ array<System::String^>^ Handle::Glob( System::String^ filename )
 		throw gcnew System::Exception(
 			     error_string );
 	}
-	filenames = gcnew array<System::String^, 1>(
-	                   ewf_number_of_filenames );
+	filenames = gcnew array<System::String^, 1>( ewf_number_of_filenames );
 
 	for( ewf_filename_index = 0;
 	     ewf_filename_index < ewf_number_of_filenames;
 	     ewf_filename_index++ )
 	{
-		filenames[ ewf_filename_index ] = gcnew System::String(
-		                                           ewf_filenames[ ewf_filename_index ] );
+		try
+		{
+			filenames[ ewf_filename_index ] = gcnew System::String(
+			                                           ewf_filenames[ ewf_filename_index ] );
+		}
+		catch( System::Exception^ exception )
+		{
+			libewf_glob_wide_free(
+			 ewf_filenames,
+			 ewf_number_of_filenames,
+			 NULL );
+
+			throw exception;
+		}
 	}
 	if( libewf_glob_wide_free(
 	     ewf_filenames,
@@ -349,7 +363,7 @@ void Handle::Open( array<System::String^>^ filenames,
 			"ewf.net " + function + ": missing filenames." );
 	}
 	ewf_filenames = (wchar_t **) memory_allocate(
-	                                sizeof( wchar_t* ) * ewf_number_of_filenames );
+	                              sizeof( wchar_t* ) * ewf_number_of_filenames );
 
 	if( ewf_filenames == NULL )
 	{
@@ -1544,6 +1558,159 @@ void Handle::SetFormat( System::Byte format )
 	}
 }
 
+int Handle::GetNumberOfAcquiryErrors( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error             = NULL;
+	libewf_handle_t *handle           = NULL;
+	System::String^ error_string      = nullptr;
+	System::String^ function          = "Handle::GetNumberOfAcquiryErrors";
+	uint32_t number_of_acquiry_errors = 0;
+	int result                        = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_number_of_acquiry_errors(
+	          handle,
+	          &number_of_acquiry_errors,
+	          &error );
+
+	if( result == -1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of acquiry errors from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	if( number_of_acquiry_errors > (uint32_t) INT_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": number of acquiry errors exceeds maximum." );
+	}
+	return( (int) number_of_acquiry_errors );
+}
+
+int Handle::GetNumberOfReadErrors( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::GetNumberOfReadErrors";
+	uint32_t number_of_read_errors = 0;
+	int result                     = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_number_of_read_errors(
+	          handle,
+	          &number_of_read_errors,
+	          &error );
+
+	if( result == -1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of read errors from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	if( number_of_read_errors > (uint32_t) INT_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": number of read errors exceeds maximum." );
+	}
+	return( (int) number_of_read_errors );
+}
+
+int Handle::GetNumberOfSessions( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
+	System::String^ error_string = nullptr;
+	System::String^ function     = "Handle::GetNumberOfSessions";
+	uint32_t number_of_sessions  = 0;
+	int result                   = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_number_of_sessions(
+	          handle,
+	          &number_of_sessions,
+	          &error );
+
+	if( result == -1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of sessions from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	if( number_of_sessions > (uint32_t) INT_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": number of sessions exceeds maximum." );
+	}
+	return( (int) number_of_sessions );
+}
+
 int Handle::GetNumberOfHeaderValues( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
@@ -1593,6 +1760,651 @@ int Handle::GetNumberOfHeaderValues( void )
 			     "ewf.net " + function + ": number of header values exceeds maximum." );
 	}
 	return( (int) number_of_header_values );
+}
+
+System::String^ Handle::GetHeaderValueIdentifier( int index )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error                   = NULL;
+	libewf_handle_t *handle                 = NULL;
+	System::Text::UTF8Encoding^ encoding    = nullptr;
+	System::String^ error_string            = nullptr;
+	System::String^ function                = "Handle::GetHeaderValueIdentifier";
+	System::String^ header_value_identifier = nullptr;
+	uint8_t *ewf_header_value_identifier    = NULL;
+	size_t ewf_header_value_identifier_size = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	if( libewf_handle_get_header_value_identifier_size(
+	     handle,
+	     index,
+	     &ewf_header_value_identifier_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve header value identifier size." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	ewf_header_value_identifier = (uint8_t *) memory_allocate(
+	                                           sizeof( uint8_t ) * ewf_header_value_identifier_size );
+
+	if( ewf_header_value_identifier == NULL )
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": unable to create header value identifier." );
+	}
+	if( libewf_handle_get_header_value_identifier(
+	     handle,
+	     index,
+	     ewf_header_value_identifier,
+	     ewf_header_value_identifier_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve header value identifier." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		memory_free(
+		 ewf_header_value_identifier );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	try
+	{
+		encoding = gcnew UTF8Encoding(
+		                  false,
+		                  true );
+
+		header_value_identifier = gcnew System::String(
+		                                 (char *) ewf_header_value_identifier,
+		                                 0,
+		                                 ewf_header_value_identifier_size - 1,
+	        	                         encoding );
+	}
+	catch( System::Exception^ exception )
+	{
+		memory_free(
+		 ewf_header_value_identifier );
+
+		throw exception;
+	}
+	memory_free(
+	 ewf_header_value_identifier );
+
+	return( header_value_identifier );
+}
+
+System::String^ Handle::GetHeaderValue( System::String^ identifier )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error                     = NULL;
+	libewf_handle_t *handle                   = NULL;
+	marshal_context ^context                  = nullptr;
+	System::String^ error_string              = nullptr;
+	System::String^ function                  = "Handle::GetHeaderValue";
+	System::String^ header_value              = nullptr;
+	uint16_t *ewf_header_value                = NULL;
+	const char *ewf_header_value_identifier   = NULL;
+	size_t ewf_header_value_identifier_length = 0;
+	size_t ewf_header_value_size              = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	context = gcnew marshal_context();
+
+	ewf_header_value_identifier = context->marshal_as<const char*>( identifier );
+
+	ewf_header_value_identifier_length = strlen(
+	                                      ewf_header_value_identifier );
+
+	if( libewf_handle_get_utf16_header_value_size(
+	     handle,
+	     (uint8_t *) ewf_header_value_identifier,
+	     ewf_header_value_identifier_length,
+	     &ewf_header_value_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve header value size." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		delete context;
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	ewf_header_value = (uint16_t *) memory_allocate(
+	                                 sizeof( uint16_t ) * ewf_header_value_size );
+
+	if( ewf_header_value == NULL )
+	{
+		delete context;
+
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": unable to create header value." );
+	}
+	if( libewf_handle_get_utf16_header_value(
+	     handle,
+	     (uint8_t *) ewf_header_value_identifier,
+	     ewf_header_value_identifier_length,
+	     ewf_header_value,
+	     ewf_header_value_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve header value." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		memory_free(
+		 ewf_header_value );
+
+		delete context;
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	try
+	{
+		header_value = gcnew System::String(
+		                      (wchar_t *) ewf_header_value );
+	}
+	catch( System::Exception^ exception )
+	{
+		memory_free(
+		 ewf_header_value );
+
+		delete context;
+
+		throw exception;
+	}
+	memory_free(
+	 ewf_header_value );
+
+	delete context;
+
+	return( header_value );
+}
+
+void Handle::SetHeaderValue( System::String^ identifier,
+      System::String^ header_value )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error                     = NULL;
+	libewf_handle_t *handle                   = NULL;
+	marshal_context ^context                  = nullptr;
+	System::String^ error_string              = nullptr;
+	System::String^ function                  = "Handle::SetHeaderValue";
+	System::String^ header_value              = nullptr;
+	pin_ptr<const wchar_t> ewf_header_value   = nullptr;
+	const char *ewf_header_value_identifier   = NULL;
+	size_t ewf_header_value_identifier_length = 0;
+	size_t ewf_header_value_length            = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	context = gcnew marshal_context();
+
+	ewf_header_value_identifier = context->marshal_as<const char*>( identifier );
+
+	ewf_header_value_identifier_length = strlen(
+	                                      ewf_header_value_identifier );
+
+	ewf_header_value = PtrToStringChars(
+	                    header_value );
+
+	ewf_header_value_length = wcslen(
+	                           ewf_header_value );
+
+	if( libewf_handle_set_utf16_header_value(
+	     handle,
+	     (uint8_t *) ewf_header_value_identifier,
+	     ewf_header_value_identifier_length,
+	     (uint16_t *) ewf_header_value,
+	     ewf_header_value_length,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to set header value." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		delete context;
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	delete context;
+}
+
+int Handle::GetNumberOfHashValues( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::GetNumberOfHashValues";
+	uint32_t number_of_hash_values = 0;
+	int result                     = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_number_of_hash_values(
+	          handle,
+	          &number_of_hash_values,
+	          &error );
+
+	if( result == -1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of hash values from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	if( number_of_hash_values > (uint32_t) INT_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": number of hash values exceeds maximum." );
+	}
+	return( (int) number_of_hash_values );
+}
+
+System::String^ Handle::GetHashValueIdentifier( int index )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error                 = NULL;
+	libewf_handle_t *handle               = NULL;
+	System::Text::UTF8Encoding^ encoding  = nullptr;
+	System::String^ error_string          = nullptr;
+	System::String^ function              = "Handle::GetHashValueIdentifier";
+	System::String^ hash_value_identifier = nullptr;
+	uint8_t *ewf_hash_value_identifier    = NULL;
+	size_t ewf_hash_value_identifier_size = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	if( libewf_handle_get_hash_value_identifier_size(
+	     handle,
+	     index,
+	     &ewf_hash_value_identifier_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve hash value identifier size." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	ewf_hash_value_identifier = (uint8_t *) memory_allocate(
+	                                         sizeof( uint8_t ) * ewf_hash_value_identifier_size );
+
+	if( ewf_hash_value_identifier == NULL )
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": unable to create hash value identifier." );
+	}
+	if( libewf_handle_get_hash_value_identifier(
+	     handle,
+	     index,
+	     ewf_hash_value_identifier,
+	     ewf_hash_value_identifier_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve hash value identifier." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		memory_free(
+		 ewf_hash_value_identifier );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	try
+	{
+		encoding = gcnew UTF8Encoding(
+		                  false,
+		                  true );
+
+		hash_value_identifier = gcnew System::String(
+		                               (char *) ewf_hash_value_identifier,
+		                               0,
+		                               ewf_hash_value_identifier_size - 1,
+	        	                       encoding );
+	}
+	catch( System::Exception^ exception )
+	{
+		memory_free(
+		 ewf_hash_value_identifier );
+
+		throw exception;
+	}
+	memory_free(
+	 ewf_hash_value_identifier );
+
+	return( hash_value_identifier );
+}
+
+System::String^ Handle::GetHashValue( System::String^ identifier )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error                   = NULL;
+	libewf_handle_t *handle                 = NULL;
+	marshal_context ^context                = nullptr;
+	System::String^ error_string            = nullptr;
+	System::String^ function                = "Handle::GetHashValue";
+	System::String^ hash_value              = nullptr;
+	uint16_t *ewf_hash_value                = NULL;
+	const char *ewf_hash_value_identifier   = NULL;
+	size_t ewf_hash_value_identifier_length = 0;
+	size_t ewf_hash_value_size              = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	context = gcnew marshal_context();
+
+	ewf_hash_value_identifier = context->marshal_as<const char*>( identifier );
+
+	ewf_hash_value_identifier_length = strlen(
+	                                    ewf_hash_value_identifier );
+
+	if( libewf_handle_get_utf16_hash_value_size(
+	     handle,
+	     (uint8_t *) ewf_hash_value_identifier,
+	     ewf_hash_value_identifier_length,
+	     &ewf_hash_value_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve hash value size." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		delete context;
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	ewf_hash_value = (uint16_t *) memory_allocate(
+	                               sizeof( uint16_t ) * ewf_hash_value_size );
+
+	if( ewf_hash_value == NULL )
+	{
+		delete context;
+
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": unable to create hash value." );
+	}
+	if( libewf_handle_get_utf16_hash_value(
+	     handle,
+	     (uint8_t *) ewf_hash_value_identifier,
+	     ewf_hash_value_identifier_length,
+	     ewf_hash_value,
+	     ewf_hash_value_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve hash value." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		memory_free(
+		 ewf_hash_value );
+
+		delete context;
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	try
+	{
+		hash_value = gcnew System::String(
+		                    (wchar_t *) ewf_hash_value );
+	}
+	catch( System::Exception^ exception )
+	{
+		memory_free(
+		 ewf_hash_value );
+
+		delete context;
+
+		throw exception;
+	}
+	memory_free(
+	 ewf_hash_value );
+
+	delete context;
+
+	return( hash_value );
+}
+
+void Handle::SetHashValue( System::String^ identifier,
+      System::String^ hash_value )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error                   = NULL;
+	libewf_handle_t *handle                 = NULL;
+	marshal_context ^context                = nullptr;
+	System::String^ error_string            = nullptr;
+	System::String^ function                = "Handle::SetHashValue";
+	System::String^ hash_value              = nullptr;
+	pin_ptr<const wchar_t> ewf_hash_value   = nullptr;
+	const char *ewf_hash_value_identifier   = NULL;
+	size_t ewf_hash_value_identifier_length = 0;
+	size_t ewf_hash_value_length            = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	context = gcnew marshal_context();
+
+	ewf_hash_value_identifier = context->marshal_as<const char*>( identifier );
+
+	ewf_hash_value_identifier_length = strlen(
+	                                    ewf_hash_value_identifier );
+
+	ewf_hash_value = PtrToStringChars(
+	                  hash_value );
+
+	ewf_hash_value_length = wcslen(
+	                         ewf_hash_value );
+
+	if( libewf_handle_set_utf16_hash_value(
+	     handle,
+	     (uint8_t *) ewf_hash_value_identifier,
+	     ewf_hash_value_identifier_length,
+	     (uint16_t *) ewf_hash_value,
+	     ewf_hash_value_length,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to set hash value." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		delete context;
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	delete context;
 }
 
 } // namespace EWF

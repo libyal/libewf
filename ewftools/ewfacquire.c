@@ -2616,20 +2616,6 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-	if( interactive_mode == 0 )
-	{
-		if( ewfacquire_imaging_handle->maximum_segment_size == 0 )
-		{
-			if( ewfacquire_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-			{
-				ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-			}
-			else
-			{
-				ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
-			}
-		}
-	}
 	if( ewfacquire_abort != 0 )
 	{
 		goto on_abort;

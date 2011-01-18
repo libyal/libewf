@@ -31,6 +31,8 @@ public ref class EWF sealed
 {
 	public:
 		System::String^ GetVersion( void );
+
+		/* TODO add codepage functions ? */
 };
 
 } // namespace EWF

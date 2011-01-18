@@ -1,5 +1,4 @@
 TODO
-* imaging handle: flush md5 and sha1 contexts on error
 
 Next stable release:
 * full test
@@ -156,7 +155,7 @@ API changes
 * low level API
   - add function to retrieve the segment file names and amount?
   - add function to retrieve EWFX xml header/hash directly
-* LVF
+* LVF write support
   - libewf_add/remove_file for LVF
 * file structure API extension (idea)
 
@@ -182,7 +181,7 @@ Tools:
   - warn if media does not fit using chunk size or APIv1
     a (32-bit) chunks size of ( 64 * 512 ) will allow up to 128 TiB
   - for EnCase 6 format request serial number and model if not set ?
-  - add support to enter sessions for optical images
+  - add support to manually provide sessions for optical images ?
   - add support for unattended write resume ?
   - improve output when encountering a read error
 * ewfacquirestream
@@ -202,8 +201,6 @@ Tools:
   - create a tool recover ewf files
 * process status
   - improve and remove "This could take a while." ?
-* ewfverify
-  - notify about mismatch in single file entry MD5 hash
 
 Tests
 * glob: .ezz, .faa ... .zzz
@@ -233,6 +230,13 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110118
+* imaging handle
+  - fix for missing default maximum segment (file) size
+* ewfacquirestream:
+  - fix for default evidence information
+* worked on ewf.net
+
 20110117
 * updated libsystem, libuna, libbfio, libsmdev, libsmraw, libodraw
 
@@ -240,7 +244,7 @@ Known issues:
 * updated libuna, libbfio, libodraw, libsmdev, libsmraw
 * updated check for dependent functions
 * ewfacquire: corrected behaviour of -g
-* ewftoos: worked on flush of md5 and sha1 contexts on error
+* ewftools: worked on flush of md5 and sha1 contexts on error
 * worked on ewf.net
 
 20110113

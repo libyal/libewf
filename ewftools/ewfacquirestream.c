@@ -1284,85 +1284,90 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	if( option_case_number != NULL )
+	if( option_case_number == NULL )
 	{
-		if( imaging_handle_set_string(
-		     ewfacquirestream_imaging_handle,
-		     option_case_number,
-		     &( ewfacquirestream_imaging_handle->case_number ),
-		     &( ewfacquirestream_imaging_handle->case_number_size ),
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set case number.\n" );
-
-			goto on_error;
-		}
+		option_case_number = _LIBCSTRING_SYSTEM_STRING( "case_number" );
 	}
-	if( option_description != NULL )
+	if( imaging_handle_set_string(
+	     ewfacquirestream_imaging_handle,
+	     option_case_number,
+	     &( ewfacquirestream_imaging_handle->case_number ),
+	     &( ewfacquirestream_imaging_handle->case_number_size ),
+	     &error ) != 1 )
 	{
-		if( imaging_handle_set_string(
-		     ewfacquirestream_imaging_handle,
-		     option_description,
-		     &( ewfacquirestream_imaging_handle->description ),
-		     &( ewfacquirestream_imaging_handle->description_size ),
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set description.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to set case number.\n" );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
-	if( option_evidence_number != NULL )
+	if( option_description == NULL )
 	{
-		if( imaging_handle_set_string(
-		     ewfacquirestream_imaging_handle,
-		     option_evidence_number,
-		     &( ewfacquirestream_imaging_handle->evidence_number ),
-		     &( ewfacquirestream_imaging_handle->evidence_number_size ),
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set evidence number.\n" );
-
-			goto on_error;
-		}
+		option_description = _LIBCSTRING_SYSTEM_STRING( "description" );
 	}
-	if( option_examiner_name != NULL )
+	if( imaging_handle_set_string(
+	     ewfacquirestream_imaging_handle,
+	     option_description,
+	     &( ewfacquirestream_imaging_handle->description ),
+	     &( ewfacquirestream_imaging_handle->description_size ),
+	     &error ) != 1 )
 	{
-		if( imaging_handle_set_string(
-		     ewfacquirestream_imaging_handle,
-		     option_examiner_name,
-		     &( ewfacquirestream_imaging_handle->examiner_name ),
-		     &( ewfacquirestream_imaging_handle->examiner_name_size ),
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set examiner name.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to set description.\n" );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
-	if( option_notes != NULL )
+	if( option_evidence_number == NULL )
 	{
-		if( imaging_handle_set_string(
-		     ewfacquirestream_imaging_handle,
-		     option_notes,
-		     &( ewfacquirestream_imaging_handle->notes ),
-		     &( ewfacquirestream_imaging_handle->notes_size ),
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set notes.\n" );
+		option_evidence_number = _LIBCSTRING_SYSTEM_STRING( "evidence_number" );
+	}
+	if( imaging_handle_set_string(
+	     ewfacquirestream_imaging_handle,
+	     option_evidence_number,
+	     &( ewfacquirestream_imaging_handle->evidence_number ),
+	     &( ewfacquirestream_imaging_handle->evidence_number_size ),
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set evidence number.\n" );
 
-			goto on_error;
-		}
+		goto on_error;
+	}
+	if( option_examiner_name == NULL )
+	{
+		option_examiner_name = _LIBCSTRING_SYSTEM_STRING( "examiner_name" );
+	}
+	if( imaging_handle_set_string(
+	     ewfacquirestream_imaging_handle,
+	     option_examiner_name,
+	     &( ewfacquirestream_imaging_handle->examiner_name ),
+	     &( ewfacquirestream_imaging_handle->examiner_name_size ),
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set examiner name.\n" );
+
+		goto on_error;
+	}
+	if( option_notes == NULL )
+	{
+		option_notes = _LIBCSTRING_SYSTEM_STRING( "notes" );
+	}
+	if( imaging_handle_set_string(
+	     ewfacquirestream_imaging_handle,
+	     option_notes,
+	     &( ewfacquirestream_imaging_handle->notes ),
+	     &( ewfacquirestream_imaging_handle->notes_size ),
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set notes.\n" );
+
+		goto on_error;
 	}
 	if( option_compression_level != NULL )
 	{

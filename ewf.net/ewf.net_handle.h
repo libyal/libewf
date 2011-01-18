@@ -43,8 +43,6 @@ public ref class Handle sealed
 		int GetAccessFlagsWrite( void );
 		int GetAccessFlagsWriteResume( void );
 
-		/* TODO add codepage functions ? */
-
 		bool CheckFileSignature( System::String^ filename );
 
 		array<System::String^>^ Glob( System::String^ filename );
@@ -115,25 +113,54 @@ public ref class Handle sealed
 
 		/* TODO add GUID functions ? */
 
-		/* TODO add MD5 hash functions ? why bother when Get/SetHash value are available ? */
+		/* TODO add MD5 hash functions ? why bother when Get/SetHashValue are available ? */
 
-		/* TODO add SHA1 hash functions ? why bother when Get/SetHash value are available ? */
+		/* TODO add SHA1 hash functions ? why bother when Get/SetHashValue are available ? */
 
 		/* TODO add other functions ? */
 
-		/* TODO add aquiry error functions ? */
+		int GetNumberOfAcquiryErrors( void );
 
-		/* TODO add read error functions ? */
+		/* TODO add aquiry error functions ?
+ 
+		bool GetAcquiryError( int index,
+		                      System::UInt64 first_sector,
+		                      System::UInt32 number_of_sectors );
 
-		/* TODO add session functions ? */
+		void AppendAcquiryError( System::UInt64 first_sector,
+		                         System::UInt32 number_of_sectors );
 
-		/* TODO add header codepage functions ? */
+		*/
 
-		/* TODO add header date format functions ? */
+		int GetNumberOfReadErrors( void );
+
+		/* TODO add read error functions ?
+ 
+		*/
+
+		int GetNumberOfSessions( void );
+
+		/* TODO add session functions ?
+ 
+		*/
+
+		/* TODO add header codepage functions ?
+
+		int GetHeaderCodepage( void );
+
+		void SetHeaderCodepage( int codepage );
+
+		*/
+
+		/* TODO add header date format functions ?
+
+		int GetHeaderValuesDateFormat( void );
+
+		void SetHeaderValuesDateFormat( int date_format );
+
+		*/
 
 		int GetNumberOfHeaderValues( void );
-
-		/* TODO add header values functions ?
 
 		System::String^ GetHeaderValueIdentifier( int index );
 
@@ -141,9 +168,6 @@ public ref class Handle sealed
 
 		void SetHeaderValue( System::String^ identifier,
 		                     System::String^ header_value );
-
-		 */
-		/* TODO add hash values functions ?
 
 		int GetNumberOfHashValues( void );
 
@@ -153,8 +177,6 @@ public ref class Handle sealed
 
 		void SetHashValue( System::String^ identifier,
 		                   System::String^ hash_value );
-
-		 */
 
 		/* TODO add single file entry root functions ?
 		 * create separate class for single file entry

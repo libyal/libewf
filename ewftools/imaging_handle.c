@@ -201,6 +201,7 @@ int imaging_handle_initialize(
 		( *imaging_handle )->bytes_per_sector         = 512;
 		( *imaging_handle )->sectors_per_chunk        = 64;
 		( *imaging_handle )->sector_error_granularity = 64;
+		( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 		( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
 		( *imaging_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
 		( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
