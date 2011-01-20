@@ -230,6 +230,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110120
+* minor changes
+
 20110118
 * imaging handle
   - fix for missing default maximum segment (file) size
