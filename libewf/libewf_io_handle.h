@@ -45,14 +45,6 @@ struct libewf_io_handle
 	 */
 	off64_t current_offset;
 
-	/* The current chunk
-	 */
-	uint32_t current_chunk;
-
-	/* The current chunk offset
-	 */
-	uint32_t current_chunk_offset;
-
 	/* Value to indicate which file format is used
 	 */
 	uint8_t format;
@@ -90,18 +82,6 @@ int libewf_io_handle_free(
 int libewf_io_handle_clone(
      libewf_io_handle_t **destination_io_handle,
      libewf_io_handle_t *source_io_handle,
-     liberror_error_t **error );
-
-int libewf_io_handle_get_current_chunk(
-     libewf_io_handle_t *io_handle,
-     uint32_t *current_chunk,
-     size_t *current_chunk_offset,
-     liberror_error_t **error );
-
-int libewf_io_handle_set_current_chunk(
-     libewf_io_handle_t *io_handle,
-     uint32_t current_chunk,
-     size_t current_chunk_offset,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

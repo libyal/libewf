@@ -166,10 +166,10 @@ int ewf_test_read_buffer(
  */
 int ewf_test_read_chunk(
      libewf_handle_t *handle,
+     uint8_t *data_buffer,
+     size_t data_buffer_size,
      uint8_t *chunk_buffer,
      size_t chunk_buffer_size,
-     uint8_t *buffer,
-     size_t buffer_size,
      size64_t input_size,
      size64_t expected_size,
      liberror_error_t **error )
@@ -184,7 +184,7 @@ int ewf_test_read_chunk(
 	ssize_t read_count      = 0;
 	uint32_t chunk_checksum = 0;
 	int8_t is_compressed    = 0;
-	int8_t read_checksum    = 0;
+	int8_t process_checksum = 0;
 
 	remaining_size = input_size;
 
@@ -197,7 +197,7 @@ int ewf_test_read_chunk(
 			      &is_compressed,
 			      (void *) checksum_buffer,
 			      &chunk_checksum,
-			      &read_checksum,
+			      &process_checksum,
 			      error );
 
 		if( read_count < 0 )
@@ -216,17 +216,17 @@ int ewf_test_read_chunk(
 		{
 			break;
 		}
-		data_size = buffer_size;
+		data_size = data_buffer_size;
 
 		process_count = libewf_handle_prepare_read_chunk(
 		                 handle,
 		                 chunk_buffer,
 		                 (size_t) read_count,
-		                 buffer,
+		                 data_buffer,
 		                 &data_size,
 		                 is_compressed,
 		                 chunk_checksum,
-		                 read_checksum,
+		                 process_checksum,
 		                 error );
 
 		if( process_count < 0 )
@@ -363,9 +363,11 @@ int ewf_test_read_chunk_at_offset(
      size64_t expected_size )
 {
 	liberror_error_t *error   = NULL;
-	uint8_t *buffer           = NULL;
 	uint8_t *chunk_buffer     = NULL;
+	uint8_t *data_buffer      = NULL;
 	const char *whence_string = NULL;
+	size_t chunk_buffer_size  = 0;
+	size_t data_buffer_size   = 0;
 	int result                = 0;
 
 	if( chunk_size == 0 )
@@ -408,11 +410,17 @@ int ewf_test_read_chunk_at_offset(
 	          expected_offset,
 	          &error );
 
-	buffer = (uint8_t *) memory_allocate(
-	                      chunk_size * 2 );
+	data_buffer_size = chunk_size;
+
+	data_buffer = (uint8_t *) memory_allocate(
+	                           sizeof( uint8_t ) * data_buffer_size );
+
+	/* The chunk buffer should at least have a size of: chunk_size + 16
+	 */
+	chunk_buffer_size = chunk_size * 2;
 
 	chunk_buffer = (uint8_t *) memory_allocate(
-	                            chunk_size + 16 );
+	                            sizeof( uint8_t ) * chunk_buffer_size );
 
 	if( result == 1 )
 	{
@@ -420,10 +428,10 @@ int ewf_test_read_chunk_at_offset(
 		{
 			result = ewf_test_read_chunk(
 				  handle,
+				  data_buffer,
+				  data_buffer_size,
 				  chunk_buffer,
-				  (size_t) chunk_size + 16,
-				  buffer,
-				  (size_t) chunk_size * 2,
+				  chunk_buffer_size,
 				  input_size,
 				  expected_size,
 			          &error );
@@ -432,7 +440,7 @@ int ewf_test_read_chunk_at_offset(
 	memory_free(
 	 chunk_buffer );
 	memory_free(
-	 buffer );
+	 data_buffer );
 
 	if( result != 0 )
 	{
@@ -638,7 +646,7 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 
-	/* Case 3: test read buffer beyond media size
+	/* Case 2: test read buffer beyond media size
 	 */
 	if( media_size < 1024 )
 	{
@@ -768,38 +776,73 @@ int main( int argc, char * const argv[] )
 	read_offset = (off64_t) ( ( media_size / 7 ) / chunk_size ) * chunk_size;
 	read_size   = ( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size;
 
-	if( ewf_test_read_chunk_at_offset(
-	     handle,
-	     chunk_size,
-	     read_offset,
-	     SEEK_SET,
-	     read_size,
-	     read_offset,
-	     read_size ) != 1 )
+	if( media_size == 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to test read chunk.\n" );
+		if( ewf_test_read_chunk_at_offset(
+		     handle,
+		     chunk_size,
+		     read_offset,
+		     SEEK_SET,
+		     read_size,
+		     read_offset,
+		     0 ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
 
-		goto on_error;
+			goto on_error;
+		}
+		if( ewf_test_read_chunk_at_offset(
+		     handle,
+		     chunk_size,
+		     read_offset,
+		     SEEK_SET,
+		     read_size,
+		     read_offset,
+		     0 ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			goto on_error;
+		}
 	}
-	if( ewf_test_read_chunk_at_offset(
-	     handle,
-	     chunk_size,
-	     read_offset,
-	     SEEK_SET,
-	     read_size,
-	     read_offset,
-	     read_size ) != 1 )
+	else
 	{
-		fprintf(
-		 stderr,
-		 "Unable to test read chunk.\n" );
+		if( ewf_test_read_chunk_at_offset(
+		     handle,
+		     chunk_size,
+		     read_offset,
+		     SEEK_SET,
+		     read_size,
+		     read_offset,
+		     read_size ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
 
-		goto on_error;
+			goto on_error;
+		}
+		if( ewf_test_read_chunk_at_offset(
+		     handle,
+		     chunk_size,
+		     read_offset,
+		     SEEK_SET,
+		     read_size,
+		     read_offset,
+		     read_size ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			goto on_error;
+		}
 	}
-
-	/* Case 3: test read chunk beyond media size
+	/* Case 2: test read chunk beyond media size
 	 */
 	if( media_size < 1024 )
 	{

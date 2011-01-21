@@ -495,8 +495,7 @@ int ewfacquire_read_input(
 
 		return( -1 );
 	}
-	if( ( imaging_handle->acquiry_size == 0 )
-	 || ( imaging_handle->acquiry_size > media_size )
+	if( ( imaging_handle->acquiry_size > media_size )
 	 || ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX ) )
 	{
 		liberror_error_set(

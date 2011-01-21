@@ -1,6 +1,7 @@
 TODO
+* implement remaining test scenarios
 
-Next stable release:
+Next beta/stable release:
 * full test
 * disable ewfdebug
 
@@ -204,12 +205,10 @@ Tools:
 
 Tests
 * glob: .ezz, .faa ... .zzz
-* seek: media size 0 instead of < 1024
-* read: media size 0 instead of < 1024
 * implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
-* implement pyewf tests
 * ewfexport: export of split RAW
+* implement pyewf tests
 
 Deployment:
 * add BORLANDC deprecated function support, unable to find suitable macro
@@ -230,8 +229,14 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110121
+* worked on read/write tests
+* ewfacquire and ewfexport now allow for media size of 0 (empty)
+* libewf: code clean up
+* read/write fix for offset drift after write
+
 20110120
-* minor changes
+* worked on ewf.net
 
 20110118
 * imaging handle

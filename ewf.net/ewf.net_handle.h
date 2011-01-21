@@ -132,9 +132,9 @@ public ref class Handle sealed
 
 		*/
 
-		int GetNumberOfReadErrors( void );
+		int GetNumberOfChecksumErrors( void );
 
-		/* TODO add read error functions ?
+		/* TODO add checksum error functions ?
  
 		*/
 

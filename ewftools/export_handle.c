@@ -3498,8 +3498,7 @@ int export_handle_export_input(
 
 		goto on_error;
 	}
-	if( ( export_handle->export_size == 0 )
-	 || ( export_handle->export_size > media_size )
+	if( ( export_handle->export_size > media_size )
 	 || ( export_handle->export_size > (ssize64_t) INT64_MAX ) )
 	{
 		liberror_error_set(

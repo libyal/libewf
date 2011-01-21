@@ -1609,30 +1609,30 @@ int Handle::GetNumberOfAcquiryErrors( void )
 	return( (int) number_of_acquiry_errors );
 }
 
-int Handle::GetNumberOfReadErrors( void )
+int Handle::GetNumberOfChecksumErrors( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error          = NULL;
-	libewf_handle_t *handle        = NULL;
-	System::String^ error_string   = nullptr;
-	System::String^ function       = "Handle::GetNumberOfReadErrors";
-	uint32_t number_of_read_errors = 0;
-	int result                     = 0;
+	libewf_error_t *error              = NULL;
+	libewf_handle_t *handle            = NULL;
+	System::String^ error_string       = nullptr;
+	System::String^ function           = "Handle::GetNumberOfChecksumErrors";
+	uint32_t number_of_checksum_errors = 0;
+	int result                         = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
 	 this->ewf_handle );
 
-	result = libewf_handle_get_number_of_read_errors(
+	result = libewf_handle_get_number_of_checksum_errors(
 	          handle,
-	          &number_of_read_errors,
+	          &number_of_checksum_errors,
 	          &error );
 
 	if( result == -1 )
 	{
 		error_string = gcnew System::String(
-		                      "ewf.net " + function + ": unable to retrieve number of read errors from ewf handle." );
+		                      "ewf.net " + function + ": unable to retrieve number of checksum errors from ewf handle." );
 
 		if( libewf_error_backtrace_sprint(
 		     error,
@@ -1652,12 +1652,12 @@ int Handle::GetNumberOfReadErrors( void )
 		throw gcnew System::Exception(
 			     error_string );
 	}
-	if( number_of_read_errors > (uint32_t) INT_MAX )
+	if( number_of_checksum_errors > (uint32_t) INT_MAX )
 	{
 		throw gcnew System::Exception(
-			     "ewf.net " + function + ": number of read errors exceeds maximum." );
+			     "ewf.net " + function + ": number of checksum errors exceeds maximum." );
 	}
-	return( (int) number_of_read_errors );
+	return( (int) number_of_checksum_errors );
 }
 
 int Handle::GetNumberOfSessions( void )
@@ -1847,7 +1847,7 @@ System::String^ Handle::GetHeaderValueIdentifier( int index )
 	}
 	try
 	{
-		encoding = gcnew UTF8Encoding(
+		encoding = gcnew System::Text::UTF8Encoding(
 		                  false,
 		                  true );
 
@@ -1884,6 +1884,7 @@ System::String^ Handle::GetHeaderValue( System::String^ identifier )
 	const char *ewf_header_value_identifier   = NULL;
 	size_t ewf_header_value_identifier_length = 0;
 	size_t ewf_header_value_size              = 0;
+	int result                                = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
@@ -1896,12 +1897,14 @@ System::String^ Handle::GetHeaderValue( System::String^ identifier )
 	ewf_header_value_identifier_length = strlen(
 	                                      ewf_header_value_identifier );
 
-	if( libewf_handle_get_utf16_header_value_size(
-	     handle,
-	     (uint8_t *) ewf_header_value_identifier,
-	     ewf_header_value_identifier_length,
-	     &ewf_header_value_size,
-	     &error ) != 1 )
+	result = libewf_handle_get_utf16_header_value_size(
+	          handle,
+	          (uint8_t *) ewf_header_value_identifier,
+	          ewf_header_value_identifier_length,
+	          &ewf_header_value_size,
+	          &error );
+
+	if( result == -1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve header value size." );
@@ -1925,6 +1928,12 @@ System::String^ Handle::GetHeaderValue( System::String^ identifier )
 
 		throw gcnew System::Exception(
 			     error_string );
+	}
+	else if( result == 0 )
+	{
+		delete context;
+
+		return( nullptr );
 	}
 	ewf_header_value = (uint16_t *) memory_allocate(
 	                                 sizeof( uint16_t ) * ewf_header_value_size );
@@ -2002,7 +2011,6 @@ void Handle::SetHeaderValue( System::String^ identifier,
 	marshal_context ^context                  = nullptr;
 	System::String^ error_string              = nullptr;
 	System::String^ function                  = "Handle::SetHeaderValue";
-	System::String^ header_value              = nullptr;
 	pin_ptr<const wchar_t> ewf_header_value   = nullptr;
 	const char *ewf_header_value_identifier   = NULL;
 	size_t ewf_header_value_identifier_length = 0;
@@ -2195,7 +2203,7 @@ System::String^ Handle::GetHashValueIdentifier( int index )
 	}
 	try
 	{
-		encoding = gcnew UTF8Encoding(
+		encoding = gcnew System::Text::UTF8Encoding(
 		                  false,
 		                  true );
 
@@ -2232,6 +2240,7 @@ System::String^ Handle::GetHashValue( System::String^ identifier )
 	const char *ewf_hash_value_identifier   = NULL;
 	size_t ewf_hash_value_identifier_length = 0;
 	size_t ewf_hash_value_size              = 0;
+	int result                              = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
@@ -2244,12 +2253,14 @@ System::String^ Handle::GetHashValue( System::String^ identifier )
 	ewf_hash_value_identifier_length = strlen(
 	                                    ewf_hash_value_identifier );
 
-	if( libewf_handle_get_utf16_hash_value_size(
-	     handle,
-	     (uint8_t *) ewf_hash_value_identifier,
-	     ewf_hash_value_identifier_length,
-	     &ewf_hash_value_size,
-	     &error ) != 1 )
+	result = libewf_handle_get_utf16_hash_value_size(
+	          handle,
+	          (uint8_t *) ewf_hash_value_identifier,
+	          ewf_hash_value_identifier_length,
+	          &ewf_hash_value_size,
+	          &error );
+
+	if( result == -1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve hash value size." );
@@ -2273,6 +2284,12 @@ System::String^ Handle::GetHashValue( System::String^ identifier )
 
 		throw gcnew System::Exception(
 			     error_string );
+	}
+	else if( result == 0 )
+	{
+		delete context;
+
+		return( nullptr );
 	}
 	ewf_hash_value = (uint16_t *) memory_allocate(
 	                               sizeof( uint16_t ) * ewf_hash_value_size );
@@ -2350,7 +2367,6 @@ void Handle::SetHashValue( System::String^ identifier,
 	marshal_context ^context                = nullptr;
 	System::String^ error_string            = nullptr;
 	System::String^ function                = "Handle::SetHashValue";
-	System::String^ hash_value              = nullptr;
 	pin_ptr<const wchar_t> ewf_hash_value   = nullptr;
 	const char *ewf_hash_value_identifier   = NULL;
 	size_t ewf_hash_value_identifier_length = 0;

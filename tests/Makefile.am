@@ -17,6 +17,7 @@ TESTS = \
 	test_read.sh \
 	test_write.sh \
 	test_read_write.sh \
+	test_read_write_delta.sh \
 	test_ewfverify.sh \
 	test_ewfverify_logical.sh \
 	test_ewfacquire.sh \
@@ -42,6 +43,7 @@ check_SCRIPTS = \
 	test_pyewf.sh \
 	test_read.sh \
 	test_read_write.sh \
+	test_read_write_delta.sh \
 	test_seek.sh \
 	test_write.sh
 
@@ -51,7 +53,8 @@ EXTRA_DIST = \
 check_PROGRAMS = \
 	ewf_test_glob \
 	ewf_test_read \
-	ewf_test_read_write \
+	ewf_test_read_write\
+	ewf_test_read_write_delta \
 	ewf_test_seek \
 	ewf_test_truncate \
 	ewf_test_write \
@@ -80,6 +83,17 @@ ewf_test_read_write_SOURCES = \
 	ewf_test_read_write.c
 
 ewf_test_read_write_LDADD = \
+	../libcstring/libcstring.la \
+	../liberror/liberror.la \
+	../libewf/libewf.la \
+	../libsystem/libsystem.la \
+        @MEMWATCH_LIBADD@
+
+ewf_test_read_write_delta_SOURCES = \
+	ewf_test_definitions.h \
+	ewf_test_read_write_delta.c
+
+ewf_test_read_write_delta_LDADD = \
 	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \

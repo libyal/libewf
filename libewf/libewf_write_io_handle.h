@@ -341,6 +341,8 @@ ssize_t libewf_write_io_handle_finalize(
          libewf_sector_list_t *sessions,
          libewf_sector_list_t *acquiry_errors,
          libewf_chunk_cache_t *chunk_cache,
+         uint32_t chunk,
+         uint32_t chunk_offset,
          liberror_error_t **error );
 
 #if defined( __cplusplus )

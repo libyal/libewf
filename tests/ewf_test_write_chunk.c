@@ -64,7 +64,7 @@ int ewf_test_write_chunk(
 	size_t compressed_chunk_buffer_size = 0;
 	ssize_t process_count               = 0;
 	ssize_t write_count                 = 0;
-	uint32_t checksum                   = 0;
+	uint32_t chunk_checksum             = 0;
 	uint32_t sectors_per_chunk          = 0;
 	int8_t is_compressed                = 0;
 	int8_t process_checksum             = 0;
@@ -175,15 +175,17 @@ int ewf_test_write_chunk(
 	}
 	chunk_buffer_size = sectors_per_chunk * 512;
 
+	/* Use the chunck buffer also as checksum buffer
+	 */
 	chunk_buffer = (uint8_t *) memory_allocate(
-	                            chunk_buffer_size + 4 );
+	                            sizeof( uint8_t ) * ( chunk_buffer_size + 4 ) );
 
 	/* The compressed data can become larger than the uncompressed data
 	 */
-	compressed_chunk_buffer = (uint8_t *) memory_allocate(
-	                                       chunk_buffer_size * 2 );
-
 	compressed_chunk_buffer_size = chunk_buffer_size * 2;
+
+	compressed_chunk_buffer = (uint8_t *) memory_allocate(
+	                                       sizeof( uint8_t ) * compressed_chunk_buffer_size );
 
 	if( chunk_buffer != NULL )
 	{
@@ -214,7 +216,7 @@ int ewf_test_write_chunk(
 				 compressed_chunk_buffer,
 				 &compressed_chunk_buffer_size,
 				 &is_compressed,
-				 &checksum,
+				 &chunk_checksum,
 				 &process_checksum,
 				 error );
 
@@ -235,10 +237,10 @@ int ewf_test_write_chunk(
 				       handle,
 				       chunk_buffer,
 				       chunk_buffer_size,
-				       (size_t) process_count,
+				       chunk_buffer_size,
 				       is_compressed,
 				       checksum_buffer,
-				       checksum,
+				       chunk_checksum,
 				       process_checksum,
 				       error );
 		}
@@ -248,10 +250,10 @@ int ewf_test_write_chunk(
 				       handle,
 				       compressed_chunk_buffer,
 				       compressed_chunk_buffer_size,
-				       (size_t) process_count,
+				       chunk_buffer_size,
 				       is_compressed,
 				       checksum_buffer,
-				       checksum,
+				       chunk_checksum,
 				       process_checksum,
 				       error );
 		}
@@ -263,7 +265,7 @@ int ewf_test_write_chunk(
 			 LIBERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write chunk of size: %" PRIzd ".",
 			 function,
-			 process_count );
+			 chunk_buffer_size );
 
 			goto on_error;
 		}

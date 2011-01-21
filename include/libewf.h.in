@@ -447,7 +447,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 /* Writes a chunk of (media) data in EWF format at the current offset
  * the necessary settings of the write values must have been made
- * size contains the size of the data within the buffer while
+ * chunk buffer size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error

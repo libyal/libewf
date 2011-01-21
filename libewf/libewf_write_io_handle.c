@@ -1015,9 +1015,7 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	/* Set offset into media data
 	 */
-	io_handle->current_offset       = (off64_t) offset_table->last_chunk_value_compared * media_values->chunk_size;
-	io_handle->current_chunk        = offset_table->last_chunk_value_compared;
-	io_handle->current_chunk_offset = 0;
+	io_handle->current_offset = (off64_t) offset_table->last_chunk_value_compared * media_values->chunk_size;
 
 	/* Set write IO handle values
 	 */
@@ -2505,7 +2503,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 chunk_data_size );
 	}
 #endif
-
 	if( libewf_segment_table_get_number_of_handles(
 	     segment_table,
 	     &number_of_segment_file_handles,
@@ -3877,7 +3874,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          void *buffer,
-         size_t buffer_size LIBEWF_ATTRIBUTE_UNUSED,
+         size_t buffer_size,
          size_t data_size,
          int8_t force_write,
          liberror_error_t **error )
@@ -3897,8 +3894,6 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 	int chunk_cache_data_used         = 0;
 	int8_t is_compressed              = 0;
 	int8_t write_checksum             = 0;
-
-	LIBEWF_UNREFERENCED_PARAMETER( buffer_size )
 
 	if( write_io_handle == NULL )
 	{
@@ -4348,11 +4343,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 
 			return( -1 );
 		}
-		io_handle->current_offset      += chunk_offset;
-		io_handle->current_chunk_offset = chunk_offset;
-
-		remaining_chunk_size = media_values->chunk_size
-		                     - io_handle->current_chunk_offset;
+		remaining_chunk_size = media_values->chunk_size - chunk_offset;
 
 		if( data_size > (size_t) remaining_chunk_size )
 		{
@@ -4561,6 +4552,8 @@ ssize_t libewf_write_io_handle_finalize(
          libewf_sector_list_t *sessions,
          libewf_sector_list_t *acquiry_errors,
          libewf_chunk_cache_t *chunk_cache,
+         uint32_t chunk,
+         uint32_t chunk_offset,
          liberror_error_t **error )
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
@@ -4650,7 +4643,7 @@ ssize_t libewf_write_io_handle_finalize(
 	}
 	/* Write data remaining in the chunk cache to file
 	 */
-	if( ( io_handle->current_chunk_offset != 0 )
+	if( ( chunk_offset != 0 )
 	 && ( chunk_cache->data_size != 0 )
 	 && ( chunk_cache->data_offset != 0 )
 	 && ( ( media_values->media_size == 0 )
@@ -4662,7 +4655,7 @@ ssize_t libewf_write_io_handle_finalize(
 			libnotify_printf(
 			 "%s: writing chunk remainder at offset: %" PRIu32 " with size: %" PRIu32 "\n",
 			 function,
-			 io_handle->current_chunk_offset,
+			 chunk_offset,
 			 chunk_cache->data_size );
 		}
 #endif
@@ -4680,7 +4673,7 @@ ssize_t libewf_write_io_handle_finalize(
 		               sessions,
 		               acquiry_errors,
 		               chunk_cache,
-		               io_handle->current_chunk,
+		               chunk,
 		               chunk_cache->data,
 		               chunk_cache->data_size,
 		               chunk_cache->data_size,
@@ -4700,14 +4693,7 @@ ssize_t libewf_write_io_handle_finalize(
 		}
 		write_finalize_count += write_count;
 
-		io_handle->current_offset       += (off64_t) write_count;
-		io_handle->current_chunk_offset += (uint32_t) write_count;
-
-		if( io_handle->current_chunk_offset == media_values->chunk_size )
-		{
-			io_handle->current_chunk_offset = 0;
-			io_handle->current_chunk       += 1;
-		}
+		io_handle->current_offset += (off64_t) write_count;
 	}
 	/* Check if all the media data has been written
 	 */

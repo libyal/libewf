@@ -27,138 +27,33 @@ EXIT_IGNORE=77;
 INPUT="input";
 TMP="tmp";
 
-AWK="awk";
-CUT="cut";
 LS="ls";
 TR="tr";
+SED="sed";
+SORT="sort";
+UNIQ="uniq";
+WC="wc";
 
 test_read_write()
 { 
-	MEDIA_SIZE=$1;
-	CHUNK_SIZE=$2;
-	COMPRESSION_LEVEL=$3;
-	WRITE_OFFSET=$4;
-	WRITE_SIZE=$5;
-
-	shift 2;
+	echo "Testing read/write of input:" $*;
 
 	mkdir ${TMP};
 
-	./${EWF_TEST_WRITE} -b ${CHUNK_SIZE} -B ${MEDIA_SIZE} -c `echo ${COMPRESSION_LEVEL} | ${CUT} -c 1` ${TMP}/write;
+	./${EWF_TEST_READ_WRITE} -t ${TMP}/read_write $*;
+
+	if [ $? -ne 0 ]; then
+		exit
+	fi
 
 	RESULT=$?;
 
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
-	then
-		FILENAMES=`${LS} ${TMP}/write.* | ${TR} '\n' ' '`;
-
-		./${EWF_TEST_READ_WRITE} -B ${WRITE_SIZE} -o ${WRITE_OFFSET} -t ${TMP}/read_write ${FILENAMES};
-
-		RESULT=$?;
-	fi
-
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
-	then
-		if [ ${WRITE_OFFSET} -lt ${MEDIA_SIZE} ];
-		then
-			if [ -e ${TMP}/read_write.d01 ];
-			then
-				FILESIZE=`${LS} -l ${TMP}/read_write.d01 | ${AWK} '{ print $5 }'`;
-
-				CHUNK_SIZE=`expr ${CHUNK_SIZE} \* 512`;
-
-				if [ `expr ${WRITE_OFFSET} + ${WRITE_SIZE}` -gt ${MEDIA_SIZE} ];
-				then
-					WRITE_SIZE=`expr ${MEDIA_SIZE} - ${WRITE_OFFSET}`;
-				fi
-
-				NUMBER_OF_CHUNKS=`expr ${WRITE_SIZE} / ${CHUNK_SIZE}`;
-				REMAINING_SIZE=`expr ${WRITE_SIZE} % ${CHUNK_SIZE}`;
-
-				if [ ${REMAINING_SIZE} -gt 0 ];
-				then
-					# Check if the remaining size is part of the last chunk
-					if [ `expr ${WRITE_OFFSET} + \( \( ${NUMBER_OF_CHUNKS} + 1 \) \* ${CHUNK_SIZE} \)` -le ${MEDIA_SIZE} ];
-					then
-						NUMBER_OF_CHUNKS=`expr ${NUMBER_OF_CHUNKS} + 1`;
-						REMAINING_SIZE=0;
-					fi
-				fi
-
-				CHUNK_OFFSET=`expr \( ${WRITE_OFFSET} / ${CHUNK_SIZE} \) \* ${CHUNK_SIZE}`;
-
-				# Check if the written data passes a chunk boundary
-				if [ ${WRITE_OFFSET} -gt ${CHUNK_OFFSET} ];
-				then
-					if [ `expr ${WRITE_OFFSET} + ${WRITE_SIZE}` -gt `expr ${CHUNK_OFFSET} + ${CHUNK_SIZE}` ];
-					then
-						NUMBER_OF_CHUNKS=`expr ${NUMBER_OF_CHUNKS} + 1`;
-					fi
-				fi
-
-				if [ ${NUMBER_OF_CHUNKS} -gt 0 ];
-				then
-					# Add the section start, the delta chunk header and chunk checksum
-					CALCULATED=`expr 76 + 18 + ${CHUNK_SIZE} + 4`;
-
-					# Multiply by the amount of chunks altered
-					CALCULATED=`expr ${CALCULATED} \* ${NUMBER_OF_CHUNKS}`;
-				fi
-
-				if [ ${REMAINING_SIZE} -gt 0 ];
-				then
-					# Add the section start, the delta chunk header and chunk checksum of the last chunk
-					CALCULATED=`expr ${CALCULATED} + 76 + 18 + ${REMAINING_SIZE} + 4`;
-				fi
-
-				# Add the segment file header and the done or next section
-				CALCULATED=`expr 13 + ${CALCULATED} + 76`;
-
-				if [ ${FILESIZE} -eq ${CALCULATED} ];
-				then
-					RESULT=${EXIT_SUCCESS};
-				else
-					RESULT=${EXIT_FAILURE};
-				fi
-			else
-				RESULT=${EXIT_FAILURE};
-			fi
-		else
-			if [ -e ${TMP}/read_write.d01 ];
-			then
-				RESULT=${EXIT_FAILURE};
-			else
-				RESULT=${EXIT_SUCCESS};
-			fi
-		fi
-	fi
-
 	rm -rf ${TMP};
 
-	echo -n "Testing read/write with offset: ${WRITE_OFFSET} and size: ${WRITE_SIZE} and compression level: ${COMPRESSION_LEVEL} ";
+	echo "";
 
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
 	return ${RESULT};
 }
-
-EWF_TEST_WRITE="ewf_test_write";
-
-if ! test -x ${EWF_TEST_WRITE};
-then
-	EWF_TEST_WRITE="ewf_test_write.exe";
-fi
-
-if ! test -x ${EWF_TEST_WRITE};
-then
-	echo "Missing executable: ${EWF_TEST_WRITE}";
-
-	exit ${EXIT_FAILURE};
-fi
 
 EWF_TEST_READ_WRITE="ewf_test_read_write";
 
@@ -174,24 +69,29 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-for COMPRESSION_LEVEL in none empty-block fast best;
+if ! test -d ${INPUT};
+then
+	echo "No ${INPUT} directory found, to test read/write create ${INPUT} directory and place EWF test files in directory.";
+	echo "Use unique filename bases per set of EWF image file(s)."
+
+	exit ${EXIT_IGNORE};
+fi
+
+RESULT=`${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ} | ${WC} -l`;
+
+if test ${RESULT} -eq 0;
+then
+	echo "No files found in ${INPUT} directory, to test read/write place EWF test files in directory.";
+	echo "Use unique filename bases per set of EWF image file(s)."
+
+	exit ${EXIT_IGNORE};
+fi
+
+for BASENAME in `${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
 do
-	if ! test_read_write 100000 64 ${COMPRESSION_LEVEL} 0 100000
-	then
-		exit ${EXIT_FAILURE};
-	fi
+	FILENAMES=`${LS} ${INPUT}/${BASENAME}.* | ${TR} '\n' ' '`;
 
-	if ! test_read_write 100000 64 ${COMPRESSION_LEVEL} 512 512
-	then
-		exit ${EXIT_FAILURE};
-	fi
-
-	if ! test_read_write 100000 64 ${COMPRESSION_LEVEL} 32512 512
-	then
-		exit ${EXIT_FAILURE};
-	fi
-
-	if ! test_read_write 100000 64 ${COMPRESSION_LEVEL} 32512 40000
+	if ! test_read_write ${FILENAMES};
 	then
 		exit ${EXIT_FAILURE};
 	fi

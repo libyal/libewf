@@ -25,9 +25,7 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 INPUT="input";
-TMP="tmp";
 
-CMP="cmp";
 LS="ls";
 TR="tr";
 SED="sed";
