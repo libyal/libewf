@@ -90,7 +90,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libmfdata\libmfdata_cache.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_cache_value.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libmfdata\libmfdata_error.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_file.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_file_list.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_list.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_list_element.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_list_element_group_values.c"
 				>
 			</File>
 			<File
@@ -120,6 +148,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libmfdata\libmfdata_cache.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_cache_value.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_date_time.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libmfdata\libmfdata_definitions.h"
 				>
 			</File>
@@ -132,11 +172,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libmfdata\libmfdata_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_file_list.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libmfdata\libmfdata_inline.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libmfdata\libmfdata_libbfio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_list_element.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libmfdata\libmfdata_list_element_group_values.h"
 				>
 			</File>
 			<File

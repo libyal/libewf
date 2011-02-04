@@ -1,5 +1,5 @@
 /*
- * Segment file handle functions
+ * Chunk data functions
  *
  * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_SEGMENT_FILE_HANDLE_H )
-#define _LIBEWF_SEGMENT_FILE_HANDLE_H
+#if !defined( _LIBEWF_CHUNK_DATA_H )
+#define _LIBEWF_CHUNK_DATA_H
 
 #include <common.h>
 #include <types.h>
@@ -31,27 +31,61 @@
 extern "C" {
 #endif
 
-typedef struct libewf_segment_file_handle libewf_segment_file_handle_t;
+typedef struct libewf_chunk_data libewf_chunk_data_t;
 
-struct libewf_segment_file_handle
+struct libewf_chunk_data
 {
-	/* The segment file index
+	/* The allocated data size
 	 */
-	int segment_file_index;
+	size_t allocated_data_size;
+
+	/* The data
+	 */
+	uint8_t *data;
+
+	/* The data size
+	 */
+	size_t data_size;
+
+	/* The compressed data
+	 */
+	uint8_t *compressed_data;
+
+	/* The compressed data size
+	 */
+	size_t compressed_data_size;
+
+	/* Value to indicate the chunk is compressed
+	 */
+	uint8_t is_compressed;
+
+	/* Value to indicate the chunk is packed
+	 */
+	uint8_t is_packed;
+
+	/* Value to indicate the chunk is corrupt
+	 */
+	uint8_t is_corrupt;
 };
 
-int libewf_segment_file_handle_initialize(
-     libewf_segment_file_handle_t **segment_file_handle,
-     int file_io_pool_entry,
+int libewf_chunk_data_initialize(
+     libewf_chunk_data_t **chunk_data,
+     size_t data_size,
      liberror_error_t **error );
 
-int libewf_segment_file_handle_free(
-     intptr_t *segment_file_handle,
+int libewf_chunk_data_free(
+     intptr_t *chunk_data,
      liberror_error_t **error );
 
-int libewf_segment_file_handle_clone(
-     intptr_t **destination_segment_file_handle,
-     intptr_t *source_segment_file_handle,
+int libewf_chunk_data_pack(
+     libewf_chunk_data_t *chunk_data,
+     int8_t compression_level,
+     uint8_t ewf_format,
+     liberror_error_t **error );
+
+int libewf_chunk_data_unpack(
+     libewf_chunk_data_t *chunk_data,
+     size_t chunk_size,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

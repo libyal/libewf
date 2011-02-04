@@ -47,8 +47,16 @@
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_array_type.h">
 			</None>
-			<None Include="..\..\..\libmfdata\libmfdata_definitions.h">
+			<CppCompile Include="..\..\..\libmfdata\libmfdata_cache.c">
+			</CppCompile>
+			<None Include="..\..\..\libmfdata\libmfdata_cache.h">
 			</None>
+			<CppCompile Include="..\..\..\libmfdata\libmfdata_cache_value.c">
+			</CppCompile>
+			<None Include="..\..\..\libmfdata\libmfdata_cache_value.h">
+			</None>
+			<CppCompile Include="..\..\..\libmfdata\libmfdata_list.c">
+			</CppCompile>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_error.c">
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_error.h">
@@ -58,6 +66,16 @@
 			<None Include="..\..\..\libmfdata\libmfdata_inline.h">
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_libbfio.h">
+			</None>
+			<None Include="..\..\..\libmfdata\libmfdata_list.h">
+			</None>
+			<CppCompile Include="..\..\..\libmfdata\libmfdata_list_element.c">
+			</CppCompile>
+			<None Include="..\..\..\libmfdata\libmfdata_list_element.h">
+			</None>
+			<None Include="..\..\..\libmfdata\libmfdata_date_time.h">
+			</None>
+			<None Include="..\..\..\libmfdata\libmfdata_definitions.h">
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_notify.c">
 			</CppCompile>

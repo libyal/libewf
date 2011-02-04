@@ -31,10 +31,10 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT;"/>
+    <USERDEFINES value="UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT;"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="libewf.bpf"/>
-    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -48,7 +48,7 @@
   <LINKER>
     <ALLOBJ value="$(OBJFILES)"/>
     <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib 
-      libfvalue.lib zlib.lib import32.lib cw32i.lib"/>
+      libmfdata.lib libfvalue.lib zlib.lib import32.lib cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]
@@ -110,7 +110,7 @@ Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
 Count=1
-Item0=UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT;
+Item0=UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT;
 
 [HistoryLists\hlIntOutputDir]
 Count=1

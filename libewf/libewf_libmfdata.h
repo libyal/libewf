@@ -28,7 +28,13 @@
  */
 #if defined( HAVE_LOCAL_LIBMFDATA )
 
+#include <libmfdata_cache.h>
 #include <libmfdata_definitions.h>
+#include <libmfdata_file.h>
+#include <libmfdata_file_list.h>
+#include <libmfdata_list.h>
+#include <libmfdata_list_element.h>
+#include <libmfdata_segment.h>
 #include <libmfdata_segment_table.h>
 #include <libmfdata_types.h>
 

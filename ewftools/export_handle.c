@@ -3953,63 +3953,66 @@ int export_handle_export_input(
 
 		goto on_error;
 	}
-	if( export_handle_hash_values_fprint(
-	     export_handle,
-	     export_handle->notify_stream,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print export hash values.",
-		 function );
-
-		goto on_error;
-	}
-	if( export_handle_checksum_errors_fprint(
-	     export_handle,
-	     export_handle->notify_stream,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print export errors.",
-		 function );
-
-		goto on_error;
-	}
-	if( log_handle != NULL )
+	if( export_handle->abort == 0 )
 	{
 		if( export_handle_hash_values_fprint(
 		     export_handle,
-		     log_handle->log_stream,
+		     export_handle->notify_stream,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print export has values in log handle.",
+			 "%s: unable to print export hash values.",
 			 function );
 
 			goto on_error;
 		}
 		if( export_handle_checksum_errors_fprint(
 		     export_handle,
-		     log_handle->log_stream,
+		     export_handle->notify_stream,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print export errors in log handle.",
+			 "%s: unable to print export errors.",
 			 function );
 
 			goto on_error;
+		}
+		if( log_handle != NULL )
+		{
+			if( export_handle_hash_values_fprint(
+			     export_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print export has values in log handle.",
+				 function );
+
+				goto on_error;
+			}
+			if( export_handle_checksum_errors_fprint(
+			     export_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print export errors in log handle.",
+				 function );
+
+				goto on_error;
+			}
 		}
 	}
 	return( 1 );

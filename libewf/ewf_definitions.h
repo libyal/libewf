@@ -33,6 +33,7 @@
 /* The possible EWF file formats
  */
 #define EWF_FORMAT_UNKNOWN			(uint8_t) 'u'
+#define EWF_FORMAT_D01				(uint8_t) 'd'
 #define EWF_FORMAT_E01				(uint8_t) 'e'
 #define EWF_FORMAT_L01				(uint8_t) 'l'
 #define EWF_FORMAT_S01				(uint8_t) 's'

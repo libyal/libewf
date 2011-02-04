@@ -322,9 +322,9 @@ int libewf_single_files_parse_file_entries(
 		{
 			liberror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: single file entries string not supported.",
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported single file entries string.",
 			 function );
 
 			goto on_error;

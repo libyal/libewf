@@ -35,13 +35,13 @@ typedef struct libewf_chunk_cache libewf_chunk_cache_t;
 
 struct libewf_chunk_cache
 {
-	/* The size of the cached chunk
+	/* The cached chunk size
 	 */
 	size_t size;
 
-	/* The identifier of the cached chunk
+	/* The cached chunk index
 	 */
-	uint32_t chunk;
+	int chunk_index;
 
 	/* The size of the data in the chunk
 	 */

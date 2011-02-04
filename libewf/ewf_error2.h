@@ -29,10 +29,9 @@
 extern "C" {
 #endif
 
-typedef struct ewf_error2 ewf_error2_t;
-typedef struct ewf_error2_sector ewf_error2_sector_t;
+typedef struct ewf_error2_header ewf_error2_header_t;
 
-struct ewf_error2
+struct ewf_error2_header
 {
 	/* The number of errors
 	 * consists of 4 bytes (32 bits)
@@ -59,6 +58,8 @@ struct ewf_error2
 	/* The last sector is followed by a 4 byte checksum
 	 */
 };
+
+typedef struct ewf_error2_sector ewf_error2_sector_t;
 
 struct ewf_error2_sector
 {

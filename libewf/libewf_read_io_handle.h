@@ -27,15 +27,11 @@
 
 #include <liberror.h>
 
-#include "libewf_chunk_cache.h"
+#include "libewf_chunk_data.h"
 #include "libewf_libbfio.h"
-#include "libewf_io_handle.h"
+#include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
-#include "libewf_offset_table.h"
 #include "libewf_sector_list.h"
-#include "libewf_segment_table.h"
-
-#include "ewf_checksum.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -49,7 +45,7 @@ struct libewf_read_io_handle
 	 */
 	libewf_sector_list_t *checksum_errors;
 
-	/* A value to indicate if a chunk should be zeroed on error
+	/* A value to indicate if the chunk data should be zeroed on error
 	 */
 	uint8_t zero_on_error;
 };
@@ -67,46 +63,15 @@ int libewf_read_io_handle_clone(
      libewf_read_io_handle_t *source_read_io_handle,
      liberror_error_t **error );
 
-ssize_t libewf_read_io_handle_process_chunk(
-         uint8_t *chunk_buffer,
-         size_t chunk_buffer_size,
-         uint8_t *uncompressed_buffer,
-         size_t *uncompressed_buffer_size,
-         int8_t is_compressed,
-         uint32_t chunk_checksum,
-         int8_t read_checksum,
-         uint8_t *checksum_mismatch,
-         liberror_error_t **error );
-
-ssize_t libewf_read_io_handle_read_chunk(
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         libewf_offset_table_t *offset_table,
-         libewf_segment_table_t *segment_table,
-         libewf_segment_table_t *delta_segment_table,
-         uint32_t chunk,
-         uint8_t *chunk_buffer,
-         size_t chunk_buffer_size,
-         int8_t *is_compressed,
-         uint8_t *checksum_buffer,
-         uint32_t *chunk_checksum,
-         int8_t *read_checksum,
-         liberror_error_t **error );
-
-ssize_t libewf_read_io_handle_read_chunk_data(
-         libewf_read_io_handle_t *read_io_handle,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         libewf_media_values_t *media_values,
-         libewf_offset_table_t *offset_table,
-         libewf_segment_table_t *segment_table,
-         libewf_segment_table_t *delta_segment_table,
-         libewf_chunk_cache_t *chunk_cache,
-         uint32_t chunk,
-         uint32_t chunk_offset,
-         uint8_t *buffer,
-         size_t size,
-         liberror_error_t **error );
+int libewf_read_io_handle_read_chunk_data(
+     libewf_read_io_handle_t *read_io_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_media_values_t *media_values,
+     libmfdata_list_t *chunk_table_list,
+     libmfdata_cache_t *chunk_table_cache,
+     int chunk_index,
+     libewf_chunk_data_t **chunk_data,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

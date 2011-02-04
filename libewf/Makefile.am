@@ -29,8 +29,8 @@ libewf_la_SOURCES = \
 	ewfx_delta_chunk.h \
 	libewf.c \
 	libewf_array_type.c libewf_array_type.h \
-	libewf_chunk_cache.c libewf_chunk_cache.h \
-	libewf_chunk_value.c libewf_chunk_value.h \
+	libewf_chunk_data.c libewf_chunk_data.h \
+	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_date_time.c libewf_date_time.h \
@@ -57,10 +57,8 @@ libewf_la_SOURCES = \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_metadata.c libewf_metadata.h \
 	libewf_notify.c libewf_notify.h \
-	libewf_offset_table.c libewf_offset_table.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
 	libewf_section.c libewf_section.h \
-	libewf_section_list.c libewf_section_list.h \
 	libewf_sector_list.c libewf_sector_list.h \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_file_handle.c libewf_segment_file_handle.h \

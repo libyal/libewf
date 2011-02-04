@@ -160,7 +160,7 @@ int ewf_test_read_write_buffer(
 		}
 		if( memory_set(
 		     buffer,
-		     (int) 'A',
+		     (int) 'B',
 		     (size_t) read_count ) == NULL )
 		{
 			liberror_error_set(
@@ -228,7 +228,9 @@ int ewf_test_read_write_chunk(
 	static char *function   = "ewf_test_read_write_chunk";
 	size64_t remaining_size = 0;
 	size64_t result_size    = 0;
+	size_t chunk_data_size  = 0;
 	size_t data_size        = 0;
+	size_t write_size       = 0;
 	ssize_t process_count   = 0;
 	ssize_t read_count      = 0;
 	ssize_t write_count     = 0;
@@ -308,7 +310,7 @@ int ewf_test_read_write_chunk(
 		}
 		if( memory_set(
 		     data_buffer,
-		     (int) 'A',
+		     (int) 'C',
 		     data_buffer_size ) == NULL )
 		{
 			liberror_error_set(
@@ -320,18 +322,21 @@ int ewf_test_read_write_chunk(
 
 			return( -1 );
 		}
+		write_size      = process_count;
+		chunk_data_size = chunk_buffer_size;
+
 		process_count = libewf_handle_prepare_write_chunk(
 				 handle,
 				 data_buffer,
-				 data_buffer_size,
+				 write_size,
 				 chunk_buffer,
-				 &chunk_buffer_size,
+				 &chunk_data_size,
 				 &is_compressed,
 				 &chunk_checksum,
 				 &process_checksum,
 				 error );
 
-		if( process_count == -1 )
+		if( process_count < 0 )
 		{
 			liberror_error_set(
 			 error,
@@ -347,8 +352,8 @@ int ewf_test_read_write_chunk(
 			write_count = libewf_handle_write_chunk(
 				       handle,
 				       data_buffer,
-				       data_buffer_size,
-				       data_buffer_size,
+				       process_count,
+				       write_size,
 				       is_compressed,
 				       checksum_buffer,
 				       chunk_checksum,
@@ -360,8 +365,8 @@ int ewf_test_read_write_chunk(
 			write_count = libewf_handle_write_chunk(
 				       handle,
 				       chunk_buffer,
-				       chunk_buffer_size,
-				       data_buffer_size,
+				       chunk_data_size,
+				       write_size,
 				       is_compressed,
 				       checksum_buffer,
 				       chunk_checksum,
@@ -376,12 +381,12 @@ int ewf_test_read_write_chunk(
 			 LIBERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write chunk of size: %" PRIzd ".",
 			 function,
-			 chunk_buffer_size );
+			 chunk_data_size );
 
 			return( -1 );
 		}
-		remaining_size -= (size64_t) data_buffer_size;
-		result_size    += (size64_t) data_buffer_size;
+		remaining_size -= (size64_t) write_size;
+		result_size    += (size64_t) write_size;
 	}
 	if( expected_size != result_size )
 	{
@@ -481,7 +486,7 @@ int ewf_test_read_write_buffer_at_offset(
 	{
 		liberror_error_backtrace_fprint(
 		 error,
-		 stdout );
+		 stderr );
 
 		liberror_error_free(
 		 &error );
@@ -601,7 +606,7 @@ int ewf_test_read_write_chunk_at_offset(
 	{
 		liberror_error_backtrace_fprint(
 		 error,
-		 stdout );
+		 stderr );
 
 		liberror_error_free(
 		 &error );
@@ -669,6 +674,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+/*
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_set_verbose(
 	 1 );
@@ -676,6 +682,7 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
+*/
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(

@@ -29,15 +29,14 @@
 extern "C" {
 #endif
 
-typedef struct ewf_table ewf_table_t;
-typedef struct ewf_table_offset ewf_table_offset_t;
+typedef struct ewf_table_header ewf_table_header_t;
 
-struct ewf_table
+struct ewf_table_header
 {
-	/* The number of chunks in the table
+	/* The number of offsets
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t number_of_chunks[ 4 ];
+	uint8_t number_of_offsets[ 4 ];
 
 	/* Padding
 	 * consists of 4 bytes
@@ -69,6 +68,8 @@ struct ewf_table
 	/* The last offset is followed by a 4 byte checksum
 	 */
 };
+
+typedef struct ewf_table_offset ewf_table_offset_t;
 
 struct ewf_table_offset
 {

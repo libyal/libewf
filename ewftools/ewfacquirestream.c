@@ -172,6 +172,45 @@ void usage_fprint(
 	fprintf( stream, "\t-2: specify the secondary target file (without extension) to write to\n" );
 }
 
+/* Signal handler for ewfacquire
+ */
+void ewfacquirestream_signal_handler(
+      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfacquirestream_signal_handler";
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
+
+	ewfacquirestream_abort = 1;
+
+	if( ewfacquirestream_imaging_handle != NULL )
+	{
+		if( imaging_handle_signal_abort(
+		     ewfacquirestream_imaging_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal imaging handle to abort.\n",
+			 function );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+	}
+	/* Force stdin to close otherwise any function reading it will remain blocked
+	 */
+	if( libsystem_file_io_close(
+	     0 ) != 0 )
+	{
+		libsystem_notify_printf(
+		 "%s: unable to close stdin.\n",
+		 function );
+	}
+}
+
 /* Reads a chunk of data from the file descriptor into the buffer
  * Returns the number of bytes read, 0 if at end of input or -1 on error
  */
@@ -807,35 +846,38 @@ int ewfacquirestream_read_input(
 
 		goto on_error;
 	}
-	if( imaging_handle->calculate_md5 == 1 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 imaging_handle->calculated_md5_hash_string );
-	}
-	if( imaging_handle->calculate_sha1 == 1 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 imaging_handle->calculated_sha1_hash_string );
-	}
-	if( log_handle != NULL )
+	if( ewfacquirestream_abort == 0 )
 	{
 		if( imaging_handle->calculate_md5 == 1 )
 		{
-			log_handle_printf(
-			 log_handle,
+			fprintf(
+			 imaging_handle->notify_stream,
 			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 imaging_handle->calculated_md5_hash_string );
 		}
 		if( imaging_handle->calculate_sha1 == 1 )
 		{
-			log_handle_printf(
-			 log_handle,
+			fprintf(
+			 imaging_handle->notify_stream,
 			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 imaging_handle->calculated_sha1_hash_string );
+		}
+		if( log_handle != NULL )
+		{
+			if( imaging_handle->calculate_md5 == 1 )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 imaging_handle->calculated_md5_hash_string );
+			}
+			if( imaging_handle->calculate_sha1 == 1 )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 imaging_handle->calculated_sha1_hash_string );
+			}
 		}
 	}
 	return( 1 );
@@ -863,45 +905,6 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
-}
-
-/* Signal handler for ewfacquire
- */
-void ewfacquirestream_signal_handler(
-      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
-{
-	liberror_error_t *error = NULL;
-	static char *function   = "ewfacquirestream_signal_handler";
-
-	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
-
-	ewfacquirestream_abort = 1;
-
-	if( ewfacquirestream_imaging_handle != NULL )
-	{
-		if( imaging_handle_signal_abort(
-		     ewfacquirestream_imaging_handle,
-		     &error ) != 1 )
-		{
-			libsystem_notify_printf(
-			 "%s: unable to signal imaging handle to abort.\n",
-			 function );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-	}
-	/* Force stdin to close otherwise any function reading it will remain blocked
-	 */
-	if( libsystem_file_io_close(
-	     0 ) != 0 )
-	{
-		libsystem_notify_printf(
-		 "%s: unable to close stdin.\n",
-		 function );
-	}
 }
 
 /* The main program

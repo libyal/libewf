@@ -25,12 +25,11 @@
 
 #include <libcstring.h>
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_array_type.h"
-#include "libewf_libbfio.h"
-#include "libewf_libmfdata.h"
+#include "libewf_definitions.h"
 #include "libewf_libuna.h"
-#include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_segment_table.h"
 
@@ -39,6 +38,7 @@
  */
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
+     int number_of_handles,
      size64_t maximum_segment_size,
      liberror_error_t **error )
 {
@@ -86,15 +86,15 @@ int libewf_segment_table_initialize(
 			goto on_error;
 		}
 		if( libewf_array_initialize(
-		     &( ( *segment_table )->segment_files_array ),
-		     0,
+		     &( ( *segment_table )->segment_file_handles ),
+		     number_of_handles,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment files array.",
+			 "%s: unable to create segment file handles array.",
 			 function );
 
 			goto on_error;
@@ -143,7 +143,7 @@ int libewf_segment_table_free(
 			 ( *segment_table )->basename );
 		}
 		if( libewf_array_free(
-		     &( ( *segment_table )->segment_files_array ),
+		     &( ( *segment_table )->segment_file_handles ),
 		     &libewf_segment_file_handle_free,
 		     error ) != 1 )
 		{
@@ -151,7 +151,7 @@ int libewf_segment_table_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free the segment files array.",
+			 "%s: unable to free the segment file handles array.",
 			 function );
 
 			result = -1;
@@ -263,8 +263,8 @@ int libewf_segment_table_clone(
 		( *destination_segment_table )->basename_size = source_segment_table->basename_size;
 	}
 	if( libewf_array_clone(
-	     &( ( *destination_segment_table )->segment_files_array ),
-	     source_segment_table->segment_files_array,
+	     &( ( *destination_segment_table )->segment_file_handles ),
+	     source_segment_table->segment_file_handles,
 	     &libewf_segment_file_handle_free,
 	     &libewf_segment_file_handle_clone,
 	     error ) != 1 )
@@ -273,7 +273,7 @@ int libewf_segment_table_clone(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination segments files.",
+		 "%s: unable to create destination segment file handles.",
 		 function );
 
 		goto on_error;
@@ -296,6 +296,45 @@ on_error:
 		*destination_segment_table = NULL;
 	}
 	return( -1 );
+}
+
+/* Resizes the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_resize(
+     libewf_segment_table_t *segment_table,
+     int number_of_handles,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_resize";
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_array_resize(
+	     segment_table->segment_file_handles,
+	     number_of_handles,
+	     &libewf_segment_file_handle_free,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+		 "%s: unable to resize segment file handles array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Retrieves the size of the basename
@@ -1254,6 +1293,190 @@ int libewf_segment_table_set_basename_wide(
 }
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
+/* Retrieves the number of handles
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_get_number_of_handles(
+     libewf_segment_table_t *segment_table,
+     int *number_of_handles,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_get_number_of_handles";
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_array_get_number_of_entries(
+	     segment_table->segment_file_handles,
+	     number_of_handles,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries in the segment file handles array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves a segment file handle from the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_get_handle(
+     libewf_segment_table_t *segment_table,
+     int handle_index,
+     libewf_segment_file_handle_t **handle,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_get_handle";
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_array_get_entry_by_index(
+	     segment_table->segment_file_handles,
+	     handle_index,
+	     (intptr_t **) handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from segment file handles array.",
+		 function,
+		 handle_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets a segment file handle
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_set_handle(
+     libewf_segment_table_t *segment_table,
+     int handle_index,
+     libewf_segment_file_handle_t *handle,
+     liberror_error_t **error )
+{
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_segment_table_set_handle";
+	int number_of_handles                             = 0;
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_array_get_number_of_entries(
+	     segment_table->segment_file_handles,
+	     &number_of_handles,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries in the segment file handles array.",
+		 function );
+
+		return( -1 );
+	}
+	if( handle_index >= number_of_handles )
+	{
+		if( libewf_segment_table_resize(
+		     segment_table,
+		     handle_index + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize the segment table.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( libewf_array_get_entry_by_index(
+		     segment_table->segment_file_handles,
+		     handle_index,
+		     (intptr_t **) &segment_file_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry: %d from segment file handles array.",
+			 function,
+			 handle_index );
+
+			return( -1 );
+		}
+		if( segment_file_handle != NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 "%s: segment file handle entry: %d value already set.",
+			 function,
+			 handle_index );
+
+			return( -1 );
+		}
+	}
+	if( libewf_array_set_entry_by_index(
+	     segment_table->segment_file_handles,
+	     handle_index,
+	     (intptr_t *) handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set entry: %d in segment file handles array.",
+		 function,
+		 handle_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the maximum segment size
  * Returns 1 if successful or -1 on error
  */
@@ -1277,235 +1500,6 @@ int libewf_segment_table_set_maximum_segment_size(
 	}
 	segment_table->maximum_segment_size = maximum_segment_size;
 
-	return( 1 );
-}
-
-/* Retrieves the number of segment files
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_get_number_of_segment_files(
-     libewf_segment_table_t *segment_table,
-     int *number_of_segment_files,
-     liberror_error_t **error )
-{
-	static char *function = "libewf_segment_table_get_number_of_segment_files";
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_array_get_number_of_entries(
-	     segment_table->segment_files_array,
-	     number_of_segment_files,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of entries in the segment files array.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves a segment file
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_get_segment_file(
-     libewf_segment_table_t *segment_table,
-     uint16_t segment_number,
-     int *segment_file_index,
-     liberror_error_t **error )
-{
-	libewf_segment_file_handle_t *segment_file_handle = NULL;
-	static char *function                             = "libewf_segment_table_get_segment_file";
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_index == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file index.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_array_get_entry_by_index(
-	     segment_table->segment_files_array,
-	     (int) segment_number,
-	     (intptr_t **) &segment_file_handle,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry: %" PRIu16 " from segment files array.",
-		 function,
-		 segment_number );
-
-		return( -1 );
-	}
-	if( segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing segment file entry: %" PRIu16 ".",
-		 function,
-		 segment_number );
-
-		return( -1 );
-	}
-	*segment_file_index = segment_file_handle->segment_file_index;
-
-	return( 1 );
-}
-
-/* Sets a segment file
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_set_segment_file(
-     libewf_segment_table_t *segment_table,
-     uint16_t segment_number,
-     int segment_file_index,
-     liberror_error_t **error )
-{
-	libewf_segment_file_handle_t *segment_file_handle = NULL;
-	static char *function                             = "libewf_segment_table_set_segment_file";
-	int number_of_segment_files                       = 0;
-
-	if( segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_array_get_number_of_entries(
-	     segment_table->segment_files_array,
-	     &number_of_segment_files,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of entries in the segment files array.",
-		 function );
-
-		return( -1 );
-	}
-	if( (int) segment_number >= number_of_segment_files )
-	{
-		if( libewf_array_resize(
-		     segment_table->segment_files_array,
-		     segment_number + 1,
-		     NULL,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize the segment files array.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		if( libewf_array_get_entry_by_index(
-		     segment_table->segment_files_array,
-		     (int) segment_number,
-		     (intptr_t **) &segment_file_handle,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve entry: %d from segment files array.",
-			 function,
-			 segment_file_index );
-
-			return( -1 );
-		}
-		if( segment_file_handle != NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: segment file entry: %" PRIu16 " already set.",
-			 function,
-			 segment_number );
-
-			return( -1 );
-		}
-	}
-	if( libewf_segment_file_handle_initialize(
-	     &segment_file_handle,
-	     segment_file_index,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment file handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_array_set_entry_by_index(
-	     segment_table->segment_files_array,
-	     (int) segment_number,
-	     (intptr_t *) segment_file_handle,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set entry: %" PRIu16 " in segment files array.",
-		 function,
-		 segment_number );
-
-		libewf_segment_file_handle_free(
-		 (intptr_t *) segment_file_handle,
-		 NULL );
-
-		return( -1 );
-	}
 	return( 1 );
 }
 

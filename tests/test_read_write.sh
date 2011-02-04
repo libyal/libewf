@@ -42,10 +42,6 @@ test_read_write()
 
 	./${EWF_TEST_READ_WRITE} -t ${TMP}/read_write $*;
 
-	if [ $? -ne 0 ]; then
-		exit
-	fi
-
 	RESULT=$?;
 
 	rm -rf ${TMP};

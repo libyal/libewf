@@ -1,4 +1,4 @@
-.Dd January 11, 2011
+.Dd February 3, 2011
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -79,7 +79,7 @@ File/Handle functions
 .Ft int
 .Fn libewf_handle_close "libewf_handle_t *handle, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_prepare_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, uint32_t chunk_checksum, int8_t read_checksum, libewf_error_t **error"
+.Fn libewf_handle_prepare_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *uncompressed_chunk_buffer, size_t *uncompressed_chunk_buffer_size, int8_t is_compressed, uint32_t chunk_checksum, int8_t read_checksum, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, int8_t *is_compressed, void *checksum_buffer, uint32_t *chunk_checksum, int8_t *read_checksum, libewf_error_t **error"
 .Ft ssize_t
@@ -87,7 +87,7 @@ File/Handle functions
 .Ft ssize_t
 .Fn libewf_handle_read_random "libewf_handle_t *handle, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_prepare_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_checksum, int8_t *write_checksum, libewf_error_t **error"
+.Fn libewf_handle_prepare_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *compressed_chunk_buffer, size_t *compressed_chunk_buffer_size, int8_t *is_compressed, uint32_t *chunk_checksum, int8_t *write_checksum, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, size_t data_size, int8_t is_compressed, const void *checksum_buffer, uint32_t chunk_checksum, int8_t write_checksum, libewf_error_t **error"
 .Ft ssize_t

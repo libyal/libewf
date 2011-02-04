@@ -76,6 +76,16 @@ int ewf_test_read_write_delta(
 
 		goto on_error;
 	}
+/*
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_set_verbose(
+	 1 );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
+*/
+
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     handle,
@@ -193,17 +203,16 @@ int ewf_test_read_write_delta(
 		}
 		if( libewf_handle_seek_offset(
 		     handle,
-		     write_offset,
-		     SEEK_SET,
+		     -1 * read_size,
+		     SEEK_CUR,
 		     error ) == -1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek offset: %" PRIi64 ".",
-			 function,
-			 write_offset );
+			 "%s: unable to seek previous offset.",
+			 function );
 
 			goto on_error;
 		}

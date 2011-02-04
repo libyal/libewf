@@ -27,15 +27,16 @@
 
 #include <liberror.h>
 
-#include "libewf_chunk_cache.h"
+#include "libewf_chunk_data.h"
+#include "libewf_chunk_table.h"
 #include "libewf_extern.h"
 #include "libewf_hash_sections.h"
 #include "libewf_libbfio.h"
 #include "libewf_libfvalue.h"
+#include "libewf_libmfdata.h"
 #include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
-#include "libewf_offset_table.h"
 #include "libewf_read_io_handle.h"
 #include "libewf_segment_table.h"
 #include "libewf_sector_list.h"
@@ -63,10 +64,9 @@ struct libewf_internal_handle
 	 */
 	libewf_io_handle_t *io_handle;
 
-	/* A simple cache is implemented here to avoid having to read and decompress the
-	 * same chunk while reading the data.
+	/* The current chunk data
 	 */
-	libewf_chunk_cache_t *chunk_cache;
+	libewf_chunk_data_t *chunk_data;
 
 	/* The media values
 	 */
@@ -100,17 +100,29 @@ struct libewf_internal_handle
 	 */
 	int maximum_number_of_open_handles;
 
-	/* The list of segment files
+	/* The segment files list
+	 */
+	libmfdata_file_list_t *segment_files_list;
+
+	/* The segment files cache
+	 */
+	libmfdata_cache_t *segment_files_cache;
+
+	/* The segment file table
 	 */
 	libewf_segment_table_t *segment_table;
 
-	/* The list of delta segment files
+	/* The delta segment file table
 	 */
 	libewf_segment_table_t *delta_segment_table;
 
-	/* The list of offsets within the segment files within the table sections
+	/* The chunk table (data) list
 	 */
-	libewf_offset_table_t *offset_table;
+	libmfdata_list_t *chunk_table_list;
+
+	/* The chunk table cache
+	 */
+	libmfdata_cache_t *chunk_table_cache;
 
 	/* The stored header sections
 	 */
@@ -191,14 +203,20 @@ int libewf_handle_open_file_io_pool(
      int access_flags,
      liberror_error_t **error );
 
+int libewf_handle_open_read_segment_files(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_chunk_table_t *chunk_table,
+     liberror_error_t **error );
+
+int libewf_handle_open_read_delta_segment_files(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_pool_t *file_io_pool,
+     liberror_error_t **error );
+
 LIBEWF_EXTERN \
 int libewf_handle_close(
      libewf_handle_t *handle,
-     liberror_error_t **error );
-
-int libewf_handle_open_read(
-     libewf_internal_handle_t *internal_handle,
-     libewf_segment_table_t *segment_table,
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -206,8 +224,8 @@ ssize_t libewf_handle_prepare_read_chunk(
          libewf_handle_t *handle,
          void *chunk_buffer,
          size_t chunk_buffer_size,
-         void *uncompressed_buffer,
-         size_t *uncompressed_buffer_size,
+         void *uncompressed_chunk_buffer,
+         size_t *uncompressed_chunk_buffer_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
          int8_t read_checksum,
@@ -244,8 +262,8 @@ ssize_t libewf_handle_prepare_write_chunk(
          libewf_handle_t *handle,
          void *chunk_buffer,
          size_t chunk_buffer_size,
-         void *compressed_buffer,
-         size_t *compressed_buffer_size,
+         void *compressed_chunk_buffer,
+         size_t *compressed_chunk_buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
          int8_t *write_checksum,

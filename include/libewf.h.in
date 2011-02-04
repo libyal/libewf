@@ -373,9 +373,10 @@ int libewf_handle_close(
      libewf_handle_t *handle,
      libewf_error_t **error );
 
-/* Prepares a chunk of (media) data after reading it according to the handle settings
+/* Prepares chunk of (media) data after reading it according to the handle settings
+ * It applies decompression if necessary and validates the chunk checksum
  * This function should be used after libewf_handle_read_chunk
- * The chunk buffer size should contain the actual chunk size
+ * The value chunk_buffer_size contains the size of the chunk
  * Returns the resulting chunk size or -1 on error
  */
 LIBEWF_EXTERN \
@@ -383,16 +384,19 @@ ssize_t libewf_handle_prepare_read_chunk(
          libewf_handle_t *handle,
          void *chunk_buffer,
          size_t chunk_buffer_size,
-         void *uncompressed_buffer,
-         size_t *uncompressed_buffer_size,
+         void *uncompressed_chunk_buffer,
+         size_t *uncompressed_chunk_buffer_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
          int8_t read_checksum,
          libewf_error_t **error );
 
 /* Reads a chunk of (media) data from the current offset into a buffer
- * size contains the size of the chunk buffer
- * The function sets the chunk checksum, is compressed and read checksum values
+ * Will read until the requested size is filled or the entire chunk is read
+ * The values read_checksum and chunk_checksum are used for uncompressed chunks only
+ * The value chunk_checksum is set to a runtime version of the value in the checksum_buffer
+ * The value read_checksum is set if the checksum has been read into checksum_buffer
+ * The value chunk_buffer_size contains the size of the chunk buffer
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN \
@@ -429,7 +433,7 @@ ssize_t libewf_handle_read_random(
 
 /* Prepares a chunk of (media) data before writing according to the handle settings
  * This function should be used before libewf_handle_write_chunk
- * The chunk buffer size should contain the actual chunk size
+ * The chunk_buffer_size should contain the actual chunk size
  * The function sets the chunk checksum, is compressed and write checksum values
  * Returns the resulting chunk size or -1 on error
  */
@@ -438,8 +442,8 @@ ssize_t libewf_handle_prepare_write_chunk(
          libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
-         void *compressed_buffer,
-         size_t *compressed_buffer_size,
+         void *compressed_chunk_buffer,
+         size_t *compressed_chunk_buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
          int8_t *write_checksum,
@@ -447,8 +451,8 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 /* Writes a chunk of (media) data in EWF format at the current offset
  * the necessary settings of the write values must have been made
- * chunk buffer size contains the size of the data within the buffer while
- * data size contains the size of the actual input data
+ * chunk_buffer_size contains the size of the data within the buffer while
+ * data_size contains the size of the actual input data
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */

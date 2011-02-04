@@ -326,6 +326,13 @@ int libewf_split_values_parse_string(
 
 		return( -1 );
 	}
+	/* An empty string has no split values
+	 */
+	if( ( string[ 0 ] == 0 )
+	 || ( string_length == 0 ) )
+	{
+		return( 1 );
+	}
 	/* Determine the number of split values
 	 */
 	split_value_start = (uint8_t *) string;

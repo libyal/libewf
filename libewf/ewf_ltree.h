@@ -29,9 +29,9 @@
 extern "C" {
 #endif
 
-typedef struct ewf_ltree ewf_ltree_t;
+typedef struct ewf_ltree_header ewf_ltree_header_t;
 
-struct ewf_ltree
+struct ewf_ltree_header
 {
 	/* Unknown
 	 * consists of 16 bytes

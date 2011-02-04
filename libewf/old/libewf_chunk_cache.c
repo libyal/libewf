@@ -122,7 +122,8 @@ int libewf_chunk_cache_initialize(
 
 			goto on_error;
 		}
-		( *chunk_cache )->size = size;
+		( *chunk_cache )->size        = size;
+		( *chunk_cache )->chunk_index = -1;
 	}
 	return( 1 );
 
@@ -256,7 +257,7 @@ int libewf_chunk_cache_resize(
 		}
 		chunk_cache->data        = (uint8_t *) reallocation;
 		chunk_cache->size        = size;
-		chunk_cache->chunk       = 0;
+		chunk_cache->chunk_index = -1;
 		chunk_cache->data_size   = 0;
 		chunk_cache->data_offset = 0;
 		chunk_cache->cached      = 0;

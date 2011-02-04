@@ -33,8 +33,15 @@
 
 /* The following type definitions hide internal data structures
  */
+#if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
+typedef struct libewf_handle {}		libewf_handle_t;
+typedef struct libewf_file_entry {}	libewf_file_entry_t;
+
+#else
 typedef intptr_t libewf_handle_t;
 typedef intptr_t libewf_file_entry_t;
+
+#endif
 
 #endif
 

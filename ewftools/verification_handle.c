@@ -1456,99 +1456,102 @@ int verification_handle_verify_input(
 
 		goto on_error;
 	}
-	fprintf(
-	 verification_handle->notify_stream,
-	 "\n" );
-
-	if( verification_handle_checksum_errors_fprint(
-	     verification_handle,
-	     verification_handle->notify_stream,
-	     error ) != 1 )
+	if( verification_handle->abort == 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print checksum errors.",
-		 function );
+		fprintf(
+		 verification_handle->notify_stream,
+		 "\n" );
 
-		goto on_error;
-	}
-	if( verification_handle_hash_values_fprint(
-	     verification_handle,
-	     verification_handle->notify_stream,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print hash values.",
-		 function );
-
-		goto on_error;
-	}
-	if( verification_handle_additional_hash_values_fprint(
-	     verification_handle,
-	     verification_handle->notify_stream,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print additional hash values.",
-		 function );
-
-		goto on_error;
-	}
-	fprintf(
-	 verification_handle->notify_stream,
-	 "\n" );
-
-	if( log_handle != NULL )
-	{
 		if( verification_handle_checksum_errors_fprint(
 		     verification_handle,
-		     log_handle->log_stream,
+		     verification_handle->notify_stream,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print checksum errors in log handle.",
+			 "%s: unable to print checksum errors.",
 			 function );
 
 			goto on_error;
 		}
 		if( verification_handle_hash_values_fprint(
 		     verification_handle,
-		     log_handle->log_stream,
+		     verification_handle->notify_stream,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print hash values in log handle.",
+			 "%s: unable to print hash values.",
 			 function );
 
 			goto on_error;
 		}
 		if( verification_handle_additional_hash_values_fprint(
 		     verification_handle,
-		     log_handle->log_stream,
+		     verification_handle->notify_stream,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print additional hash values in log handle.",
+			 "%s: unable to print additional hash values.",
 			 function );
 
 			goto on_error;
+		}
+		fprintf(
+		 verification_handle->notify_stream,
+		 "\n" );
+
+		if( log_handle != NULL )
+		{
+			if( verification_handle_checksum_errors_fprint(
+			     verification_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print checksum errors in log handle.",
+				 function );
+
+				goto on_error;
+			}
+			if( verification_handle_hash_values_fprint(
+			     verification_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print hash values in log handle.",
+				 function );
+
+				goto on_error;
+			}
+			if( verification_handle_additional_hash_values_fprint(
+			     verification_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print additional hash values in log handle.",
+				 function );
+
+				goto on_error;
+			}
 		}
 	}
 	if( libewf_handle_get_number_of_checksum_errors(

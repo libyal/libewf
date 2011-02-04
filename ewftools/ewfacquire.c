@@ -191,6 +191,61 @@ void ewfacquire_usage_fprint(
 	                 "\t        to\n" );
 }
 
+/* Signal handler for ewfacquire
+ */
+void ewfacquire_signal_handler(
+      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfacquire_signal_handler";
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
+
+	ewfacquire_abort = 1;
+
+	if( ewfacquire_device_handle != NULL )
+	{
+		if( device_handle_signal_abort(
+		     ewfacquire_device_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal device handle to abort.\n",
+			 function );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+	}
+	if( ewfacquire_imaging_handle != NULL )
+	{
+		if( imaging_handle_signal_abort(
+		     ewfacquire_imaging_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal imaging handle to abort.\n",
+			 function );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
+	}
+	/* Force stdin to close otherwise any function reading it will remain blocked
+	 */
+	if( libsystem_file_io_close(
+	     0 ) != 0 )
+	{
+		libsystem_notify_printf(
+		 "%s: unable to close stdin.\n",
+		 function );
+	}
+}
+
 /* Prints an overview of the acquiry parameters and asks the for confirmation
  * Returns 1 if confirmed by user, 0 otherwise or -1 on error
  */
@@ -311,17 +366,6 @@ int ewfacquire_determine_sessions(
 
 		return( -1 );
 	}
-	if( media_size > (uint64_t) UINT32_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid media size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
 	if( device_handle_get_number_of_sessions(
 	     device_handle,
 	     &number_of_sessions,
@@ -358,10 +402,23 @@ int ewfacquire_determine_sessions(
 			 stderr,
 			 "Unable to determine number of session on optical disc - defaulting to single session.\n" );
 		}
+		number_of_sectors = media_size / imaging_handle->bytes_per_sector;
+
+		if( number_of_sectors > (uint64_t) UINT32_MAX )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid number of sectors value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 		if( imaging_handle_append_session(
 		     ewfacquire_imaging_handle,
 		     (uint64_t) 0,
-		     (uint64_t) ( media_size / imaging_handle->bytes_per_sector ),
+		     (uint64_t) number_of_sectors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1033,63 +1090,66 @@ int ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( device_handle_read_errors_fprint(
-	     device_handle,
-	     stdout,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to device read errors.",
-		 function );
-
-		goto on_error;
-	}
-	if( imaging_handle->calculate_md5 == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 imaging_handle->calculated_md5_hash_string );
-	}
-	if( imaging_handle->calculate_sha1 == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-		 imaging_handle->calculated_sha1_hash_string );
-	}
-	if( log_handle != NULL )
+	if( ewfacquire_abort == 0 )
 	{
 		if( device_handle_read_errors_fprint(
-		    device_handle,
-		    log_handle->log_stream,
-		    error ) != 1 )
+		     device_handle,
+		     stdout,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to device read errors in log handle.",
+			 "%s: unable to device read errors.",
 			 function );
 
 			goto on_error;
 		}
 		if( imaging_handle->calculate_md5 == 1 )
 		{
-			log_handle_printf(
-			 log_handle,
+			fprintf(
+			 stdout,
 			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 imaging_handle->calculated_md5_hash_string );
 		}
 		if( imaging_handle->calculate_sha1 == 1 )
 		{
-			log_handle_printf(
-			 log_handle,
+			fprintf(
+			 stdout,
 			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 imaging_handle->calculated_sha1_hash_string );
+		}
+		if( log_handle != NULL )
+		{
+			if( device_handle_read_errors_fprint(
+			    device_handle,
+			    log_handle->log_stream,
+			    error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to device read errors in log handle.",
+				 function );
+
+				goto on_error;
+			}
+			if( imaging_handle->calculate_md5 == 1 )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 imaging_handle->calculated_md5_hash_string );
+			}
+			if( imaging_handle->calculate_sha1 == 1 )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 imaging_handle->calculated_sha1_hash_string );
+			}
 		}
 	}
 	return( 1 );
@@ -1117,61 +1177,6 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
-}
-
-/* Signal handler for ewfacquire
- */
-void ewfacquire_signal_handler(
-      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
-{
-	liberror_error_t *error = NULL;
-	static char *function   = "ewfacquire_signal_handler";
-
-	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
-
-	ewfacquire_abort = 1;
-
-	if( ewfacquire_device_handle != NULL )
-	{
-		if( device_handle_signal_abort(
-		     ewfacquire_device_handle,
-		     &error ) != 1 )
-		{
-			libsystem_notify_printf(
-			 "%s: unable to signal device handle to abort.\n",
-			 function );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-	}
-	if( ewfacquire_imaging_handle != NULL )
-	{
-		if( imaging_handle_signal_abort(
-		     ewfacquire_imaging_handle,
-		     &error ) != 1 )
-		{
-			libsystem_notify_printf(
-			 "%s: unable to signal imaging handle to abort.\n",
-			 function );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-	}
-	/* Force stdin to close otherwise any function reading it will remain blocked
-	 */
-	if( libsystem_file_io_close(
-	     0 ) != 0 )
-	{
-		libsystem_notify_printf(
-		 "%s: unable to close stdin.\n",
-		 function );
-	}
 }
 
 /* The main program

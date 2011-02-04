@@ -149,7 +149,6 @@ int libewf_compress(
 			 function );
 		}
 #endif
-
 #if defined( HAVE_COMPRESS_BOUND )
 		/* Use compressBound to determine the size of the uncompressed buffer
 		 */
@@ -269,7 +268,6 @@ int libewf_decompress(
 			 function );
 		}
 #endif
-
 		*uncompressed_size = 0;
 
 		return( 0 );
@@ -284,7 +282,6 @@ int libewf_decompress(
 			 function );
 		}
 #endif
-
 		/* Estimate that a factor 2 enlargement should suffice
 		 */
 		*uncompressed_size *= 2;
@@ -305,7 +302,7 @@ int libewf_decompress(
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_COMPRESSION,
-		 LIBERROR_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
+		 LIBERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
 		 "%s: zlib returned undefined error: %d.",
 		 function,
 		 result );

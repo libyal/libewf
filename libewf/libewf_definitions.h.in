@@ -25,6 +25,8 @@
 #include <common.h>
 #include <byte_stream.h>
 
+#include <libewf_libmfdata.h>
+
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */
 #if !defined( HAVE_LOCAL_LIBEWF )
@@ -170,6 +172,8 @@ enum LIBEWF_FILE_ENTRY_FLAGS
 
 #define LIBEWF_ENDIAN_BIG				_BYTE_STREAM_ENDIAN_BIG
 #define LIBEWF_ENDIAN_LITTLE				_BYTE_STREAM_ENDIAN_LITTLE
+
+#define LIBEWF_CHUNK_FLAG_IS_DELTA			LIBMFDATA_LIST_ELEMENT_DATA_RANGE_FLAG_USER_DEFINED_1
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
 #define LIBEWF_2_TIB					0x20000000000UL

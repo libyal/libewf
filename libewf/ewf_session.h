@@ -29,9 +29,9 @@
 extern "C" {
 #endif
 
-typedef struct ewf_session ewf_session_t;
+typedef struct ewf_session_header ewf_session_header_t;
 
-struct ewf_session
+struct ewf_session_header
 {
 	/* NUmber of sessions
 	 * consists of 4 bytes

@@ -28,7 +28,7 @@
 				<Dependencies/>
 			</Projects>
 			<Projects Include="libewf\libewf.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libmfdata\libmfdata.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="libodraw\libodraw.cbproj">
 				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj</Dependencies>

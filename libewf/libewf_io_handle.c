@@ -28,7 +28,6 @@
 #include "libewf_codepage.h"
 #include "libewf_definitions.h"
 #include "libewf_io_handle.h"
-#include "libewf_libbfio.h"
 
 #include "ewf_definitions.h"
 

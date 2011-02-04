@@ -1,5 +1,24 @@
 TODO
+* borlanc
+  - update libmfdata
+* check performance
+* clean up libewf_section.c (in progress)
+  - libewf_section_table2_read
+* libmfdata rewrite
+  - segment table split off data files list
+  - add support for table2 section
+  - set chunk (data) size in chunk table
+  - do not write section start on data update ?
+  - read performance: flag if checksum has be checked
+  - add flags to by-pass cache ?
+* segment table
+  - split segment and delta segment files list, make segment number - 1 the index
+  - remove segment number mapping from segment table
+* ewftools: do not print status on abort
+  - set process status to abort ?
 * implement remaining test scenarios
+* API chunk table access
+  - rewrite read/write chunk functions, pass chunk index
 
 Next beta/stable release:
 * full test
@@ -10,7 +29,9 @@ Roadmap:
   - add support for permissions
   - thread aware support (check)
 * code clean up
-  - integrate libmfdata (before working on segment file error tollerance)
+  - handle code
+  - write io handle code
+  - make write debug output similar to read debug output ?
 * error tollerance
   - allow for missing segment file(s)
   - allow for missing chunk(s)
@@ -43,12 +64,7 @@ Roadmap:
 
 Code clean up:
 * clean up configure.ac and acinclude.m4
-* integrate libmfdata
-* move sections into separate objects ?
-* refactor section_list to list_type and section_value ?
 * clean up ewfacquire: move imaging preferences into imaging handle
-* make debug output similar to other libraries
-  - clean up libewf_section.c
 * make libewf_convert_date_header_value more strict
 * ewfinfo
   - move DFXML code to separate code files, what about separate library ?
@@ -103,6 +119,7 @@ Recovery and analysis:
 * recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
 * check into resume write error for 32-bit compile (different zlib sizes)
+* detect consistent number of chunks in table sections
 
 Additional (integrity) checks:
 * read: check if successive headers match first header
@@ -229,10 +246,47 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110204
+* updates for msvscpp
+
+20110203
+* worked on libmfdata integration
+* worked on ewftools
+  - detailed info is no longer printed on abort
+  - removed restrictive media size safe guard for optical discs from ewfacquire
+* updated libodraw
+
+20110202
+* worked on libmfdata integration
+
+20110201
+* worked on libmfdata integration
+* updated libsystem
+
+20110128
+* worked on libmfdata integration
+
+20110127
+* worked on libmfdata integration
+
+20110126
+* worked on libmfdata integration
+
+20110125
+* worked on libmfdata integration
+
+20110123
+* worked on libmfdata integration
+
+20110122
+* worked on libmfdata integration
+* worked on debug output to match other libraries
+
 20110121
 * worked on read/write tests
 * ewfacquire and ewfexport now allow for media size of 0 (empty)
 * libewf: code clean up
+* worked on libmfdata integration
 * read/write fix for offset drift after write
 
 20110120
