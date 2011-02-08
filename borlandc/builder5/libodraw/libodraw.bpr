@@ -5,10 +5,10 @@
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libodraw.lib"/>
     <OBJFILES value="libodraw_array_type.obj libodraw_cue_parser.obj libodraw_cue_scanner.obj 
-      libodraw_data_file.obj libodraw_data_file_descriptor.obj 
-      libodraw_debug.obj libodraw_error.obj libodraw_handle.obj 
-      libodraw_io_handle.obj libodraw_metadata.obj libodraw_notify.obj 
-      libodraw_sector_range.obj libodraw_support.obj libodraw_track_value.obj"/>
+      libodraw_debug.obj libodraw_error.obj libodraw_file_value.obj 
+      libodraw_handle.obj libodraw_io_handle.obj libodraw_list_type.obj 
+      libodraw_notify.obj libodraw_sector_list.obj libodraw_support.obj 
+      libodraw_track_value.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>

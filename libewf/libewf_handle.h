@@ -104,6 +104,10 @@ struct libewf_internal_handle
 	 */
 	libmfdata_file_list_t *segment_files_list;
 
+	/* The delta segment files list
+	 */
+	libmfdata_file_list_t *delta_segment_files_list;
+
 	/* The segment files cache
 	 */
 	libmfdata_cache_t *segment_files_cache;

@@ -4,15 +4,16 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libewf.dll"/>
-    <OBJFILES value="libewf.obj libewf_array_type.obj libewf_chunk_data.obj 
-      libewf_chunk_table.obj libewf_compression.obj libewf_date_time.obj 
+    <OBJFILES value="libewf.obj libewf_array_type.obj libewf_chunk_cache.obj 
+      libewf_chunk_value.obj libewf_compression.obj libewf_date_time.obj 
       libewf_date_time_values.obj libewf_debug.obj libewf_empty_block.obj 
       libewf_error.obj libewf_file_entry.obj libewf_filename.obj 
       libewf_handle.obj libewf_hash_sections.obj libewf_hash_values.obj 
       libewf_header_sections.obj libewf_header_values.obj libewf_io_handle.obj 
       libewf_legacy.obj libewf_list_type.obj libewf_media_values.obj 
-      libewf_metadata.obj libewf_notify.obj libewf_read_io_handle.obj 
-      libewf_section.obj libewf_sector_list.obj libewf_segment_file.obj 
+      libewf_metadata.obj libewf_notify.obj libewf_offset_table.obj 
+      libewf_read_io_handle.obj libewf_section.obj libewf_section_list.obj 
+      libewf_sector_list.obj libewf_segment_file.obj 
       libewf_segment_file_handle.obj libewf_segment_table.obj 
       libewf_single_file_entry.obj libewf_single_files.obj 
       libewf_split_values.obj libewf_support.obj libewf_tree_type.obj 

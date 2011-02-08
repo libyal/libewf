@@ -4,10 +4,7 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libmfdata.lib"/>
-    <OBJFILES value="libmfdata_array_type.obj libmfdata_cache.obj libmfdata_cache_value.obj 
-      libmfdata_error.obj libmfdata_file.obj libmfdata_file_list.obj 
-      libmfdata_list.obj libmfdata_list_element.obj 
-      libmfdata_list_element_group_values.obj libmfdata_notify.obj 
+    <OBJFILES value="libmfdata_array_type.obj libmfdata_error.obj libmfdata_notify.obj 
       libmfdata_segment.obj libmfdata_segment_table.obj libmfdata_support.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>

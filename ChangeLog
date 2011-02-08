@@ -1,8 +1,6 @@
 TODO
-* ewf.net
-  - fix for missing msclr/marshal.h in VS2008 Express
-* borlanc
-  - update libmfdata
+* resync with version on chode
+  - borland5 and codegear update libmfdata
 * check performance
 * clean up libewf_section.c (in progress)
   - libewf_section_table2_read
@@ -248,9 +246,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
-20110205
-* updates for builder5 and codegear
-* updated libodraw for improved section header mode support
+20110208
+* worked on libmfdata integration
+  - removed segment table data file index lookup
 
 20110204
 * updates for msvscpp

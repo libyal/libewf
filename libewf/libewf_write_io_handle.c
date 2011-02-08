@@ -690,10 +690,9 @@ int libewf_write_io_handle_initialize_resume(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment file: %" PRIu16 " (list index: %d) from segment table.",
+		 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
 		 function,
-		 segment_number,
-		 segment_files_list_index );
+		 segment_number );
 
 		return( -1 );
 	}
@@ -710,10 +709,9 @@ int libewf_write_io_handle_initialize_resume(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment file: %" PRIu16 " (list index: %d) from segment files list.",
+		 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
 		 function,
-		 segment_number,
-		 segment_files_list_index );
+		 segment_number );
 
 		return( -1 );
 	}
@@ -1767,7 +1765,6 @@ int libewf_write_io_handle_create_segment_file(
 	size_t filename_size                    = 0;
 	int bfio_access_flags                   = 0;
 	int number_of_segment_files             = 0;
-	int segment_files_list_index            = 0;
 
 	if( segment_table == NULL )
 	{
@@ -1994,7 +1991,7 @@ int libewf_write_io_handle_create_segment_file(
 
 	if( libmfdata_file_list_append_file(
 	     segment_files_list,
-	     &segment_files_list_index,
+	     (int) ( segment_number - 1 ),
 	     *file_io_pool_entry,
 	     error ) != 1 )
 	{
@@ -2002,7 +1999,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to append segment file: %" PRIu16 " to segment files list.",
+		 "%s: unable to set segment file: %" PRIu16 " in list.",
 		 function,
 		 segment_number );
 
@@ -2011,7 +2008,7 @@ int libewf_write_io_handle_create_segment_file(
 	if( libmfdata_file_list_set_file_value_by_index(
 	     segment_files_list,
 	     segment_files_cache,
-	     segment_files_list_index,
+	     (int) ( segment_number - 1 ),
 	     (intptr_t *) *segment_file,
 	     &libewf_segment_file_free,
 	     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
@@ -2021,29 +2018,9 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set segment file: %" PRIu16 " (list index: %d) to segment files list.",
+		 "%s: unable to set segment file: %" PRIu16 " value in list.",
 		 function,
-		 segment_number,
-		 libewf_segment_file_free );
-
-		*segment_file = NULL;
-
-		goto on_error;
-	}
-	if( libewf_segment_table_set_segment_file(
-	     segment_table,
-	     segment_number,
-	     segment_files_list_index,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set segment file: %" PRIu16 " (list index: %d) in segment table.",
-		 function,
-		 segment_number,
-		 segment_files_list_index );
+		 segment_number );
 
 		*segment_file = NULL;
 
@@ -2332,10 +2309,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %" PRIu16 " (list index: %d) from segment files list.",
+			 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
 			 function,
-			 segment_number,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -2535,11 +2511,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %" PRIu16 " (list index: %d).",
+			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %" PRIu16 ".",
 			 function,
 			 write_io_handle->resume_segment_file_offset,
-			 segment_number,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -3243,10 +3218,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve segment file: %" PRIu16 " (list index: %d) from segment files list.",
+				 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
 				 function,
-				 segment_number,
-				 segment_files_list_index );
+				 segment_number );
 
 				return( -1 );
 			}
@@ -3256,10 +3230,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing segment file: %" PRIu16 " (list index: %d).",
+				 "%s: missing segment file: %" PRIu16 ".",
 				 function,
-				 segment_number,
-				 segment_files_list_index );
+				 segment_number );
 
 				return( -1 );
 			}
@@ -3330,11 +3303,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_IO,
 					 LIBERROR_IO_ERROR_SEEK_FAILED,
-					 "%s: unable to seek offset: %" PRIi64 " in segment file: %" PRIu16 " (list index: %d).",
+					 "%s: unable to seek offset: %" PRIi64 " in segment file: %" PRIu16 ".",
 					 function,
 					 last_section->start_offset,
-					 segment_number,
-					 segment_files_list_index );
+					 segment_number );
 
 					return( -1 );
 				}
@@ -3481,10 +3453,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %" PRIu16 " (list index: %d) from segment files list.",
+			 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
 			 function,
-			 segment_number,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -3494,10 +3465,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing segment file: %" PRIu16 " (list index: %d).",
+			 "%s: missing segment file: %" PRIu16 ".",
 			 function,
-			 segment_number,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -3689,10 +3659,9 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %" PRIu16 " (list index: %d) from segment files list.",
+			 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
 			 function,
-			 segment_number,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
