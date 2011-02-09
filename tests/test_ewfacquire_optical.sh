@@ -191,22 +191,22 @@ for FILENAME in `${LS} ${INPUT}/*.[cC][uU][eE] | ${TR} ' ' '\n'`;
 do
 	for FORMAT in encase6;
 	do
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" none 650MB 64;
+		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" none 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi
 
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" empty-block 650MB 64;
+		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" empty-block 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi
 
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" fast 650MB 64;
+		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" fast 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi
 
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" best 650MB 64;
+		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" best 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi
@@ -217,22 +217,22 @@ for FILENAME in `${LS} ${INPUT}/*.[cC][uU][eE] | ${TR} ' ' '\n'`;
 do
 	for FORMAT in encase6;
 	do
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" none 650MB 64;
+		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" none 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi
 
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" empty-block 650MB 64;
+		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" empty-block 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi
 
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" fast 650MB 64;
+		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" fast 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi
 
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" best 650MB 64;
+		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" best 650MB 16;
 		then
 			exit ${EXIT_FAILURE};
 		fi

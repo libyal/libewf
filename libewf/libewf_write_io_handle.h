@@ -227,6 +227,7 @@ int libewf_write_io_handle_create_segment_file(
      uint16_t maximum_number_of_segments,
      uint8_t segment_file_type,
      libewf_segment_file_t **segment_file,
+     int *segment_files_list_index,
      int *file_io_pool_entry,
      liberror_error_t **error );
 
@@ -260,7 +261,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
-         libmfdata_file_list_t *segment_files_list,
+         libmfdata_file_list_t *delta_segment_files_list,
          libmfdata_cache_t *segment_files_cache,
          libewf_segment_table_t *delta_segment_table,
          libmfdata_list_t *chunk_table_list,
@@ -282,7 +283,6 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_media_values_t *media_values,
      libmfdata_file_list_t *segment_files_list,
      libmfdata_cache_t *segment_files_cache,
-     libewf_segment_table_t *segment_table,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,

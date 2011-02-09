@@ -2329,7 +2329,7 @@ int imaging_handle_prompt_for_sector_error_granularity(
 	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
 	          request_string,
 	          1,
-	          64,
+	          imaging_handle->sectors_per_chunk,
 	          (uint64_t) imaging_handle->sectors_per_chunk,
 	          &size_variable,
 	          error );
@@ -2348,6 +2348,10 @@ int imaging_handle_prompt_for_sector_error_granularity(
 	else if( result != 0 )
 	{
 		imaging_handle->sector_error_granularity = (uint32_t) size_variable;
+	}
+	else
+	{
+		imaging_handle->sector_error_granularity = imaging_handle->sectors_per_chunk;
 	}
 	return( result );
 }
@@ -2439,7 +2443,7 @@ int imaging_handle_get_output_values(
 	if( imaging_handle_get_header_value(
 	     imaging_handle,
 	     (uint8_t *) "case_number",
-	     12,
+	     11,
 	     &( imaging_handle->case_number ),
 	     &( imaging_handle->case_number_size ),
 	     error ) != 1 )
@@ -2456,7 +2460,7 @@ int imaging_handle_get_output_values(
 	if( imaging_handle_get_header_value(
 	     imaging_handle,
 	     (uint8_t *) "description",
-	     12,
+	     11,
 	     &( imaging_handle->description ),
 	     &( imaging_handle->description_size ),
 	     error ) != 1 )
@@ -2473,7 +2477,7 @@ int imaging_handle_get_output_values(
 	if( imaging_handle_get_header_value(
 	     imaging_handle,
 	     (uint8_t *) "evidence_number",
-	     16,
+	     15,
 	     &( imaging_handle->evidence_number ),
 	     &( imaging_handle->evidence_number_size ),
 	     error ) != 1 )
@@ -2490,7 +2494,7 @@ int imaging_handle_get_output_values(
 	if( imaging_handle_get_header_value(
 	     imaging_handle,
 	     (uint8_t *) "examiner_name",
-	     14,
+	     13,
 	     &( imaging_handle->examiner_name ),
 	     &( imaging_handle->examiner_name_size ),
 	     error ) != 1 )
@@ -2507,7 +2511,7 @@ int imaging_handle_get_output_values(
 	if( imaging_handle_get_header_value(
 	     imaging_handle,
 	     (uint8_t *) "notes",
-	     6,
+	     5,
 	     &( imaging_handle->notes ),
 	     &( imaging_handle->notes_size ),
 	     error ) != 1 )
@@ -3621,6 +3625,11 @@ int imaging_handle_set_output_values(
 		 function );
 
 		return( -1 );
+	}
+	if( ( imaging_handle->sector_error_granularity == 0 )
+	 || ( imaging_handle->sector_error_granularity >= imaging_handle->sectors_per_chunk ) )
+	{
+		imaging_handle->sector_error_granularity = imaging_handle->sectors_per_chunk;
 	}
 	if( libewf_handle_set_error_granularity(
 	     imaging_handle->output_handle,

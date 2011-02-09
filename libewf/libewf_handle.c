@@ -38,6 +38,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libmfdata.h"
+#include "libewf_metadata.h"
 #include "libewf_sector_list.h"
 #include "libewf_segment_file.h"
 #include "libewf_single_files.h"
@@ -1660,7 +1661,6 @@ int libewf_handle_open_file_io_pool(
 	libewf_internal_handle_t *internal_handle = NULL;
 	libewf_segment_file_t *segment_file       = NULL;
 	static char *function                     = "libewf_handle_open_file_io_pool";
-	size64_t maximum_segment_size             = 0;
 	ssize_t read_count                        = 0;
 	uint16_t maximum_delta_segment_number     = 0;
 	uint16_t maximum_segment_number           = 0;
@@ -2136,53 +2136,6 @@ int libewf_handle_open_file_io_pool(
 			if( ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
 			 || ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
 			{
-				if( segment_file->segment_number == 1 )
-				{
-					/* Use the size of the first as the maximum segment size
-					 */
-					if( libbfio_pool_get_size(
-					     file_io_pool,
-					     file_io_pool_entry,
-					     &maximum_segment_size,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-						 "%s: unable to retrieve first segment file size.",
-						 function );
-
-						libewf_segment_file_free(
-						 (intptr_t *) segment_file,
-						 NULL );
-
-						goto on_error;
-					}
-					/* Round the maximum segment size to nearest number of KiB
-					 */
-					maximum_segment_size /= 1024;
-					maximum_segment_size *= 1024;
-
-					if( libewf_segment_table_set_maximum_segment_size(
-					     internal_handle->segment_table,
-					     maximum_segment_size,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to set maximum segment size in segment table.",
-						 function );
-
-						libewf_segment_file_free(
-						 (intptr_t *) segment_file,
-						 NULL );
-
-						goto on_error;
-					}
-				}
 				if( segment_file->segment_number > maximum_segment_number )
 				{
 					if( libmfdata_file_list_resize(
@@ -2205,7 +2158,7 @@ int libewf_handle_open_file_io_pool(
 					}
 					maximum_segment_number = segment_file->segment_number;
 				}
-				if( libmfdata_file_list_set_file(
+				if( libmfdata_file_list_set_file_by_index(
 				     internal_handle->segment_files_list,
 				     (int) ( segment_file->segment_number - 1 ),
 				     file_io_pool_entry,
@@ -2228,54 +2181,7 @@ int libewf_handle_open_file_io_pool(
 			}
 			else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 			{
-				if( segment_file->segment_number == 1 )
-				{
-					/* Use the size of the first as the maximum segment size
-					 */
-					if( libbfio_pool_get_size(
-					     file_io_pool,
-					     file_io_pool_entry,
-					     &maximum_segment_size,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-						 "%s: unable to retrieve first delta segment file size.",
-						 function );
-
-						libewf_segment_file_free(
-						 (intptr_t *) segment_file,
-						 NULL );
-
-						goto on_error;
-					}
-					/* Round the maximum segment size to nearest number of KiB
-					 */
-					maximum_segment_size /= 1024;
-					maximum_segment_size *= 1024;
-
-					if( libewf_segment_table_set_maximum_segment_size(
-					     internal_handle->delta_segment_table,
-					     maximum_segment_size,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to set maximum segment size in delta segment table.",
-						 function );
-
-						libewf_segment_file_free(
-						 (intptr_t *) segment_file,
-						 NULL );
-
-						goto on_error;
-					}
-				}
-				if( segment_file->segment_number > maximum_segment_number )
+				if( segment_file->segment_number > maximum_delta_segment_number )
 				{
 					if( libmfdata_file_list_resize(
 					     internal_handle->delta_segment_files_list,
@@ -2295,9 +2201,9 @@ int libewf_handle_open_file_io_pool(
 
 						goto on_error;
 					}
-					maximum_segment_number = segment_file->segment_number;
+					maximum_delta_segment_number = segment_file->segment_number;
 				}
-				if( libmfdata_file_list_set_file(
+				if( libmfdata_file_list_set_file_by_index(
 				     internal_handle->delta_segment_files_list,
 				     (int) ( segment_file->segment_number - 1 ),
 				     file_io_pool_entry,
@@ -2608,6 +2514,7 @@ int libewf_handle_open_read_segment_files(
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_handle_open_read_segment_files";
 	off64_t section_offset              = 0;
+	size64_t maximum_segment_size       = 0;
 	size64_t segment_file_size          = 0;
 	ssize_t read_count                  = 0;
 	int file_io_pool_entry              = 0;
@@ -2615,7 +2522,7 @@ int libewf_handle_open_read_segment_files(
 	int known_section                   = 0;
 	int last_section                    = 0;
 	int result                          = 0;
-	int segment_number                  = 0;
+	int segment_files_list_index        = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2662,7 +2569,7 @@ int libewf_handle_open_read_segment_files(
 		return( -1 );
 	}
 	if( libmfdata_file_list_get_number_of_files(
-	     internal_handle->segment_table,
+	     internal_handle->segment_files_list,
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
@@ -2675,7 +2582,7 @@ int libewf_handle_open_read_segment_files(
 
 		goto on_error;
 	}
-	if( number_of_segment_files <= 1 )
+	if( number_of_segment_files <= 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -2686,13 +2593,13 @@ int libewf_handle_open_read_segment_files(
 
 		goto on_error;
 	}
-	for( segment_number = 0;
-	     segment_number < number_of_segment_files;
-	     segment_number++ )
+	for( segment_files_list_index = 0;
+	     segment_files_list_index < number_of_segment_files;
+	     segment_files_list_index++ )
 	{
 		if( libmfdata_file_list_get_file_by_index(
 		     internal_handle->segment_files_list,
-		     segment_number,
+		     segment_files_list_index,
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
@@ -2702,7 +2609,7 @@ int libewf_handle_open_read_segment_files(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_number + 1 );
+			 segment_files_list_index + 1 );
 
 			goto on_error;
 		}
@@ -2721,6 +2628,28 @@ int libewf_handle_open_read_segment_files(
 			 file_io_pool_entry );
 
 			goto on_error;
+		}
+		if( ( segment_files_list_index == 0 )
+		 && ( number_of_segment_files > 1 ) )
+		{
+			/* Round the maximum segment size to nearest number of KiB
+			 */
+			maximum_segment_size = ( segment_file_size >> 10 ) << 10;
+
+			if( libewf_segment_table_set_maximum_segment_size(
+			     internal_handle->segment_table,
+			     maximum_segment_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set maximum segment size in segment table.",
+				 function );
+
+				goto on_error;
+			}
 		}
 /* TODO handle missing segment files */
 /* TODO handle corrupt segment files */
@@ -2774,7 +2703,7 @@ int libewf_handle_open_read_segment_files(
 
 			goto on_error;
 		}
-		if( segment_file->segment_number != segment_number )
+		if( segment_file->segment_number != ( segment_files_list_index + 1 ) )
 		{
 			liberror_error_set(
 			 error,
@@ -2794,7 +2723,7 @@ int libewf_handle_open_read_segment_files(
 		if( libmfdata_file_list_set_file_value_by_index(
 		     internal_handle->segment_files_list,
 		     internal_handle->segment_files_cache,
-		     segment_number,
+		     segment_files_list_index,
 		     (intptr_t *) segment_file,
 		     &libewf_segment_file_free,
 		     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
@@ -2806,7 +2735,7 @@ int libewf_handle_open_read_segment_files(
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set segment file: %d in list.",
 			 function,
-			 segment_number + 1 );
+			 segment_files_list_index + 1 );
 
 			libewf_segment_file_free(
 			 (intptr_t *) segment_file,
@@ -3292,7 +3221,7 @@ int libewf_handle_open_read_segment_files(
 				libnotify_printf(
 				 "%s: trailing data in segment file: %" PRIu16 "\n",
 				 function,
-				 segment_number );
+				 segment_files_list_index );
 			}
 		}
 #endif
@@ -3322,13 +3251,14 @@ int libewf_handle_open_read_delta_segment_files(
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_handle_open_read_delta_segment_files";
 	off64_t section_offset              = 0;
+	size64_t maximum_segment_size       = 0;
 	size64_t segment_file_size          = 0;
 	ssize_t read_count                  = 0;
 	int file_io_pool_entry              = 0;
 	int number_of_segment_files         = 0;
 	int known_section                   = 0;
 	int last_section                    = 0;
-	int segment_number                  = 0;
+	int segment_files_list_index        = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -3342,7 +3272,7 @@ int libewf_handle_open_read_delta_segment_files(
 		return( -1 );
 	}
 	if( libmfdata_file_list_get_number_of_files(
-	     internal_handle->delta_segment_table,
+	     internal_handle->delta_segment_files_list,
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
@@ -3359,13 +3289,13 @@ int libewf_handle_open_read_delta_segment_files(
 	{
 		return( 1 );
 	}
-	for( segment_number = 0;
-	     segment_number < number_of_segment_files;
-	     segment_number++ )
+	for( segment_files_list_index = 0;
+	     segment_files_list_index < number_of_segment_files;
+	     segment_files_list_index++ )
 	{
 		if( libmfdata_file_list_get_file_by_index(
 		     internal_handle->segment_files_list,
-		     segment_number,
+		     segment_files_list_index,
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
@@ -3375,22 +3305,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data file: %d from segment files list.",
 			 function,
-			 segment_number + 1 );
-
-			goto on_error;
-		}
-/* TODO handle missing delta segment files */
-/* TODO handle corrupt delta segment files */
-		if( libewf_segment_file_initialize(
-		     &segment_file,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment file.",
-			 function );
+			 segment_files_list_index + 1 );
 
 			goto on_error;
 		}
@@ -3410,6 +3325,43 @@ int libewf_handle_open_read_delta_segment_files(
 
 			goto on_error;
 		}
+		if( ( segment_files_list_index == 0 )
+		 && ( number_of_segment_files > 1 ) )
+		{
+			/* Round the maximum segment size to nearest number of KiB
+			 */
+			maximum_segment_size = ( segment_file_size >> 10 ) << 10;
+
+			if( libewf_segment_table_set_maximum_segment_size(
+			     internal_handle->delta_segment_table,
+			     maximum_segment_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set maximum segment size in delta segment table.",
+				 function );
+
+				goto on_error;
+			}
+		}
+/* TODO handle missing delta segment files */
+/* TODO handle corrupt delta segment files */
+		if( libewf_segment_file_initialize(
+		     &segment_file,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create segment file.",
+			 function );
+
+			goto on_error;
+		}
 		read_count = libewf_segment_file_read_file_header(
 			      segment_file,
 			      file_io_pool,
@@ -3425,6 +3377,10 @@ int libewf_handle_open_read_delta_segment_files(
 			 "%s: unable to read segment file header.",
 			 function );
 
+			libewf_segment_file_free(
+			 (intptr_t *) segment_file,
+			 NULL );
+
 			goto on_error;
 		}
 		if( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_DWF )
@@ -3436,9 +3392,13 @@ int libewf_handle_open_read_delta_segment_files(
 			 "%s: unsupported segment file type.",
 			 function );
 
+			libewf_segment_file_free(
+			 (intptr_t *) segment_file,
+			 NULL );
+
 			goto on_error;
 		}
-		if( segment_file->segment_number != segment_number )
+		if( segment_file->segment_number != ( segment_files_list_index + 1 ) )
 		{
 			liberror_error_set(
 			 error,
@@ -3446,6 +3406,29 @@ int libewf_handle_open_read_delta_segment_files(
 			 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
 			 "%s: segment number mismatch.",
 			 function );
+
+			libewf_segment_file_free(
+			 (intptr_t *) segment_file,
+			 NULL );
+
+			goto on_error;
+		}
+		if( libmfdata_file_list_set_file_value_by_index(
+		     internal_handle->segment_files_list,
+		     internal_handle->segment_files_cache,
+		     segment_files_list_index,
+		     (intptr_t *) segment_file,
+		     &libewf_segment_file_free,
+		     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set segment file: %d in segment files list.",
+			 function,
+			 segment_files_list_index + 1 );
 
 			goto on_error;
 		}
@@ -3607,29 +3590,10 @@ int libewf_handle_open_read_delta_segment_files(
 				libnotify_printf(
 				 "%s: trailing data in segment file: %" PRIu16 "\n",
 				 function,
-				 segment_number );
+				 segment_files_list_index );
 			}
 		}
 #endif
-		if( libmfdata_file_list_set_file_value_by_index(
-		     internal_handle->segment_files_list,
-		     internal_handle->segment_files_cache,
-		     segment_number,
-		     (intptr_t *) segment_file,
-		     &libewf_segment_file_free,
-		     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set segment file: %d in segment files list.",
-			 function,
-			 segment_number + 1 );
-
-			goto on_error;
-		}
 		segment_file = NULL;
 	}
 	return( 1 );
@@ -3639,12 +3603,6 @@ on_error:
 	{
 		libewf_section_free(
 		 (intptr_t *) section,
-		 NULL );
-	}
-	if( segment_file != NULL )
-	{
-		libewf_segment_file_free(
-		 (intptr_t *) segment_file,
 		 NULL );
 	}
 	return( -1 );
@@ -5367,7 +5325,7 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->io_handle,
 		               internal_handle->file_io_pool,
 		               internal_handle->media_values,
-		               internal_handle->segment_files_list,
+		               internal_handle->delta_segment_files_list,
 		               internal_handle->segment_files_cache,
 		               internal_handle->delta_segment_table,
 		               internal_handle->chunk_table_list,
@@ -5823,7 +5781,7 @@ ssize_t libewf_handle_write_buffer(
 				       internal_handle->io_handle,
 				       internal_handle->file_io_pool,
 				       internal_handle->media_values,
-				       internal_handle->segment_files_list,
+				       internal_handle->delta_segment_files_list,
 				       internal_handle->segment_files_cache,
 				       internal_handle->delta_segment_table,
 				       internal_handle->chunk_table_list,
@@ -6167,11 +6125,11 @@ ssize_t libewf_handle_write_finalize(
 	ssize_t write_finalize_count              = 0;
 	uint64_t chunk_index                      = 0;
 	int8_t compression_level                  = 0;
-	uint16_t segment_number                   = 0;
 	int file_io_pool_entry                    = -1;
 	int number_of_segment_files               = 0;
 	int is_empty_zero_block                   = 0;
 	int result                                = 0;
+	int segment_files_list_index              = 0;
 
 	if( handle == NULL )
 	{
@@ -6404,8 +6362,8 @@ ssize_t libewf_handle_write_finalize(
 	{
 		return( write_finalize_count );
 	}
-	if( libewf_segment_table_get_number_of_segment_files(
-	     internal_handle->segment_table,
+	if( libmfdata_file_list_get_number_of_files(
+	     internal_handle->segment_files_list,
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
@@ -6473,18 +6431,17 @@ ssize_t libewf_handle_write_finalize(
 				return( -1 );
 			}
 		}
-		segment_number = 1;
-
 		if( libewf_write_io_handle_create_segment_file(
 		     internal_handle->io_handle,
 		     internal_handle->file_io_pool,
 		     internal_handle->segment_files_list,
 		     internal_handle->segment_files_cache,
 		     internal_handle->segment_table,
-		     segment_number,
+		     1,
 		     internal_handle->write_io_handle->maximum_number_of_segments,
 		     LIBEWF_SEGMENT_FILE_TYPE_EWF,
 		     &segment_file,
+		     &segment_files_list_index,
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
@@ -6492,9 +6449,8 @@ ssize_t libewf_handle_write_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to create segment file for segment: %" PRIu16 ".",
-			 function,
-			 segment_number );
+			 "%s: unable to create segment file: 1.",
+			 function );
 
 			return( -1 );
 		}
@@ -6523,11 +6479,11 @@ ssize_t libewf_handle_write_finalize(
 	}
 	else
 	{
-		segment_number = (uint16_t) number_of_segment_files - 1;
+		segment_files_list_index = number_of_segment_files - 1;
 
 		if( libmfdata_file_list_get_file_by_index(
 		     internal_handle->segment_files_list,
-		     (int) ( segment_number - 1 ),
+		     segment_files_list_index,
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
@@ -6535,9 +6491,9 @@ ssize_t libewf_handle_write_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
+			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_number );
+			 segment_files_list_index + 1 );
 
 			return( -1 );
 		}
@@ -6545,7 +6501,7 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->segment_files_list,
 		     internal_handle->file_io_pool,
 		     internal_handle->segment_files_cache,
-		     (int) ( segment_number - 1 ),
+		     segment_files_list_index,
 		     (intptr_t **) &segment_file,
 		     0,
 		     error ) != 1 )
@@ -6554,9 +6510,9 @@ ssize_t libewf_handle_write_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %" PRIu16 " value from list.",
+			 "%s: unable to retrieve segment file: %d value from list.",
 			 function,
-			 segment_number );
+			 segment_files_list_index + 1 );
 
 			return( -1 );
 		}
@@ -6566,9 +6522,9 @@ ssize_t libewf_handle_write_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing segment file: %" PRIu16 ".",
+			 "%s: missing segment file: %d.",
 			 function,
-			 segment_number );
+			 segment_files_list_index + 1 );
 
 			return( -1 );
 		}
@@ -6588,10 +6544,10 @@ ssize_t libewf_handle_write_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %" PRIu16 ".",
+			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
 			 function,
 			 internal_handle->write_io_handle->resume_segment_file_offset,
-			 segment_number );
+			 segment_files_list_index + 1 );
 
 			return( -1 );
 		}
@@ -6726,7 +6682,6 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->media_values,
 		     internal_handle->segment_files_list,
 		     internal_handle->segment_files_cache,
-		     internal_handle->segment_table,
 		     internal_handle->hash_values,
 		     internal_handle->hash_sections,
 		     internal_handle->sessions,

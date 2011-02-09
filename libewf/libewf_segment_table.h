@@ -113,23 +113,6 @@ int libewf_segment_table_set_maximum_segment_size(
      size64_t maximum_segment_size,
      liberror_error_t **error );
 
-int libewf_segment_table_get_number_of_segment_files(
-     libewf_segment_table_t *segment_table,
-     int *number_of_segment_files,
-     liberror_error_t **error );
-
-int libewf_segment_table_get_segment_file(
-     libewf_segment_table_t *segment_table,
-     uint16_t segment_number,
-     int *segment_file_index,
-     liberror_error_t **error );
-
-int libewf_segment_table_set_segment_file(
-     libewf_segment_table_t *segment_table,
-     uint16_t segment_number,
-     int segment_file_index,
-     liberror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

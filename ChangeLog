@@ -1,19 +1,17 @@
 TODO
+* resume
+  - allow resume from volume/disk section
 * resync with version on chode
   - borland5 and codegear update libmfdata
 * check performance
 * clean up libewf_section.c (in progress)
   - libewf_section_table2_read
 * libmfdata rewrite
-  - segment table split off data files list
   - add support for table2 section
-  - set chunk (data) size in chunk table
+  - set chunk (data) size in chunk table (value size)
   - do not write section start on data update ?
   - read performance: flag if checksum has be checked
   - add flags to by-pass cache ?
-* segment table
-  - split segment and delta segment files list, make segment number - 1 the index
-  - remove segment number mapping from segment table
 * ewftools: do not print status on abort
   - set process status to abort ?
 * implement remaining test scenarios
@@ -91,6 +89,7 @@ Further analysis of the EWF format:
   - are flags similar to file attribute flags ?
 * FTK Imager: support for "Use AD Encryption"
   - requires support for ADCRYPT file format
+* Audio track data ?
 
 Features
 * resume write support for ENCASE1/SMART table sections ?
@@ -245,6 +244,14 @@ Known issues:
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
+
+20110209
+* updated libodraw
+* worked on libmfdata integration
+  - removed segment table data file index lookup
+* imaging handle
+  - correction of upper bound of error granularity in prompt
+  - correction of header values retrieval on resume
 
 20110208
 * worked on libmfdata integration
