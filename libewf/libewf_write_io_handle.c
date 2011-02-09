@@ -493,6 +493,20 @@ int libewf_write_io_handle_initialize_values(
 
 			goto on_error;
 		}
+		if( memory_set(
+		     zero_byte_empty_block,
+		     0,
+		     sizeof( uint8_t ) * (size_t) media_values->chunk_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear zero byte empty block.",
+			 function );
+
+			goto on_error;
+		}
 		write_io_handle->compressed_zero_byte_empty_block_size = 512;
 
 		compressed_zero_byte_empty_block = (uint8_t *) memory_allocate(
@@ -2135,7 +2149,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		return( -1 );
 	}
-	chunk_exists = libmfdata_list_is_element_set(
+	chunk_exists = libmfdata_list_is_set(
 			chunk_table_list,
 			chunk_index,
 			error );

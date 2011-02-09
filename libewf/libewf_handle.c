@@ -4872,7 +4872,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 			return( -1 );
 		}
-		chunk_exists = libmfdata_list_is_element_set(
+		chunk_exists = libmfdata_list_is_set(
 		                internal_handle->chunk_table_list,
 		                (int) chunk_index,
 		                error );
@@ -5291,7 +5291,7 @@ ssize_t libewf_handle_write_chunk(
 	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 	{
-		chunk_exists = libmfdata_list_is_element_set(
+		chunk_exists = libmfdata_list_is_set(
 		                internal_handle->chunk_table_list,
 		                (int) chunk_index,
 		                error );
@@ -5583,7 +5583,7 @@ ssize_t libewf_handle_write_buffer(
 	}
 	while( buffer_size > 0 )
 	{
-		chunk_exists = libmfdata_list_is_element_set(
+		chunk_exists = libmfdata_list_is_set(
 				internal_handle->chunk_table_list,
 				(int) chunk_index,
 				error );

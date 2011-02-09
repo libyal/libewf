@@ -966,22 +966,6 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 
 		return( -1 );
 	}
-	if( libmfdata_list_set_element_value_size_by_index(
-	     chunk_table_list,
-	     (int) chunk_index,
-	     (size64_t) chunk_size - sizeof( uint32_t ),
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set value size of chunk: %" PRIu32 " in chunk table list.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
 	return( 1 );
 }
 
@@ -2817,22 +2801,6 @@ ssize_t libewf_segment_file_write_chunk(
 
 		return( -1 );
 	}
-	if( libmfdata_list_set_element_value_size_by_index(
-	     chunk_table_list,
-	     chunk_index,
-	     (size64_t) chunk_data_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set value size of chunk: %d in chunk table list.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
 	return( total_write_count );
 }
 
@@ -2883,7 +2851,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		return( -1 );
 	}
-	chunk_exists = libmfdata_list_is_element_set(
+	chunk_exists = libmfdata_list_is_set(
 			chunk_table_list,
 			chunk_index,
 			error );

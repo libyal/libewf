@@ -103,17 +103,6 @@ int libewf_section_set(
      off64_t end_offset,
      liberror_error_t **error );
 
-/* TODO libmfdata */
-ssize_t libewf_section_table2_read(
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         size_t section_size,
-         uint32_t media_number_of_chunks,
-         libmfdata_list_t *chunk_table_list,
-         uint8_t format,
-         uint8_t ewf_format,
-         liberror_error_t **error );
-
 ssize_t libewf_section_start_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,

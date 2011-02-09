@@ -149,7 +149,7 @@ int libewf_compress(
 			 function );
 		}
 #endif
-#if defined( HAVE_COMPRESS_BOUND )
+#if defined( HAVE_COMPRESS_BOUND ) || defined( WINAPI )
 		/* Use compressBound to determine the size of the uncompressed buffer
 		 */
 		safe_compressed_size = compressBound( (uLong) uncompressed_size );

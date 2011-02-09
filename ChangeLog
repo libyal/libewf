@@ -1,6 +1,8 @@
 TODO
+* libmfdata
+  - add group value size
 * resume
-  - allow resume from volume/disk section
+  - allow resume from volume/disk section + test scenario
 * resync with version on chode
   - borland5 and codegear update libmfdata
 * check performance
@@ -8,15 +10,12 @@ TODO
   - libewf_section_table2_read
 * libmfdata rewrite
   - add support for table2 section
-  - set chunk (data) size in chunk table (value size)
-  - do not write section start on data update ?
+  - set chunk (data) size in chunk table (value size) ?
   - read performance: flag if checksum has be checked
   - add flags to by-pass cache ?
 * ewftools: do not print status on abort
   - set process status to abort ?
 * implement remaining test scenarios
-* API chunk table access
-  - rewrite read/write chunk functions, pass chunk index
 
 Next beta/stable release:
 * full test
@@ -128,12 +127,6 @@ Additional (integrity) checks:
   - correct size
 
 Possible performance improvements:
-* create a offset table per segment file
-  - create it on demand (e.g. libqcow)
-  - map offset table start entry from segment table as a pointer or index number ?
-* fill offset table while reading ?
-  - only read first and last segment file for index build?
-  - add offsets of other segment files when needed
 * tune read and write buffer sizes
   - read/write block size seems to have little effect for dd on average
   - buffered bfio ?
@@ -144,6 +137,8 @@ Possible performance improvements:
   - pass length/size as much as possible
 * pass zero byte empty block compressed data cache as a pointer
   do not copy data to compressed chunk cache
+* do not write section start on data update
+  - performance improvement is insignificant
 
 Error handling/tollerance
 * what about a function that translates error into an equivalent errno?
@@ -161,6 +156,13 @@ Python bindings (pyewf)
 * mono support ?
 
 API changes
+* low level API
+  - segment file access
+  - section access
+  - chunk table access
+  - add function to retrieve EWFX xml header/hash directly
+* chunk table access
+  - rewrite read/write chunk functions, pass chunk index
 * add wide character functions definitions by default?
   - not necessary on most platforms
 * libbfio API extension
@@ -169,9 +171,6 @@ API changes
   - export libewf_glob_file_io_handle
     refactor glob functions to use libbfio handle input and return libbfio pool?
     think about libewf_glob_file_io_handle and abstration of file io handle get/set name
-* low level API
-  - add function to retrieve the segment file names and amount?
-  - add function to retrieve EWFX xml header/hash directly
 * LVF write support
   - libewf_add/remove_file for LVF
 * file structure API extension (idea)
