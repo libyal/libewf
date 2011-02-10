@@ -3019,17 +3019,15 @@ int libewf_handle_open_read_segment_files(
 					  (void *) "table2",
 					  6 ) == 0 )
 				{
-/* TODO libmfdata
-					read_count = libewf_section_table2_read(
-						      file_io_pool,
-						      file_io_pool_entry,
-						      (size_t) section_size,
-						      media_values->number_of_chunks,
-						      chunk_table_list,
-						      io_handle->format,
-						      io_handle->ewf_format,
-						      error );
-*/
+					result = libewf_segment_file_read_table2_section(
+						  segment_file,
+						  section,
+						  file_io_pool,
+						  file_io_pool_entry,
+						  chunk_table,
+						  internal_handle->chunk_table_list,
+						  error );
+
 					known_section = 1;
 				}
 				else if( memory_compare(
@@ -3199,7 +3197,7 @@ int libewf_handle_open_read_segment_files(
 				break;
 			}
 /* TODO libmfdata rewrite
-		last_segment_file = 1;
+			last_segment_file = 1;
 */
 		}
 		if( last_section == 0 )
@@ -3568,7 +3566,7 @@ int libewf_handle_open_read_delta_segment_files(
 				break;
 			}
 /* TODO libmfdata rewrite
-		last_segment_file = 1;
+			last_segment_file = 1;
 */
 		}
 		if( last_section == 0 )
@@ -6836,7 +6834,7 @@ off64_t libewf_handle_seek_offset(
 
 			return( -1 );
 		}
-		if( libmfdata_list_get_element_by_index(
+		if( libmfdata_list_get_data_range_by_index(
 		     internal_handle->chunk_table_list,
 		     (int) chunk_index,
 		     &file_io_pool_entry,
@@ -6849,7 +6847,7 @@ off64_t libewf_handle_seek_offset(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve chunk: %" PRIu64 " data range.",
+			 "%s: unable to retrieve data range of chunk: %" PRIu64 ".",
 			 function,
 			 chunk_index );
 
@@ -8263,7 +8261,7 @@ int libewf_handle_get_file_io_handle(
 
 		return( -1 );
 	}
-	if( libmfdata_list_get_element_by_index(
+	if( libmfdata_list_get_data_range_by_index(
 	     internal_handle->chunk_table_list,
 	     (int) chunk_index,
 	     &file_io_pool_entry,
@@ -8276,7 +8274,7 @@ int libewf_handle_get_file_io_handle(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunk: %" PRIu64 " data range.",
+		 "%s: unable to retrieve data range of chunk: %" PRIu64 ".",
 		 function,
 		 chunk_index );
 

@@ -120,6 +120,15 @@ ssize_t libewf_segment_file_read_table_section(
          libmfdata_list_t *chunk_table_list,
          liberror_error_t **error );
 
+ssize_t libewf_segment_file_read_table2_section(
+         libewf_segment_file_t *segment_file,
+         libewf_section_t *section,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         libewf_chunk_table_t *chunk_table,
+         libmfdata_list_t *chunk_table_list,
+         liberror_error_t **error );
+
 ssize_t libewf_segment_file_read_volume_section(
          libewf_segment_file_t *segment_file,
          libewf_section_t *section,

@@ -1063,7 +1063,7 @@ int libewf_chunk_table_fill(
 			{
 				chunk_flags |= LIBMFDATA_LIST_ELEMENT_DATA_RANGE_FLAG_IS_TAINTED;
 			}
-			if( libmfdata_list_set_element_by_index(
+			if( libmfdata_list_set_data_range_by_index(
 			     list,
 			     chunk_index,
 			     file_io_pool_entry,
@@ -1076,7 +1076,7 @@ int libewf_chunk_table_fill(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set chunk: %d in chunk table list.",
+				 "%s: unable to set data range of chunk: %d.",
 				 function,
 				 chunk_index );
 
@@ -1247,7 +1247,7 @@ int libewf_chunk_table_fill(
 		{
 			chunk_flags |= LIBMFDATA_LIST_ELEMENT_DATA_RANGE_FLAG_IS_TAINTED;
 		}
-		if( libmfdata_list_set_element_by_index(
+		if( libmfdata_list_set_data_range_by_index(
 		     list,
 		     chunk_index,
 		     file_io_pool_entry,
@@ -1260,7 +1260,7 @@ int libewf_chunk_table_fill(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set chunk: %d in chunk table list.",
+			 "%s: unable to set data range of chunk: %d.",
 			 function,
 			 chunk_index );
 
@@ -2371,7 +2371,7 @@ int libewf_chunk_table_fill_offsets(
 	     table_offset_index < number_of_offsets;
 	     table_offset_index++ )
 	{
-		if( libmfdata_list_get_element_by_index(
+		if( libmfdata_list_get_data_range_by_index(
 		     chunk_table_list,
 		     chunk_index,
 		     &file_io_pool_entry,

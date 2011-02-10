@@ -3099,7 +3099,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		return( -1 );
 	}
-	if( libmfdata_list_get_element_by_index(
+	if( libmfdata_list_get_data_range_by_index(
 	     chunk_table_list,
 	     chunk_index,
 	     &file_io_pool_entry,
