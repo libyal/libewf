@@ -905,13 +905,14 @@ ssize_t libewf_segment_file_read_table2_section(
 	}
 	if( number_of_offsets > 0 )
 	{
+/* TODO compare number of offsets with group values ? */
 		if( libmfdata_list_set_backup_data_range_by_index(
 		     chunk_table_list,
 		     chunk_table->last_chunk_compared,
-		     (int) number_of_offsets,
 		     file_io_pool_entry,
 		     section->start_offset,
 		     section->size,
+		     0,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1058,6 +1059,21 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 	             + sizeof( ewf_section_start_t )
 	             + sizeof( ewfx_delta_chunk_header_t );
 
+	if( libmfdata_list_set_element_by_index(
+	     chunk_table_list,
+	     (int) chunk_index,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set chunk: %" PRIu32 ".",
+		 function,
+		 chunk_index );
+
+		return( -1 );
+	}
 	if( libmfdata_list_set_data_range_by_index(
 	     chunk_table_list,
 	     (int) chunk_index,
@@ -2893,6 +2909,21 @@ ssize_t libewf_segment_file_write_chunk(
 	{
 		chunk_flags = 0;
 	}
+	if( libmfdata_list_set_element_by_index(
+	     chunk_table_list,
+	     chunk_index,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set chunk: %d.",
+		 function,
+		 chunk_index );
+
+		return( -1 );
+	}
 	if( libmfdata_list_set_data_range_by_index(
 	     chunk_table_list,
 	     chunk_index,
@@ -3073,6 +3104,21 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	if( write_checksum != 0 )
 	{
 		chunk_size += sizeof( uint32_t );
+	}
+	if( libmfdata_list_set_element_by_index(
+	     chunk_table_list,
+	     chunk_index,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set chunk: %d.",
+		 function,
+		 chunk_index );
+
+		goto on_error;
 	}
 	if( libmfdata_list_set_data_range_by_index(
 	     chunk_table_list,

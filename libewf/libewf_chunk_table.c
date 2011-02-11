@@ -1063,6 +1063,21 @@ int libewf_chunk_table_fill(
 			{
 				chunk_flags |= LIBMFDATA_LIST_ELEMENT_DATA_RANGE_FLAG_IS_TAINTED;
 			}
+			if( libmfdata_list_set_element_by_index(
+			     list,
+			     chunk_index,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set chunk: %d.",
+				 function,
+				 chunk_index );
+
+				return( -1 );
+			}
 			if( libmfdata_list_set_data_range_by_index(
 			     list,
 			     chunk_index,
@@ -1246,6 +1261,21 @@ int libewf_chunk_table_fill(
 		if( tainted != 0 )
 		{
 			chunk_flags |= LIBMFDATA_LIST_ELEMENT_DATA_RANGE_FLAG_IS_TAINTED;
+		}
+		if( libmfdata_list_set_element_by_index(
+		     list,
+		     chunk_index,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set chunk: %d.",
+			 function,
+			 chunk_index );
+
+			return( -1 );
 		}
 		if( libmfdata_list_set_data_range_by_index(
 		     list,
