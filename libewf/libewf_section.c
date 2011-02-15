@@ -4036,6 +4036,10 @@ ssize_t libewf_section_session_read(
 	uint32_t session_index               = 0;
 	uint32_t stored_checksum             = 0;
 
+#if defined( HAVE_DEBUG_OUTPUT )
+	uint32_t value_32bit         = 0;
+#endif
+
 	if( section == NULL )
 	{
 		liberror_error_set(
@@ -4299,13 +4303,14 @@ ssize_t libewf_section_session_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
+			byte_stream_copy_to_uint32_little_endian(
+			 ( session_entries[ session_index ] ).type,
+			 value_32bit );
 			libnotify_printf(
-			 "%s: session: %02" PRIu32 " unknown1:\n",
+			 "%s: session: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
 			 function,
-			 session_index );
-			libnotify_print_data(
-			 ( session_entries[ session_index ] ).unknown1,
-			 4 );
+			 session_index,
+			 value_32bit );
 
 			libnotify_printf(
 			 "%s: session: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu32 ")\n",
@@ -4339,13 +4344,14 @@ ssize_t libewf_section_session_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
+				byte_stream_copy_to_uint32_little_endian(
+				 ( session_entries[ session_index ] ).type,
+				 value_32bit );
 				libnotify_printf(
-				 "%s: session: %02" PRIu32 " unknown1:\n",
+				 "%s: session: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
 				 function,
-				 session_index );
-				libnotify_print_data(
-				 ( session_entries[ session_index ] ).unknown1,
-				 4 );
+				 session_index,
+				 value_32bit );
 
 				libnotify_printf(
 				 "%s: session: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",

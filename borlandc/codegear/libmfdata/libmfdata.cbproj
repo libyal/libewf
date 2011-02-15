@@ -40,103 +40,74 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<None Include="..\..\..\libmfdata\libmfdata_unused.h">
-				<BuildOrder>0</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_array_type.c">
-				<BuildOrder>1</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_array_type.h">
-				<BuildOrder>2</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_cache.c">
-				<BuildOrder>3</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_cache.h">
-				<BuildOrder>4</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_cache_value.c">
-				<BuildOrder>5</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_cache_value.h">
-				<BuildOrder>6</BuildOrder>
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_date_time.h">
-				<BuildOrder>7</BuildOrder>
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_definitions.h">
-				<BuildOrder>8</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_error.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_error.h">
-				<BuildOrder>10</BuildOrder>
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_extern.h">
-				<BuildOrder>11</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_file.c">
-				<BuildOrder>12</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_file.h">
-				<BuildOrder>13</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_file_list.c">
-				<BuildOrder>14</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_file_list.h">
-				<BuildOrder>15</BuildOrder>
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_inline.h">
-				<BuildOrder>16</BuildOrder>
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_libbfio.h">
-				<BuildOrder>17</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_list.c">
-				<BuildOrder>18</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_list.h">
-				<BuildOrder>19</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_list_element.c">
-				<BuildOrder>20</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_list_element.h">
-				<BuildOrder>21</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libmfdata\libmfdata_list_element_group_values.c">
-				<BuildOrder>22</BuildOrder>
+			<CppCompile Include="..\..\..\libmfdata\libmfdata_group.c">
 			</CppCompile>
-			<None Include="..\..\..\libmfdata\libmfdata_list_element_group_values.h">
-				<BuildOrder>23</BuildOrder>
+			<None Include="..\..\..\libmfdata\libmfdata_group.h">
+			</None>
+			<CppCompile Include="..\..\..\libmfdata\libmfdata_range.c">
+			</CppCompile>
+			<None Include="..\..\..\libmfdata\libmfdata_range.h">
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_notify.c">
-				<BuildOrder>24</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_notify.h">
-				<BuildOrder>25</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_segment.c">
-				<BuildOrder>26</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_segment.h">
-				<BuildOrder>27</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_segment_table.c">
-				<BuildOrder>28</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_segment_table.h">
-				<BuildOrder>29</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_support.c">
-				<BuildOrder>30</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_support.h">
-				<BuildOrder>31</BuildOrder>
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_types.h">
-				<BuildOrder>32</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

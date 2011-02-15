@@ -33,7 +33,7 @@ typedef struct ewf_session_header ewf_session_header_t;
 
 struct ewf_session_header
 {
-	/* NUmber of sessions
+	/* Number of sessions
 	 * consists of 4 bytes
 	 */
 	uint8_t number_of_sessions[ 4 ];
@@ -63,11 +63,10 @@ typedef struct ewf_session_entry ewf_session_entry_t;
 
 struct ewf_session_entry
 {
-	/* Unknown
-	 * contains 0x00
+	/* The type
 	 * consists of 4 bytes
 	 */
-	uint8_t unknown1[ 4 ];
+	uint8_t type[ 4 ];
 
 	/* The first sector of the session
 	 * consists of 4 bytes
