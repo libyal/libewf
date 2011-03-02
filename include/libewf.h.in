@@ -1185,6 +1185,36 @@ int libewf_handle_append_session(
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
+/* Retrieves the number of tracks
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_number_of_tracks(
+     libewf_handle_t *handle,
+     uint32_t *number_of_tracks,
+     libewf_error_t **error );
+
+/* Retrieves a track
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_track(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint64_t *first_sector,
+     uint64_t *number_of_sectors,
+     libewf_error_t **error );
+
+/* Appends a track
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_append_track(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     libewf_error_t **error );
+
 /* Retrieves the header codepage
  * Returns 1 if successful or -1 on error
  */

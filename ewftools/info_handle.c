@@ -3209,6 +3209,155 @@ int info_handle_sessions_fprint(
 	return( result );
 }
 
+/* Prints the tracks to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_tracks_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error )
+{
+	static char *function      = "info_handle_tracks_fprint";
+	uint64_t start_sector      = 0;
+	uint64_t number_of_sectors = 0;
+	uint32_t bytes_per_sector  = 0;
+	uint32_t number_of_tracks  = 0;
+	uint32_t track_iterator    = 0;
+	int result                 = 1;
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid info handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_get_bytes_per_sector(
+	     info_handle->input_handle,
+	     &bytes_per_sector,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_get_number_of_tracks(
+	     info_handle->input_handle,
+	     &number_of_tracks,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of tracks.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_tracks > 0 )
+	{
+		if( info_handle_section_header_fprint(
+		     info_handle,
+		     "tracks",
+		     "Tracks",
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section header: tracks.",
+			 function );
+
+			result = -1;
+		}
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\ttotal number: %" PRIu32 "\n",
+			 number_of_tracks );
+		}
+		for( track_iterator = 0;
+		     track_iterator < number_of_tracks;
+		     track_iterator++ )
+		{
+			if( libewf_handle_get_track(
+			     info_handle->input_handle,
+			     track_iterator,
+			     &start_sector,
+			     &number_of_sectors,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve the track: %" PRIu32 ".",
+				 function,
+				 track_iterator );
+
+				start_sector      = 0;
+				number_of_sectors = 0;
+
+				result = -1;
+			}
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\t\t<run image_offset=\"%" PRIu64 "\" len=\"%" PRIu64 "\"/>\n",
+				 start_sector * bytes_per_sector,
+				 number_of_sectors * bytes_per_sector );
+			}
+			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+				 start_sector,
+				 start_sector + number_of_sectors - 1,
+				 number_of_sectors );
+			}
+		}
+		if( info_handle_section_footer_fprint(
+		     info_handle,
+		     "tracks",
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section footer: tracks.",
+			 function );
+
+			result = -1;
+		}
+	}
+	return( result );
+}
+
 /* Prints the single files to a stream
  * Returns 1 if successful or -1 on error
  */

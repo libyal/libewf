@@ -146,6 +146,19 @@ int libewf_handle_initialize(
 			goto on_error;
 		}
 		if( libewf_sector_list_initialize(
+		     &( internal_handle->tracks ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create tracks sector list.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_sector_list_initialize(
 		     &( internal_handle->acquiry_errors ),
 		     error ) != 1 )
 		{
@@ -168,6 +181,12 @@ int libewf_handle_initialize(
 on_error:
 	if( internal_handle != NULL )
 	{
+		if( internal_handle->tracks != NULL )
+		{
+			libewf_sector_list_free(
+			 &( internal_handle->tracks ),
+			 NULL );
+		}
 		if( internal_handle->sessions != NULL )
 		{
 			libewf_sector_list_free(
@@ -271,6 +290,19 @@ int libewf_handle_free(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sessions sector list.",
+			 function );
+
+			result = -1;
+		}
+		if( libewf_sector_list_free(
+		     &( internal_handle->tracks ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free tracks sector list.",
 			 function );
 
 			result = -1;
@@ -424,6 +456,20 @@ int libewf_handle_clone(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination sessions.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_list_clone(
+	     &( internal_destination_handle->tracks ),
+	     internal_source_handle->tracks,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination tracks.",
 		 function );
 
 		goto on_error;
@@ -779,6 +825,12 @@ on_error:
 		{
 			libewf_sector_list_free(
 			 &( internal_destination_handle->acquiry_errors ),
+			 NULL );
+		}
+		if( internal_destination_handle->tracks != NULL )
+		{
+			libewf_sector_list_free(
+			 &( internal_destination_handle->tracks ),
 			 NULL );
 		}
 		if( internal_destination_handle->sessions != NULL )
@@ -2021,6 +2073,19 @@ int libewf_handle_open_file_io_pool(
 		goto on_error;
 	}
 	if( libewf_sector_list_empty(
+	     internal_handle->tracks,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty tracks sector list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_list_empty(
 	     internal_handle->acquiry_errors,
 	     error ) != 1 )
 	{
@@ -3117,6 +3182,7 @@ int libewf_handle_open_read_segment_files(
 						      file_io_pool_entry,
 						      internal_handle->media_values,
 						      internal_handle->sessions,
+						      internal_handle->tracks,
 						      error );
 
 					known_section = 1;
@@ -3915,6 +3981,19 @@ int libewf_handle_close(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty sessions sector list.",
+		 function );
+
+		result = -1;
+	}
+	if( libewf_sector_list_empty(
+	     internal_handle->tracks,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty tracks sector list.",
 		 function );
 
 		result = -1;
@@ -5354,6 +5433,7 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->header_sections,
 		               internal_handle->hash_sections,
 		               internal_handle->sessions,
+		               internal_handle->tracks,
 		               internal_handle->acquiry_errors,
 		               (int) chunk_index,
 		               (uint8_t *) chunk_buffer,
@@ -5994,6 +6074,7 @@ ssize_t libewf_handle_write_buffer(
 					       internal_handle->header_sections,
 					       internal_handle->hash_sections,
 					       internal_handle->sessions,
+					       internal_handle->tracks,
 					       internal_handle->acquiry_errors,
 					       (int) chunk_index,
 					       internal_handle->chunk_data->data,
@@ -6307,6 +6388,7 @@ ssize_t libewf_handle_write_finalize(
 			       internal_handle->header_sections,
 			       internal_handle->hash_sections,
 			       internal_handle->sessions,
+			       internal_handle->tracks,
 			       internal_handle->acquiry_errors,
 			       (int) chunk_index,
 			       internal_handle->chunk_data->data,
@@ -6637,6 +6719,7 @@ ssize_t libewf_handle_write_finalize(
 		               internal_handle->hash_values,
 		               internal_handle->media_values,
 		               internal_handle->sessions,
+		               internal_handle->tracks,
 		               internal_handle->acquiry_errors,
 		               &( internal_handle->write_io_handle->data_section ),
 		               error );
@@ -6683,6 +6766,7 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->hash_values,
 		     internal_handle->hash_sections,
 		     internal_handle->sessions,
+		     internal_handle->tracks,
 		     internal_handle->acquiry_errors,
 		     &( internal_handle->write_io_handle->data_section ),
 		     error ) != 1 )

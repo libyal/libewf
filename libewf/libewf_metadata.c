@@ -2459,6 +2459,162 @@ int libewf_handle_append_session(
 	return( 1 );
 }
 
+/* Retrieves the number of tracks
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_number_of_tracks(
+     libewf_handle_t *handle,
+     uint32_t *number_of_tracks,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_number_of_tracks";
+	int number_of_elements                    = 0;
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( number_of_tracks == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of tracks.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_sector_list_get_number_of_elements(
+	     internal_handle->tracks,
+	     &number_of_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from tracks sector list.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_elements < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of elements value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_tracks = (uint32_t) number_of_elements;
+
+	return( 1 );
+}
+
+/* Retrieves a track
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_track(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint64_t *first_sector,
+     uint64_t *number_of_sectors,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_track";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( libewf_sector_list_get_sector(
+	     internal_handle->tracks,
+	     (int) index,
+	     first_sector,
+	     number_of_sectors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve track: %" PRIu32 ".",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Appends a track
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_append_track(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_append_track";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( libewf_sector_list_append_sector(
+	     internal_handle->tracks,
+	     first_sector,
+	     number_of_sectors,
+	     0,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append track.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the header codepage
  * Returns 1 if successful or -1 on error
  */

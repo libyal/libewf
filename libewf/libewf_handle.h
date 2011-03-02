@@ -76,6 +76,10 @@ struct libewf_internal_handle
 	 */
 	libewf_sector_list_t *sessions;
 
+	/* The stored tracks information
+	 */
+	libewf_sector_list_t *tracks;
+
 	/* The sectors with acquiry read errors
 	 */
 	libewf_sector_list_t *acquiry_errors;

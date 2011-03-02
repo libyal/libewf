@@ -268,6 +268,27 @@ int libewf_handle_append_session(
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_handle_get_number_of_tracks(
+     libewf_handle_t *handle,
+     uint32_t *number_of_tracks,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_handle_get_track(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint64_t *first_sector,
+     uint64_t *number_of_sectors,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_handle_append_track(
+     libewf_handle_t *handle,
+     uint64_t first_sector,
+     uint64_t number_of_sectors,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_get_header_codepage(
      libewf_handle_t *handle,
      int *header_codepage,

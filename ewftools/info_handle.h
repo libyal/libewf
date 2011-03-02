@@ -201,6 +201,10 @@ int info_handle_sessions_fprint(
      info_handle_t *info_handle,
      liberror_error_t **error );
 
+int info_handle_tracks_fprint(
+     info_handle_t *info_handle,
+     liberror_error_t **error );
+
 int info_handle_single_files_fprint(
      info_handle_t *info_handle,
      liberror_error_t **error );

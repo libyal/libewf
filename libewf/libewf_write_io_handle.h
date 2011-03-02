@@ -245,6 +245,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
          libewf_sector_list_t *sessions,
+         libewf_sector_list_t *tracks,
          libewf_sector_list_t *acquiry_errors,
          int chunk_index,
          uint8_t *chunk_buffer,
@@ -286,6 +287,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,
+     libewf_sector_list_t *tracks,
      libewf_sector_list_t *acquiry_errors,
      ewf_data_t **cached_data_section,
      liberror_error_t **error );

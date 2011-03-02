@@ -272,6 +272,7 @@ ssize_t libewf_section_session_read(
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
          libewf_sector_list_t *sessions,
+         libewf_sector_list_t *tracks,
          liberror_error_t **error );
 
 ssize_t libewf_section_session_write(
@@ -280,6 +281,7 @@ ssize_t libewf_section_session_write(
          int file_io_pool_entry,
          off64_t section_offset,
          libewf_sector_list_t *sessions,
+         libewf_sector_list_t *tracks,
          liberror_error_t **error );
 
 ssize_t libewf_section_table_header_read(

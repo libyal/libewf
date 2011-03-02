@@ -4017,6 +4017,7 @@ ssize_t libewf_section_session_read(
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
          libewf_sector_list_t *sessions,
+         libewf_sector_list_t *tracks,
          liberror_error_t **error )
 {
 	ewf_session_header_t session_header;
@@ -4031,14 +4032,14 @@ ssize_t libewf_section_session_read(
 	uint32_t calculated_checksum         = 0;
 	uint32_t first_sector                = 0;
 	uint32_t previous_first_sector       = 0;
+	uint32_t previous_type               = 0;
 	uint32_t number_of_sectors           = 0;
-	uint32_t number_of_sessions          = 0;
-	uint32_t session_index               = 0;
+	uint32_t number_of_sessions_entries  = 0;
+	uint32_t session_first_sector        = 0;
+	uint32_t sessions_entry_index        = 0;
 	uint32_t stored_checksum             = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t value_32bit         = 0;
-#endif
+	uint32_t track_first_sector          = 0;
+	uint32_t type                        = 0;
 
 	if( section == NULL )
 	{
@@ -4121,7 +4122,7 @@ ssize_t libewf_section_session_read(
 #endif
 	byte_stream_copy_to_uint32_little_endian(
 	 session_header.number_of_sessions,
-	 number_of_sessions );
+	 number_of_sessions_entries );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 session_header.checksum,
@@ -4131,9 +4132,9 @@ ssize_t libewf_section_session_read(
 	if( libnotify_verbose != 0 )
 	{
 		libnotify_printf(
-		 "%s: number of sessions\t\t\t: %" PRIu32 "\n",
+		 "%s: number of sessions entries\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_sessions );
+		 number_of_sessions_entries );
 
 		libnotify_printf(
 		 "%s: unknown1:\n",
@@ -4169,9 +4170,9 @@ ssize_t libewf_section_session_read(
 
 		goto on_error;
 	}
-	if( number_of_sessions > 0 )
+	if( number_of_sessions_entries > 0 )
 	{
-		session_entries_size = sizeof( ewf_session_entry_t ) * number_of_sessions;
+		session_entries_size = sizeof( ewf_session_entry_t ) * number_of_sessions_entries;
 
 		if( section_data_size < (size64_t) session_entries_size )
 		{
@@ -4297,33 +4298,34 @@ ssize_t libewf_section_session_read(
 			goto on_error;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 ( session_entries[ session_index ] ).first_sector,
+		 ( session_entries[ sessions_entry_index ] ).type,
+		 previous_type );
+
+		byte_stream_copy_to_uint32_little_endian(
+		 ( session_entries[ sessions_entry_index ] ).first_sector,
 		 previous_first_sector );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
 		{
-			byte_stream_copy_to_uint32_little_endian(
-			 ( session_entries[ session_index ] ).type,
-			 value_32bit );
 			libnotify_printf(
-			 "%s: session: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
+			 "%s: entry: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
 			 function,
-			 session_index,
-			 value_32bit );
+			 sessions_entry_index,
+			 previous_type );
 
 			libnotify_printf(
-			 "%s: session: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu32 ")\n",
+			 "%s: entry: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu32 ")\n",
 			 function,
-			 session_index,
+			 sessions_entry_index,
 			 previous_first_sector );
 
 			libnotify_printf(
-			 "%s: session: %02" PRIu32 " unknown2:\n",
+			 "%s: entry: %02" PRIu32 " unknown2:\n",
 			 function,
-			 session_index );
+			 sessions_entry_index );
 			libnotify_print_data(
-			 ( session_entries[ session_index ] ).unknown2,
+			 ( session_entries[ sessions_entry_index ] ).unknown2,
 			 24 );
 		}
 #endif
@@ -4331,40 +4333,42 @@ ssize_t libewf_section_session_read(
 		 * This is either some EnCase specific behavior or the value is used for
 		 * other purposes.
 		 */
-		previous_first_sector = 0;
+		session_first_sector = 0;
+		track_first_sector   = 0;
 
-		for( session_index = 1;
-		     session_index < number_of_sessions;
-		     session_index++ )
+		for( sessions_entry_index = 1;
+		     sessions_entry_index < number_of_sessions_entries;
+		     sessions_entry_index++ )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 session_entries[ session_index ].first_sector,
+			 ( session_entries[ sessions_entry_index ] ).type,
+			 type );
+
+			byte_stream_copy_to_uint32_little_endian(
+			 session_entries[ sessions_entry_index ].first_sector,
 			 first_sector );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
-				byte_stream_copy_to_uint32_little_endian(
-				 ( session_entries[ session_index ] ).type,
-				 value_32bit );
 				libnotify_printf(
-				 "%s: session: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
+				 "%s: entry: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
 				 function,
-				 session_index,
-				 value_32bit );
+				 sessions_entry_index,
+				 type );
 
 				libnotify_printf(
-				 "%s: session: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
+				 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
 				 function,
-				 session_index,
+				 sessions_entry_index,
 				 first_sector );
 
 				libnotify_printf(
-				 "%s: session: %02" PRIu32 " unknown2:\n",
+				 "%s: entry: %02" PRIu32 " unknown2:\n",
 				 function,
-				 session_index );
+				 sessions_entry_index );
 				libnotify_print_data(
-				 ( session_entries[ session_index ] ).unknown2,
+				 ( session_entries[ sessions_entry_index ] ).unknown2,
 				 24 );
 			}
 #endif
@@ -4380,42 +4384,69 @@ ssize_t libewf_section_session_read(
 
 				goto on_error;
 			}
-			number_of_sectors = first_sector - previous_first_sector;
-
-			if( libewf_sector_list_append_sector(
-			     sessions,
-			     (uint64_t) previous_first_sector,
-			     (uint64_t) number_of_sectors,
-			     0,
-			     error ) != 1 )
+			if( type == 0 )
 			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append session to sector list.",
-				 function );
+				number_of_sectors = first_sector - session_first_sector;
 
-				goto on_error;
+				if( libewf_sector_list_append_sector(
+				     sessions,
+				     (uint64_t) session_first_sector,
+				     (uint64_t) number_of_sectors,
+				     0,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append session to sector list.",
+					 function );
+	
+					goto on_error;
+				}
+				session_first_sector = first_sector;
 			}
+			if( previous_type == 1 )
+			{
+				number_of_sectors = first_sector - track_first_sector;
+
+				if( libewf_sector_list_append_sector(
+				     tracks,
+				     (uint64_t) track_first_sector,
+				     (uint64_t) number_of_sectors,
+				     0,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append track to sector list.",
+					 function );
+	
+					goto on_error;
+				}
+				track_first_sector = first_sector;
+			}
+			previous_type         = type;
 			previous_first_sector = first_sector;
-		}
-		if( media_values->number_of_sectors > previous_first_sector )
-		{
-			number_of_sectors = (uint32_t) ( media_values->number_of_sectors - previous_first_sector );
-		}
-		else
-		{
-			number_of_sectors = 0;
 		}
 		memory_free(
 		 session_entries );
 
 		session_entries = NULL;
 
+		if( media_values->number_of_sectors > session_first_sector )
+		{
+			number_of_sectors = (uint32_t) ( media_values->number_of_sectors - session_first_sector );
+		}
+		else
+		{
+			number_of_sectors = 0;
+		}
 		if( libewf_sector_list_append_sector(
 		     sessions,
-		     (uint64_t) previous_first_sector,
+		     (uint64_t) session_first_sector,
 		     (uint64_t) number_of_sectors,
 		     0,
 		     error ) != 1 )
@@ -4428,6 +4459,33 @@ ssize_t libewf_section_session_read(
 			 function );
 
 			goto on_error;
+		}
+		if( type == 1 )
+		{
+			if( media_values->number_of_sectors > track_first_sector )
+			{
+				number_of_sectors = (uint32_t) ( media_values->number_of_sectors - track_first_sector );
+			}
+			else
+			{
+				number_of_sectors = 0;
+			}
+			if( libewf_sector_list_append_sector(
+			     tracks,
+			     (uint64_t) track_first_sector,
+			     (uint64_t) number_of_sectors,
+			     0,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append track to sector list.",
+				 function );
+
+				goto on_error;
+			}
 		}
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -4458,6 +4516,7 @@ ssize_t libewf_section_session_write(
          int file_io_pool_entry,
          off64_t section_offset,
          libewf_sector_list_t *sessions,
+         libewf_sector_list_t *tracks,
          liberror_error_t **error )
 {
 	ewf_session_header_t session_header;

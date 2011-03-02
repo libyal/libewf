@@ -666,6 +666,27 @@ int main( int argc, char * const argv[] )
 			liberror_error_free(
 			 &error );
 		}
+		if( info_handle_tracks_fprint(
+		     info_handle,
+		     &error ) != 1 )
+		{
+			if( print_header != 0 )
+			{
+				ewfoutput_version_fprint(
+				 stderr,
+				 program );
+
+				print_header = 0;
+			}
+			fprintf(
+			 stderr,
+			 "Unable to print tracks.\n" );
+
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
 	if( ( info_option == 'a' )
 	 || ( info_option == 'e' ) )

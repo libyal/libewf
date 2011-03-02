@@ -241,6 +241,7 @@ ssize_t libewf_segment_file_write_close(
          libfvalue_table_t *hash_values,
          libewf_media_values_t *media_values,
          libewf_sector_list_t *sessions,
+         libewf_sector_list_t *tracks,
          libewf_sector_list_t *acquiry_errors,
          ewf_data_t **cached_data_section,
          liberror_error_t **error );
@@ -256,6 +257,7 @@ int libewf_segment_file_write_sections_correction(
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,
+     libewf_sector_list_t *tracks,
      libewf_sector_list_t *acquiry_errors,
      ewf_data_t **cached_data_section,
      liberror_error_t **error );
