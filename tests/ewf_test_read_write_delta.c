@@ -203,7 +203,7 @@ int ewf_test_read_write_delta(
 		}
 		if( libewf_handle_seek_offset(
 		     handle,
-		     -1 * read_size,
+		     -1 * (off64_t) read_size,
 		     SEEK_CUR,
 		     error ) == -1 )
 		{
@@ -242,7 +242,7 @@ int ewf_test_read_write_delta(
 			 LIBERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write buffer of size: %" PRIzd ".",
 			 function,
-			 write_size );
+			 read_count );
 
 			goto on_error;
 		}
@@ -329,7 +329,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-				 argv[ optind ] );
+				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );
 

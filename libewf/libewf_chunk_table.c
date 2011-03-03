@@ -689,6 +689,7 @@ int libewf_chunk_table_read_offsets(
 
 		if( stored_checksum != calculated_checksum )
 		{
+#ifdef TODO
 #if defined( HAVE_VERBOSE_OUTPUT )
 			if( libnotify_verbose != 0 )
 			{
@@ -702,6 +703,18 @@ int libewf_chunk_table_read_offsets(
 			/* The table offsets cannot be fully trusted therefore mark them as corrupted
 			 */
 			table_offsets_corrupted = 1;
+#else
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_INPUT,
+			 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+			 function,
+			 stored_checksum,
+			 calculated_checksum );
+
+			goto on_error;
+#endif
 		}
 	}
 	if( libewf_chunk_table_fill(
@@ -1066,21 +1079,6 @@ int libewf_chunk_table_fill(
 			if( libmfdata_list_set_element_by_index(
 			     list,
 			     chunk_index,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set chunk: %d.",
-				 function,
-				 chunk_index );
-
-				return( -1 );
-			}
-			if( libmfdata_list_set_data_range_by_index(
-			     list,
-			     chunk_index,
 			     file_io_pool_entry,
 			     base_offset + current_offset,
 			     (size64_t) chunk_size,
@@ -1091,7 +1089,7 @@ int libewf_chunk_table_fill(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set data range of chunk: %d.",
+				 "%s: unable to set chunk: %d.",
 				 function,
 				 chunk_index );
 
@@ -1142,6 +1140,7 @@ int libewf_chunk_table_fill(
 	 * The offset of the next section is either table_section->end_offset for original EWF and EWF-S01
 	 * or table_section->start_offset for other types of EWF
 	 */
+/* TODO what about table2 */
 	last_chunk_offset = (off64_t) base_offset + current_offset;
 
 	if( last_chunk_offset > (off64_t) INT64_MAX )
@@ -1265,21 +1264,6 @@ int libewf_chunk_table_fill(
 		if( libmfdata_list_set_element_by_index(
 		     list,
 		     chunk_index,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set chunk: %d.",
-			 function,
-			 chunk_index );
-
-			return( -1 );
-		}
-		if( libmfdata_list_set_data_range_by_index(
-		     list,
-		     chunk_index,
 		     file_io_pool_entry,
 		     last_chunk_offset,
 		     (size64_t) last_chunk_size,
@@ -1290,7 +1274,7 @@ int libewf_chunk_table_fill(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set data range of chunk: %d.",
+			 "%s: unable to set chunk: %d.",
 			 function,
 			 chunk_index );
 

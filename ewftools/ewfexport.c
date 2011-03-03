@@ -278,7 +278,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
 #if defined( _MSC_VER )
 	if( _setmode(
 	     _fileno(
@@ -321,7 +321,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-				 argv[ optind ] );
+				 argv[ optind - 1 ] );
 
 				usage_fprint(
 				 stderr );

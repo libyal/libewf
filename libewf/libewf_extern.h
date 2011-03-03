@@ -28,7 +28,7 @@
  */
 #if !defined( HAVE_LOCAL_LIBEWF )
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
+/* If Cygwin libtool DLL support is enabled set LIBEWF_DLL_EXPORT
  * before including libewf/extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )

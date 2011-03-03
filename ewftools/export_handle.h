@@ -28,23 +28,10 @@
 #include <libcstring.h>
 #include <liberror.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
-#if defined( HAVE_LOCAL_LIBSMRAW )
-#include <libsmraw_types.h>
-#elif defined( HAVE_LIBSMRAW_H )
-#include <libsmraw.h>
-#endif
-
 #include "digest_context.h"
 #include "digest_hash.h"
+#include "ewftools_libewf.h"
+#include "ewftools_libsmraw.h"
 #include "log_handle.h"
 #include "md5.h"
 #include "sha1.h"

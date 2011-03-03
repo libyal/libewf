@@ -91,7 +91,8 @@ ewfdebug_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	ewfdebug.c \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h
+	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h
 
 ewfdebug_LDADD = \
 	../libcstring/libcstring.la \

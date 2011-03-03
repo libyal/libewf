@@ -145,7 +145,7 @@ int ewf_test_read_write_buffer(
 		}
 		if( libewf_handle_seek_offset(
 		     handle,
-	             (off64_t) ( -1 * read_count ),
+	             -1 * (off64_t) read_count,
 	             SEEK_CUR,
 	             error ) == -1 )
 		{
@@ -295,7 +295,7 @@ int ewf_test_read_write_chunk(
 		}
 		if( libewf_handle_seek_offset(
 		     handle,
-	             (off64_t) ( -1 * process_count ),
+	             -1 * (off64_t) process_count,
 	             SEEK_CUR,
 	             error ) == -1 )
 		{
@@ -644,7 +644,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-				 argv[ optind ] );
+				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );
 

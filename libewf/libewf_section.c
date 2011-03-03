@@ -4528,11 +4528,19 @@ ssize_t libewf_section_session_write(
 	size_t session_entries_size          = 0;
 	ssize_t total_write_count            = 0;
 	ssize_t write_count                  = 0;
-	uint64_t first_sector                = 0;
-	uint64_t number_of_sectors           = 0;
+	uint64_t session_first_sector        = 0;
+	uint64_t session_last_sector         = 0;
+	uint64_t session_number_of_sectors   = 0;
+	uint64_t track_first_sector          = 0;
+	uint64_t track_last_sector           = 0;
+	uint64_t track_number_of_sectors     = 0;
 	uint32_t calculated_checksum         = 0;
 	int number_of_sessions               = 0;
+	int number_of_sessions_entries       = 0;
+	int number_of_tracks                 = 0;
 	int session_index                    = 0;
+	int sessions_entry_index             = 0;
+	int tracks_index                     = 0;
 
 	if( section == NULL )
 	{
@@ -4559,7 +4567,7 @@ ssize_t libewf_section_session_write(
 
 		goto on_error;
 	}
-	if( number_of_sessions <= 0 )
+	if( number_of_sessions < 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -4570,7 +4578,113 @@ ssize_t libewf_section_session_write(
 
 		goto on_error;
 	}
-	session_entries_size = sizeof( ewf_session_entry_t ) * number_of_sessions;
+	if( libewf_sector_list_get_number_of_elements(
+	     tracks,
+	     &number_of_tracks,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from tracks sector list.",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_tracks < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of tracks value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( number_of_sessions != 0 )
+	 && ( number_of_tracks == 0 ) )
+	{
+		number_of_sessions_entries = number_of_sessions;
+	}
+	else if( ( number_of_sessions == 0 )
+	      && ( number_of_tracks != 0 ) )
+	{
+		number_of_sessions_entries = number_of_tracks;
+	}
+#ifdef TODO
+	else if( ( number_of_sessions != 0 )
+	      && ( number_of_tracks != 0 ) )
+	{
+		if( libewf_sector_list_get_sector(
+		     sessions,
+		     0,
+		     &session_first_sector,
+		     &session_number_of_sectors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve session: %d from sector list.",
+			 function,
+			 session_index );
+
+			goto on_error;
+		}
+		session_last_sector = session_first_sector
+		                    + session_number_of_sectors;
+		session_index       = 1;
+
+		if( libewf_sector_list_get_sector(
+		     tracks,
+		     0,
+		     &track_first_sector,
+		     &track_number_of_sectors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve track: %d from sector list.",
+			 function,
+			 track_index );
+
+			goto on_error;
+		}
+		track_last_sector = track_first_sector
+		                  + track_number_of_sectors;
+		track_index       = 1;
+
+		/* Encase does not store sessions containing tracks
+		 * therefore determine the number of sessions entries
+		 */
+		while( ( session_index < number_of_sessions )
+		    && ( track_index < number_of_tracks ) )
+		{
+			if( ( track_first_sector <= session_first_sector )
+			 && ( track_last_sector <= session_last_sector ) )
+			{
+			}
+		}
+	}
+#endif /* TODO */
+	if( number_of_sessions_entries == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of sessions entries value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	session_entries_size = sizeof( ewf_session_entry_t )
+	                     * number_of_sessions_entries;
 
 	section_size = sizeof( ewf_section_start_t )
 	             + sizeof( ewf_session_header_t )
@@ -4629,7 +4743,7 @@ ssize_t libewf_section_session_write(
 	}
 	byte_stream_copy_from_uint32_little_endian(
 	 session_header.number_of_sessions,
-	 (uint32_t) number_of_sessions );
+	 (uint32_t) number_of_sessions_entries );
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       &session_header,
@@ -4688,6 +4802,7 @@ ssize_t libewf_section_session_write(
 
 		goto on_error;
 	}
+/* TODO handle tracks and sessions */
 	for( session_index = 0;
 	     session_index < number_of_sessions;
 	     session_index++ )
@@ -4695,8 +4810,8 @@ ssize_t libewf_section_session_write(
 		if( libewf_sector_list_get_sector(
 		     sessions,
 		     session_index,
-		     &first_sector,
-		     &number_of_sectors,
+		     &session_first_sector,
+		     &session_number_of_sectors,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -4714,13 +4829,13 @@ ssize_t libewf_section_session_write(
 		 * other purposes.
 		 */
 		if( ( session_index == 0 )
-		 && ( first_sector == 0 ) )
+		 && ( session_first_sector == 0 ) )
 		{
-			first_sector = 16;
+			session_first_sector = 16;
 		}
 		byte_stream_copy_from_uint32_little_endian(
 		 ( session_entries[ session_index ] ).first_sector,
-		 (uint32_t) first_sector );
+		 (uint32_t) session_first_sector );
 	}
 	write_count = libbfio_pool_write(
 		       file_io_pool,

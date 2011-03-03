@@ -31,20 +31,12 @@
 #include <sys/utsname.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "digest_hash.h"
 #include "ewfinput.h"
+#include "ewftools_libewf.h"
 #include "guid.h"
 #include "info_handle.h"
 #include "platform.h"
@@ -3921,7 +3913,12 @@ int dfxml_build_environment_fprint(
 		 __BORLANDC__ );
 	}
 
-#elif defined( __GNUC__ ) && defined( __GNUC_MINOR__ )
+#elif defined( __GNUC__ )
+#if defined( __CYGWIN__ )
+	fprintf(
+	 stream,
+	 "\t\t\t<compiler>Cygwin</compiler>\n" );
+#endif
 #if defined( __MINGW64_VERSION_MAJOR ) && defined( __MINGW64_VERSION_MINOR )
 	fprintf(
 	 stream,
@@ -3935,11 +3932,18 @@ int dfxml_build_environment_fprint(
 	 __MINGW32_MAJOR_VERSION,
 	 __MINGW32_MINOR_VERSION );
 #endif
+#if defined( __GNUC_MINOR__ )
 	fprintf(
 	 stream,
 	 "\t\t\t<compiler>GCC %d.%d</compiler>\n",
 	 __GNUC__,
 	 __GNUC_MINOR__ );
+#else
+	fprintf(
+	 stream,
+	 "\t\t\t<compiler>GCC %d</compiler>\n",
+	 __GNUC__ );
+#endif
 #endif		
 	fprintf(
 	 stream,

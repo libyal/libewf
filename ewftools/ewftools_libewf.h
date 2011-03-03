@@ -24,7 +24,7 @@
 
 #include <common.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+/* If Cygwin libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )

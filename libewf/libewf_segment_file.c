@@ -774,6 +774,10 @@ ssize_t libewf_segment_file_read_table_section(
 			     chunk_table_list,
 			     &( chunk_table->last_chunk_filled ),
 			     (int) number_of_offsets,
+			     file_io_pool_entry,
+			     section->start_offset,
+			     section->size,
+			     0,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -792,6 +796,10 @@ ssize_t libewf_segment_file_read_table_section(
 			     chunk_table_list,
 			     chunk_table->last_chunk_filled,
 			     (int) number_of_offsets,
+			     file_io_pool_entry,
+			     section->start_offset,
+			     section->size,
+			     0,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -805,26 +813,6 @@ ssize_t libewf_segment_file_read_table_section(
 
 				return( -1 );
 			}
-		}
-		if( libmfdata_list_set_data_range_by_index(
-		     chunk_table_list,
-		     chunk_table->last_chunk_filled,
-		     file_io_pool_entry,
-		     section->start_offset,
-		     section->size,
-		     0,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set data range of chunk group: %d - %d.",
-			 function,
-			 chunk_table->last_chunk_filled,
-			 chunk_table->last_chunk_filled + number_of_offsets );
-
-			return( -1 );
 		}
 		chunk_table->last_chunk_filled += (int) number_of_offsets;
 
@@ -1062,21 +1050,6 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 	if( libmfdata_list_set_element_by_index(
 	     chunk_table_list,
 	     (int) chunk_index,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set chunk: %" PRIu32 ".",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
-	if( libmfdata_list_set_data_range_by_index(
-	     chunk_table_list,
-	     (int) chunk_index,
 	     file_io_pool_entry,
 	     chunk_offset,
 	     (size64_t) chunk_size,
@@ -1087,7 +1060,7 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set data range of chunk: %" PRIu32 ".",
+		 "%s: unable to set chunk: %" PRIu32 ".",
 		 function,
 		 chunk_index );
 
@@ -2912,21 +2885,6 @@ ssize_t libewf_segment_file_write_chunk(
 	if( libmfdata_list_set_element_by_index(
 	     chunk_table_list,
 	     chunk_index,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set chunk: %d.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
-	if( libmfdata_list_set_data_range_by_index(
-	     chunk_table_list,
-	     chunk_index,
 	     file_io_pool_entry,
 	     segment_file_offset,
 	     (size64_t) total_write_count,
@@ -2937,7 +2895,7 @@ ssize_t libewf_segment_file_write_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set data range of chunk: %d.",
+		 "%s: unable to set chunk: %d.",
 		 function,
 		 chunk_index );
 
@@ -3108,21 +3066,6 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	if( libmfdata_list_set_element_by_index(
 	     chunk_table_list,
 	     chunk_index,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set chunk: %d.",
-		 function,
-		 chunk_index );
-
-		goto on_error;
-	}
-	if( libmfdata_list_set_data_range_by_index(
-	     chunk_table_list,
-	     chunk_index,
 	     file_io_pool_entry,
 	     chunk_offset,
 	     (size64_t) chunk_size,
@@ -3133,7 +3076,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set data range of chunk: %d.",
+		 "%s: unable to set chunk: %d.",
 		 function,
 		 chunk_index );
 

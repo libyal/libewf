@@ -1,6 +1,9 @@
 TODO
+* Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8 ?
 * sessions: audio track support
   - write audio track data
+* deal with corrupted table section
+  - what about handling both corrupted table and table2 sections
 * libmfdata
   - add backup data range (partial)
   - add backup data range on write ?
@@ -15,6 +18,7 @@ TODO
 * ewftools: do not print status on abort
   - set process status to abort ?
 * implement remaining test scenarios
+* add test for table2 read
 
 Next beta/stable release:
 * full test
@@ -243,11 +247,24 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+20110303
+* updated libbfio, libsmdev, libsystem, libcstring
+  - some changes for Cygwin WINAPI support
+* worked on libmfdata integration
+  - update to clone function for groups
+  - moved data range values back into initialize
+* fixes to ewftools
+* fixes to test programs
+* worked on audio track support
+  - worked on write support
+
 20110302
 * worked on audio track support
+  - worked on read support
 
 20110218
 * worked on audio track support
+  - worked on read support
 
 20110214
 * worked on libmfdata integration

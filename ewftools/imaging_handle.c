@@ -33,15 +33,6 @@
 #include <uuid/uuid.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
@@ -49,6 +40,7 @@
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
+#include "ewftools_libewf.h"
 #include "guid.h"
 #include "imaging_handle.h"
 #include "md5.h"

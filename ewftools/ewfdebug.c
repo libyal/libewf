@@ -31,19 +31,11 @@
 #include <stdlib.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewftools_libewf.h"
 
 libewf_handle_t *ewfdebug_input_handle = NULL;
 int ewfdebug_abort                     = 0;
@@ -172,7 +164,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-				 argv[ optind ] );
+				 argv[ optind - 1 ] );
 
 				usage_fprint(
 				 stdout );

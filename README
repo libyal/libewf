@@ -22,7 +22,19 @@ TODO
 
 
 Creating a DLL using Cygwin
-You'll need Cygwin with a libtool version that supports building DLLs.
+You'll need Cygwin with:
+* binutils
+* gcc-core
+* bison (for libodraw)
+* flex (for libodraw)
+* autoconf
+* automake
+* make
+* libtool
+* gettext
+* zlib-devel
+* openssl-devel (for ewftools)
+* libuuid-devel (optional)
 
 Building the library:
 ./configure
