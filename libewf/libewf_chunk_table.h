@@ -92,7 +92,7 @@ int libewf_chunk_table_read_chunk(
 int libewf_chunk_table_read_offsets(
      intptr_t *io_handle,
      libbfio_pool_t *file_io_pool,
-     libmfdata_list_t *list,
+     libmfdata_list_t *chunk_table_list,
      int element_index,
      int number_of_elements,
      libmfdata_cache_t *cache,
@@ -104,7 +104,7 @@ int libewf_chunk_table_read_offsets(
 
 int libewf_chunk_table_fill(
      libewf_chunk_table_t *chunk_table,
-     libmfdata_list_t *list,
+     libmfdata_list_t *chunk_table_list,
      int chunk_index,
      int file_io_pool_entry,
      libewf_section_t *table_section,
@@ -114,30 +114,17 @@ int libewf_chunk_table_fill(
      uint8_t tainted,
      liberror_error_t **error );
 
-#ifdef TODO
-int libewf_chunk_table_fill_last_chunk(
+int libewf_chunk_table_correct(
      libewf_chunk_table_t *chunk_table,
-     libmfdata_list_t *list,
-     int last_element_group_index,
-     libewf_list_t *section_list,
-     uint8_t tainted,
-     liberror_error_t **error );
-
-int libewf_chunk_table_compare(
-     libewf_chunk_table_t *chunk_table,
+     libmfdata_list_t *chunk_table_list,
+     int chunk_index,
+     int file_io_pool_entry,
+     libewf_section_t *table_section,
      off64_t base_chunk,
      ewf_table_offset_t *table_offsets,
-     uint32_t number_of_chunks,
-     int segment_table_index,
+     uint32_t number_of_offsets,
      uint8_t tainted,
      liberror_error_t **error );
-
-int libewf_chunk_table_compare_last_chunk(
-     libewf_chunk_table_t *chunk_table,
-     libewf_list_t *section_list,
-     uint8_t tainted,
-     liberror_error_t **error );
-#endif
 
 int libewf_chunk_table_fill_offsets(
      libmfdata_list_t *chunk_table_list,

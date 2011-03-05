@@ -518,6 +518,13 @@ AC_CHECK_FUNCS(
   [1]) ])
 
 AC_CHECK_FUNCS(
+ [ftruncate],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: ftruncate],
+  [1]) ])
+
+AC_CHECK_FUNCS(
  [lseek],
  [],
  [AC_MSG_FAILURE(
@@ -543,13 +550,6 @@ AC_CHECK_FUNCS(
  [],
  [AC_MSG_FAILURE(
   [Missing function: stat],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [ftruncate],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: ftruncate],
   [1]) ])
 
 AC_CHECK_FUNCS(
