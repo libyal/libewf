@@ -2876,7 +2876,7 @@ ssize_t libewf_segment_file_write_chunk(
 	}
 	if( is_compressed != 0 )
 	{
-		chunk_flags = LIBMFDATA_LIST_ELEMENT_DATA_RANGE_FLAG_IS_COMPRESSED;
+		chunk_flags = LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 	}
 	else
 	{
