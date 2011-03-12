@@ -31,7 +31,9 @@
 
 #include <vcclr.h>
 
+#if _MSC_VER >= 1600
 #include <msclr/marshal.h>
+#endif
 
 #include "ewf.net.h"
 #include "ewf.net_handle.h"
@@ -40,7 +42,10 @@
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
+
+#if _MSC_VER >= 1600
 using namespace msclr::interop;
+#endif
 
 namespace EWF {
 
@@ -1711,6 +1716,8 @@ int Handle::GetNumberOfSessions( void )
 	return( (int) number_of_sessions );
 }
 
+#if _MSC_VER >= 1600
+
 int Handle::GetNumberOfHeaderValues( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
@@ -2422,6 +2429,8 @@ void Handle::SetHashValue( System::String^ identifier,
 	}
 	delete context;
 }
+
+#endif /* _MSC_VER >= 1600 */
 
 } // namespace EWF
 

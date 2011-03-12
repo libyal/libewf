@@ -1,5 +1,4 @@
 TODO
-* Cygwin add indication of all-static build
 * sessions: audio track support
   - write audio track data
 * deal with corrupted table section
@@ -247,6 +246,10 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110312
+* updated libuna, libbfio, libsmdev, libsmraw, libodraw
+* msvscpp added VSDebug build option
 
 20110306
 * updated libmfdata

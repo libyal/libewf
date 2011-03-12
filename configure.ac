@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110306],
+ [20110312],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -1499,6 +1499,10 @@ AS_IF(
  [STATIC_LDFLAGS="-all-static";
  AC_SUBST(
   [STATIC_LDFLAGS])
+ AC_DEFINE(
+  [HAVE_STATIC_EXECUTABLES],
+  [1],
+  [Define if executables should be static compiled.])
  ac_cv_libewf_enable_static_executables=yes])
 
 dnl Check if ewftools should be build with low level read and write functions

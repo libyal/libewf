@@ -160,6 +160,8 @@ public ref class Handle sealed
 
 		*/
 
+#if _MSC_VER >= 1600
+
 		int GetNumberOfHeaderValues( void );
 
 		System::String^ GetHeaderValueIdentifier( int index );
@@ -177,6 +179,8 @@ public ref class Handle sealed
 
 		void SetHashValue( System::String^ identifier,
 		                   System::String^ hash_value );
+
+#endif /* _MSC_VER >= 1600 */
 
 		/* TODO add single file entry root functions ?
 		 * create separate class for single file entry

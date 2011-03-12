@@ -3856,6 +3856,8 @@ int dfxml_build_environment_fprint(
 	version_string = "8.0";
 #elif _MSC_VER == 1500
 	version_string = "9.0";
+#elif _MSC_VER == 1600
+	version_string = "10.0";
 #endif
 
 #endif

@@ -1017,7 +1017,7 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( -1 );
 	}
-	while( md5_hash_string_index < 33 )
+	while( md5_hash_string_index < 32 )
 	{
 		if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) '0' )
 		 && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) '9' ) )
@@ -1034,9 +1034,25 @@ int libewf_hash_values_generate_md5_hash(
 		{
 			md5_digit = 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) 'a' );
 		}
+		else if( md5_hash_string[ md5_hash_string_index ] == 0 )
+		{
+			md5_digit = 0;
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in MD5 string.",
+			 function,
+			 md5_hash_string[ md5_hash_string_index ] );
+
+			return( -1 );
+		}
 		md5_hash_string_index++;
 
-		md5_digit *= 16;
+		md5_digit <<= 4;
 
 		if( ( md5_hash_string[ md5_hash_string_index ] >= (uint8_t) '0' )
 		 && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) '9' ) )
@@ -1052,6 +1068,18 @@ int libewf_hash_values_generate_md5_hash(
 		      && ( md5_hash_string[ md5_hash_string_index ] <= (uint8_t) 'f' ) )
 		{
 			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_index ] - (uint8_t) 'a' );
+		}
+		else if( md5_hash_string[ md5_hash_string_index ] != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in MD5 string.",
+			 function,
+			 md5_hash_string[ md5_hash_string_index ] );
+
+			return( -1 );
 		}
 		md5_hash_string_index++;
 
@@ -1168,7 +1196,7 @@ int libewf_hash_values_generate_sha1_hash(
 
 		return( -1 );
 	}
-	while( sha1_hash_string_index < 41 )
+	while( sha1_hash_string_index < 40 )
 	{
 		if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) '0' )
 		 && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) '9' ) )
@@ -1185,9 +1213,25 @@ int libewf_hash_values_generate_sha1_hash(
 		{
 			sha1_digit = 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) 'a' );
 		}
+		else if( sha1_hash_string[ sha1_hash_string_index ] == 0 )
+		{
+			sha1_digit = 0;
+		}
+		else
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in SHA1 string.",
+			 function,
+			 sha1_hash_string[ sha1_hash_string_index ] );
+
+			return( -1 );
+		}
 		sha1_hash_string_index++;
 
-		sha1_digit *= 16;
+		sha1_digit <<= 4;
 
 		if( ( sha1_hash_string[ sha1_hash_string_index ] >= (uint8_t) '0' )
 		 && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) '9' ) )
@@ -1203,6 +1247,18 @@ int libewf_hash_values_generate_sha1_hash(
 		      && ( sha1_hash_string[ sha1_hash_string_index ] <= (uint8_t) 'f' ) )
 		{
 			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_index ] - (uint8_t) 'a' );
+		}
+		else if( sha1_hash_string[ sha1_hash_string_index ] != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in SHA1 string.",
+			 function,
+			 sha1_hash_string[ sha1_hash_string_index ] );
+
+			return( -1 );
 		}
 		sha1_hash_string_index++;
 
