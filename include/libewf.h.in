@@ -410,7 +410,7 @@ ssize_t libewf_handle_read_chunk(
          int8_t *read_checksum,
          libewf_error_t **error );
 
-/* Reads (media) data from the current offset into a buffer
+/* Reads (media) data at the current offset into a buffer
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN \

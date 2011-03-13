@@ -4498,7 +4498,7 @@ ssize_t libewf_handle_read_chunk(
 	return( (ssize_t) read_size );
 }
 
-/* Reads (media) data from the last current into a buffer
+/* Reads (media) data at the current offset into a buffer
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_handle_read_buffer(
