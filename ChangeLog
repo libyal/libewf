@@ -1,4 +1,7 @@
 TODO
+* make byte string decimal separator l17n
+  - LOCALE_SDECIMAL, GetLocaleInfo()
+  - struct lconv
 * sessions: audio track support
   - write audio track data
 * deal with corrupted table section
