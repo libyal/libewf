@@ -250,6 +250,9 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110319
+* added INTLLIBS to ewftools
+
 20110312
 * updated libuna, libbfio, libsmdev, libsmraw, libodraw
 * msvscpp added VSDebug build option
