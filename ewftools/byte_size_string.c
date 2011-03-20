@@ -47,6 +47,7 @@ int byte_size_string_create(
 	uint64_t last_factored_size                        = 0;
 	int8_t factor                                      = 0;
 	int8_t remainder                                   = -1;
+	int decimal_point                                  = 0;
 
 	if( byte_size_string == NULL )
 	{
@@ -145,14 +146,29 @@ int byte_size_string_create(
 	}
 	if( remainder >= 0 )
 	{
+		decimal_point = libcstring_locale_get_decimal_point();
+
+		if( decimal_point == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve locale decimal point.",
+			 function );
+
+			return( -1 );
+		}
 		print_count = libcstring_system_string_sprintf(
 		               byte_size_string,
 		               byte_size_string_length,
 		               _LIBCSTRING_SYSTEM_STRING( "%" ) _LIBCSTRING_SYSTEM_STRING( PRIu64 )
-		               _LIBCSTRING_SYSTEM_STRING( ".%" ) _LIBCSTRING_SYSTEM_STRING( PRIu8 )
+		               _LIBCSTRING_SYSTEM_STRING( "%" ) _LIBCSTRING_SYSTEM_STRING( PRIc_LIBCSTRING_SYSTEM )
+		               _LIBCSTRING_SYSTEM_STRING( "%" ) _LIBCSTRING_SYSTEM_STRING( PRIu8 )
 		               _LIBCSTRING_SYSTEM_STRING( " %" ) _LIBCSTRING_SYSTEM_STRING( PRIs_LIBCSTRING_SYSTEM )
 		               _LIBCSTRING_SYSTEM_STRING( "%" ) _LIBCSTRING_SYSTEM_STRING( PRIs_LIBCSTRING_SYSTEM ),
 		               factored_size,
+		               (libcstring_system_character_t) decimal_point,
 		               remainder,
 		               factor_string,
 		               units_string );
@@ -198,6 +214,7 @@ int byte_size_string_convert(
 	uint64_t byte_size               = 0;
 	int8_t factor                    = 0;
 	int8_t remainder                 = -1;
+	int decimal_point                = 0;
 	int units                        = 0;
 
 	if( byte_size_string == NULL )
@@ -222,6 +239,19 @@ int byte_size_string_convert(
 
 		return( -1 );
 	}
+	decimal_point = libcstring_locale_get_decimal_point();
+
+	if( decimal_point == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve locale decimal point.",
+		 function );
+
+		return( -1 );
+	}
 	while( byte_size_string_iterator < byte_size_string_length )
 	{
 		if( ( byte_size_string[ byte_size_string_iterator ] < (libcstring_system_character_t) '0' )
@@ -234,7 +264,7 @@ int byte_size_string_convert(
 
 		byte_size_string_iterator++;
 	}
-	if( byte_size_string[ byte_size_string_iterator ] == (libcstring_system_character_t) '.' )
+	if( byte_size_string[ byte_size_string_iterator ] == (libcstring_system_character_t) decimal_point )
 	{
 		byte_size_string_iterator++;
 

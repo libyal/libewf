@@ -4063,7 +4063,7 @@ int export_handle_export_single_files(
 	libewf_file_entry_t *file_entry  = NULL;
 	process_status_t *process_status = NULL;
 	static char *function            = "export_handle_export_single_files";
-	size_t export_path_length        = 0;
+	size_t export_path_size          = 0;
 	int result                       = 0;
 
 	if( export_handle == NULL )
@@ -4088,12 +4088,12 @@ int export_handle_export_single_files(
 
 		return( -1 );
 	}
-	export_path_length = libcstring_system_string_length(
-	                      export_handle->target_filename );
+	export_path_size = 1 + libcstring_system_string_length(
+	                        export_handle->target_filename );
 
 	if( libsystem_path_sanitize(
 	     export_handle->target_filename,
-	     export_path_length,
+	     &export_path_size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -4156,7 +4156,7 @@ int export_handle_export_single_files(
 	     export_handle,
 	     file_entry,
 	     export_handle->target_filename,
-	     export_path_length,
+	     export_path_size - 1,
 	     log_handle,
 	     error ) != 1 )
 	{
@@ -4380,7 +4380,7 @@ int export_handle_export_file_entry(
 		}
 		if( libsystem_path_sanitize_filename(
 		     name,
-		     name_size - 1,
+		     &name_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
