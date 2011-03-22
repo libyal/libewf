@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110320],
+ [20110322],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -968,7 +968,34 @@ AS_IF(
   [AC_CHECK_HEADERS([linux/usbdevice_fs.h linux/usb/ch9.h])
  ])
 
- LIBEWF_CHECK_FUNC_POSIX_FADVISE])
+ LIBEWF_CHECK_FUNC_POSIX_FADVISE
+
+ dnl Check if winioctl.h defines STORAGE_BUS_TYPE
+ AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xyes],
+  [AC_CACHE_CHECK(
+   [whether winioctl.h defines STORAGE_BUS_TYPE],
+   [ac_cv_libewf_have_winioctl_storage_bus_type],
+   [AC_LANG_PUSH(C)
+   AC_COMPILE_IFELSE(
+    AC_LANG_PROGRAM(
+     [[#include <windows.h>
+#include <winioctl.h>]],
+     [[STORAGE_BUS_TYPE storage_bus_type;
+storage_bus_type = BusTypeUnknown;]]),
+    [ac_cv_libewf_have_winioctl_storage_bus_type=yes],
+    [ac_cv_libewf_have_winioctl_storage_bus_type=no])
+   AC_LANG_POP(C)],
+   [ac_cv_libewf_have_winioctl_storage_bus_type=no])
+  AS_IF(
+   [test "x$ac_cv_libewf_have_winioctl_storage_bus_type" = xyes],
+   [AC_DEFINE(
+    [HAVE_STORAGE_BUS_TYPE],
+    [1],
+    [Define to 1 if STORAGE_BUS_TYPE is defined.])
+   ])
+  ])
+ ])
 
 dnl Check for enabling libsmraw for storage media (split) RAW support
 LIBEWF_CHECK_LIBSMRAW
