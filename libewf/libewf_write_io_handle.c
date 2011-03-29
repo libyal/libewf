@@ -2324,6 +2324,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( segment_file->write_open == 0 )
 		{
 			segment_file = NULL;
+
+			segment_files_list_index += 1;
 		}
 	}
 	if( segment_file == NULL )

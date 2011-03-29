@@ -248,6 +248,10 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110329
+* fix for initial segment file rewrite
+* added split ewfacquire test
+
 20110322
 * updated configure.ac and libsmdev for improved STORAGE_BUS_TYPE detection
 
