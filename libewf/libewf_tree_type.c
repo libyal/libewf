@@ -1104,7 +1104,7 @@ int libewf_tree_node_get_sub_node_by_index(
      libewf_tree_node_t **sub_node,
      liberror_error_t **error )
 {
-	static char *function = "libewf_tree_node_get_sub_node";
+	static char *function = "libewf_tree_node_get_sub_node_by_index";
 	int result            = -1;
 	int sub_node_iterator = 0;
 

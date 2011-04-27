@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-/* The array comparison definitions
+/* The tree node comparison definitions
  */
 enum LIBEWF_TREE_NODE_COMPARE_DEFINITIONS
 {
@@ -50,7 +50,7 @@ enum LIBEWF_TREE_NODE_COMPARE_DEFINITIONS
         LIBEWF_TREE_NODE_COMPARE_GREATER
 };
 
-/* The array insert flag definitions
+/* The tree node insert flag definitions
  */
 enum LIBEWF_TREE_NODE_INSERT_FLAGS
 {

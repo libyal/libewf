@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-/* The array comparison definitions
+/* The list comparison definitions
  */
 enum LIBEWF_LIST_COMPARE_DEFINITIONS
 {
@@ -48,7 +48,7 @@ enum LIBEWF_LIST_COMPARE_DEFINITIONS
         LIBEWF_LIST_COMPARE_GREATER
 };
 
-/* The array insert flag definitions
+/* The list insert flag definitions
  */
 enum LIBEWF_LIST_INSERT_FLAGS
 {
