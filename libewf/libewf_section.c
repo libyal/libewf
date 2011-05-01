@@ -901,8 +901,7 @@ ssize_t libewf_section_last_write(
 	}
 	/* The EnCase (EWF-E01) format leaves the size of this section empty
 	 */
-	if( ( ewf_format == EWF_FORMAT_S01 )
-	 || ( format == LIBEWF_FORMAT_FTK ) )
+	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		section_size = (uint64_t) sizeof( ewf_section_start_t );
 	}
@@ -1458,7 +1457,7 @@ ssize_t libewf_section_data_read(
 	 	 "%s: data:\n",
 		 function );
 		libnotify_print_data(
-		 (uint8_t *) &data,
+		 (uint8_t *) data,
 		 sizeof( ewf_data_t ) );
 	}
 #endif
@@ -1926,14 +1925,7 @@ ssize_t libewf_section_data_write(
 
 			return( -1 );
 		}
-		if( io_handle->format == LIBEWF_FORMAT_FTK )
-		{
-			( *cached_data_section )->media_type = 0x01;
-		}
-		else
-		{
-			( *cached_data_section )->media_type = media_values->media_type;
-		}
+		( *cached_data_section )->media_type = media_values->media_type;
 		( *cached_data_section )->media_flags = media_values->media_flags;
 
 		byte_stream_copy_from_uint32_little_endian(
@@ -5583,7 +5575,7 @@ ssize_t libewf_section_volume_e01_read(
 	 	 "%s: volume data:\n",
 		 function );
 		libnotify_print_data(
-		 (uint8_t *) &volume,
+		 (uint8_t *) volume,
 		 sizeof( ewf_volume_t ) );
 	}
 #endif
@@ -5933,14 +5925,7 @@ ssize_t libewf_section_volume_e01_write(
 
 		goto on_error;
 	}
-	if( io_handle->format == LIBEWF_FORMAT_FTK )
-	{
-		volume->media_type = 0x01;
-	}
-	else
-	{
-		volume->media_type = media_values->media_type;
-	}
+	volume->media_type = media_values->media_type;
 	volume->media_flags = media_values->media_flags;
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -6148,7 +6133,7 @@ ssize_t libewf_section_volume_s01_read(
 		 "%s: volume data:\n",
 		 function );
 		libnotify_print_data(
-		 (uint8_t *) &volume,
+		 (uint8_t *) volume,
 		 sizeof( ewf_volume_smart_t ) );
 	}
 #endif

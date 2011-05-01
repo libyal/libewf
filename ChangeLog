@@ -248,6 +248,13 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110501
+* updated include/codepage.h
+* fixes in debug output
+* changes for FTK imager format:
+  recent versions of FTK imager now longer force media type to be 0x01
+  and size of the last section is no longer set
+
 20110427
 * fix for LOCALE_RETURN_NUMBER clash on Vista/Win7
 
