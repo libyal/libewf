@@ -248,6 +248,9 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110504
+* small changes
+
 20110501
 * updated include/codepage.h
 * fixes in debug output
