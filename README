@@ -62,9 +62,12 @@ You'll need:
 Extract the contents of the zlib DLL package to:
 libewf-<version>/msvscpp/zlib-1.2.5
 
+Make sure to check if your build environment defines the correct WINVER for your build.
+The code uses WINAPI version specific functions based on WINVER.
+You can define a custom WINVER in the msvscpp project files or in libewf-<version>/common/config_msc.h
+
 You should be able to build the libewf DLL using the provided
-project files. Note that the project files contain a debug and release
-configuration.
+project files. Note that the project files contain a Release and VSDebug configuration.
 
 
 Creating a DLL using MingW

@@ -781,6 +781,17 @@ int libewf_chunk_table_read_offsets(
 		 && ( chunk_table->io_handle->format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
+			if( element_group_size > (size64_t) SSIZE_MAX )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+				 "%s: invalid element group size value exceeds maximum.",
+				 function );
+
+				goto on_error;
+			}
 			libnotify_printf(
 		 	 "%s: trailing data:\n",
 			 function );
@@ -803,7 +814,7 @@ int libewf_chunk_table_read_offsets(
 				      file_io_pool,
 				      file_io_pool_entry,
 				      trailing_data,
-				      element_group_size,
+				      (size_t) element_group_size,
 				      error );
 
 			if( read_count != (ssize_t) element_group_size )

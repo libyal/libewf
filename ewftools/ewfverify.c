@@ -54,8 +54,8 @@ void usage_fprint(
 	{
 		return;
 	}
-	fprintf( stream, "Use ewfverify to verify data stored in the EWF format (Expert Witness Compression\n"
-	                 "Format).\n\n" );
+	fprintf( stream, "Use ewfverify to verify data stored in the EWF format (Expert Witness\n"
+	                 "Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfverify [ -A codepage ] [ -d digest_type ] [ -f format ]\n"
 	                 "                 [ -l log_filename ] [ -p process_buffer_size ]\n"

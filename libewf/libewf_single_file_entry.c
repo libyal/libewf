@@ -168,8 +168,8 @@ int libewf_single_file_entry_clone(
 
 		return( 1 );
 	}
-	*destination_single_file_entry = (intptr_t *) memory_allocate(
-			                               sizeof( libewf_single_file_entry_t ) );
+	*destination_single_file_entry = memory_allocate_structure_as_value(
+			                  libewf_single_file_entry_t );
 
 	if( *destination_single_file_entry == NULL )
 	{
@@ -474,7 +474,7 @@ int libewf_single_file_entry_get_utf8_name(
 
 		return( -1 );
 	}
-	if( utf8_string_size < single_file_entry->name_size )
+	if( utf8_string_size == 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -485,22 +485,40 @@ int libewf_single_file_entry_get_utf8_name(
 
 		return( -1 );
 	}
-	if( libcstring_narrow_string_copy(
-	     (char *) utf8_string,
-	     (char *) single_file_entry->name,
-	     single_file_entry->name_size ) == NULL )
+	if( ( single_file_entry->name == NULL )
+	 || ( single_file_entry->name_size == 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set UTF-8 string.",
-		 function );
-
-		return( -1 );
+		utf8_string[ 0 ] = 0;
 	}
-	utf8_string[ single_file_entry->name_size - 1 ] = 0;
+	else
+	{
+		if( utf8_string_size < single_file_entry->name_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: invalid UTF-8 string size value too small.",
+			 function );
 
+			return( -1 );
+		}
+		if( libcstring_narrow_string_copy(
+		     (char *) utf8_string,
+		     (char *) single_file_entry->name,
+		     single_file_entry->name_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set UTF-8 string.",
+			 function );
+
+			return( -1 );
+		}
+		utf8_string[ single_file_entry->name_size - 1 ] = 0;
+	}
 	return( 1 );
 }
 
@@ -526,20 +544,39 @@ int libewf_single_file_entry_get_utf16_name_size(
 
 		return( -1 );
 	}
-	if( libuna_utf16_string_size_from_utf8(
-	     single_file_entry->name,
-	     single_file_entry->name_size,
-	     utf16_string_size,
-	     error ) != 1 )
+	if( ( single_file_entry->name == NULL )
+	 || ( single_file_entry->name_size == 0 ) )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 string size.",
-		 function );
+		if( utf16_string_size == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid UTF-16 string size.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		*utf16_string_size = 0;
+	}
+	else
+	{
+		if( libuna_utf16_string_size_from_utf8(
+		     single_file_entry->name,
+		     single_file_entry->name_size,
+		     utf16_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }
@@ -567,21 +604,51 @@ int libewf_single_file_entry_get_utf16_name(
 
 		return( -1 );
 	}
-	if( libuna_utf16_string_copy_from_utf8(
-	     utf16_string,
-	     utf16_string_size,
-	     single_file_entry->name,
-	     single_file_entry->name_size,
-	     error ) != 1 )
+	if( utf16_string == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy name to UTF-16 string.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 string.",
 		 function );
 
 		return( -1 );
+	}
+	if( utf16_string_size == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: invalid UTF-16 string size value too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( single_file_entry->name == NULL )
+	 || ( single_file_entry->name_size == 0 ) )
+	{
+		utf16_string[ 0 ] = 0;
+	}
+	else
+	{
+		if( libuna_utf16_string_copy_from_utf8(
+		     utf16_string,
+		     utf16_string_size,
+		     single_file_entry->name,
+		     single_file_entry->name_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy name to UTF-16 string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }

@@ -248,6 +248,10 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110508
+* updated libodraw
+* fix for retrieving empty UTF16 file entry name
+
 20110504
 * small changes
 
