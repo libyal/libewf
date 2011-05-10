@@ -3594,6 +3594,22 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		}
 		segment_file = NULL;
 
+		if( libmfdata_file_list_get_file_by_index(
+		     segment_files_list,
+		     segment_files_list_index,
+		     &file_io_pool_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file: %d from list.",
+			 function,
+			 segment_files_list_index + 1 );
+
+			return( -1 );
+		}
 		if( libmfdata_file_list_get_file_value_by_index(
 		     segment_files_list,
 		     file_io_pool,

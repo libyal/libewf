@@ -3780,7 +3780,7 @@ int export_handle_export_input(
 		while( read_process_count > 0 )
 		{
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			if( read_process_count > output_chunk_size )
+			if( read_process_count > (ssize_t) output_chunk_size )
 			{
 				write_size = output_chunk_size;
 			}

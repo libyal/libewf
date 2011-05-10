@@ -183,7 +183,7 @@ for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
 do
 	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk smart ewfx;
 	do
-		for SEGMENT_SIZE in 650MB 1MB;
+		for SEGMENT_SIZE in 650MB 1MiB;
 		do
 			if ! test_acquire_file "${FILENAME}" "${FORMAT}" none "${SEGMENT_SIZE}" 64;
 			then
@@ -209,48 +209,54 @@ do
 
 	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
-		if ! test_acquire_file "${FILENAME}" encase6 none 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for SEGMENT_SIZE in 650MB 1MiB;
+		do
+			if ! test_acquire_file "${FILENAME}" encase6 none "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
 
-		if ! test_acquire_file "${FILENAME}" encase6 empty-block 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+			if ! test_acquire_file "${FILENAME}" encase6 empty-block "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
 
-		if ! test_acquire_file "${FILENAME}" encase6 fast 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+			if ! test_acquire_file "${FILENAME}" encase6 fast "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
 
-		if ! test_acquire_file "${FILENAME}" encase6 best 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+			if ! test_acquire_file "${FILENAME}" encase6 best "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
 	done
 
 	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
-		if ! test_acquire_file "${FILENAME}" smart none 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for SEGMENT_SIZE in 650MB 1MiB;
+		do
+			if ! test_acquire_file "${FILENAME}" smart none "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
 
-		if ! test_acquire_file "${FILENAME}" smart empty-block 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+			if ! test_acquire_file "${FILENAME}" smart empty-block "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
 
-		if ! test_acquire_file "${FILENAME}" smart fast 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+			if ! test_acquire_file "${FILENAME}" smart fast "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
 
-		if ! test_acquire_file "${FILENAME}" smart best 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+			if ! test_acquire_file "${FILENAME}" smart best "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
 	done
 done
 

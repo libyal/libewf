@@ -6302,7 +6302,8 @@ ssize_t libewf_handle_write_finalize(
 	{
 		return( 0 );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->io_handle->current_offset
+	            / internal_handle->media_values->chunk_size;
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{

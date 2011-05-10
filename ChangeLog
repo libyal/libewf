@@ -1,4 +1,6 @@
 TODO
+* fix: input_raw/floppy.raw to ewf format: smart with compression: none and chunk size: 2048  (FAIL)
+  - issue in uncompressed smart chunk size calc ?
 * libsystem path implement GetVolumeInformation
 * sessions: audio track support
   - write audio track data
@@ -247,6 +249,16 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110510
+* worked on write finalize issue
+  - added ewfacquirestream multi segment test
+  - fixed issue in libewf_write_io_handle_finalize_write_sections_corrections
+* small change to multi segment ewfacquire test
+* updated libodraw
+
+20110509
+* small changes
 
 20110508
 * updated libodraw
