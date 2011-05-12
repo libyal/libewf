@@ -7474,6 +7474,9 @@ int libewf_handle_get_maximum_segment_size(
 }
 
 /* Sets the maximum segment file size
+ * A maximum segment file size of 0 represents the maximum possible size for the format
+ * If the maximum segment file size is smaller than the size needed to store a single chunk
+ * the size off the latter is enforced and not the maximum segment file size
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_set_maximum_segment_size(
@@ -7497,6 +7500,17 @@ int libewf_handle_set_maximum_segment_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->segment_table == NULL )
 	{
 		liberror_error_set(
@@ -7532,8 +7546,7 @@ int libewf_handle_set_maximum_segment_size(
 
 		return( -1 );
 	}
-	if( ( maximum_segment_size == 0 )
-	 || ( maximum_segment_size > internal_handle->write_io_handle->maximum_segment_file_size ) )
+	if( maximum_segment_size > internal_handle->write_io_handle->maximum_segment_file_size )
 	{
 		liberror_error_set(
 		 error,

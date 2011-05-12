@@ -604,6 +604,9 @@ int libewf_handle_get_maximum_segment_size(
      libewf_error_t **error );
 
 /* Sets the maximum segment file size
+ * A maximum segment file size of 0 represents the maximum possible size for the format
+ * If the maximum segment file size is smaller than the size needed to store a single chunk
+ * the size off the latter is enforced and not the maximum segment file size
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \

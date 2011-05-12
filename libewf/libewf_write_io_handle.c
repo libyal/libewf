@@ -395,17 +395,6 @@ int libewf_write_io_handle_initialize_values(
 
 		return( -1 );
 	}
-	if( segment_table->maximum_segment_size == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment file size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
 	/* Determine the EWF file format
 	 */
 	if( io_handle->format == LIBEWF_FORMAT_LVF )
@@ -418,6 +407,10 @@ int libewf_write_io_handle_initialize_values(
 		 function );
 
 		return( -1 );
+	}
+	if( segment_table->maximum_segment_size == 0 )
+	{
+		segment_table->maximum_segment_size = write_io_handle->maximum_segment_file_size;
 	}
 	/* If no input write size was provided check if EWF file format allows for streaming
 	 */
@@ -1397,9 +1390,15 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	{
 		calculated_chunks_per_segment_file += number_of_chunks_written_to_segment;
 	}
+	/* Fail safe segment should contain at least 1 chunk
+	 */
+	if( calculated_chunks_per_segment_file <= 0 )
+	{
+		calculated_chunks_per_segment_file = 1;
+	}
 	/* Fail safe no more than 2^32 values are allowed
 	 */
-	if( calculated_chunks_per_segment_file > (int64_t) UINT32_MAX )
+	else if( calculated_chunks_per_segment_file > (int64_t) UINT32_MAX )
 	{
 		calculated_chunks_per_segment_file = UINT32_MAX;
 	}
