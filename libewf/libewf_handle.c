@@ -6799,11 +6799,6 @@ off64_t libewf_handle_seek_offset(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_seek_offset";
-	off64_t chunk_offset                      = 0;
-	size64_t chunk_size                       = 0;
-	uint64_t chunk_index                      = 0;
-	uint32_t chunk_flags                      = 0;
-	int file_io_pool_entry                    = 0;
 
 	if( handle == NULL )
 	{
@@ -6903,60 +6898,6 @@ off64_t libewf_handle_seek_offset(
 		 function );
 
 		return( -1 );
-	}
-	if( offset < (off64_t) internal_handle->media_values->media_size )
-	{
-		chunk_index = (uint64_t) ( offset / internal_handle->media_values->chunk_size );
-
-		if( chunk_index > (uint64_t) INT_MAX )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid chunk index value exceeds maximum.",
-			 function );
-
-			return( -1 );
-		}
-		if( libmfdata_list_get_data_range_by_index(
-		     internal_handle->chunk_table_list,
-		     (int) chunk_index,
-		     &file_io_pool_entry,
-		     &chunk_offset,
-		     &chunk_size,
-		     &chunk_flags,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data range of chunk: %" PRIu64 ".",
-			 function,
-			 chunk_index );
-
-			return( -1 );
-		}
-		if( libbfio_pool_seek_offset(
-		     internal_handle->file_io_pool,
-		     file_io_pool_entry,
-		     chunk_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek chunk: %" PRIu64 " in file IO pool entry: %d at offset: %" PRIi64 ".",
-			 function,
-			 chunk_index,
-			 file_io_pool_entry,
-			 chunk_offset );
-
-			return( -1 );
-		}
 	}
 	internal_handle->io_handle->current_offset = offset;
 

@@ -513,11 +513,11 @@ ssize_t libewf_segment_file_write_file_header(
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_read(
-     intptr_t *io_handle,
+     intptr_t *io_handle LIBEWF_ATTRIBUTE_UNUSED,
      libbfio_pool_t *file_io_pool,
      int file_io_pool_entry,
      libmfdata_file_t *file LIBEWF_ATTRIBUTE_UNUSED,
-     libmfdata_cache_t *cache,
+     libmfdata_cache_t *cache LIBEWF_ATTRIBUTE_UNUSED,
      uint8_t read_flags LIBEWF_ATTRIBUTE_UNUSED,
      liberror_error_t **error )
 {
@@ -529,7 +529,9 @@ int libewf_segment_file_read(
 	ssize_t read_count                  = 0;
 	int last_section                    = 0;
 
+	LIBEWF_UNREFERENCED_PARAMETER( io_handle )
 	LIBEWF_UNREFERENCED_PARAMETER( file )
+	LIBEWF_UNREFERENCED_PARAMETER( cache )
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
 
 /* TODO determine what to store in IO handle
