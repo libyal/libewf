@@ -1,4 +1,5 @@
 TODO
+* replace libewf split values by libfvalue split string
 * libsystem path implement GetVolumeInformation
 * sessions: audio track support
   - write audio track data
@@ -247,6 +248,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110530
+* updated libfvalue
 
 20110523
 * merged 20110519 changes - libmfdata fix

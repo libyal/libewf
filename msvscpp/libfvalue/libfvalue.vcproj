@@ -159,6 +159,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfvalue\libfvalue_split_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfvalue\libfvalue_string.c"
 				>
 			</File>
@@ -210,6 +214,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfvalue\libfvalue_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfvalue\libfvalue_split_string.h"
 				>
 			</File>
 			<File

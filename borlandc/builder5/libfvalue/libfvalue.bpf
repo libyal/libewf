@@ -12,6 +12,8 @@ USE("..\..\..\libfvalue\libfvalue_extern.h", File);
 USE("..\..\..\libfvalue\libfvalue_libfdatetime.h", File);
 USE("..\..\..\libfvalue\libfvalue_libfguid.h", File);
 USE("..\..\..\libfvalue\libfvalue_libuna.h", File);
+USEUNIT("..\..\..\libfvalue\libfvalue_split_string.c");
+USE("..\..\..\libfvalue\libfvalue_split_string.h", File);
 USEUNIT("..\..\..\libfvalue\libfvalue_string.c");
 USE("..\..\..\libfvalue\libfvalue_string.h", File);
 USEUNIT("..\..\..\libfvalue\libfvalue_table.c");
