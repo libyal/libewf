@@ -77,7 +77,7 @@ int digest_context_update(
 int digest_context_finalize(
      digest_context_t *digest_context,
      digest_hash_t *digest_hash,
-     size_t *size,
+     size_t *digest_hash_size,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

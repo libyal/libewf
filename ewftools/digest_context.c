@@ -35,7 +35,7 @@
 #endif /* defined( WINAPI ) */
 
 /* Initializes the digest context
- * Returns 1 if successful, 0 on failure or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int digest_context_initialize(
      digest_context_t *digest_context,
@@ -79,14 +79,14 @@ int digest_context_initialize(
 	/* Request the AES crypt provider, fail back to the RSA crypt provider
 	*/
  	if( CryptAcquireContext(
-	     &digest_context->crypt_provider,
+	     &( digest_context->crypt_provider ),
 	     NULL,
 	     NULL,
 	     PROV_RSA_AES,
 	     CRYPT_VERIFYCONTEXT ) == 0 )
 	{
 		if( CryptAcquireContext(
-		     &digest_context->crypt_provider,
+		     &( digest_context->crypt_provider ),
 		     NULL,
 		     NULL,
 		     PROV_RSA_FULL,
@@ -99,7 +99,7 @@ int digest_context_initialize(
 			 "%s: unable to create AES or RSA crypt provider.",
 			 function );
 
-			return( 0 );
+			return( -1 );
 		}
 	}
 	if( digest_context->crypt_provider == 0 )
@@ -111,7 +111,7 @@ int digest_context_initialize(
 		 "%s: unable to create crypt provider.",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	if( type == DIGEST_CONTEXT_TYPE_MD5 )
 	{
@@ -126,7 +126,7 @@ int digest_context_initialize(
 	     digest_type,
 	     0,
 	     0,
-	     &digest_context->hash ) != 1 )
+	     &( digest_context->hash ) ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -139,7 +139,7 @@ int digest_context_initialize(
 		 digest_context->crypt_provider,
 		 0 );
 
-		return( 0 );
+		return( -1 );
 	}
 
 #elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
@@ -165,14 +165,14 @@ int digest_context_initialize(
 		 "%s: unable to initialize context.",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 #endif
 	return( 1 );
 }
 
 /* Updates the digest context
- * Returns 1 if successful, 0 on failure or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int digest_context_update(
      digest_context_t *digest_context,
@@ -237,10 +237,10 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to update digest context hash.",
+		 "%s: unable to update hash.",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 
 #elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
@@ -253,22 +253,22 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to update digest hash.",
+		 "%s: unable to update digest context.",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 #endif
 	return( 1 );
 }
 
 /* Finalizes the digest context
- * Returns 1 if successful, 0 on failure or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int digest_context_finalize(
      digest_context_t *digest_context,
      digest_hash_t *digest_hash,
-     size_t *size,
+     size_t *digest_hash_size,
      liberror_error_t **error )
 {
 	static char *function = "digest_context_finalize";
@@ -284,15 +284,15 @@ int digest_context_finalize(
 
 		return( -1 );
 	}
-	if( size != NULL )
+	if( digest_hash_size != NULL )
 	{
-		if( *size > (size_t) SSIZE_MAX )
+		if( *digest_hash_size > (size_t) SSIZE_MAX )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid size value exceeds maximum.",
+			 "%s: invalid digest hash size value exceeds maximum.",
 			 function );
 
 			return( -1 );
@@ -311,13 +311,13 @@ int digest_context_finalize(
 		return( -1 );
 	}
 	if( ( digest_hash != NULL )
-	 && ( size != NULL ) )
+	 && ( digest_hash_size != NULL ) )
 	{
 		if( CryptGetHashParam(
 		     digest_context->hash,
 		     HP_HASHVAL,
 		     (BYTE *) digest_hash,
-		     (DWORD *) size,
+		     (DWORD *) digest_hash_size,
 		     0 ) != 1 )
 		{
 			liberror_error_set(
@@ -327,7 +327,7 @@ int digest_context_finalize(
 			 "%s: unable to finalize digest hash.",
 			 function );
 
-			return( 0 );
+			return( -1 );
 		}
 	}
 	if( digest_context->crypt_provider != 0 )
@@ -344,21 +344,21 @@ int digest_context_finalize(
 
 #elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 	if( ( digest_hash != NULL )
-	 && ( size != NULL ) )
+	 && ( digest_hash_size != NULL ) )
 	{
 		if( EVP_DigestFinal_ex(
 		     digest_context,
 		     (unsigned char *) digest_hash,
-		     (unsigned int *) size ) != 1 )
+		     (unsigned int *) digest_hash_size ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to finalize digest hash.",
+			 "%s: unable to finalize digest context.",
 			 function );
 
-			return( 0 );
+			return( -1 );
 		}
 	}
 	if( EVP_MD_CTX_cleanup(
