@@ -1813,7 +1813,7 @@ int verification_handle_verify_file_entry(
 	size_t read_size                           = 0;
 	size_t target_path_size                    = 0;
 	ssize_t read_count                         = 0;
-	uint32_t file_entry_flags                  = 0;
+	uint8_t file_entry_type                    = 0;
 	int md5_hash_compare                       = 0;
 	int result                                 = 0;
 	int sha1_hash_compare                      = 0;
@@ -1956,23 +1956,23 @@ int verification_handle_verify_file_entry(
 		target_path      = (libcstring_system_character_t *) file_entry_path;
 		target_path_size = file_entry_path_length + 1;
 	}
-	if( libewf_file_entry_get_flags(
+	if( libewf_file_entry_get_type(
 	     file_entry,
-	     &file_entry_flags,
+	     &file_entry_type,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry flags.",
+		 "%s: unable to retrieve file entry type.",
 		 function );
 
 		goto on_error;
 	}
 	/* TODO what about NTFS streams ?
 	 */
-	if( ( file_entry_flags & LIBEWF_FILE_ENTRY_FLAG_IS_FILE ) != 0 )
+	if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_FILE )
 	{
 		fprintf(
 		 verification_handle->notify_stream,
@@ -2202,7 +2202,7 @@ int verification_handle_verify_file_entry(
 			 "\n" );
 		}
 	}
-	else
+	else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 	{
 		result = verification_handle_verify_sub_file_entries(
 		          verification_handle,

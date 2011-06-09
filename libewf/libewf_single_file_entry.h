@@ -37,6 +37,10 @@ typedef struct libewf_single_file_entry libewf_single_file_entry_t;
 
 struct libewf_single_file_entry
 {
+	/* The type
+	 */
+	uint8_t type;
+
 	/* The flags
 	 */
 	uint32_t flags;
@@ -101,6 +105,11 @@ int libewf_single_file_entry_free(
 int libewf_single_file_entry_clone(
      intptr_t **destination_single_file_entry,
      intptr_t *source_single_file_entry,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_type(
+     libewf_single_file_entry_t *single_file_entry,
+     uint8_t *type,
      liberror_error_t **error );
 
 int libewf_single_file_entry_get_flags(

@@ -4255,7 +4255,7 @@ int export_handle_export_file_entry(
 	size_t read_size                           = 0;
 	size_t target_path_size                    = 0;
 	ssize_t read_count                         = 0;
-	uint32_t file_entry_flags                  = 0;
+	uint8_t file_entry_type                    = 0;
 	int result                                 = 0;
 
 	if( export_handle == NULL )
@@ -4460,23 +4460,23 @@ int export_handle_export_file_entry(
 
 		goto on_error;
 	}
-	if( libewf_file_entry_get_flags(
+	if( libewf_file_entry_get_type(
 	     file_entry,
-	     &file_entry_flags,
+	     &file_entry_type,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry flags.",
+		 "%s: unable to retrieve file entry type.",
 		 function );
 
 		goto on_error;
 	}
 	/* TODO what about NTFS streams ?
 	 */
-	if( ( file_entry_flags & LIBEWF_FILE_ENTRY_FLAG_IS_FILE ) != 0 )
+	if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_FILE )
 	{
 		/* Create the file entry data file
 		 */
@@ -4621,7 +4621,7 @@ int export_handle_export_file_entry(
 		}
 		file_entry_data_file_stream = NULL;
 	}
-	else
+	else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 	{
 		if( export_handle_make_directory(
 		     export_handle,

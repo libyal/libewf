@@ -83,6 +83,12 @@ int libewf_file_entry_free(
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_file_entry_get_type(
+     libewf_file_entry_t *file_entry,
+     uint8_t *type,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_file_entry_get_flags(
      libewf_file_entry_t *file_entry,
      uint32_t *flags,

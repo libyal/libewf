@@ -2110,6 +2110,15 @@ int libewf_file_entry_free(
      libewf_file_entry_t **file_entry,
      libewf_error_t **error );
 
+/* Retrieves the type
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_type(
+     libewf_file_entry_t *file_entry,
+     uint8_t *type,
+     libewf_error_t **error );
+
 /* Retrieves the flags
  * Returns 1 if successful or -1 on error
  */

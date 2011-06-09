@@ -3807,7 +3807,7 @@ ssize_t libewf_section_ltree_read(
 		 16 );
 
 		libnotify_printf(
-		 "%s: tree size\t\t\t: %" PRIu32 "\n",
+		 "%s: tree size\t\t\t\t\t: %" PRIu32 "\n",
 		 function,
 		 ltree_size );
 
@@ -5026,7 +5026,7 @@ ssize_t libewf_section_table_header_read(
 		 4 );
 
 		libnotify_printf(
-		 "%s: checksum\t\t\t\t: %" PRIu32 "\n",
+		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 

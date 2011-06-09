@@ -291,6 +291,43 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the type
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_file_entry_get_type(
+     libewf_single_file_entry_t *single_file_entry,
+     uint8_t *type,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_type";
+
+	if( single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( type == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid type.",
+		 function );
+
+		return( -1 );
+	}
+	*type = single_file_entry->type;
+
+	return( 1 );
+}
+
 /* Retrieves the flags
  * Returns 1 if successful or -1 on error
  */

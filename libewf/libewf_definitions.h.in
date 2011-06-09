@@ -161,11 +161,21 @@ enum LIBEWF_SEGMENT_FILE_TYPES
 	LIBEWF_SEGMENT_FILE_TYPE_LWF			= (int) 'L'
 };
 
+/* The (single) file entry types
+ */
+enum LIBEWF_FILE_ENTRY_TYPES
+{
+	LIBEWF_FILE_ENTRY_TYPE_DIRECTORY		= (uint8_t) 'd',
+	LIBEWF_FILE_ENTRY_TYPE_FILE			= (uint8_t) 'f'
+};
+
+#define LIBEWF_FILE_ENTRY_TYPE_FOLDER			LIBEWF_FILE_ENTRY_TYPE_DIRECTORY
+
 /* The (single) file entry flags
  */
 enum LIBEWF_FILE_ENTRY_FLAGS
 {
-	LIBEWF_FILE_ENTRY_FLAG_IS_FILE			= 0x08,
+	LIBEWF_FILE_ENTRY_FLAG_ARCHIVE			= 0x08,
 };
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
