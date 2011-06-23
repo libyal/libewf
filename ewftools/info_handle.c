@@ -153,19 +153,21 @@ int info_handle_free(
 	}
 	if( *info_handle != NULL )
 	{
-		if( ( ( *info_handle )->input_handle != NULL )
-		 && ( libewf_handle_free(
-		       &( ( *info_handle )->input_handle ),
-		       error ) != 1 ) )
+		if( ( *info_handle )->input_handle != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free input handle.",
-			 function );
+			if( libewf_handle_free(
+			     &( ( *info_handle )->input_handle ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free input handle.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
 		memory_free(
 		 *info_handle );
@@ -3469,16 +3471,17 @@ int info_handle_single_files_fprint(
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
-     int level,
+     int indentation_level,
      liberror_error_t **error )
 {
 	libcstring_system_character_t *name = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
 	static char *function               = "info_handle_file_entry_fprint";
 	size_t name_size                    = 0;
-	int iterator                        = 0;
+	int indentation_iterator            = 0;
 	int number_of_sub_file_entries      = 0;
 	int result                          = 0;
+	int sub_file_entry_index            = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3579,9 +3582,9 @@ int info_handle_file_entry_fprint(
 			 info_handle->notify_stream,
 			 "\t" );
 
-			for( iterator = 1;
-			     iterator < level;
-			     iterator++ )
+			for( indentation_iterator = 1;
+			     indentation_iterator < indentation_level;
+			     indentation_iterator++ )
 			{
 				fprintf(
 				 info_handle->notify_stream,
@@ -3623,13 +3626,13 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	for( iterator = 0;
-	     iterator < number_of_sub_file_entries;
-	     iterator++ )
+	for( sub_file_entry_index = 0;
+	     sub_file_entry_index < number_of_sub_file_entries;
+	     sub_file_entry_index++ )
 	{
 		if( libewf_file_entry_get_sub_file_entry(
 		     file_entry,
-		     iterator,
+		     sub_file_entry_index,
 		     &sub_file_entry,
 		     error ) != 1 )
 		{
@@ -3639,14 +3642,14 @@ int info_handle_file_entry_fprint(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to free retrieve sub file entry: %d.",
 			 function,
-			 iterator + 1 );
+			 sub_file_entry_index + 1 );
 
 			return( -1 );
 		}
 		if( info_handle_file_entry_fprint(
 		     info_handle,
 		     sub_file_entry,
-		     level + 1,
+		     indentation_level + 1,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -3655,7 +3658,7 @@ int info_handle_file_entry_fprint(
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print sub file entry: %d.",
 			 function,
-			 iterator + 1 );
+			 sub_file_entry_index + 1 );
 
 			libewf_file_entry_free(
 			 &sub_file_entry,
@@ -3673,7 +3676,7 @@ int info_handle_file_entry_fprint(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sub file entry: %d.",
 			 function,
-			 iterator + 1 );
+			 sub_file_entry_index + 1 );
 
 			return( -1 );
 		}

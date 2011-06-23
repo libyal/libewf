@@ -205,7 +205,7 @@ int info_handle_single_files_fprint(
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
-     int level,
+     int indentation_level,
      liberror_error_t **error );
 
 int info_handle_dfxml_header_fprint(

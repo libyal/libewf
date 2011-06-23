@@ -823,7 +823,8 @@ on_abort:
 			print_header = 0;
 		}
 		fprintf(
-		 stdout, "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );
