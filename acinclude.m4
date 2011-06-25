@@ -1170,6 +1170,24 @@ AC_DEFUN([LIBEWF_CHECK_LIBFVALUE],
   ])
  ])
 
+dnl Function to detect if libmdhashf available
+AC_DEFUN([LIBEWF_CHECK_LIBMDHASHF],
+ [AC_CHECK_HEADERS([libmdhashf.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_libmdhashf_h" = xno],
+  [ac_libewf_have_libmdhashf=no],
+  [ac_libewf_have_libmdhashf=yes
+  AC_CHECK_LIB(
+   mdhashf,
+   libmdhashf_get_version,
+   [],
+   [ac_libewf_have_libmdhashf=no])
+
+   ])
+  ])
+ ])
+
 dnl Function to detect if libsmdev available
 AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
  [AC_CHECK_HEADERS([libsmdev.h])

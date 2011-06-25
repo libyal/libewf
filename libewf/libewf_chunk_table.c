@@ -239,13 +239,12 @@ int libewf_chunk_table_read_chunk(
      uint8_t read_flags LIBEWF_ATTRIBUTE_UNUSED,
      liberror_error_t **error )
 {
-	libewf_chunk_data_t *chunk_data   = NULL;
-	libewf_chunk_table_t *chunk_table = NULL;
-	static char *function             = "libewf_chunk_table_read_chunk";
-	ssize_t read_count                = 0;
+	libewf_chunk_data_t *chunk_data = NULL;
+	static char *function           = "libewf_chunk_table_read_chunk";
+	ssize_t read_count              = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	int element_index                 = 0;
+	int element_index               = 0;
 #endif
 
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
@@ -261,8 +260,6 @@ int libewf_chunk_table_read_chunk(
 
 		return( -1 );
 	}
-	chunk_table = (libewf_chunk_table_t *) io_handle;
-
 	if( element_data_size > (size64_t) SSIZE_MAX )
 	{
 		liberror_error_set(

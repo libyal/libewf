@@ -2586,7 +2586,6 @@ int libewf_handle_open_read_segment_files(
 	int number_of_segment_files         = 0;
 	int known_section                   = 0;
 	int last_section                    = 0;
-	int result                          = 0;
 	int segment_files_list_index        = 0;
 
 	if( internal_handle == NULL )
@@ -2971,15 +2970,15 @@ int libewf_handle_open_read_segment_files(
 					  (void *) "table",
 					  5 ) == 0 )
 				{
-					result = libewf_segment_file_read_table_section(
-						  segment_file,
-						  section,
-						  file_io_pool,
-						  file_io_pool_entry,
-						  internal_handle->media_values,
-						  chunk_table,
-						  internal_handle->chunk_table_list,
-						  error );
+					read_count = libewf_segment_file_read_table_section(
+						      segment_file,
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->media_values,
+						      chunk_table,
+						      internal_handle->chunk_table_list,
+						      error );
 
 					known_section = 1;
 				}
@@ -3084,14 +3083,14 @@ int libewf_handle_open_read_segment_files(
 					  (void *) "table2",
 					  6 ) == 0 )
 				{
-					result = libewf_segment_file_read_table2_section(
-						  segment_file,
-						  section,
-						  file_io_pool,
-						  file_io_pool_entry,
-						  chunk_table,
-						  internal_handle->chunk_table_list,
-						  error );
+					read_count = libewf_segment_file_read_table2_section(
+						      segment_file,
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      chunk_table,
+						      internal_handle->chunk_table_list,
+						      error );
 
 					known_section = 1;
 				}
@@ -4031,10 +4030,9 @@ ssize_t libewf_handle_prepare_read_chunk(
          int8_t read_checksum,
          liberror_error_t **error )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	uint8_t *checksum_buffer                  = NULL;
-	static char *function                     = "libewf_handle_prepare_read_chunk";
-	uint32_t calculated_checksum              = 0;
+	uint8_t *checksum_buffer     = NULL;
+	static char *function        = "libewf_handle_prepare_read_chunk";
+	uint32_t calculated_checksum = 0;
 
 	if( handle == NULL )
 	{
@@ -4047,8 +4045,6 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 		return( -1 );
 	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
 	if( chunk_buffer == NULL )
 	{
 		liberror_error_set(
@@ -5483,9 +5479,12 @@ ssize_t libewf_handle_write_buffer(
 	uint64_t chunk_data_offset                = 0;
 	int8_t compression_level                  = 0;
 	int chunk_exists                          = 0;
-	int is_empty_zero_block                   = 0;
 	int result                                = 0;
 	int write_chunk                           = 0;
+
+#ifdef TODO
+	int is_empty_zero_block                   = 0;
+#endif
 
 	if( handle == NULL )
 	{
@@ -6031,10 +6030,12 @@ ssize_t libewf_handle_write_buffer(
 							{
 								compression_level = EWF_COMPRESSION_DEFAULT;
 							}
+#ifdef TODO
 							if( ( internal_handle->chunk_data->data )[ 0 ] == 0 )
 							{
 								is_empty_zero_block = 1;
 							}
+#endif
 						}
 						else
 						{
@@ -6206,9 +6207,11 @@ ssize_t libewf_handle_write_finalize(
 	int8_t compression_level                  = 0;
 	int file_io_pool_entry                    = -1;
 	int number_of_segment_files               = 0;
-	int is_empty_zero_block                   = 0;
 	int result                                = 0;
 	int segment_files_list_index              = 0;
+#ifdef TODO
+	int is_empty_zero_block                   = 0;
+#endif
 
 	if( handle == NULL )
 	{
@@ -6346,10 +6349,12 @@ ssize_t libewf_handle_write_finalize(
 					{
 						compression_level = EWF_COMPRESSION_DEFAULT;
 					}
+#ifdef TODO
 					if( ( internal_handle->chunk_data->data )[ 0 ] == 0 )
 					{
 						is_empty_zero_block = 1;
 					}
+#endif
 				}
 				else
 				{

@@ -501,7 +501,6 @@ int ewfacquire_read_input(
 	ssize_t read_count                           = 0;
 	ssize_t process_count                        = 0;
 	ssize_t write_count                          = 0;
-	uint32_t byte_error_granularity              = 0;
 	uint32_t chunk_size                          = 0;
 	int number_of_read_errors                    = 0;
 	int read_error_iterator                      = 0;
@@ -637,9 +636,6 @@ int ewfacquire_read_input(
 			goto on_error;
 		}
 	}
-	byte_error_granularity = imaging_handle->sector_error_granularity
-	                       * imaging_handle->bytes_per_sector;
-
 	if( imaging_handle_get_chunk_size(
 	     imaging_handle,
 	     &chunk_size,

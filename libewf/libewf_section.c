@@ -4521,18 +4521,21 @@ ssize_t libewf_section_session_write(
 	ssize_t total_write_count            = 0;
 	ssize_t write_count                  = 0;
 	uint64_t session_first_sector        = 0;
-	uint64_t session_last_sector         = 0;
 	uint64_t session_number_of_sectors   = 0;
-	uint64_t track_first_sector          = 0;
-	uint64_t track_last_sector           = 0;
-	uint64_t track_number_of_sectors     = 0;
 	uint32_t calculated_checksum         = 0;
 	int number_of_sessions               = 0;
 	int number_of_sessions_entries       = 0;
 	int number_of_tracks                 = 0;
 	int session_index                    = 0;
+
+#ifdef TODO
+	uint64_t session_last_sector         = 0;
+	uint64_t track_first_sector          = 0;
+	uint64_t track_last_sector           = 0;
+	uint64_t track_number_of_sectors     = 0;
 	int sessions_entry_index             = 0;
 	int tracks_index                     = 0;
+#endif
 
 	if( section == NULL )
 	{

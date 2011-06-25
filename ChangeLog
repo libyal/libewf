@@ -1,6 +1,10 @@
 TODO
-* update return values of digest_context, use -1 instead of 0
-  - check code that is using digest context
+* libhashf
+  - replace code that is using digest context
+  - implement fall back implementations for static compilation
+  - add SHA256
+  - cross platform check, e.g. what about MD5 functions without return value
+  - alter configure.ac EVP check to allow separate MD hash support
 * replace libewf split values by libfvalue split string
 * libsystem path implement GetVolumeInformation
 * sessions: audio track support
@@ -254,7 +258,10 @@ Known issues:
 20110625
 * updated autoconf/make files
 * changed INTLLIBS to LIBINTL
-* changes for: arning: AC_LANG_CONFTEST: no AC_LANG_SOURCE call detected in body
+* changes for: warning: AC_LANG_CONFTEST: no AC_LANG_SOURCE call detected in body
+* updated libmfdata, libfvalue, libuna, libbfio, libodraw, libsmdev, libsmraw
+* code clean up
+* worked on libhashf to wrap message digest hash functions
 
 20110623
 * code clean up in info_handle

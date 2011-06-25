@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBMFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
+	@LIBMDHASHF_CPPFLAGS@ \
 	@LIBODRAW_CPPFLAGS@ \
 	@LIBSMDEV_CPPFLAGS@ \
 	@LIBSMRAW_CPPFLAGS@ \
@@ -27,23 +28,20 @@ bin_PROGRAMS = \
 ewfacquire_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	device_handle.c device_handle.h \
-	digest_context.c digest_context.h \
-	digest_hash.c digest_hash.h \
 	ewfacquire.c \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
+	ewftools_libmdhashf.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
-	md5.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfacquire_LDADD = \
@@ -51,6 +49,7 @@ ewfacquire_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBMDHASHF_LIBADD@ \
 	@LIBODRAW_LIBADD@ \
 	@LIBSMDEV_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
@@ -83,6 +82,7 @@ ewfacquirestream_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBMDHASHF_LIBADD@ \
 	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
@@ -128,6 +128,7 @@ ewfexport_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBMDHASHF_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
 	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
@@ -176,6 +177,7 @@ ewfverify_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
+	@LIBMDHASHF_LIBADD@ \
 	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \

@@ -36,16 +36,13 @@
 #include <libsystem.h>
 
 #include "byte_size_string.h"
-#include "digest_context.h"
-#include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewftools_libewf.h"
+#include "ewftools_libmdhashf.h"
 #include "guid.h"
 #include "imaging_handle.h"
-#include "md5.h"
 #include "platform.h"
-#include "sha1.h"
 #include "storage_media_buffer.h"
 
 #define IMAGING_HANDLE_INPUT_BUFFER_SIZE	64
@@ -59,6 +56,7 @@ int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
      uint8_t calculate_sha1,
+     uint8_t calculate_sha256,
      liberror_error_t **error )
 {
 	static char *function = "imaging_handle_initialize";
@@ -153,7 +151,7 @@ int imaging_handle_initialize(
 		if( calculate_md5 != 0 )
 		{
 			( *imaging_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
-			                                                   DIGEST_HASH_STRING_SIZE_MD5 );
+			                                                   33 );
 
 			if( ( *imaging_handle )->calculated_md5_hash_string == NULL )
 			{
@@ -170,7 +168,7 @@ int imaging_handle_initialize(
 		if( calculate_sha1 != 0 )
 		{
 			( *imaging_handle )->calculated_sha1_hash_string = libcstring_system_string_allocate(
-			                                                    DIGEST_HASH_STRING_SIZE_SHA1 );
+			                                                    41 );
 
 			if( ( *imaging_handle )->calculated_sha1_hash_string == NULL )
 			{
@@ -184,8 +182,26 @@ int imaging_handle_initialize(
 				goto on_error;
 			}
 		}
+		if( calculate_sha256 != 0 )
+		{
+			( *imaging_handle )->calculated_sha256_hash_string = libcstring_system_string_allocate(
+			                                                      65 );
+
+			if( ( *imaging_handle )->calculated_sha256_hash_string == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create calculated SHA256 digest hash string.",
+				 function );
+
+				goto on_error;
+			}
+		}
 		( *imaging_handle )->calculate_md5            = calculate_md5;
 		( *imaging_handle )->calculate_sha1           = calculate_sha1;
+		( *imaging_handle )->calculate_sha256         = calculate_sha256;
 		( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
 		( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
 		( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
@@ -203,6 +219,16 @@ int imaging_handle_initialize(
 on_error:
 	if( *imaging_handle != NULL )
 	{
+		if( ( *imaging_handle )->calculated_sha1_hash_string != NULL )
+		{
+			memory_free(
+			 ( *imaging_handle )->calculated_sha1_hash_string );
+		}
+		if( ( *imaging_handle )->calculated_md5_hash_string != NULL )
+		{
+			memory_free(
+			 ( *imaging_handle )->calculated_md5_hash_string );
+		}
 		if( ( *imaging_handle )->output_handle != NULL )
 		{
 			libewf_handle_free(
@@ -292,6 +318,11 @@ int imaging_handle_free(
 		{
 			memory_free(
 			 ( *imaging_handle )->calculated_sha1_hash_string );
+		}
+		if( ( *imaging_handle )->calculated_sha256_hash_string != NULL )
+		{
+			memory_free(
+			 ( *imaging_handle )->calculated_sha256_hash_string );
 		}
 		if( libewf_handle_free(
 		     &( ( *imaging_handle )->output_handle ),
@@ -4446,7 +4477,7 @@ ssize_t imaging_handle_finalize(
 		                         imaging_handle->secondary_output_handle,
 		                         error );
 
-		if( write_count == -1 )
+		if( secondary_write_count == -1 )
 		{
 			liberror_error_set(
 			 error,
