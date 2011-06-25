@@ -41,7 +41,7 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_LANGINFO_CODESET],
    AC_LINK_IFELSE(
     [AC_LANG_PROGRAM(
      [[#include <langinfo.h>]],
-     [[char* charset = nl_langinfo( CODESET );]]) ],
+     [[char* charset = nl_langinfo( CODESET );]] )],
     [ac_cv_libewf_langinfo_codeset=yes],
     [ac_cv_libewf_langinfo_codeset=no])
    AC_LANG_POP(C) ]) ],
@@ -187,9 +187,9 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_CTIME],
   AC_LANG_PUSH(C)
 
   AC_LINK_IFELSE(
-   AC_LANG_PROGRAM(
+   [AC_LANG_PROGRAM(
     [[#include <time.h>]],
-    [[ctime_r( NULL, NULL, 0 )]]),
+    [[ctime_r( NULL, NULL, 0 )]] )],
     [AC_MSG_RESULT(
      [with additional size argument])
     ac_cv_libewf_ctime_r_size=yes],
@@ -198,9 +198,9 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_CTIME],
   AS_IF(
    [test "x$ac_cv_libewf_ctime_r_size" = xno],
    [AC_LINK_IFELSE(
-    AC_LANG_PROGRAM(
+    [AC_LANG_PROGRAM(
      [[#include <time.h>]],
-     [[ctime_r( NULL, NULL )]]),
+     [[ctime_r( NULL, NULL )]] )],
     [AC_MSG_RESULT(
      [with two arguments])
     ac_cv_libewf_ctime_r_posix=yes],
@@ -211,9 +211,9 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_CTIME],
    [test "x$ac_cv_libewf_ctime_r_posix" = xno],
    [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
    AC_LINK_IFELSE(
-    AC_LANG_PROGRAM(
+    [AC_LANG_PROGRAM(
      [[#include <time.h>]],
-     [[ctime_r( NULL, NULL )]]),
+     [[ctime_r( NULL, NULL )]] )],
     [AC_MSG_RESULT(
      [with two arguments and definition _POSIX_PTHREAD_SEMANTICS])
      ac_cv_libewf_ctime_r_posix=yes],
@@ -273,10 +273,10 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_MKDIR],
   AC_LANG_PUSH(C)
 
   AC_LINK_IFELSE(
-   AC_LANG_PROGRAM(
+   [AC_LANG_PROGRAM(
     [[#include <sys/stat.h>
 #include <sys/types.h>]],
-    [[mkdir( "", 0 )]]),
+    [[mkdir( "", 0 )]] )],
     [AC_MSG_RESULT(
      [with additional mode argument])
     ac_cv_libewf_mkdir_mode=yes],
@@ -285,9 +285,9 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_MKDIR],
   AS_IF(
    [test "x$ac_cv_libewf_mkdir_mode" = xno],
    [AC_LINK_IFELSE(
-    AC_LANG_PROGRAM(
+    [AC_LANG_PROGRAM(
      [[#include <io.h>]],
-     [[mkdir( "" )]]),
+     [[mkdir( "" )]] )],
     [AC_MSG_RESULT(
      [with single argument])
     ac_cv_libewf_mkdir=yes],
@@ -342,12 +342,12 @@ AC_DEFUN([LIBEWF_CHECK_FUNC_POSIX_FADVISE],
    AC_LANG_PUSH(C)
 
    AC_LINK_IFELSE(
-    AC_LANG_PROGRAM(
+    [AC_LANG_PROGRAM(
      [[#include <fcntl.h>]],
      [[#if !defined( POSIX_FADV_SEQUENTIAL )
 #define POSIX_FADV_SEQUENTIAL 2
 #endif
-posix_fadvise( 0, 0, 0, POSIX_FADV_SEQUENTIAL )]]),
+posix_fadvise( 0, 0, 0, POSIX_FADV_SEQUENTIAL )]] )],
      [ac_cv_func_posix_fadvise=yes],
      [ac_cv_func_posix_fadvise=no])
 

@@ -54,7 +54,7 @@ ewfacquire_LDADD = \
 	@LIBODRAW_LIBADD@ \
 	@LIBSMDEV_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
-	@INTLLIBS@ \
+	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
 	@LIBDL_LIBADD@ \
@@ -83,7 +83,7 @@ ewfacquirestream_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@INTLLIBS@ \
+	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
 	@LIBDL_LIBADD@ \
@@ -101,7 +101,7 @@ ewfdebug_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@INTLLIBS@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 ewfexport_SOURCES = \
@@ -129,7 +129,7 @@ ewfexport_LDADD = \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
 	@LIBSMRAW_LIBADD@ \
-	@INTLLIBS@ \
+	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
 	@LIBDL_LIBADD@ \
@@ -151,7 +151,7 @@ ewfinfo_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@INTLLIBS@ \
+	@LIBINTL@ \
 	@LIBUUID_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
@@ -176,7 +176,7 @@ ewfverify_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@INTLLIBS@ \
+	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
 	@MEMWATCH_LIBADD@

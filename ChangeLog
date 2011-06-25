@@ -251,6 +251,11 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110625
+* updated autoconf/make files
+* changed INTLLIBS to LIBINTL
+* changes for: arning: AC_LANG_CONFTEST: no AC_LANG_SOURCE call detected in body
+
 20110623
 * code clean up in info_handle
 

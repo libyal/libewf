@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110623],
+ [20110625],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -978,11 +978,11 @@ AS_IF(
    [ac_cv_libewf_have_winioctl_storage_bus_type],
    [AC_LANG_PUSH(C)
    AC_COMPILE_IFELSE(
-    AC_LANG_PROGRAM(
+    [AC_LANG_PROGRAM(
      [[#include <windows.h>
 #include <winioctl.h>]],
      [[STORAGE_BUS_TYPE storage_bus_type;
-storage_bus_type = BusTypeUnknown;]]),
+storage_bus_type = BusTypeUnknown;]] )],
     [ac_cv_libewf_have_winioctl_storage_bus_type=yes],
     [ac_cv_libewf_have_winioctl_storage_bus_type=no])
    AC_LANG_POP(C)],
@@ -1123,10 +1123,10 @@ AS_IF(
   AC_MSG_CHECKING(
    [if openssl/evp.h can be used in combination with zlib.h])
   AC_LINK_IFELSE(
-   AC_LANG_PROGRAM(
+   [AC_LANG_PROGRAM(
     [[#include <zlib.h>
 #include <openssl/evp.h>]],
-    [[ ]]),
+    [[ ]] )],
     [AC_MSG_RESULT(
      [yes])
     AC_DEFINE(
