@@ -12,6 +12,7 @@ EXTRA_DIST = \
 	libfvalue/libfvalue.vcproj \
 	libmfdata/libmfdata.vcproj \
 	libnotify/libnotify.vcproj \
+	libmdhashf/libmdhashf.vcproj \
 	libodraw/libodraw.vcproj \
 	libsmdev/libsmdev.vcproj \
 	libsmraw/libsmraw.vcproj \

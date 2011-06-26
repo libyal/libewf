@@ -2,9 +2,7 @@ TODO
 * imaging handle
   - add functions fo digest hash print and set
 * libhashf
-  - replace code that is using digest context
   - implement fall back implementations for static compilation
-  - add SHA256
   - cross platform check, e.g. what about MD5 functions without return value
   - alter configure.ac EVP check to allow separate MD hash support
 * replace libewf split values by libfvalue split string
@@ -261,6 +259,7 @@ Known issues:
 * refactored ewftools to use libmdhashf
 * code clean up
 * ewftools: worked on SHA256 support
+* added SHA256 support
 
 20110625
 * updated autoconf/make files
