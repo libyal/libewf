@@ -415,8 +415,7 @@ int imaging_handle_set_process_buffer_size(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
-/* TODO */
-int imaging_handle_set_additional_digest(
+int imaging_handle_set_additional_digests(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );

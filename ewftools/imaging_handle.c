@@ -3324,7 +3324,91 @@ int imaging_handle_set_process_buffer_size(
 	return( result );
 }
 
-/* TODO refactor into a function that sets alls the output values
+/* Sets the additiona digests
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
+ */
+int imaging_handle_set_additional_digests(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	libsystem_split_string_t *string_elements = NULL;
+	static char *function                     = "imaging_handle_set_additional_digests";
+	size_t string_length                      = 0;
+	int number_of_segments                    = 0;
+	int result                                = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( libsystem_string_split(
+	     string,
+	     string_length,
+	     (libcstring_system_character_t) ',',
+	     &string_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libsystem_split_string_get_number_of_segments(
+	     string_elements,
+	     &number_of_segments,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of segments.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO */
+	if( libsystem_split_string_free(
+	     &string_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split string.",
+		 function );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( string_elements != NULL )
+	{
+		libsystem_split_string_free(
+		 &string_elements,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* TODO refactor into a function that sets all the output values
  * for a single output handle, repeat it for the secondary output handle if necessary
  * this requires to unfold imaging_handle_set_header_value
  */

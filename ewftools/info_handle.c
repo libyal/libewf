@@ -1727,12 +1727,13 @@ int info_handle_header_value_extents_fprint(
 {
 	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
-	libsystem_split_values_t *extents_elements = NULL;
+	libsystem_split_string_t *extents_elements = NULL;
 	static char *function                      = "info_handle_header_value_extents_fprint";
 	size_t header_value_length                 = 0;
 	size_t header_value_size                   = INFO_HANDLE_VALUE_SIZE;
-	int extents_element_iterator               = 0;
+	int number_of_segments                     = 0;
 	int result                                 = 0;
+	int segment_index                          = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1780,29 +1781,43 @@ int info_handle_header_value_extents_fprint(
 		header_value_length = libcstring_system_string_length(
 		                       header_value );
 
-		if( libsystem_split_values_parse_string(
-		     &extents_elements,
+		if( libsystem_string_split(
 		     header_value,
 		     header_value_length,
 		     (libcstring_system_character_t) ' ',
+		     &extents_elements,
 		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to split header value into elements.",
+			 "%s: unable to split string.",
 			 function );
 
 			goto on_error;
 		}
-		if( ( extents_elements->number_of_values % 4 ) != 1 )
+		if( libsystem_split_string_get_number_of_segments(
+		     extents_elements,
+		     &number_of_segments,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of segments.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( number_of_segments % 4 ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported number of extents elements in header value.",
+			 "%s: unsupported number of segments.",
 			 function );
 
 			goto on_error;
@@ -1812,10 +1827,9 @@ int info_handle_header_value_extents_fprint(
 			fprintf(
 			 info_handle->notify_stream,
 			 "\tExtents:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 extents_elements->values[ 0 ] );
+			 extents_elements->segments[ 0 ] );
 		}
-
-		if( extents_elements->number_of_values > 1 )
+		if( number_of_segments > 1 )
 		{
 			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 			{
@@ -1823,9 +1837,9 @@ int info_handle_header_value_extents_fprint(
 				 info_handle->notify_stream,
 				 "\t\t\t<extents>\n" );
 			}
-			for( extents_element_iterator = 1;
-			     extents_element_iterator < extents_elements->number_of_values;
-			     extents_element_iterator += 4 )
+			for( segment_index = 1;
+			     segment_index < number_of_segments;
+			     segment_index += 4 )
 			{
 				fprintf(
 				 info_handle->notify_stream,
@@ -1840,10 +1854,10 @@ int info_handle_header_value_extents_fprint(
 				fprintf(
 				 info_handle->notify_stream,
 				 "%" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM "",
-				 extents_elements->values[ extents_element_iterator ],
-				 extents_elements->values[ extents_element_iterator + 1 ],
-				 extents_elements->values[ extents_element_iterator + 2 ],
-				 extents_elements->values[ extents_element_iterator + 3 ] );
+				 extents_elements->segments[ segment_index ],
+				 extents_elements->segments[ segment_index + 1 ],
+				 extents_elements->segments[ segment_index + 2 ],
+				 extents_elements->segments[ segment_index + 3 ] );
 
 				if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 				{
@@ -1862,7 +1876,7 @@ int info_handle_header_value_extents_fprint(
 				 "\t\t\t</extents>\n" );
 			}
 		}
-		if( libsystem_split_values_free(
+		if( libsystem_split_string_free(
 		     &extents_elements,
 		     error ) != 1 )
 		{
@@ -1870,7 +1884,7 @@ int info_handle_header_value_extents_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free split date time elements.",
+			 "%s: unable to free split string.",
 			 function );
 
 			goto on_error;
@@ -1881,7 +1895,7 @@ int info_handle_header_value_extents_fprint(
 on_error:
 	if( extents_elements != NULL )
 	{
-		libsystem_split_values_free(
+		libsystem_split_string_free(
 		 &extents_elements,
 		 NULL );
 	}

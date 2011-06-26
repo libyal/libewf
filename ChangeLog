@@ -1,4 +1,8 @@
 TODO
+* replace system split values by split string
+  - info handle line: 1825 replace ->segments by function
+  - libsystem_path
+* replace libewf split values by libfvalue split string
 * imaging handle
   - add functions to set the addition digest hash calculations
 * libhashf
@@ -8,7 +12,6 @@ TODO
     - SHA256 test
   - cross platform check, e.g. what about MD5 functions without return value
   - alter configure.ac EVP check to allow separate MD hash support
-* replace libewf split values by libfvalue split string
 * libsystem path implement GetVolumeInformation
 * sessions: audio track support
   - write audio track data
@@ -228,6 +231,10 @@ Tools:
   - implement low and high level api separation
 * ewfrecover
   - create a tool recover ewf files
+* ewfmount
+  - create a tool fuse mount ewf files
+  - create mount handle
+  - LEV support
 * process status
   - improve and remove "This could take a while." ?
 

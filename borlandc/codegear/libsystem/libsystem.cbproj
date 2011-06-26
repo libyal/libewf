@@ -49,6 +49,8 @@
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_date_time.h">
 			</None>
+			<None Include="..\..\..\libsystem\libsystem_definitions.h">
+			</None>
 			<None Include="..\..\..\libsystem\libsystem_directory.h">
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_directory_io.h">
@@ -91,9 +93,9 @@
 			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_signal.h">
 			</None>
-			<CppCompile Include="..\..\..\libsystem\libsystem_split_values.c">
+			<CppCompile Include="..\..\..\libsystem\libsystem_split_string.c">
 			</CppCompile>
-			<None Include="..\..\..\libsystem\libsystem_split_values.h">
+			<None Include="..\..\..\libsystem\libsystem_split_string.h">
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_string.c">
 			</CppCompile>

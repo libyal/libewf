@@ -638,6 +638,23 @@ dnl Check for internationalization functions in libsystem/libsystem_support.c
 AC_CHECK_FUNCS([textdomain])
 
 dnl System functions
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xno],
+ [AC_CHECK_FUNCS(
+  [geteuid],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: geteuid],
+   [1]) ])
+
+ AC_CHECK_FUNCS(
+  [getuid],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: getuid],
+   [1]) ])
+ ])
+
 AC_CHECK_FUNCS([uname])
 
 dnl Check for printf conversion specifier support
@@ -1163,7 +1180,7 @@ AS_IF(
   [ac_libewf_have_sha256_support=local])
  ])
 
-dnl Check for libcrypto openssl EVP support
+dnl Check for libcrypto (openssl) EVP support
 AS_IF(
  [test "x$ac_libewf_have_crypto_support" = xno],
  [AC_CHECK_HEADERS([openssl/evp.h openssl/opensslv.h])
@@ -1195,7 +1212,7 @@ AS_IF(
   [ac_libewf_have_crypto_support=no])
  ])
 
-dnl Check if all required libcrypto openssl EVP functions are available
+dnl Check if all required libcrypto (openssl) EVP functions are available
 AS_IF(
  [test "x$ac_libewf_have_crypto_support" = xlibcrypto_evp],
  [AC_CHECK_LIB(
@@ -1268,7 +1285,7 @@ AS_IF(
  ac_libewf_have_sha1_support=no
  ac_libewf_have_sha256_support=no])
 
-dnl Check for libcrypto openssl MD5 support
+dnl Check for libcrypto (openssl) MD5 support
 AS_IF(
  [test "x$ac_libewf_have_md5_support" = xno],
  [AC_CHECK_HEADERS([openssl/md5.h])
@@ -1297,10 +1314,10 @@ AS_IF(
 AS_IF(
  [test "x$ac_libewf_have_md5_support" = xno],
  [AC_MSG_NOTICE(
-  [No support for calculating MD5 hashes, if required install (openssl) libcrypto with MD5 support or Windows Crypto API.])
+  [No support for calculating MD5 hashes, if required install libcrypto (openssl) with MD5 support or Windows Crypto API.])
  ])
 
-dnl Check for libcrypto SHA1 support
+dnl Check for libcrypto (openssl) SHA1 support
 AS_IF(
  [test "x$ac_libewf_have_sha1_support" = xno],
  [AC_CHECK_HEADERS([openssl/sha.h])
@@ -1329,10 +1346,10 @@ AS_IF(
 AS_IF(
  [test "x$ac_libewf_have_sha1_support" = xno],
  [AC_MSG_NOTICE(
-  [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support or Windows Crypto API.])
+  [No support for calculating SHA1 hashes, if required install libcrypto (openssl) with SHA1 support or Windows Crypto API.])
  ])
 
-dnl Check for libcrypto SHA256 support
+dnl Check for libcrypto (openssl) SHA256 support
 AS_IF(
  [test "x$ac_libewf_have_sha256_support" = xno],
  [AC_CHECK_HEADERS([openssl/sha.h])
@@ -1361,7 +1378,7 @@ AS_IF(
 AS_IF(
  [test "x$ac_libewf_have_sha256_support" = xno],
  [AC_MSG_NOTICE(
-  [No support for calculating SHA256 hashes, if required install (openssl) libcrypto with SHA256 support or Windows Crypto API.])
+  [No support for calculating SHA256 hashes, if required install libcrypto (openssl) with SHA256 support or Windows Crypto API.])
  ])
 
 AS_IF(
@@ -1680,6 +1697,21 @@ AS_IF(
  AC_SUBST(
   [HAVE_WCHAR_H],
   [0]) ])
+
+dnl Check for libfuse Filesystem in Userspace (FUSE) support
+AS_IF(
+ [test "x$ac_cv_libewf_enable_winapi" = xno],
+ [AC_CHECK_HEADERS([fuse/fuse.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_fuse_fuse_h" = xyes],
+  [AC_CHECK_LIB(
+   fuse,
+   fuse_main,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_fuse_support=no])
+  ])
+ ])
 
 dnl Check if ewftools should be build as static executables
 AS_IF(

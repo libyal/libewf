@@ -134,7 +134,7 @@ void ewfacquire_usage_fprint(
 	                 "\t        empty-block, fast or best\n" );
 	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options:\n"
-	                 "\t        sha1\n" );
+	                 "\t        sha1, sha256\n" );
 	fprintf( stream, "\t-D:     specify the description (default is description).\n" );
 	fprintf( stream, "\t-e:     specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );

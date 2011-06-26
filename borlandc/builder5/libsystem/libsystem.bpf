@@ -5,6 +5,7 @@
 USE("..\..\..\libsystem\libsystem.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_date_time.c");
 USE("..\..\..\libsystem\libsystem_date_time.h", File);
+USE("..\..\..\libsystem\libsystem_definitions.h", File);
 USE("..\..\..\libsystem\libsystem_directory.h", File);
 USE("..\..\..\libsystem\libsystem_directory_io.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_error_string.c");
@@ -26,8 +27,8 @@ USEUNIT("..\..\..\libsystem\libsystem_path.c");
 USE("..\..\..\libsystem\libsystem_path.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_signal.c");
 USE("..\..\..\libsystem\libsystem_signal.h", File);
-USEUNIT("..\..\..\libsystem\libsystem_split_values.c");
-USE("..\..\..\libsystem\libsystem_split_values.h", File);
+USEUNIT("..\..\..\libsystem\libsystem_split_string.c");
+USE("..\..\..\libsystem\libsystem_split_string.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_string.c");
 USE("..\..\..\libsystem\libsystem_string.h", File);
 USEUNIT("..\..\..\libsystem\libsystem_support.c");

@@ -185,7 +185,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsystem\libsystem_split_values.c"
+				RelativePath="..\..\libsystem\libsystem_split_string.c"
 				>
 			</File>
 			<File
@@ -208,6 +208,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libsystem\libsystem_date_time.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsystem\libsystem_definitions.h"
 				>
 			</File>
 			<File
@@ -267,7 +271,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsystem\libsystem_split_values.h"
+				RelativePath="..\..\libsystem\libsystem_split_string.h"
 				>
 			</File>
 			<File
