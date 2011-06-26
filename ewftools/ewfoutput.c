@@ -57,26 +57,6 @@
 #include <zlib.h>
 #endif
 
-#include <libewf.h>
-
-#if defined( HAVE_LOCAL_LIBODRAW )
-#include <libodraw_definitions.h>
-#elif defined( HAVE_LIBODRAW )
-#include <libodraw.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBSMDEV )
-#include <libsmdev_definitions.h>
-#elif defined( HAVE_LIBSMDEV )
-#include <libsmdev.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBSMRAW )
-#include <libsmraw_definitions.h>
-#elif defined( HAVE_LIBSMRAW )
-#include <libsmraw.h>
-#endif
-
 #if defined( HAVE_OPENSSL_OPENSSLV_H )
 #include <openssl/opensslv.h>
 #endif
@@ -88,6 +68,11 @@
 #include <libsystem.h>
 
 #include "ewfoutput.h"
+#include "ewftools_libewf.h"
+#include "ewftools_libmdhashf.h"
+#include "ewftools_libodraw.h"
+#include "ewftools_libsmdev.h"
+#include "ewftools_libsmraw.h"
 
 /* Prints the executable version information
  */
@@ -202,6 +187,20 @@ void ewfoutput_version_detailed_fprint(
 	 ZLIB_VERSION );
 #endif
 
+#if defined( HAVE_LIBMDHASHF ) || defined( HAVE_LOCAL_LIBMDHASHF )
+	fprintf(
+	 stream,
+	 ", libmdhashf %s",
+	 LIBMDHASHF_VERSION_STRING );
+
+#if defined( HAVE_LIBCRYPTO )
+	fprintf(
+	 stream,
+	 " (libcrypto %s)",
+	 SHLIB_VERSION_NUMBER );
+#endif
+#endif
+
 #if defined( HAVE_LIBODRAW ) || defined( HAVE_LOCAL_LIBODRAW )
 	fprintf(
 	 stream,
@@ -221,13 +220,6 @@ void ewfoutput_version_detailed_fprint(
 	 stream,
 	 ", libsmraw %s",
 	 LIBSMRAW_VERSION_STRING );
-#endif
-
-#if defined( HAVE_LIBCRYPTO )
-	fprintf(
-	 stream,
-	 ", libcrypto %s",
-	 SHLIB_VERSION_NUMBER );
 #endif
 
 #if defined( HAVE_LIBUUID )

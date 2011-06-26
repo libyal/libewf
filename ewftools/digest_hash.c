@@ -31,7 +31,7 @@
  * Returns 1 if successful or -1 on error
  */
 int digest_hash_copy_to_string(
-     digest_hash_t *digest_hash,
+     const uint8_t *digest_hash,
      size_t digest_hash_size,
      libcstring_system_character_t *string,
      size_t string_size,

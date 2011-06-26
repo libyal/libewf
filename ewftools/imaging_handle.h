@@ -156,7 +156,7 @@ struct imaging_handle
 
 	/* The MD5 digest context
 	 */
-	libmdhash_md5_context_t *md5_context;
+	libmdhashf_md5_context_t *md5_context;
 
 	/* Value to indicate the MD5 digest context was initialized
 	 */
@@ -172,13 +172,13 @@ struct imaging_handle
 
 	/* The SHA1 digest context
 	 */
-	libmdhash_sha1_context_t *sha1_context;
+	libmdhashf_sha1_context_t *sha1_context;
 
-	/* Value to indicate the SHA-1 digest context was initialized
+	/* Value to indicate the SHA1 digest context was initialized
 	 */
 	uint8_t sha1_context_initialized;
 
-	/* The calculated SHA-1 digest hash string
+	/* The calculated SHA1 digest hash string
 	 */
 	libcstring_system_character_t *calculated_sha1_hash_string;
 
@@ -188,13 +188,13 @@ struct imaging_handle
 
 	/* The SHA256 digest context
 	 */
-	libmdhash_sha256_context_t *sha256_context;
+	libmdhashf_sha256_context_t *sha256_context;
 
-	/* Value to indicate the SHA-256 digest context was initialized
+	/* Value to indicate the SHA256 digest context was initialized
 	 */
 	uint8_t sha256_context_initialized;
 
-	/* The calculated SHA-256 digest hash string
+	/* The calculated SHA256 digest hash string
 	 */
 	libcstring_system_character_t *calculated_sha256_hash_string;
 
@@ -299,10 +299,6 @@ int imaging_handle_update_integrity_hash(
      liberror_error_t **error );
 
 int imaging_handle_finalize_integrity_hash(
-     imaging_handle_t *imaging_handle,
-     liberror_error_t **error );
-
-int imaging_handle_finalize_integrity_hash_on_error(
      imaging_handle_t *imaging_handle,
      liberror_error_t **error );
 
@@ -419,6 +415,12 @@ int imaging_handle_set_process_buffer_size(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
+/* TODO */
+int imaging_handle_set_additional_digest(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
      libcstring_system_character_t *acquiry_software,
@@ -472,6 +474,11 @@ int imaging_handle_print_parameters(
      uint8_t read_error_retries,
      uint8_t zero_block_on_read_error,
      uint8_t resume_acquiry,
+     liberror_error_t **error );
+
+int imaging_handle_print_hashes(
+     imaging_handle_t *imaging_handle,
+     FILE *stream,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

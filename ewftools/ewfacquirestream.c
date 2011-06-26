@@ -852,15 +852,22 @@ int ewfacquirestream_read_input(
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
-			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "MD5 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 imaging_handle->calculated_md5_hash_string );
 		}
 		if( imaging_handle->calculate_sha1 == 1 )
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
-			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "SHA1 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 imaging_handle->calculated_sha1_hash_string );
+		}
+		if( imaging_handle->calculate_sha256 == 1 )
+		{
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "SHA256 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 imaging_handle->calculated_sha256_hash_string );
 		}
 		if( log_handle != NULL )
 		{
@@ -868,15 +875,22 @@ int ewfacquirestream_read_input(
 			{
 				log_handle_printf(
 				 log_handle,
-				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "MD5 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 				 imaging_handle->calculated_md5_hash_string );
 			}
 			if( imaging_handle->calculate_sha1 == 1 )
 			{
 				log_handle_printf(
 				 log_handle,
-				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "SHA1 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 				 imaging_handle->calculated_sha1_hash_string );
+			}
+			if( imaging_handle->calculate_sha256 == 1 )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "SHA256 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 imaging_handle->calculated_sha256_hash_string );
 			}
 		}
 	}
@@ -894,10 +908,6 @@ on_error:
 		 &process_status,
 		 NULL );
 	}
-	imaging_handle_finalize_integrity_hash_on_error(
-	 imaging_handle,
-	 NULL );
-
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
@@ -944,6 +954,7 @@ int main( int argc, char * const argv[] )
 	size_t string_length                                            = 0;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
+	uint8_t calculate_sha256                                        = 0;
 	uint8_t print_status_information                                = 1;
 	uint8_t read_error_retries                                      = 2;
 	uint8_t resume_acquiry                                          = 0;
@@ -1054,6 +1065,13 @@ int main( int argc, char * const argv[] )
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
+				}
+				else if( libcstring_system_string_compare(
+				          optarg,
+				          _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+				          2 ) == 0 )
+				{
+					calculate_sha256 = 1;
 				}
 				else
 				{
@@ -1207,6 +1225,7 @@ int main( int argc, char * const argv[] )
 	     &ewfacquirestream_imaging_handle,
 	     calculate_md5,
 	     calculate_sha1,
+	     calculate_sha256,
 	     &error ) != 1 )
 	{
 		fprintf(

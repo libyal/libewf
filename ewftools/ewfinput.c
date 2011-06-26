@@ -34,12 +34,11 @@
 #include <string.h>
 #endif
 
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "ewfinput.h"
+#include "ewftools_libewf.h"
 
 /* Input selection defintions
  */

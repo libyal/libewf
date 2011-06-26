@@ -32,16 +32,8 @@
 extern "C" {
 #endif
 
-#define DIGEST_HASH_SIZE_MD5	(size_t) ( sizeof( digest_hash_t ) * 16 )
-#define DIGEST_HASH_SIZE_SHA1	(size_t) ( sizeof( digest_hash_t ) * 20 )
-
-#define DIGEST_HASH_STRING_SIZE_MD5	33
-#define DIGEST_HASH_STRING_SIZE_SHA1	41
-
-typedef uint8_t digest_hash_t;
-
 int digest_hash_copy_to_string(
-     digest_hash_t *digest_hash,
+     const uint8_t *digest_hash,
      size_t digest_hash_size,
      libcstring_system_character_t *string,
      size_t string_size,

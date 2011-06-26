@@ -1097,54 +1097,54 @@ int ewfacquire_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to device read errors.",
+			 "%s: unable to print device read errors.",
 			 function );
 
 			goto on_error;
 		}
-		if( imaging_handle->calculate_md5 == 1 )
+		if( imaging_handle_print_hashes(
+		     imaging_handle,
+		     stdout,
+		     error ) != 1 )
 		{
-			fprintf(
-			 stdout,
-			 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 imaging_handle->calculated_md5_hash_string );
-		}
-		if( imaging_handle->calculate_sha1 == 1 )
-		{
-			fprintf(
-			 stdout,
-			 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 imaging_handle->calculated_sha1_hash_string );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print hashes.",
+			 function );
+
+			goto on_error;
 		}
 		if( log_handle != NULL )
 		{
 			if( device_handle_read_errors_fprint(
-			    device_handle,
-			    log_handle->log_stream,
-			    error ) != 1 )
+			     device_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to device read errors in log handle.",
+				 "%s: unable to print device read errors in log handle.",
 				 function );
 
 				goto on_error;
 			}
-			if( imaging_handle->calculate_md5 == 1 )
+			if( imaging_handle_print_hashes(
+			     imaging_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
 			{
-				log_handle_printf(
-				 log_handle,
-				 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 imaging_handle->calculated_md5_hash_string );
-			}
-			if( imaging_handle->calculate_sha1 == 1 )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 imaging_handle->calculated_sha1_hash_string );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print hashes in log handle.",
+				 function );
+
+				goto on_error;
 			}
 		}
 	}
@@ -1162,10 +1162,6 @@ on_error:
 		 &process_status,
 		 NULL );
 	}
-	imaging_handle_finalize_integrity_hash_on_error(
-	 imaging_handle,
-	 NULL );
-
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
@@ -1223,6 +1219,7 @@ int main( int argc, char * const argv[] )
 	uint64_t media_size                                             = 0;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t calculate_sha1                                          = 0;
+	uint8_t calculate_sha256                                        = 0;
 	uint8_t print_status_information                                = 1;
 	uint8_t resume_acquiry                                          = 0;
 	uint8_t swap_byte_pairs                                         = 0;
@@ -1307,6 +1304,13 @@ int main( int argc, char * const argv[] )
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
+				}
+				else if( libcstring_system_string_compare(
+				          optarg,
+				          _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+				          6 ) == 0 )
+				{
+					calculate_sha256 = 1;
 				}
 				else
 				{
@@ -1612,6 +1616,7 @@ int main( int argc, char * const argv[] )
 	     &ewfacquire_imaging_handle,
 	     calculate_md5,
 	     calculate_sha1,
+	     calculate_sha256,
 	     &error ) != 1 )
 	{
 		fprintf(

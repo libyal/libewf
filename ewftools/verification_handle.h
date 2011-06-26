@@ -28,20 +28,10 @@
 #include <libcstring.h>
 #include <liberror.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
-#include "digest_context.h"
 #include "digest_hash.h"
+#include "ewftools_libewf.h"
+#include "ewftools_libmdhashf.h"
 #include "log_handle.h"
-#include "md5.h"
-#include "sha1.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -76,7 +66,7 @@ struct verification_handle
 
 	/* The MD5 digest context
 	 */
-	md5_context_t md5_context;
+	libmdhashf_md5_context_t *md5_context;
 
 	/* Value to indicate the MD5 digest context was initialized
 	 */
@@ -100,13 +90,13 @@ struct verification_handle
 
 	/* The SHA1 digest context
 	 */
-	sha1_context_t sha1_context;
+	libmdhashf_sha1_context_t *sha1_context;
 
-	/* Value to indicate the SHA-1 digest context was initialized
+	/* Value to indicate the SHA1 digest context was initialized
 	 */
 	uint8_t sha1_context_initialized;
 
-	/* The calculated SHA-1 digest hash string
+	/* The calculated SHA1 digest hash string
 	 */
 	libcstring_system_character_t *calculated_sha1_hash_string;
 
@@ -114,9 +104,33 @@ struct verification_handle
 	 */
 	int stored_sha1_hash_available;
 
-	/* The stored SHA-1 digest hash string
+	/* The stored SHA1 digest hash string
 	 */
 	libcstring_system_character_t *stored_sha1_hash_string;
+
+	/* Value to indicate if the SHA256 digest hash should be calculated
+	 */
+	uint8_t calculate_sha256;
+
+	/* The SHA256 digest context
+	 */
+	libmdhashf_sha256_context_t *sha256_context;
+
+	/* Value to indicate the SHA256 digest context was initialized
+	 */
+	uint8_t sha256_context_initialized;
+
+	/* The calculated SHA256 digest hash string
+	 */
+	libcstring_system_character_t *calculated_sha256_hash_string;
+
+	/* Value to indicate a stored SHA256 digest hash is available
+	 */
+	int stored_sha256_hash_available;
+
+	/* The stored SHA256 digest hash string
+	 */
+	libcstring_system_character_t *stored_sha256_hash_string;
 
 	/* The libewf input handle
 	 */
@@ -151,6 +165,7 @@ int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
      uint8_t calculate_sha1,
+     uint8_t calculate_sha256,
      liberror_error_t **error );
 
 int verification_handle_free(

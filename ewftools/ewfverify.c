@@ -147,6 +147,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_integer_t option                        = 0;
 	uint8_t calculate_md5                                     = 1;
 	uint8_t calculate_sha1                                    = 0;
+	uint8_t calculate_sha256                                  = 0;
 	uint8_t print_status_information                          = 1;
 	uint8_t zero_chunk_on_error                               = 0;
 	uint8_t verbose                                           = 0;
@@ -205,6 +206,13 @@ int main( int argc, char * const argv[] )
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
+				}
+				else if( libcstring_system_string_compare(
+				          optarg,
+				          _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+				          6 ) == 0 )
+				{
+					calculate_sha256 = 1;
 				}
 				else
 				{
@@ -310,6 +318,7 @@ int main( int argc, char * const argv[] )
 	     &ewfverify_verification_handle,
 	     calculate_md5,
 	     calculate_sha1,
+	     calculate_sha256,
 	     &error ) != 1 )
 	{
 		fprintf(

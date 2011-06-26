@@ -34,17 +34,14 @@
 #include <libsystem.h>
 
 #include "byte_size_string.h"
-#include "digest_context.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libewf.h"
 #include "export_handle.h"
 #include "log_handle.h"
-#include "md5.h"
 #include "platform.h"
 #include "process_status.h"
-#include "sha1.h"
 #include "storage_media_buffer.h"
 
 #define EWFEXPORT_INPUT_BUFFER_SIZE		64
@@ -249,6 +246,7 @@ int main( int argc, char * const argv[] )
 	size_t string_length                                       = 0;
 	uint8_t calculate_md5                                      = 1;
 	uint8_t calculate_sha1                                     = 0;
+	uint8_t calculate_sha256                                   = 0;
 	uint8_t print_status_information                           = 1;
 	uint8_t swap_byte_pairs                                    = 0;
 	uint8_t verbose                                            = 0;
@@ -355,6 +353,13 @@ int main( int argc, char * const argv[] )
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
+				}
+				else if( libcstring_system_string_compare(
+				          optarg,
+				          _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+				          6 ) == 0 )
+				{
+					calculate_sha256 = 1;
 				}
 				else
 				{
@@ -501,6 +506,7 @@ int main( int argc, char * const argv[] )
 	     &ewfexport_export_handle,
 	     calculate_md5,
 	     calculate_sha1,
+	     calculate_sha256,
 	     &error ) != 1 )
 	{
 		fprintf(

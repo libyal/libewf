@@ -27,6 +27,7 @@ bin_PROGRAMS = \
 
 ewfacquire_SOURCES = \
 	byte_size_string.c byte_size_string.h \
+	digest_hash.c digest_hash.h \
 	device_handle.c device_handle.h \
 	ewfacquire.c \
 	ewfcommon.h \
@@ -61,20 +62,18 @@ ewfacquire_LDADD = \
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
 	ewfacquirestream.c \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
+	ewftools_libmdhashf.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
-	md5.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfacquirestream_LDADD = \
@@ -106,21 +105,19 @@ ewfdebug_LDADD = \
 
 ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
 	ewfcommon.h \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
+	ewftools_libmdhashf.h \
 	ewftools_libsmraw.h \
 	export_handle.c export_handle.h \
 	guid.c guid.h \
 	log_handle.c log_handle.h \
-	md5.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfexport_LDADD = \
@@ -158,17 +155,15 @@ ewfinfo_LDADD = \
 
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
+	ewftools_libmdhashf.h \
 	ewfverify.c \
 	log_handle.c log_handle.h \
-	md5.h \
 	process_status.c process_status.h \
-	sha1.h \
 	storage_media_buffer.c storage_media_buffer.h \
 	verification_handle.c verification_handle.h
 

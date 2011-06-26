@@ -29,15 +29,13 @@
 #include <libsystem.h>
 
 #include "byte_size_string.h"
-#include "digest_context.h"
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewftools_libewf.h"
+#include "ewftools_libmdhashf.h"
 #include "log_handle.h"
-#include "md5.h"
 #include "process_status.h"
-#include "sha1.h"
 #include "storage_media_buffer.h"
 #include "verification_handle.h"
 
@@ -52,6 +50,7 @@ int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
      uint8_t calculate_sha1,
+     uint8_t calculate_sha256,
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_initialize";
@@ -135,7 +134,7 @@ int verification_handle_initialize(
 		if( calculate_md5 != 0 )
 		{
 			( *verification_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
-			                                                        DIGEST_HASH_STRING_SIZE_MD5 );
+			                                                        33 );
 
 			if( ( *verification_handle )->calculated_md5_hash_string == NULL )
 			{
@@ -150,7 +149,7 @@ int verification_handle_initialize(
 			}
 		}
 		( *verification_handle )->stored_md5_hash_string = libcstring_system_string_allocate(
-		                                                    DIGEST_HASH_STRING_SIZE_MD5 );
+		                                                    33 );
 
 		if( ( *verification_handle )->stored_md5_hash_string == NULL )
 		{
@@ -166,7 +165,7 @@ int verification_handle_initialize(
 		if( calculate_sha1 != 0 )
 		{
 			( *verification_handle )->calculated_sha1_hash_string = libcstring_system_string_allocate(
-			                                                         DIGEST_HASH_STRING_SIZE_SHA1 );
+			                                                         41 );
 
 			if( ( *verification_handle )->calculated_sha1_hash_string == NULL )
 			{
@@ -181,7 +180,7 @@ int verification_handle_initialize(
 			}
 		}
 		( *verification_handle )->stored_sha1_hash_string = libcstring_system_string_allocate(
-		                                                     DIGEST_HASH_STRING_SIZE_SHA1 );
+		                                                     41 );
 
 		if( ( *verification_handle )->stored_sha1_hash_string == NULL )
 		{
@@ -194,9 +193,41 @@ int verification_handle_initialize(
 
 			goto on_error;
 		}
+		if( calculate_sha256 != 0 )
+		{
+			( *verification_handle )->calculated_sha256_hash_string = libcstring_system_string_allocate(
+			                                                           65 );
+
+			if( ( *verification_handle )->calculated_sha256_hash_string == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create calculated SHA256 digest hash string.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		( *verification_handle )->stored_sha256_hash_string = libcstring_system_string_allocate(
+		                                                       65 );
+
+		if( ( *verification_handle )->stored_sha256_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create stored SHA256 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
 		( *verification_handle )->input_format        = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
 		( *verification_handle )->calculate_md5       = calculate_md5;
 		( *verification_handle )->calculate_sha1      = calculate_sha1;
+		( *verification_handle )->calculate_sha256    = calculate_sha256;
 		( *verification_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
 		( *verification_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
 		( *verification_handle )->notify_stream       = VERIFICATION_HANDLE_NOTIFY_STREAM;
@@ -277,6 +308,22 @@ int verification_handle_free(
 
 			result = -1;
 		}
+		if( ( *verification_handle )->md5_context != NULL )
+		{
+			if( libmdhashf_md5_free(
+			     &( ( *verification_handle )->md5_context ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free MD5 context.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *verification_handle )->calculated_md5_hash_string != NULL )
 		{
 			memory_free(
@@ -287,6 +334,22 @@ int verification_handle_free(
 			memory_free(
 			 ( *verification_handle )->stored_md5_hash_string );
 		}
+		if( ( *verification_handle )->sha1_context != NULL )
+		{
+			if( libmdhashf_sha1_free(
+			     &( ( *verification_handle )->sha1_context ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free SHA1 context.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *verification_handle )->calculated_sha1_hash_string != NULL )
 		{
 			memory_free(
@@ -296,6 +359,32 @@ int verification_handle_free(
 		{
 			memory_free(
 			 ( *verification_handle )->stored_sha1_hash_string );
+		}
+		if( ( *verification_handle )->sha256_context != NULL )
+		{
+			if( libmdhashf_sha256_free(
+			     &( ( *verification_handle )->sha256_context ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free SHA256 context.",
+				 function );
+
+				result = -1;
+			}
+		}
+		if( ( *verification_handle )->calculated_sha256_hash_string != NULL )
+		{
+			memory_free(
+			 ( *verification_handle )->calculated_sha256_hash_string );
+		}
+		if( ( *verification_handle )->stored_sha256_hash_string != NULL )
+		{
+			memory_free(
+			 ( *verification_handle )->stored_sha256_hash_string );
 		}
 		memory_free(
 		 *verification_handle );
@@ -794,7 +883,7 @@ int verification_handle_initialize_integrity_hash(
 	}
 	if( verification_handle->calculate_md5 != 0 )
 	{
-		if( md5_initialize(
+		if( libmdhashf_md5_initialize(
 		     &( verification_handle->md5_context ),
 		     error ) != 1 )
 		{
@@ -811,7 +900,7 @@ int verification_handle_initialize_integrity_hash(
 	}
 	if( verification_handle->calculate_sha1 != 0 )
 	{
-		if( sha1_initialize(
+		if( libmdhashf_sha1_initialize(
 		     &( verification_handle->sha1_context ),
 		     error ) != 1 )
 		{
@@ -826,13 +915,38 @@ int verification_handle_initialize_integrity_hash(
 		}
 		verification_handle->sha1_context_initialized = 1;
 	}
+	if( verification_handle->calculate_sha256 != 0 )
+	{
+		if( libmdhashf_sha256_initialize(
+		     &( verification_handle->sha256_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize SHA256 context.",
+			 function );
+
+			goto on_error;
+		}
+		verification_handle->sha256_context_initialized = 1;
+	}
 	return( 1 );
 
 on_error:
-	verification_handle_finalize_integrity_hash_on_error(
-	 verification_handle,
-	 NULL );
-
+	if( verification_handle->sha1_context != NULL )
+	{
+		libmdhashf_sha1_free(
+		 &( verification_handle->sha1_context ),
+		 NULL );
+	}
+	if( verification_handle->md5_context != NULL )
+	{
+		libmdhashf_md5_free(
+		 &( verification_handle->md5_context ),
+		 NULL );
+	}
 	return( -1 );
 }
 
@@ -883,14 +997,11 @@ int verification_handle_update_integrity_hash(
 	}
 	if( verification_handle->calculate_md5 != 0 )
 	{
-		md5_update(
-		 &( verification_handle->md5_context ),
-		 buffer,
-		 buffer_size,
-		 error );
-
-		if( ( error != NULL )
-		 && ( *error != NULL ) )
+		if( libmdhashf_md5_update(
+		     verification_handle->md5_context,
+		     buffer,
+		     buffer_size,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -904,20 +1015,35 @@ int verification_handle_update_integrity_hash(
 	}
 	if( verification_handle->calculate_sha1 != 0 )
 	{
-		sha1_update(
-		 &( verification_handle->sha1_context ),
-		 buffer,
-		 buffer_size,
-		 error );
-
-		if( ( error != NULL )
-		 && ( *error != NULL ) )
+		if( libmdhashf_sha1_update(
+		     verification_handle->sha1_context,
+		     buffer,
+		     buffer_size,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update SHA1 digest hash.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( verification_handle->calculate_sha256 != 0 )
+	{
+		if( libmdhashf_sha256_update(
+		     verification_handle->sha256_context,
+		     buffer,
+		     buffer_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update SHA256 digest hash.",
 			 function );
 
 			return( -1 );
@@ -933,12 +1059,11 @@ int verification_handle_finalize_integrity_hash(
      verification_handle_t *verification_handle,
      liberror_error_t **error )
 {
-	digest_hash_t calculated_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
-	digest_hash_t calculated_sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
+	uint8_t calculated_md5_hash[ LIBMDHASHF_MD5_HASH_SIZE ];
+	uint8_t calculated_sha1_hash[ LIBMDHASHF_SHA1_HASH_SIZE ];
+	uint8_t calculated_sha256_hash[ LIBMDHASHF_SHA256_HASH_SIZE ];
 
-	static char *function            = "verification_handle_finalize_integrity_hash";
-	size_t calculated_md5_hash_size  = DIGEST_HASH_SIZE_MD5;
-	size_t calculated_sha1_hash_size = DIGEST_HASH_SIZE_SHA1;
+	static char *function = "verification_handle_finalize_integrity_hash";
 
 	if( verification_handle == NULL )
 	{
@@ -964,10 +1089,10 @@ int verification_handle_finalize_integrity_hash(
 
 			return( -1 );
 		}
-		if( md5_finalize(
-		     &( verification_handle->md5_context ),
+		if( libmdhashf_md5_finalize(
+		     verification_handle->md5_context,
 		     calculated_md5_hash,
-		     &calculated_md5_hash_size,
+		     LIBMDHASHF_MD5_HASH_SIZE,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -981,9 +1106,9 @@ int verification_handle_finalize_integrity_hash(
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_md5_hash,
-		     calculated_md5_hash_size,
+		     LIBMDHASHF_MD5_HASH_SIZE,
 		     verification_handle->calculated_md5_hash_string,
-		     DIGEST_HASH_STRING_SIZE_MD5,
+		     33,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1009,10 +1134,10 @@ int verification_handle_finalize_integrity_hash(
 
 			return( -1 );
 		}
-		if( sha1_finalize(
-		     &( verification_handle->sha1_context ),
+		if( libmdhashf_sha1_finalize(
+		     verification_handle->sha1_context,
 		     calculated_sha1_hash,
-		     &calculated_sha1_hash_size,
+		     LIBMDHASHF_SHA1_HASH_SIZE,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1026,9 +1151,9 @@ int verification_handle_finalize_integrity_hash(
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_sha1_hash,
-		     calculated_sha1_hash_size,
+		     LIBMDHASHF_SHA1_HASH_SIZE,
 		     verification_handle->calculated_sha1_hash_string,
-		     DIGEST_HASH_STRING_SIZE_SHA1,
+		     41,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1041,75 +1166,52 @@ int verification_handle_finalize_integrity_hash(
 			return( -1 );
 		}
 	}
+	if( verification_handle->calculate_sha256 != 0 )
+	{
+		if( verification_handle->calculated_sha256_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid verification handle - missing calculated SHA256 hash string.",
+			 function );
+
+			return( -1 );
+		}
+		if( libmdhashf_sha256_finalize(
+		     verification_handle->sha256_context,
+		     calculated_sha256_hash,
+		     LIBMDHASHF_SHA256_HASH_SIZE,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize SHA256 hash.",
+			 function );
+
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     calculated_sha256_hash,
+		     LIBMDHASHF_SHA256_HASH_SIZE,
+		     verification_handle->calculated_sha256_hash_string,
+		     65,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create calculated SHA256 hash string.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	return( 1 );
-}
-
-/* Finalizes the integrity hash(es) on error
- * Returns 1 if successful or -1 on error
- */
-int verification_handle_finalize_integrity_hash_on_error(
-     verification_handle_t *verification_handle,
-     liberror_error_t **error )
-{
-	static char *function = "verification_handle_finalize_integrity_hash_on_error";
-	int result            = 1;
-
-	if( verification_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( verification_handle->calculate_md5 != 0 )
-	{
-		if( verification_handle->md5_context_initialized != 0 )
-		{
-			if( md5_finalize(
-			     &( verification_handle->md5_context ),
-			     NULL,
-			     NULL,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to finalize MD5 hash.",
-				 function );
-
-				result = -1;
-			}
-			verification_handle->md5_context_initialized = 0;
-		}
-	}
-	if( verification_handle->calculate_sha1 != 0 )
-	{
-		if( verification_handle->md5_context_initialized != 0 )
-		{
-			if( sha1_finalize(
-			     &( verification_handle->sha1_context ),
-			     NULL,
-			     NULL,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to finalize SHA1 hash.",
-				 function );
-
-				result = -1;
-			}
-			verification_handle->sha1_context_initialized = 0;
-		}
-	}
-	return( result );
 }
 
 /* Verifies the input
@@ -1135,6 +1237,7 @@ int verification_handle_verify_input(
 	uint32_t number_of_checksum_errors           = 0;
 	int md5_hash_compare                         = 0;
 	int sha1_hash_compare                        = 0;
+	int sha256_hash_compare                      = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -1574,7 +1677,7 @@ int verification_handle_verify_input(
 		md5_hash_compare = libcstring_system_string_compare(
 		                    verification_handle->stored_md5_hash_string,
 		                    verification_handle->calculated_md5_hash_string,
-		                    DIGEST_HASH_STRING_SIZE_MD5 );
+		                    33 );
 	}
 	if( ( verification_handle->calculate_sha1 != 0 )
 	 && ( verification_handle->stored_sha1_hash_available != 0 ) )
@@ -1582,13 +1685,22 @@ int verification_handle_verify_input(
 		sha1_hash_compare = libcstring_system_string_compare(
 		                     verification_handle->stored_sha1_hash_string,
 		                     verification_handle->calculated_sha1_hash_string,
-		                     DIGEST_HASH_STRING_SIZE_SHA1 );
+		                     41 );
+	}
+	if( ( verification_handle->calculate_sha256 != 0 )
+	 && ( verification_handle->stored_sha256_hash_available != 0 ) )
+	{
+		sha256_hash_compare = libcstring_system_string_compare(
+		                       verification_handle->stored_sha256_hash_string,
+		                       verification_handle->calculated_sha256_hash_string,
+		                       65 );
 	}
 	/* Note that a set of EWF files can be verified without an integrity hash
 	 */
 	if( ( number_of_checksum_errors == 0 )
 	 && ( md5_hash_compare == 0 )
-	 && ( sha1_hash_compare == 0 ) )
+	 && ( sha1_hash_compare == 0 )
+	 && ( sha256_hash_compare == 0 ) )
 	{
 		return( 1 );
 	}
@@ -1606,10 +1718,6 @@ on_error:
 		 &process_status,
 		 NULL );
 	}
-	verification_handle_finalize_integrity_hash_on_error(
-	 verification_handle,
-	 NULL );
-
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
@@ -1817,6 +1925,7 @@ int verification_handle_verify_file_entry(
 	int md5_hash_compare                       = 0;
 	int result                                 = 0;
 	int sha1_hash_compare                      = 0;
+	int sha256_hash_compare                    = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -2169,7 +2278,7 @@ int verification_handle_verify_file_entry(
 				md5_hash_compare = libcstring_system_string_compare(
 				                    verification_handle->stored_md5_hash_string,
 				                    verification_handle->calculated_md5_hash_string,
-				                    DIGEST_HASH_STRING_SIZE_MD5 );
+				                    33 );
 			}
 			if( ( verification_handle->calculate_sha1 != 0 )
 			 && ( verification_handle->stored_sha1_hash_available != 0 ) )
@@ -2177,10 +2286,19 @@ int verification_handle_verify_file_entry(
 				sha1_hash_compare = libcstring_system_string_compare(
 				                     verification_handle->stored_sha1_hash_string,
 				                     verification_handle->calculated_sha1_hash_string,
-				                     DIGEST_HASH_STRING_SIZE_SHA1 );
+				                     41 );
+			}
+			if( ( verification_handle->calculate_sha256 != 0 )
+			 && ( verification_handle->stored_sha256_hash_available != 0 ) )
+			{
+				sha256_hash_compare = libcstring_system_string_compare(
+				                       verification_handle->stored_sha256_hash_string,
+				                       verification_handle->calculated_sha256_hash_string,
+				                       65 );
 			}
 			if( ( md5_hash_compare == 0 )
-			 && ( sha1_hash_compare == 0 ) )
+			 && ( sha1_hash_compare == 0 )
+			 && ( sha256_hash_compare == 0 ) )
 			{
 				result = 1;
 			}
@@ -2237,10 +2355,6 @@ on_error:
 		memory_free(
 		 file_entry_data );
 	}
-	verification_handle_finalize_integrity_hash_on_error(
-	 verification_handle,
-	 NULL );
-
 	if( ( target_path != NULL )
 	 && ( target_path != file_entry_path ) )
 	{
@@ -2372,7 +2486,7 @@ int verification_handle_get_integrity_hash_from_input(
      liberror_error_t **error )
 {
 #if defined( USE_LIBEWF_GET_MD5_HASH )
-        digest_hash_t stored_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+        uint8_t stored_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 #endif
 
 	static char *function = "verification_handle_get_integrity_hash_from_input";
@@ -2411,6 +2525,17 @@ int verification_handle_get_integrity_hash_from_input(
 
 		return( -1 );
 	}
+	if( verification_handle->stored_sha256_hash_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid verification handle - missing stored SHA256 hash string.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 	result = libewf_handle_get_md5_hash(
 		  verification_handle->input_handle,
@@ -2435,7 +2560,7 @@ int verification_handle_get_integrity_hash_from_input(
 	     md5_hash,
 	     DIGEST_HASH_SIZE_MD5,
 	     verification_handle->stored_md5_hash_string,
-	     DIGEST_HASH_STRING_SIZE_MD5 ) != 1 )
+	     33 ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2453,7 +2578,7 @@ int verification_handle_get_integrity_hash_from_input(
 		  (uint8_t *) "MD5",
 		  3,
 		  (uint16_t *) verification_handle->stored_md5_hash_string,
-		  DIGEST_HASH_STRING_SIZE_MD5,
+		  33,
 		  error );
 #else
 	result = libewf_handle_get_utf8_hash_value(
@@ -2461,7 +2586,7 @@ int verification_handle_get_integrity_hash_from_input(
 		  (uint8_t *) "MD5",
 		  3,
 		  (uint8_t *) verification_handle->stored_md5_hash_string,
-		  DIGEST_HASH_STRING_SIZE_MD5,
+		  33,
 		  error );
 #endif
 	if( result == -1 )
@@ -2483,7 +2608,7 @@ int verification_handle_get_integrity_hash_from_input(
 		  (uint8_t *) "SHA1",
 		  4,
 		  (uint16_t *) verification_handle->stored_sha1_hash_string,
-		  DIGEST_HASH_STRING_SIZE_SHA1,
+		  41,
 		  error );
 #else
 	result = libewf_handle_get_utf8_hash_value(
@@ -2491,7 +2616,7 @@ int verification_handle_get_integrity_hash_from_input(
 		  (uint8_t *) "SHA1",
 		  4,
 		  (uint8_t *) verification_handle->stored_sha1_hash_string,
-		  DIGEST_HASH_STRING_SIZE_SHA1,
+		  41,
 		  error );
 #endif
 	if( result == -1 )
@@ -2506,6 +2631,36 @@ int verification_handle_get_integrity_hash_from_input(
 		return( -1 );
 	}
 	verification_handle->stored_sha1_hash_available = result;
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_get_utf16_hash_value(
+		  verification_handle->input_handle,
+		  (uint8_t *) "SHA256",
+		  6,
+		  (uint16_t *) verification_handle->stored_sha256_hash_string,
+		  65,
+		  error );
+#else
+	result = libewf_handle_get_utf8_hash_value(
+		  verification_handle->input_handle,
+		  (uint8_t *) "SHA256",
+		  6,
+		  (uint8_t *) verification_handle->stored_sha256_hash_string,
+		  65,
+		  error );
+#endif
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine stored SHA256 hash string.",
+		 function );
+
+		return( -1 );
+	}
+	verification_handle->stored_sha256_hash_available = result;
 
 	return( 1 );
 }
@@ -2547,13 +2702,13 @@ int verification_handle_get_integrity_hash_from_file_entry(
 	result = libewf_file_entry_get_utf16_hash_value_md5(
 		  file_entry,
 		  (uint16_t *) verification_handle->stored_md5_hash_string,
-		  DIGEST_HASH_STRING_SIZE_MD5,
+		  33,
 		  error );
 #else
 	result = libewf_file_entry_get_utf8_hash_value_md5(
 		  file_entry,
 		  (uint8_t *) verification_handle->stored_md5_hash_string,
-		  DIGEST_HASH_STRING_SIZE_MD5,
+		  33,
 		  error );
 #endif
 	if( result == -1 )
@@ -2570,6 +2725,8 @@ int verification_handle_get_integrity_hash_from_file_entry(
 	verification_handle->stored_md5_hash_available = result;
 
 	verification_handle->stored_sha1_hash_available = 0;
+
+	verification_handle->stored_sha256_hash_available = 0;
 
 	return( 1 );
 }
@@ -2879,45 +3036,65 @@ int verification_handle_hash_values_fprint(
 
 		return( -1 );
 	}
-	if( verification_handle->calculate_md5 == 1 )
+	if( verification_handle->calculate_md5 != 0 )
 	{
 		if( verification_handle->stored_md5_hash_available == 0 )
 		{
 			fprintf(
 			 stream,
-			 "MD5 hash stored in file:\tN/A\n" );
+			 "MD5 hash stored in file:\t\tN/A\n" );
 		}
 		else
 		{
 			fprintf(
 			 stream,
-			 "MD5 hash stored in file:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "MD5 hash stored in file:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 verification_handle->stored_md5_hash_string );
 		}
 		fprintf(
 		 stream,
-		 "MD5 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "MD5 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 		 verification_handle->calculated_md5_hash_string );
 	}
-	if( verification_handle->calculate_sha1 == 1 )
+	if( verification_handle->calculate_sha1 != 0 )
 	{
 		if( verification_handle->stored_sha1_hash_available == 0 )
 		{
 			fprintf(
 			 stream,
-			 "SHA1 hash stored in file:\tN/A\n" );
+			 "SHA1 hash stored in file:\t\tN/A\n" );
 		}
 		else
 		{
 			fprintf(
 			 stream,
-			 "SHA1 hash stored in file:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "SHA1 hash stored in file:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 			 verification_handle->stored_sha1_hash_string );
 		}
 		fprintf(
 		 stream,
-		 "SHA1 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "SHA1 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
 		 verification_handle->calculated_sha1_hash_string );
+	}
+	if( verification_handle->calculate_sha256 != 0 )
+	{
+		if( verification_handle->stored_sha256_hash_available == 0 )
+		{
+			fprintf(
+			 stream,
+			 "SHA256 hash stored in file:\t\tN/A\n" );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "SHA256 hash stored in file:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 verification_handle->stored_sha256_hash_string );
+		}
+		fprintf(
+		 stream,
+		 "SHA256 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 verification_handle->calculated_sha256_hash_string );
 	}
 	return( 1 );
 }
@@ -3032,21 +3209,44 @@ int verification_handle_additional_hash_values_fprint(
 
 			continue;
 		}
-		if( ( verification_handle->calculate_md5 != 0 )
-		 && ( libcstring_narrow_string_compare(
-		       hash_value_identifier,
-		       "MD5",
-		       3 ) == 0 ) )
+		if( verification_handle->calculate_md5 != 0 )
 		{
-			continue;
+			if( hash_value_identifier_size == 4 )
+			{
+				if( libcstring_narrow_string_compare(
+				     hash_value_identifier,
+				     "MD5",
+				     3 ) == 0 )
+				{
+					continue;
+				}
+			}
 		}
-		if( ( verification_handle->calculate_sha1 != 0 )
-		 && ( libcstring_narrow_string_compare(
-		       hash_value_identifier,
-		       "SHA1",
-		       4 ) == 0 ) )
+		if( verification_handle->calculate_sha1 != 0 )
 		{
-			continue;
+			if( hash_value_identifier_size == 5 )
+			{
+				if( libcstring_narrow_string_compare(
+				     hash_value_identifier,
+				     "SHA1",
+				     4 ) == 0 )
+				{
+					continue;
+				}
+			}
+		}
+		if( verification_handle->calculate_sha256 != 0 )
+		{
+			if( hash_value_identifier_size == 7 )
+			{
+				if( libcstring_narrow_string_compare(
+				     hash_value_identifier,
+				     "SHA256",
+				     6 ) == 0 )
+				{
+					continue;
+				}
+			}
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_handle_get_utf16_hash_value(

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110625],
+ [20110626],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -1220,7 +1220,7 @@ AS_IF(
 
 AS_IF(
  [test "x$ac_libewf_have_sha256_support" = xlibcrypto_evp],
- AC_CHECK_LIB(
+ [AC_CHECK_LIB(
   crypto,
   EVP_sha256,
   [ac_libewf_dummy=yes],

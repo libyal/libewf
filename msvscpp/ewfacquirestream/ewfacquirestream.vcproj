@@ -41,8 +41,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsystem;..\zlib-1.2.5"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsystem;..\..\libmdhashf;..\zlib-1.2.5"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMDHASHF;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
@@ -120,8 +120,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsystem;..\zlib-1.2.5"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libsystem;..\..\libmdhashf;..\zlib-1.2.5"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMDHASHF;LIBEWF_DLL_IMPORT"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
@@ -189,10 +189,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_context.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\digest_hash.c"
 				>
 			</File>
@@ -243,10 +239,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\digest_context.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\digest_hash.h"
 				>
 			</File>
@@ -267,6 +259,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libmdhashf.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\guid.h"
 				>
 			</File>
@@ -279,19 +275,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\md5.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\platform.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\process_status.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\sha1.h"
 				>
 			</File>
 			<File
