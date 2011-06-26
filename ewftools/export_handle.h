@@ -30,7 +30,7 @@
 
 #include "digest_hash.h"
 #include "ewftools_libewf.h"
-#include "ewftools_libmdhashf.h"
+#include "ewftools_libhmac.h"
 #include "ewftools_libsmraw.h"
 #include "log_handle.h"
 #include "storage_media_buffer.h"
@@ -104,7 +104,7 @@ struct export_handle
 
 	/* The MD5 digest context
 	 */
-	libmdhashf_md5_context_t *md5_context;
+	libhmac_md5_context_t *md5_context;
 
 	/* Value to indicate the MD5 digest context was initialized
 	 */
@@ -120,7 +120,7 @@ struct export_handle
 
 	/* The SHA1 digest context
 	 */
-	libmdhashf_sha1_context_t *sha1_context;
+	libhmac_sha1_context_t *sha1_context;
 
 	/* Value to indicate the SHA1 digest context was initialized
 	 */
@@ -136,7 +136,7 @@ struct export_handle
 
 	/* The SHA256 digest context
 	 */
-	libmdhashf_sha256_context_t *sha256_context;
+	libhmac_sha256_context_t *sha256_context;
 
 	/* Value to indicate the SHA256 digest context was initialized
 	 */

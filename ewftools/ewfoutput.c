@@ -69,7 +69,7 @@
 
 #include "ewfoutput.h"
 #include "ewftools_libewf.h"
-#include "ewftools_libmdhashf.h"
+#include "ewftools_libhmac.h"
 #include "ewftools_libodraw.h"
 #include "ewftools_libsmdev.h"
 #include "ewftools_libsmraw.h"
@@ -187,11 +187,11 @@ void ewfoutput_version_detailed_fprint(
 	 ZLIB_VERSION );
 #endif
 
-#if defined( HAVE_LIBMDHASHF ) || defined( HAVE_LOCAL_LIBMDHASHF )
+#if defined( HAVE_LIBHMAC ) || defined( HAVE_LOCAL_LIBHMAC )
 	fprintf(
 	 stream,
-	 ", libmdhashf %s",
-	 LIBMDHASHF_VERSION_STRING );
+	 ", libhmac %s",
+	 LIBHMAC_VERSION_STRING );
 
 #if defined( HAVE_LIBCRYPTO )
 	fprintf(

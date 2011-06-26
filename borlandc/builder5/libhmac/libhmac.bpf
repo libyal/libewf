@@ -1,0 +1,23 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+//---------------------------------------------------------------------------
+USE("..\..\..\libhmac\libhmac_types.h", File);
+USE("..\..\..\libhmac\libhmac_definitions.h", File);
+USEUNIT("..\..\..\libhmac\libhmac_error.c");
+USE("..\..\..\libhmac\libhmac_error.h", File);
+USE("..\..\..\libhmac\libhmac_extern.h", File);
+USEUNIT("..\..\..\libhmac\libhmac_md5.c");
+USE("..\..\..\libhmac\libhmac_md5.h", File);
+USEUNIT("..\..\..\libhmac\libhmac_sha1.c");
+USE("..\..\..\libhmac\libhmac_sha1.h", File);
+USEUNIT("..\..\..\libhmac\libhmac_sha256.c");
+USE("..\..\..\libhmac\libhmac_sha256.h", File);
+USEUNIT("..\..\..\libhmac\libhmac_support.c");
+USE("..\..\..\libhmac\libhmac_support.h", File);
+//---------------------------------------------------------------------------
+#define Library
+
+// To add a file to the library use the Project menu 'Add to Project'.
+

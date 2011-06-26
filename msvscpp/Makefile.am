@@ -10,9 +10,9 @@ EXTRA_DIST = \
 	liberror/liberror.vcproj \
 	libewf_dll/libewf_dll.vcproj \
 	libfvalue/libfvalue.vcproj \
+	libhmac/libhmac.vcproj \
 	libmfdata/libmfdata.vcproj \
 	libnotify/libnotify.vcproj \
-	libmdhashf/libmdhashf.vcproj \
 	libodraw/libodraw.vcproj \
 	libsmdev/libsmdev.vcproj \
 	libsmraw/libsmraw.vcproj \

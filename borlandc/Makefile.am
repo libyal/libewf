@@ -18,10 +18,12 @@ BUILDER5_FILES = \
 	builder5/libewf/libewf.bpf \
 	builder5/libewf/libewf.bpr \
 	builder5/libewf.bpg \
-	builder5/libmfdata/libmfdata.bpf \
-	builder5/libmfdata/libmfdata.bpr \
 	builder5/libfvalue/libfvalue.bpf \
 	builder5/libfvalue/libfvalue.bpr \
+	builder5/libhmac/libhmac.bpf \
+	builder5/libhmac/libhmac.bpr \
+	builder5/libmfdata/libmfdata.bpf \
+	builder5/libmfdata/libmfdata.bpr \
 	builder5/libnotify/libnotify.bpf \
 	builder5/libnotify/libnotify.bpr \
 	builder5/libodraw/libodraw.bpf \
@@ -57,6 +59,7 @@ CODEGEAR_FILES = \
 	codegear/libewf.groupproj \
 	codegear/libewf_static.groupproj \
 	codegear/libfvalue/libfvalue.cbproj \
+	codegear/libhmac/libhmac.cbproj \
 	codegear/libmfdata/libmfdata.cbproj \
 	codegear/libnotify/libnotify.cbproj \
 	codegear/libodraw/libodraw.cbproj \

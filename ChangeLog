@@ -1,8 +1,11 @@
 TODO
 * imaging handle
-  - add functions fo digest hash print and set
+  - add functions to set the addition digest hash calculations
 * libhashf
   - implement fall back implementations for static compilation
+    - MD5
+    - SHA1
+    - SHA256 test
   - cross platform check, e.g. what about MD5 functions without return value
   - alter configure.ac EVP check to allow separate MD hash support
 * replace libewf split values by libfvalue split string
@@ -260,6 +263,7 @@ Known issues:
 * code clean up
 * ewftools: worked on SHA256 support
 * added SHA256 support
+* updated msvscpp, codegear and builder5 files
 
 20110625
 * updated autoconf/make files

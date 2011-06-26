@@ -14,6 +14,7 @@
       libuna_codepage_iso_8859_14.obj libuna_codepage_iso_8859_15.obj 
       libuna_codepage_iso_8859_16.obj libuna_codepage_koi8_r.obj 
       libuna_codepage_koi8_u.obj libuna_codepage_windows_874.obj 
+      libuna_codepage_windows_932.obj libuna_codepage_windows_936.obj 
       libuna_codepage_windows_1250.obj libuna_codepage_windows_1251.obj 
       libuna_codepage_windows_1252.obj libuna_codepage_windows_1253.obj 
       libuna_codepage_windows_1254.obj libuna_codepage_windows_1255.obj 

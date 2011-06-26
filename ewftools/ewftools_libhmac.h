@@ -1,5 +1,5 @@
 /*
- * The internal libmdhashf header
+ * The internal libhmac header
  *
  * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,21 +19,21 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFTOOLS_LIBMDHASHF_H )
-#define _EWFTOOLS_LIBMDHASHF_H
+#if !defined( _EWFTOOLS_LIBHMAC_H )
+#define _EWFTOOLS_LIBHMAC_H
 
 #include <common.h>
 
-#if defined( HAVE_LOCAL_LIBMDHASHF )
-#include <libmdhashf_definitions.h>
-#include <libmdhashf_md5.h>
-#include <libmdhashf_sha1.h>
-#include <libmdhashf_sha256.h>
-#include <libmdhashf_support.h>
-#include <libmdhashf_types.h>
+#if defined( HAVE_LOCAL_LIBHMAC )
+#include <libhmac_definitions.h>
+#include <libhmac_md5.h>
+#include <libhmac_sha1.h>
+#include <libhmac_sha256.h>
+#include <libhmac_support.h>
+#include <libhmac_types.h>
 
-#elif defined( HAVE_LIBMDHASHF_H )
-#include <libmdhashf.h>
+#elif defined( HAVE_LIBHMAC_H )
+#include <libhmac.h>
 
 #endif
 

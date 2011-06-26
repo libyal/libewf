@@ -8,7 +8,7 @@ AM_CPPFLAGS = \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBMFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
-	@LIBMDHASHF_CPPFLAGS@ \
+	@LIBHMAC_CPPFLAGS@ \
 	@LIBODRAW_CPPFLAGS@ \
 	@LIBSMDEV_CPPFLAGS@ \
 	@LIBSMRAW_CPPFLAGS@ \
@@ -34,7 +34,7 @@ ewfacquire_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
-	ewftools_libmdhashf.h \
+	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
@@ -50,7 +50,7 @@ ewfacquire_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@LIBMDHASHF_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
 	@LIBODRAW_LIBADD@ \
 	@LIBSMDEV_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
@@ -68,7 +68,7 @@ ewfacquirestream_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
-	ewftools_libmdhashf.h \
+	ewftools_libhmac.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
@@ -81,7 +81,7 @@ ewfacquirestream_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@LIBMDHASHF_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
 	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
@@ -111,7 +111,7 @@ ewfexport_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
-	ewftools_libmdhashf.h \
+	ewftools_libhmac.h \
 	ewftools_libsmraw.h \
 	export_handle.c export_handle.h \
 	guid.c guid.h \
@@ -125,7 +125,7 @@ ewfexport_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@LIBMDHASHF_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
 	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
@@ -160,7 +160,7 @@ ewfverify_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
-	ewftools_libmdhashf.h \
+	ewftools_libhmac.h \
 	ewfverify.c \
 	log_handle.c log_handle.h \
 	process_status.c process_status.h \
@@ -172,7 +172,7 @@ ewfverify_LDADD = \
 	../liberror/liberror.la \
 	../libewf/libewf.la \
 	../libsystem/libsystem.la \
-	@LIBMDHASHF_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
 	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \

@@ -41,7 +41,7 @@
 #include "ewfinput.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libsmraw.h"
-#include "ewftools_libmdhashf.h"
+#include "ewftools_libhmac.h"
 #include "export_handle.h"
 #include "guid.h"
 #include "process_status.h"
@@ -321,7 +321,7 @@ int export_handle_free(
 		}
 		if( ( *export_handle )->md5_context != NULL )
 		{
-			if( libmdhashf_md5_free(
+			if( libhmac_md5_free(
 			     &( ( *export_handle )->md5_context ),
 			     error ) != 1 )
 			{
@@ -342,7 +342,7 @@ int export_handle_free(
 		}
 		if( ( *export_handle )->sha1_context != NULL )
 		{
-			if( libmdhashf_sha1_free(
+			if( libhmac_sha1_free(
 			     &( ( *export_handle )->sha1_context ),
 			     error ) != 1 )
 			{
@@ -363,7 +363,7 @@ int export_handle_free(
 		}
 		if( ( *export_handle )->sha256_context != NULL )
 		{
-			if( libmdhashf_sha256_free(
+			if( libhmac_sha256_free(
 			     &( ( *export_handle )->sha256_context ),
 			     error ) != 1 )
 			{
@@ -1516,7 +1516,7 @@ int export_handle_initialize_integrity_hash(
 	}
 	if( export_handle->calculate_md5 != 0 )
 	{
-		if( libmdhashf_md5_initialize(
+		if( libhmac_md5_initialize(
 		     &( export_handle->md5_context ),
 		     error ) != 1 )
 		{
@@ -1533,7 +1533,7 @@ int export_handle_initialize_integrity_hash(
 	}
 	if( export_handle->calculate_sha1 != 0 )
 	{
-		if( libmdhashf_sha1_initialize(
+		if( libhmac_sha1_initialize(
 		     &( export_handle->sha1_context ),
 		     error ) != 1 )
 		{
@@ -1550,7 +1550,7 @@ int export_handle_initialize_integrity_hash(
 	}
 	if( export_handle->calculate_sha256 != 0 )
 	{
-		if( libmdhashf_sha256_initialize(
+		if( libhmac_sha256_initialize(
 		     &( export_handle->sha256_context ),
 		     error ) != 1 )
 		{
@@ -1570,13 +1570,13 @@ int export_handle_initialize_integrity_hash(
 on_error:
 	if( export_handle->sha1_context != NULL )
 	{
-		libmdhashf_sha1_free(
+		libhmac_sha1_free(
 		 &( export_handle->sha1_context ),
 		 NULL );
 	}
 	if( export_handle->md5_context != NULL )
 	{
-		libmdhashf_md5_free(
+		libhmac_md5_free(
 		 &( export_handle->md5_context ),
 		 NULL );
 	}
@@ -1630,7 +1630,7 @@ int export_handle_update_integrity_hash(
 	}
 	if( export_handle->calculate_md5 != 0 )
 	{
-		if( libmdhashf_md5_update(
+		if( libhmac_md5_update(
 		     export_handle->md5_context,
 		     buffer,
 		     buffer_size,
@@ -1648,7 +1648,7 @@ int export_handle_update_integrity_hash(
 	}
 	if( export_handle->calculate_sha1 != 0 )
 	{
-		if( libmdhashf_sha1_update(
+		if( libhmac_sha1_update(
 		     export_handle->sha1_context,
 		     buffer,
 		     buffer_size,
@@ -1666,7 +1666,7 @@ int export_handle_update_integrity_hash(
 	}
 	if( export_handle->calculate_sha256 != 0 )
 	{
-		if( libmdhashf_sha256_update(
+		if( libhmac_sha256_update(
 		     export_handle->sha256_context,
 		     buffer,
 		     buffer_size,
@@ -1692,9 +1692,9 @@ int export_handle_finalize_integrity_hash(
      export_handle_t *export_handle,
      liberror_error_t **error )
 {
-	uint8_t calculated_md5_hash[ LIBMDHASHF_MD5_HASH_SIZE ];
-	uint8_t calculated_sha1_hash[ LIBMDHASHF_SHA1_HASH_SIZE ];
-	uint8_t calculated_sha256_hash[ LIBMDHASHF_SHA256_HASH_SIZE ];
+	uint8_t calculated_md5_hash[ LIBHMAC_MD5_HASH_SIZE ];
+	uint8_t calculated_sha1_hash[ LIBHMAC_SHA1_HASH_SIZE ];
+	uint8_t calculated_sha256_hash[ LIBHMAC_SHA256_HASH_SIZE ];
 
 	static char *function = "export_handle_finalize_integrity_hash";
 
@@ -1722,10 +1722,10 @@ int export_handle_finalize_integrity_hash(
 
 			return( -1 );
 		}
-		if( libmdhashf_md5_finalize(
+		if( libhmac_md5_finalize(
 		     export_handle->md5_context,
 		     calculated_md5_hash,
-		     LIBMDHASHF_MD5_HASH_SIZE,
+		     LIBHMAC_MD5_HASH_SIZE,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1739,7 +1739,7 @@ int export_handle_finalize_integrity_hash(
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_md5_hash,
-		     LIBMDHASHF_MD5_HASH_SIZE,
+		     LIBHMAC_MD5_HASH_SIZE,
 		     export_handle->calculated_md5_hash_string,
 		     33,
 		     error ) != 1 )
@@ -1767,10 +1767,10 @@ int export_handle_finalize_integrity_hash(
 
 			return( -1 );
 		}
-		if( libmdhashf_sha1_finalize(
+		if( libhmac_sha1_finalize(
 		     export_handle->sha1_context,
 		     calculated_sha1_hash,
-		     LIBMDHASHF_SHA1_HASH_SIZE,
+		     LIBHMAC_SHA1_HASH_SIZE,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1784,7 +1784,7 @@ int export_handle_finalize_integrity_hash(
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_sha1_hash,
-		     LIBMDHASHF_SHA1_HASH_SIZE,
+		     LIBHMAC_SHA1_HASH_SIZE,
 		     export_handle->calculated_sha1_hash_string,
 		     41,
 		     error ) != 1 )
@@ -1812,10 +1812,10 @@ int export_handle_finalize_integrity_hash(
 
 			return( -1 );
 		}
-		if( libmdhashf_sha256_finalize(
+		if( libhmac_sha256_finalize(
 		     export_handle->sha256_context,
 		     calculated_sha256_hash,
-		     LIBMDHASHF_SHA256_HASH_SIZE,
+		     LIBHMAC_SHA256_HASH_SIZE,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1829,7 +1829,7 @@ int export_handle_finalize_integrity_hash(
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_sha256_hash,
-		     LIBMDHASHF_SHA256_HASH_SIZE,
+		     LIBHMAC_SHA256_HASH_SIZE,
 		     export_handle->calculated_sha256_hash_string,
 		     41,
 		     error ) != 1 )

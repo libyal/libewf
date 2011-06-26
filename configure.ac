@@ -987,6 +987,7 @@ storage_bus_type = BusTypeUnknown;]] )],
     [ac_cv_libewf_have_winioctl_storage_bus_type=no])
    AC_LANG_POP(C)],
    [ac_cv_libewf_have_winioctl_storage_bus_type=no])
+
   AS_IF(
    [test "x$ac_cv_libewf_have_winioctl_storage_bus_type" = xyes],
    [AC_DEFINE(
@@ -1047,86 +1048,120 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMRAW],
  [test "x$ac_libewf_have_libsmraw" = xlocal])
 
-dnl Check for enabling libmdhashf for message digest hash function support
-LIBEWF_CHECK_LIBMDHASHF
+dnl Check for enabling libhmac for message digest hash function support
+LIBEWF_CHECK_LIBHMAC
 
 AS_IF(
- [test "x$ac_libewf_have_libmdhashf" = xyes],
- [dnl libmdhashf is available
+ [test "x$ac_libewf_have_libhmac" = xyes],
+ [dnl libhmac is available
  AC_SUBST(
-  [libewf_spec_requires_libmdhashf],
-  [libmdhashf])
+  [libewf_spec_requires_libhmac],
+  [libhmac])
  AC_SUBST(
-  [libewf_spec_build_requires_libmdhashf],
-  [libmdhashf-devel])
+  [libewf_spec_build_requires_libhmac],
+  [libhmac-devel])
  AC_SUBST(
-  [LIBMDHASHF_CPPFLAGS],
+  [LIBHMAC_CPPFLAGS],
   [])
  AC_SUBST(
-  [LIBMDHASHF_LIBADD],
+  [LIBHMAC_LIBADD],
   [])
  AC_SUBST(
-  [HAVE_LIBMDHASHF],
+  [HAVE_LIBHMAC],
   [1]) ],
- [dnl libmdhashf is not available, using the (local) version that came with the source package
+ [dnl libhmac is not available, using the (local) version that came with the source package
  AC_DEFINE(
-  [HAVE_LOCAL_LIBMDHASHF],
+  [HAVE_LOCAL_LIBHMAC],
   [1],
-  [Define to 1 if the local version of libmdhashf is used.])
+  [Define to 1 if the local version of libhmac is used.])
  AC_SUBST(
-  [HAVE_LOCAL_LIBMDHASHF],
+  [HAVE_LOCAL_LIBHMAC],
   [1])
  AC_SUBST(
-  [libewf_spec_requires_libmdhashf],
+  [libewf_spec_requires_libhmac],
   [])
  AC_SUBST(
-  [libewf_spec_build_requires_libmdhashf],
+  [libewf_spec_build_requires_libhmac],
   [])
  AC_SUBST(
-  [LIBMDHASHF_CPPFLAGS],
-  [-I../libmdhashf])
+  [LIBHMAC_CPPFLAGS],
+  [-I../libhmac])
  AC_SUBST(
-  [LIBMDHASHF_LIBADD],
-  [../libmdhashf/libmdhashf.la])
+  [LIBHMAC_LIBADD],
+  [../libhmac/libhmac.la])
  AC_SUBST(
-  [HAVE_LIBMDHASHF],
+  [HAVE_LIBHMAC],
   [0])
- ac_libewf_have_libmdhashf=local])
+ ac_libewf_have_libhmac=local])
 
 AM_CONDITIONAL(
- [HAVE_LOCAL_LIBMDHASHF],
- [test "x$ac_libewf_have_libmdhashf" = xlocal])
+ [HAVE_LOCAL_LIBHMAC],
+ [test "x$ac_libewf_have_libhmac" = xlocal])
 
 AS_IF(
- [test "x$ac_libewf_have_libmdhashf" = xlocal],
+ [test "x$ac_libewf_have_libhmac" = xlocal],
  [ac_libewf_have_crypto_support=no],
- [ac_libewf_have_crypto_support=libmdhashf])
+ [ac_libewf_have_crypto_support=libhmac])
 
 AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xlibmdhashf],
- [dnl TODO check if all LIBMDHASHF functions are available])
+ [test "x$ac_libewf_have_crypto_support" = xlibhmac],
+ [dnl TODO check if all LIBHMAC functions are available])
 
 AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xlibmdhashf],
- [ac_libewf_have_md5_support=libmdhashf
- ac_libewf_have_sha1_support=libmdhashf
- ac_libewf_have_sha256_support=libmdhashf])
+ [test "x$ac_libewf_have_crypto_support" = xlibhmac],
+ [ac_libewf_have_md5_support=libhmac
+ ac_libewf_have_sha1_support=libhmac
+ ac_libewf_have_sha256_support=libhmac])
 
 dnl Check for Windows crypto API support
 AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xno],
+ [test "x$ac_cv_libewf_enable_winapi" = xyes],
  [AS_IF(
-  [test "x$ac_cv_libewf_enable_winapi" = xyes],
+  [test "x$ac_libewf_have_crypto_support" = xno],
   [AC_SUBST(
    [LIBCRYPTO_LIBADD],
    [-ladvapi32])
-   ac_libewf_have_crypto_support=libadvapi32]) ])
+   ac_libewf_have_crypto_support=libadvapi32])
+ ])
 
 AS_IF(
  [test "x$ac_libewf_have_crypto_support" = xlibadvapi32],
  [ac_libewf_have_md5_support=libadvapi32
  ac_libewf_have_sha1_support=libadvapi32
  ac_libewf_have_sha256_support=libadvapi32])
+
+AS_IF(
+ [test "x$ac_libewf_have_md5_support" = xlibadvapi32],
+ [LIBEWF_CHECK_WINAPI_DEFINE(
+  [wincrypt.h],
+  [CALG_MD5])
+ AS_IF(
+  [test "x$ac_cv_libewf_winapi_define_CALG_MD5" = xyes],
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_md5_support=local])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_sha1_support" = xlibadvapi32],
+ [LIBEWF_CHECK_WINAPI_DEFINE(
+  [wincrypt.h],
+  [CALG_SHA1])
+ AS_IF(
+  [test "x$ac_cv_libewf_winapi_define_CALG_SHA1" = xyes],
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_sha1_support=local])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_sha256_support" = xlibadvapi32],
+ [LIBEWF_CHECK_WINAPI_DEFINE(
+  [wincrypt.h],
+  [CALG_SHA_256])
+ AS_IF(
+  [test "x$ac_cv_libewf_winapi_define_CALG_SHA_256" = xyes],
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_sha256_support=local])
+ ])
 
 dnl Check for libcrypto openssl EVP support
 AS_IF(
@@ -1765,7 +1800,7 @@ AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libmfdata/Makefile])
 AC_CONFIG_FILES([libfvalue/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
-AC_CONFIG_FILES([libmdhashf/Makefile])
+AC_CONFIG_FILES([libhmac/Makefile])
 AC_CONFIG_FILES([libodraw/Makefile])
 AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])
@@ -1807,7 +1842,7 @@ Building:
    libbfio support:                                 $ac_libewf_have_libbfio
    libmfdata support:                               $ac_libewf_have_libmfdata
    libfvalue support:                               $ac_libewf_have_libfvalue
-   libmdhashf support:                              $ac_libewf_have_libmdhashf
+   libhmac support:                                 $ac_libewf_have_libhmac
    libodraw support:                                $ac_libewf_have_libodraw
    libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw

@@ -4,9 +4,9 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\ewfverify.exe"/>
-    <OBJFILES value="byte_size_string.obj digest_context.obj digest_hash.obj ewfverify.obj 
-      ewfinput.obj ewfoutput.obj log_handle.obj process_status.obj 
-      storage_media_buffer.obj verification_handle.obj"/>
+    <OBJFILES value="byte_size_string.obj digest_hash.obj ewfverify.obj ewfinput.obj 
+      ewfoutput.obj log_handle.obj process_status.obj storage_media_buffer.obj 
+      verification_handle.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -21,10 +21,10 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBHMAC"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="ewfverify.bpf"/>
-    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\ewftools;..\..\..\libsystem;..\..\..\libhmac;..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\ewftools;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -37,8 +37,8 @@
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0x32w.obj $(OBJFILES)"/>
-    <ALLLIB value="libcstring.lib liberror.lib libuna.lib libewf.lib libsystem.lib 
-      import32.lib cw32i.lib"/>
+    <ALLLIB value="libcstring.lib liberror.lib libuna.lib libewf.lib libhmac.lib 
+      libsystem.lib import32.lib cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]

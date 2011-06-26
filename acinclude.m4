@@ -28,6 +28,26 @@ AC_DEFUN([LIBEWF_TEST_WITH],
    [ac_cv_libewf_with_$2=$4])dnl
  ])
 
+dnl Function to detect whether a certain #define is present in a certain WINAPI header
+AC_DEFUN([LIBEWF_CHECK_WINAPI_DEFINE],
+ [AC_CACHE_CHECK(
+  [whether $1 defines $2],
+  [ac_cv_libewf_winapi_define_$2],
+  [AC_LANG_PUSH(C)
+  AC_COMPILE_IFELSE(
+   [AC_LANG_PROGRAM(
+    [[#include <windows.h>
+#include <$1>
+
+#if !defined( $2 )
+#error $2 is not defined
+#endif]]
+    [[]] )],
+   [ac_cv_libewf_winapi_define_$2=yes],
+   [ac_cv_libewf_winapi_define_$2=no])
+   AC_LANG_POP(C) ])
+ ])
+
 dnl Function to detect whether nl_langinfo supports CODESET
 AC_DEFUN([LIBEWF_CHECK_FUNC_LANGINFO_CODESET],
  [AC_CHECK_FUNCS([nl_langinfo])
@@ -1170,19 +1190,19 @@ AC_DEFUN([LIBEWF_CHECK_LIBFVALUE],
   ])
  ])
 
-dnl Function to detect if libmdhashf available
-AC_DEFUN([LIBEWF_CHECK_LIBMDHASHF],
- [AC_CHECK_HEADERS([libmdhashf.h])
+dnl Function to detect if libhmac available
+AC_DEFUN([LIBEWF_CHECK_LIBHMAC],
+ [AC_CHECK_HEADERS([libhmac.h])
 
  AS_IF(
-  [test "x$ac_cv_header_libmdhashf_h" = xno],
-  [ac_libewf_have_libmdhashf=no],
-  [ac_libewf_have_libmdhashf=yes
+  [test "x$ac_cv_header_libhmac_h" = xno],
+  [ac_libewf_have_libhmac=no],
+  [ac_libewf_have_libhmac=yes
   AC_CHECK_LIB(
-   mdhashf,
-   libmdhashf_get_version,
+   hmac,
+   libhmac_get_version,
    [],
-   [ac_libewf_have_libmdhashf=no])
+   [ac_libewf_have_libhmac=no])
 
    ])
   ])

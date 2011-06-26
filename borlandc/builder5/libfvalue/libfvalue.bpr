@@ -4,8 +4,9 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libfvalue.lib"/>
-    <OBJFILES value="libfvalue_array_type.obj libfvalue_debug.obj libfvalue_string.obj 
-      libfvalue_table.obj libfvalue_value.obj libfvalue_value_entry.obj"/>
+    <OBJFILES value="libfvalue_array_type.obj libfvalue_debug.obj libfvalue_split_string.obj 
+      libfvalue_string.obj libfvalue_table.obj libfvalue_value.obj 
+      libfvalue_value_entry.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>

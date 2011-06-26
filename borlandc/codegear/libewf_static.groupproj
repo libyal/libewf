@@ -28,7 +28,10 @@
 				<Dependencies/>
 			</Projects>
 			<Projects Include="libewf\libewf_static.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libmfdata\libmfdata.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib_static.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib_static.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libhmac\libhmac.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="libodraw\libodraw.cbproj">
 				<Dependencies/>
@@ -43,19 +46,19 @@
 				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libcstring\libcstring.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfacquire\ewfacquire_static.cbproj">
-				<Dependencies>liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libsmdev\libsmdev.cbproj;libsmraw\libsmraw.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libsmdev\libsmdev.cbproj;libsmraw\libsmraw.cbproj;libsystem\libsystem.cbproj;libhmac\libhmac.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfacquirestream\ewfacquirestream_static.cbproj">
-				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libhmac\libhmac.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfexport\ewfexport_static.cbproj">
-				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libhmac\libhmac.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfinfo\ewfinfo_static.cbproj">
 				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfverify\ewfverify_static.cbproj">
-				<Dependencies>liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libcstring\libcstring.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libsystem\libsystem.cbproj;libhmac\libhmac.cbproj</Dependencies>
 			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
@@ -146,6 +149,15 @@
 		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libfvalue:Make;zlib_static:Make" Name="libewf_static:Make">
 			<MSBuild Targets="Make" Projects="libewf\libewf_static.cbproj"/>
 		</Target>
+		<Target DependsOnTargets="libcstring;liberror" Name="libhmac">
+			<MSBuild Projects="libhmac\libhmac.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean" Name="libhmac:Clean">
+			<MSBuild Targets="Clean" Projects="libhmac\libhmac.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;liberror:Make" Name="libhmac:Make">
+			<MSBuild Targets="Make" Projects="libhmac\libhmac.cbproj"/>
+		</Target>
 		<Target Name="libodraw">
 			<MSBuild Projects="libodraw\libodraw.cbproj"/>
 		</Target>
@@ -182,31 +194,31 @@
 		<Target DependsOnTargets="liberror:Make;libuna:Make;libcstring:Make" Name="libsystem:Make">
 			<MSBuild Targets="Make" Projects="libsystem\libsystem.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror;libnotify;libuna;libbfio;libewf_static;libsmdev;libsmraw;libsystem;libcstring" Name="ewfacquire_static">
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna;libbfio;libewf_static;libsmdev;libsmraw;libsystem;libhmac" Name="ewfacquire_static">
 			<MSBuild Projects="ewfacquire\ewfacquire_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libewf_static:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;libcstring:Clean" Name="ewfacquire_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libewf_static:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;libhmac:Clean" Name="ewfacquire_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfacquire\ewfacquire_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libewf_static:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;libcstring:Make" Name="ewfacquire_static:Make">
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libewf_static:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;libhmac:Make" Name="ewfacquire_static:Make">
 			<MSBuild Targets="Make" Projects="ewfacquire\ewfacquire_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfacquirestream_static">
+		<Target DependsOnTargets="libcstring;liberror;libuna;libewf_static;libsystem;libhmac" Name="ewfacquirestream_static">
 			<MSBuild Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libcstring:Clean" Name="ewfacquirestream_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libhmac:Clean" Name="ewfacquirestream_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfacquirestream_static:Make">
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libhmac:Make" Name="ewfacquirestream_static:Make">
 			<MSBuild Targets="Make" Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfexport_static">
+		<Target DependsOnTargets="libcstring;liberror;libuna;libewf_static;libsystem;libhmac" Name="ewfexport_static">
 			<MSBuild Projects="ewfexport\ewfexport_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libcstring:Clean" Name="ewfexport_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libhmac:Clean" Name="ewfexport_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfexport\ewfexport_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfexport_static:Make">
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libhmac:Make" Name="ewfexport_static:Make">
 			<MSBuild Targets="Make" Projects="ewfexport\ewfexport_static.cbproj"/>
 		</Target>
 		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfinfo_static">
@@ -218,23 +230,23 @@
 		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfinfo_static:Make">
 			<MSBuild Targets="Make" Projects="ewfinfo\ewfinfo_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror;libuna;libewf_static;libsystem;libcstring" Name="ewfverify_static">
+		<Target DependsOnTargets="libcstring;liberror;libuna;libewf_static;libsystem;libhmac" Name="ewfverify_static">
 			<MSBuild Projects="ewfverify\ewfverify_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libcstring:Clean" Name="ewfverify_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libuna:Clean;libewf_static:Clean;libsystem:Clean;libhmac:Clean" Name="ewfverify_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfverify\ewfverify_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libcstring:Make" Name="ewfverify_static:Make">
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libuna:Make;libewf_static:Make;libsystem:Make;libhmac:Make" Name="ewfverify_static:Make">
 			<MSBuild Targets="Make" Projects="ewfverify\ewfverify_static.cbproj"/>
 		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="libcstring;liberror;libnotify;libuna;libbfio;libmfdata;libfvalue;zlib_static;libewf_static;libodraw;libsmdev;libsmraw;libsystem;ewfacquire_static;ewfacquirestream_static;ewfexport_static;ewfinfo_static;ewfverify_static"/>
+			<CallTarget Targets="libcstring;liberror;libnotify;libuna;libbfio;libmfdata;libfvalue;zlib_static;libewf_static;libhmac;libodraw;libsmdev;libsmraw;libsystem;ewfacquire_static;ewfacquirestream_static;ewfexport_static;ewfinfo_static;ewfverify_static"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libmfdata:Clean;libfvalue:Clean;zlib_static:Clean;libewf_static:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;ewfacquire_static:Clean;ewfacquirestream_static:Clean;ewfexport_static:Clean;ewfinfo_static:Clean;ewfverify_static:Clean"/>
+			<CallTarget Targets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libmfdata:Clean;libfvalue:Clean;zlib_static:Clean;libewf_static:Clean;libhmac:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libsystem:Clean;ewfacquire_static:Clean;ewfacquirestream_static:Clean;ewfexport_static:Clean;ewfinfo_static:Clean;ewfverify_static:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libmfdata:Make;libfvalue:Make;zlib_static:Make;libewf_static:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;ewfacquire_static:Make;ewfacquirestream_static:Make;ewfexport_static:Make;ewfinfo_static:Make;ewfverify_static:Make"/>
+			<CallTarget Targets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libmfdata:Make;libfvalue:Make;zlib_static:Make;libewf_static:Make;libhmac:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libsystem:Make;ewfacquire_static:Make;ewfacquirestream_static:Make;ewfexport_static:Make;ewfinfo_static:Make;ewfverify_static:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>

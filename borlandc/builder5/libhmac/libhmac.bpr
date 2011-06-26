@@ -3,28 +3,25 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\Release\libmfdata.lib"/>
-    <OBJFILES value="libmfdata_array_type.obj libmfdata_cache.obj libmfdata_cache_value.obj 
-      libmfdata_error.obj libmfdata_file.obj libmfdata_file_list.obj 
-      libmfdata_list.obj libmfdata_list_element.obj libmfdata_group.obj 
-      libmfdata_range.obj libmfdata_notify.obj libmfdata_segment.obj 
-      libmfdata_segment_table.obj libmfdata_support.obj"/>
+    <PROJECT value="..\Release\libhmac.lib"/>
+    <OBJFILES value="libhmac_error.obj libhmac_md5.obj libhmac_sha1.obj libhmac_sha256.obj 
+      libhmac_support.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;..\..\..\libmfdata"/>
+    <PATHCPP value=".;..\..\..\libhmac"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBHMAC"/>
     <SYSDEFINES value="NO_STRICT;_RTLDLL"/>
-    <MAINSOURCE value="libmfdata.bpf"/>
-    <INCLUDEPATH value="..\..\..\libmfdata;..\..\..\libbfio;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\..\libmfdata;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <MAINSOURCE value="libhmac.bpf"/>
+    <INCLUDEPATH value="..\..\..\libhmac;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\..\libhmac;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>
@@ -68,15 +65,15 @@ Comments=
 
 [HistoryLists\hlIncludePath]
 Count=4
-Item0=..\..\..\libmfdata;..\..\..\libbfio;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libmfdata;..\..\..\libbfio;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item2=..\..\..\libmfdata;$(BCB)\include;$(BCB)\include\vcl
+Item0=..\..\..\libhmac;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libhmac;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libhmac;$(BCB)\include;$(BCB)\include\vcl
 Item3=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=3
-Item0=..\..\..\libmfdata;$(BCB)\lib\obj;$(BCB)\lib
-Item1=..\..\..\libmfdata;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
+Item0=..\..\..\libhmac;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\..\..\libhmac;$(BCB)\lib\obj;$(BCB)\lib;$(BCB)\lib\PSDK
 Item2=$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
@@ -85,15 +82,15 @@ Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
 Count=4
-Item0=UNICODE;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA
-Item1=WINVER=0x0400;_WIN32_WINNT=0x0400;UNICODE;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA
-Item2=WINNT;UNICODE;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA
-Item3=HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA
+Item0=UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBHMAC
+Item1=WINVER=0x0400;_WIN32_WINNT=0x0400;UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBHMAC
+Item2=WINNT;UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBHMAC
+Item3=HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBHMAC
 
 [HistoryLists\hlIntOutputDir]
 Count=2
 Item0=.
-Item1=..\libmfdata
+Item1=..\libhmac
 
 [HistoryLists\hlFinalOutputDir]
 Count=2
