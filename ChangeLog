@@ -1,4 +1,7 @@
 TODO
+* spec
+  - make flex, yacc and openssl flexible
+* configure move openssl zlib check in to separate function
 * replace system split values by split string
   - info handle line: 1825 replace ->segments by function
   - libsystem_path
@@ -265,8 +268,11 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110627
+* updates to libhmac and configure.ac
+
 20110626
-* refactored ewftools to use libmdhashf
+* refactored ewftools to use libhmac
 * code clean up
 * ewftools: worked on SHA256 support
 * added SHA256 support

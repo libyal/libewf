@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110626],
+ [20110627],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -903,6 +903,396 @@ AM_CONDITIONAL(
  [HAVE_LOCAL_LIBFVALUE],
  [test "x$ac_libewf_have_libfvalue" = xlocal])
 
+dnl Check for message digest hash support
+ac_libewf_have_hmac_support=no
+
+dnl Check for enabling libhmac for message digest hash function support
+LIBEWF_CHECK_LIBHMAC
+
+AS_IF(
+ [test "x$ac_libewf_have_libhmac" = xyes],
+ [dnl libhmac is available
+ AC_SUBST(
+  [libewf_spec_requires_libhmac],
+  [libhmac])
+ AC_SUBST(
+  [libewf_spec_build_requires_libhmac],
+  [libhmac-devel])
+ AC_SUBST(
+  [LIBHMAC_CPPFLAGS],
+  [])
+ AC_SUBST(
+  [LIBHMAC_LIBADD],
+  [])
+ AC_SUBST(
+  [HAVE_LIBHMAC],
+  [1]) ],
+ [dnl libhmac is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBHMAC],
+  [1],
+  [Define to 1 if the local version of libhmac is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBHMAC],
+  [1])
+ AC_SUBST(
+  [libewf_spec_requires_libhmac],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libhmac],
+  [])
+ AC_SUBST(
+  [LIBHMAC_CPPFLAGS],
+  [-I../libhmac])
+ AC_SUBST(
+  [LIBHMAC_LIBADD],
+  [../libhmac/libhmac.la])
+ AC_SUBST(
+  [HAVE_LIBHMAC],
+  [0])
+ ac_libewf_have_libhmac=local])
+
+AM_CONDITIONAL(
+ [HAVE_LOCAL_LIBHMAC],
+ [test "x$ac_libewf_have_libhmac" = xlocal])
+
+AS_IF(
+ [test "x$ac_libewf_have_libhmac" = xlocal],
+ [ac_libewf_have_hmac_support=no],
+ [ac_libewf_have_hmac_support=libhmac])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xlibhmac],
+ [dnl TODO check if all LIBHMAC functions are available])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xlibhmac],
+ [ac_libewf_have_hmac_md5_support=libhmac
+ ac_libewf_have_hmac_sha1_support=libhmac
+ ac_libewf_have_hmac_sha256_support=libhmac])
+
+dnl Check for Windows crypto API support
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xno],
+ [AS_IF(
+  [test "x$ac_cv_libewf_enable_winapi" = xyes],
+  [AC_SUBST(
+   [LIBCRYPTO_LIBADD],
+   [-ladvapi32])
+   ac_libewf_have_hmac_support=libadvapi32])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xlibadvapi32],
+ [ac_libewf_have_hmac_md5_support=libadvapi32
+ ac_libewf_have_hmac_sha1_support=libadvapi32
+ ac_libewf_have_hmac_sha256_support=libadvapi32])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_md5_support" = xlibadvapi32],
+ [LIBEWF_CHECK_WINAPI_DEFINE(
+  [wincrypt.h],
+  [CALG_MD5])
+
+ AS_IF(
+  [test "x$ac_cv_libewf_winapi_define_CALG_MD5" = xyes],
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_md5_support=local])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha1_support" = xlibadvapi32],
+ [LIBEWF_CHECK_WINAPI_DEFINE(
+  [wincrypt.h],
+  [CALG_SHA1])
+
+ AS_IF(
+  [test "x$ac_cv_libewf_winapi_define_CALG_SHA1" = xyes],
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_sha1_support=local])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha256_support" = xlibadvapi32],
+ [LIBEWF_CHECK_WINAPI_DEFINE(
+  [wincrypt.h],
+  [CALG_SHA_256])
+
+ AS_IF(
+  [test "x$ac_cv_libewf_winapi_define_CALG_SHA_256" = xyes],
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_sha256_support=local])
+ ])
+
+dnl Check for libcrypto (openssl) EVP support
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xno],
+ [AC_CHECK_HEADERS([openssl/evp.h openssl/opensslv.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_evp_h" = xyes],
+  [LIBEWF_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE
+
+  AS_IF(
+   [test "x$ac_cv_libewf_openssl_evp_zlib_compatible" = xyes],
+   [ac_libewf_have_hmac_support=libcrypto_evp],
+   [ac_libewf_have_hmac_support=no]) ],
+  [ac_libewf_have_hmac_support=no])
+ ])
+
+dnl Check if all required libcrypto (openssl) EVP MD functions are available
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xlibcrypto_evp],
+ [AC_CHECK_LIB(
+  crypto,
+  EVP_MD_CTX_init,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_support=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_MD_CTX_cleanup,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_support=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_DigestInit_ex,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_support=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_DigestUpdate,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_support=no])
+ AC_CHECK_LIB(
+  crypto,
+  EVP_DigestFinal_ex,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_support=no])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xlibcrypto_evp],
+ [ac_libewf_have_openssl_evp=yes
+ ac_libewf_have_libcrypto=yes
+ ac_libewf_have_hmac_md5_support=libcrypto_evp
+ ac_libewf_have_hmac_sha1_support=libcrypto_evp
+ ac_libewf_have_hmac_sha256_support=libcrypto_evp])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_md5_support" = xlibcrypto_evp],
+ [AC_CHECK_LIB(
+  crypto,
+  EVP_md5,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_md5_support=no])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha1_support" = xlibcrypto_evp],
+ [AC_CHECK_LIB(
+  crypto,
+  EVP_sha1,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_sha1_support=no])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha256_support" = xlibcrypto_evp],
+ [AC_CHECK_LIB(
+  crypto,
+  EVP_sha256,
+  [ac_libewf_dummy=yes],
+  [ac_libewf_have_hmac_sha256_support=no])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xno],
+ [ac_libewf_have_hmac_md5_support=no
+ ac_libewf_have_hmac_sha1_support=no
+ ac_libewf_have_hmac_sha256_support=no])
+
+dnl Check for libcrypto (openssl) MD5 support
+AS_IF(
+ [test "x$ac_libewf_have_hmac_md5_support" = xno],
+ [AC_CHECK_HEADERS([openssl/md5.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_md5_h" = xyes],
+  [ac_libewf_have_hmac_md5_support=libcrypto
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Init,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_md5_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_md5_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_md5_support=no])
+  ])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_md5_support" != xno],
+ [ac_libewf_have_libcrypto=yes],
+ [ac_libewf_have_hmac_md5_support=local])
+
+dnl Check for libcrypto (openssl) SHA1 support
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha1_support" = xno],
+ [AC_CHECK_HEADERS([openssl/sha.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_sha1_h" = xyes],
+  [ac_libewf_have_hmac_sha1_support=libcrypto
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Init,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha1_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha1_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha1_support=no])
+  ])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha1_support" != xno],
+ [ac_libewf_have_libcrypto=yes],
+ [ac_libewf_have_hmac_sha1_support=local])
+
+dnl Check for libcrypto (openssl) SHA256 support
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha256_support" = xno],
+ [AC_CHECK_HEADERS([openssl/sha.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_sha256_h" = xyes],
+  [ac_libewf_have_hmac_sha256_support=libcrypto
+  AC_CHECK_LIB(
+   crypto,
+   SHA256_Init,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha256_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA256_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha256_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA256_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha256_support=no])
+  ])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha256_support" != xno],
+ [ac_libewf_have_libcrypto=yes],
+ [ac_libewf_have_hmac_sha256_support=local])
+
+dnl Setup libcrypto (openssl) parameters
+AS_IF(
+ [test "x$ac_libewf_have_openssl_evp" = xyes],
+ [AC_DEFINE(
+  [HAVE_OPENSSL_EVP_H],
+  [1],
+  [Define to 1 if you have the <openssl/evp.h> header file.])
+ AC_SUBST(
+  [HAVE_OPENSSL_EVP_H],
+  [1]) ],
+ [AC_SUBST(
+  [HAVE_OPENSSL_EVP_H],
+  [0])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_libcrypto" = xyes],
+ [AC_SUBST(
+  [LIBCRYPTO_LIBADD],
+  ["-lcrypto"])
+ AC_DEFINE(
+  [HAVE_LIBCRYPTO],
+  [1],
+  [Define to 1 if you have the 'crypto' library (-lcrypto).])
+ dnl Enforce the dynamic loader library to be included if available
+ AC_CHECK_LIB(
+  dl,
+  dlopen,
+  [AC_SUBST(
+   [LIBDL_LIBADD],
+   ["-ldl"])],
+  [])
+ ])
+
+dnl Check for enabling libodraw for optical disc (split) RAW support
+LIBEWF_CHECK_LIBODRAW
+
+AS_IF(
+ [test "x$ac_libewf_have_libodraw" = xyes],
+ [dnl libodraw is available
+ AC_SUBST(
+  [libewf_spec_requires_libodraw],
+  [libodraw])
+ AC_SUBST(
+  [libewf_spec_build_requires_libodraw],
+  [libodraw-devel])
+ AC_SUBST(
+  [LIBODRAW_CPPFLAGS],
+  [])
+ AC_SUBST(
+  [LIBODRAW_LIBADD],
+  [])
+ AC_SUBST(
+  [HAVE_LIBODRAW],
+  [1]) ],
+ [dnl libodraw is not available, using the (local) version that came with the source package
+ AC_DEFINE(
+  [HAVE_LOCAL_LIBODRAW],
+  [1],
+  [Define to 1 if the local version of libodraw is used.])
+ AC_SUBST(
+  [HAVE_LOCAL_LIBODRAW],
+  [1])
+ AC_SUBST(
+  [libewf_spec_requires_libodraw],
+  [])
+ AC_SUBST(
+  [libewf_spec_build_requires_libodraw],
+  [])
+ AC_SUBST(
+  [LIBODRAW_CPPFLAGS],
+  [-I../libodraw])
+ AC_SUBST(
+  [LIBODRAW_LIBADD],
+  [../libodraw/libodraw.la])
+ AC_SUBST(
+  [HAVE_LIBODRAW],
+  [0])
+ ac_libewf_have_libodraw=local])
+
+AM_CONDITIONAL(
+ [HAVE_LOCAL_LIBODRAW],
+ [test "x$ac_libewf_have_libodraw" = xlocal])
+
+AS_IF(
+ [test "x$ac_libewf_have_libodraw" = xlocal],
+ [AM_PROG_LEX
+ AC_PROG_YACC])
+
 dnl Check for enabling libsmdev for storage media device support
 LIBEWF_CHECK_LIBSMDEV
 
@@ -1064,396 +1454,6 @@ AS_IF(
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBSMRAW],
  [test "x$ac_libewf_have_libsmraw" = xlocal])
-
-dnl Check for enabling libhmac for message digest hash function support
-LIBEWF_CHECK_LIBHMAC
-
-AS_IF(
- [test "x$ac_libewf_have_libhmac" = xyes],
- [dnl libhmac is available
- AC_SUBST(
-  [libewf_spec_requires_libhmac],
-  [libhmac])
- AC_SUBST(
-  [libewf_spec_build_requires_libhmac],
-  [libhmac-devel])
- AC_SUBST(
-  [LIBHMAC_CPPFLAGS],
-  [])
- AC_SUBST(
-  [LIBHMAC_LIBADD],
-  [])
- AC_SUBST(
-  [HAVE_LIBHMAC],
-  [1]) ],
- [dnl libhmac is not available, using the (local) version that came with the source package
- AC_DEFINE(
-  [HAVE_LOCAL_LIBHMAC],
-  [1],
-  [Define to 1 if the local version of libhmac is used.])
- AC_SUBST(
-  [HAVE_LOCAL_LIBHMAC],
-  [1])
- AC_SUBST(
-  [libewf_spec_requires_libhmac],
-  [])
- AC_SUBST(
-  [libewf_spec_build_requires_libhmac],
-  [])
- AC_SUBST(
-  [LIBHMAC_CPPFLAGS],
-  [-I../libhmac])
- AC_SUBST(
-  [LIBHMAC_LIBADD],
-  [../libhmac/libhmac.la])
- AC_SUBST(
-  [HAVE_LIBHMAC],
-  [0])
- ac_libewf_have_libhmac=local])
-
-AM_CONDITIONAL(
- [HAVE_LOCAL_LIBHMAC],
- [test "x$ac_libewf_have_libhmac" = xlocal])
-
-AS_IF(
- [test "x$ac_libewf_have_libhmac" = xlocal],
- [ac_libewf_have_crypto_support=no],
- [ac_libewf_have_crypto_support=libhmac])
-
-AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xlibhmac],
- [dnl TODO check if all LIBHMAC functions are available])
-
-AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xlibhmac],
- [ac_libewf_have_md5_support=libhmac
- ac_libewf_have_sha1_support=libhmac
- ac_libewf_have_sha256_support=libhmac])
-
-dnl Check for Windows crypto API support
-AS_IF(
- [test "x$ac_cv_libewf_enable_winapi" = xyes],
- [AS_IF(
-  [test "x$ac_libewf_have_crypto_support" = xno],
-  [AC_SUBST(
-   [LIBCRYPTO_LIBADD],
-   [-ladvapi32])
-   ac_libewf_have_crypto_support=libadvapi32])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xlibadvapi32],
- [ac_libewf_have_md5_support=libadvapi32
- ac_libewf_have_sha1_support=libadvapi32
- ac_libewf_have_sha256_support=libadvapi32])
-
-AS_IF(
- [test "x$ac_libewf_have_md5_support" = xlibadvapi32],
- [LIBEWF_CHECK_WINAPI_DEFINE(
-  [wincrypt.h],
-  [CALG_MD5])
- AS_IF(
-  [test "x$ac_cv_libewf_winapi_define_CALG_MD5" = xyes],
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_md5_support=local])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_sha1_support" = xlibadvapi32],
- [LIBEWF_CHECK_WINAPI_DEFINE(
-  [wincrypt.h],
-  [CALG_SHA1])
- AS_IF(
-  [test "x$ac_cv_libewf_winapi_define_CALG_SHA1" = xyes],
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_sha1_support=local])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_sha256_support" = xlibadvapi32],
- [LIBEWF_CHECK_WINAPI_DEFINE(
-  [wincrypt.h],
-  [CALG_SHA_256])
- AS_IF(
-  [test "x$ac_cv_libewf_winapi_define_CALG_SHA_256" = xyes],
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_sha256_support=local])
- ])
-
-dnl Check for libcrypto (openssl) EVP support
-AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xno],
- [AC_CHECK_HEADERS([openssl/evp.h openssl/opensslv.h])
-
- AS_IF(
-  [test "x$ac_cv_header_openssl_evp_h" = xyes],
-  [AC_LANG_PUSH(C)
-  AC_MSG_CHECKING(
-   [if openssl/evp.h can be used in combination with zlib.h])
-  AC_LINK_IFELSE(
-   [AC_LANG_PROGRAM(
-    [[#include <zlib.h>
-#include <openssl/evp.h>]],
-    [[ ]] )],
-    [AC_MSG_RESULT(
-     [yes])
-    AC_DEFINE(
-     [HAVE_OPENSSL_EVP_H],
-     [1],
-     [Define to 1 if you have the <openssl/evp.h> header file.])
-    AC_SUBST(
-     [HAVE_OPENSSL_EVP_H],
-     [1])
-    ac_libewf_have_crypto_support=libcrypto_evp],
-   [AC_MSG_RESULT(
-    [no])
-   ac_libewf_have_crypto_support=no])
-  AC_LANG_POP(C)],
-  [ac_libewf_have_crypto_support=no])
- ])
-
-dnl Check if all required libcrypto (openssl) EVP functions are available
-AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xlibcrypto_evp],
- [AC_CHECK_LIB(
-  crypto,
-  EVP_MD_CTX_init,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_crypto_support=no])
- AC_CHECK_LIB(
-  crypto,
-  EVP_MD_CTX_cleanup,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_crypto_support=no])
- AC_CHECK_LIB(
-  crypto,
-  EVP_DigestInit_ex,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_crypto_support=no])
- AC_CHECK_LIB(
-  crypto,
-  EVP_DigestUpdate,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_crypto_support=no])
- AC_CHECK_LIB(
-  crypto,
-  EVP_DigestFinal_ex,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_crypto_support=no])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xlibcrypto_evp],
- [ac_libewf_have_md5_support=libcrypto_evp
- ac_libewf_have_sha1_support=libcrypto_evp
- ac_libewf_have_sha256_support=libcrypto_evp],
- [AC_SUBST(
-  [HAVE_OPENSSL_EVP_H],
-  [0])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_md5_support" = xlibcrypto_evp],
- [AC_CHECK_LIB(
-  crypto,
-  EVP_md5,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_md5_support=no])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_sha1_support" = xlibcrypto_evp],
- [AC_CHECK_LIB(
-  crypto,
-  EVP_sha1,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_sha1_support=no])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_sha256_support" = xlibcrypto_evp],
- [AC_CHECK_LIB(
-  crypto,
-  EVP_sha256,
-  [ac_libewf_dummy=yes],
-  [ac_libewf_have_sha256_support=no])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_crypto_support" = xno],
- [ac_libewf_have_md5_support=no
- ac_libewf_have_sha1_support=no
- ac_libewf_have_sha256_support=no])
-
-dnl Check for libcrypto (openssl) MD5 support
-AS_IF(
- [test "x$ac_libewf_have_md5_support" = xno],
- [AC_CHECK_HEADERS([openssl/md5.h])
-
- AS_IF(
-  [test "x$ac_cv_header_openssl_md5_h" = xyes],
-  [ac_libewf_have_md5_support=libcrypto
-  AC_CHECK_LIB(
-   crypto,
-   MD5_Init,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_md5_support=no])
-  AC_CHECK_LIB(
-   crypto,
-   MD5_Update,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_md5_support=no])
-  AC_CHECK_LIB(
-   crypto,
-   MD5_Final,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_md5_support=no])
-  ])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_md5_support" = xno],
- [AC_MSG_NOTICE(
-  [No support for calculating MD5 hashes, if required install libcrypto (openssl) with MD5 support or Windows Crypto API.])
- ])
-
-dnl Check for libcrypto (openssl) SHA1 support
-AS_IF(
- [test "x$ac_libewf_have_sha1_support" = xno],
- [AC_CHECK_HEADERS([openssl/sha.h])
-
- AS_IF(
-  [test "x$ac_cv_header_openssl_sha1_h" = xyes],
-  [ac_libewf_have_sha1_support=libcrypto
-  AC_CHECK_LIB(
-   crypto,
-   SHA1_Init,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_sha1_support=no])
-  AC_CHECK_LIB(
-   crypto,
-   SHA1_Update,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_sha1_support=no])
-  AC_CHECK_LIB(
-   crypto,
-   SHA1_Final,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_sha1_support=no])
-  ])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_sha1_support" = xno],
- [AC_MSG_NOTICE(
-  [No support for calculating SHA1 hashes, if required install libcrypto (openssl) with SHA1 support or Windows Crypto API.])
- ])
-
-dnl Check for libcrypto (openssl) SHA256 support
-AS_IF(
- [test "x$ac_libewf_have_sha256_support" = xno],
- [AC_CHECK_HEADERS([openssl/sha.h])
-
- AS_IF(
-  [test "x$ac_cv_header_openssl_sha256_h" = xyes],
-  [ac_libewf_have_sha256_support=libcrypto
-  AC_CHECK_LIB(
-   crypto,
-   SHA256_Init,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_sha256_support=no])
-  AC_CHECK_LIB(
-   crypto,
-   SHA256_Update,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_sha256_support=no])
-  AC_CHECK_LIB(
-   crypto,
-   SHA256_Final,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_sha256_support=no])
-  ])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_sha256_support" = xno],
- [AC_MSG_NOTICE(
-  [No support for calculating SHA256 hashes, if required install libcrypto (openssl) with SHA256 support or Windows Crypto API.])
- ])
-
-AS_IF(
- [test "x$ac_libewf_have_md5_support" = xlibcrypto_evp || test "x$ac_libewf_have_md5_support" = xlibcrypto],
- [AC_SUBST(
-  [LIBCRYPTO_LIBADD],
-  ["-lcrypto"])
- AC_DEFINE(
-  [HAVE_LIBCRYPTO],
-  [1],
-  [Define to 1 if you have the 'crypto' library (-lcrypto).])
- dnl Enforce the dynamic loader library to be included if available
- AC_CHECK_LIB(
-  dl,
-  dlopen,
-  [AC_SUBST(
-   [LIBDL_LIBADD],
-   ["-ldl"])],
-  [])
- ])
-
-dnl Check for enabling libodraw for optical disc (split) RAW support
-LIBEWF_CHECK_LIBODRAW
-
-AS_IF(
- [test "x$ac_libewf_have_libodraw" = xyes],
- [dnl libodraw is available
- AC_SUBST(
-  [libewf_spec_requires_libodraw],
-  [libodraw])
- AC_SUBST(
-  [libewf_spec_build_requires_libodraw],
-  [libodraw-devel])
- AC_SUBST(
-  [LIBODRAW_CPPFLAGS],
-  [])
- AC_SUBST(
-  [LIBODRAW_LIBADD],
-  [])
- AC_SUBST(
-  [HAVE_LIBODRAW],
-  [1]) ],
- [dnl libodraw is not available, using the (local) version that came with the source package
- AC_DEFINE(
-  [HAVE_LOCAL_LIBODRAW],
-  [1],
-  [Define to 1 if the local version of libodraw is used.])
- AC_SUBST(
-  [HAVE_LOCAL_LIBODRAW],
-  [1])
- AC_SUBST(
-  [libewf_spec_requires_libodraw],
-  [])
- AC_SUBST(
-  [libewf_spec_build_requires_libodraw],
-  [])
- AC_SUBST(
-  [LIBODRAW_CPPFLAGS],
-  [-I../libodraw])
- AC_SUBST(
-  [LIBODRAW_LIBADD],
-  [../libodraw/libodraw.la])
- AC_SUBST(
-  [HAVE_LIBODRAW],
-  [0])
- ac_libewf_have_libodraw=local])
-
-AM_CONDITIONAL(
- [HAVE_LOCAL_LIBODRAW],
- [test "x$ac_libewf_have_libodraw" = xlocal])
-
-AS_IF(
- [test "x$ac_libewf_have_libodraw" = xlocal],
- [AM_PROG_LEX
- AC_PROG_YACC])
 
 dnl Check for enabling GUID/UUID support
 AS_IF(
@@ -1878,9 +1878,9 @@ Building:
    libodraw support:                                $ac_libewf_have_libodraw
    libsmdev support:                                $ac_libewf_have_libsmdev
    libsmraw support:                                $ac_libewf_have_libsmraw
-   MD5 support:                                     $ac_libewf_have_md5_support
-   SHA1 support:                                    $ac_libewf_have_sha1_support
-   SHA256 support:                                  $ac_libewf_have_sha256_support
+   MD5 support:                                     $ac_libewf_have_hmac_md5_support
+   SHA1 support:                                    $ac_libewf_have_hmac_sha1_support
+   SHA256 support:                                  $ac_libewf_have_hmac_sha256_support
    GUID/UUID support:                               $ac_libewf_have_guid_support
 
 Features:

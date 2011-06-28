@@ -387,6 +387,22 @@ posix_fadvise( 0, 0, 0, POSIX_FADV_SEQUENTIAL )]] )],
   ])
  ])
 
+dnl Function to detect whether openssl/evp.h can be used in combination with zlib.h
+AC_DEFUN([LIBEWF_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE],
+ [AC_CACHE_CHECK(
+  [if openssl/evp.h can be used in combination with zlib.h],
+  [ac_cv_libewf_openssl_evp_zlib_compatible],
+  [AC_LANG_PUSH(C)
+  AC_LINK_IFELSE(
+   [AC_LANG_PROGRAM(
+    [[#include <zlib.h>
+#include <openssl/evp.h>]],
+    [[ ]] )],
+   [ac_cv_libewf_openssl_evp_zlib_compatible=yes],
+   [ac_cv_libewf_openssl_evp_zlib_compatible=no])
+  AC_LANG_POP(C)])
+ ])
+
 dnl Function to detect if libuna available
 AC_DEFUN([LIBEWF_CHECK_LIBUNA],
  [AC_CHECK_HEADERS([libuna.h])
