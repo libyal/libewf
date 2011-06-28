@@ -4902,6 +4902,7 @@ ssize_t libewf_section_table_header_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format LIBEWF_ATTRIBUTE_UNUSED,
          uint32_t *number_of_offsets,
          uint64_t *base_offset,
          liberror_error_t **error )
@@ -4913,6 +4914,8 @@ ssize_t libewf_section_table_header_read(
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( format )
 
 	if( section == NULL )
 	{
@@ -5064,7 +5067,10 @@ ssize_t libewf_section_table_header_read(
 			 "%s: table contains no offsets.\n",
 			 function );
 		}
-		else if( *number_of_offsets > EWF_MAXIMUM_OFFSETS_IN_TABLE )
+		else if( ( ( format != LIBEWF_FORMAT_ENCASE6 )
+		       &&  ( *number_of_offsets > EWF_MAXIMUM_OFFSETS_IN_TABLE ) )
+		      || ( ( format == LIBEWF_FORMAT_ENCASE6 )
+		       &&  ( *number_of_offsets > EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6 ) ) )
 		{
 			libnotify_printf(
 			 "%s: number of offsets: %" PRIu32 " exceeds maximum: %d.\n",

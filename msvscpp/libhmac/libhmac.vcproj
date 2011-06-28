@@ -177,6 +177,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\libhmac\libhmac_byte_stream.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libhmac\libhmac_definitions.h"
 				>
 			</File>

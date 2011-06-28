@@ -268,6 +268,12 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110628
+* changed direction of >= in ewftools to <=
+* updated manuals
+* fix for EWF_MAXIMUM_OFFSETS_IN_TABLE being applied to the ENCASE6 format
+  instead of EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6
+
 20110627
 * updates to libhmac and configure.ac
 

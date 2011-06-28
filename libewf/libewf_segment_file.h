@@ -113,6 +113,7 @@ int libewf_segment_file_read(
 ssize_t libewf_segment_file_read_table_section(
          libewf_segment_file_t *segment_file,
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
@@ -123,6 +124,7 @@ ssize_t libewf_segment_file_read_table_section(
 ssize_t libewf_segment_file_read_table2_section(
          libewf_segment_file_t *segment_file,
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_chunk_table_t *chunk_table,

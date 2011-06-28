@@ -700,6 +700,7 @@ on_error:
 ssize_t libewf_segment_file_read_table_section(
          libewf_segment_file_t *segment_file,
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
@@ -734,6 +735,17 @@ ssize_t libewf_segment_file_read_table_section(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( chunk_table == NULL )
 	{
 		liberror_error_set(
@@ -751,6 +763,7 @@ ssize_t libewf_segment_file_read_table_section(
 	              section,
 	              file_io_pool,
 	              file_io_pool_entry,
+	              io_handle->format,
 	              &number_of_offsets,
 	              &base_offset,
 	              error );
@@ -830,6 +843,7 @@ ssize_t libewf_segment_file_read_table_section(
 ssize_t libewf_segment_file_read_table2_section(
          libewf_segment_file_t *segment_file,
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_chunk_table_t *chunk_table,
@@ -863,6 +877,17 @@ ssize_t libewf_segment_file_read_table2_section(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( chunk_table == NULL )
 	{
 		liberror_error_set(
@@ -878,6 +903,7 @@ ssize_t libewf_segment_file_read_table2_section(
 	              section,
 	              file_io_pool,
 	              file_io_pool_entry,
+	              io_handle->format,
 	              &number_of_offsets,
 	              &base_offset,
 	              error );

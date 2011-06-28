@@ -40,43 +40,32 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<None Include="..\..\..\libhmac\libhmac_types.h">
-				<BuildOrder>0</BuildOrder>
+			</None>
+			<None Include="..\..\..\libhmac\libhmac_byte_stream.h">
 			</None>
 			<None Include="..\..\..\libhmac\libhmac_definitions.h">
-				<BuildOrder>1</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libhmac\libhmac_error.c">
-				<BuildOrder>2</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libhmac\libhmac_error.h">
-				<BuildOrder>3</BuildOrder>
 			</None>
 			<None Include="..\..\..\libhmac\libhmac_extern.h">
-				<BuildOrder>4</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libhmac\libhmac_md5.c">
-				<BuildOrder>5</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libhmac\libhmac_md5.h">
-				<BuildOrder>6</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libhmac\libhmac_sha1.c">
-				<BuildOrder>7</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libhmac\libhmac_sha1.h">
-				<BuildOrder>8</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libhmac\libhmac_sha256.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libhmac\libhmac_sha256.h">
-				<BuildOrder>10</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libhmac\libhmac_support.c">
-				<BuildOrder>11</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libhmac\libhmac_support.h">
-				<BuildOrder>12</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

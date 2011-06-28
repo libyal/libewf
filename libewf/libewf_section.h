@@ -288,6 +288,7 @@ ssize_t libewf_section_table_header_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format,
          uint32_t *number_of_offsets,
          uint64_t *base_offset,
          liberror_error_t **error );

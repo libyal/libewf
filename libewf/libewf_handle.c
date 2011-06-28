@@ -2973,6 +2973,7 @@ int libewf_handle_open_read_segment_files(
 					read_count = libewf_segment_file_read_table_section(
 						      segment_file,
 						      section,
+						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      internal_handle->media_values,
@@ -3086,6 +3087,7 @@ int libewf_handle_open_read_segment_files(
 					read_count = libewf_segment_file_read_table2_section(
 						      segment_file,
 						      section,
+						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      chunk_table,

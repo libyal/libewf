@@ -1228,7 +1228,7 @@ int ewfinput_get_size_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ",
+		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " <= value <= %" PRIu64 ") [%" PRIu64 "]: ",
 		 request_string,
 		 minimum_size,
 		 maximum_size,
@@ -1445,7 +1445,7 @@ int ewfinput_get_byte_size_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIs_LIBCSTRING_SYSTEM " >= value >= %" PRIs_LIBCSTRING_SYSTEM ") [%" PRIs_LIBCSTRING_SYSTEM "]: ",
+		 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIs_LIBCSTRING_SYSTEM " <= value <= %" PRIs_LIBCSTRING_SYSTEM ") [%" PRIs_LIBCSTRING_SYSTEM "]: ",
 		 request_string,
 		 minimum_size_string,
 		 maximum_size_string,

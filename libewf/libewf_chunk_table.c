@@ -529,6 +529,7 @@ int libewf_chunk_table_read_offsets(
 	              section,
 	              file_io_pool,
 	              file_io_pool_entry,
+	              chunk_table->io_handle->format,
 	              &number_of_offsets,
 	              &base_offset,
 	              error );
