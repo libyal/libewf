@@ -880,7 +880,6 @@ ssize_t libewf_section_last_write(
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
-         uint8_t format,
          uint8_t ewf_format,
          liberror_error_t **error )
 {

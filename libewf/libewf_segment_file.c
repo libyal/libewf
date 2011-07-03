@@ -1815,7 +1815,6 @@ ssize_t libewf_segment_file_write_last_section(
 		       last_section_type,
 		       4,
 		       section_offset,
-		       io_handle->format,
 		       io_handle->ewf_format,
 	               error );
 
