@@ -1727,13 +1727,15 @@ int info_handle_header_value_extents_fprint(
 {
 	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
-	libsystem_split_string_t *extents_elements = NULL;
-	static char *function                      = "info_handle_header_value_extents_fprint";
-	size_t header_value_length                 = 0;
-	size_t header_value_size                   = INFO_HANDLE_VALUE_SIZE;
-	int number_of_segments                     = 0;
-	int result                                 = 0;
-	int segment_index                          = 0;
+	libcstring_system_character_t *string_segment = NULL;
+	libsystem_split_string_t *extents_elements    = NULL;
+	static char *function                         = "info_handle_header_value_extents_fprint";
+	size_t header_value_length                    = 0;
+	size_t header_value_size                      = INFO_HANDLE_VALUE_SIZE;
+	size_t string_segment_size                    = 0;
+	int number_of_segments                        = 0;
+	int result                                    = 0;
+	int segment_index                             = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1824,10 +1826,29 @@ int info_handle_header_value_extents_fprint(
 		}
 		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\tExtents:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 extents_elements->segments[ 0 ] );
+			if( libsystem_split_string_get_segment_by_index(
+			     extents_elements,
+			     0,
+			     &string_segment,
+			     &string_segment_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve string segment: 0.",
+				 function );
+
+				goto on_error;
+			}
+			if( string_segment != NULL )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\tExtents:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 string_segment );
+			}
 		}
 		if( number_of_segments > 1 )
 		{
@@ -1839,35 +1860,63 @@ int info_handle_header_value_extents_fprint(
 			}
 			for( segment_index = 1;
 			     segment_index < number_of_segments;
-			     segment_index += 4 )
+			     segment_index++ )
 			{
-				fprintf(
-				 info_handle->notify_stream,
-				 "\t\t\t\t" );
-
-				if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+				if( ( segment_index % 4 ) == 1 )
 				{
 					fprintf(
 					 info_handle->notify_stream,
-					 "<extent>" );
-				}
-				fprintf(
-				 info_handle->notify_stream,
-				 "%" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM " %" PRIs_LIBCSTRING_SYSTEM "",
-				 extents_elements->segments[ segment_index ],
-				 extents_elements->segments[ segment_index + 1 ],
-				 extents_elements->segments[ segment_index + 2 ],
-				 extents_elements->segments[ segment_index + 3 ] );
+					 "\t\t\t\t" );
 
-				if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+					if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+					{
+						fprintf(
+						 info_handle->notify_stream,
+						 "<extent>" );
+					}
+				}
+				if( libsystem_split_string_get_segment_by_index(
+				     extents_elements,
+				     segment_index,
+				     &string_segment,
+				     &string_segment_size,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve string segment: %d.",
+					 function,
+					 segment_index );
+
+					goto on_error;
+				}
+				if( string_segment != NULL )
 				{
 					fprintf(
 					 info_handle->notify_stream,
-					 "</extent>" );
+					 "%" PRIs_LIBCSTRING_SYSTEM "",
+					 string_segment );
 				}
-				fprintf(
-				 info_handle->notify_stream,
-				 "\n" );
+				if( ( segment_index % 4 ) != 0 )
+				{
+					fprintf(
+					 info_handle->notify_stream,
+					 " " );
+				}
+				else
+				{
+					if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+					{
+						fprintf(
+						 info_handle->notify_stream,
+						 "</extent>" );
+					}
+					fprintf(
+					 info_handle->notify_stream,
+					 "\n" );
+				}
 			}
 			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 			{

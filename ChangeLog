@@ -1,10 +1,6 @@
 TODO
-* spec
-  - make flex, yacc and openssl flexible
-* configure move openssl zlib check in to separate function
 * replace system split values by split string
-  - info handle line: 1825 replace ->segments by function
-  - libsystem_path
+  - libsystem_path, add set segment function ?
 * replace libewf split values by libfvalue split string
 * imaging handle
   - add functions to set the addition digest hash calculations
@@ -249,6 +245,9 @@ Tests
 * implement pyewf tests
 
 Deployment:
+* configure move openssl zlib check in to separate function
+* spec file
+  - make flex, yacc and openssl flexible
 * add BORLANDC deprecated function support, unable to find suitable macro
   #pragma deprecated( function )
   __declspec(deprecated)
@@ -267,6 +266,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110712
+* info handle: replaced ->segments by functions
 
 20110703
 * worked on libhmac SHA1 fallback implementation

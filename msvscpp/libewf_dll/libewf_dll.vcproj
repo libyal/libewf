@@ -133,6 +133,7 @@
 				AdditionalDependencies="zlib.lib"
 				OutputFile="$(OutDir)\libewf.dll"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				GenerateDebugInformation="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)\libewf.lib"
