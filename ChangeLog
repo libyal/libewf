@@ -1,7 +1,11 @@
 TODO
-* replace system split values by split string
-  - libsystem_path, add set segment function ?
 * replace libewf split values by libfvalue split string
+  - libewf_header_values
+  - libewf_single_files
+* libewf_date_time_values_copy_to_timestamp
+  - check ranges of values
+* libewf_convert_date_header_value
+  - check ranges of values
 * imaging handle
   - add functions to set the addition digest hash calculations
 * libhashf
@@ -267,8 +271,14 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
+20110713
+* updated libsystem: worked on replacing ->segments by functions
+* updated libfvalue
+* worked on replacing libewf split values by libfvalue split string
+
 20110712
 * info handle: replaced ->segments by functions
+* updated libsystem: worked on replacing ->segments by functions
 
 20110703
 * worked on libhmac SHA1 fallback implementation

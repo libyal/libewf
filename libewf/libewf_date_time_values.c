@@ -39,7 +39,6 @@
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
 #include "libewf_libfvalue.h"
-#include "libewf_split_values.h"
 
 /* Copies date and time values string from a timestamp
  * The string must be at least 20 characters + the length of the timezone string and/or timezone name of size including the end of string character
@@ -318,8 +317,13 @@ int libewf_date_time_values_copy_to_timestamp(
 {
 	struct tm time_elements;
 
-	libewf_split_values_t *date_time_elements = NULL;
-	static char *function                     = "libewf_date_time_values_copy_to_timestamp";
+	libfvalue_split_utf8_string_t *date_time_values = NULL;
+	uint8_t *string_segment                         = NULL;
+	static char *function                           = "libewf_date_time_values_copy_to_timestamp";
+	size_t string_segment_size                      = 0;
+	uint32_t value_32bit                            = 0;
+	uint16_t value_16bit                            = 0;
+	int number_of_segments                          = 0;
 
 	if( date_time_values_string == NULL )
 	{
@@ -354,77 +358,335 @@ int libewf_date_time_values_copy_to_timestamp(
 
 		return( -1 );
 	}
-	if( libewf_split_values_parse_string(
-	     &date_time_elements,
+	if( libfvalue_utf8_string_split(
 	     date_time_values_string,
 	     date_time_values_string_length,
 	     (uint8_t) ' ',
+	     &date_time_values,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split date time values string into elements.",
+		 "%s: unable to split date time values string.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( date_time_elements->number_of_values < 6 )
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     date_time_values,
+	     &number_of_segments,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of segments.",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_segments < 6 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported number of elements in date time values string.",
+		 "%s: unsupported number of segments in date time values string.",
 		 function );
 
-		libewf_split_values_free(
-		 &date_time_elements,
-	         NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	/* Set the year
 	 */
-	time_elements.tm_year = (int) ( ( ( ( date_time_elements->values[ 0 ] )[ 0 ] - (uint8_t) '0' ) * 1000 )
-	                      + ( ( ( date_time_elements->values[ 0 ] )[ 1 ] - (uint8_t) '0' ) * 100 )
-	                      + ( ( ( date_time_elements->values[ 0 ] )[ 2 ] - (uint8_t) '0' ) * 10 )
-	                      + ( ( date_time_elements->values[ 0 ] )[ 3 ] - (uint8_t) '0' )
-	                      - 1900 );
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     date_time_values,
+	     0,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string segment: 0.",
+		 function );
+
+		goto on_error;
+	}
+	if( string_segment_size != 5 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported string segment size: 0.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_decimal_copy_to_32bit(
+	     string_segment,
+	     string_segment_size,
+	     &value_32bit,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy string segment: 0 to 32-bit value.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO check range of value */
+	time_elements.tm_year = (int)( value_32bit - 1900 );
 
 	/* Set the month
 	 */
-	time_elements.tm_mon = (int) ( ( ( ( date_time_elements->values[ 1 ] )[ 0 ] - (uint8_t) '0' ) * 10 )
-	                     + ( ( date_time_elements->values[ 1 ] )[ 1 ] - (uint8_t) '0' )
-	                     - 1 );
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     date_time_values,
+	     1,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string segment: 1.",
+		 function );
+
+		goto on_error;
+	}
+	if( string_segment_size != 3 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported string segment size: 1.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_decimal_copy_to_16bit(
+	     string_segment,
+	     string_segment_size,
+	     &value_16bit,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy string segment: 1 to 16-bit value.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO check range of value */
+	time_elements.tm_mon = (int) ( value_16bit - 1 );
 
 	/* Set the day of the month
 	 */
-	time_elements.tm_mday = (int) ( ( ( ( date_time_elements->values[ 2 ] )[ 0 ] - (uint8_t) '0' ) * 10 )
-	                      + ( ( date_time_elements->values[ 2 ] )[ 1 ] - (uint8_t) '0' ) );
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     date_time_values,
+	     2,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string segment: 2.",
+		 function );
+
+		goto on_error;
+	}
+	if( string_segment_size != 3 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported string segment size: 2.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_decimal_copy_to_16bit(
+	     string_segment,
+	     string_segment_size,
+	     &value_16bit,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy string segment: 2 to 16-bit value.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO check range of value */
+	time_elements.tm_mday = (int) value_16bit;
 
 	/* Set the hour
 	 */
-	time_elements.tm_hour = (int) ( ( ( ( date_time_elements->values[ 3 ] )[ 0 ] - (uint8_t) '0' ) * 10 )
-	                      + ( ( date_time_elements->values[ 3 ] )[ 1 ] - (uint8_t) '0' ) );
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     date_time_values,
+	     3,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string segment: 3.",
+		 function );
+
+		goto on_error;
+	}
+	if( string_segment_size != 3 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported string segment size: 3.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_decimal_copy_to_16bit(
+	     string_segment,
+	     string_segment_size,
+	     &value_16bit,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy string segment: 3 to 16-bit value.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO check range of value */
+	time_elements.tm_hour = (int) value_16bit;
 
 	/* Set the minutes
 	 */
-	time_elements.tm_min = (int) ( ( ( ( date_time_elements->values[ 4 ] )[ 0 ] - (uint8_t) '0' ) * 10 )
-	                     + ( ( date_time_elements->values[ 4 ] )[ 1 ] - (uint8_t) '0' ) );
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     date_time_values,
+	     4,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string segment: 4.",
+		 function );
+
+		goto on_error;
+	}
+	if( string_segment_size != 3 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported string segment size: 4.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_decimal_copy_to_16bit(
+	     string_segment,
+	     string_segment_size,
+	     &value_16bit,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy string segment: 4 to 16-bit value.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO check range of value */
+	time_elements.tm_min = (int) value_16bit;
 
 	/* Set the seconds
 	 */
-	time_elements.tm_sec = (int) ( ( ( ( date_time_elements->values[ 5 ] )[ 0 ] - (uint8_t) '0' ) * 10 )
-	                     + ( ( date_time_elements->values[ 5 ] )[ 1 ] - (uint8_t) '0' ) );
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     date_time_values,
+	     5,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string segment: 5.",
+		 function );
+
+		goto on_error;
+	}
+	if( string_segment_size != 3 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported string segment size: 5.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_decimal_copy_to_16bit(
+	     string_segment,
+	     string_segment_size,
+	     &value_16bit,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy string segment: 5 to 16-bit value.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO check range of value */
+	time_elements.tm_sec = (int) value_16bit;
 
 	/* Set to ignore the daylight saving time
 	 */
 	time_elements.tm_isdst = -1;
 
-	if( libewf_split_values_free(
-	     &date_time_elements,
+	if( libfvalue_split_utf8_string_free(
+	     &date_time_values,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -434,7 +696,7 @@ int libewf_date_time_values_copy_to_timestamp(
 		 "%s: unable to free split date time elements.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	/* Create a timestamp
 	 */
@@ -450,9 +712,18 @@ int libewf_date_time_values_copy_to_timestamp(
 		 "%s: unable to create timestamp.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( date_time_values != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &date_time_values,
+	         NULL );
+	}
+	return( -1 );
 }
 
 /* Copies an UTF-8 encoded string of a day of week from time elements
