@@ -1,11 +1,9 @@
 TODO
+* fix date/time split values issue
 * replace libewf split values by libfvalue split string
-  - libewf_header_values
   - libewf_single_files
-* libewf_date_time_values_copy_to_timestamp
-  - check ranges of values
-* libewf_convert_date_header_value
-  - check ranges of values
+* refactor in to sub functions
+  - libewf_date_time_values_copy_to_timestamp
 * imaging handle
   - add functions to set the addition digest hash calculations
 * libhashf
@@ -270,6 +268,19 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110717
+* worked on date time value functions
+
+20110716
+* worked on date time value functions
+
+20110715
+* updated libhmac
+* worked on date time value functions
+
+20110714
+* worked on replacing libewf split values by libfvalue split string
 
 20110713
 * updated libsystem: worked on replacing ->segments by functions

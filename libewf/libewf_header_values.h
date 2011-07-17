@@ -110,7 +110,7 @@ int libewf_header_values_set_value_by_index(
 
 int libewf_convert_date_header_value(
      const uint8_t *header_value,
-     size_t header_value_length,
+     size_t header_value_size,
      uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
      liberror_error_t **error );
@@ -123,7 +123,7 @@ int libewf_generate_date_header_value(
 
 int libewf_convert_date_header2_value(
      const uint8_t *header_value,
-     size_t header_value_length,
+     size_t header_value_size,
      uint8_t **date_time_values_string,
      size_t *date_time_values_string_size,
      liberror_error_t **error );

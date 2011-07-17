@@ -3267,7 +3267,7 @@ int libewf_handle_get_utf8_header_value_size(
 		}
 		if( libewf_date_time_values_copy_to_utf8_string(
 		     header_value_data,
-		     header_value_data_size - 1,
+		     header_value_data_size,
 		     internal_handle->date_format,
 		     date_time_string,
 		     date_time_string_size,
@@ -3470,7 +3470,7 @@ int libewf_handle_get_utf8_header_value(
 		}
 		if( libewf_date_time_values_copy_to_utf8_string(
 		     header_value_data,
-		     header_value_data_size - 1,
+		     header_value_data_size,
 		     internal_handle->date_format,
 		     utf8_string,
 		     utf8_string_size,
@@ -3828,7 +3828,7 @@ int libewf_handle_get_utf16_header_value_size(
 		}
 		if( libewf_date_time_values_copy_to_utf16_string(
 		     header_value_data,
-		     header_value_data_size - 1,
+		     header_value_data_size,
 		     internal_handle->date_format,
 		     date_time_string,
 		     date_time_string_size,
@@ -4031,7 +4031,7 @@ int libewf_handle_get_utf16_header_value(
 		}
 		if( libewf_date_time_values_copy_to_utf16_string(
 		     header_value_data,
-		     header_value_data_size - 1,
+		     header_value_data_size,
 		     internal_handle->date_format,
 		     utf16_string,
 		     utf16_string_size,
