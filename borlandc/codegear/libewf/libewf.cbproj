@@ -222,10 +222,6 @@
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_single_files.h">
 			</None>
-			<CppCompile Include="..\..\..\libewf\libewf_split_values.c">
-			</CppCompile>
-			<None Include="..\..\..\libewf\libewf_split_values.h">
-			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_support.c">
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_support.h">

@@ -80,8 +80,6 @@ USEUNIT("..\..\..\libewf\libewf_single_file_entry.c");
 USE("..\..\..\libewf\libewf_single_file_entry.h", File);
 USEUNIT("..\..\..\libewf\libewf_single_files.c");
 USE("..\..\..\libewf\libewf_single_files.h", File);
-USEUNIT("..\..\..\libewf\libewf_split_values.c");
-USE("..\..\..\libewf\libewf_split_values.h", File);
 USEUNIT("..\..\..\libewf\libewf_support.c");
 USE("..\..\..\libewf\libewf_support.h", File);
 USE("..\..\..\libewf\libewf_system_string.h", File);

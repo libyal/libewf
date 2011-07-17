@@ -57,8 +57,6 @@
 int export_handle_initialize(
      export_handle_t **export_handle,
      uint8_t calculate_md5,
-     uint8_t calculate_sha1,
-     uint8_t calculate_sha256,
      liberror_error_t **error )
 {
 	static char *function = "export_handle_initialize";
@@ -167,43 +165,7 @@ int export_handle_initialize(
 				goto on_error;
 			}
 		}
-		if( calculate_sha1 != 0 )
-		{
-			( *export_handle )->calculated_sha1_hash_string = libcstring_system_string_allocate(
-			                                                   41 );
-
-			if( ( *export_handle )->calculated_sha1_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated SHA1 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		if( calculate_sha256 != 0 )
-		{
-			( *export_handle )->calculated_sha256_hash_string = libcstring_system_string_allocate(
-			                                                     65 );
-
-			if( ( *export_handle )->calculated_sha256_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated SHA256 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
 		( *export_handle )->calculate_md5       = calculate_md5;
-		( *export_handle )->calculate_sha1      = calculate_sha1;
-		( *export_handle )->calculate_sha256    = calculate_sha256;
 		( *export_handle )->compression_level   = LIBEWF_COMPRESSION_NONE;
 		( *export_handle )->output_format       = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 		( *export_handle )->ewf_format          = LIBEWF_FORMAT_ENCASE6;
@@ -2842,6 +2804,186 @@ int export_handle_set_process_buffer_size(
 		}
 	}
 	return( result );
+}
+
+/* Sets the additional digest types
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_set_additional_digest_types(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *string_segment = NULL;
+	libsystem_split_string_t *string_elements     = NULL;
+	static char *function                         = "export_handle_set_additional_digest_types";
+	size_t string_length                          = 0;
+	size_t string_segment_size                    = 0;
+	uint8_t calculate_sha1                        = 0;
+	uint8_t calculate_sha256                      = 0;
+	int number_of_segments                        = 0;
+	int segment_index                             = 0;
+	int result                                    = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( libsystem_string_split(
+	     string,
+	     string_length + 1,
+	     (libcstring_system_character_t) ',',
+	     &string_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libsystem_split_string_get_number_of_segments(
+	     string_elements,
+	     &number_of_segments,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of segments.",
+		 function );
+
+		return( -1 );
+	}
+	for( segment_index = 0;
+	     segment_index < number_of_segments;
+	     segment_index++ )
+	{
+		if( libsystem_split_string_get_segment_by_index(
+		     string_elements,
+		     segment_index,
+		     &string_segment,
+		     &string_segment_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string segment: %d.",
+			 function,
+			 segment_index );
+
+			goto on_error;
+		}
+		if( string_segment == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing string segment: %d.",
+			 function,
+			 segment_index );
+
+			return( -1 );
+		}
+		if( string_segment_size == 4 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
+			     3 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+		}
+		else if( string_segment_size == 7 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+			     6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+		}
+	}
+	if( ( calculate_sha1 != 0 )
+	 && ( export_handle->calculate_sha1 == 0 ) )
+	{
+		export_handle->calculated_sha1_hash_string = libcstring_system_string_allocate(
+		                                               41 );
+
+		if( export_handle->calculated_sha1_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA1 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+		export_handle->calculate_sha1 = 1;
+	}
+	if( ( calculate_sha256 != 0 )
+	 && ( export_handle->calculate_sha256 == 0 ) )
+	{
+		export_handle->calculated_sha256_hash_string = libcstring_system_string_allocate(
+		                                                 65 );
+
+		if( export_handle->calculated_sha256_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA256 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+		export_handle->calculate_sha256 = 1;
+	}
+	if( libsystem_split_string_free(
+	     &string_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split string.",
+		 function );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( string_elements != NULL )
+	{
+		libsystem_split_string_free(
+		 &string_elements,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Sets the output values of the export handle

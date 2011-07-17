@@ -85,11 +85,7 @@
 			</None>
 			<None Include="..\..\..\libewf\libewf_libbfio.h">
 			</None>
-			<None Include="..\..\..\libewf\libewf_split_values.h">
-			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_support.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_split_values.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_single_file_entry.c">
 			</CppCompile>

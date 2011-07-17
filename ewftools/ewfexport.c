@@ -121,7 +121,7 @@ void usage_fprint(
 	fprintf( stream, "\t-c:        specify the compression level, options: none (default),\n"
 	                 "\t           empty-block, fast or best (not used for raw and files format)\n" );
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
-	                 "\t           options: sha1 (not used for raw and files format)\n" );
+	                 "\t           options: sha1, sha256 (not used for raw and files format)\n" );
 	fprintf( stream, "\t-f:        specify the output format to write to, options:\n"
 	                 "\t           raw (default), files (restricted to logical volume files), ewf,\n"
 	                 "\t           smart, encase1, encase2, encase3, encase4, encase5, encase6,\n"
@@ -217,44 +217,43 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 	libcstring_system_character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
-	libcstring_system_character_t * const *argv_filenames      = NULL;
+	libcstring_system_character_t * const *argv_filenames         = NULL;
 
-	liberror_error_t *error                                    = NULL;
+	liberror_error_t *error                                       = NULL;
 
 #if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                                     = NULL;
+	libsystem_glob_t *glob                                        = NULL;
 #endif
 
-	libcstring_system_character_t *acquiry_software_version    = NULL;
-	libcstring_system_character_t *log_filename                = NULL;
-	libcstring_system_character_t *option_compression_level    = NULL;
-	libcstring_system_character_t *option_format               = NULL;
-	libcstring_system_character_t *option_header_codepage      = NULL;
-	libcstring_system_character_t *option_maximum_segment_size = NULL;
-	libcstring_system_character_t *option_offset               = NULL;
-	libcstring_system_character_t *option_process_buffer_size  = NULL;
-	libcstring_system_character_t *option_sectors_per_chunk    = NULL;
-	libcstring_system_character_t *option_size                 = NULL;
-	libcstring_system_character_t *option_target_filename      = NULL;
-	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfexport" );
-	libcstring_system_character_t *request_string              = NULL;
+	libcstring_system_character_t *acquiry_software_version       = NULL;
+	libcstring_system_character_t *log_filename                   = NULL;
+	libcstring_system_character_t *option_additional_digest_types = NULL;
+	libcstring_system_character_t *option_compression_level       = NULL;
+	libcstring_system_character_t *option_format                  = NULL;
+	libcstring_system_character_t *option_header_codepage         = NULL;
+	libcstring_system_character_t *option_maximum_segment_size    = NULL;
+	libcstring_system_character_t *option_offset                  = NULL;
+	libcstring_system_character_t *option_process_buffer_size     = NULL;
+	libcstring_system_character_t *option_sectors_per_chunk       = NULL;
+	libcstring_system_character_t *option_size                    = NULL;
+	libcstring_system_character_t *option_target_filename         = NULL;
+	libcstring_system_character_t *program                        = _LIBCSTRING_SYSTEM_STRING( "ewfexport" );
+	libcstring_system_character_t *request_string                 = NULL;
 
-	log_handle_t *log_handle                                   = NULL;
+	log_handle_t *log_handle                                      = NULL;
 
-	libcstring_system_integer_t option                         = 0;
-	size64_t media_size                                        = 0;
-	size_t string_length                                       = 0;
-	uint8_t calculate_md5                                      = 1;
-	uint8_t calculate_sha1                                     = 0;
-	uint8_t calculate_sha256                                   = 0;
-	uint8_t print_status_information                           = 1;
-	uint8_t swap_byte_pairs                                    = 0;
-	uint8_t verbose                                            = 0;
-	uint8_t zero_chunk_on_error                                = 0;
-	int interactive_mode                                       = 1;
-	int number_of_filenames                                    = 0;
-	int result                                                 = 1;
-	int status                                                 = 0;
+	libcstring_system_integer_t option                            = 0;
+	size64_t media_size                                           = 0;
+	size_t string_length                                          = 0;
+	uint8_t calculate_md5                                         = 1;
+	uint8_t print_status_information                              = 1;
+	uint8_t swap_byte_pairs                                       = 0;
+	uint8_t verbose                                               = 0;
+	uint8_t zero_chunk_on_error                                   = 0;
+	int interactive_mode                                          = 1;
+	int number_of_filenames                                       = 0;
+	int result                                                    = 1;
+	int status                                                    = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -347,26 +346,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'd':
-				if( libcstring_system_string_compare(
-				     optarg,
-				     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
-				     4 ) == 0 )
-				{
-					calculate_sha1 = 1;
-				}
-				else if( libcstring_system_string_compare(
-				          optarg,
-				          _LIBCSTRING_SYSTEM_STRING( "sha256" ),
-				          6 ) == 0 )
-				{
-					calculate_sha256 = 1;
-				}
-				else
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported digest type.\n" );
-				}
+				option_additional_digest_types = optarg;
+
 				break;
 
 			case (libcstring_system_integer_t) 'f':
@@ -505,8 +486,6 @@ int main( int argc, char * const argv[] )
 	if( export_handle_initialize(
 	     &ewfexport_export_handle,
 	     calculate_md5,
-	     calculate_sha1,
-	     calculate_sha256,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -808,6 +787,22 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
+	if( option_additional_digest_types != NULL )
+	{
+		result = export_handle_set_additional_digest_types(
+			  ewfexport_export_handle,
+			  option_additional_digest_types,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set additional digest types.\n" );
+
+			goto on_error;
 		}
 	}
 	/* Initialize values

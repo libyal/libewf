@@ -200,8 +200,6 @@ struct export_handle
 int export_handle_initialize(
      export_handle_t **export_handle,
      uint8_t calculate_md5,
-     uint8_t calculate_sha1,
-     uint8_t calculate_sha256,
      liberror_error_t **error );
 
 int export_handle_free(
@@ -359,6 +357,11 @@ int export_handle_set_header_codepage(
      liberror_error_t **error );
 
 int export_handle_set_process_buffer_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int export_handle_set_additional_digest_types(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );

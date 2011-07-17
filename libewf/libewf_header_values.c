@@ -1474,11 +1474,11 @@ int libewf_header_values_parse_utf8_header_string(
 	size_t line_string_size               = 0;
 	size_t type_string_size               = 0;
 	size_t value_string_size              = 0;
-	int header_value_index                = 0;
 	int number_of_lines                   = 0;
 	int number_of_types                   = 0;
 	int number_of_values                  = 0;
 	int result                            = 0;
+	int value_index                       = 0;
 
 	if( header_string == NULL )
 	{
@@ -1558,7 +1558,7 @@ int libewf_header_values_parse_utf8_header_string(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: header values string not supported.",
+			 "%s: unsupported header values string.",
 			 function );
 
 			goto on_error;
@@ -1661,18 +1661,18 @@ int libewf_header_values_parse_utf8_header_string(
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-			 	"%s: mismatch in number of header values types and values.\n",
+			 	"%s: mismatch in number of types and values.\n",
 				 function );
 			}
 		}
 #endif
-		for( header_value_index = 0;
-		     header_value_index < number_of_types;
-		     header_value_index++ )
+		for( value_index = 0;
+		     value_index < number_of_types;
+		     value_index++ )
 		{
 			if( libfvalue_split_utf8_string_get_segment_by_index(
 			     types,
-			     header_value_index,
+			     value_index,
 			     &type_string,
 			     &type_string_size,
 			     error ) != 1 )
@@ -1683,7 +1683,7 @@ int libewf_header_values_parse_utf8_header_string(
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve type string: %d.",
 				 function,
-				 header_value_index );
+				 value_index );
 
 				goto on_error;
 			}
@@ -1697,7 +1697,7 @@ int libewf_header_values_parse_utf8_header_string(
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing type string: %d.",
 				 function,
-				 header_value_index );
+				 value_index );
 
 				goto on_error;
 			}
@@ -1709,11 +1709,11 @@ int libewf_header_values_parse_utf8_header_string(
 
 				type_string_size -= 1;
 			}
-			if( header_value_index < number_of_values )
+			if( value_index < number_of_values )
 			{
 				if( libfvalue_split_utf8_string_get_segment_by_index(
 				     values,
-				     header_value_index,
+				     value_index,
 				     &value_string,
 				     &value_string_size,
 				     error ) != 1 )
@@ -1724,7 +1724,7 @@ int libewf_header_values_parse_utf8_header_string(
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 					 "%s: unable to retrieve value string: %d.",
 					 function,
-					 header_value_index );
+					 value_index );
 
 					goto on_error;
 				}
@@ -1759,6 +1759,12 @@ int libewf_header_values_parse_utf8_header_string(
 				 (char *) value_string );
 			}
 #endif
+			/* Ignore empty values
+			 */
+			if( value_string == NULL )
+			{
+				continue;
+			}
 			identifier      = NULL;
 			identifier_size = 0;
 

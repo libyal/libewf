@@ -42,6 +42,47 @@
 
 #include "ewf_test_definitions.h"
 
+/* Tests libewf_handle_get_offset
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int ewf_test_get_offset(
+     libewf_handle_t *handle,
+     off64_t expected_offset,
+     liberror_error_t **error )
+{
+	static char *function = "ewf_test_get_offset";
+	off64_t result_offset = 0;
+
+	if( expected_offset != -1 )
+	{
+		if( libewf_handle_get_offset(
+		     handle,
+		     &result_offset,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve offset.",
+			 function );
+
+			return( -1 );
+		}
+		if( result_offset != expected_offset )
+		{
+			fprintf(
+			 stderr,
+			 "%s: unexpected result offset: %" PRIi64 "\n",
+			 function,
+			 result_offset );
+
+			return( 0 );
+		}
+	}
+	return( 1 );
+}
+
 /* Tests libewf_handle_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -319,6 +360,16 @@ int ewf_test_read_buffer_at_offset(
 			          &error );
 		}
 	}
+	if( result == 1 )
+	{
+		if( input_offset >= 0 )
+		{
+			result = ewf_test_get_offset(
+			          handle,
+			          input_offset + expected_size,
+			          &error );
+		}
+	}
 	memory_free(
 	 buffer );
 
@@ -442,6 +493,16 @@ int ewf_test_read_chunk_at_offset(
 	memory_free(
 	 data_buffer );
 
+	if( result == 1 )
+	{
+		if( input_offset >= 0 )
+		{
+			result = ewf_test_get_offset(
+			          handle,
+			          input_offset - ( input_offset % chunk_size ) + expected_size,
+			          &error );
+		}
+	}
 	if( result != 0 )
 	{
 		fprintf(

@@ -32,7 +32,6 @@
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_files.h"
-#include "libewf_split_values.h"
 #include "libewf_tree_type.h"
 
 /* Initialize the single files
@@ -273,10 +272,13 @@ int libewf_single_files_parse_file_entries(
      size_t entries_string_size,
      liberror_error_t **error )
 {
-	libewf_split_values_t *lines = NULL;
-	libewf_split_values_t *types = NULL;
-	static char *function        = "libewf_single_files_parse_file_entries";
-	int line_iterator            = 0;
+	libfvalue_split_utf8_string_t *lines = NULL;
+	libfvalue_split_utf8_string_t *types = NULL;
+	uint8_t *line_string                 = NULL;
+	static char *function                = "libewf_single_files_parse_file_entries";
+	size_t line_string_size              = 0;
+	int line_index                       = 0;
+	int number_of_lines                  = 0;
 
 	if( single_files == NULL )
 	{
@@ -300,11 +302,11 @@ int libewf_single_files_parse_file_entries(
 
 		return( -1 );
 	}
-	if( libewf_split_values_parse_string(
-	     &lines,
+	if( libfvalue_utf8_string_split(
 	     entries_string,
 	     entries_string_size - 1,
 	     (uint8_t) '\n',
+	     &lines,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -316,10 +318,52 @@ int libewf_single_files_parse_file_entries(
 
 		goto on_error;
 	}
-	if( lines->number_of_values > 0 )
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     lines,
+	     &number_of_lines,
+	     error ) != 1 )
 	{
-		if( ( ( lines->values[ 0 ] )[ 0 ] < (uint8_t) '0' )
-		 || ( ( lines->values[ 0 ] )[ 0 ] > (uint8_t) '9' ) )
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of lines",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_lines > 0 )
+	{
+		if( libfvalue_split_utf8_string_get_segment_by_index(
+		     lines,
+		     0,
+		     &line_string,
+		     &line_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve line string: 0.",
+			 function );
+
+			goto on_error;
+		}
+		if( line_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing line string: 0.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO line size check */
+		if( ( line_string[ 0 ] < (uint8_t) '0' )
+		 || ( line_string[ 0 ] > (uint8_t) '9' ) )
 		{
 			liberror_error_set(
 			 error,
@@ -332,18 +376,47 @@ int libewf_single_files_parse_file_entries(
 		}
 		/* Find the line containing: "rec"
 		 */
-		for( line_iterator = 0;
-		     line_iterator < lines->number_of_values;
-		     line_iterator++ )
+		for( line_index = 0;
+		     line_index < number_of_lines;
+		     line_index++ )
 		{
-			if( lines->sizes[ line_iterator ] == 4 )
+			if( libfvalue_split_utf8_string_get_segment_by_index(
+			     lines,
+			     line_index,
+			     &line_string,
+			     &line_string_size,
+			     error ) != 1 )
 			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve line string: %d.",
+				 function,
+				 line_index );
+
+				goto on_error;
+			}
+			if( line_string_size == 4 )
+			{
+				if( line_string == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 "%s: missing line string: %d.",
+					 function,
+					 line_index );
+
+					goto on_error;
+				}
 				if( libcstring_narrow_string_compare(
-				     (char *) lines->values[ line_iterator ],
+				     (char *) line_string,
 				     "rec",
 				     3 ) == 0 )
 				{
-					line_iterator += 1;
+					line_index += 1;
 
 					break;
 				}
@@ -352,7 +425,7 @@ int libewf_single_files_parse_file_entries(
 		if( libewf_single_files_parse_record_values(
 		     media_size,
 		     lines,
-		     &line_iterator,
+		     &line_index,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -366,30 +439,78 @@ int libewf_single_files_parse_file_entries(
 		}
 		/* Find the line containing: "entry"
 		 */
-		for( line_iterator = 0;
-		     line_iterator < lines->number_of_values;
-		     line_iterator++ )
+		for( line_index = 0;
+		     line_index < number_of_lines;
+		     line_index++ )
 		{
-			if( lines->sizes[ line_iterator ] == 6 )
+			if( libfvalue_split_utf8_string_get_segment_by_index(
+			     lines,
+			     line_index,
+			     &line_string,
+			     &line_string_size,
+			     error ) != 1 )
 			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve line string: %d.",
+				 function,
+				 line_index );
+
+				goto on_error;
+			}
+			if( line_string_size == 6 )
+			{
+				if( line_string == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 "%s: missing line string: %d.",
+					 function,
+					 line_index );
+
+					goto on_error;
+				}
 				if( libcstring_narrow_string_compare(
-				     (char *) lines->values[ line_iterator ],
+				     (char *) line_string,
 				     "entry",
 				     5 ) == 0 )
 				{
-					line_iterator += 2;
+					line_index += 2;
 
 					break;
 				}
 			}
 		}
-		if( line_iterator < lines->number_of_values )
+		if( line_index < number_of_lines )
 		{
-			if( libewf_split_values_parse_string(
-			     &types,
-			     lines->values[ line_iterator ],
-			     lines->sizes[ line_iterator ] - 1,
+			if( libfvalue_split_utf8_string_get_segment_by_index(
+			     lines,
+			     line_index,
+			     &line_string,
+			     &line_string_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve line string: %d.",
+				 function,
+				 line_index );
+
+				goto on_error;
+			}
+			line_index += 1;
+
+			if( libfvalue_utf8_string_split(
+			     line_string,
+			     line_string_size,
 			     (uint8_t) '\t',
+			     &types,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -401,8 +522,6 @@ int libewf_single_files_parse_file_entries(
 
 				goto on_error;
 			}
-			line_iterator += 1;
-
 			if( libewf_tree_node_initialize(
 			     &( single_files->root_file_entry_node ),
 			     error ) != 1 )
@@ -421,7 +540,7 @@ int libewf_single_files_parse_file_entries(
 			if( libewf_single_files_parse_file_entry(
 			     single_files->root_file_entry_node,
 			     lines,
-			     &line_iterator,
+			     &line_index,
 			     types,
 			     error ) != 1 )
 			{
@@ -436,13 +555,30 @@ int libewf_single_files_parse_file_entries(
 			}
 			/* The single files entries should be followed by an emtpy line
 			 */
-			if( ( lines->sizes[ line_iterator ] == 1 )
-			 && ( ( lines->values[ line_iterator ] )[ 0 ] == 0 ) )
+			if( libfvalue_split_utf8_string_get_segment_by_index(
+			     lines,
+			     line_index,
+			     &line_string,
+			     &line_string_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve line string: %d.",
+				 function,
+				 line_index );
+
+				goto on_error;
+			}
+			if( ( line_string_size != 1 )
+			 || ( line_string[ 0 ] != 0 ) )
 			{
 				/* TODO error if line is not empty */
 			}
 		}
-		if( libewf_split_values_free(
+		if( libfvalue_split_utf8_string_free(
 		     &types,
 		     error ) != 1 )
 		{
@@ -456,7 +592,7 @@ int libewf_single_files_parse_file_entries(
 			goto on_error;
 		}
 	}
-	if( libewf_split_values_free(
+	if( libfvalue_split_utf8_string_free(
 	     &lines,
 	     error ) != 1 )
 	{
@@ -467,20 +603,20 @@ int libewf_single_files_parse_file_entries(
 		 "%s: unable to free split lines.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
 
 on_error:
 	if( types != NULL )
 	{
-		libewf_split_values_free(
+		libfvalue_split_utf8_string_free(
 		 &types,
 		 NULL );
 	}
 	if( lines != NULL )
 	{
-		libewf_split_values_free(
+		libfvalue_split_utf8_string_free(
 		 &lines,
 		 NULL );
 	}
@@ -492,17 +628,23 @@ on_error:
  */
 int libewf_single_files_parse_record_values(
      size64_t *media_size,
-     libewf_split_values_t *lines,
-     int *line_iterator,
+     libfvalue_split_utf8_string_t *lines,
+     int *line_index,
      liberror_error_t **error )
 {
-	libewf_split_values_t *types  = NULL;
-	libewf_split_values_t *values = NULL;
-	static char *function         = "libewf_single_files_parse_record_values";
-	size_t type_string_length     = 0;
-	size_t value_string_length    = 0;
-	uint64_t value_64bit          = 0;
-	int value_iterator            = 0;
+	libfvalue_split_utf8_string_t *types  = NULL;
+	libfvalue_split_utf8_string_t *values = NULL;
+	uint8_t *line_string                  = NULL;
+	uint8_t *type_string                  = NULL;
+	uint8_t *value_string                 = NULL;
+	static char *function                 = "libewf_single_files_parse_record_values";
+	size_t line_string_size               = 0;
+	size_t type_string_size               = 0;
+	size_t value_string_size              = 0;
+	uint64_t value_64bit                  = 0;
+	int number_of_types                   = 0;
+	int number_of_values                  = 0;
+	int value_index                       = 0;
 
 	if( media_size == NULL )
 	{
@@ -515,58 +657,41 @@ int libewf_single_files_parse_record_values(
 
 		return( 1 );
 	}
-	if( lines == NULL )
+	if( line_index == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid lines.",
+		 "%s: invalid line index.",
 		 function );
 
 		return( 1 );
 	}
-	if( line_iterator == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line iterator.",
-		 function );
-
-		return( 1 );
-	}
-	if( ( *line_iterator < 0 )
-	 || ( *line_iterator >= lines->number_of_values ) )
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     lines,
+	     *line_index,
+	     &line_string,
+	     &line_string_size,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: line iterator out of bounds.",
-		 function );
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve line string: %d.",
+		 function,
+		 *line_index );
 
-		return( -1 );
+		goto on_error;
 	}
-	/* Make sure there are at least 2 lines
-	 */
-	if( ( *line_iterator + 1 ) >= lines->number_of_values )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: lines too small.",
-		 function );
+	*line_index += 1;
 
-		return( -1 );
-	}
-	if( libewf_split_values_parse_string(
-	     &types,
-	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ] - 1,
+	if( libfvalue_utf8_string_split(
+	     line_string,
+	     line_string_size,
 	     (uint8_t) '\t',
+	     &types,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -578,13 +703,44 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
-	*line_iterator += 1;
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     types,
+	     &number_of_types,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of types",
+		 function );
 
-	if( libewf_split_values_parse_string(
-	     &values,
-	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ] - 1,
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     lines,
+	     *line_index,
+	     &line_string,
+	     &line_string_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve line string: %d.",
+		 function,
+		 *line_index );
+
+		goto on_error;
+	}
+	*line_index += 1;
+
+	if( libfvalue_utf8_string_split(
+	     line_string,
+	     line_string_size,
 	     (uint8_t) '\t',
+	     &values,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -596,35 +752,113 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
-	if( types->number_of_values != values->number_of_values )
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     values,
+	     &number_of_values,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported single file entry second line.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of values",
 		 function );
 
 		goto on_error;
 	}
-	for( value_iterator = 0;
-	     value_iterator < values->number_of_values;
-	     value_iterator++ )
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( number_of_types != number_of_values )
 	{
-		type_string_length  = types->sizes[ value_iterator ] - 1;
-		value_string_length = values->sizes[ value_iterator ] - 1;
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			"%s: mismatch in number of types and values.\n",
+			 function );
+		}
+	}
+#endif
+	for( value_index = 0;
+	     value_index < number_of_types;
+	     value_index++ )
+	{
+		if( libfvalue_split_utf8_string_get_segment_by_index(
+		     types,
+		     value_index,
+		     &type_string,
+		     &type_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve type string: %d.",
+			 function,
+			 value_index );
 
+			goto on_error;
+		}
+		if( ( type_string == NULL )
+		 || ( type_string_size < 2 )
+		 || ( type_string[ 0 ] == 0 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing type string: %d.",
+			 function,
+			 value_index );
+
+			goto on_error;
+		}
 		/* Remove trailing carriage return
 		 */
-		if( ( type_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ type_string_length - 1 ] == (uint8_t) '\r' ) )
+		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
 		{
-			type_string_length -= 1;
+			type_string[ type_string_size - 2 ] = 0;
+
+			type_string_size -= 1;
 		}
-		if( ( value_string_length > 0 )
-		 && ( ( values->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
+		if( value_index < number_of_values )
 		{
-			value_string_length -= 1;
+			if( libfvalue_split_utf8_string_get_segment_by_index(
+			     values,
+			     value_index,
+			     &value_string,
+			     &value_string_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value string: %d.",
+				 function,
+				 value_index );
+
+				goto on_error;
+			}
+			if( ( value_string == NULL )
+			 || ( value_string_size < 2 )
+			 || ( value_string[ 0 ] == 0 ) )
+			{
+				value_string      = NULL;
+				value_string_size = 0;
+			}
+			/* Remove trailing carriage return
+			 */
+			else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
+			{
+				value_string[ value_string_size - 2 ] = 0;
+
+				value_string_size -= 1;
+			}
+		}
+		else
+		{
+			value_string      = NULL;
+			value_string_size = 0;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
@@ -632,32 +866,28 @@ int libewf_single_files_parse_record_values(
 			libnotify_printf(
 			 "%s: type: %s with value: %s.\n",
 			 function,
-			 (char *) types->values[ value_iterator ],
-			 (char *) values->values[ value_iterator ] );
+			 (char *) type_string,
+			 (char *) value_string );
 		}
 #endif
 		/* Ignore empty values
 		 */
-		if( value_string_length == 0 )
+		if( value_string == NULL )
 		{
 			continue;
 		}
-		else if( type_string_length == 2 )
+		if( type_string_size == 3 )
 		{
-			if( libcstring_narrow_string_compare(
-			     types->values[ value_iterator ],
-			     "cl",
-			     type_string_length ) == 0 )
+			if( ( type_string[ 0 ] == (uint8_t) 'c' )
+			 && ( type_string[ 1 ] == (uint8_t) 'l' ) )
 			{
 			}
-			else if( libcstring_narrow_string_compare(
-				  types->values[ value_iterator ],
-				  "tb",
-				  type_string_length ) == 0 )
+			else if( ( type_string[ 0 ] == (uint8_t) 't' )
+			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
 			{
 				if( libfvalue_utf8_string_decimal_copy_to_64bit(
-				     values->values[ value_iterator ],
-				     value_string_length + 1,
+				     value_string,
+				     value_string_size,
 				     &value_64bit,
 				     error ) != 1 )
 				{
@@ -674,7 +904,7 @@ int libewf_single_files_parse_record_values(
 			}
 		}
 	}
-	if( libewf_split_values_free(
+	if( libfvalue_split_utf8_string_free(
 	     &values,
 	     error ) != 1 )
 	{
@@ -687,7 +917,7 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
-	if( libewf_split_values_free(
+	if( libfvalue_split_utf8_string_free(
 	     &types,
 	     error ) != 1 )
 	{
@@ -700,21 +930,19 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
-	*line_iterator += 1;
-
 	return( 1 );
 
 on_error:
-	if( types != NULL )
-	{
-		libewf_split_values_free(
-		 &types,
-		 NULL );
-	}
 	if( values != NULL )
 	{
-		libewf_split_values_free(
+		libfvalue_split_utf8_string_free(
 		 &values,
+		 NULL );
+	}
+	if( types != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &types,
 		 NULL );
 	}
 	return( -1 );
@@ -725,22 +953,32 @@ on_error:
  */
 int libewf_single_files_parse_file_entry(
      libewf_tree_node_t *parent_file_entry_node,
-     libewf_split_values_t *lines,
-     int *line_iterator,
-     libewf_split_values_t *types,
+     libfvalue_split_utf8_string_t *lines,
+     int *line_index,
+     libfvalue_split_utf8_string_t *types,
      liberror_error_t **error )
 {
 	libewf_single_file_entry_t *single_file_entry = NULL;
-	libewf_split_values_t *offset_values          = NULL;
-	libewf_split_values_t *values                 = NULL;
+	libfvalue_split_utf8_string_t *offset_values  = NULL;
+	libfvalue_split_utf8_string_t *values         = NULL;
 	libewf_tree_node_t *file_entry_node           = NULL;
+	uint8_t *line_string                          = NULL;
+	uint8_t *offset_value_string                  = NULL;
+	uint8_t *type_string                          = NULL;
+	uint8_t *value_string                         = NULL;
 	static char *function                         = "libewf_single_files_parse_file_entry";
-	size_t type_string_length                     = 0;
+	size_t line_string_size                       = 0;
+	size_t offset_value_string_size               = 0;
+	size_t type_string_size                       = 0;
+	size_t value_string_size                      = 0;
 	size_t value_string_index                     = 0;
-	size_t value_string_length                    = 0;
-	uint64_t number_of_child_entries              = 0;
+	uint64_t number_of_sub_entries                = 0;
 	uint64_t value_64bit                          = 0;
-	int value_iterator                            = 0;
+	int number_of_lines                           = 0;
+	int number_of_offset_values                   = 0;
+	int number_of_types                           = 0;
+	int number_of_values                          = 0;
+	int value_index                               = 0;
 
 	if( parent_file_entry_node == NULL )
 	{
@@ -753,69 +991,70 @@ int libewf_single_files_parse_file_entry(
 
 		return( 1 );
 	}
-	if( lines == NULL )
+	if( line_index == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid lines.",
+		 "%s: invalid line index.",
 		 function );
 
 		return( 1 );
 	}
-	if( line_iterator == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line iterator.",
-		 function );
-
-		return( 1 );
-	}
-	if( ( *line_iterator < 0 )
-	 || ( *line_iterator >= lines->number_of_values ) )
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     types,
+	     &number_of_types,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: line iterator out of bounds.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of types",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	/* Make sure there are at least 2 lines
-	 */
-	if( ( *line_iterator + 1 ) >= lines->number_of_values )
+	if( libewf_single_files_parse_file_entry_number_of_sub_entries(
+	     lines,
+	     line_index,
+	     &number_of_sub_entries,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: lines too small.",
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to parse file entry number of sub entries.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( types == NULL )
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     lines,
+	     *line_index,
+	     &line_string,
+	     &line_string_size,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid types.",
-		 function );
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve line string: %d.",
+		 function,
+		 *line_index );
 
-		return( 1 );
+		goto on_error;
 	}
-	if( libewf_split_values_parse_string(
-	     &values,
-	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ] - 1,
+	*line_index += 1;
+
+	if( libfvalue_utf8_string_split(
+	     line_string,
+	     line_string_size,
 	     (uint8_t) '\t',
+	     &values,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -827,76 +1066,31 @@ int libewf_single_files_parse_file_entry(
 
 		goto on_error;
 	}
-	if( ( values->number_of_values != 2 )
-	 || ( values->sizes[ 0 ] != 2 )
-	 || ( ( values->values[ 0 ] )[ 0 ] != '0' ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported single file entry first line.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfvalue_utf8_string_decimal_copy_to_64bit(
-	     values->values[ 1 ],
-	     values->sizes[ 1 ],
-	     &number_of_child_entries,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to set number fo child entries.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_split_values_free(
-	     &values,
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     values,
+	     &number_of_values,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split values.",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of values",
 		 function );
 
 		goto on_error;
 	}
-	*line_iterator += 1;
-
-	if( libewf_split_values_parse_string(
-	     &values,
-	     lines->values[ *line_iterator ],
-	     lines->sizes[ *line_iterator ] - 1,
-	     (uint8_t) '\t',
-	     error ) != 1 )
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( number_of_types != number_of_values )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split entries string into values.",
-		 function );
-
-		goto on_error;
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			"%s: mismatch in number of types and values.\n",
+			 function );
+		}
 	}
-	if( types->number_of_values != values->number_of_values )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported single file entry second line.",
-		 function );
-
-		goto on_error;
-	}
+#endif
 	if( libewf_single_file_entry_initialize(
 	     &single_file_entry,
 	     error ) != 1 )
@@ -910,24 +1104,88 @@ int libewf_single_files_parse_file_entry(
 
 		goto on_error;
 	}
-	for( value_iterator = 0;
-	     value_iterator < values->number_of_values;
-	     value_iterator++ )
+	for( value_index = 0;
+	     value_index < number_of_types;
+	     value_index++ )
 	{
-		type_string_length  = types->sizes[ value_iterator ] - 1;
-		value_string_length = values->sizes[ value_iterator ] - 1;
+		if( libfvalue_split_utf8_string_get_segment_by_index(
+		     types,
+		     value_index,
+		     &type_string,
+		     &type_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve type string: %d.",
+			 function,
+			 value_index );
 
+			goto on_error;
+		}
+		if( ( type_string == NULL )
+		 || ( type_string_size < 2 )
+		 || ( type_string[ 0 ] == 0 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing type string: %d.",
+			 function,
+			 value_index );
+
+			goto on_error;
+		}
 		/* Remove trailing carriage return
 		 */
-		if( ( type_string_length > 0 )
-		 && ( ( types->values[ value_iterator ] )[ type_string_length - 1 ] == (uint8_t) '\r' ) )
+		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
 		{
-			type_string_length -= 1;
+			type_string[ type_string_size - 2 ] = 0;
+
+			type_string_size -= 1;
 		}
-		if( ( value_string_length > 0 )
-		 && ( ( values->values[ value_iterator ] )[ value_string_length - 1 ] == (uint8_t) '\r' ) )
+		if( value_index < number_of_values )
 		{
-			value_string_length -= 1;
+			if( libfvalue_split_utf8_string_get_segment_by_index(
+			     values,
+			     value_index,
+			     &value_string,
+			     &value_string_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value string: %d.",
+				 function,
+				 value_index );
+
+				goto on_error;
+			}
+			if( ( value_string == NULL )
+			 || ( value_string_size < 2 )
+			 || ( value_string[ 0 ] == 0 ) )
+			{
+				value_string      = NULL;
+				value_string_size = 0;
+			}
+			/* Remove trailing carriage return
+			 */
+			else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
+			{
+				value_string[ value_string_size - 2 ] = 0;
+
+				value_string_size -= 1;
+			}
+		}
+		else
+		{
+			value_string      = NULL;
+			value_string_size = 0;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libnotify_verbose != 0 )
@@ -935,432 +1193,448 @@ int libewf_single_files_parse_file_entry(
 			libnotify_printf(
 			 "%s: type: %s with value: %s.\n",
 			 function,
-			 (char *) types->values[ value_iterator ],
-			 (char *) values->values[ value_iterator ] );
+			 (char *) type_string,
+			 (char *) value_string );
 		}
 #endif
 		/* Ignore empty values
 		 */
-		if( value_string_length > 0 )
+		if( value_string == NULL )
 		{
-			if( type_string_length == 3 )
+			continue;
+		}
+/* TODO */
+		if( type_string_size == 4 )
+		{
+			if( ( type_string[ 0 ] == (uint8_t) 'c' )
+			 && ( type_string[ 1 ] == (uint8_t) 'i' )
+			 && ( type_string[ 2 ] == (uint8_t) 'd' ) )
 			{
-				if( libcstring_narrow_string_compare(
-				     types->values[ value_iterator ],
-				     "cid",
-				     type_string_length ) == 0 )
-				{
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "opr",
-					  type_string_length ) == 0 )
-				{
-					if( libfvalue_utf8_string_decimal_copy_to_64bit(
-					     values->values[ value_iterator ],
-					     value_string_length + 1,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set entry flags.",
-						 function );
-
-						goto on_error;
-					}
-					/* TODO range check */
-					single_file_entry->flags = (uint32_t) value_64bit;
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "src",
-					  type_string_length ) == 0 )
-				{
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "sub",
-					  type_string_length ) == 0 )
-				{
-				}
 			}
-			else if( type_string_length == 2 )
+			else if( ( type_string[ 0 ] == (uint8_t) 'o' )
+			      && ( type_string[ 1 ] == (uint8_t) 'p' )
+			      && ( type_string[ 2 ] == (uint8_t) 'r' ) )
 			{
-				/* Access time
-				 */
-				if( libcstring_narrow_string_compare(
-				     types->values[ value_iterator ],
-				     "ac",
-				     type_string_length ) == 0 )
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     error ) != 1 )
 				{
-					if( libfvalue_utf8_string_decimal_copy_to_64bit(
-					     values->values[ value_iterator ],
-					     value_string_length + 1,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set access time.",
-						 function );
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set entry flags.",
+					 function );
 
-						goto on_error;
-					}
-					/* TODO range check */
-					single_file_entry->access_time = value_64bit;
+					goto on_error;
 				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "aq",
-					  type_string_length ) == 0 )
-				{
-				}
-				/* Data offset
-				 * consist of: unknown, offset and size
-				 */
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "be",
-					  type_string_length ) == 0 )
-				{
-					if( libewf_split_values_parse_string(
-					     &offset_values,
-					     values->values[ value_iterator ],
-					     value_string_length,
-					     (uint8_t) ' ',
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-						 "%s: unable to split value string into offset values.",
-						 function );
-
-						goto on_error;
-					}
-					if( offset_values->number_of_values == 3 )
-					{
-						if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
-						     offset_values->values[ 1 ],
-						     offset_values->sizes[ 1 ],
-						     &value_64bit,
-						     error ) != 1 )
-						{
-							liberror_error_set(
-							 error,
-							 LIBERROR_ERROR_DOMAIN_MEMORY,
-							 LIBERROR_MEMORY_ERROR_SET_FAILED,
-							 "%s: unable to set data offset.",
-							 function );
-
-							goto on_error;
-						}
-						single_file_entry->data_offset = (off64_t) value_64bit;
-
-						if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
-						     offset_values->values[ 2 ],
-						     offset_values->sizes[ 2 ],
-						     &value_64bit,
-						     error ) != 1 )
-						{
-							liberror_error_set(
-							 error,
-							 LIBERROR_ERROR_DOMAIN_MEMORY,
-							 LIBERROR_MEMORY_ERROR_SET_FAILED,
-							 "%s: unable to set data size.",
-							 function );
-
-							goto on_error;
-						}
-						single_file_entry->data_size = (size64_t) value_64bit;
-					}
-					if( libewf_split_values_free(
-					     &offset_values,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-						 "%s: unable to free split offset values.",
-						 function );
-
-						goto on_error;
-					}
-				}
-				/* Creation time
-				 */
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "cr",
-					  type_string_length ) == 0 )
-				{
-					if( libfvalue_utf8_string_decimal_copy_to_64bit(
-					     values->values[ value_iterator ],
-					     value_string_length + 1,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set creation time.",
-						 function );
-
-						goto on_error;
-					}
-					/* TODO range check */
-					single_file_entry->creation_time = value_64bit;
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "dl",
-					  type_string_length ) == 0 )
-				{
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "du",
-					  type_string_length ) == 0 )
-				{
-				}
-				/* MD5 digest hash
-				 */
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "ha",
-					  type_string_length ) == 0 )
-				{
-					single_file_entry->md5_hash = (uint8_t *) memory_allocate(
-										   sizeof( uint8_t ) * ( value_string_length + 1 ) );
-
-					if( single_file_entry->md5_hash == NULL )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-						 "%s: unable to create MD5 hash.",
-						 function );
-
-						goto on_error;
-					}
-					for( value_string_index = 0;
-					     value_string_index < value_string_length;
-					     value_string_index++ )
-					{
-						if( ( ( values->values[ value_iterator ] )[ value_string_index ] >= (uint8_t) '0' )
-						 && ( ( values->values[ value_iterator ] )[ value_string_index ] <= (uint8_t) '9' ) )
-						{
-							single_file_entry->md5_hash[ value_string_index ] = ( values->values[ value_iterator ] )[ value_string_index ];
-						}
-						else if( ( ( values->values[ value_iterator ] )[ value_string_index ] >= (uint8_t) 'A' )
-						      && ( ( values->values[ value_iterator ] )[ value_string_index ] <= (uint8_t) 'F' ) )
-						{
-							single_file_entry->md5_hash[ value_string_index ] = (uint8_t) ( 'a' - 'A' ) + ( values->values[ value_iterator ] )[ value_string_index ];
-						}
-						else if( ( ( values->values[ value_iterator ] )[ value_string_index ] >= (uint8_t) 'a' )
-						      && ( ( values->values[ value_iterator ] )[ value_string_index ] <= (uint8_t) 'f' ) )
-						{
-							single_file_entry->md5_hash[ value_string_index ] = ( values->values[ value_iterator ] )[ value_string_index ];
-						}
-						else
-						{
-							liberror_error_set(
-							 error,
-							 LIBERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-							 "%s: unsupported character in MD5 hash.",
-							 function );
-
-							goto on_error;
-						}
-					}
-					single_file_entry->md5_hash[ value_string_length ] = 0;
-
-					single_file_entry->md5_hash_size = value_string_length + 1;
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "id",
-					  type_string_length ) == 0 )
-				{
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "jq",
-					  type_string_length ) == 0 )
-				{
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "lo",
-					  type_string_length ) == 0 )
-				{
-				}
-				/* Size
-				 */
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "ls",
-					  type_string_length ) == 0 )
-				{
-					if( libfvalue_utf8_string_decimal_copy_to_64bit(
-					     values->values[ value_iterator ],
-					     value_string_length + 1,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set size.",
-						 function );
-
-						goto on_error;
-					}
-					single_file_entry->size = (size64_t) value_64bit;
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "mo",
-					  type_string_length ) == 0 )
-				{
-					if( libfvalue_utf8_string_decimal_copy_to_64bit(
-					     values->values[ value_iterator ],
-					     value_string_length + 1,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set entry modification time.",
-						 function );
-
-						goto on_error;
-					}
-					/* TODO range check */
-					single_file_entry->entry_modification_time = value_64bit;
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "pm",
-					  type_string_length ) == 0 )
-				{
-				}
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "po",
-					  type_string_length ) == 0 )
-				{
-				}
-				/* Modification time
-				 */
-				else if( libcstring_narrow_string_compare(
-					  types->values[ value_iterator ],
-					  "wr",
-					  type_string_length ) == 0 )
-				{
-					if( libfvalue_utf8_string_decimal_copy_to_64bit(
-					     values->values[ value_iterator ],
-					     value_string_length + 1,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set modification time.",
-						 function );
-
-						goto on_error;
-					}
-					/* TODO range check */
-					single_file_entry->modification_time = value_64bit;
-				}
+				/* TODO range check */
+				single_file_entry->flags = (uint32_t) value_64bit;
 			}
-			else if( type_string_length == 1 )
+			else if( ( type_string[ 0 ] == (uint8_t) 's' )
+			      && ( type_string[ 1 ] == (uint8_t) 'r' )
+			      && ( type_string[ 2 ] == (uint8_t) 'c' ) )
 			{
-				/* Name
-				 */
-				if( libcstring_narrow_string_compare(
-				     types->values[ value_iterator ],
-				     "n",
-				     type_string_length ) == 0 )
-				{
-					single_file_entry->name = (uint8_t *) memory_allocate(
-									       sizeof( uint8_t ) * ( value_string_length + 1 ) );
-
-					if( single_file_entry->name == NULL )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-						 "%s: unable to create name.",
-						 function );
-
-						goto on_error;
-					}
-					if( libcstring_narrow_string_copy(
-					     single_file_entry->name,
-					     values->values[ value_iterator ],
-					     value_string_length ) == NULL )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set name.",
-						 function );
-
-						goto on_error;
-					}
-					single_file_entry->name[ value_string_length ] = 0;
-
-					single_file_entry->name_size = value_string_length + 1;
-				}
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 's' )
+			      && ( type_string[ 1 ] == (uint8_t) 'u' )
+			      && ( type_string[ 2 ] == (uint8_t) 'b' ) )
+			{
 			}
 		}
-		if( type_string_length == 1 )
+		else if( type_string_size == 3 )
 		{
-			if( libcstring_narrow_string_compare(
-			     types->values[ value_iterator ],
-			     "p",
-			     type_string_length ) == 0 )
+			/* Access time
+			 */
+			if( ( type_string[ 0 ] == (uint8_t) 'a' )
+			 && ( type_string[ 1 ] == (uint8_t) 'c' ) )
+			{
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set access time.",
+					 function );
+
+					goto on_error;
+				}
+				/* TODO range check */
+				single_file_entry->access_time = value_64bit;
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
+			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
+			{
+			}
+			/* Data offset
+			 * consist of: unknown, offset and size
+			 */
+			else if( ( type_string[ 0 ] == (uint8_t) 'b' )
+			      && ( type_string[ 1 ] == (uint8_t) 'e' ) )
+			{
+/* TODO refactor to separate function */
+				if( libfvalue_utf8_string_split(
+				     value_string,
+				     value_string_size,
+				     (uint8_t) ' ',
+				     &offset_values,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to split value string into offset values.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfvalue_split_utf8_string_get_number_of_segments(
+				     offset_values,
+				     &number_of_offset_values,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve number of lines",
+					 function );
+
+					goto on_error;
+				}
+				if( ( number_of_offset_values != 1 )
+				 && ( number_of_offset_values != 3 ) )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+					 "%s: unsupported number of offset values.",
+					 function );
+
+					goto on_error;
+				}
+				if( number_of_offset_values == 3 )
+				{
+					if( libfvalue_split_utf8_string_get_segment_by_index(
+					     offset_values,
+					     1,
+					     &offset_value_string,
+					     &offset_value_string_size,
+					     error ) != 1 )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve offset value string: 1.",
+						 function );
+
+						goto on_error;
+					}
+					if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
+					     offset_value_string,
+					     offset_value_string_size,
+					     &value_64bit,
+					     error ) != 1 )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_MEMORY,
+						 LIBERROR_MEMORY_ERROR_SET_FAILED,
+						 "%s: unable to set data offset.",
+						 function );
+
+						goto on_error;
+					}
+					single_file_entry->data_offset = (off64_t) value_64bit;
+
+					if( libfvalue_split_utf8_string_get_segment_by_index(
+					     offset_values,
+					     2,
+					     &offset_value_string,
+					     &offset_value_string_size,
+					     error ) != 1 )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve offset value string: 2.",
+						 function );
+
+						goto on_error;
+					}
+					if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
+					     offset_value_string,
+					     offset_value_string_size,
+					     &value_64bit,
+					     error ) != 1 )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_MEMORY,
+						 LIBERROR_MEMORY_ERROR_SET_FAILED,
+						 "%s: unable to set data size.",
+						 function );
+
+						goto on_error;
+					}
+					single_file_entry->data_size = (size64_t) value_64bit;
+				}
+				if( libfvalue_split_utf8_string_free(
+				     &offset_values,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free split offset values.",
+					 function );
+
+					goto on_error;
+				}
+			}
+			/* Creation time
+			 */
+			else if( ( type_string[ 0 ] == (uint8_t) 'c' )
+			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
+			{
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set creation time.",
+					 function );
+
+					goto on_error;
+				}
+				/* TODO range check */
+				single_file_entry->creation_time = value_64bit;
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
+			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
+			{
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
+			      && ( type_string[ 1 ] == (uint8_t) 'u' ) )
+			{
+			}
+			/* MD5 digest hash
+			 */
+			else if( ( type_string[ 0 ] == (uint8_t) 'h' )
+			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
+			{
+				single_file_entry->md5_hash = (uint8_t *) memory_allocate(
+									   sizeof( uint8_t ) * value_string_size );
+
+				if( single_file_entry->md5_hash == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create MD5 hash.",
+					 function );
+
+					goto on_error;
+				}
+				for( value_string_index = 0;
+				     value_string_index < value_string_size - 1;
+				     value_string_index++ )
+				{
+					if( ( value_string[ value_string_index ] >= (uint8_t) '0' )
+					 && ( value_string[ value_string_index ] <= (uint8_t) '9' ) )
+					{
+						single_file_entry->md5_hash[ value_string_index ] = value_string[ value_string_index ];
+					}
+					else if( ( value_string[ value_string_index ] >= (uint8_t) 'A' )
+					      && ( value_string[ value_string_index ] <= (uint8_t) 'F' ) )
+					{
+						single_file_entry->md5_hash[ value_string_index ] = (uint8_t) ( 'a' - 'A' ) + value_string[ value_string_index ];
+					}
+					else if( ( value_string[ value_string_index ] >= (uint8_t) 'a' )
+					      && ( value_string[ value_string_index ] <= (uint8_t) 'f' ) )
+					{
+						single_file_entry->md5_hash[ value_string_index ] = value_string[ value_string_index ];
+					}
+					else
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+						 "%s: unsupported character in MD5 hash.",
+						 function );
+
+						goto on_error;
+					}
+				}
+				single_file_entry->md5_hash[ value_string_size - 1 ] = 0;
+
+				single_file_entry->md5_hash_size = value_string_size;
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'i' )
+			      && ( type_string[ 1 ] == (uint8_t) 'd' ) )
+			{
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'j' )
+			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
+			{
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
+			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
+			{
+			}
+			/* Size
+			 */
+			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
+			      && ( type_string[ 1 ] == (uint8_t) 's' ) )
+			{
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set size.",
+					 function );
+
+					goto on_error;
+				}
+				single_file_entry->size = (size64_t) value_64bit;
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'm' )
+			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
+			{
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set entry modification time.",
+					 function );
+
+					goto on_error;
+				}
+				/* TODO range check */
+				single_file_entry->entry_modification_time = value_64bit;
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
+			      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
+			{
+			}
+			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
+			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
+			{
+			}
+			/* Modification time
+			 */
+			else if( ( type_string[ 0 ] == (uint8_t) 'w' )
+			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
+			{
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set modification time.",
+					 function );
+
+					goto on_error;
+				}
+				/* TODO range check */
+				single_file_entry->modification_time = value_64bit;
+			}
+		}
+		else if( type_string_size == 2 )
+		{
+			/* Name
+			 */
+			if( type_string[ 0 ] == (uint8_t) 'n' )
+			{
+				single_file_entry->name = (uint8_t *) memory_allocate(
+								       sizeof( uint8_t ) * value_string_size );
+
+				if( single_file_entry->name == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create name.",
+					 function );
+
+					goto on_error;
+				}
+				if( libcstring_narrow_string_copy(
+				     single_file_entry->name,
+				     value_string,
+				     value_string_size - 1 ) == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set name.",
+					 function );
+
+					goto on_error;
+				}
+				single_file_entry->name[ value_string_size - 1 ] = 0;
+
+				single_file_entry->name_size = value_string_size;
+			}
+		}
+		if( type_string_size == 2 )
+		{
+			if( type_string[ 0 ] == (uint8_t) 'p' )
 			{
 				/* p = 1 if directory
 				 * p = emtpy if file
 				 */
-				if( value_string_length == 0 )
+				if( ( value_string_size == 2 )
+				 && ( value_string[ 0 ] == (uint8_t) '1' ) )
+				{
+					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
+				}
+				else if( value_string_size == 1 )
 				{
 					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
-				}
-				else if( value_string_length == 1 )
-				{
-					if( libcstring_narrow_string_compare(
-					     values->values[ value_iterator ],
-					     "1",
-					     value_string_length ) == 0 )
-					{
-						single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
-					}
 				}
 			}
 		}
 	}
-	if( libewf_split_values_free(
+	if( libfvalue_split_utf8_string_free(
 	     &values,
 	     error ) != 1 )
 	{
@@ -1373,8 +1647,6 @@ int libewf_single_files_parse_file_entry(
 
 		goto on_error;
 	}
-	*line_iterator += 1;
-
 	if( libewf_tree_node_set_value(
 	     parent_file_entry_node,
 	     (intptr_t *) single_file_entry,
@@ -1391,18 +1663,32 @@ int libewf_single_files_parse_file_entry(
 	}
 	single_file_entry = NULL;
 
-	if( ( *line_iterator + number_of_child_entries ) > (uint64_t) lines->number_of_values )
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     lines,
+	     &number_of_lines,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of lines",
+		 function );
+
+		goto on_error;
+	}
+	if( ( *line_index + number_of_sub_entries ) > (uint64_t) number_of_lines )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: number of child entries exceed the number of available lines.",
+		 "%s: number of sub entries exceed the number of available lines.",
 		 function );
 
 		goto on_error;
 	}
-	while( number_of_child_entries > 0 )
+	while( number_of_sub_entries > 0 )
 	{
 		if( libewf_tree_node_initialize(
 		     &file_entry_node,
@@ -1420,7 +1706,7 @@ int libewf_single_files_parse_file_entry(
 		if( libewf_single_files_parse_file_entry(
 		     file_entry_node,
 		     lines,
-		     line_iterator,
+		     line_index,
 		     types,
 		     error ) != 1 )
 		{
@@ -1449,7 +1735,7 @@ int libewf_single_files_parse_file_entry(
 		}
 		file_entry_node = NULL;
 
-		number_of_child_entries--;
+		number_of_sub_entries--;
 	}
 	return( 1 );
 
@@ -1469,7 +1755,180 @@ on_error:
 	}
 	if( values != NULL )
 	{
-		libewf_split_values_free(
+		libfvalue_split_utf8_string_free(
+		 &values,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Parse a single file entry string for the values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_files_parse_file_entry_number_of_sub_entries(
+     libfvalue_split_utf8_string_t *lines,
+     int *line_index,
+     uint64_t *number_of_sub_entries,
+     liberror_error_t **error )
+{
+	libfvalue_split_utf8_string_t *values = NULL;
+	uint8_t *line_string                  = NULL;
+	uint8_t *value_string                 = NULL;
+	static char *function                 = "libewf_single_files_parse_file_entry_number_of_sub_entries";
+	size_t line_string_size               = 0;
+	size_t value_string_size              = 0;
+	int number_of_values                  = 0;
+
+	if( line_index == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line index.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     lines,
+	     *line_index,
+	     &line_string,
+	     &line_string_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve line string: %d.",
+		 function,
+		 *line_index );
+
+		goto on_error;
+	}
+	*line_index += 1;
+
+	if( libfvalue_utf8_string_split(
+	     line_string,
+	     line_string_size,
+	     (uint8_t) '\t',
+	     &values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split entries string into values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     values,
+	     &number_of_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of values",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_values != 2 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported number of values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     values,
+	     0,
+	     &value_string,
+	     &value_string_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value string: 0.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( value_string_size != 2 )
+	 || ( value_string[ 0 ] != (uint8_t) '0' ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported first value: 0x%x.",
+		 function,
+		 value_string[ 0 ] );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     values,
+	     1,
+	     &value_string,
+	     &value_string_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value string: 1.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_decimal_copy_to_64bit(
+	     value_string,
+	     value_string_size,
+	     number_of_sub_entries,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to set number fo sub entries.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_free(
+	     &values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split values.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( values != NULL )
+	{
+		libfvalue_split_utf8_string_free(
 		 &values,
 		 NULL );
 	}

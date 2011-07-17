@@ -100,9 +100,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA"
-				RuntimeLibrary="2"
+				BasicRuntimeChecks="3"
+				SmallerTypeCheck="true"
+				RuntimeLibrary="3"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 				CompileAs="1"
@@ -224,18 +227,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libuna\libuna_codepage_windows_874.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libuna\libuna_codepage_windows_932.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libuna\libuna_codepage_windows_936.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libuna\libuna_codepage_windows_1250.c"
 				>
 			</File>
@@ -269,6 +260,18 @@
 			</File>
 			<File
 				RelativePath="..\..\libuna\libuna_codepage_windows_1258.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_874.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_932.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_936.c"
 				>
 			</File>
 			<File
@@ -394,18 +397,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libuna\libuna_codepage_windows_874.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libuna\libuna_codepage_windows_932.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libuna\libuna_codepage_windows_936.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libuna\libuna_codepage_windows_1250.h"
 				>
 			</File>
@@ -439,6 +430,18 @@
 			</File>
 			<File
 				RelativePath="..\..\libuna\libuna_codepage_windows_1258.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_874.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_932.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libuna\libuna_codepage_windows_936.h"
 				>
 			</File>
 			<File

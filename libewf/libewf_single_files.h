@@ -28,7 +28,7 @@
 #include <liberror.h>
 
 #include "libewf_extern.h"
-#include "libewf_split_values.h"
+#include "libewf_libfvalue.h"
 #include "libewf_tree_type.h"
 #include "libewf_types.h"
 
@@ -75,15 +75,21 @@ int libewf_single_files_parse_file_entries(
 
 int libewf_single_files_parse_record_values(
      size64_t *media_size,
-     libewf_split_values_t *lines,
+     libfvalue_split_utf8_string_t *lines,
      int *line_iterator,
      liberror_error_t **error );
 
 int libewf_single_files_parse_file_entry(
      libewf_tree_node_t *parent_file_entry_node,
-     libewf_split_values_t *lines,
+     libfvalue_split_utf8_string_t *lines,
      int *line_iterator,
-     libewf_split_values_t *types,
+     libfvalue_split_utf8_string_t *types,
+     liberror_error_t **error );
+
+int libewf_single_files_parse_file_entry_number_of_sub_entries(
+     libfvalue_split_utf8_string_t *lines,
+     int *line_index,
+     uint64_t *number_of_sub_entries,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

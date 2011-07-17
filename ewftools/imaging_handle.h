@@ -222,8 +222,6 @@ struct imaging_handle
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
-     uint8_t calculate_sha1,
-     uint8_t calculate_sha256,
      liberror_error_t **error );
 
 int imaging_handle_free(
@@ -415,7 +413,7 @@ int imaging_handle_set_process_buffer_size(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
-int imaging_handle_set_additional_digests(
+int imaging_handle_set_additional_digest_types(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );

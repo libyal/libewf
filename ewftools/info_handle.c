@@ -1785,7 +1785,7 @@ int info_handle_header_value_extents_fprint(
 
 		if( libsystem_string_split(
 		     header_value,
-		     header_value_length,
+		     header_value_length + 1,
 		     (libcstring_system_character_t) ' ',
 		     &extents_elements,
 		     error ) != 1 )

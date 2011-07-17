@@ -126,7 +126,8 @@ void usage_fprint(
 	fprintf( stream, "\t-c: specify the compression level, options: none (default),\n"
 	                 "\t    empty-block, fast or best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
-	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options:\n"
+	                 "\t    sha1, sha256\n" );
 	fprintf( stream, "\t-D: specify the description (default is description).\n" );
 	fprintf( stream, "\t-e: specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E: specify the evidence number (default is evidence_number).\n" );
@@ -928,6 +929,7 @@ int main( int argc, char * const argv[] )
 	liberror_error_t *error                                         = NULL;
 
 	libcstring_system_character_t *log_filename                     = NULL;
+	libcstring_system_character_t *option_additional_digest_types   = NULL;
 	libcstring_system_character_t *option_bytes_per_sector          = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
 	libcstring_system_character_t *option_compression_level         = NULL;
@@ -953,8 +955,6 @@ int main( int argc, char * const argv[] )
 	libcstring_system_integer_t option                              = 0;
 	size_t string_length                                            = 0;
 	uint8_t calculate_md5                                           = 1;
-	uint8_t calculate_sha1                                          = 0;
-	uint8_t calculate_sha256                                        = 0;
 	uint8_t print_status_information                                = 1;
 	uint8_t read_error_retries                                      = 2;
 	uint8_t resume_acquiry                                          = 0;
@@ -1059,26 +1059,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'd':
-				if( libcstring_system_string_compare(
-				     optarg,
-				     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
-				     4 ) == 0 )
-				{
-					calculate_sha1 = 1;
-				}
-				else if( libcstring_system_string_compare(
-				          optarg,
-				          _LIBCSTRING_SYSTEM_STRING( "sha256" ),
-				          2 ) == 0 )
-				{
-					calculate_sha256 = 1;
-				}
-				else
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported digest type.\n" );
-				}
+				option_additional_digest_types = optarg;
+
 				break;
 
 			case (libcstring_system_integer_t) 'D':
@@ -1224,8 +1206,6 @@ int main( int argc, char * const argv[] )
 	if( imaging_handle_initialize(
 	     &ewfacquirestream_imaging_handle,
 	     calculate_md5,
-	     calculate_sha1,
-	     calculate_sha256,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -1630,6 +1610,22 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
+	if( option_additional_digest_types != NULL )
+	{
+		result = imaging_handle_set_additional_digest_types(
+			  ewfacquirestream_imaging_handle,
+			  option_additional_digest_types,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set additional digest types.\n" );
+
+			goto on_error;
 		}
 	}
 	fprintf(

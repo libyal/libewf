@@ -56,8 +56,6 @@
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
-     uint8_t calculate_sha1,
-     uint8_t calculate_sha256,
      liberror_error_t **error )
 {
 	static char *function = "imaging_handle_initialize";
@@ -152,7 +150,7 @@ int imaging_handle_initialize(
 		if( calculate_md5 != 0 )
 		{
 			( *imaging_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
-			                                                   33 );
+									   33 );
 
 			if( ( *imaging_handle )->calculated_md5_hash_string == NULL )
 			{
@@ -166,43 +164,7 @@ int imaging_handle_initialize(
 				goto on_error;
 			}
 		}
-		if( calculate_sha1 != 0 )
-		{
-			( *imaging_handle )->calculated_sha1_hash_string = libcstring_system_string_allocate(
-			                                                    41 );
-
-			if( ( *imaging_handle )->calculated_sha1_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated SHA1 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		if( calculate_sha256 != 0 )
-		{
-			( *imaging_handle )->calculated_sha256_hash_string = libcstring_system_string_allocate(
-			                                                      65 );
-
-			if( ( *imaging_handle )->calculated_sha256_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated SHA256 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
 		( *imaging_handle )->calculate_md5            = calculate_md5;
-		( *imaging_handle )->calculate_sha1           = calculate_sha1;
-		( *imaging_handle )->calculate_sha256         = calculate_sha256;
 		( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
 		( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
 		( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
@@ -3324,19 +3286,24 @@ int imaging_handle_set_process_buffer_size(
 	return( result );
 }
 
-/* Sets the additiona digests
- * Returns 1 if successful, 0 if unsupported value or -1 on error
+/* Sets the additional digest types
+ * Returns 1 if successful or -1 on error
  */
-int imaging_handle_set_additional_digests(
+int imaging_handle_set_additional_digest_types(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error )
 {
-	libsystem_split_string_t *string_elements = NULL;
-	static char *function                     = "imaging_handle_set_additional_digests";
-	size_t string_length                      = 0;
-	int number_of_segments                    = 0;
-	int result                                = 0;
+	libcstring_system_character_t *string_segment = NULL;
+	libsystem_split_string_t *string_elements     = NULL;
+	static char *function                         = "imaging_handle_set_additional_digest_types";
+	size_t string_length                          = 0;
+	size_t string_segment_size                    = 0;
+	uint8_t calculate_sha1                        = 0;
+	uint8_t calculate_sha256                      = 0;
+	int number_of_segments                        = 0;
+	int segment_index                             = 0;
+	int result                                    = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -3354,7 +3321,7 @@ int imaging_handle_set_additional_digests(
 
 	if( libsystem_string_split(
 	     string,
-	     string_length,
+	     string_length + 1,
 	     (libcstring_system_character_t) ',',
 	     &string_elements,
 	     error ) != 1 )
@@ -3382,7 +3349,98 @@ int imaging_handle_set_additional_digests(
 
 		return( -1 );
 	}
-/* TODO */
+	for( segment_index = 0;
+	     segment_index < number_of_segments;
+	     segment_index++ )
+	{
+		if( libsystem_split_string_get_segment_by_index(
+		     string_elements,
+		     segment_index,
+		     &string_segment,
+		     &string_segment_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string segment: %d.",
+			 function,
+			 segment_index );
+
+			goto on_error;
+		}
+		if( string_segment == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing string segment: %d.",
+			 function,
+			 segment_index );
+
+			return( -1 );
+		}
+		if( string_segment_size == 4 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
+			     3 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+		}
+		else if( string_segment_size == 7 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+			     6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+		}
+	}
+	if( ( calculate_sha1 != 0 )
+	 && ( imaging_handle->calculate_sha1 == 0 ) )
+	{
+		imaging_handle->calculated_sha1_hash_string = libcstring_system_string_allocate(
+		                                               41 );
+
+		if( imaging_handle->calculated_sha1_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA1 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+		imaging_handle->calculate_sha1 = 1;
+	}
+	if( ( calculate_sha256 != 0 )
+	 && ( imaging_handle->calculate_sha256 == 0 ) )
+	{
+		imaging_handle->calculated_sha256_hash_string = libcstring_system_string_allocate(
+		                                                 65 );
+
+		if( imaging_handle->calculated_sha256_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA256 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+		imaging_handle->calculate_sha256 = 1;
+	}
 	if( libsystem_split_string_free(
 	     &string_elements,
 	     error ) != 1 )

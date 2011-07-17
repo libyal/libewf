@@ -1186,6 +1186,7 @@ int main( int argc, char * const argv[] )
 	liberror_error_t *error                                         = NULL;
 
 	libcstring_system_character_t *log_filename                     = NULL;
+	libcstring_system_character_t *option_additional_digest_types   = NULL;
 	libcstring_system_character_t *option_bytes_per_sector          = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
 	libcstring_system_character_t *option_compression_level         = NULL;
@@ -1218,8 +1219,6 @@ int main( int argc, char * const argv[] )
 	size_t string_length                                            = 0;
 	uint64_t media_size                                             = 0;
 	uint8_t calculate_md5                                           = 1;
-	uint8_t calculate_sha1                                          = 0;
-	uint8_t calculate_sha256                                        = 0;
 	uint8_t print_status_information                                = 1;
 	uint8_t resume_acquiry                                          = 0;
 	uint8_t swap_byte_pairs                                         = 0;
@@ -1298,26 +1297,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'd':
-				if( libcstring_system_string_compare(
-				     optarg,
-				     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
-				     4 ) == 0 )
-				{
-					calculate_sha1 = 1;
-				}
-				else if( libcstring_system_string_compare(
-				          optarg,
-				          _LIBCSTRING_SYSTEM_STRING( "sha256" ),
-				          6 ) == 0 )
-				{
-					calculate_sha256 = 1;
-				}
-				else
-				{
-					fprintf(
-					 stderr,
-					 "Unsupported digest type.\n" );
-				}
+				option_additional_digest_types = optarg;
+
 				break;
 
 			case (libcstring_system_integer_t) 'D':
@@ -1615,8 +1596,6 @@ int main( int argc, char * const argv[] )
 	if( imaging_handle_initialize(
 	     &ewfacquire_imaging_handle,
 	     calculate_md5,
-	     calculate_sha1,
-	     calculate_sha256,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -2065,6 +2044,22 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
+	if( option_additional_digest_types != NULL )
+	{
+		result = imaging_handle_set_additional_digest_types(
+			  ewfacquire_imaging_handle,
+			  option_additional_digest_types,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set additional digest types.\n" );
+
+			goto on_error;
 		}
 	}
 	/* Initialize values

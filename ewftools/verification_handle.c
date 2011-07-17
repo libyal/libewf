@@ -49,8 +49,6 @@
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
-     uint8_t calculate_sha1,
-     uint8_t calculate_sha256,
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_initialize";
@@ -162,23 +160,6 @@ int verification_handle_initialize(
 
 			goto on_error;
 		}
-		if( calculate_sha1 != 0 )
-		{
-			( *verification_handle )->calculated_sha1_hash_string = libcstring_system_string_allocate(
-			                                                         41 );
-
-			if( ( *verification_handle )->calculated_sha1_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated SHA1 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
 		( *verification_handle )->stored_sha1_hash_string = libcstring_system_string_allocate(
 		                                                     41 );
 
@@ -192,23 +173,6 @@ int verification_handle_initialize(
 			 function );
 
 			goto on_error;
-		}
-		if( calculate_sha256 != 0 )
-		{
-			( *verification_handle )->calculated_sha256_hash_string = libcstring_system_string_allocate(
-			                                                           65 );
-
-			if( ( *verification_handle )->calculated_sha256_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated SHA256 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
 		}
 		( *verification_handle )->stored_sha256_hash_string = libcstring_system_string_allocate(
 		                                                       65 );
@@ -226,8 +190,6 @@ int verification_handle_initialize(
 		}
 		( *verification_handle )->input_format        = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
 		( *verification_handle )->calculate_md5       = calculate_md5;
-		( *verification_handle )->calculate_sha1      = calculate_sha1;
-		( *verification_handle )->calculate_sha256    = calculate_sha256;
 		( *verification_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
 		( *verification_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
 		( *verification_handle )->notify_stream       = VERIFICATION_HANDLE_NOTIFY_STREAM;
@@ -2899,6 +2861,186 @@ int verification_handle_set_process_buffer_size(
 		}
 	}
 	return( result );
+}
+
+/* Sets the additional digest types
+ * Returns 1 if successful or -1 on error
+ */
+int verification_handle_set_additional_digest_types(
+     verification_handle_t *verification_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *string_segment = NULL;
+	libsystem_split_string_t *string_elements     = NULL;
+	static char *function                         = "verification_handle_set_additional_digest_types";
+	size_t string_length                          = 0;
+	size_t string_segment_size                    = 0;
+	uint8_t calculate_sha1                        = 0;
+	uint8_t calculate_sha256                      = 0;
+	int number_of_segments                        = 0;
+	int segment_index                             = 0;
+	int result                                    = 0;
+
+	if( verification_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( libsystem_string_split(
+	     string,
+	     string_length + 1,
+	     (libcstring_system_character_t) ',',
+	     &string_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libsystem_split_string_get_number_of_segments(
+	     string_elements,
+	     &number_of_segments,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of segments.",
+		 function );
+
+		return( -1 );
+	}
+	for( segment_index = 0;
+	     segment_index < number_of_segments;
+	     segment_index++ )
+	{
+		if( libsystem_split_string_get_segment_by_index(
+		     string_elements,
+		     segment_index,
+		     &string_segment,
+		     &string_segment_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string segment: %d.",
+			 function,
+			 segment_index );
+
+			goto on_error;
+		}
+		if( string_segment == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing string segment: %d.",
+			 function,
+			 segment_index );
+
+			return( -1 );
+		}
+		if( string_segment_size == 4 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
+			     3 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+		}
+		else if( string_segment_size == 7 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+			     6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+		}
+	}
+	if( ( calculate_sha1 != 0 )
+	 && ( verification_handle->calculate_sha1 == 0 ) )
+	{
+		verification_handle->calculated_sha1_hash_string = libcstring_system_string_allocate(
+		                                               41 );
+
+		if( verification_handle->calculated_sha1_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA1 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+		verification_handle->calculate_sha1 = 1;
+	}
+	if( ( calculate_sha256 != 0 )
+	 && ( verification_handle->calculate_sha256 == 0 ) )
+	{
+		verification_handle->calculated_sha256_hash_string = libcstring_system_string_allocate(
+		                                                 65 );
+
+		if( verification_handle->calculated_sha256_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA256 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+		verification_handle->calculate_sha256 = 1;
+	}
+	if( libsystem_split_string_free(
+	     &string_elements,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split string.",
+		 function );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( string_elements != NULL )
+	{
+		libsystem_split_string_free(
+		 &string_elements,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Sets the zero chunk on error

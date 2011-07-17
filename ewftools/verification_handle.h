@@ -164,8 +164,6 @@ struct verification_handle
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
-     uint8_t calculate_sha1,
-     uint8_t calculate_sha256,
      liberror_error_t **error );
 
 int verification_handle_free(
@@ -263,6 +261,11 @@ int verification_handle_set_format(
      liberror_error_t **error );
 
 int verification_handle_set_process_buffer_size(
+     verification_handle_t *verification_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int verification_handle_set_additional_digest_types(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );

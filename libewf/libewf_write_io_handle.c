@@ -3001,7 +3001,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          int chunk_index,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
-         size_t chunk_data_size,
+         size_t chunk_data_size LIBEWF_ATTRIBUTE_UNUSED,
          int8_t is_compressed,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
@@ -3023,6 +3023,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	int file_io_pool_entry                   = -1;
 	int number_of_segment_files              = 0;
 	int segment_files_list_index             = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( chunk_data_size )
 
 	if( write_io_handle == NULL )
 	{

@@ -2682,7 +2682,7 @@ ssize_t libewf_segment_file_write_chunk(
          int chunk_index,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
-         size_t chunk_data_size,
+         size_t chunk_data_size LIBEWF_ATTRIBUTE_UNUSED,
          int8_t is_compressed,
          uint8_t *checksum_buffer,
          uint32_t *chunk_checksum,
@@ -2700,6 +2700,8 @@ ssize_t libewf_segment_file_write_chunk(
 #if defined( HAVE_DEBUG_OUTPUT )
 	char *chunk_type            = NULL;
 #endif
+
+	LIBEWF_UNREFERENCED_PARAMETER( chunk_data_size )
 
 	if( segment_file == NULL )
 	{

@@ -1,16 +1,14 @@
 TODO
-* fix date/time split values issue
-* replace libewf split values by libfvalue split string
-  - libewf_single_files
-* refactor in to sub functions
-  - libewf_date_time_values_copy_to_timestamp
-* imaging handle
-  - add functions to set the addition digest hash calculations
+* ewfexport support target path "."
+* libewf_single_files refactor to use utf-16
+* add functions to set the addition digest hash calculations
+* SHA256 support
+  - ewfexport (raw format?)
 * libhashf
   - implement fall back implementations for static compilation
     - MD5
     - SHA1
-    - SHA256 test
+    - SHA256
   - cross platform check, e.g. what about MD5 functions without return value
   - alter configure.ac EVP check to allow separate MD hash support
 * libsystem path implement GetVolumeInformation
@@ -236,6 +234,7 @@ Tools:
   - create a tool fuse mount ewf files
   - create mount handle
   - LEV support
+  - Linux use fuse, Windows use imgdisk, MacOS use API?
 * process status
   - improve and remove "This could take a while." ?
 
@@ -271,13 +270,20 @@ Known issues:
 
 20110717
 * worked on date time value functions
+* worked on replacing libewf split values by libfvalue split string
+* added ewf_test_get_offset test to ewf_test_read
+* fixes to configure for MingW compilation of libhmac
+* update msvscpp files
+* worked on libhmac
 
 20110716
 * worked on date time value functions
+* worked on replacing libewf split values by libfvalue split string
 
 20110715
 * updated libhmac
 * worked on date time value functions
+* worked on replacing libewf split values by libfvalue split string
 
 20110714
 * worked on replacing libewf split values by libfvalue split string
@@ -313,7 +319,6 @@ Known issues:
 * refactored ewftools to use libhmac
 * code clean up
 * ewftools: worked on SHA256 support
-* added SHA256 support
 * updated msvscpp, codegear and builder5 files
 
 20110625
