@@ -333,7 +333,6 @@ ssize_t ewfacquirestream_read_chunk(
 				 read_count );
 			}
 #endif
-
 			if( read_count <= -1 )
 			{
 				if( ( errno == ESPIPE )
@@ -432,7 +431,6 @@ ssize_t ewfacquirestream_read_chunk(
 					 read_count );
 				}
 #endif
-
 				/* There was a read error at a certain offset
 				 */
 				read_error_offset += read_count;
@@ -849,49 +847,35 @@ int ewfacquirestream_read_input(
 	}
 	if( ewfacquirestream_abort == 0 )
 	{
-		if( imaging_handle->calculate_md5 == 1 )
+		if( imaging_handle_print_hashes(
+		     imaging_handle,
+		     imaging_handle->notify_stream,
+		     error ) != 1 )
 		{
-			fprintf(
-			 imaging_handle->notify_stream,
-			 "MD5 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 imaging_handle->calculated_md5_hash_string );
-		}
-		if( imaging_handle->calculate_sha1 == 1 )
-		{
-			fprintf(
-			 imaging_handle->notify_stream,
-			 "SHA1 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 imaging_handle->calculated_sha1_hash_string );
-		}
-		if( imaging_handle->calculate_sha256 == 1 )
-		{
-			fprintf(
-			 imaging_handle->notify_stream,
-			 "SHA256 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-			 imaging_handle->calculated_sha256_hash_string );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print hashes.",
+			 function );
+
+			goto on_error;
 		}
 		if( log_handle != NULL )
 		{
-			if( imaging_handle->calculate_md5 == 1 )
+			if( imaging_handle_print_hashes(
+			     imaging_handle,
+			     log_handle->log_stream,
+			     error ) != 1 )
 			{
-				log_handle_printf(
-				 log_handle,
-				 "MD5 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 imaging_handle->calculated_md5_hash_string );
-			}
-			if( imaging_handle->calculate_sha1 == 1 )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "SHA1 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 imaging_handle->calculated_sha1_hash_string );
-			}
-			if( imaging_handle->calculate_sha256 == 1 )
-			{
-				log_handle_printf(
-				 log_handle,
-				 "SHA256 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
-				 imaging_handle->calculated_sha256_hash_string );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print hashes in log handle.",
+				 function );
+
+				goto on_error;
 			}
 		}
 	}

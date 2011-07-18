@@ -4768,7 +4768,7 @@ int imaging_handle_print_parameters(
 	}
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Image path and filename:\t%" PRIs_LIBCSTRING_SYSTEM ".",
+	 "Image path and filename:\t\t%" PRIs_LIBCSTRING_SYSTEM ".",
 	 imaging_handle->target_filename );
 
 	if( resume_acquiry == 0 )
@@ -4801,7 +4801,7 @@ int imaging_handle_print_parameters(
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
-		 "Secondary copy:\t\t\t%" PRIs_LIBCSTRING_SYSTEM "",
+		 "Secondary copy:\t\t\t\t%" PRIs_LIBCSTRING_SYSTEM "",
 		 imaging_handle->secondary_target_filename );
 
 		if( resume_acquiry == 0 )
@@ -4832,7 +4832,7 @@ int imaging_handle_print_parameters(
 	}
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Case number:\t\t\t" );
+	 "Case number:\t\t\t\t" );
 
 	if( imaging_handle->case_number != NULL )
 	{
@@ -4847,7 +4847,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Description:\t\t\t" );
+	 "Description:\t\t\t\t" );
 
 	if( imaging_handle->description != NULL )
 	{
@@ -4862,7 +4862,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Evidence number:\t\t" );
+	 "Evidence number:\t\t\t" );
 
 	if( imaging_handle->evidence_number != NULL )
 	{
@@ -4877,7 +4877,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Examiner name:\t\t\t" );
+	 "Examiner name:\t\t\t\t" );
 
 	if( imaging_handle->examiner_name != NULL )
 	{
@@ -4892,7 +4892,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Notes:\t\t\t\t" );
+	 "Notes:\t\t\t\t\t" );
 
 	if( imaging_handle->notes != NULL )
 	{
@@ -4907,7 +4907,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Media type:\t\t\t" );
+	 "Media type:\t\t\t\t" );
 
 	if( imaging_handle->media_type == LIBEWF_MEDIA_TYPE_FIXED )
 	{
@@ -4939,7 +4939,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Is physical:\t\t\t" );
+	 "Is physical:\t\t\t\t" );
 
 	if( ( imaging_handle->media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
 	{
@@ -4959,7 +4959,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Compression used:\t\t" );
+	 "Compression used:\t\t\t" );
 
 	if( imaging_handle->compression_level == LIBEWF_COMPRESSION_FAST )
 	{
@@ -4994,7 +4994,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "EWF file format:\t\t" );
+	 "EWF file format:\t\t\t" );
 
 	if( imaging_handle->ewf_format == LIBEWF_FORMAT_EWF )
 	{
@@ -5074,19 +5074,19 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Acquiry start offset:\t\t%" PRIi64 "\n",
+	 "Acquiry start offset:\t\t\t%" PRIi64 "\n",
 	 imaging_handle->acquiry_offset );
 
 	if( resume_acquiry != 0 )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
-		 "Resuming acquiry at offset:\t%" PRIi64 "\n",
+		 "Resuming acquiry at offset:\t\t%" PRIi64 "\n",
 		 resume_acquiry_offset );
 	}
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Number of bytes to acquire:\t" );
+	 "Number of bytes to acquire:\t\t" );
 
 	if( imaging_handle->acquiry_size == 0 )
 	{
@@ -5133,7 +5133,7 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Evidence segment file size:\t" );
+	 "Evidence segment file size:\t\t" );
 
 	if( result == 1 )
 	{
@@ -5156,27 +5156,27 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Bytes per sector:\t\t%" PRIu32 "\n",
+	 "Bytes per sector:\t\t\t%" PRIu32 "\n",
 	 imaging_handle->bytes_per_sector );
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Block size:\t\t\t%" PRIu32 " sectors\n",
+	 "Block size:\t\t\t\t%" PRIu32 " sectors\n",
 	 imaging_handle->sectors_per_chunk );
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Error granularity:\t\t%" PRIu32 " sectors\n",
+	 "Error granularity:\t\t\t%" PRIu32 " sectors\n",
 	 imaging_handle->sector_error_granularity );
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Retries on read error:\t\t%" PRIu8 "\n",
+	 "Retries on read error:\t\t\t%" PRIu8 "\n",
 	 read_error_retries );
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Zero sectors on read error:\t" );
+	 "Zero sectors on read error:\t\t" );
 
 	if( zero_block_on_read_error == 0 )
 	{

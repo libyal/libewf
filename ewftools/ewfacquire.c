@@ -1090,7 +1090,7 @@ int ewfacquire_read_input(
 	{
 		if( device_handle_read_errors_fprint(
 		     device_handle,
-		     stdout,
+		     imaging_handle->notify_stream,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -1104,7 +1104,7 @@ int ewfacquire_read_input(
 		}
 		if( imaging_handle_print_hashes(
 		     imaging_handle,
-		     stdout,
+		     imaging_handle->notify_stream,
 		     error ) != 1 )
 		{
 			liberror_error_set(

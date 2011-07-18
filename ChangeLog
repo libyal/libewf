@@ -10,6 +10,7 @@ TODO
     - SHA1
     - SHA256 (big-endian?)
   - cross platform check, e.g. what about MD5 functions without return value
+  - libhmac winxp cross compile support SHA256
   - alter configure.ac EVP check to allow separate MD hash support
   - big endian system ?
 * libsystem path implement GetVolumeInformation
@@ -271,6 +272,7 @@ Known issues:
 
 20110718
 * updated libhmac
+* ewftools: worked on SHA256 support
 
 20110717
 * worked on date time value functions
