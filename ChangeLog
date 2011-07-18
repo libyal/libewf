@@ -8,9 +8,10 @@ TODO
   - implement fall back implementations for static compilation
     - MD5
     - SHA1
-    - SHA256
+    - SHA256 (big-endian?)
   - cross platform check, e.g. what about MD5 functions without return value
   - alter configure.ac EVP check to allow separate MD hash support
+  - big endian system ?
 * libsystem path implement GetVolumeInformation
 * sessions: audio track support
   - write audio track data
@@ -267,6 +268,9 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110718
+* updated libhmac
 
 20110717
 * worked on date time value functions
