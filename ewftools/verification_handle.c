@@ -2959,12 +2959,12 @@ int verification_handle_set_additional_digest_types(
 
 			return( -1 );
 		}
-		if( string_segment_size == 4 )
+		if( string_segment_size == 5 )
 		{
 			if( libcstring_system_string_compare(
 			     string_segment,
 			     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
-			     3 ) == 0 )
+			     4 ) == 0 )
 			{
 				calculate_sha1 = 1;
 			}

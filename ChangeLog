@@ -169,6 +169,8 @@ Python bindings (pyewf)
 * add more functions
 
 .Net bindings (ewf.net)
+* add single file functions
+  ewf.net_file_entry.h
 * add more functions
 * mono support ?
 
@@ -269,6 +271,16 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110721
+* updated libhmac
+* fix for SHA1 detection in -d argument
+
+20110720
+* updated libhmac
+
+20110719
+* updated libhmac
 
 20110718
 * updated libhmac
