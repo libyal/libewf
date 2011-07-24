@@ -4300,7 +4300,7 @@ ssize_t libewf_section_session_read(
 		if( libnotify_verbose != 0 )
 		{
 			libnotify_printf(
-			 "%s: entry: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
+			 "%s: entry: %02" PRIu32 " type\t\t\t\t: %" PRIu32 "\n",
 			 function,
 			 sessions_entry_index,
 			 previous_type );
@@ -4343,7 +4343,7 @@ ssize_t libewf_section_session_read(
 			if( libnotify_verbose != 0 )
 			{
 				libnotify_printf(
-				 "%s: entry: %02" PRIu32 " type\t\t\t: %" PRIu32 "\n",
+				 "%s: entry: %02" PRIu32 " type\t\t\t\t: %" PRIu32 "\n",
 				 function,
 				 sessions_entry_index,
 				 type );
@@ -4519,22 +4519,20 @@ ssize_t libewf_section_session_write(
 	size_t session_entries_size          = 0;
 	ssize_t total_write_count            = 0;
 	ssize_t write_count                  = 0;
+	uint64_t current_sector              = 0;
 	uint64_t session_first_sector        = 0;
+	uint64_t session_last_sector         = 0;
 	uint64_t session_number_of_sectors   = 0;
+	uint64_t track_first_sector          = 0;
+	uint64_t track_last_sector           = 0;
+	uint64_t track_number_of_sectors     = 0;
 	uint32_t calculated_checksum         = 0;
 	int number_of_sessions               = 0;
 	int number_of_sessions_entries       = 0;
 	int number_of_tracks                 = 0;
 	int session_index                    = 0;
-
-#ifdef TODO
-	uint64_t session_last_sector         = 0;
-	uint64_t track_first_sector          = 0;
-	uint64_t track_last_sector           = 0;
-	uint64_t track_number_of_sectors     = 0;
 	int sessions_entry_index             = 0;
-	int tracks_index                     = 0;
-#endif
+	int track_index                      = 0;
 
 	if( section == NULL )
 	{
@@ -4607,65 +4605,85 @@ ssize_t libewf_section_session_write(
 	{
 		number_of_sessions_entries = number_of_tracks;
 	}
-#ifdef TODO
 	else if( ( number_of_sessions != 0 )
 	      && ( number_of_tracks != 0 ) )
 	{
-		if( libewf_sector_list_get_sector(
-		     sessions,
-		     0,
-		     &session_first_sector,
-		     &session_number_of_sectors,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve session: %d from sector list.",
-			 function,
-			 session_index );
-
-			goto on_error;
-		}
-		session_last_sector = session_first_sector
-		                    + session_number_of_sectors;
-		session_index       = 1;
-
-		if( libewf_sector_list_get_sector(
-		     tracks,
-		     0,
-		     &track_first_sector,
-		     &track_number_of_sectors,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve track: %d from sector list.",
-			 function,
-			 track_index );
-
-			goto on_error;
-		}
-		track_last_sector = track_first_sector
-		                  + track_number_of_sectors;
-		track_index       = 1;
-
 		/* Encase does not store sessions containing tracks
-		 * therefore determine the number of sessions entries
+		 * therefore the number of sessions entries needs to be determined
+		 * from the run-time tracks and session information
 		 */
-		while( ( session_index < number_of_sessions )
-		    && ( track_index < number_of_tracks ) )
+		do
 		{
-			if( ( track_first_sector <= session_first_sector )
-			 && ( track_last_sector <= session_last_sector ) )
+			if( ( session_index < number_of_sessions )
+			 && ( current_sector >= session_last_sector ) )
 			{
+				if( libewf_sector_list_get_sector(
+				     sessions,
+				     session_index,
+				     &session_first_sector,
+				     &session_number_of_sectors,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve session: %d from sector list.",
+					 function,
+					 session_index );
+
+					goto on_error;
+				}
+				session_last_sector = session_first_sector
+						    + session_number_of_sectors;
+
+				session_index++;
+			}
+			if( ( track_index < number_of_tracks )
+			 && ( current_sector >= track_last_sector ) )
+			{
+				if( libewf_sector_list_get_sector(
+				     tracks,
+				     track_index,
+				     &track_first_sector,
+				     &track_number_of_sectors,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve track: %d from sector list.",
+					 function,
+					 track_index );
+
+					goto on_error;
+				}
+				track_last_sector = track_first_sector
+						  + track_number_of_sectors;
+
+				track_index++;
+			}
+			if( ( number_of_tracks > 0 )
+			 && ( current_sector >= track_first_sector )
+			 && ( current_sector < track_last_sector ) )
+			{
+				number_of_sessions_entries++;
+
+				current_sector = track_last_sector;
+			}
+			else if( ( number_of_sessions > 0 )
+			      && ( current_sector >= session_first_sector )
+			      && ( current_sector < session_last_sector ) )
+			{
+				number_of_sessions_entries++;
+
+				current_sector = session_last_sector;
 			}
 		}
+		while( ( session_index < number_of_sessions )
+		    || ( track_index < number_of_tracks ) );
 	}
-#endif /* TODO */
 	if( number_of_sessions_entries == 0 )
 	{
 		liberror_error_set(
@@ -4677,6 +4695,18 @@ ssize_t libewf_section_session_write(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: number of sessions entries\t\t: %" PRIu32 "\n",
+		 function,
+		 number_of_sessions_entries );
+
+		libnotify_printf(
+		 "\n" );
+	}
+#endif
 	session_entries_size = sizeof( ewf_session_entry_t )
 	                     * number_of_sessions_entries;
 
@@ -4796,40 +4826,157 @@ ssize_t libewf_section_session_write(
 
 		goto on_error;
 	}
-/* TODO handle tracks and sessions */
-	for( session_index = 0;
-	     session_index < number_of_sessions;
-	     session_index++ )
-	{
-		if( libewf_sector_list_get_sector(
-		     sessions,
-		     session_index,
-		     &session_first_sector,
-		     &session_number_of_sectors,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve session: %d from sector list.",
-			 function,
-			 session_index );
+	current_sector       = 0;
+	session_first_sector = 0;
+	session_index        = 0;
+	session_last_sector  = 0;
+	track_first_sector   = 0;
+	track_index          = 0;
+	track_last_sector    = 0;
 
-			goto on_error;
-		}
-		/* Note that EnCase says the first session starts at session 16
-		 * This is either some EnCase specific behavior or the value is used for
-		 * other purposes.
-		 */
-		if( ( session_index == 0 )
-		 && ( session_first_sector == 0 ) )
+	for( sessions_entry_index = 0;
+	     sessions_entry_index < number_of_sessions_entries;
+	     sessions_entry_index++ )
+	{
+		if( ( session_index < number_of_sessions )
+		 && ( current_sector >= session_last_sector ) )
 		{
-			session_first_sector = 16;
+			if( libewf_sector_list_get_sector(
+			     sessions,
+			     session_index,
+			     &session_first_sector,
+			     &session_number_of_sectors,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve session: %d from sector list.",
+				 function,
+				 session_index );
+
+				goto on_error;
+			}
+			session_last_sector = session_first_sector
+					    + session_number_of_sectors;
+
+			session_index++;
 		}
-		byte_stream_copy_from_uint32_little_endian(
-		 ( session_entries[ session_index ] ).first_sector,
-		 (uint32_t) session_first_sector );
+		if( ( track_index < number_of_tracks )
+		 && ( current_sector >= track_last_sector ) )
+		{
+			if( libewf_sector_list_get_sector(
+			     tracks,
+			     track_index,
+			     &track_first_sector,
+			     &track_number_of_sectors,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve track: %d from sector list.",
+				 function,
+				 track_index );
+
+				goto on_error;
+			}
+			track_last_sector = track_first_sector
+					  + track_number_of_sectors;
+
+			track_index++;
+		}
+		if( ( number_of_tracks > 0 )
+		 && ( current_sector >= track_first_sector )
+		 && ( current_sector < track_last_sector ) )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: entry: %02" PRIu32 " type\t\t\t\t: 1\n",
+				 function,
+				 sessions_entry_index );
+
+				libnotify_printf(
+				 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
+				 function,
+				 sessions_entry_index,
+				 track_first_sector );
+
+				libnotify_printf(
+				 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
+				 function,
+				 sessions_entry_index,
+				 track_last_sector );
+
+				libnotify_printf(
+				 "\n" );
+			}
+#endif
+			/* Note that EnCase says the first track starts at sector 16
+			 * This is either some EnCase specific behavior or the value is used for
+			 * other purposes.
+			 */
+			if( ( sessions_entry_index == 0 )
+			 && ( track_first_sector == 0 ) )
+			{
+				track_first_sector = 16;
+			}
+			byte_stream_copy_from_uint32_little_endian(
+			 ( session_entries[ sessions_entry_index ] ).type,
+			 1 );
+			byte_stream_copy_from_uint32_little_endian(
+			 ( session_entries[ sessions_entry_index ] ).first_sector,
+			 (uint32_t) track_first_sector );
+
+			current_sector = track_last_sector;
+		}
+		else if( ( number_of_sessions > 0 )
+		      && ( current_sector >= session_first_sector )
+		      && ( current_sector < session_last_sector ) )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libnotify_verbose != 0 )
+			{
+				libnotify_printf(
+				 "%s: entry: %02" PRIu32 " type\t\t\t\t: 0\n",
+				 function,
+				 sessions_entry_index );
+
+				libnotify_printf(
+				 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
+				 function,
+				 sessions_entry_index,
+				 session_first_sector );
+
+				libnotify_printf(
+				 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
+				 function,
+				 sessions_entry_index,
+				 session_last_sector );
+
+				libnotify_printf(
+				 "\n" );
+			}
+#endif
+			/* Note that EnCase says the first session starts at sector 16
+			 * This is either some EnCase specific behavior or the value is used for
+			 * other purposes.
+			 */
+			if( ( sessions_entry_index == 0 )
+			 && ( session_first_sector == 0 ) )
+			{
+				session_first_sector = 16;
+			}
+			byte_stream_copy_from_uint32_little_endian(
+			 ( session_entries[ sessions_entry_index ] ).first_sector,
+			 (uint32_t) session_first_sector );
+
+			current_sector = session_last_sector;
+		}
 	}
 	write_count = libbfio_pool_write(
 		       file_io_pool,

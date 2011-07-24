@@ -1,6 +1,8 @@
 TODO
 * sessions: audio track support
-  - write audio track data
+  - write audio track data (test and fix)
+
+
 * libewf_single_files refactor to use utf-16
 * ewf.net single files support
 * libsystem path implement GetVolumeInformation
@@ -272,6 +274,7 @@ Known issues:
 * change seek offset behavior of single file to match POSIX
 * added support target path "." in ewfexport
 * made additional digest hash type detection more tollerable
+* worked on audio track support in sessions section
 
 20110721
 * updated libhmac
