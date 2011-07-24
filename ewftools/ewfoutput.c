@@ -35,12 +35,6 @@
 
 #include <libewf/features.h>
 
-#if defined( HAVE_LOCAL_LIBUNA )
-#include <libuna_definitions.h>
-#elif defined( HAVE_LIBUNA_H )
-#include <libuna.h>
-#endif
-
 #if defined( HAVE_LOCAL_LIBBFIO )
 #include <libbfio_definitions.h>
 #elif defined( HAVE_LIBBFIO )
@@ -73,6 +67,7 @@
 #include "ewftools_libodraw.h"
 #include "ewftools_libsmdev.h"
 #include "ewftools_libsmraw.h"
+#include "ewftools_libuna.h"
 
 /* Prints the executable version information
  */
@@ -186,6 +181,11 @@ void ewfoutput_version_detailed_fprint(
 	 ", zlib %s",
 	 ZLIB_VERSION );
 #endif
+
+	fprintf(
+	 stream,
+	 ", libsystem %s",
+	 LIBSYSTEM_VERSION_STRING );
 
 #if defined( HAVE_LIBHMAC ) || defined( HAVE_LOCAL_LIBHMAC )
 	fprintf(

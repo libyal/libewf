@@ -283,6 +283,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libuna.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\guid.h"
 				>
 			</File>

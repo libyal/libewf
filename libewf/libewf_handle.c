@@ -2416,22 +2416,19 @@ int libewf_handle_open_file_io_pool(
 				goto on_error;
 			}
 		}
-		else
+		if( libewf_internal_handle_get_media_values(
+		     internal_handle,
+		     &( internal_handle->media_values->media_size ),
+		     error ) != 1 )
 		{
-			if( libewf_internal_handle_get_media_values(
-			     internal_handle,
-			     &( internal_handle->media_values->media_size ),
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine media values.",
-				 function );
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine media values.",
+			 function );
 
-				goto on_error;
-			}
+			goto on_error;
 		}
 	}
 	/* Make sure format specific values are set
@@ -5306,7 +5303,7 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
-	if( ( internal_handle->media_values->media_size > 0 )
+	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size ) )
 	{
 		return( 0 );
@@ -5328,7 +5325,7 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
-	if( ( internal_handle->media_values->media_size > 0 )
+	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( (size64_t) ( internal_handle->io_handle->current_offset + data_size ) >= internal_handle->media_values->media_size ) )
 	{
 		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
@@ -5623,12 +5620,12 @@ ssize_t libewf_handle_write_buffer(
 
 		return( -1 );
 	}
-	if( ( internal_handle->media_values->media_size > 0 )
+	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size ) )
 	{
 		return( 0 );
 	}
-	if( ( internal_handle->media_values->media_size > 0 )
+	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( (size64_t) ( internal_handle->io_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size ) )
 	{
 		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );

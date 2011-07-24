@@ -77,6 +77,16 @@
 			</None>
 			<None Include="..\..\..\ewftools\ewftools_libewf.h">
 			</None>
+			<None Include="..\..\..\ewftools\ewftools_libhmac.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libodraw.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libsmdev.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libsmraw.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libuna.h">
+			</None>
 			<CppCompile Include="..\..\..\ewftools\info_handle.c">
 			</CppCompile>
 			<None Include="..\..\..\ewftools\info_handle.h">

@@ -560,7 +560,7 @@ on_abort:
 	{
 		fprintf(
 		 stderr,
-		 "Unable to close EWF file(s).\n" );
+		 "Unable to close verification handle.\n" );
 
 		goto on_error;
 

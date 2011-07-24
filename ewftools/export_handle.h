@@ -278,10 +278,6 @@ int export_handle_finalize_integrity_hash(
      export_handle_t *export_handle,
      liberror_error_t **error );
 
-int export_handle_finalize_integrity_hash_on_error(
-     export_handle_t *export_handle,
-     liberror_error_t **error );
-
 int export_handle_get_input_media_size(
      export_handle_t *export_handle,
      size64_t *media_size,
@@ -412,7 +408,7 @@ int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
-     size_t export_path_length,
+     size_t export_path_size,
      log_handle_t *log_handle,
      liberror_error_t **error );
 
@@ -420,7 +416,7 @@ int export_handle_export_file_entry_sub_file_entries(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
-     size_t export_path_length,
+     size_t export_path_size,
      log_handle_t *log_handle,
      liberror_error_t **error );
 

@@ -18,8 +18,8 @@ AC_DEFUN([LIBEWF_TEST_WITH],
  [AC_ARG_WITH(
   [$1],
   [AS_HELP_STRING(
-   [--with-$1],
-   [$3 (default is $4)])],
+   [--with-$1=[$5]],
+   [$3 [default is $4]])],
   [ac_cv_libewf_with_$2=$withval],
   [ac_cv_libewf_with_$2=$4])dnl
   AC_CACHE_CHECK(

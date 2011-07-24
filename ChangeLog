@@ -1,21 +1,9 @@
 TODO
-* ewfexport support target path "."
-* libewf_single_files refactor to use utf-16
-* add functions to set the addition digest hash calculations
-* SHA256 support
-  - ewfexport (raw format?)
-* libhashf
-  - implement fall back implementations for static compilation
-    - MD5
-    - SHA1
-    - SHA256 (big-endian?)
-  - cross platform check, e.g. what about MD5 functions without return value
-  - libhmac winxp cross compile support SHA256
-  - alter configure.ac EVP check to allow separate MD hash support
-  - big endian system ?
-* libsystem path implement GetVolumeInformation
 * sessions: audio track support
   - write audio track data
+* libewf_single_files refactor to use utf-16
+* ewf.net single files support
+* libsystem path implement GetVolumeInformation
 * deal with corrupted table section
   - what about handling both corrupted table and table2 sections
 * libmfdata
@@ -271,6 +259,19 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110724
+* updated libhmac
+* code clean up
+* multiple bug fixes:
+  - media size not being set for L01
+  - ewfverify return true while verification in correct
+  - single file type not being set
+  - buffer size calculation if exceeds maximum size
+  - due to re-use of hmac handles
+* change seek offset behavior of single file to match POSIX
+* added support target path "." in ewfexport
+* made additional digest hash type detection more tollerable
 
 20110721
 * updated libhmac

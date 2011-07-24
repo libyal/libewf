@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110721],
+ [20110724],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -64,6 +64,13 @@ LIBEWF_TEST_ENABLE(
  [v1_api],
  [enable version 1 API],
  [yes])
+
+LIBEWF_TEST_WITH(
+ [openssl],
+ [openssl],
+ [search for openssl in includedir and libdir or in the specified DIR, or no if not to use openssl],
+ [auto-detect],
+ [DIR])
 
 dnl Check for libtool DLL support
 AC_LIBTOOL_WIN32_DLL
@@ -181,7 +188,7 @@ dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_file_io.h
 dnl libsmdev/libsmdev_handle.c and libsmdev/libsmdev_support.c
 AC_CHECK_HEADERS([fcntl.h unistd.h])
 
-dnl Headers included in libewf/libewf_date_time.h
+dnl Headers included in libsystem/libsystem_date_time.h and libewf/libewf_date_time.h
 AC_HEADER_TIME
 
 dnl Headers included in libsystem/libsystem_glob.h
@@ -1029,18 +1036,35 @@ AS_IF(
  [test "x$ac_libewf_have_hmac_support" = xno],
  [AS_IF(
   [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([openssl/evp.h openssl/opensslv.h])
+  [AS_IF(
+   [test "x$ac_cv_libewf_with_openssl" != xno],
+   [AS_IF(
+    [test "x$ac_cv_libewf_with_openssl" != xauto-detect],
+    [AS_IF(
+     [test -d "$ac_cv_libewf_with_openssl"],
+     [ac_libewf_have_hmac_support=libcrypto_evp
+     CFLAGS="$CFLAGS -I${ac_cv_libewf_with_openssl}/include"
+     LDFLAGS="$LDFLAGS -L${ac_cv_libewf_with_openssl}/lib"],
+     [AC_MSG_WARN([no such directory: $ac_cv_libewf_with_openssl]) ])
+    ],
+    [ac_libewf_have_hmac_support=libcrypto_evp])
+   ])
+  ])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_support" = xlibcrypto_evp],
+ [AC_CHECK_HEADERS([openssl/evp.h openssl/opensslv.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_evp_h" = xyes],
+  [LIBEWF_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE
 
   AS_IF(
-   [test "x$ac_cv_header_openssl_evp_h" = xyes],
-   [LIBEWF_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE
-
-   AS_IF(
-    [test "x$ac_cv_libewf_openssl_evp_zlib_compatible" = xyes],
-    [ac_libewf_have_hmac_support=libcrypto_evp],
-    [ac_libewf_have_hmac_support=no]) ],
+   [test "x$ac_cv_libewf_openssl_evp_zlib_compatible" = xyes],
+   [ac_libewf_have_hmac_support=libcrypto_evp],
+   [ac_libewf_have_hmac_support=no]) ],
    [ac_libewf_have_hmac_support=no])
-  ])
  ])
 
 dnl Check if all required libcrypto (openssl) EVP MD functions are available
@@ -1119,28 +1143,34 @@ AS_IF(
  [test "x$ac_libewf_have_hmac_md5_support" = xno],
  [AS_IF(
   [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([openssl/md5.h])
-
-  AS_IF(
-   [test "x$ac_cv_header_openssl_md5_h" = xyes],
-   [ac_libewf_have_hmac_md5_support=libcrypto
-   AC_CHECK_LIB(
-    crypto,
-    MD5_Init,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_md5_support=no])
-   AC_CHECK_LIB(
-    crypto,
-    MD5_Update,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_md5_support=no])
-   AC_CHECK_LIB(
-    crypto,
-    MD5_Final,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_md5_support=no])
-   ])
+  [AS_IF(
+   [test "x$ac_cv_libewf_with_openssl" != xno],
+   [ac_libewf_have_hmac_md5_support=libcrypto])
   ])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_md5_support" = xlibcrypto],
+ [AC_CHECK_HEADERS([openssl/md5.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_md5_h" = xyes],
+  [AC_CHECK_LIB(
+   crypto,
+   MD5_Init,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_md5_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_md5_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   MD5_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_md5_support=no]) ],
+  [ac_libewf_have_hmac_md5_support=no])
  ])
 
 AS_IF(
@@ -1156,28 +1186,34 @@ AS_IF(
  [test "x$ac_libewf_have_hmac_sha1_support" = xno],
  [AS_IF(
   [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([openssl/sha.h])
-
-  AS_IF(
-   [test "x$ac_cv_header_openssl_sha_h" = xyes],
-   [ac_libewf_have_hmac_sha1_support=libcrypto
-   AC_CHECK_LIB(
-    crypto,
-    SHA1_Init,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_sha1_support=no])
-   AC_CHECK_LIB(
-    crypto,
-    SHA1_Update,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_sha1_support=no])
-   AC_CHECK_LIB(
-    crypto,
-    SHA1_Final,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_sha1_support=no])
-   ])
+  [AS_IF(
+   [test "x$ac_cv_libewf_with_openssl" != xno],
+   [ac_libewf_have_hmac_sha1_support=libcrypto])
   ])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha1_support" = xlibcrypto],
+ [AC_CHECK_HEADERS([openssl/sha.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_sha_h" = xyes],
+  [AC_CHECK_LIB(
+   crypto,
+   SHA1_Init,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha1_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha1_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA1_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha1_support=no]) ],
+  [ac_libewf_have_hmac_sha1_support=no])
  ])
 
 AS_IF(
@@ -1193,28 +1229,34 @@ AS_IF(
  [test "x$ac_libewf_have_hmac_sha256_support" = xno],
  [AS_IF(
   [test "x$ac_cv_libewf_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([openssl/sha.h])
-
-  AS_IF(
-   [test "x$ac_cv_header_openssl_sha_h" = xyes],
-   [ac_libewf_have_hmac_sha256_support=libcrypto
-   AC_CHECK_LIB(
-    crypto,
-    SHA256_Init,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_sha256_support=no])
-   AC_CHECK_LIB(
-    crypto,
-    SHA256_Update,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_sha256_support=no])
-   AC_CHECK_LIB(
-    crypto,
-    SHA256_Final,
-    [ac_libewf_dummy=yes],
-    [ac_libewf_have_hmac_sha256_support=no])
-   ])
+  [AS_IF(
+   [test "x$ac_cv_libewf_with_openssl" != xno],
+   [ac_libewf_have_hmac_sha256_support=libcrypto])
   ])
+ ])
+
+AS_IF(
+ [test "x$ac_libewf_have_hmac_sha256_support" = xlibcrypto],
+ [AC_CHECK_HEADERS([openssl/sha.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_sha_h" = xyes],
+  [AC_CHECK_LIB(
+   crypto,
+   SHA256_Init,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha256_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA256_Update,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha256_support=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA256_Final,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_hmac_sha256_support=no]) ],
+  [ac_libewf_have_hmac_sha256_support=no])
  ])
 
 AS_IF(

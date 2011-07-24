@@ -126,7 +126,6 @@ int main( int argc, char * const argv[] )
 #if !defined( LIBSYSTEM_HAVE_GLOB )
 	libsystem_glob_t *glob                                = NULL;
 #endif
-	info_handle_t *info_handle                            = NULL;
 	liberror_error_t *error                               = NULL;
 
 	libcstring_system_character_t *option_date_format     = NULL;
@@ -315,7 +314,7 @@ int main( int argc, char * const argv[] )
 	 NULL );
 
 	if( info_handle_initialize(
-	     &info_handle,
+	     &ewfinfo_info_handle,
 	     &error ) != 1 )
 	{
 		ewfoutput_version_fprint(
@@ -331,7 +330,7 @@ int main( int argc, char * const argv[] )
 	if( option_output_format != NULL )
 	{
 		result = info_handle_set_output_format(
-		          info_handle,
+		          ewfinfo_info_handle,
 		          option_output_format,
 		          &error );
 
@@ -360,10 +359,10 @@ int main( int argc, char * const argv[] )
 			 "Unsupported output format defaulting to: text.\n" );
 		}
 	}
-	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	if( ewfinfo_info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
 		if( info_handle_dfxml_header_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			ewfoutput_version_fprint(
@@ -377,7 +376,7 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	else if( ewfinfo_info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 	{
 		ewfoutput_version_fprint(
 		 stdout,
@@ -389,7 +388,7 @@ int main( int argc, char * const argv[] )
 	 && ( option_date_format != NULL ) )
 	{
 		result = info_handle_set_date_format(
-		          info_handle,
+		          ewfinfo_info_handle,
 		          option_date_format,
 		          &error );
 
@@ -427,7 +426,7 @@ int main( int argc, char * const argv[] )
 	if( option_header_codepage != NULL )
 	{
 		result = info_handle_set_header_codepage(
-		          info_handle,
+		          ewfinfo_info_handle,
 		          option_header_codepage,
 		          &error );
 
@@ -530,7 +529,7 @@ int main( int argc, char * const argv[] )
 		 &error );
 	}
 	result = info_handle_open_input(
-	          info_handle,
+	          ewfinfo_info_handle,
 	          argv_filenames,
 	          number_of_filenames,
 	          &error );
@@ -579,7 +578,7 @@ int main( int argc, char * const argv[] )
 	 || ( info_option == 'i' ) )
 	{
 		if( info_handle_header_values_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			if( print_header != 0 )
@@ -604,7 +603,7 @@ int main( int argc, char * const argv[] )
 	 || ( info_option == 'm' ) )
 	{
 		if( info_handle_media_information_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			if( print_header != 0 )
@@ -625,7 +624,7 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 		if( info_handle_hash_values_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			if( print_header != 0 )
@@ -646,7 +645,7 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 		if( info_handle_sessions_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			if( print_header != 0 )
@@ -667,7 +666,7 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 		if( info_handle_tracks_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			if( print_header != 0 )
@@ -692,7 +691,7 @@ int main( int argc, char * const argv[] )
 	 || ( info_option == 'e' ) )
 	{
 		if( info_handle_acquiry_errors_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			if( print_header != 0 )
@@ -714,7 +713,7 @@ int main( int argc, char * const argv[] )
 		}
 	}
 	if( info_handle_single_files_fprint(
-	     info_handle,
+	     ewfinfo_info_handle,
 	     &error ) != 1 )
 	{
 		if( print_header != 0 )
@@ -734,10 +733,10 @@ int main( int argc, char * const argv[] )
 		liberror_error_free(
 		 &error );
 	}
-	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	if( ewfinfo_info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
 		if( info_handle_dfxml_footer_fprint(
-		     info_handle,
+		     ewfinfo_info_handle,
 		     &error ) != 1 )
 		{
 			if( print_header != 0 )
@@ -757,7 +756,7 @@ int main( int argc, char * const argv[] )
 	}
 on_abort:
 	if( info_handle_close(
-	     info_handle,
+	     ewfinfo_info_handle,
 	     &error ) != 0 )
 	{
 		if( print_header != 0 )
@@ -770,7 +769,7 @@ on_abort:
 		}
 		fprintf(
 		 stderr,
-		 "Unable to close EWF file(s).\n" );
+		 "Unable to close info handle.\n" );
 
 		goto on_error;
 	}
@@ -795,7 +794,7 @@ on_abort:
 		 &error );
 	}
 	if( info_handle_free(
-	     &info_handle,
+	     &ewfinfo_info_handle,
 	     &error ) != 1 )
 	{
 		if( print_header != 0 )
@@ -839,10 +838,10 @@ on_error:
 		liberror_error_free(
 		 &error );
 	}
-	if( info_handle != NULL )
+	if( ewfinfo_info_handle != NULL )
 	{
 		info_handle_free(
-		 &info_handle,
+		 &ewfinfo_info_handle,
 		 NULL );
 	}
 #if !defined( LIBSYSTEM_HAVE_GLOB )

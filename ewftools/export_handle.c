@@ -2911,6 +2911,44 @@ int export_handle_set_additional_digest_types(
 			{
 				calculate_sha1 = 1;
 			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA1" ),
+			          4 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+		}
+		else if( string_segment_size == 6 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha-1" ),
+			     5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "sha_1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA-1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA_1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
 		}
 		else if( string_segment_size == 7 )
 		{
@@ -2918,6 +2956,44 @@ int export_handle_set_additional_digest_types(
 			     string_segment,
 			     _LIBCSTRING_SYSTEM_STRING( "sha256" ),
 			     6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA256" ),
+			          6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+		}
+		else if( string_segment_size == 8 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha-256" ),
+			     7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "sha_256" ),
+			          7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA-256" ),
+			          7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA_256" ),
+			          7 ) == 0 )
 			{
 				calculate_sha256 = 1;
 			}
@@ -4397,7 +4473,7 @@ int export_handle_export_single_files(
 	     export_handle,
 	     file_entry,
 	     export_handle->target_filename,
-	     export_path_size - 1,
+	     export_path_size,
 	     log_handle,
 	     error ) != 1 )
 	{
@@ -4481,7 +4557,7 @@ int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
-     size_t export_path_length,
+     size_t export_path_size,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
@@ -4554,6 +4630,20 @@ int export_handle_export_file_entry(
 
 		return( -1 );
 	}
+	if( libewf_file_entry_get_type(
+	     file_entry,
+	     &file_entry_type,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry type.",
+		 function );
+
+		goto on_error;
+	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_file_entry_get_utf16_name_size(
 	          file_entry,
@@ -4614,9 +4704,6 @@ int export_handle_export_file_entry(
 			 "%s: unable to retrieve the name.",
 			 function );
 
-			memory_free(
-			 name );
-
 			goto on_error;
 		}
 		if( libsystem_path_sanitize_filename(
@@ -4631,16 +4718,13 @@ int export_handle_export_file_entry(
 			 "%s: unable sanitize name.",
 			 function );
 
-			memory_free(
-			 name );
-
 			goto on_error;
 		}
 		if( libsystem_path_create(
 		     name,
 		     name_size - 1,
 		     export_path,
-		     export_path_length,
+		     export_path_size - 1,
 		     &target_path,
 		     &target_path_size,
 		     error ) != 1 )
@@ -4652,13 +4736,12 @@ int export_handle_export_file_entry(
 			 "%s: unable to create target path.",
 			 function );
 
-			memory_free(
-			 name );
-
 			goto on_error;
 		}
 		memory_free(
 		 name );
+
+		name = NULL;
 
 		if( target_path == NULL )
 		{
@@ -4675,7 +4758,7 @@ int export_handle_export_file_entry(
 	else
 	{
 		target_path      = (libcstring_system_character_t *) export_path;
-		target_path_size = export_path_length + 1;
+		target_path_size = export_path_size;
 	}
 	result = libsystem_file_exists(
 		  target_path,
@@ -4693,198 +4776,188 @@ int export_handle_export_file_entry(
 
 		goto on_error;
 	}
-	else if( result == 1 )
+	else if( result == 0 )
 	{
-		log_handle_printf(
-		 log_handle,
-		 "Skipping file entry it already exists.\n" );
-
-		goto on_error;
-	}
-	if( libewf_file_entry_get_type(
-	     file_entry,
-	     &file_entry_type,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry type.",
-		 function );
-
-		goto on_error;
-	}
-	/* TODO what about NTFS streams ?
-	 */
-	if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_FILE )
-	{
-		/* Create the file entry data file
+		/* TODO what about NTFS streams ?
 		 */
-		file_entry_data_file_stream = libsystem_file_stream_open(
-		                               target_path,
-		                               _LIBCSTRING_SYSTEM_STRING( FILE_STREAM_BINARY_OPEN_WRITE ) );
-
-		if( file_entry_data_file_stream == NULL )
+		if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_FILE )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open: %" PRIs_LIBCSTRING_SYSTEM ".",
-			 function,
-			 target_path );
-
-			goto on_error;
-		}
-		/* Export the file entry data
-		 */
-		if( libewf_file_entry_get_size(
-		     file_entry,
-		     &file_entry_data_size,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve file entry data size.",
-			 function );
-
-			goto on_error;
-		}
-		/* If there is no file entry data an empty file is written
-		 */
-		if( file_entry_data_size > 0 )
-		{
-			if( export_handle->process_buffer_size == 0 )
-			{
-				process_buffer_size = export_handle->input_chunk_size;
-			}
-			else
-			{
-				process_buffer_size = export_handle->process_buffer_size;
-			}
-			/* This function in not necessary for normal use
-			 * but it was added for testing
+			/* Create the file entry data file
 			 */
-			if( libewf_file_entry_seek_offset(
-			     file_entry,
-			     0,
-			     SEEK_SET,
-			     error ) != 0 )
+			file_entry_data_file_stream = libsystem_file_stream_open(
+						       target_path,
+						       _LIBCSTRING_SYSTEM_STRING( FILE_STREAM_BINARY_OPEN_WRITE ) );
+
+			if( file_entry_data_file_stream == NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to seek the start of the file entry data.",
-				 function );
+				 LIBERROR_IO_ERROR_OPEN_FAILED,
+				 "%s: unable to open: %" PRIs_LIBCSTRING_SYSTEM ".",
+				 function,
+				 target_path );
 
 				goto on_error;
 			}
-			file_entry_data = (uint8_t *) memory_allocate(
-			                               sizeof( uint8_t ) * process_buffer_size );
-
-			if( file_entry_data == NULL )
+			/* Export the file entry data
+			 */
+			if( libewf_file_entry_get_size(
+			     file_entry,
+			     &file_entry_data_size,
+			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create file entry data.",
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve file entry data size.",
 				 function );
 
 				goto on_error;
 			}
-			while( file_entry_data_size > 0 )
+			/* If there is no file entry data an empty file is written
+			 */
+			if( file_entry_data_size > 0 )
 			{
-				if( file_entry_data_size >= EXPORT_HANDLE_BUFFER_SIZE )
+				if( export_handle->process_buffer_size == 0 )
 				{
-					read_size = EXPORT_HANDLE_BUFFER_SIZE;
+					process_buffer_size = export_handle->input_chunk_size;
 				}
 				else
 				{
-					read_size = (size_t) file_entry_data_size;
+					process_buffer_size = export_handle->process_buffer_size;
 				}
-				file_entry_data_size -= read_size;
-
-				read_count = libewf_file_entry_read_buffer(
-				              file_entry,
-				              file_entry_data,
-				              read_size,
-				              error );
-
-				if( read_count != (ssize_t) read_size )
+				/* This function in not necessary for normal use
+				 * but it was added for testing
+				 */
+				if( libewf_file_entry_seek_offset(
+				     file_entry,
+				     0,
+				     SEEK_SET,
+				     error ) != 0 )
 				{
 					liberror_error_set(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_IO,
 					 LIBERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read file entry data.",
+					 "%s: unable to seek the start of the file entry data.",
 					 function );
 
 					goto on_error;
 				}
-				if( libsystem_file_stream_write(
-				     file_entry_data_file_stream,
-				     file_entry_data,
-				     read_size ) != read_size )
+				file_entry_data = (uint8_t *) memory_allocate(
+				                               sizeof( uint8_t ) * process_buffer_size );
+
+				if( file_entry_data == NULL )
 				{
 					liberror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable to write file entry data.",
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create file entry data.",
 					 function );
 
 					goto on_error;
 				}
+				while( file_entry_data_size > 0 )
+				{
+					if( file_entry_data_size >= EXPORT_HANDLE_BUFFER_SIZE )
+					{
+						read_size = EXPORT_HANDLE_BUFFER_SIZE;
+					}
+					else
+					{
+						read_size = (size_t) file_entry_data_size;
+					}
+					read_count = libewf_file_entry_read_buffer(
+						      file_entry,
+						      file_entry_data,
+						      read_size,
+						      error );
+
+					if( read_count != (ssize_t) read_size )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_IO,
+						 LIBERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read file entry data.",
+						 function );
+
+						goto on_error;
+					}
+					file_entry_data_size -= read_size;
+
+					if( libsystem_file_stream_write(
+					     file_entry_data_file_stream,
+					     file_entry_data,
+					     read_size ) != read_size )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_IO,
+						 LIBERROR_IO_ERROR_WRITE_FAILED,
+						 "%s: unable to write file entry data.",
+						 function );
+
+						goto on_error;
+					}
+				}
+				memory_free(
+				 file_entry_data );
+
+				file_entry_data = NULL;
 			}
-			memory_free(
-			 file_entry_data );
+			/* Close the file entry data file
+			 */
+			if( libsystem_file_stream_close(
+			     file_entry_data_file_stream ) != 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_CLOSE_FAILED,
+				 "%s: unable to close file entry data file.",
+				 function );
 
-			file_entry_data = NULL;
+				goto on_error;
+			}
+			file_entry_data_file_stream = NULL;
 		}
-		/* Close the file entry data file
-		 */
-		if( libsystem_file_stream_close(
-		     file_entry_data_file_stream ) != 0 )
+		else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file entry data file.",
-			 function );
+			if( export_handle_make_directory(
+			     export_handle,
+			     target_path,
+			     log_handle,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to create directory: %" PRIs_LIBCSTRING_SYSTEM "",
+				 function,
+				 target_path );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
-		file_entry_data_file_stream = NULL;
 	}
-	else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
+	else
 	{
-		if( export_handle_make_directory(
-		     export_handle,
-		     target_path,
-		     log_handle,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to create directory: %" PRIs_LIBCSTRING_SYSTEM "",
-			 function,
-			 target_path );
-
-			goto on_error;
-		}
+		log_handle_printf(
+		 log_handle,
+		 "Skipping file entry it already exists.\n" );
+	}
+	if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
+	{
 		if( export_handle_export_file_entry_sub_file_entries(
 		     export_handle,
 		     file_entry,
 		     target_path,
-		     target_path_size - 1,
+		     target_path_size,
 		     log_handle,
 		     error ) != 1 )
 		{
@@ -4922,6 +4995,11 @@ on_error:
 		memory_free(
 		 target_path );
 	}
+	if( name != NULL )
+	{
+		memory_free(
+		 name );
+	}
 	return( -1 );
 }
 
@@ -4932,7 +5010,7 @@ int export_handle_export_file_entry_sub_file_entries(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
-     size_t export_path_length,
+     size_t export_path_size,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
@@ -4990,7 +5068,7 @@ int export_handle_export_file_entry_sub_file_entries(
 		     export_handle,
 		     sub_file_entry,
 		     export_path,
-		     export_path_length,
+		     export_path_size,
 		     log_handle,
 		     error ) != 1 )
 		{

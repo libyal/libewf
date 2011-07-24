@@ -3391,6 +3391,44 @@ int imaging_handle_set_additional_digest_types(
 			{
 				calculate_sha1 = 1;
 			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA1" ),
+			          4 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+		}
+		else if( string_segment_size == 6 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha-1" ),
+			     5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "sha_1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA-1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA_1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
 		}
 		else if( string_segment_size == 7 )
 		{
@@ -3398,6 +3436,44 @@ int imaging_handle_set_additional_digest_types(
 			     string_segment,
 			     _LIBCSTRING_SYSTEM_STRING( "sha256" ),
 			     6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA256" ),
+			          6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+		}
+		else if( string_segment_size == 8 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha-256" ),
+			     7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "sha_256" ),
+			          7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA-256" ),
+			          7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA_256" ),
+			          7 ) == 0 )
 			{
 				calculate_sha256 = 1;
 			}

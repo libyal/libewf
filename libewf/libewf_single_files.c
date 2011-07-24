@@ -1197,14 +1197,12 @@ int libewf_single_files_parse_file_entry(
 			 (char *) value_string );
 		}
 #endif
-		/* Ignore empty values
-		 */
 		if( value_string == NULL )
 		{
-			continue;
+			/* Ignore empty values
+			 */
 		}
-/* TODO */
-		if( type_string_size == 4 )
+		else if( type_string_size == 4 )
 		{
 			if( ( type_string[ 0 ] == (uint8_t) 'c' )
 			 && ( type_string[ 1 ] == (uint8_t) 'i' )
@@ -1622,14 +1620,14 @@ int libewf_single_files_parse_file_entry(
 				/* p = 1 if directory
 				 * p = emtpy if file
 				 */
-				if( ( value_string_size == 2 )
-				 && ( value_string[ 0 ] == (uint8_t) '1' ) )
-				{
-					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
-				}
-				else if( value_string_size == 1 )
+				if( value_string == NULL )
 				{
 					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
+				}
+				else if( ( value_string_size == 2 )
+				      && ( value_string[ 0 ] == (uint8_t) '1' ) )
+				{
+					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
 				}
 			}
 		}

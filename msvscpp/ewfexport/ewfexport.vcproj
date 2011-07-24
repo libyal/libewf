@@ -263,7 +263,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libodraw.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_libsmdev.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewftools_libsmraw.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_libuna.h"
 				>
 			</File>
 			<File

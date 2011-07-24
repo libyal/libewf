@@ -15,6 +15,7 @@ USE("..\..\..\ewftools\ewftools_libhmac.h", File);
 USE("..\..\..\ewftools\ewftools_libodraw.h", File);
 USE("..\..\..\ewftools\ewftools_libsmdev.h", File);
 USE("..\..\..\ewftools\ewftools_libsmraw.h", File);
+USE("..\..\..\ewftools\ewftools_libuna.h", File);
 USEUNIT("..\..\..\ewftools\guid.c");
 USE("..\..\..\ewftools\guid.h", File);
 USEUNIT("..\..\..\ewftools\imaging_handle.c");

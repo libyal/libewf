@@ -209,10 +209,6 @@ int verification_handle_finalize_integrity_hash(
      verification_handle_t *verification_handle,
      liberror_error_t **error );
 
-int verification_handle_finalize_integrity_hash_on_error(
-     verification_handle_t *verification_handle,
-     liberror_error_t **error );
-
 int verification_handle_verify_input(
      verification_handle_t *verification_handle,
      uint8_t print_status_information,

@@ -1066,6 +1066,19 @@ int verification_handle_finalize_integrity_hash(
 
 			return( -1 );
 		}
+		if( libhmac_md5_free(
+		     &( verification_handle->md5_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free MD5 context.",
+			 function );
+
+			return( -1 );
+		}
 		if( digest_hash_copy_to_string(
 		     calculated_md5_hash,
 		     LIBHMAC_MD5_HASH_SIZE,
@@ -1111,6 +1124,19 @@ int verification_handle_finalize_integrity_hash(
 
 			return( -1 );
 		}
+		if( libhmac_sha1_free(
+		     &( verification_handle->sha1_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free SHA1 context.",
+			 function );
+
+			return( -1 );
+		}
 		if( digest_hash_copy_to_string(
 		     calculated_sha1_hash,
 		     LIBHMAC_SHA1_HASH_SIZE,
@@ -1152,6 +1178,19 @@ int verification_handle_finalize_integrity_hash(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize SHA256 hash.",
+			 function );
+
+			return( -1 );
+		}
+		if( libhmac_sha256_free(
+		     &( verification_handle->sha256_context ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free SHA256 context.",
 			 function );
 
 			return( -1 );
@@ -2136,8 +2175,6 @@ int verification_handle_verify_file_entry(
 				{
 					read_size = (size_t) file_entry_data_size;
 				}
-				file_entry_data_size -= read_size;
-
 				read_count = libewf_file_entry_read_buffer(
 				              file_entry,
 				              file_entry_data,
@@ -2155,6 +2192,8 @@ int verification_handle_verify_file_entry(
 
 					goto on_error;
 				}
+				file_entry_data_size -= read_size;
+
 				if( verification_handle_update_integrity_hash(
 				     verification_handle,
 				     file_entry_data,
@@ -2276,6 +2315,7 @@ int verification_handle_verify_file_entry(
 					 log_handle,
 				 	 "FAILED\n" );
 				}
+				result = 0;
 			}
 			fprintf(
 			 verification_handle->notify_stream,
@@ -2968,6 +3008,44 @@ int verification_handle_set_additional_digest_types(
 			{
 				calculate_sha1 = 1;
 			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA1" ),
+			          4 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+		}
+		else if( string_segment_size == 6 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha-1" ),
+			     5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "sha_1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA-1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA_1" ),
+			          5 ) == 0 )
+			{
+				calculate_sha1 = 1;
+			}
 		}
 		else if( string_segment_size == 7 )
 		{
@@ -2975,6 +3053,44 @@ int verification_handle_set_additional_digest_types(
 			     string_segment,
 			     _LIBCSTRING_SYSTEM_STRING( "sha256" ),
 			     6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA256" ),
+			          6 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+		}
+		else if( string_segment_size == 8 )
+		{
+			if( libcstring_system_string_compare(
+			     string_segment,
+			     _LIBCSTRING_SYSTEM_STRING( "sha-256" ),
+			     7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "sha_256" ),
+			          7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA-256" ),
+			          7 ) == 0 )
+			{
+				calculate_sha256 = 1;
+			}
+			else if( libcstring_system_string_compare(
+			          string_segment,
+			          _LIBCSTRING_SYSTEM_STRING( "SHA_256" ),
+			          7 ) == 0 )
 			{
 				calculate_sha256 = 1;
 			}

@@ -38,6 +38,7 @@ ewfacquire_SOURCES = \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
+	ewftools_libuna.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
@@ -69,6 +70,10 @@ ewfacquirestream_SOURCES = \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
+	ewftools_libsmraw.h \
+	ewftools_libuna.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
@@ -93,7 +98,12 @@ ewfdebug_SOURCES = \
 	ewfdebug.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
-	ewftools_libewf.h
+	ewftools_libewf.h \
+	ewftools_libhmac.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
+	ewftools_libsmraw.h \
+	ewftools_libuna.h
 
 ewfdebug_LDADD = \
 	../libcstring/libcstring.la \
@@ -112,7 +122,10 @@ ewfexport_SOURCES = \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
+	ewftools_libuna.h \
 	export_handle.c export_handle.h \
 	guid.c guid.h \
 	log_handle.c log_handle.h \
@@ -140,6 +153,11 @@ ewfinfo_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
+	ewftools_libhmac.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
+	ewftools_libsmraw.h \
+	ewftools_libuna.h \
 	guid.c guid.h \
 	info_handle.c info_handle.h \
 	platform.c platform.h
@@ -161,6 +179,10 @@ ewfverify_SOURCES = \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
+	ewftools_libsmraw.h \
+	ewftools_libuna.h \
 	ewfverify.c \
 	log_handle.c log_handle.h \
 	process_status.c process_status.h \

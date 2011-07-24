@@ -1048,6 +1048,7 @@ ssize_t libewf_file_entry_read_buffer(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_read_buffer";
+	off64_t data_offset                               = 0;
 	size64_t data_size                                = 0;
 	ssize_t read_count                                = 0;
 
@@ -1075,20 +1076,6 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
-	if( libewf_single_file_entry_get_data_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
-	     &data_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size.",
-		 function );
-
-		return( -1 );
-	}
 	if( buffer == NULL )
 	{
 		liberror_error_set(
@@ -1111,9 +1098,68 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
+	if( internal_file_entry->offset < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid file entry - offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_single_file_entry_get_data_offset(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     &data_offset,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_single_file_entry_get_data_size(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     &data_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->offset >= (off64_t) data_size )
+	{
+		return( 0 );
+	}
 	if( (off64_t) ( internal_file_entry->offset + buffer_size ) > (off64_t) data_size )
 	{
-		buffer_size = (size_t) ( buffer_size - internal_file_entry->offset );
+		buffer_size = (size_t) ( data_size - internal_file_entry->offset );
+	}
+	if( libewf_handle_seek_offset(
+	     (libewf_handle_t *) internal_file_entry->internal_handle,
+	     data_offset + internal_file_entry->offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset: %" PRIi64 ".",
+		 function,
+		 data_offset + internal_file_entry->offset );
+
+		return( -1 );
 	}
 	read_count = libewf_handle_read_buffer(
 	              (libewf_handle_t *) internal_file_entry->internal_handle,
@@ -1132,6 +1178,8 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
+	internal_file_entry->offset += read_count;
+
 	return( read_count );
 }
 
@@ -1194,7 +1242,6 @@ off64_t libewf_file_entry_seek_offset(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_seek_offset";
-	off64_t data_offset                               = 0;
 	size64_t data_size                                = 0;
 
 	if( file_entry == NULL )
@@ -1217,20 +1264,6 @@ off64_t libewf_file_entry_seek_offset(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid file entry - missing file entry tree node.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_single_file_entry_get_data_offset(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
-	     &data_offset,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data offset.",
 		 function );
 
 		return( -1 );
@@ -1279,8 +1312,7 @@ off64_t libewf_file_entry_seek_offset(
 		 offset );
 	}
 #endif
-	if( ( offset < 0 )
-	 || ( offset > (off64_t) data_size ) )
+	if( offset < 0 )
 	{
 		liberror_error_set(
 		 error,
@@ -1293,22 +1325,6 @@ off64_t libewf_file_entry_seek_offset(
 	}
 	internal_file_entry->offset = offset;
 
-	if( libewf_handle_seek_offset(
-	     (libewf_handle_t *) internal_file_entry->internal_handle,
-	     data_offset + offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset: %" PRIi64 ".",
-		 function,
-		 offset );
-
-		return( -1 );
-	}
 	return( offset );
 }
 

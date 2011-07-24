@@ -43,106 +43,84 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
-				<BuildOrder>0</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\byte_size_string.h">
-				<BuildOrder>3</BuildOrder>
 			</None>
 			<None Include="..\..\..\ewftools\digest_hash.h">
-				<BuildOrder>4</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\digest_hash.c">
-				<BuildOrder>5</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\ewftools_libewf.h">
-				<BuildOrder>6</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libhmac.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libodraw.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libsmdev.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libsmraw.h">
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libuna.h">
 			</None>
 			<None Include="..\..\..\ewftools\ewfoutput.h">
-				<BuildOrder>7</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\ewfoutput.c">
-				<BuildOrder>8</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\ewftools\log_handle.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\ewftools\ewfverify.c">
-				<BuildOrder>10</BuildOrder>
 			</CppCompile>
 			<LibFiles Include="..\Release\libcstring.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>11</BuildOrder>
 			</LibFiles>
 			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
-				<BuildOrder>12</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\ewfinput.h">
-				<BuildOrder>13</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\process_status.c">
-				<BuildOrder>14</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\storage_media_buffer.h">
-				<BuildOrder>16</BuildOrder>
 			</None>
 			<None Include="..\..\..\ewftools\process_status.h">
-				<BuildOrder>17</BuildOrder>
 			</None>
 			<None Include="..\..\..\ewftools\log_handle.h">
-				<BuildOrder>18</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\storage_media_buffer.c">
-				<BuildOrder>19</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\verification_handle.h">
-				<BuildOrder>20</BuildOrder>
 			</None>
 			<LibFiles Include="..\Release\libuna.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>21</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\libsystem.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>23</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\liberror.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>24</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\zlib_static.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>25</BuildOrder>
 			</LibFiles>
 			<CppCompile Include="..\..\..\ewftools\verification_handle.c">
-				<BuildOrder>26</BuildOrder>
 			</CppCompile>
 			<LibFiles Include="..\Release\libewf_static.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>27</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\libmfdata.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>28</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\libbfio.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>29</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\libnotify.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>30</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\libfvalue.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>31</BuildOrder>
 			</LibFiles>
 			<LibFiles Include="..\Release\libhmac.lib">
 				<IgnorePath>true</IgnorePath>
-				<BuildOrder>32</BuildOrder>
 			</LibFiles>
-			<None Include="..\..\..\ewftools\ewftools_libhmac.h">
-				<BuildOrder>29</BuildOrder>
-			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
