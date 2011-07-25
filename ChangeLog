@@ -1,4 +1,33 @@
 TODO
+Fix (silence):
+libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
+value.
+libewf_convert_date_header_value: unable to copy day of month value.
+libewf_header_values_parse_utf8_header_string: unable to create date time
+values string.
+libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
+value.
+libewf_convert_date_header_value: unable to copy day of month value.
+libewf_header_values_parse_utf8_header_string: unable to create date time
+values string.
+libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
+value.
+libewf_date_time_values_copy_to_timestamp: unable to copy day of month value.
+libewf_date_time_values_copy_to_utf8_string: unable to create timestamp.
+libewf_handle_get_utf8_header_value: unable to copy header value data to UTF-8
+string.
+info_handle_header_value_fprint: unable to retrieve header value:
+acquiry_date.
+info_handle_header_values_fprint: unable to print header value: acquiry_date.
+libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
+value.
+libewf_date_time_values_copy_to_timestamp: unable to copy day of month value.
+libewf_date_time_values_copy_to_utf8_string: unable to create timestamp.
+libewf_handle_get_utf8_header_value: unable to copy header value data to UTF-8
+string.
+info_handle_header_value_fprint: unable to retrieve header value: system_date.
+info_handle_header_values_fprint: unable to print header value: system_date.
+
 * sessions: audio track support
   - write audio track data (test and fix)
 
@@ -261,6 +290,10 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+20110725
+* worked on audio track support in sessions section
+* updated libodraw
 
 20110724
 * updated libhmac
