@@ -42,6 +42,50 @@
 #define DEVICE_HANDLE_VALUE_SIZE		512
 #define DEVICE_HANDLE_NOTIFY_STREAM		stdout
 
+/* Retrieves the track type
+ * Returns a string represenation of the track type
+ */
+const char *device_handle_get_track_type(
+             uint8_t track_type )
+{
+	switch( track_type )
+	{
+		case DEVICE_HANDLE_TRACK_TYPE_AUDIO:
+			return( "audio" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_CDG:
+			return( "CD+G" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_MODE1_2048:
+			return( "mode1/2048" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_MODE1_2352:
+			return( "mode1/2352" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_MODE2_2048:
+			return( "mode2/2048" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_MODE2_2324:
+			return( "mode2/2324" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_MODE2_2336:
+			return( "mode2/2336" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_MODE2_2352:
+			return( "mode2/2352" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_CDI_2336:
+			return( "CDI/2336" );
+
+		case DEVICE_HANDLE_TRACK_TYPE_CDI_2352:
+			return( "CDI/2352" );
+
+		default:
+			break;
+	}
+	return( "UNKNOWN" );
+}
+
 /* Initializes the device handle
  * Returns 1 if successful or -1 on error
  */
@@ -1899,6 +1943,186 @@ int device_handle_get_session(
 	return( 1 );
 }
 
+/* Retrieves the number of tracks
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_number_of_tracks(
+     device_handle_t *device_handle,
+     int *number_of_tracks,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_get_number_of_tracks";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+/* TODO add functionality to libsmdev
+		if( libsmdev_handle_get_number_of_tracks(
+		     device_handle->smdev_input_handle,
+		     number_of_tracks,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of tracks from device input handle.",
+			 function );
+
+			return( -1 );
+		}
+*/
+		if( number_of_tracks == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of tracks raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+		*number_of_tracks = 0;
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
+	{
+		if( libodraw_handle_get_number_of_tracks(
+		     device_handle->odraw_input_handle,
+		     number_of_tracks,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of tracks from optical disc raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		if( number_of_tracks == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of tracks raw input handle.",
+			 function );
+
+			return( -1 );
+		}
+		*number_of_tracks = 0;
+	}
+	return( 1 );
+}
+
+/* Retrieves the information of a track
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_get_track(
+     device_handle_t *device_handle,
+     int index,
+     uint64_t *start_sector,
+     uint64_t *number_of_sectors,
+     uint8_t *type,
+     liberror_error_t **error )
+{
+	static char *function           = "device_handle_get_track";
+	uint64_t data_file_start_sector = 0;
+	int data_file_index             = 0;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
+	{
+/* TODO add functionality to libsmdev
+		if( libsmdev_handle_get_track(
+		     device_handle->smdev_input_handle,
+		     index,
+		     start_sector,
+		     number_of_sectors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve track: %d from device input handle.",
+			 function,
+			 index );
+
+			return( -1 );
+		}
+*/
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
+	{
+		if( libodraw_handle_get_track(
+		     device_handle->odraw_input_handle,
+		     index,
+		     start_sector,
+		     number_of_sectors,
+		     type,
+		     &data_file_index,
+		     &data_file_start_sector,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve track: %d from optical disc raw input handle.",
+			 function,
+			 index );
+
+			return( -1 );
+		}
+	}
+	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets a string
  * Returns 1 if successful or -1 on error
  */
@@ -2616,6 +2840,20 @@ int device_handle_media_information_fprint(
 
 			return( -1 );
 		}
+		if( device_handle_tracks_fprint(
+		     device_handle,
+		     stream,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print tracks.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	else
 	{
@@ -2762,6 +3000,7 @@ int device_handle_sessions_fprint(
      liberror_error_t **error )
 {
 	static char *function      = "device_handle_sessions_fprint";
+	uint64_t last_sector       = 0;
 	uint64_t number_of_sectors = 0;
 	uint64_t start_sector      = 0;
 	int number_of_sessions     = 0;
@@ -2834,17 +3073,143 @@ int device_handle_sessions_fprint(
 				 function,
 				 session_index );
 
+				start_sector      = 0;
+				number_of_sectors = 0;
+
 				result = -1;
 			}
-			else
+			last_sector = start_sector + number_of_sectors;
+
+			if( number_of_sectors != 0 )
 			{
-				fprintf(
-				 stream,
-				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
-				 start_sector,
-				 start_sector + number_of_sectors - 1,
-				 number_of_sectors );
+				last_sector -= 1;
 			}
+			fprintf(
+			 stream,
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+			 start_sector,
+			 last_sector,
+			 number_of_sectors );
+		}
+		fprintf(
+		 stream,
+		 "\n" );
+	}
+	return( result );
+}
+
+/* Print the tracks to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_tracks_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
+     liberror_error_t **error )
+{
+	static char *function      = "device_handle_tracks_fprint";
+	uint64_t last_sector       = 0;
+	uint64_t number_of_sectors = 0;
+	uint64_t start_sector      = 0;
+	uint8_t type               = 0;
+	int number_of_tracks       = 0;
+	int track_index            = 0;
+	int result                 = 1;
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( stream == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_handle_get_number_of_tracks(
+	     device_handle,
+	     &number_of_tracks,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of tracks.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_tracks > 0 )
+	{
+		fprintf(
+		 stream,
+		 "Tracks:\n" );
+		
+		fprintf(
+		 stream,
+		 "\ttotal number: %d\n",
+		 number_of_tracks );
+
+		for( track_index = 0;
+		     track_index < number_of_tracks;
+		     track_index++ )
+		{
+			if( device_handle_get_track(
+			     device_handle,
+			     track_index,
+			     &start_sector,
+			     &number_of_sectors,
+			     &type,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve track: %d.",
+				 function,
+				 track_index );
+
+				start_sector      = 0;
+				number_of_sectors = 0;
+				type              = 0;
+
+				result = -1;
+			}
+			fprintf(
+			 stream,
+			 "\t" );
+
+			fprintf(
+			 stream,
+			 "type: %s",
+			 device_handle_get_track_type(
+			  type ) );
+
+			last_sector = start_sector + number_of_sectors;
+
+			if( number_of_sectors != 0 )
+			{
+				last_sector -= 1;
+			}
+			fprintf(
+			 stream,
+			 " at sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+			 start_sector,
+			 last_sector,
+			 number_of_sectors );
 		}
 		fprintf(
 		 stream,

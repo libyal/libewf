@@ -2976,8 +2976,9 @@ int info_handle_acquiry_errors_fprint(
      liberror_error_t **error )
 {
 	static char *function      = "info_handle_acquiry_errors_fprint";
-	uint64_t start_sector      = 0;
+	uint64_t last_sector       = 0;
 	uint64_t number_of_sectors = 0;
+	uint64_t start_sector      = 0;
 	uint32_t bytes_per_sector  = 0;
 	uint32_t number_of_errors  = 0;
 	uint32_t error_iterator    = 0;
@@ -3091,11 +3092,17 @@ int info_handle_acquiry_errors_fprint(
 			}
 			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 			{
+				last_sector = start_sector + number_of_sectors;
+
+				if( number_of_sectors != 0 )
+				{
+					last_sector -= 1;
+				}
 				fprintf(
 				 info_handle->notify_stream,
 				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
 				 start_sector,
-				 start_sector + number_of_sectors - 1,
+				 last_sector,
 				 number_of_sectors );
 			}
 		}
@@ -3125,8 +3132,9 @@ int info_handle_sessions_fprint(
      liberror_error_t **error )
 {
 	static char *function       = "info_handle_sessions_fprint";
-	uint64_t start_sector       = 0;
+	uint64_t last_sector        = 0;
 	uint64_t number_of_sectors  = 0;
+	uint64_t start_sector       = 0;
 	uint32_t bytes_per_sector   = 0;
 	uint32_t number_of_sessions = 0;
 	uint32_t session_iterator   = 0;
@@ -3240,11 +3248,17 @@ int info_handle_sessions_fprint(
 			}
 			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 			{
+				last_sector = start_sector + number_of_sectors;
+
+				if( number_of_sectors != 0 )
+				{
+					last_sector -= 1;
+				}
 				fprintf(
 				 info_handle->notify_stream,
 				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
 				 start_sector,
-				 start_sector + number_of_sectors - 1,
+				 last_sector,
 				 number_of_sectors );
 			}
 		}
@@ -3274,8 +3288,9 @@ int info_handle_tracks_fprint(
      liberror_error_t **error )
 {
 	static char *function      = "info_handle_tracks_fprint";
-	uint64_t start_sector      = 0;
+	uint64_t last_sector        = 0;
 	uint64_t number_of_sectors = 0;
+	uint64_t start_sector      = 0;
 	uint32_t bytes_per_sector  = 0;
 	uint32_t number_of_tracks  = 0;
 	uint32_t track_iterator    = 0;
@@ -3389,11 +3404,17 @@ int info_handle_tracks_fprint(
 			}
 			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 			{
+				last_sector = start_sector + number_of_sectors;
+
+				if( number_of_sectors != 0 )
+				{
+					last_sector -= 1;
+				}
 				fprintf(
 				 info_handle->notify_stream,
 				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
 				 start_sector,
-				 start_sector + number_of_sectors - 1,
+				 last_sector,
 				 number_of_sectors );
 			}
 		}

@@ -326,7 +326,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	return( input_confirmed );
 }
 
-/* Determines the sessions of an optical disc using the device handle
+/* Determines the sessions and tracks of an optical disc using the device handle
  * and appends them to the imaging handle, if the device is a file
  * a single session is simulated
  * Returns 1 if successful or -1 on error
@@ -342,7 +342,9 @@ int ewfacquire_determine_sessions(
 	uint64_t start_sector      = 0;
 	uint8_t type               = 0;
 	int number_of_sessions     = 0;
+	int number_of_tracks       = 0;
 	int session_index          = 0;
+	int track_index            = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -380,7 +382,48 @@ int ewfacquire_determine_sessions(
 
 		return( -1 );
 	}
-	if( number_of_sessions == 0 )
+	if( number_of_sessions != 0 )
+	{
+		for( session_index = 0;
+		     session_index < number_of_sessions;
+		     session_index++ )
+		{
+			if( device_handle_get_session(
+			     device_handle,
+			     session_index,
+			     &start_sector,
+			     &number_of_sectors,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve session: %d from device handle.",
+				 function,
+				 session_index );
+
+				return( -1 );
+			}
+			if( imaging_handle_append_session(
+			     imaging_handle,
+			     start_sector,
+			     number_of_sectors,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append session: %d to imaging handle.",
+				 function,
+				 session_index );
+
+				return( -1 );
+			}
+		}
+	}
+	else
 	{
 		if( device_handle_get_type(
 		     device_handle,
@@ -431,44 +474,62 @@ int ewfacquire_determine_sessions(
 			return( -1 );
 		}
 	}
-	else
+	if( device_handle_get_number_of_tracks(
+	     device_handle,
+	     &number_of_tracks,
+	     error ) != 1 )
 	{
-		for( session_index = 0;
-		     session_index < number_of_sessions;
-		     session_index++ )
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of tracks.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_tracks != 0 )
+	{
+		for( track_index = 0;
+		     track_index < number_of_tracks;
+		     track_index++ )
 		{
-			if( device_handle_get_session(
+			if( device_handle_get_track(
 			     device_handle,
-			     session_index,
+			     track_index,
 			     &start_sector,
 			     &number_of_sectors,
+			     &type,
 			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve session: %d from device handle.",
+				 "%s: unable to retrieve track: %d from device handle.",
 				 function,
-				 session_index );
+				 track_index );
 
 				return( -1 );
 			}
-			if( imaging_handle_append_session(
-			     imaging_handle,
-			     start_sector,
-			     number_of_sectors,
-			     error ) != 1 )
+			if( type == DEVICE_HANDLE_TRACK_TYPE_AUDIO )
 			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append session: %d to imaging handle.",
-				 function,
-				 session_index );
+				if( imaging_handle_append_track(
+				     imaging_handle,
+				     start_sector,
+				     number_of_sectors,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append track: %d to imaging handle.",
+					 function,
+					 track_index );
 
-				return( -1 );
+					return( -1 );
+				}
 			}
 		}
 	}

@@ -4676,8 +4676,11 @@ ssize_t libewf_section_session_write(
 			      && ( current_sector >= session_first_sector )
 			      && ( current_sector < session_last_sector ) )
 			{
-				number_of_sessions_entries++;
-
+				if( ( track_last_sector == 0 )
+				 || ( track_last_sector < session_first_sector ) ) 
+				{
+					number_of_sessions_entries++;
+				}
 				current_sector = session_last_sector;
 			}
 		}
@@ -4834,9 +4837,7 @@ ssize_t libewf_section_session_write(
 	track_index          = 0;
 	track_last_sector    = 0;
 
-	for( sessions_entry_index = 0;
-	     sessions_entry_index < number_of_sessions_entries;
-	     sessions_entry_index++ )
+	do
 	{
 		if( ( session_index < number_of_sessions )
 		 && ( current_sector >= session_last_sector ) )
@@ -4932,52 +4933,66 @@ ssize_t libewf_section_session_write(
 			 ( session_entries[ sessions_entry_index ] ).first_sector,
 			 (uint32_t) track_first_sector );
 
+			sessions_entry_index++;
+
 			current_sector = track_last_sector;
 		}
 		else if( ( number_of_sessions > 0 )
 		      && ( current_sector >= session_first_sector )
 		      && ( current_sector < session_last_sector ) )
 		{
+			if( ( track_last_sector == 0 )
+			 || ( track_last_sector < session_first_sector ) ) 
+			{
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
-			{
-				libnotify_printf(
-				 "%s: entry: %02" PRIu32 " type\t\t\t\t: 0\n",
-				 function,
-				 sessions_entry_index );
+				if( libnotify_verbose != 0 )
+				{
+					libnotify_printf(
+					 "%s: entry: %02" PRIu32 " type\t\t\t\t: 0\n",
+					 function,
+					 sessions_entry_index );
 
-				libnotify_printf(
-				 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
-				 function,
-				 sessions_entry_index,
-				 session_first_sector );
+					libnotify_printf(
+					 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
+					 function,
+					 sessions_entry_index,
+					 session_first_sector );
 
-				libnotify_printf(
-				 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
-				 function,
-				 sessions_entry_index,
-				 session_last_sector );
+					libnotify_printf(
+					 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
+					 function,
+					 sessions_entry_index,
+					 session_last_sector );
 
-				libnotify_printf(
-				 "\n" );
-			}
+					libnotify_printf(
+					 "\n" );
+				}
 #endif
-			/* Note that EnCase says the first session starts at sector 16
-			 * This is either some EnCase specific behavior or the value is used for
-			 * other purposes.
-			 */
-			if( ( sessions_entry_index == 0 )
-			 && ( session_first_sector == 0 ) )
-			{
-				session_first_sector = 16;
-			}
-			byte_stream_copy_from_uint32_little_endian(
-			 ( session_entries[ sessions_entry_index ] ).first_sector,
-			 (uint32_t) session_first_sector );
+				/* Note that EnCase says the first session starts at sector 16
+				 * This is either some EnCase specific behavior or the value is used for
+				 * other purposes.
+				 */
+				if( ( sessions_entry_index == 0 )
+				 && ( session_first_sector == 0 ) )
+				{
+					session_first_sector = 16;
+				}
+				byte_stream_copy_from_uint32_little_endian(
+				 ( session_entries[ sessions_entry_index ] ).first_sector,
+				 (uint32_t) session_first_sector );
 
+				sessions_entry_index++;
+			}
 			current_sector = session_last_sector;
 		}
+		if( sessions_entry_index >= number_of_sessions_entries )
+		{
+			break;
+		}
 	}
+	while( ( session_index < number_of_sessions )
+	    || ( track_index < number_of_tracks ) );
+
 	write_count = libbfio_pool_write(
 		       file_io_pool,
 		       file_io_pool_entry,

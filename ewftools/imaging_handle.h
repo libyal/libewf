@@ -461,6 +461,12 @@ int imaging_handle_append_session(
      uint64_t number_of_sectors,
      liberror_error_t **error );
 
+int imaging_handle_append_track(
+     imaging_handle_t *imaging_handle,
+     uint64_t start_sector,
+     uint64_t number_of_sectors,
+     liberror_error_t **error );
+
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
          liberror_error_t **error );

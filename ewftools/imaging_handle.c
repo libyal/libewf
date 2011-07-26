@@ -4674,6 +4674,64 @@ int imaging_handle_append_session(
 	return( 1 );
 }
  
+/* Appends a track to the output handle
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_append_track(
+     imaging_handle_t *imaging_handle,
+     uint64_t start_sector,
+     uint64_t number_of_sectors,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_append_track";
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_append_track(
+	     imaging_handle->output_handle,
+	     start_sector,
+	     number_of_sectors,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append track.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->secondary_output_handle != NULL )
+	{
+		if( libewf_handle_append_track(
+		     imaging_handle->secondary_output_handle,
+		     start_sector,
+		     number_of_sectors,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append track to secondary output handle.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+ 
 /* Finalizes the imaging handle
  * Returns the number of input bytes written or -1 on error
  */

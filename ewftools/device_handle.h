@@ -71,6 +71,23 @@ enum DEVICE_HANDLE_MEDIA_TYPES
 	DEVICE_HANDLE_MEDIA_TYPE_MEMORY			= 0x10
 };
 
+/* The (optical disc) track type definitions
+ */
+enum DEVICE_HANDLE_TRACK_TYPES
+{
+	DEVICE_HANDLE_TRACK_TYPE_UNKNOWN,
+	DEVICE_HANDLE_TRACK_TYPE_AUDIO,
+	DEVICE_HANDLE_TRACK_TYPE_CDG,
+	DEVICE_HANDLE_TRACK_TYPE_MODE1_2048,
+	DEVICE_HANDLE_TRACK_TYPE_MODE1_2352,
+	DEVICE_HANDLE_TRACK_TYPE_MODE2_2048,
+	DEVICE_HANDLE_TRACK_TYPE_MODE2_2324,
+	DEVICE_HANDLE_TRACK_TYPE_MODE2_2336,
+	DEVICE_HANDLE_TRACK_TYPE_MODE2_2352,
+	DEVICE_HANDLE_TRACK_TYPE_CDI_2336,
+	DEVICE_HANDLE_TRACK_TYPE_CDI_2352,
+};
+
 typedef struct device_handle device_handle_t;
 
 struct device_handle
@@ -115,6 +132,9 @@ struct device_handle
 	 */
 	FILE *notify_stream;
 };
+
+const char *device_handle_get_track_type(
+             uint8_t track_type );
 
 int device_handle_initialize(
      device_handle_t **device_handle,
@@ -225,6 +245,19 @@ int device_handle_get_session(
      uint64_t *number_of_sectors,
      liberror_error_t **error );
 
+int device_handle_get_number_of_tracks(
+     device_handle_t *device_handle,
+     int *number_of_tracks,
+     liberror_error_t **error );
+
+int device_handle_get_track(
+     device_handle_t *device_handle,
+     int index,
+     uint64_t *start_sector,
+     uint64_t *number_of_sectors,
+     uint8_t *type,
+     liberror_error_t **error );
+
 int device_handle_set_string(
      device_handle_t *device_handle,
      const libcstring_system_character_t *string,
@@ -265,6 +298,11 @@ int device_handle_read_errors_fprint(
      liberror_error_t **error );
 
 int device_handle_sessions_fprint(
+     device_handle_t *device_handle,
+     FILE *stream,
+     liberror_error_t **error );
+
+int device_handle_tracks_fprint(
      device_handle_t *device_handle,
      FILE *stream,
      liberror_error_t **error );
