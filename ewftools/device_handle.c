@@ -1660,12 +1660,8 @@ int device_handle_get_information_value(
      size_t information_value_size,
      liberror_error_t **error )
 {
-	uint8_t utf8_information_value[ DEVICE_HANDLE_VALUE_SIZE ];
-
-	static char *function                    = "device_handle_get_information_value";
-	size_t calculated_information_value_size = 0;
-	size_t utf8_information_value_size       = DEVICE_HANDLE_VALUE_SIZE;
-	int result                               = 0;
+	static char *function = "device_handle_get_information_value";
+	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1680,17 +1676,23 @@ int device_handle_get_information_value(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		/* TODO add UTF-16 information value function
-		 * requires libsmdev UTF-16 support
-		 */
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libsmdev_handle_get_utf16_information_value(
+		          device_handle->smdev_input_handle,
+		          information_value_identifier,
+		          information_value_identifier_length,
+		          (uint16_t *) information_value,
+		          information_value_size,
+		          error );
+#else
 		result = libsmdev_handle_get_utf8_information_value(
 		          device_handle->smdev_input_handle,
 		          information_value_identifier,
 		          information_value_identifier_length,
-		          utf8_information_value,
-		          utf8_information_value_size,
+		          (uint8_t *) information_value,
+		          information_value_size,
 		          error );
-
+#endif
 		if( result == -1 )
 		{
 			liberror_error_set(
@@ -1702,56 +1704,6 @@ int device_handle_get_information_value(
 			 (char *) information_value_identifier );
 
 			return( -1 );
-		}
-		if( result == 1 )
-		{
-			/* Determine the header value size
-			 */
-			utf8_information_value_size = 1 + libcstring_narrow_string_length(
-			                                   (char *) utf8_information_value );
-
-			if( libsystem_string_size_from_utf8_string(
-			     utf8_information_value,
-			     utf8_information_value_size,
-			     &calculated_information_value_size,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBERROR_CONVERSION_ERROR_GENERIC,
-				 "%s: unable to determine header value size.",
-				 function );
-
-				return( -1 );
-			}
-			if( information_value_size < calculated_information_value_size )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-				 "%s: header value too small.",
-				 function );
-
-				return( -1 );
-			}
-			if( libsystem_string_copy_from_utf8_string(
-			     information_value,
-			     information_value_size,
-			     utf8_information_value,
-			     utf8_information_value_size,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBERROR_CONVERSION_ERROR_GENERIC,
-				 "%s: unable to set header value.",
-				 function );
-
-				return( -1 );
-			}
 		}
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
@@ -1966,7 +1918,6 @@ int device_handle_get_number_of_tracks(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-/* TODO add functionality to libsmdev
 		if( libsmdev_handle_get_number_of_tracks(
 		     device_handle->smdev_input_handle,
 		     number_of_tracks,
@@ -1981,19 +1932,6 @@ int device_handle_get_number_of_tracks(
 
 			return( -1 );
 		}
-*/
-		if( number_of_tracks == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid number of tracks raw input handle.",
-			 function );
-
-			return( -1 );
-		}
-		*number_of_tracks = 0;
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
@@ -2058,12 +1996,12 @@ int device_handle_get_track(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-/* TODO add functionality to libsmdev
 		if( libsmdev_handle_get_track(
 		     device_handle->smdev_input_handle,
 		     index,
 		     start_sector,
 		     number_of_sectors,
+		     type,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2076,15 +2014,6 @@ int device_handle_get_track(
 
 			return( -1 );
 		}
-*/
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid index value out of bounds.",
-		 function );
-
-		return( -1 );
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{

@@ -4382,6 +4382,7 @@ int export_handle_export_single_files(
 	static char *function            = "export_handle_export_single_files";
 	size_t export_path_size          = 0;
 	int result                       = 0;
+	int status                       = PROCESS_STATUS_COMPLETED;
 
 	if( export_handle == NULL )
 	{
@@ -4486,10 +4487,14 @@ int export_handle_export_single_files(
 
 		goto on_error;
 	}
+	if( export_handle->abort != 0 )
+	{
+		status = PROCESS_STATUS_ABORTED;
+	}
 	if( process_status_stop(
 	     process_status,
 	     0,
-	     PROCESS_STATUS_COMPLETED,
+	     status,
 	     error ) != 1 )
 	{
 		liberror_error_set(

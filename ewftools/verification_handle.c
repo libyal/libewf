@@ -1239,6 +1239,7 @@ int verification_handle_verify_input(
 	int md5_hash_compare                         = 0;
 	int sha1_hash_compare                        = 0;
 	int sha256_hash_compare                      = 0;
+	int status                                   = PROCESS_STATUS_COMPLETED;
 
 	if( verification_handle == NULL )
 	{
@@ -1532,10 +1533,14 @@ int verification_handle_verify_input(
 
 		goto on_error;
 	}
+	if( verification_handle->abort != 0 )
+	{
+		status = PROCESS_STATUS_ABORTED;
+	}
 	if( process_status_stop(
 	     process_status,
 	     verify_count,
-	     PROCESS_STATUS_COMPLETED,
+	     status,
 	     error ) != 1 )
 	{
 		liberror_error_set(

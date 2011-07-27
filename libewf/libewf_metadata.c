@@ -4474,7 +4474,7 @@ int libewf_handle_parse_header_values(
 	 || ( result_header2 != 1 )
 	 || ( result_xheader != 1 ) )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 		if( ( error != NULL )
 		 && ( *error != NULL ) )
 		{

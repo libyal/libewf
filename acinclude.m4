@@ -1345,6 +1345,16 @@ AC_DEFUN([LIBEWF_CHECK_LIBSMDEV],
    libsmdev_handle_get_session,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_number_of_tracks,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
+  AC_CHECK_LIB(
+   smdev,
+   libsmdev_handle_get_track,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libsmdev=no])
 
   AC_CHECK_LIB(
    smdev,
@@ -1566,6 +1576,16 @@ AC_DEFUN([LIBEWF_CHECK_LIBODRAW],
   AC_CHECK_LIB(
    odraw,
    libodraw_handle_get_session,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_number_of_tracks,
+   [ac_libewf_dummy=yes],
+   [ac_libewf_have_libodraw=no])
+  AC_CHECK_LIB(
+   odraw,
+   libodraw_handle_get_track,
    [ac_libewf_dummy=yes],
    [ac_libewf_have_libodraw=no])
 

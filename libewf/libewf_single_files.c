@@ -411,10 +411,9 @@ int libewf_single_files_parse_file_entries(
 
 					goto on_error;
 				}
-				if( libcstring_narrow_string_compare(
-				     (char *) line_string,
-				     "rec",
-				     3 ) == 0 )
+				if( ( line_string[ 0 ] == (uint8_t) 'r' )
+				 && ( line_string[ 1 ] == (uint8_t) 'e' )
+				 && ( line_string[ 2 ] == (uint8_t) 'c' ) )
 				{
 					line_index += 1;
 
@@ -474,10 +473,11 @@ int libewf_single_files_parse_file_entries(
 
 					goto on_error;
 				}
-				if( libcstring_narrow_string_compare(
-				     (char *) line_string,
-				     "entry",
-				     5 ) == 0 )
+				if( ( line_string[ 0 ] == (uint8_t) 'e' )
+				 && ( line_string[ 1 ] == (uint8_t) 'n' )
+				 && ( line_string[ 2 ] == (uint8_t) 't' )
+				 && ( line_string[ 3 ] == (uint8_t) 'r' )
+				 && ( line_string[ 4 ] == (uint8_t) 'y' ) )
 				{
 					line_index += 2;
 

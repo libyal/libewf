@@ -565,6 +565,7 @@ int ewfacquire_read_input(
 	uint32_t chunk_size                          = 0;
 	int number_of_read_errors                    = 0;
 	int read_error_iterator                      = 0;
+	int status                                   = PROCESS_STATUS_COMPLETED;
 
 	if( imaging_handle == NULL )
 	{
@@ -1119,10 +1120,14 @@ int ewfacquire_read_input(
 		}
 		acquiry_count += write_count;
 	}
+	if( ewfacquire_abort != 0 )
+	{
+		status = PROCESS_STATUS_ABORTED;
+	}
 	if( process_status_stop(
 	     process_status,
 	     acquiry_count,
-	     PROCESS_STATUS_COMPLETED,
+	     status,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1287,7 +1292,6 @@ int main( int argc, char * const argv[] )
 	int8_t acquiry_parameters_confirmed                             = 0;
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
-	int status                                                      = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -2879,17 +2883,6 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	if( ewfacquire_abort == 0 )
-	{
-		if( result != 1 )
-		{
-			status = PROCESS_STATUS_FAILED;
-		}
-		else
-		{
-			status = PROCESS_STATUS_COMPLETED;
-		}
-	}
 on_abort:
 	if( libsystem_signal_detach(
 	     &error ) != 1 )
@@ -2952,7 +2945,7 @@ on_abort:
 
 		return( EXIT_FAILURE );
 	}
-	if( status != PROCESS_STATUS_COMPLETED )
+	if( result != 1 )
 	{
 		fprintf(
 		 stdout,

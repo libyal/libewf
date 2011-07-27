@@ -39,7 +39,6 @@
 #include "ewfoutput.h"
 #include "ewftools_libewf.h"
 #include "log_handle.h"
-#include "process_status.h"
 #include "verification_handle.h"
 
 verification_handle_t *ewfverify_verification_handle = NULL;
@@ -510,14 +509,6 @@ int main( int argc, char * const argv[] )
 			 &error );
 		}
 	}
-	if( result != 1 )
-	{
-		status = PROCESS_STATUS_FAILED;
-	}
-	else
-	{
-		status = PROCESS_STATUS_COMPLETED;
-	}
 	if( log_handle != NULL )
 	{
 		if( log_handle_close(
@@ -584,7 +575,7 @@ on_abort:
 
 		return( EXIT_FAILURE );
 	}
-	if( status != PROCESS_STATUS_COMPLETED )
+	if( result != 1 )
 	{
 		fprintf(
 		 stdout,

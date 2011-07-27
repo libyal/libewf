@@ -1,37 +1,9 @@
 TODO
-Fix (silence):
-libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
-value.
-libewf_convert_date_header_value: unable to copy day of month value.
-libewf_header_values_parse_utf8_header_string: unable to create date time
-values string.
-libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
-value.
-libewf_convert_date_header_value: unable to copy day of month value.
-libewf_header_values_parse_utf8_header_string: unable to create date time
-values string.
-libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
-value.
-libewf_date_time_values_copy_to_timestamp: unable to copy day of month value.
-libewf_date_time_values_copy_to_utf8_string: unable to create timestamp.
-libewf_handle_get_utf8_header_value: unable to copy header value data to UTF-8
-string.
-info_handle_header_value_fprint: unable to retrieve header value:
-acquiry_date.
-info_handle_header_values_fprint: unable to print header value: acquiry_date.
-libewf_utf8_string_day_of_month_copy_to_time_elements: unsupported month
-value.
-libewf_date_time_values_copy_to_timestamp: unable to copy day of month value.
-libewf_date_time_values_copy_to_utf8_string: unable to create timestamp.
-libewf_handle_get_utf8_header_value: unable to copy header value data to UTF-8
-string.
-info_handle_header_value_fprint: unable to retrieve header value: system_date.
-info_handle_header_values_fprint: unable to print header value: system_date.
-
-* sessions: audio track support
-  - libsmdev add track support, update device handle
-
-* libewf_single_files refactor to use utf-16
+* clean up TODOs
+* implement remaining test scenarios
+* add test for table2 read
+* write resume
+  - allow resume from volume/disk section + test scenario
 * ewf.net single files support
 * libsystem path implement GetVolumeInformation
 * deal with corrupted table section
@@ -44,15 +16,11 @@ info_handle_header_values_fprint: unable to print header value: system_date.
   - set chunk (data) size in chunk table (value size) ?
   - read performance: flag if checksum has be checked
   - add flags to by-pass cache ? direct read/write
-* write resume
-  - allow resume from volume/disk section + test scenario
 * check performance
-* ewftools: do not print status on abort
-  - set process status to abort ?
-* implement remaining test scenarios
-* add test for table2 read
 
 Next beta/stable release:
+* check pc file
+* check spec file
 * full test
 * disable ewfdebug
 
@@ -72,6 +40,7 @@ Roadmap:
   - .Net (partial)
   - Java/JNI
 * improve device handle (libsmdev)
+  - audio track support - libsmdev
 * libbfio API extensions (partial)
 * low and high level API
   - to allow low level access to sections etc. (for recovery)
@@ -289,6 +258,17 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
+
+Notes:
+* libewf_single_files refactor to use UTF-16 split string
+  - does not really matter still need to do conversion to runtime UTF-16
+
+20110727
+* updated function checks for tracks functions
+* updated libsmdev
+* update in device handle for libsmdev UTF-16 and tracks functions
+* libewf now prints header value parse errors in debug mode not verbose mode
+* ewftools: fixed status print on abort
 
 20110726
 * updated libodraw

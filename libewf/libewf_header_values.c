@@ -1550,7 +1550,17 @@ int libewf_header_values_parse_utf8_header_string(
 
 			goto on_error;
 		}
-/* TODO line size check */
+		if( line_string_size != 2 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported header values string.",
+			 function );
+
+			goto on_error;
+		}
 		if( ( line_string[ 0 ] < (uint8_t) '0' )
 		 || ( line_string[ 0 ] > (uint8_t) '9' ) )
 		{
