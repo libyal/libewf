@@ -263,6 +263,9 @@ Notes:
 * libewf_single_files refactor to use UTF-16 split string
   - does not really matter still need to do conversion to runtime UTF-16
 
+20110728
+* fixed issue in libewf_utf8_string_day_of_month_copy_to_time_elements
+
 20110727
 * updated function checks for tracks functions
 * updated libsmdev

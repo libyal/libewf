@@ -1550,6 +1550,27 @@ int libewf_header_values_parse_utf8_header_string(
 
 			goto on_error;
 		}
+		if( ( line_string == NULL )
+		 || ( line_string_size < 2 )
+		 || ( line_string[ 0 ] == 0 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing line string: 0.",
+			 function );
+
+			goto on_error;
+		}
+		/* Remove trailing carriage return
+		 */
+		else if( line_string[ line_string_size - 2 ] == (uint8_t) '\r' )
+		{
+			line_string[ line_string_size - 2 ] = 0;
+
+			line_string_size -= 1;
+		}
 		if( line_string_size != 2 )
 		{
 			liberror_error_set(

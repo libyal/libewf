@@ -1009,18 +1009,18 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
 		return( -1 );
 	}
 	if( ( value_8bit < 1 )
-	 || ( value_8bit >= 13 ) )
+	 || ( value_8bit >= 31 ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported month value.",
+		 "%s: unsupported day of the month value.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements->tm_mon = (int) ( value_8bit - 1 );
+	time_elements->tm_mday = (int) ( value_8bit - 1 );
 
 	return( 1 );
 }
@@ -1105,7 +1105,7 @@ int libewf_utf8_string_month_copy_from_time_elements(
 		return( -1 );
 	}
 	if( ( time_elements->tm_mon < 0 )
-	 || ( time_elements->tm_mon > 11 ) )
+	 || ( time_elements->tm_mon >= 12 ) )
 	{
 		liberror_error_set(
 		 error,

@@ -151,7 +151,6 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                                               = 0;
 	int number_of_filenames                                       = 0;
 	int result                                                    = 0;
-	int status                                                    = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
