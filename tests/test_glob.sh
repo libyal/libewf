@@ -103,26 +103,29 @@ test_glob_sequence()
 	FILENAME=$3;
 	LAST=$4;
 
-	RESULT=`echo ${LAST} | ${EGREP} "^[esEL][0-9a-zA-Z][0-9a-zA-Z]$"`;
-	LAST_IS_VALID=$?;
+	RESULT=`echo ${SCHEMA} | ${EGREP} "^[.][esEL][0-9a-zA-Z][0-9a-zA-Z]$"`;
+	IS_VALID=$?;
 
-	if [ ${LAST_IS_VALID} -ne 0 ];
+	if [ ${IS_VALID} -ne 0 ];
+	then
+		echo "Unsupported schema: ${SCHEMA}";
+
+		exit ${EXIT_FAILURE};
+	fi
+
+	RESULT=`echo ${LAST} | ${EGREP} "^[e-zE-Z][0-9a-zA-Z][0-9a-zA-Z]$"`;
+	IS_VALID=$?;
+
+	if [ ${IS_VALID} -ne 0 ];
 	then
 		echo "Unsupported last: ${LAST}";
 
 		exit ${EXIT_FAILURE};
 	fi
 
-	FIRST_LETTER=`echo ${LAST} | cut -c 1`;
+	FIRST_LETTER=`echo ${SCHEMA} | cut -c 2`;
 
-	if [ ${LAST} = "${FIRST_LETTER}00" ];
-	then
-		echo "Unsupported last: ${LAST}";
-
-		exit ${EXIT_FAILURE};
-	fi
-
-	RESULT=`echo ${LAST} | ${EGREP} "^[esEL][0-9][0-9]$"`;
+	RESULT=`echo ${LAST} | ${EGREP} "^${FIRST_LETTER}[0-9][0-9]$"`;
 	LAST_IS_NUMERIC=$?;
 
 	if [ ${LAST_IS_NUMERIC} -eq 0 ];
@@ -138,21 +141,42 @@ test_glob_sequence()
 
 	if [ ${LAST_IS_NUMERIC} -ne 0 ];
 	then
-		RESULT=`echo ${LAST} | ${EGREP} "^[esEL][A-Z][A-Z]$"`;
-		LAST_IS_UPPER_CASE=$?;
+		RESULT=`echo ${LAST} | ${EGREP} "^[A-Z][A-Z][A-Z]$"`;
+		IS_UPPER_CASE=$?;
 
 		SECOND_ITERATOR=0;
 		THIRD_ITERATOR=0;
 
-		if [ ${LAST_IS_UPPER_CASE} -eq 0 ];
+		if [ ${IS_UPPER_CASE} -eq 0 ];
 		then
+			if [ ${FIRST_LETTER} = "E" ];
+			then
+				FIRST_ITERATOR=4;
+
+			elif [ ${FIRST_LETTER} = "L" ];
+			then
+				FIRST_ITERATOR=11;
+			fi
+
+			FIRST_BYTE_VALUE=`expr 65 + ${FIRST_ITERATOR}`;
 			SECOND_BYTE_VALUE=`expr 65 + ${SECOND_ITERATOR}`;
 			THIRD_BYTE_VALUE=`expr 65 + ${THIRD_ITERATOR}`;
 		else
+			if [ ${FIRST_LETTER} = "e" ];
+			then
+				FIRST_ITERATOR=4;
+
+			elif [ ${FIRST_LETTER} = "s" ];
+			then
+				FIRST_ITERATOR=18;
+			fi
+
+			FIRST_BYTE_VALUE=`expr 97 + ${FIRST_ITERATOR}`;
 			SECOND_BYTE_VALUE=`expr 97 + ${SECOND_ITERATOR}`;
 			THIRD_BYTE_VALUE=`expr 97 + ${THIRD_ITERATOR}`;
 		fi
 
+		FIRST_LETTER=`chr ${FIRST_BYTE_VALUE}`;
 		SECOND_LETTER=`chr ${SECOND_BYTE_VALUE}`;
 		THIRD_LETTER=`chr ${THIRD_BYTE_VALUE}`;
 
@@ -171,15 +195,25 @@ test_glob_sequence()
 				THIRD_ITERATOR=0;
 			fi
 
-			if [ ${LAST_IS_UPPER_CASE} -eq 0 ];
+			if [ ${SECOND_ITERATOR} -ge 26 ];
 			then
+				FIRST_ITERATOR=`expr ${FIRST_ITERATOR} + 1`;
+
+				SECOND_ITERATOR=0;
+			fi
+
+			if [ ${IS_UPPER_CASE} -eq 0 ];
+			then
+				FIRST_BYTE_VALUE=`expr 65 + ${FIRST_ITERATOR}`;
 				SECOND_BYTE_VALUE=`expr 65 + ${SECOND_ITERATOR}`;
 				THIRD_BYTE_VALUE=`expr 65 + ${THIRD_ITERATOR}`;
 			else
+				FIRST_BYTE_VALUE=`expr 97 + ${FIRST_ITERATOR}`;
 				SECOND_BYTE_VALUE=`expr 97 + ${SECOND_ITERATOR}`;
 				THIRD_BYTE_VALUE=`expr 97 + ${THIRD_ITERATOR}`;
 			fi
 
+			FIRST_LETTER=`chr ${FIRST_BYTE_VALUE}`;
 			SECOND_LETTER=`chr ${SECOND_BYTE_VALUE}`;
 			THIRD_LETTER=`chr ${THIRD_BYTE_VALUE}`;
 
@@ -258,6 +292,11 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+if ! test_glob_sequence "PREFIX.e01" ".e01" "PREFIX" "faa";
+then
+	exit ${EXIT_FAILURE};
+fi
+
 if ! test_glob "PREFIX.s01" ".s01" "PREFIX.s01";
 then
 	exit ${EXIT_FAILURE};
@@ -274,6 +313,11 @@ then
 fi
 
 if ! test_glob_sequence "PREFIX.s01" ".s01" "PREFIX" "sba";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob_sequence "PREFIX.s01" ".s01" "PREFIX" "taa";
 then
 	exit ${EXIT_FAILURE};
 fi
@@ -298,6 +342,11 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+if ! test_glob_sequence "PREFIX.E01" ".E01" "PREFIX" "FAA";
+then
+	exit ${EXIT_FAILURE};
+fi
+
 if ! test_glob "PREFIX.L01" ".L01" "PREFIX.L01";
 then
 	exit ${EXIT_FAILURE};
@@ -314,6 +363,11 @@ then
 fi
 
 if ! test_glob_sequence "PREFIX.L01" ".L01" "PREFIX" "LBA";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob_sequence "PREFIX.L01" ".L01" "PREFIX" "MAA";
 then
 	exit ${EXIT_FAILURE};
 fi

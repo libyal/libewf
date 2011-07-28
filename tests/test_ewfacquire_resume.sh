@@ -174,6 +174,11 @@ do
 		exit ${EXIT_FAILURE};
 	fi
 
+	if ! test_write_resume "${FILENAME}" 1477351
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
 	if ! test_write_resume "${FILENAME}" 1478432
 	then
 		exit ${EXIT_FAILURE};

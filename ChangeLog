@@ -1,13 +1,12 @@
 TODO
 * clean up TODOs
 * implement remaining test scenarios
-* add test for table2 read
-* write resume
-  - allow resume from volume/disk section + test scenario
 * ewf.net single files support
 * libsystem path implement GetVolumeInformation
 * deal with corrupted table section
   - what about handling both corrupted table and table2 sections
+  - test file for non-overlapping corruption
+  - test file for overlapping corruption
 * libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -31,7 +30,7 @@ Roadmap:
 * code clean up
   - handle code
   - write io handle code
-  - make write debug output similar to read debug output ?
+  - make write debug output similar to read debug output
 * error tollerance
   - allow for missing segment file(s)
   - allow for missing chunk(s)
@@ -259,12 +258,16 @@ Known issues:
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 * Cygwin compilation missing __xpg_strerror_r - bug in recent Cygwin 1.7.8
 
-Notes:
+Closed:
 * libewf_single_files refactor to use UTF-16 split string
   - does not really matter still need to do conversion to runtime UTF-16
+* write resume, allow resume from volume/disk section + test scenario
+  - why bother no media data has been written anyway
 
 20110728
 * fixed issue in libewf_utf8_string_day_of_month_copy_to_time_elements
+* extended glob test for first letter change scenario
+* created test file for table2 read (corrupted table)
 
 20110727
 * updated function checks for tracks functions
