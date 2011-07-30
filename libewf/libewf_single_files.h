@@ -29,6 +29,7 @@
 
 #include "libewf_extern.h"
 #include "libewf_libfvalue.h"
+#include "libewf_single_file_entry.h"
 #include "libewf_tree_type.h"
 #include "libewf_types.h"
 
@@ -90,6 +91,12 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      uint64_t *number_of_sub_entries,
+     liberror_error_t **error );
+
+int libewf_single_files_parse_file_entry_offset_values(
+     libewf_single_file_entry_t *single_file_entry,
+     const uint8_t *offset_values_string,
+     size_t offset_values_string_size,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

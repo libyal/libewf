@@ -80,7 +80,11 @@ int libewf_chunk_data_free(
 int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
      int8_t compression_level,
+     uint8_t compression_flags,
      uint8_t ewf_format,
+     size32_t chunk_size,
+     const uint8_t *compressed_zero_byte_empty_block,
+     size_t compressed_zero_byte_empty_block_size,
      liberror_error_t **error );
 
 int libewf_chunk_data_unpack(

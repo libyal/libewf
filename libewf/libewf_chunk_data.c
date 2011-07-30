@@ -29,6 +29,8 @@
 
 #include "libewf_chunk_data.h"
 #include "libewf_compression.h"
+#include "libewf_definitions.h"
+#include "libewf_empty_block.h"
 
 #include "ewf_checksum.h"
 #include "ewf_definitions.h"
@@ -167,12 +169,17 @@ int libewf_chunk_data_free(
 int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
      int8_t compression_level,
+     uint8_t compression_flags,
      uint8_t ewf_format,
+     size32_t chunk_size,
+     const uint8_t *compressed_zero_byte_empty_block,
+     size_t compressed_zero_byte_empty_block_size,
      liberror_error_t **error )
 {
 	static char *function        = "libewf_chunk_data_pack";
 	void *reallocation           = NULL;
 	uint32_t calculated_checksum = 0;
+	int is_empty_zero_block      = 0;
 	int result                   = 0;
 
 	if( chunk_data == NULL )
@@ -203,6 +210,41 @@ int libewf_chunk_data_pack(
 	}
 	chunk_data->is_compressed = 0;
 
+	if( ( ewf_format != EWF_FORMAT_S01 )
+	 && ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
+	{
+		result = libewf_empty_block_test(
+			  chunk_data->data,
+			  chunk_data->data_size,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if chunk data is empty an empty block.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 1 )
+		{
+			if( compression_level == EWF_COMPRESSION_NONE )
+			{
+				compression_level = EWF_COMPRESSION_DEFAULT;
+			}
+			if( ( chunk_data->data )[ 0 ] == 0 )
+			{
+				is_empty_zero_block = 1;
+			}
+		}
+		else
+		{
+			compression_level = EWF_COMPRESSION_NONE;
+		}
+	}
 	if( ( ewf_format == EWF_FORMAT_S01 )
 	 || ( compression_level != EWF_COMPRESSION_NONE ) )
 	{
@@ -222,58 +264,81 @@ int libewf_chunk_data_pack(
 
 			return( -1 );
 		}
-		result = libewf_compress(
-			  chunk_data->compressed_data,
-			  &( chunk_data->compressed_data_size ),
-			  chunk_data->data,
-			  chunk_data->data_size,
-			  compression_level,
-			  error );
-
-		/* Check if the compressed buffer was too small
-		 * and a new compressed data size buffer was passed back
-		 */
-		if( ( result == -1 )
-		 && ( chunk_data->compressed_data_size > 0 ) )
+		if( ( is_empty_zero_block != 0 )
+		 && ( chunk_data->data_size == (size_t) chunk_size )
+		 && ( compressed_zero_byte_empty_block != NULL ) )
 		{
-			liberror_error_free(
-			 error );
-
-			reallocation = memory_reallocate(
-			                chunk_data->compressed_data,
-			                sizeof( uint8_t ) * chunk_data->compressed_data_size );
-
-			if( reallocation == NULL )
+			if( memory_copy(
+			     chunk_data->compressed_data,
+			     compressed_zero_byte_empty_block,
+			     compressed_zero_byte_empty_block_size ) == NULL )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to resize compressed data.",
+				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy compressed zero byte empty block to compressed chunk buffer.",
 				 function );
 
 				return( -1 );
 			}
-			chunk_data->compressed_data = (uint8_t *) reallocation;
-
-			result = libewf_compress(
-			          chunk_data->compressed_data,
-			          &( chunk_data->compressed_data_size ),
-			          chunk_data->data,
-			          chunk_data->data_size,
-			          compression_level,
-			          error );
+			chunk_data->compressed_data_size = compressed_zero_byte_empty_block_size;
 		}
-		if( result != 1 )
+		else
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_COMPRESSION,
-			 LIBERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
-			 "%s: unable to compress chunk data.",
-			 function );
+			result = libewf_compress(
+				  chunk_data->compressed_data,
+				  &( chunk_data->compressed_data_size ),
+				  chunk_data->data,
+				  chunk_data->data_size,
+				  compression_level,
+				  error );
 
-			return( -1 );
+			/* Check if the compressed buffer was too small
+			 * and a new compressed data size buffer was passed back
+			 */
+			if( ( result == -1 )
+			 && ( chunk_data->compressed_data_size > 0 ) )
+			{
+				liberror_error_free(
+				 error );
+
+				reallocation = memory_reallocate(
+						chunk_data->compressed_data,
+						sizeof( uint8_t ) * chunk_data->compressed_data_size );
+
+				if( reallocation == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to resize compressed data.",
+					 function );
+
+					return( -1 );
+				}
+				chunk_data->compressed_data = (uint8_t *) reallocation;
+
+				result = libewf_compress(
+					  chunk_data->compressed_data,
+					  &( chunk_data->compressed_data_size ),
+					  chunk_data->data,
+					  chunk_data->data_size,
+					  compression_level,
+					  error );
+			}
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_COMPRESSION,
+				 LIBERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
+				 "%s: unable to compress chunk data.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	 	if( ( ewf_format == EWF_FORMAT_S01 )
 		 || ( chunk_data->compressed_data_size < chunk_data->data_size ) )

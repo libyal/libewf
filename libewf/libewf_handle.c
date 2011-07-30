@@ -2583,6 +2583,7 @@ int libewf_handle_open_read_segment_files(
 	int number_of_segment_files         = 0;
 	int known_section                   = 0;
 	int last_section                    = 0;
+	int last_segment_file               = 0;
 	int segment_files_list_index        = 0;
 
 	if( internal_handle == NULL )
@@ -2712,8 +2713,6 @@ int libewf_handle_open_read_segment_files(
 				goto on_error;
 			}
 		}
-/* TODO handle missing segment files */
-/* TODO handle corrupt segment files */
 		if( libewf_segment_file_initialize(
 		     &segment_file,
 		     error ) != 1 )
@@ -2769,7 +2768,7 @@ int libewf_handle_open_read_segment_files(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_INPUT,
-			 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
 			 "%s: segment number mismatch.",
 			 function );
 
@@ -2901,17 +2900,28 @@ int libewf_handle_open_read_segment_files(
 					  (void *) "done",
 					  4 ) == 0 )
 				{
+					if( ( segment_files_list_index + 1 ) != number_of_segment_files )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_INPUT,
+						 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
+						 "%s: last segment number mismatch.",
+						 function );
+
+						goto on_error;
+					}
 					/* Nothing to do for the done section
 					 */
-					known_section = 1;
-					last_section  = 1;
+					known_section     = 1;
+					last_section      = 1;
+					last_segment_file = 1;
 				}
 				else if( memory_compare(
 					  (void *) section->type,
 					  (void *) "hash",
 					  4 ) == 0 )
 				{
-/* TODO store location of hash section and read on-demand */
 					read_count = libewf_section_hash_read(
 						      section,
 						      file_io_pool,
@@ -2951,7 +2961,6 @@ int libewf_handle_open_read_segment_files(
 #endif
 						internal_handle->io_handle->ewf_format = EWF_FORMAT_L01;
 				        }
-/* TODO store location of ltree section and read on-demand */
 					read_count = libewf_section_ltree_read(
 						      section,
 						      file_io_pool,
@@ -2996,7 +3005,6 @@ int libewf_handle_open_read_segment_files(
 				                }
 				        }
 #endif
-/* TODO store location of xhash section and read on-demand */
 					read_count = libewf_section_xhash_read(
 						      section,
 						      file_io_pool,
@@ -3025,7 +3033,6 @@ int libewf_handle_open_read_segment_files(
 				                }
 				        }
 #endif
-/* TODO store location of digest section and read on-demand */
 					read_count = libewf_section_digest_read(
 						      section,
 						      file_io_pool,
@@ -3051,7 +3058,6 @@ int libewf_handle_open_read_segment_files(
 				                }
 				        }
 #endif
-/* TODO store location of error2 section and read on-demand */
 					read_count = libewf_section_error2_read(
 						      section,
 						      file_io_pool,
@@ -3066,7 +3072,6 @@ int libewf_handle_open_read_segment_files(
 					  (void *) "header",
 					  6 ) == 0 )
 				{
-/* TODO store location of header section and read on-demand */
 					read_count = libewf_section_header_read(
 						      section,
 						      file_io_pool,
@@ -3127,7 +3132,6 @@ int libewf_handle_open_read_segment_files(
 				     (void *) "header2",
 				     7 ) == 0 )
 				{
-/* TODO store location of header2 section and read on-demand */
 					read_count = libewf_section_header2_read(
 						      section,
 						      file_io_pool,
@@ -3173,7 +3177,6 @@ int libewf_handle_open_read_segment_files(
 				                }
 				        }
 #endif
-/* TODO store location of session section and read on-demand */
 					read_count = libewf_section_session_read(
 						      section,
 						      file_io_pool,
@@ -3190,8 +3193,6 @@ int libewf_handle_open_read_segment_files(
 					  (void *) "xheader",
 					  7 ) == 0 )
 				{
-/* TODO store location of xheader section and read on-demand */
-
 					read_count = libewf_section_xheader_read(
 						      section,
 						      file_io_pool,
@@ -3260,9 +3261,6 @@ int libewf_handle_open_read_segment_files(
 			{
 				break;
 			}
-/* TODO libmfdata rewrite
-			last_segment_file = 1;
-*/
 		}
 		if( last_section == 0 )
 		{
@@ -3288,6 +3286,17 @@ int libewf_handle_open_read_segment_files(
 		}
 #endif
 		segment_file = NULL;
+	}
+	if( last_segment_file == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing done section.",
+		 function );
+
+		goto on_error;
 	}
 	return( 1 );
 
@@ -3320,6 +3329,7 @@ int libewf_handle_open_read_delta_segment_files(
 	int number_of_segment_files         = 0;
 	int known_section                   = 0;
 	int last_section                    = 0;
+	int last_segment_file               = 0;
 	int segment_files_list_index        = 0;
 
 	if( internal_handle == NULL )
@@ -3409,8 +3419,6 @@ int libewf_handle_open_read_delta_segment_files(
 				goto on_error;
 			}
 		}
-/* TODO handle missing delta segment files */
-/* TODO handle corrupt delta segment files */
 		if( libewf_segment_file_initialize(
 		     &segment_file,
 		     error ) != 1 )
@@ -3465,7 +3473,7 @@ int libewf_handle_open_read_delta_segment_files(
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_INPUT,
-			 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
 			 "%s: segment number mismatch.",
 			 function );
 
@@ -3537,10 +3545,22 @@ int libewf_handle_open_read_delta_segment_files(
 				     (void *) "done",
 				     4 ) == 0 )
 				{
+					if( ( segment_files_list_index + 1 ) != number_of_segment_files )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_INPUT,
+						 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
+						 "%s: last segment number mismatch.",
+						 function );
+
+						goto on_error;
+					}
 					/* Nothing to do for the done section
 					 */
-					known_section = 1;
-					last_section  = 1;
+					known_section     = 1;
+					last_section      = 1;
+					last_segment_file = 1;
 				}
 				else if( memory_compare(
 				          (void *) section->type,
@@ -3629,9 +3649,6 @@ int libewf_handle_open_read_delta_segment_files(
 			{
 				break;
 			}
-/* TODO libmfdata rewrite
-			last_segment_file = 1;
-*/
 		}
 		if( last_section == 0 )
 		{
@@ -3657,6 +3674,17 @@ int libewf_handle_open_read_delta_segment_files(
 		}
 #endif
 		segment_file = NULL;
+	}
+	if( last_segment_file == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing done section.",
+		 function );
+
+		goto on_error;
 	}
 	return( 1 );
 
@@ -4226,7 +4254,6 @@ ssize_t libewf_handle_read_chunk(
 
 		return( -1 );
 	}
-/* TODO handle this */
 	if( internal_handle->chunk_data != NULL )
 	{
 		liberror_error_set(
@@ -4535,7 +4562,6 @@ ssize_t libewf_handle_read_buffer(
 
 		return( -1 );
 	}
-/* TODO handle this */
 	if( internal_handle->chunk_data != NULL )
 	{
 		liberror_error_set(
@@ -5206,7 +5232,6 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
-/* TODO handle this */
 	if( internal_handle->chunk_data != NULL )
 	{
 		liberror_error_set(
@@ -5476,14 +5501,8 @@ ssize_t libewf_handle_write_buffer(
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
 	uint64_t chunk_data_offset                = 0;
-	int8_t compression_level                  = 0;
 	int chunk_exists                          = 0;
-	int result                                = 0;
 	int write_chunk                           = 0;
-
-#ifdef TODO
-	int is_empty_zero_block                   = 0;
-#endif
 
 	if( handle == NULL )
 	{
@@ -5839,7 +5858,11 @@ ssize_t libewf_handle_write_buffer(
 			if( libewf_chunk_data_pack(
 			     chunk_data,
 			     EWF_COMPRESSION_NONE,
+			     0,
 			     EWF_FORMAT_D01,
+			     internal_handle->media_values->chunk_size,
+			     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
+			     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -6001,53 +6024,16 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( write_chunk != 0 )
 			{
-				if( internal_handle->io_handle->ewf_format != EWF_FORMAT_S01 )
-				{
-					compression_level = internal_handle->io_handle->compression_level;
-
-					if( ( internal_handle->io_handle->compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
-					{
-						result = libewf_empty_block_test(
-							  internal_handle->chunk_data->data,
-							  internal_handle->chunk_data->data_size,
-							  error );
-
-						if( result == -1 )
-						{
-							liberror_error_set(
-							 error,
-							 LIBERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-							 "%s: unable to determine if chunk buffer is empty.",
-							 function );
-
-							return( -1 );
-						}
-						else if( result == 1 )
-						{
-							if( compression_level == EWF_COMPRESSION_NONE )
-							{
-								compression_level = EWF_COMPRESSION_DEFAULT;
-							}
-#ifdef TODO
-							if( ( internal_handle->chunk_data->data )[ 0 ] == 0 )
-							{
-								is_empty_zero_block = 1;
-							}
-#endif
-						}
-						else
-						{
-							compression_level = EWF_COMPRESSION_NONE;
-						}
-					}
-				}
 				chunk_data_size = internal_handle->chunk_data->data_size;
 
 				if( libewf_chunk_data_pack(
 				     internal_handle->chunk_data,
-				     compression_level,
+				     internal_handle->io_handle->compression_level,
+				     internal_handle->io_handle->compression_flags,
 				     internal_handle->io_handle->ewf_format,
+				     internal_handle->media_values->chunk_size,
+				     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
+				     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -6199,18 +6185,14 @@ ssize_t libewf_handle_write_finalize(
 	libewf_segment_file_t *segment_file       = NULL;
 	static char *function                     = "libewf_handle_write_finalize";
 	void *reallocation                        = NULL;
+	off64_t segment_file_offset               = 0;
 	size_t chunk_data_size                    = 0;
 	ssize_t write_count                       = 0;
 	ssize_t write_finalize_count              = 0;
 	uint64_t chunk_index                      = 0;
-	int8_t compression_level                  = 0;
 	int file_io_pool_entry                    = -1;
 	int number_of_segment_files               = 0;
-	int result                                = 0;
 	int segment_files_list_index              = 0;
-#ifdef TODO
-	int is_empty_zero_block                   = 0;
-#endif
 
 	if( handle == NULL )
 	{
@@ -6320,53 +6302,16 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-		if( internal_handle->io_handle->ewf_format != EWF_FORMAT_S01 )
-		{
-			compression_level = internal_handle->io_handle->compression_level;
-
-			if( ( internal_handle->io_handle->compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
-			{
-				result = libewf_empty_block_test(
-					  internal_handle->chunk_data->data,
-					  internal_handle->chunk_data->data_size,
-					  error );
-
-				if( result == -1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to determine if chunk buffer is empty.",
-					 function );
-
-					return( -1 );
-				}
-				else if( result == 1 )
-				{
-					if( compression_level == EWF_COMPRESSION_NONE )
-					{
-						compression_level = EWF_COMPRESSION_DEFAULT;
-					}
-#ifdef TODO
-					if( ( internal_handle->chunk_data->data )[ 0 ] == 0 )
-					{
-						is_empty_zero_block = 1;
-					}
-#endif
-				}
-				else
-				{
-					compression_level = EWF_COMPRESSION_NONE;
-				}
-			}
-		}
 		chunk_data_size = internal_handle->chunk_data->data_size;
 
 		if( libewf_chunk_data_pack(
 		     internal_handle->chunk_data,
-		     compression_level,
+		     internal_handle->io_handle->compression_level,
+		     internal_handle->io_handle->compression_flags,
 		     internal_handle->io_handle->ewf_format,
+		     internal_handle->media_values->chunk_size,
+		     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
+		     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -6441,7 +6386,6 @@ ssize_t libewf_handle_write_finalize(
 	}
 	/* Check if all media data has been written
 	 */
-/* TODO why internal_handle->write_io_handle->input_write_count < (ssize64_t) internal_handle->media_values->media_size ? */
 	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( internal_handle->write_io_handle->input_write_count < (ssize64_t) internal_handle->media_values->media_size ) )
 	{
@@ -6642,6 +6586,21 @@ ssize_t libewf_handle_write_finalize(
 	 */
 	if( segment_file->write_open != 0 )
 	{
+		if( libbfio_pool_get_offset(
+		     internal_handle->file_io_pool,
+		     file_io_pool_entry,
+		     &segment_file_offset,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve current offset in segment file.",
+			 function );
+
+			return( -1 );
+		}
 		/* Check if chunks section needs to be corrected
 		 */
 		if( internal_handle->write_io_handle->chunks_section_offset != 0 )
@@ -6681,6 +6640,7 @@ ssize_t libewf_handle_write_finalize(
 				       internal_handle->io_handle,
 				       internal_handle->file_io_pool,
 				       file_io_pool_entry,
+				       segment_file_offset,
 				       internal_handle->chunk_table_list,
 			               internal_handle->write_io_handle->table_offsets,
 			               internal_handle->write_io_handle->number_of_table_offsets,
@@ -6701,6 +6661,7 @@ ssize_t libewf_handle_write_finalize(
 
 				return( -1 );
 			}
+			segment_file_offset  += write_count;
 			write_finalize_count += write_count;
 		}
 		/* Close the segment file
@@ -6718,6 +6679,7 @@ ssize_t libewf_handle_write_finalize(
 		               internal_handle->io_handle,
 		               internal_handle->file_io_pool,
 		               file_io_pool_entry,
+		               segment_file_offset,
 		               internal_handle->write_io_handle->number_of_chunks_written_to_segment,
 		               1,
 		               internal_handle->hash_sections,
@@ -6828,7 +6790,6 @@ off64_t libewf_handle_seek_offset(
 
 		return( -1 );
 	}
-/* TODO handle this */
 	if( internal_handle->chunk_data != NULL )
 	{
 		liberror_error_set(

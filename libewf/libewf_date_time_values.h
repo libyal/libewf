@@ -122,18 +122,12 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
      struct tm *time_elements,
      liberror_error_t **error );
 
-/* TODO libewf_utf16_string_day_of_week_copy_to_time_elements */
-
-/* TODO libewf_utf16_string_day_of_month_copy_to_time_elements */
-
 int libewf_utf16_string_month_copy_from_time_elements(
      uint16_t *utf16_string,
      size_t utf16_string_size,
      size_t *utf16_string_index,
      struct tm *time_elements,
      liberror_error_t **error );
-
-/* TODO libewf_utf16_string_month_copy_to_time_elements */
 
 int libewf_utf16_string_time_copy_from_time_elements(
      uint16_t *utf16_string,
@@ -149,14 +143,6 @@ int libewf_date_time_values_copy_to_utf8_string(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      liberror_error_t **error );
-
-/* TODO libewf_utf16_string_year_copy_to_time_elements */
-
-/* TODO libewf_utf16_string_hours_copy_to_time_elements */
-
-/* TODO libewf_utf16_string_minutes_copy_to_time_elements */
-
-/* TODO libewf_utf16_string_seconds_copy_to_time_element */
 
 int libewf_date_time_values_copy_to_utf16_string(
      const uint8_t *date_time_values_string,

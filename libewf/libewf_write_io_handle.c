@@ -2655,6 +2655,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		               io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               write_io_handle->chunks_section_offset,
 		               chunk_table_list,
 		               write_io_handle->table_offsets,
 		               write_io_handle->number_of_table_offsets,
@@ -2872,6 +2873,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		               io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               segment_file_offset,
 		               chunk_table_list,
 		               write_io_handle->table_offsets,
 		               write_io_handle->number_of_table_offsets,
@@ -2892,6 +2894,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			return( -1 );
 		}
+		segment_file_offset                   += write_count;
 		total_write_count                     += write_count;
 		write_io_handle->create_chunks_section = 1;
 		write_io_handle->chunks_section_offset = 0;
@@ -2951,6 +2954,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 					       io_handle,
 					       file_io_pool,
 					       file_io_pool_entry,
+					       segment_file_offset,
 					       write_io_handle->number_of_chunks_written_to_segment,
 					       0,
 					       hash_sections,
@@ -2973,7 +2977,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 					return( -1 );
 				}
-				total_write_count += write_count;
+				segment_file_offset += write_count;
+				total_write_count   += write_count;
 			}
 		}
 	}
@@ -3307,6 +3312,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 					       io_handle,
 					       file_io_pool,
 					       file_io_pool_entry,
+				               segment_file_offset,
 					       0,
 					       error );
 
@@ -3321,7 +3327,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 					return( -1 );
 				}
-				total_write_count += write_count;
+				segment_file_offset += write_count;
+				total_write_count   += write_count;
 
 				segment_file = NULL;
 			}
@@ -3411,8 +3418,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 				return( -1 );
 			}
-			total_write_count  += write_count;
 			segment_file_offset = write_count;
+			total_write_count  += write_count;
 		}
 	}
 	else
@@ -3506,7 +3513,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		return( -1 );
 	}
-	total_write_count += write_count;
+	segment_file_offset += write_count;
+	total_write_count   += write_count;
 
 	if( no_section_append == 0 )
 	{
@@ -3515,6 +3523,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			       io_handle,
 			       file_io_pool,
 			       file_io_pool_entry,
+			       segment_file_offset,
 			       1,
 		               error );
 
@@ -3529,7 +3538,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 			return( -1 );
 		}
-		total_write_count += write_count;
+		segment_file_offset += write_count;
+		total_write_count   += write_count;
 	}
 	return( total_write_count );
 }

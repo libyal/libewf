@@ -2541,6 +2541,42 @@ int info_handle_media_information_fprint(
 				result = -1;
 			}
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libewf_handle_get_chunk_size(
+		     info_handle->input_handle,
+		     &value_32bit,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve chunk size.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+			if( info_handle_section_value_32bit_fprint(
+			     info_handle,
+			     "chunk_size",
+			     "Chunk size",
+			     10,
+			     value_32bit,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section 32-bit value: number_of_sectors.",
+				 function );
+
+				result = -1;
+			}
+		}
+#endif
 	}
 	if( libewf_handle_get_media_size(
 	     info_handle->input_handle,

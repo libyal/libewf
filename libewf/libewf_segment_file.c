@@ -547,7 +547,6 @@ int libewf_segment_file_read(
 		return( -1 );
 	}
 */
-
 	if( libewf_segment_file_initialize(
 	     &segment_file,
 	     error ) != 1 )
@@ -583,7 +582,7 @@ int libewf_segment_file_read(
 		      file_io_pool_entry,
 		      error );
 
-	if( read_count < 0 )
+	if( read_count == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -768,7 +767,7 @@ ssize_t libewf_segment_file_read_table_section(
 	              &base_offset,
 	              error );
 	
-	if( read_count < 0 )
+	if( read_count == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -908,7 +907,7 @@ ssize_t libewf_segment_file_read_table2_section(
 	              &base_offset,
 	              error );
 	
-	if( read_count < 0 )
+	if( read_count == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1060,7 +1059,7 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 	              &chunk_size,
 	              error );
 	
-	if( read_count < 0 )
+	if( read_count == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1105,12 +1104,12 @@ ssize_t libewf_segment_file_write_headers(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         off64_t section_offset,
          libewf_header_sections_t *header_sections,
          liberror_error_t **error )
 {
 	libewf_section_t *section = NULL;
 	static char *function     = "libewf_segment_file_write_headers";
-	off64_t section_offset    = 0;
 	ssize_t write_count       = 0;
 	ssize_t total_write_count = 0;
 
@@ -1158,22 +1157,6 @@ ssize_t libewf_segment_file_write_headers(
 		 function );
 
 		return( -1 );
-	}
-/* TODO pass offset instead of retrieving it from pool */
-	if( libbfio_pool_get_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     &section_offset,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.",
-		 function );
-
-		goto on_error;
 	}
 	if( ( io_handle->format == LIBEWF_FORMAT_EWF )
 	 || ( io_handle->format == LIBEWF_FORMAT_SMART )
@@ -1738,13 +1721,13 @@ ssize_t libewf_segment_file_write_last_section(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         off64_t section_offset,
          int last_segment_file,
          liberror_error_t **error )
 {
 	libewf_section_t *section  = NULL;
 	uint8_t *last_section_type = NULL;
 	static char *function      = "libewf_segment_file_write_last_section";
-	off64_t section_offset     = 0;
 	ssize_t write_count        = 0;
 
 	if( segment_file == NULL )
@@ -1776,22 +1759,6 @@ ssize_t libewf_segment_file_write_last_section(
 	else
 	{
 		last_section_type = (uint8_t *) "done";
-	}
-/* TODO pass offset instead of retrieving it from pool */
-	if( libbfio_pool_get_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     &section_offset,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.",
-		 function );
-
-		goto on_error;
 	}
 	/* Write next or done section
 	 */
@@ -1916,6 +1883,7 @@ ssize_t libewf_segment_file_write_start(
 
 		return( -1 );
 	}
+	section_offset    += write_count;
 	total_write_count += write_count;
 
 	if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
@@ -1927,6 +1895,7 @@ ssize_t libewf_segment_file_write_start(
 				       io_handle,
 				       file_io_pool,
 				       file_io_pool_entry,
+				       section_offset,
 				       header_sections,
 			               error );
 
@@ -1942,22 +1911,7 @@ ssize_t libewf_segment_file_write_start(
 				return( -1 );
 			}
 			total_write_count += write_count;
-		}
-/* TODO pass offset instead of retrieving it from pool */
-		if( libbfio_pool_get_offset(
-		     file_io_pool,
-		     file_io_pool_entry,
-		     &section_offset,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve current offset in segment file.",
-			 function );
-
-			goto on_error;
+			section_offset    += write_count;
 		}
 		if( libewf_section_initialize(
 		     &section,
@@ -2035,6 +1989,7 @@ ssize_t libewf_segment_file_write_start(
 			}
 		}
 		total_write_count += write_count;
+		section_offset    += write_count;
 
 		if( libewf_list_append_value(
 		     segment_file->section_list,
@@ -2072,6 +2027,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
          ewf_table_offset_t *table_offsets,
          uint32_t number_of_table_offsets,
@@ -2081,7 +2037,6 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 {	
 	libewf_section_t *section = NULL;
 	static char *function     = "libewf_segment_file_write_chunks_section_start";
-	off64_t section_offset    = 0;
 	ssize_t write_count       = 0;
 	int number_of_chunks      = 0;
 
@@ -2150,22 +2105,6 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 			return( -1 );
 		}
-	}
-/* TODO pass offset instead of retrieving it from pool */
-	if( libbfio_pool_get_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     &section_offset,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.",
-		 function );
-
-		goto on_error;
 	}
 	if( libewf_section_initialize(
 	     &section,
@@ -2271,6 +2210,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
          ewf_table_offset_t *table_offsets,
          uint32_t number_of_table_offsets,
@@ -2280,13 +2220,12 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
          uint32_t section_number_of_chunks,
          liberror_error_t **error )
 {
-	libewf_section_t *section        = NULL;
-	uint8_t *table_section_string    = NULL;
-	static char *function            = "libewf_segment_file_write_chunks_section_correction";
-	off64_t last_segment_file_offset = 0;
-	off64_t base_offset              = 0;
-	ssize_t total_write_count        = 0;
-	ssize_t write_count              = 0;
+	libewf_section_t *section     = NULL;
+	uint8_t *table_section_string = NULL;
+	static char *function         = "libewf_segment_file_write_chunks_section_correction";
+	off64_t base_offset           = 0;
+	ssize_t total_write_count     = 0;
+	ssize_t write_count           = 0;
 
 	if( segment_file == NULL )
 	{
@@ -2367,21 +2306,6 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to fill table offsets.",
-		 function );
-
-		return( -1 );
-	}
-	if( libbfio_pool_get_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     &last_segment_file_offset,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.",
 		 function );
 
 		return( -1 );
@@ -2522,13 +2446,13 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		libnotify_printf(
 		 "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
 		 function,
-		 last_segment_file_offset );
+		 section_offset );
 	}
 #endif
 	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     file_io_pool_entry,
-	     last_segment_file_offset,
+	     section_offset,
 	     SEEK_SET,
 	     error ) == -1 )
 	{
@@ -2563,7 +2487,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               file_io_pool_entry,
 		               (uint8_t *) "table",
 		               5,
-		               last_segment_file_offset,
+		               section_offset,
 		               base_offset,
 		               table_offsets,
 		               section_number_of_chunks,
@@ -2582,8 +2506,8 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 			return( -1 );
 		}
-		total_write_count        += write_count;
-		last_segment_file_offset += write_count;
+		section_offset    += write_count;
+		total_write_count += write_count;
 
 		if( libewf_list_append_value(
 		     segment_file->section_list,
@@ -2620,7 +2544,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               file_io_pool_entry,
 		               (uint8_t *) "table2",
 		               6,
-		               last_segment_file_offset,
+		               section_offset,
 		               base_offset,
 		               table_offsets,
 		               section_number_of_chunks,
@@ -2639,6 +2563,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 			return( -1 );
 		}
+		section_offset    += write_count;
 		total_write_count += write_count;
 
 		if( libewf_list_append_value(
@@ -3039,7 +2964,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	               write_checksum,
 	               error );
 
-	if( write_count < 0 )
+	if( write_count == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -3050,7 +2975,6 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		goto on_error;
 	}
-/* TODO what about write count == 0 */
 	if( no_section_append == 0 )
 	{
 		if( libewf_list_append_value(
@@ -3131,6 +3055,7 @@ ssize_t libewf_segment_file_write_close(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         off64_t section_offset,
          uint32_t number_of_chunks_written_to_segment,
          int last_segment_file,
          libewf_hash_sections_t *hash_sections,
@@ -3144,7 +3069,6 @@ ssize_t libewf_segment_file_write_close(
 {
 	libewf_section_t *section = NULL;
 	static char *function     = "libewf_segment_file_write_close";
-	off64_t section_offset    = 0;
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
 	int number_of_elements    = 0;
@@ -3223,22 +3147,6 @@ ssize_t libewf_segment_file_write_close(
 		{
 			if( segment_file->segment_number == 1 )
 			{
-/* TODO pass offset instead of retrieving it from pool */
-				if( libbfio_pool_get_offset(
-				     file_io_pool,
-				     file_io_pool_entry,
-				     &section_offset,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve current offset in segment file.",
-					 function );
-
-					goto on_error;
-				}
 				if( libewf_section_initialize(
 				     &section,
 				     error ) != 1 )
@@ -3273,6 +3181,7 @@ ssize_t libewf_segment_file_write_close(
 
 					goto on_error;
 				}
+				section_offset    += write_count;
 				total_write_count += write_count;
 
 				if( libewf_list_append_value(
@@ -3316,22 +3225,6 @@ ssize_t libewf_segment_file_write_close(
 			}
 			if( number_of_elements > 0 )
 			{
-/* TODO pass offset instead of retrieving it from pool */
-				if( libbfio_pool_get_offset(
-				     file_io_pool,
-				     file_io_pool_entry,
-				     &section_offset,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve current offset in segment file.",
-					 function );
-
-					goto on_error;
-				}
 				if( libewf_section_initialize(
 				     &section,
 				     error ) != 1 )
@@ -3365,6 +3258,7 @@ ssize_t libewf_segment_file_write_close(
 
 					goto on_error;
 				}
+				section_offset    += write_count;
 				total_write_count += write_count;
 
 				if( libewf_list_append_value(
@@ -3410,22 +3304,6 @@ ssize_t libewf_segment_file_write_close(
 			}
 			if( number_of_elements > 0 )
 			{
-/* TODO pass offset instead of retrieving it from pool */
-				if( libbfio_pool_get_offset(
-				     file_io_pool,
-				     file_io_pool_entry,
-				     &section_offset,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve current offset in segment file.",
-					 function );
-
-					goto on_error;
-				}
 				if( libewf_section_initialize(
 				     &section,
 				     error ) != 1 )
@@ -3458,6 +3336,7 @@ ssize_t libewf_segment_file_write_close(
 
 					goto on_error;
 				}
+				section_offset    += write_count;
 				total_write_count += write_count;
 
 				if( libewf_list_append_value(
@@ -3484,22 +3363,6 @@ ssize_t libewf_segment_file_write_close(
 			 */
 			if( hash_sections->sha1_digest_set != 0 )
 			{
-/* TODO pass offset instead of retrieving it from pool */
-				if( libbfio_pool_get_offset(
-				     file_io_pool,
-				     file_io_pool_entry,
-				     &section_offset,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve current offset in segment file.",
-					 function );
-
-					goto on_error;
-				}
 				if( libewf_section_initialize(
 				     &section,
 				     error ) != 1 )
@@ -3532,6 +3395,7 @@ ssize_t libewf_segment_file_write_close(
 
 					goto on_error;
 				}
+				section_offset    += write_count;
 				total_write_count += write_count;
 
 				if( libewf_list_append_value(
@@ -3555,22 +3419,6 @@ ssize_t libewf_segment_file_write_close(
 		 */
 		if( hash_sections->md5_hash_set != 0 )
 		{
-/* TODO pass offset instead of retrieving it from pool */
-			if( libbfio_pool_get_offset(
-			     file_io_pool,
-			     file_io_pool_entry,
-			     &section_offset,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve current offset in segment file.",
-				 function );
-
-				goto on_error;
-			}
 			if( libewf_section_initialize(
 			     &section,
 			     error ) != 1 )
@@ -3603,6 +3451,7 @@ ssize_t libewf_segment_file_write_close(
 
 				goto on_error;
 			}
+			section_offset    += write_count;
 			total_write_count += write_count;
 
 			if( libewf_list_append_value(
@@ -3655,22 +3504,6 @@ ssize_t libewf_segment_file_write_close(
 
 				goto on_error;
 			}
-/* TODO pass offset instead of retrieving it from pool */
-			if( libbfio_pool_get_offset(
-			     file_io_pool,
-			     file_io_pool_entry,
-			     &section_offset,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve current offset in segment file.",
-				 function );
-
-				goto on_error;
-			}
 			if( libewf_section_initialize(
 			     &section,
 			     error ) != 1 )
@@ -3704,6 +3537,7 @@ ssize_t libewf_segment_file_write_close(
 
 				goto on_error;
 			}
+			section_offset    += write_count;
 			total_write_count += write_count;
 
 			if( libewf_list_append_value(
@@ -3731,6 +3565,7 @@ ssize_t libewf_segment_file_write_close(
 		       io_handle,
 		       file_io_pool,
 		       file_io_pool_entry,
+	               section_offset,
 	               last_segment_file,
 	               error );
 
@@ -3746,6 +3581,7 @@ ssize_t libewf_segment_file_write_close(
 		goto on_error;
 	}
 	total_write_count += write_count;
+	section_offset    += write_count;
 
 	segment_file->number_of_chunks = number_of_chunks_written_to_segment;
 
@@ -4019,7 +3855,6 @@ int libewf_segment_file_write_sections_correction(
 				     section->type,
 				     "next",
 				     4 ) == 0 )
-
 				{
 					correct_last_next_section = 1;
 					next_section_start_offset = section->start_offset;
@@ -4077,6 +3912,7 @@ int libewf_segment_file_write_sections_correction(
 			       io_handle,
 			       file_io_pool,
 			       file_io_pool_entry,
+			       next_section_start_offset,
 			       number_of_chunks_written_to_segment,
 			       1,
 			       hash_sections,

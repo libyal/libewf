@@ -3837,11 +3837,7 @@ ssize_t libewf_section_ltree_read(
 
 	ltree_header = NULL;
 
-/* TODO compare ltree_size with ltree_data_size */
-
-	ltree_data_size = (size_t) section_data_size;
-
-	if( section_data_size < (size64_t) ltree_data_size )
+	if( section_data_size < (size64_t) ltree_size )
 	{
 		liberror_error_set(
 		 error,
@@ -3852,6 +3848,8 @@ ssize_t libewf_section_ltree_read(
 
 		goto on_error;
 	}
+	ltree_data_size = (size_t) ltree_size;
+
 	ltree_data = (uint8_t *) memory_allocate(
                                   ltree_data_size );
 

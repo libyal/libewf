@@ -69,12 +69,6 @@ struct libewf_section
 	/* The size the section
 	 */
 	size64_t size;
-
-#ifdef TODO_ERROR_TOLLERANCE
-	/* The flags
-	 */
-	uint8_t flags;
-#endif
 };
 
 int libewf_section_test_zero(

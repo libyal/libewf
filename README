@@ -18,7 +18,20 @@ Multiple methods of creating a DLL are supported:
 
 
 Creating a DLL using Borland C++
-TODO
+* Borland C++ Builder
+  The provided CodeGear project files were created using the 5.0 SP1
+  version.
+* The zlib 1.2.5 source package including from the zlib project site:
+  http://www.gzip.org/zlib/
+
+Extract the contents of the zlib DLL package to:
+libewf-<version>/borlandc/zlib-1.2.5
+
+Make sure to check if your build environment defines the correct WINVER for your build.
+The code uses WINAPI version specific functions based on WINVER.
+You can define a custom WINVER in the CodeGear project files or in libewf-<version>/common/config_borlandc.h
+
+You should be able to build the libewf DLL using the provided project files.
 
 
 Creating a DLL using Cygwin
@@ -45,7 +58,23 @@ libewf-<version>/libewf/.libs/cygewf-0.dll
 
 
 Creating a DLL using CodeGear
-TODO
+You'll need:
+* Embarcadero CodeGear C++ Builder
+  The provided CodeGear project files were created using the 2009
+  version. Note that some version of CodeGear have a broken
+  compiler/linker and you'll need to turn off code optimization
+  to be able to build libewf.
+* The zlib 1.2.5 source package including from the zlib project site:
+  http://www.gzip.org/zlib/
+
+Extract the contents of the zlib DLL package to:
+libewf-<version>/borlandc/zlib-1.2.5
+
+Make sure to check if your build environment defines the correct WINVER for your build.
+The code uses WINAPI version specific functions based on WINVER.
+You can define a custom WINVER in the CodeGear project files or in libewf-<version>/common/config_borlandc.h
+
+You should be able to build the libewf DLL using the provided project files.
 
 
 Creating a DLL using Microsoft Visual Studio C++
@@ -66,8 +95,8 @@ Make sure to check if your build environment defines the correct WINVER for your
 The code uses WINAPI version specific functions based on WINVER.
 You can define a custom WINVER in the msvscpp project files or in libewf-<version>/common/config_msc.h
 
-You should be able to build the libewf DLL using the provided
-project files. Note that the project files contain a Release and VSDebug configuration.
+You should be able to build the libewf DLL using the provided project files.
+Note that the project files contain a Release and VSDebug configuration.
 
 
 Creating a DLL using MingW

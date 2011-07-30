@@ -3,10 +3,6 @@ TODO
 * implement remaining test scenarios
 * ewf.net single files support
 * libsystem path implement GetVolumeInformation
-* deal with corrupted table section
-  - what about handling both corrupted table and table2 sections
-  - test file for non-overlapping corruption
-  - test file for overlapping corruption
 * libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -122,6 +118,20 @@ Recovery and analysis:
 * check into resume write error for 32-bit compile (different zlib sizes)
 * detect consistent number of chunks in table sections
 
+Error handling/tollerance
+* what about a function that translates error into an equivalent errno?
+* have wchar error messages for WINAPI?
+* improve offset table correction
+  - if not correctable skip chunk while reading and mark as crc error
+    or try to determine offset/size of chunk somehow
+* handle corruption in both table and table2 sections
+  - non-overlapping corruption
+  - overlapping corruption
+* handle missing segment files
+* handle corrupt segment files
+* handle missing delta segment files
+* handle corrupt delta segment files
+
 Additional (integrity) checks:
 * read: check if successive headers match first header
 * read: add check for next and done segment
@@ -142,13 +152,16 @@ Possible performance improvements:
   do not copy data to compressed chunk cache
 * do not write section start on data update
   - performance improvement is insignificant
-
-Error handling/tollerance
-* what about a function that translates error into an equivalent errno?
-* have wchar error messages for WINAPI?
-* improve offset table correction
-  - if not correctable skip chunk while reading and mark as crc error
-    or try to determine offset/size of chunk somehow
+* read section data on demain
+  - store location of hash section and read on-demand
+  - store location of ltree section and read on-demand
+  - store location of xhash section and read on-demand
+  - store location of digest section and read on-demand
+  - store location of error2 section and read on-demand
+  - store location of header section and read on-demand
+  - store location of header2 section and read on-demand
+  - store location of session section and read on-demand
+  - store location of xheader section and read on-demand
 
 Python bindings (pyewf)
 * add WINAPI wide character support for open() and glob()
@@ -263,6 +276,10 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
+
+20110730
+* updated README
+* code cleanup - worked on TODOs
 
 20110728
 * fixed issue in libewf_utf8_string_day_of_month_copy_to_time_elements

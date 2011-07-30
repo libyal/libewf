@@ -350,7 +350,9 @@ int libewf_single_files_parse_file_entries(
 
 			goto on_error;
 		}
-		if( line_string == NULL )
+		if( ( line_string == NULL )
+		 || ( line_string_size < 2 )
+		 || ( line_string[ 0 ] == 0 ) )
 		{
 			liberror_error_set(
 			 error,
@@ -361,7 +363,25 @@ int libewf_single_files_parse_file_entries(
 
 			goto on_error;
 		}
-/* TODO line size check */
+		/* Remove trailing carriage return
+		 */
+		else if( line_string[ line_string_size - 2 ] == (uint8_t) '\r' )
+		{
+			line_string[ line_string_size - 2 ] = 0;
+
+			line_string_size -= 1;
+		}
+		if( line_string_size != 2 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported single file entries string.",
+			 function );
+
+			goto on_error;
+		}
 		if( ( line_string[ 0 ] < (uint8_t) '0' )
 		 || ( line_string[ 0 ] > (uint8_t) '9' ) )
 		{
@@ -575,7 +595,15 @@ int libewf_single_files_parse_file_entries(
 			if( ( line_string_size != 1 )
 			 || ( line_string[ 0 ] != 0 ) )
 			{
-				/* TODO error if line is not empty */
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported empty line string: %d - not empty.",
+				 function,
+				 line_index );
+
+				goto on_error;
 			}
 		}
 		if( libfvalue_split_utf8_string_free(
@@ -959,23 +987,19 @@ int libewf_single_files_parse_file_entry(
      liberror_error_t **error )
 {
 	libewf_single_file_entry_t *single_file_entry = NULL;
-	libfvalue_split_utf8_string_t *offset_values  = NULL;
 	libfvalue_split_utf8_string_t *values         = NULL;
 	libewf_tree_node_t *file_entry_node           = NULL;
 	uint8_t *line_string                          = NULL;
-	uint8_t *offset_value_string                  = NULL;
 	uint8_t *type_string                          = NULL;
 	uint8_t *value_string                         = NULL;
 	static char *function                         = "libewf_single_files_parse_file_entry";
 	size_t line_string_size                       = 0;
-	size_t offset_value_string_size               = 0;
 	size_t type_string_size                       = 0;
 	size_t value_string_size                      = 0;
 	size_t value_string_index                     = 0;
 	uint64_t number_of_sub_entries                = 0;
 	uint64_t value_64bit                          = 0;
 	int number_of_lines                           = 0;
-	int number_of_offset_values                   = 0;
 	int number_of_types                           = 0;
 	int number_of_values                          = 0;
 	int value_index                               = 0;
@@ -1277,126 +1301,17 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'b' )
 			      && ( type_string[ 1 ] == (uint8_t) 'e' ) )
 			{
-/* TODO refactor to separate function */
-				if( libfvalue_utf8_string_split(
+				if( libewf_single_files_parse_file_entry_offset_values(
+				     single_file_entry,
 				     value_string,
 				     value_string_size,
-				     (uint8_t) ' ',
-				     &offset_values,
 				     error ) != 1 )
 				{
 					liberror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to split value string into offset values.",
-					 function );
-
-					goto on_error;
-				}
-				if( libfvalue_split_utf8_string_get_number_of_segments(
-				     offset_values,
-				     &number_of_offset_values,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve number of lines",
-					 function );
-
-					goto on_error;
-				}
-				if( ( number_of_offset_values != 1 )
-				 && ( number_of_offset_values != 3 ) )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-					 "%s: unsupported number of offset values.",
-					 function );
-
-					goto on_error;
-				}
-				if( number_of_offset_values == 3 )
-				{
-					if( libfvalue_split_utf8_string_get_segment_by_index(
-					     offset_values,
-					     1,
-					     &offset_value_string,
-					     &offset_value_string_size,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-						 "%s: unable to retrieve offset value string: 1.",
-						 function );
-
-						goto on_error;
-					}
-					if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
-					     offset_value_string,
-					     offset_value_string_size,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set data offset.",
-						 function );
-
-						goto on_error;
-					}
-					single_file_entry->data_offset = (off64_t) value_64bit;
-
-					if( libfvalue_split_utf8_string_get_segment_by_index(
-					     offset_values,
-					     2,
-					     &offset_value_string,
-					     &offset_value_string_size,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-						 "%s: unable to retrieve offset value string: 2.",
-						 function );
-
-						goto on_error;
-					}
-					if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
-					     offset_value_string,
-					     offset_value_string_size,
-					     &value_64bit,
-					     error ) != 1 )
-					{
-						liberror_error_set(
-						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set data size.",
-						 function );
-
-						goto on_error;
-					}
-					single_file_entry->data_size = (size64_t) value_64bit;
-				}
-				if( libfvalue_split_utf8_string_free(
-				     &offset_values,
-				     error ) != 1 )
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free split offset values.",
+					 LIBERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to parse offset values string.",
 					 function );
 
 					goto on_error;
@@ -1760,7 +1675,7 @@ on_error:
 	return( -1 );
 }
 
-/* Parse a single file entry string for the values
+/* Parse a single file entry string for the number of sub entries
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_file_entry_number_of_sub_entries(
@@ -1928,6 +1843,168 @@ on_error:
 	{
 		libfvalue_split_utf8_string_free(
 		 &values,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Parse a single file entry offset values string for the values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_files_parse_file_entry_offset_values(
+     libewf_single_file_entry_t *single_file_entry,
+     const uint8_t *offset_values_string,
+     size_t offset_values_string_size,
+     liberror_error_t **error )
+{
+	libfvalue_split_utf8_string_t *offset_values  = NULL;
+	uint8_t *offset_value_string                  = NULL;
+	static char *function                         = "libewf_single_files_parse_file_entry_offset_values";
+	size_t offset_value_string_size               = 0;
+	uint64_t value_64bit                          = 0;
+	int number_of_offset_values                   = 0;
+
+	if( single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfvalue_utf8_string_split(
+	     offset_values_string,
+	     offset_values_string_size,
+	     (uint8_t) ' ',
+	     &offset_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split string into offset values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     offset_values,
+	     &number_of_offset_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of offset values",
+		 function );
+
+		goto on_error;
+	}
+	if( ( number_of_offset_values != 1 )
+	 && ( number_of_offset_values != 3 ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported number of offset values.",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_offset_values == 3 )
+	{
+		if( libfvalue_split_utf8_string_get_segment_by_index(
+		     offset_values,
+		     1,
+		     &offset_value_string,
+		     &offset_value_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve offset value string: 1.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
+		     offset_value_string,
+		     offset_value_string_size,
+		     &value_64bit,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to set data offset.",
+			 function );
+
+			goto on_error;
+		}
+		single_file_entry->data_offset = (off64_t) value_64bit;
+
+		if( libfvalue_split_utf8_string_get_segment_by_index(
+		     offset_values,
+		     2,
+		     &offset_value_string,
+		     &offset_value_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve offset value string: 2.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
+		     offset_value_string,
+		     offset_value_string_size,
+		     &value_64bit,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to set data size.",
+			 function );
+
+			goto on_error;
+		}
+		single_file_entry->data_size = (size64_t) value_64bit;
+	}
+	if( libfvalue_split_utf8_string_free(
+	     &offset_values,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split offset values.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( offset_values != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &offset_values,
 		 NULL );
 	}
 	return( -1 );

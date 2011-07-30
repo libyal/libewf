@@ -952,7 +952,6 @@ int libewf_array_insert_entry(
 
 			return( -1 );
 		}
-		/* TODO can this loop safely be replaced by a memcpy ? */
 		for( entry_iterator = array->number_of_entries - 1;
 		     entry_iterator > *entry_index;
 		     entry_iterator-- )
