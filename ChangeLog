@@ -1,4 +1,7 @@
 TODO
+* clean up configure.ac and acinclude.m4
+  - fix openssl detection
+  - refactor to use m4/
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -280,7 +283,7 @@ Closed:
 
 20110731
 * code cleanup - worked on TODOs
-* updated libmfdata, libsmraw
+* updated libmfdata, libsmraw, libsmdev
 * added > 2 GiB media and segment file size, and delta file open scenarios
 
 20110730
