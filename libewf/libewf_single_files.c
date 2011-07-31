@@ -555,8 +555,6 @@ int libewf_single_files_parse_file_entries(
 
 				goto on_error;
 			}
-			/* TODO parse first entries differently ?
-			 */
 			if( libewf_single_files_parse_file_entry(
 			     single_files->root_file_entry_node,
 			     lines,
@@ -1252,7 +1250,17 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				/* TODO range check */
+				if( value_64bit > (uint64_t) UINT32_MAX )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+					 "%s: invalid entry flags value exceeds maximum.",
+					 function );
+
+					goto on_error;
+				}
 				single_file_entry->flags = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 's' )
@@ -1288,7 +1296,6 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				/* TODO range check */
 				single_file_entry->access_time = value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
@@ -1337,7 +1344,6 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				/* TODO range check */
 				single_file_entry->creation_time = value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
@@ -1454,7 +1460,6 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				/* TODO range check */
 				single_file_entry->entry_modification_time = value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
@@ -1485,7 +1490,6 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				/* TODO range check */
 				single_file_entry->modification_time = value_64bit;
 			}
 		}

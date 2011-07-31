@@ -585,7 +585,6 @@ int libewf_chunk_table_read_offsets(
 
 		goto on_error;
 	}
-/* TODO handle corruption element_group_size < table_offsets_data_size ? */
 	if( element_group_size < (size64_t) table_offsets_data_size )
 	{
 		liberror_error_set(
@@ -755,7 +754,7 @@ int libewf_chunk_table_read_offsets(
 	table_offsets_data = NULL;
 
 	if( libewf_section_free(
-	     (intptr_t *) section,
+	     section,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -868,7 +867,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 (intptr_t *) section,
+		 section,
 		 NULL );
 	}
 	return( -1 );

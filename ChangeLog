@@ -1,9 +1,6 @@
 TODO
-* clean up TODOs
-* implement remaining test scenarios
 * ewf.net single files support
-* libsystem path implement GetVolumeInformation
-* libmfdata
+* ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
   - add group value size
@@ -85,6 +82,7 @@ Further analysis of the EWF format:
 * does newer linen6 has sha1 support?
 * LVF: single file entry:
   - are flags similar to file attribute flags ?
+  - parse first entries differently ? for file hierarchy
 * FTK Imager: support for "Use AD Encryption"
   - requires support for ADCRYPT file format
 * Audio track data ?
@@ -131,6 +129,8 @@ Error handling/tollerance
 * handle corrupt segment files
 * handle missing delta segment files
 * handle corrupt delta segment files
+* write resume
+  - add support for ENCASE1/SMART table section
 
 Additional (integrity) checks:
 * read: check if successive headers match first header
@@ -240,6 +240,7 @@ Tools:
   - Linux use fuse, Windows use imgdisk, MacOS use API?
 * process status
   - improve and remove "This could take a while." ?
+* libsystem path implement GetVolumeInformation
 
 Tests
 * glob: .ezz, .faa ... .zzz
@@ -276,6 +277,11 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
+
+20110731
+* code cleanup - worked on TODOs
+* updated libmfdata, libsmraw
+* added > 2 GiB media and segment file size, and delta file open scenarios
 
 20110730
 * updated README

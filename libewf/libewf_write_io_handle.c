@@ -920,7 +920,6 @@ int libewf_write_io_handle_initialize_resume(
 			     (void *) "sectors",
 			     8 ) != 0 )
 			{
-				/* TODO handle ENCASE1/SMART table section */
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
@@ -931,7 +930,6 @@ int libewf_write_io_handle_initialize_resume(
 
 				return( -1 );
 			}
-/* TODO refactor to read IO handle */
 			if( chunk_table->previous_last_chunk_filled > chunk_table->last_chunk_filled )
 			{
 				liberror_error_set(
@@ -2019,7 +2017,7 @@ int libewf_write_io_handle_create_segment_file(
 	     segment_files_cache,
 	     *segment_files_list_index,
 	     (intptr_t *) *segment_file,
-	     &libewf_segment_file_free,
+	     (int(*)(intptr_t *, liberror_error_t **)) &libewf_segment_file_free,
 	     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
@@ -2041,7 +2039,7 @@ on_error:
 	if( *segment_file != NULL )
 	{
 		libewf_segment_file_free(
-		 (intptr_t *) *segment_file,
+		 *segment_file,
 		 NULL );
 
 		*segment_file = NULL;
@@ -3349,7 +3347,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 					return( -1 );
 				}
 				if( libewf_section_free(
-				     last_list_element->value,
+				     (libewf_section_t *) last_list_element->value,
 				     error ) != 1 )
 				{
 					liberror_error_set(

@@ -25,6 +25,7 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 INPUT="input_raw";
+INPUT_MORE="input_raw_more";
 TMP="tmp";
 
 LS="ls";
@@ -330,6 +331,29 @@ do
 			exit ${EXIT_FAILURE};
 		fi
 	done
+done
+
+for FILENAME in `${LS} ${INPUT_MORE}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
+do
+	if ! test_acquire_file "${FILENAME}" encase6 none 100GB 64;
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	if ! test_acquire_file "${FILENAME}" encase6 empty-block 100GB 64;
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	if ! test_acquire_file "${FILENAME}" encase6 fast 100GB 64;
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
+	if ! test_acquire_file "${FILENAME}" encase6 best 100GB 64;
+	then
+		exit ${EXIT_FAILURE};
+	fi
 done
 
 exit ${EXIT_SUCCESS};

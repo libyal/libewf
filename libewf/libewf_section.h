@@ -77,11 +77,11 @@ int libewf_section_test_zero(
      liberror_error_t **error );
 
 int libewf_section_initialize(
-     libewf_section_t **sections,
+     libewf_section_t **section,
      liberror_error_t **error );
 
 int libewf_section_free(
-     intptr_t *sections,
+     libewf_section_t *section,
      liberror_error_t **error );
 
 int libewf_section_clone(

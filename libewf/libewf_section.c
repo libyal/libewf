@@ -170,7 +170,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_free(
-     intptr_t *section,
+     libewf_section_t *section,
      liberror_error_t **error )
 {
 	static char *function = "libewf_section_free";
@@ -2894,8 +2894,7 @@ ssize_t libewf_section_error2_write(
 	}
 	total_write_count += write_count;
 
-	/* TODO EnCase compatible way to handle > 32-bit sector values
-	 */
+/* TODO EnCase compatible way to handle > 32-bit sector values */
 	error2_sectors = (ewf_error2_sector_t *) memory_allocate(
 						  error2_sectors_size );
 

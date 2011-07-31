@@ -24,7 +24,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_optical";
+INPUT="input_raw_optical";
 TMP="tmp";
 
 LS="ls";

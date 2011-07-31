@@ -25,6 +25,8 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 INPUT="input";
+INPUT_LOGICAL="input_logical";
+INPUT_OPTICAL="input_optical";
 
 LS="ls";
 TR="tr";
@@ -81,6 +83,46 @@ then
 		echo "No files found in ${INPUT} directory, to test ewfinfo place EWF test files in directory.";
 	else
 		for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
+		do
+			if ! test_info "${FILENAME}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+
+		EXIT_RESULT=${EXIT_SUCCESS};
+	fi
+fi
+
+if test -d ${INPUT_LOGICAL};
+then
+	RESULT=`${LS} ${INPUT_LOGICAL}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files found in ${INPUT_LOGICAL} directory, to test ewfinfo place EWF test files in directory.";
+	else
+		for FILENAME in `${LS} ${INPUT_LOGICAL}/*.[esE]01 | ${TR} ' ' '\n'`;
+		do
+			if ! test_info "${FILENAME}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+
+		EXIT_RESULT=${EXIT_SUCCESS};
+	fi
+fi
+
+if test -d ${INPUT_OPTICAL};
+then
+	RESULT=`${LS} ${INPUT_OPTICAL}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files found in ${INPUT_OPTICAL} directory, to test ewfinfo place EWF test files in directory.";
+	else
+		for FILENAME in `${LS} ${INPUT_OPTICAL}/*.[esE]01 | ${TR} ' ' '\n'`;
 		do
 			if ! test_info "${FILENAME}";
 			then

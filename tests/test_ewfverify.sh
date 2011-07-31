@@ -26,6 +26,7 @@ EXIT_IGNORE=77;
 
 INPUT="input";
 INPUT_ERROR="input_error";
+INPUT_MORE="input_more";
 TMP="tmp";
 
 LS="ls";
@@ -102,11 +103,31 @@ then
 
 	if test ${RESULT} -eq 0;
 	then
-		echo "No files found in error directory, to test read place test files in directory.";
+		echo "No files found in ${INPUT_ERROR} directory, to test read place test files in directory.";
 	else
 		for FILENAME in `${LS} ${INPUT_ERROR}/*.[esE]01 | ${TR} ' ' '\n'`;
 		do
 			if test_verify "${FILENAME}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+
+		EXIT_RESULT=${EXIT_SUCCESS};
+	fi
+fi
+
+if test -d ${INPUT_MORE};
+then
+	RESULT=`${LS} ${INPUT_MORE}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files found in ${INPUT_MORE} directory, to test read place test files in directory.";
+	else
+		for FILENAME in `${LS} ${INPUT_MORE}/*.[esE]01 | ${TR} ' ' '\n'`;
+		do
+			if ! test_verify "${FILENAME}";
 			then
 				exit ${EXIT_FAILURE};
 			fi

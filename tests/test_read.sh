@@ -25,6 +25,7 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 INPUT="input";
+INPUT_DELTA="input_delta";
 
 LS="ls";
 TR="tr";
@@ -87,6 +88,29 @@ do
 		exit ${EXIT_FAILURE};
 	fi
 done
+
+if test -d ${INPUT_DELTA};
+then
+	RESULT=`${LS} ${INPUT_DELTA} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ} | ${WC} -l`;
+
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files found in ${INPUT_DELTA} directory, to test read place EWF test files in directory.";
+		echo "Use unique filename bases per set of EWF image file(s)."
+
+		exit ${EXIT_IGNORE};
+	fi
+
+	for BASENAME in `${LS} ${INPUT_DELTA} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+	do
+		FILENAMES=`${LS} ${INPUT_DELTA}/${BASENAME}.* | ${TR} '\n' ' '`;
+
+		if ! test_read ${FILENAMES};
+		then
+			exit ${EXIT_FAILURE};
+		fi
+	done
+fi
 
 exit ${EXIT_SUCCESS};
 
