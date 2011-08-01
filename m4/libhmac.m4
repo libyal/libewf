@@ -117,11 +117,11 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_EVP],
   [AC_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE
  
   AS_IF(
-   [test "x$ac_cv_libewf_openssl_evp_zlib_compatible" = xyes],
+   [test "x$ac_cv_openssl_evp_zlib_compatible" = xyes],
    [ac_cv_libcrypto=evp],
    [ac_cv_libcrypto=no])
  ])
- 
+
  dnl Check if all required libcrypto (openssl) EVP MD functions are available
  AS_IF(
   [test "x$ac_cv_libcrypto" = xevp],

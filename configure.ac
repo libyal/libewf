@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110731],
+ [20110801],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -19,56 +19,105 @@ dnl Check for large file support
 AC_SYS_LARGEFILE
 
 dnl Check for configure arguments
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [wide-character-type],
  [wide_character_type],
  [enable wide character type support],
  [no])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [winapi],
  [winapi],
  [enable WINAPI support for cross-compilation],
  [auto-detect])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [static-executables],
  [static_executables],
  [build the ewftools as static executables],
  [no])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [guid],
  [guid],
  [enable GUID/UUID support in the ewftools],
  [yes])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [low-level-functions],
  [low_level_functions],
  [use libewf's low level read and write functions in the ewftools],
  [no])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [verbose-output],
  [verbose_output],
  [enable verbose output],
  [no])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [debug-output],
  [debug_output],
  [enable debug output],
  [no])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [python],
  [python],
  [build python bindings (pyewf)],
  [no])
-LIBEWF_ARG_ENABLE(
+COMMON_ARG_ENABLE(
  [v1-api],
  [v1_api],
  [enable version 1 API],
  [yes])
 
-LIBEWF_ARG_WITH(
+COMMON_ARG_WITH(
+ [libuna],
+ [libuna],
+ [search for libuna in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [libbfio],
+ [libbfio],
+ [search for libbfio in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [libfvalue],
+ [libfvalue],
+ [search for libfvalue in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [libmfdata],
+ [libmfdata],
+ [search for libmfdata in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+
+COMMON_ARG_WITH(
+ [libhmac],
+ [libhmac],
+ [search for libhmac in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
  [openssl],
  [openssl],
  [search for openssl in includedir and libdir or in the specified DIR, or no if not to use openssl],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [libodraw],
+ [libodraw],
+ [search for libodraw in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [libmsdev],
+ [libmsdev],
+ [search for libmsdev in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [libmsraw],
+ [libmsraw],
+ [search for libmsdev in includedir and libdir or in the specified DIR, or no if to use local version],
  [auto-detect],
  [DIR])
 
@@ -91,7 +140,7 @@ AC_C_CONST
 AC_C_VOLATILE
 
 dnl Automatically enable winapi support for mingw
-LIBEWF_CHECK_WINAPI
+AC_CHECK_WINAPI
 
 dnl Check for headers
 dnl Headers included in include/libewf/types.h
@@ -124,66 +173,8 @@ AS_IF(
   [HAVE_STDINT_H],
   [0])])
 
-dnl Headers included in common/common.h
-AS_IF(
- [test "x$ac_cv_enable_winapi" = xyes],
- [AC_CHECK_HEADERS([windows.h])
-
- AS_IF(
-  [test "x$ac_cv_header_windows_h" = xno],
-  [AC_MSG_FAILURE(
-   [Missing header: windows.h header is required to compile with winapi support],
-   [1]) ])
- ])
-
-AS_IF(
- [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_HEADERS([libintl.h]) ])
-
-dnl Headers included in common/types.h
-AC_CHECK_HEADERS([limits.h])
-
-dnl Headers included in common/memory.h and libcstring/libcstring_narrow_string.h
-AC_CHECK_HEADERS([stdlib.h string.h])
-
-dnl Headers included in libcstring/libcstring_locale.c
-AC_CHECK_HEADERS([langinfo.h locale.h])
-
-dnl Headers included in liberror/liberror_error.c and libnotify/libnotify_print.c
-AC_CHECK_HEADERS([stdarg.h])
-
-AS_IF(
- [test "x$ac_cv_header_stdarg_h" != xyes],
- [AC_CHECK_HEADERS([varargs.h]) ])
-
-AS_IF(
- [test "x$ac_cv_header_stdarg_h" != xyes && test "x$ac_cv_header_varargs_h" != xyes],
- [AC_MSG_FAILURE(
-  [Missing headers: stdarg.h and varargs.h],
-  [1]) ])
-
-dnl Headers included in libnotify/libnotify_stream.c, libbfio/libbfio_file.c
-dnl libsystem/libsystem_file.h and libsystem/libsystem_string.h
-AC_CHECK_HEADERS([errno.h])
-
-dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_directory_io.h, libsystem/libsystem_file_io.h
-AC_CHECK_HEADERS([sys/stat.h])
-
-dnl Headers included in libbfio/libbfio_file.c, libsystem/libsystem_file_io.h
-AC_CHECK_HEADERS([fcntl.h unistd.h])
-
-dnl Headers included in libsystem/libsystem_date_time.h and libewf/libewf_date_time.h
+dnl Headers included in libewf/libewf_date_time.h
 AC_HEADER_TIME
-
-dnl Headers included in libsystem/libsystem_glob.h
-AC_CHECK_HEADERS([glob.h])
-
-AS_IF(
- [test "x$ac_cv_header_glob_h" = xno],
- [AC_CHECK_HEADERS([io.h]) ])
-
-dnl Headers included in libsystem/libsystem_signal.h
-AC_CHECK_HEADERS([signal.h sys/signal.h])
 
 dnl Headers included in ewftools/platform.c
 AC_CHECK_HEADERS([sys/utsname.h])
@@ -249,317 +240,7 @@ AC_CHECK_SIZEOF([off_t])
 AC_CHECK_SIZEOF([size_t])
 
 dnl Check for functions
-dnl File stream functions used in common/file_stream.h
-AC_CHECK_FUNCS(
- [fclose],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fclose],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [feof],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: feof],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fgets],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fgets],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fopen],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fopen],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fread],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fread],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fseeko],
- [],
- [AC_CHECK_FUNCS(
-  [fseeko64],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: fseeko and fseeko64],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [fwrite],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fwrite],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [vfprintf],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: vfprintf],
-  [1]) ])
-
-dnl Memory functions used in common/memory.h
-AC_CHECK_FUNCS(
- [free],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: free],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [malloc],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: malloc],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [memcmp],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: memcmp],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [memcpy],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: memcpy],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [memset],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: memset],
-  [1]) ])
-
-dnl TODO re-enable in the future
-dnl AC_CHECK_FUNCS([posix_memalign])
-
-AC_CHECK_FUNCS(
- [realloc],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: realloc],
-  [1]) ])
-
-dnl Check for environment functions in libcstring/libcstring_locale.c
-AC_CHECK_FUNCS(
- [getenv],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: getenv],
-  [1]) ])
-
-dnl Check for localization functions in libcstring/libcstring_locale.c
-AS_IF(
- [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_FUNCS(
-  [localeconv],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: localeconv],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [setlocale],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: setlocale],
-  [1]) ])
-
-LIBEWF_CHECK_FUNC_LANGINFO_CODESET
-
-dnl Narrow character string functions used in libcstring/libcstring_narrow_string.h
-AC_CHECK_FUNCS(
- [fgets],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fgets],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [memchr],
- [],
- [AC_CHECK_FUNCS(
-  [strchr],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: memchr and strchr],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [memcmp],
- [],
- [AC_CHECK_FUNCS(
-  [strncmp],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: memcmp and strncmp],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [memcpy],
- [],
- [AC_CHECK_FUNCS(
-  [strncpy],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: memcpy and strncpy],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [memrchr],
- [AC_CHECK_DECLS(
-  [memrchr],
-  [ac_libewf_have_memrchr=yes],
-  [ac_libewf_have_memrchr=no]) ],
- [ac_libewf_have_memrchr=no])
-
-AS_IF(
- [test "x$ac_libewf_have_memrchr" = xno],
- [AC_CHECK_FUNCS(
-  [strrchr],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strrchr and memrchr],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [snprintf],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: snprintf],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [sscanf],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: sscanf],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [strlen],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: strlen],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [strncasecmp],
- [],
- [AC_CHECK_FUNCS(
-  [strcasecmp],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strncasecmp and strcasecmp],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [strstr],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: strstr],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [strtoll],
- [],
- [AC_CHECK_FUNCS(
-  [atoll],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strtoll and atoll],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [strtoull],
- [],
- [AC_CHECK_FUNCS(
-  [atoll],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strtoull and atoll],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [vsnprintf],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: vsnprintf],
-  [1]) ])
-
-dnl File input/output functions used in libbfio/libbfio_file.h and libsystem/libsystem_file_io.h
-AC_CHECK_FUNCS(
- [close],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: close],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fstat],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fstat],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [ftruncate],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: ftruncate],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [lseek],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: lseek],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [open],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: open],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [read],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: read],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [stat],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: stat],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [write],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: write],
-  [1]) ])
-
-dnl Date and time functions used in libewf/libewf_date_time.h and libsystem/libsystem_date_time.c
+dnl Date and time functions used in libewf/libewf_date_time.h
 AC_CHECK_FUNCS(
  [localtime_r],
  [],
@@ -569,7 +250,7 @@ AC_CHECK_FUNCS(
   [AC_MSG_FAILURE(
    [Missing functions: localtime_r and localtime],
    [1]) ]) ])
-
+ 
 AC_CHECK_FUNCS(
  [mktime],
  [],
@@ -577,56 +258,8 @@ AC_CHECK_FUNCS(
   [Missing function: mktime],
   [1]) ])
 
-dnl Date and time functions used in libsystem/libsystem_date_time.h
-LIBEWF_CHECK_FUNC_CTIME
-
-AC_CHECK_FUNCS(
- [gmtime_r],
- [],
- [AC_CHECK_FUNCS(
-  [gmtime],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: gmtime_r and gmtime],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [time],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: time],
-  [1]) ])
-
-dnl Directory functions used in libsystem/libsystem_directory_io.h
-AC_CHECK_FUNCS(
- [chdir],
- [],
- [AC_MSG_FAILURE(
-  [Missing functions: chdir],
-  [1]) ])
-
-LIBEWF_CHECK_FUNC_MKDIR
-
-dnl Check for error string functions used in libbfio/libbfio_error_string.c and libsystem/libsystem_error_string.c
-AC_FUNC_STRERROR_R()
-
-AS_IF(
- [test "x$ac_cv_have_decl_strerror_r" = xno],
- [AC_CHECK_FUNCS(
-  [strerror],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strerror_r and strerror],
-   [1]) ]) ])
-
-dnl Commandline argument/option parsing functions in libsystem/libsystem_getopt.h
-AC_CHECK_FUNCS([getopt])
-
-dnl Check for internationalization functions in <library>/<library>_i18n.c and libsystem/libsystem_support.c
+dnl Check for internationalization functions in libewf/libewf_i18n.c 
 AC_CHECK_FUNCS([bindtextdomain])
-
-dnl Check for internationalization functions in libsystem/libsystem_support.c
-AC_CHECK_FUNCS([textdomain])
 
 dnl System functions
 AS_IF(
@@ -649,10 +282,16 @@ AS_IF(
 AC_CHECK_FUNCS([uname])
 
 dnl Check for printf conversion specifier support
-LIBEWF_CHECK_FUNC_PRINTF_JD
-LIBEWF_CHECK_FUNC_PRINTF_ZD
+AC_CHECK_FUNC_PRINTF_JD
+AC_CHECK_FUNC_PRINTF_ZD
 
 dnl Checks for libraries and library functions
+AC_CHECK_LOCAL_COMMON
+AC_CHECK_LOCAL_LIBCSTRING
+AC_CHECK_LOCAL_LIBERROR
+AC_CHECK_LOCAL_LIBNOTIFY
+AC_CHECK_LOCAL_LIBSYSTEM
+
 dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 
 dnl Check for zlib compression support
@@ -773,6 +412,10 @@ AS_IF(
   [../libbfio/libbfio.la])
  ac_cv_libbfio=local
  ])
+
+AS_IF(
+ [test "x$ac_cv_libbfio" = xlocal],
+ [AC_CHECK_LOCAL_LIBBFIO])
 
 AM_CONDITIONAL(
  [HAVE_LOCAL_LIBBFIO],
@@ -1111,10 +754,6 @@ AS_IF(
 
 dnl Check if libewf should be build with wide character type support
 AS_IF(
- [test "x$ac_cv_enable_winapi" = xyes],
- [ac_cv_enable_wide_character_type=yes])
-
-AS_IF(
  [test "x$ac_cv_enable_wide_character_type" != xno],
  [dnl Check for the wide character header
  AC_CHECK_HEADERS(
@@ -1134,111 +773,6 @@ AS_IF(
  AC_CHECK_SIZEOF([wchar_t])
 
  dnl Check for wide character string functions
-
- dnl Wide character string functions used in common/file_stream.h
- AC_CHECK_FUNCS(
-  [fgetws],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: fgetws],
-   [1]) ])
-
- dnl Wide character string functions used in libcstring/libcstring_wide_string.h
- AC_CHECK_FUNCS(
-  [swprintf],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: swprintf],
-   [1]) ])
-
- AC_CHECK_FUNCS(
-  [wmemchr],
-  [],
-  [AC_CHECK_FUNCS(
-   [wcschr],
-   [],
-   [AC_MSG_FAILURE(
-    [Missing functions: wmemchr and wcschr],
-    [1]) ]) ])
-
- AC_CHECK_FUNCS(
-  [wmemcmp],
-  [],
-  [AC_CHECK_FUNCS(
-   [wcsncmp],
-   [],
-   [AC_MSG_FAILURE(
-    [Missing functions: wmemcmp and wcsncmp],
-    [1]) ]) ])
-
- AC_CHECK_FUNCS(
-  [wmemcpy],
-  [],
-  [AC_CHECK_FUNCS(
-   [wcsncpy],
-   [],
-   [AC_MSG_FAILURE(
-    [Missing functions: wmemcpy and wcsncpy],
-    [1]) ]) ])
-
- AC_CHECK_FUNCS(
-  [wmemrchr],
-  [],
-  [AC_CHECK_FUNCS(
-   [wcsrchr],
-   [],
-   [AC_MSG_FAILURE(
-    [Missing functions: wmemrchr and wcsrchr],
-    [1]) ]) ])
-
- AC_CHECK_FUNCS(
-  [wcslen],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: wcslen],
-   [1]) ])
- 
- AC_CHECK_FUNCS(
-  [wcsncasecmp],
-  [],
-  [AC_CHECK_FUNCS(
-   [wcscasecmp],
-   [],
-   [AC_CHECK_FUNCS(
-    [towlower],
-    [],
-    [AC_MSG_FAILURE(
-     [Missing functions: wcsncasecmp, wcscasecmp and towlower],
-     [1]) ]) ]) ])
-
- AC_CHECK_FUNCS(
-  [wcsstr],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: wcsstr],
-   [1]) ])
-
- AC_CHECK_FUNCS(
-  [wcstoll],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: wcstoll],
-   [1]) ])
-
- AC_CHECK_FUNCS(
-  [wcstoull],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: wcstoull],
-   [1]) ])
-
- dnl Wide character string functions used in liberror/liberror_error.h
- AC_CHECK_FUNCS(
-  [wcstombs],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: wcstombs],
-   [1]) ])
 
  dnl Make the necessary definitions
  AC_DEFINE(

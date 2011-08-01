@@ -1,7 +1,7 @@
 TODO
 * clean up configure.ac and acinclude.m4
-  - fix openssl detection
   - refactor to use m4/
+  - add support for --with-libuna and others - add handling code
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -281,10 +281,14 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110801
+* configure clean up
+
 20110731
 * code cleanup - worked on TODOs
 * updated libmfdata, libsmraw, libsmdev
 * added > 2 GiB media and segment file size, and delta file open scenarios
+* configure clean up
 
 20110730
 * updated README

@@ -223,3 +223,88 @@ AC_DEFUN([AC_CHECK_LIBBFIO],
   ])
  ])
 
+dnl Function to detect if libbfio dependencies are available
+AC_DEFUN([AC_CHECK_LOCAL_LIBBFIO],
+ [dnl Headers included in libbfio/libbfio_file.c
+ AC_CHECK_HEADERS([errno.h fcntl.h sys/stat.h unistd.h])
+
+ dnl File input/output functions used in libbfio/libbfio_file.h
+ AC_CHECK_FUNCS(
+  [close],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: close],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [fstat],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: fstat],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [ftruncate],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: ftruncate],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [lseek],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: lseek],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [open],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: open],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [read],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: read],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [stat],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: stat],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [write],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: write],
+   [1])
+  ])
+
+ dnl Check for error string functions used in libbfio/libbfio_error_string.c
+ AC_FUNC_STRERROR_R()
+
+ AS_IF(
+  [test "x$ac_cv_have_decl_strerror_r" = xno],
+  [AC_CHECK_FUNCS(
+   [strerror],
+   [],
+   [AC_MSG_FAILURE(
+    [Missing functions: strerror_r and strerror],
+    [1])
+   ])
+  ])
+ ])
+
