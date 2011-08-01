@@ -1,7 +1,4 @@
 TODO
-* clean up configure.ac and acinclude.m4
-  - refactor to use m4/
-  - add support for --with-libuna and others - add handling code
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -14,10 +11,11 @@ TODO
 * check performance
 
 Next beta/stable release:
-* check pc file
-* check spec file
 * full test
 * disable ewfdebug
+* remove fuse check
+* clean up configure.ac and acinclude.m4
+  - check if all functions are checked for
 
 Roadmap:
 * lvf support
@@ -60,8 +58,10 @@ Roadmap:
 
 Code clean up:
 * clean up configure.ac and acinclude.m4
-* clean up ewfacquire: move imaging preferences into imaging handle
-* make libewf_convert_date_header_value more strict
+  - refactor dfxml check
+  - refactor fuse check - to acinclude
+  - refactor guid check - to acinclude
+  - refactor zlib check - to acinclude
 * ewfinfo
   - move DFXML code to separate code files, what about separate library ?
   - implement a statefull XML writer e.g. open/close_section, open/close_value
@@ -88,7 +88,6 @@ Further analysis of the EWF format:
   - parse first entries differently ? for file hierarchy
 * FTK Imager: support for "Use AD Encryption"
   - requires support for ADCRYPT file format
-* Audio track data ?
 
 Features
 * resume write support for ENCASE1/SMART table sections ?
@@ -283,6 +282,10 @@ Closed:
 
 20110801
 * configure clean up
+* configure added support for --with-libuna and others
+* updated libhmac, bug fix in MD5 fallback functions
+* updated .pc and .spec file
+* updated manuals
 
 20110731
 * code cleanup - worked on TODOs

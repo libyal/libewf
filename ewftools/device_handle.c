@@ -2479,7 +2479,7 @@ int device_handle_media_information_fprint(
 		}
 		fprintf(
 		 stream,
-		 "Bus type:\t\t\t" );
+		 "Bus type:\t\t\t\t" );
 
 		switch( bus_type )
 		{
@@ -2536,7 +2536,7 @@ int device_handle_media_information_fprint(
 		}
 		fprintf(
 		 stream,
-		 "Vendor:\t\t\t\t%s\n",
+		 "Vendor:\t\t\t\t\t%s\n",
 		 (char *) media_information_value );
 
 		result = libsmdev_handle_get_utf8_information_value(
@@ -2564,7 +2564,7 @@ int device_handle_media_information_fprint(
 		}
 		fprintf(
 		 stream,
-		 "Model:\t\t\t\t%s\n",
+		 "Model:\t\t\t\t\t%s\n",
 		 (char *) media_information_value );
 
 		result = libsmdev_handle_get_utf8_information_value(
@@ -2592,7 +2592,7 @@ int device_handle_media_information_fprint(
 		}
 		fprintf(
 		 stream,
-		 "Serial:\t\t\t\t%s\n",
+		 "Serial:\t\t\t\t\t%s\n",
 		 (char *) media_information_value );
 
 		fprintf(
@@ -2605,7 +2605,7 @@ int device_handle_media_information_fprint(
 
 	fprintf(
 	 stream,
-	 "Type:\t\t\t\t" );
+	 "Type:\t\t\t\t\t" );
 
 	switch( device_handle->type )
 	{
@@ -2655,7 +2655,7 @@ int device_handle_media_information_fprint(
 	{
 		fprintf(
 		 stream,
-		 "Media type:\t\t\t" );
+		 "Media type:\t\t\t\t" );
 
 		switch( media_type )
 		{
@@ -2723,7 +2723,7 @@ int device_handle_media_information_fprint(
 	{
 		fprintf(
 		 stream,
-		 "Media size:\t\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
+		 "Media size:\t\t\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
 		 byte_size_string,
 		 media_size );
 	}
@@ -2731,7 +2731,7 @@ int device_handle_media_information_fprint(
 	{
 		fprintf(
 		 stream,
-		 "Media size:\t\t\t%" PRIu64 " bytes\n",
+		 "Media size:\t\t\t\t%" PRIu64 " bytes\n",
 		 media_size );
 	}
 	if( device_handle_get_bytes_per_sector(
@@ -2750,7 +2750,7 @@ int device_handle_media_information_fprint(
 	}
 	fprintf(
 	 stream,
-	 "Bytes per sector:\t\t%" PRIu32 "\n",
+	 "Bytes per sector:\t\t\t%" PRIu32 "\n",
 	 bytes_per_sector );
 
 	if( media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )

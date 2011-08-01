@@ -89,6 +89,12 @@ COMMON_ARG_WITH(
  [search for libmfdata in includedir and libdir or in the specified DIR, or no if to use local version],
  [auto-detect],
  [DIR])
+COMMON_ARG_WITH(
+ [zlib],
+ [zlib],
+ [search for zlib in includedir and libdir or in the specified DIR],
+ [auto-detect],
+ [DIR])
 
 COMMON_ARG_WITH(
  [libhmac],
@@ -142,37 +148,13 @@ AC_C_VOLATILE
 dnl Automatically enable winapi support for mingw
 AC_CHECK_WINAPI
 
+dnl Check for type definitions
+AC_CHECK_LOCAL_TYPES
+
+dnl TODO move to sub m4 file, add comment where it's used or remove
+AC_STRUCT_TM
+
 dnl Check for headers
-dnl Headers included in include/libewf/types.h
-AC_CHECK_HEADERS([sys/types.h inttypes.h stdint.h])
-
-AS_IF(
- [test "x$ac_cv_header_sys_types_h" = xyes],
- [AC_SUBST(
-  [HAVE_SYS_TYPES_H],
-  [1])],
- [AC_SUBST(
-  [HAVE_SYS_TYPES_H],
-  [0])])
-
-AS_IF(
- [test "x$ac_cv_header_inttypes_h" = xyes],
- [AC_SUBST(
-  [HAVE_INTTYPES_H],
-  [1])],
- [AC_SUBST(
-  [HAVE_INTTYPES_H],
-  [0])])
-
-AS_IF(
- [test "x$ac_cv_header_stdint_h" = xyes],
- [AC_SUBST(
-  [HAVE_STDINT_H],
-  [1])],
- [AC_SUBST(
-  [HAVE_STDINT_H],
-  [0])])
-
 dnl Headers included in libewf/libewf_date_time.h
 AC_HEADER_TIME
 
@@ -180,64 +162,6 @@ dnl Headers included in ewftools/platform.c
 AC_CHECK_HEADERS([sys/utsname.h])
 
 dnl Other headers
-
-dnl Check for type definitions
-AC_STRUCT_TM
-
-AC_TYPE_MODE_T
-AC_TYPE_OFF_T
-AC_TYPE_SIZE_T
-
-AC_CHECK_TYPE(
- [size32_t],
- [AC_SUBST(
-  [HAVE_SIZE32_T],
-  [1])],
- [AC_SUBST(
-  [HAVE_SIZE32_T],
-  [0])])
-
-AC_CHECK_TYPE(
- [ssize32_t],
- [AC_SUBST(
-  [HAVE_SSIZE32_T],
-  [1])],
- [AC_SUBST(
-  [HAVE_SSIZE32_T],
-  [0])])
-
-AC_CHECK_TYPE(
- [size64_t],
- [AC_SUBST(
-  [HAVE_SIZE64_T],
-  [1])],
- [AC_SUBST(
-  [HAVE_SIZE64_T],
-  [0])])
-
-AC_CHECK_TYPE(
- [ssize64_t],
- [AC_SUBST(
-  [HAVE_SSIZE64_T],
-  [1])],
- [AC_SUBST(
-  [HAVE_SSIZE64_T],
-  [0])])
-
-AC_CHECK_TYPE(
- [off64_t],
- [AC_SUBST(
-  [HAVE_OFF64_T],
-  [1])],
- [AC_SUBST(
-  [HAVE_OFF64_T],
-  [0])])
-
-AC_CHECK_TYPE([ssize_t])
-AC_CHECK_TYPE([u64])
-
-AC_CHECK_SIZEOF([off_t])
-AC_CHECK_SIZEOF([size_t])
 
 dnl Check for functions
 dnl Date and time functions used in libewf/libewf_date_time.h
@@ -295,6 +219,16 @@ AC_CHECK_LOCAL_LIBSYSTEM
 dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 
 dnl Check for zlib compression support
+AS_IF(
+ [test x"$ac_cv_with_zlib" != x && test "x$ac_cv_with_zlib" != xauto-detect],
+ [AS_IF(
+  [test -d "$ac_cv_with_zlib"],
+  [CFLAGS="$CFLAGS -I${ac_cv_with_zlib}/include"
+  LDFLAGS="$LDFLAGS -L${ac_cv_with_zlib}/lib"],
+  [AC_MSG_WARN([no such directory: $ac_cv_with_zlib])
+  ])
+ ])
+
 AC_CHECK_HEADERS([zlib.h])
 
 AC_CHECK_LIB(
@@ -544,6 +478,16 @@ AS_IF(
  [test "x$ac_cv_libhmac" = xlocal],
  [AC_CHECK_LOCAL_LIBHMAC])
 
+AS_IF(
+ [test "x$ac_cv_libcrypto" != xno],
+ [AC_SUBST(
+  [libewf_spec_requires_libcrypto],
+  [openssl])
+ AC_SUBST(
+  [libewf_spec_build_requires_libcrypto],
+  [openssl-devel])
+ ])
+
 dnl Check for enabling libodraw for optical disc (split) RAW support
 AC_CHECK_LIBODRAW
 
@@ -751,45 +695,6 @@ AS_IF(
   [libewf_spec_build_requires_libuuid],
   [])
  ac_libewf_dummy=yes])
-
-dnl Check if libewf should be build with wide character type support
-AS_IF(
- [test "x$ac_cv_enable_wide_character_type" != xno],
- [dnl Check for the wide character header
- AC_CHECK_HEADERS(
-  [wchar.h],
-  [AC_DEFINE(
-   [HAVE_WCHAR_H],
-   [1],
-   [Define to 1 if you have the <wchar.h> header file.])
-  AC_SUBST(
-   [HAVE_WCHAR_H],
-   [1]) ],
-  [AC_MSG_FAILURE(
-   [Missing header: wchar.h],
-   [1]) ])
-
- dnl Determine wide character byte size
- AC_CHECK_SIZEOF([wchar_t])
-
- dnl Check for wide character string functions
-
- dnl Make the necessary definitions
- AC_DEFINE(
-  [HAVE_WIDE_CHARACTER_TYPE],
-  [1],
-  [Define to 1 if wide character type should be used.])
- AC_SUBST(
-  [HAVE_WIDE_CHARACTER_TYPE],
-  [1])
- ac_cv_enable_wide_character_type=yes],
-
- [AC_SUBST(
-  [HAVE_WIDE_CHARACTER_TYPE],
-  [0])
- AC_SUBST(
-  [HAVE_WCHAR_H],
-  [0]) ])
 
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AS_IF(

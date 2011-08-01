@@ -1,4 +1,4 @@
-.Dd July 17, 2011
+.Dd August 1, 2011
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -114,25 +114,25 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # ewfacquirestream \-C 1 \-D Floppy \-E 1.1 \-e 'John D.' \-N 'Just a floppy in my system' \-m removable \-M logical \-t floppy </dev/fd0
-ewfacquirestream 20101221
+ewfacquirestream 20110801
 
 Using the following acquiry parameters:
-Image path and filename:        floppy.E01
-Case number:                    1
-Description:                    Floppy
-Evidence number:                1.1
-Examiner name:                  John D.
-Notes:                          Just a floppy in my system
-Media type:                     removable
-Volume type:                    logical
-Compression used:               none
-EWF file format:                EnCase 5
-Acquiry start offet:            0
-Number of bytes to acquire:     0 (until end of input)
-Evidence segment file size:     1.4 GiB (1572864000 bytes)
-Block size:                     64 sectors
-Error granularity:              64 sectors
-Retries on read error:          2
+Image path and filename:		floppy.E01
+Case number:				1
+Description:				Floppy
+Evidence number:			1.1
+Examiner name:				John D.
+Notes:					Just a floppy in my system
+Media type:				removable
+Volume type:				logical
+Compression used:			none
+EWF file format:			EnCase 5
+Acquiry start offet:			0
+Number of bytes to acquire:		0 (until end of input)
+Evidence segment file size:		1.4 GiB (1572864000 bytes)
+Block size:				64 sectors
+Error granularity:			64 sectors
+Retries on read error:			2
 
 Acquiry started at: Sat Feb 28 11:32:41 2009
 
@@ -145,7 +145,7 @@ Acquiry completed at: Sat Feb 28 11:32:42 2009
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-MD5 hash calculated over data: ae1ce8f5ac079d3ee93f97fe3792bda3
+MD5 hash calculated over data:		ae1ce8f5ac079d3ee93f97fe3792bda3
 .Ed
 .Sh DIAGNOSTICS
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.

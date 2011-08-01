@@ -1,4 +1,4 @@
-.Dd July 17, 2011
+.Dd August 1, 2011
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -150,18 +150,18 @@ will ask for the information it requires.
 .Ss To image a floppy:
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20110109
+ewfacquire 20110801
 
 Device information:
 Bus type:
-Vendor:				Y-E DATA
-Model:				USB-FDU
+Vendor:					Y-E DATA
+Model:					USB-FDU
 Serial:
 
 Storage media information:
-Type:				Device
-Media size:			1.4 MB (1474560 bytes)
-Bytes per sector:		512
+Type:					Device
+Media size:				1.4 MB (1474560 bytes)
+Bytes per sector:			512
 
 Information about acquiry required, please provide the necessary input
 Image path and filename without extension: floppy
@@ -184,24 +184,24 @@ The number of retries when a read error occurs (0 <= value <= 255) [2]:
 Zero sectors on read error (mimic EnCase like behavior) (yes, no) [no]:
 
 The following information was provided:
-Image path and filename:        floppy.E01
-Case number:                    1
-Description:                    Floppy
-Evidence number:                1.1
-Examiner name:                  John D.
-Notes:                          Just a floppy in my system
-Media type:                     removable
-Is physical:                    no
-Compression used:               none
-EWF file format:                Encase 5
-Acquiry start offset:           0
-Number of bytes to acquire:     1.4 MiB (1474560 bytes)
-Evidence segment file size:     1.4 GiB (1572864000 bytes)
-Bytes per sector:		512
-Block size:                     64 sectors
-Error granularity:              64 sectors
-Retries on read error:          2
-Zero sectors on read error:     no
+Image path and filename:		floppy.E01
+Case number:				1
+Description:				Floppy
+Evidence number:			1.1
+Examiner name:				John D.
+Notes:					Just a floppy in my system
+Media type:				removable
+Is physical:				no
+Compression used:			none
+EWF file format:			Encase 5
+Acquiry start offset:			0
+Number of bytes to acquire:		1.4 MiB (1474560 bytes)
+Evidence segment file size:		1.4 GiB (1572864000 bytes)
+Bytes per sector:			512
+Block size:				64 sectors
+Error granularity:			64 sectors
+Retries on read error:			2
+Zero sectors on read error:		no
 
 Continue acquiry with these values (yes, no) [yes]:
 
@@ -222,18 +222,18 @@ Acquiry completed at: Sat Feb 28 11:32:42 2009
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-MD5 hash calculated over data: ae1ce8f5ac079d3ee93f97fe3792bda3
+MD5 hash calculated over data:		ae1ce8f5ac079d3ee93f97fe3792bda3
 
 .Ed
 .Ss To convert a split RAW image into an EWF image:
 .Bd -literal
 # ewfacquire usb256.raw.0??
-ewfacquire 20110109
+ewfacquire 20110801
 
 Storage media information:
-Type:				RAW image
-Media size:     	        262 MB (262144000 bytes)
-Bytes per sector:		512
+Type:					RAW image
+Media size:				262 MB (262144000 bytes)
+Bytes per sector:			512
 
 .Dl ...
 
@@ -241,12 +241,12 @@ Bytes per sector:		512
 .Ss To convert an optical disc RAW image with a table of contents file into an EWF image:
 .Bd -literal
 # ewfacquire -T cdrom.cue cdrom.iso
-ewfacquire 20110109
+ewfacquire 20110801
 
 Storage media information:
-Type:				Optical disc RAW image
-Media size:			42 MB (42885120 bytes)
-Bytes per sector:		2048
+Type:					Optical disc RAW image
+Media size:				42 MB (42885120 bytes)
+Bytes per sector:			2048
 Sessions:
 	total number: 2
 	at sector(s): 0 - 20619 number: 20620
