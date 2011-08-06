@@ -28,7 +28,7 @@
 				<Dependencies/>
 			</Projects>
 			<Projects Include="libewf\libewf.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libmfdata\libmfdata.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="libhmac\libhmac.cbproj">
 				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj</Dependencies>
@@ -140,13 +140,13 @@
 		<Target Name="zlib:Make">
 			<MSBuild Targets="Make" Projects="zlib\zlib.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna;libbfio;libfvalue;zlib" Name="libewf">
+		<Target DependsOnTargets="libcstring;liberror;libnotify;libuna;libbfio;libmfdata;libfvalue;zlib" Name="libewf">
 			<MSBuild Projects="libewf\libewf.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libfvalue:Clean;zlib:Clean" Name="libewf:Clean">
+		<Target DependsOnTargets="libcstring:Clean;liberror:Clean;libnotify:Clean;libuna:Clean;libbfio:Clean;libmfdata:Clean;libfvalue:Clean;zlib:Clean" Name="libewf:Clean">
 			<MSBuild Targets="Clean" Projects="libewf\libewf.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libfvalue:Make;zlib:Make" Name="libewf:Make">
+		<Target DependsOnTargets="libcstring:Make;liberror:Make;libnotify:Make;libuna:Make;libbfio:Make;libmfdata:Make;libfvalue:Make;zlib:Make" Name="libewf:Make">
 			<MSBuild Targets="Make" Projects="libewf\libewf.cbproj"/>
 		</Target>
 		<Target DependsOnTargets="libcstring;liberror" Name="libhmac">

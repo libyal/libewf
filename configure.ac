@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110801],
+ [20110806],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -210,13 +210,12 @@ AC_CHECK_FUNC_PRINTF_JD
 AC_CHECK_FUNC_PRINTF_ZD
 
 dnl Checks for libraries and library functions
+dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 AC_CHECK_LOCAL_COMMON
 AC_CHECK_LOCAL_LIBCSTRING
 AC_CHECK_LOCAL_LIBERROR
 AC_CHECK_LOCAL_LIBNOTIFY
 AC_CHECK_LOCAL_LIBSYSTEM
-
-dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 
 dnl Check for zlib compression support
 AS_IF(

@@ -142,3 +142,7 @@ make
 make install
 
 
+Solaris
+Make sure that /usr/ccs/bin and /usr/swf/bin are defined in the PATH environment variable
+
+

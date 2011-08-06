@@ -530,6 +530,14 @@ int libewf_write_io_handle_initialize_values(
 		if( ( result == -1 )
 		 && ( write_io_handle->compressed_zero_byte_empty_block_size > 0 ) )
 		{
+#if !defined( HAVE_COMPRESS_BOUND ) && !defined( WINAPI )
+			/* The some version of zlib require a fairly large buffer
+			 * if compressBound() was not used but 2 x 512 then assume
+			 * the chunk size + 16 is sufficient
+			 */
+			write_io_handle->compressed_zero_byte_empty_block_size = media_values->chunk_size + 16;
+#endif
+
 			liberror_error_free(
 			 error );
 
@@ -560,23 +568,24 @@ int libewf_write_io_handle_initialize_values(
 		}
 		if( result != 1 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_COMPRESSION,
-			 LIBERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
-			 "%s: unable to compress zero byte emtpy block.",
-			 function );
+			liberror_error_free(
+			 error );
 
-			goto on_error;
+			memory_free(
+			 compressed_zero_byte_empty_block );
+
+			write_io_handle->compressed_zero_byte_empty_block_size = 0;
 		}
+		else
+		{
+			write_io_handle->compressed_zero_byte_empty_block = compressed_zero_byte_empty_block;
+		}
+		compressed_zero_byte_empty_block = NULL;
+
 		memory_free(
 		 zero_byte_empty_block );
 
 		zero_byte_empty_block = NULL;
-
-		write_io_handle->compressed_zero_byte_empty_block = compressed_zero_byte_empty_block;
-
-		compressed_zero_byte_empty_block = NULL;
 	}
 	/* Flag that the write values were initialized
 	 */

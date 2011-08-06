@@ -1,4 +1,6 @@
 TODO
+* error in ewfexport test ? invalid value: ewfexport does not ask for
+compression
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -230,6 +232,7 @@ Tools:
   - creates write only raw export file with msvscpp compilation
   - limit output formats for input types (lvf vs ewf)
   - add information and media values to raw output
+  - improve -f files error tollerability
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -279,6 +282,14 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
+
+20110806
+* worked on improving ewfexport output and error tollerability
+* updated libhmac - bug fixes for Solaris build
+* fixed ewfexport not detecting ewf formats correctly
+* updated libodraw
+* improve handling of cached compressed zero byte empty block for older
+  version of zlib
 
 20110801
 * configure clean up

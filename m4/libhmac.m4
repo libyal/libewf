@@ -184,6 +184,28 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_EVP],
    EVP_sha256,
    [ac_cv_libhmac_sha256=libcrypto_evp],
    [ac_cv_libhmac_sha256=no])
+
+  AS_IF(
+   [test x"$ac_cv_libhmac_md5" = xlibcrypto_evp],
+   [AC_DEFINE(
+    [HAVE_EVP_MD5],
+    [1],
+    [Define to 1 if you have the `EVP_md5' function".])
+   ])
+  AS_IF(
+   [test x"$ac_cv_libhmac_sha1" = xlibcrypto_evp],
+   [AC_DEFINE(
+    [HAVE_EVP_SHA1],
+    [1],
+    [Define to 1 if you have the `EVP_sha1' function".])
+   ])
+  AS_IF(
+   [test x"$ac_cv_libhmac_sha256" = xlibcrypto_evp],
+   [AC_DEFINE(
+    [HAVE_EVP_SHA256],
+    [1],
+    [Define to 1 if you have the `EVP_sha256' function".])
+   ])
   ])
  ])
 

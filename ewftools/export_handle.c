@@ -2200,6 +2200,8 @@ int export_handle_prompt_for_format(
 	}
 	else if( result != 0 )
 	{
+		result = 0;
+
 		fixed_string_variable_length = libcstring_system_string_length(
 		                                fixed_string_variable );
 
@@ -4368,7 +4370,7 @@ on_error:
 }
 
 /* Exports the single files
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int export_handle_export_single_files(
      export_handle_t *export_handle,
@@ -4470,13 +4472,16 @@ int export_handle_export_single_files(
 
 		goto on_error;
 	}
-	if( export_handle_export_file_entry(
-	     export_handle,
-	     file_entry,
-	     export_handle->target_filename,
-	     export_path_size,
-	     log_handle,
-	     error ) != 1 )
+	result = export_handle_export_file_entry(
+	          export_handle,
+	          file_entry,
+	          export_handle->target_filename,
+	          export_path_size,
+	          export_path_size - 1,
+	          log_handle,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -4556,13 +4561,14 @@ on_error:
 }
 
 /* Exports a (single) file entry
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
      size_t export_path_size,
+     size_t file_entry_path_index,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
@@ -4579,6 +4585,7 @@ int export_handle_export_file_entry(
 	ssize_t read_count                         = 0;
 	uint8_t file_entry_type                    = 0;
 	int result                                 = 0;
+	int return_value                           = 1;
 
 	if( export_handle == NULL )
 	{
@@ -4620,6 +4627,17 @@ int export_handle_export_file_entry(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid export handle - process buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_entry_path_index >= export_path_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: file entry path index value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4787,6 +4805,11 @@ int export_handle_export_file_entry(
 		 */
 		if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_FILE )
 		{
+	                fprintf(
+	                 export_handle->notify_stream,
+        	         "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
+	                 &( target_path[ file_entry_path_index ] ) );
+
 			/* Create the file entry data file
 			 */
 			file_entry_data_file_stream = libsystem_file_stream_open(
@@ -4881,7 +4904,7 @@ int export_handle_export_file_entry(
 						      read_size,
 						      error );
 
-					if( read_count != (ssize_t) read_size )
+					if( read_count == (ssize_t) -1 )
 					{
 						liberror_error_set(
 						 error,
@@ -4891,6 +4914,12 @@ int export_handle_export_file_entry(
 						 function );
 
 						goto on_error;
+					}
+					else if( read_count != (ssize_t) read_size )
+					{
+						return_value = 0;
+
+						break;
 					}
 					file_entry_data_size -= read_size;
 
@@ -4929,6 +4958,23 @@ int export_handle_export_file_entry(
 				goto on_error;
 			}
 			file_entry_data_file_stream = NULL;
+
+			if( return_value == 0 )
+			{
+				fprintf(
+				 export_handle->notify_stream,
+				 "FAILED\n" );
+
+				if( log_handle != NULL )
+				{
+					log_handle_printf(
+					 log_handle,
+				 	 "FAILED\n" );
+				}
+			}
+			fprintf(
+			 export_handle->notify_stream,
+			 "\n" );
 		}
 		else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 		{
@@ -4958,13 +5004,16 @@ int export_handle_export_file_entry(
 	}
 	if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 	{
-		if( export_handle_export_file_entry_sub_file_entries(
-		     export_handle,
-		     file_entry,
-		     target_path,
-		     target_path_size,
-		     log_handle,
-		     error ) != 1 )
+		result = export_handle_export_file_entry_sub_file_entries(
+		          export_handle,
+		          file_entry,
+		          target_path,
+		          target_path_size,
+		          file_entry_path_index,
+		          log_handle,
+		          error );
+
+		if( result == -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -4975,13 +5024,17 @@ int export_handle_export_file_entry(
 
 			goto on_error;
 		}
+		else if( result == 0 )
+		{
+			return_value = 0;
+		}
 	}
 	if( target_path != export_path )
 	{
 		memory_free(
 		 target_path );
 	}
-	return( 1 );
+	return( return_value );
 
 on_error:
 	if( file_entry_data != NULL )
@@ -5009,19 +5062,22 @@ on_error:
 }
 
 /* Exports a (single) file entry sub file entries
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int export_handle_export_file_entry_sub_file_entries(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
      size_t export_path_size,
+     size_t file_entry_path_index,
      log_handle_t *log_handle,
      liberror_error_t **error )
 {
 	libewf_file_entry_t *sub_file_entry = NULL;
 	static char *function               = "export_handle_export_file_entry_sub_file_entries";
 	int number_of_sub_file_entries      = 0;
+	int result                          = 0;
+	int return_value                    = 1;
 	int sub_file_entry_index            = 0;
 
 	if( export_handle == NULL )
@@ -5065,17 +5121,20 @@ int export_handle_export_file_entry_sub_file_entries(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to free retrieve sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
 			goto on_error;
 		}
-		if( export_handle_export_file_entry(
-		     export_handle,
-		     sub_file_entry,
-		     export_path,
-		     export_path_size,
-		     log_handle,
-		     error ) != 1 )
+		result = export_handle_export_file_entry(
+		          export_handle,
+		          sub_file_entry,
+		          export_path,
+		          export_path_size,
+		          file_entry_path_index,
+		          log_handle,
+		          error );
+
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -5083,9 +5142,13 @@ int export_handle_export_file_entry_sub_file_entries(
 			 LIBERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to export sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
 			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			return_value = 0;
 		}
 		if( libewf_file_entry_free(
 		     &sub_file_entry,
@@ -5097,12 +5160,12 @@ int export_handle_export_file_entry_sub_file_entries(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
 			goto on_error;
 		}
 	}
-	return( 1 );
+	return( return_value );
 
 on_error:
 	if( sub_file_entry != NULL )

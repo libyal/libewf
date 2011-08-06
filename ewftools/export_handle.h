@@ -409,6 +409,7 @@ int export_handle_export_file_entry(
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
      size_t export_path_size,
+     size_t file_entry_path_index,
      log_handle_t *log_handle,
      liberror_error_t **error );
 
@@ -417,6 +418,7 @@ int export_handle_export_file_entry_sub_file_entries(
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *export_path,
      size_t export_path_size,
+     size_t file_entry_path_index,
      log_handle_t *log_handle,
      liberror_error_t **error );
 
