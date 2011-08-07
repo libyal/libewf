@@ -2548,6 +2548,12 @@ on_error:
 		 &( internal_handle->segment_files_list ),
 		 NULL );
 	}
+	if( internal_handle->delta_segment_files_list != NULL )
+	{
+		libmfdata_file_list_free(
+		 &( internal_handle->delta_segment_files_list ),
+		 NULL );
+	}
 	if( internal_handle->write_io_handle != NULL )
 	{
 		libewf_write_io_handle_free(
@@ -3817,6 +3823,22 @@ int libewf_handle_close(
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free segment files list.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->delta_segment_files_list != NULL )
+	{
+		if( libmfdata_file_list_free(
+		     &( internal_handle->delta_segment_files_list ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free delta segment files list.",
 			 function );
 
 			result = -1;

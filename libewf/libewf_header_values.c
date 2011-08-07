@@ -1908,6 +1908,17 @@ int libewf_header_values_parse_utf8_header_string(
 						 LIBERROR_CONVERSION_ERROR_GENERIC,
 						 "%s: unable to create date time values string.",
 						 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+						if( ( error != NULL )
+						 && ( *error != NULL ) )
+						{
+							libnotify_print_error_backtrace(
+							 *error );
+						}
+#endif
+						liberror_error_free(
+						 error );
 					}
 					/* The effective size of the date time values string is needed
 					 */
@@ -5842,7 +5853,16 @@ int libewf_header_values_parse_xheader_date_value(
 			 "%s: unable to create date time values string.",
 			 function );
 
-			goto on_error;
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				libnotify_print_error_backtrace(
+				 *error );
+			}
+#endif
+			liberror_error_free(
+			 error );
 		}
 		else if( result != 0 )
 		{

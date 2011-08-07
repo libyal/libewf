@@ -3753,6 +3753,7 @@ int export_handle_export_input(
 	ssize_t read_process_count                          = 0;
 	ssize_t write_count                                 = 0;
 	ssize_t write_process_count                         = 0;
+	int status                                          = PROCESS_STATUS_COMPLETED;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer_t *output_storage_media_buffer = NULL;
@@ -4272,6 +4273,38 @@ int export_handle_export_input(
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to finalize.",
+		 function );
+
+		goto on_error;
+	}
+	if( export_handle->abort != 0 )
+	{
+		status = PROCESS_STATUS_ABORTED;
+	}
+	if( process_status_stop(
+	     process_status,
+	     export_count,
+	     status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to stop process status.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_free(
+	     &process_status,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free process status.",
 		 function );
 
 		goto on_error;

@@ -283,6 +283,11 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110807
+* fixed process status in export handle
+* fixed error clean up in header values
+* fixed delta segment files list clean up
+
 20110806
 * worked on improving ewfexport output and error tollerability
 * updated libhmac - bug fixes for Solaris build
