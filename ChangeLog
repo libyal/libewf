@@ -1,6 +1,4 @@
 TODO
-* error in ewfexport test ? invalid value: ewfexport does not ask for
-compression
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -282,6 +280,9 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
+
+20110809
+* small changes
 
 20110807
 * fixed process status in export handle
