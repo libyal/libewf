@@ -31,18 +31,10 @@
 
 #include <stdio.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
 #include <libsystem.h>
 
 #include "ewf_test_definitions.h"
+#include "ewf_test_libewf.h"
 
 /* Tests writing data of media size to EWF file(s) with a maximum segment size
  * Return 1 if successful, 0 if not or -1 on error

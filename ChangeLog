@@ -281,6 +281,10 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110810
+* moved libewf.h include to separate file for tests
+* updated README
+
 20110809
 * small changes
 

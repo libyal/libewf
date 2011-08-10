@@ -61,7 +61,8 @@ check_PROGRAMS = \
 	ewf_test_write_chunk
 
 ewf_test_glob_SOURCES = \
-	ewf_test_glob.c
+	ewf_test_glob.c \
+	ewf_test_libewf.h
 
 ewf_test_glob_LDADD = \
 	../libcstring/libcstring.la \
@@ -70,6 +71,7 @@ ewf_test_glob_LDADD = \
 
 ewf_test_read_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libewf.h \
 	ewf_test_read.c
 
 ewf_test_read_LDADD = \
@@ -80,6 +82,7 @@ ewf_test_read_LDADD = \
 
 ewf_test_read_write_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libewf.h \
 	ewf_test_read_write.c
 
 ewf_test_read_write_LDADD = \
@@ -91,6 +94,7 @@ ewf_test_read_write_LDADD = \
 
 ewf_test_read_write_delta_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libewf.h \
 	ewf_test_read_write_delta.c
 
 ewf_test_read_write_delta_LDADD = \
@@ -101,6 +105,7 @@ ewf_test_read_write_delta_LDADD = \
         @MEMWATCH_LIBADD@
 
 ewf_test_seek_SOURCES = \
+	ewf_test_libewf.h \
 	ewf_test_seek.c
 
 ewf_test_seek_LDADD = \
@@ -110,6 +115,7 @@ ewf_test_seek_LDADD = \
         @MEMWATCH_LIBADD@
 
 ewf_test_truncate_SOURCES = \
+	ewf_test_libewf.h \
 	ewf_test_truncate.c
 
 ewf_test_truncate_LDADD = \
@@ -120,6 +126,7 @@ ewf_test_truncate_LDADD = \
 
 ewf_test_write_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libewf.h \
 	ewf_test_write.c
 
 ewf_test_write_LDADD = \
@@ -131,6 +138,7 @@ ewf_test_write_LDADD = \
 
 ewf_test_write_chunk_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libewf.h \
 	ewf_test_write_chunk.c
 
 ewf_test_write_chunk_LDADD = \

@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-#include <libewf.h>
+#include "ewf_test_libewf.h"
 
 /* The main program
  */

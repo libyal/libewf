@@ -3,9 +3,10 @@ Libewf requires:
 * zlib
 
 ewftools require:
-* libcrypto (OpenSSL)
-  or Windows Crypto API from the Windows Platform SDK
-* libuuid (optional)
+* libcrypto (OpenSSL) or Windows Crypto API from the Windows Platform SDK
+  (optional but recommended)
+* libuuid or Windows RPC API
+  (optional but recommended)
 
 
 Creating a DLL
@@ -45,16 +46,22 @@ You'll need Cygwin with:
 * make
 * libtool
 * gettext
+* libiconv
 * zlib-devel
-* openssl-devel (for ewftools)
-* libuuid-devel (optional)
+* openssl-devel (optional but recommended)
+* libuuid-devel (optional but recommended)
 
 Building the library:
 ./configure
-make libewf
+make library
 
 You should end up with the following DLL:
 libewf-<version>/libewf/.libs/cygewf-0.dll
+
+Older versions of Cygwin might require e2fsprogs for libuuid support
+Install the e2fsprogs package and run the commands as following:
+LDFLAGS=-L/usr/lib/e2fsprogs ./configure
+make library
 
 
 Creating a DLL using CodeGear
@@ -100,7 +107,7 @@ Note that the project files contain a Release and VSDebug configuration.
 
 
 Creating a DLL using MingW
-See documents/mingw.txt
+See README.mingw
 
 
 Using a DLL
@@ -124,25 +131,17 @@ Use glibtoolize instead
 
 
 Building multiple architecture binaries
-E.g. on Mac OS X 10.4 run the following commands:
-CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386" LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386" ./configure --disable-dependency-tracking --prefix=$PWD/macosx/tmp/
+E.g. on Mac OS X 10.4 to build an PPC and Intel 32-bit multi binary, run the following commands:
+CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386" \
+LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386" \
+./configure --disable-dependency-tracking --prefix=$PWD/macosx/tmp/
 make
 make install
 
 The binaries are installed in $PWD/macosx/tmp/
 
 
-Cygwin
-* libuuid support
-
-libuuid support
-Install the e2fsprogs package and run the following commands:
-LDFLAGS=-L/usr/lib/e2fsprogs ./configure
-make
-make install
-
-
 Solaris
-Make sure that /usr/ccs/bin and /usr/swf/bin are defined in the PATH environment variable
+To build libewf on Solaris make sure that /usr/ccs/bin and /usr/swf/bin are defined in the PATH environment variable
 
 
