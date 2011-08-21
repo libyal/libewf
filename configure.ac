@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110809],
+ [20110821],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -124,6 +124,12 @@ COMMON_ARG_WITH(
  [libmsraw],
  [libmsraw],
  [search for libmsdev in includedir and libdir or in the specified DIR, or no if to use local version],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [fuse],
+ [fuse],
+ [search for fuse in includedir and libdir or in the specified DIR, or no if not to use fuse],
  [auto-detect],
  [DIR])
 
@@ -608,18 +614,18 @@ AS_IF(
   [AC_SUBST(
    [LIBUUID_LIBADD],
    [-lrpcrt4])
-   ac_libewf_have_guid_support=librpcrt4],
+   ac_cv_libuuid=librpcrt4],
   [AC_CHECK_HEADERS(
    [uuid/uuid.h],
    [],
-   [ac_libewf_have_guid_support=no])
+   [ac_cv_libuuid=no])
   AS_IF(
-   [test "x$ac_libewf_have_guid_support" != xno],
-   [ac_libewf_have_guid_support=native
+   [test "x$ac_cv_libuuid" != xno],
+   [ac_cv_libuuid=native
    AC_CHECK_FUNC(
     [uuid_generate],
     [],
-    [ac_libewf_have_guid_support=libuuid
+    [ac_cv_libuuid=libuuid
      AC_CHECK_LIB(
      [uuid],
      [uuid_generate],
@@ -630,23 +636,23 @@ AS_IF(
       [HAVE_LIBUUID],
       [1],
       [Define to 1 if you have the 'uuid' library (-luuid).]) ],
-     [ac_libewf_have_guid_support=no])
+     [ac_cv_libuuid=no])
     ])
    ])
   ])
 
  AS_IF(
-  [test "x$ac_libewf_have_guid_support" != xno],
+  [test "x$ac_cv_libuuid" != xno],
   [AC_DEFINE(
    [HAVE_GUID_SUPPORT],
    [1],
    [Define to 1 if GUID/UUID support is available.])
   ])
  ],
- [ac_libewf_have_guid_support=disabled])
+ [ac_cv_libuuid=disabled])
 
 AS_IF(
- [test "x$ac_libewf_have_guid_support" = xnative],
+ [test "x$ac_cv_libuuid" = xnative],
  [AC_CHECK_FUNC(
   [uuid_generate_random],
   [AC_DEFINE(
@@ -664,7 +670,7 @@ AS_IF(
  ])
 
 AS_IF(
- [test "x$ac_libewf_have_guid_support" = xlibuuid],
+ [test "x$ac_cv_libuuid" = xlibuuid],
  [AC_CHECK_LIB(
   [uuid],
   [uuid_generate_random],
@@ -697,18 +703,55 @@ AS_IF(
 
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AS_IF(
- [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_HEADERS([fuse/fuse.h])
-
- AS_IF(
-  [test "x$ac_cv_header_fuse_fuse_h" = xyes],
-  [AC_CHECK_LIB(
-   fuse,
-   fuse_main,
-   [ac_libewf_dummy=yes],
-   [ac_libewf_have_fuse_support=no])
+ [test "x$ac_cv_with_fuse" != xno && test "x$ac_cv_with_fuse" != xauto-detect],
+ [AS_IF(
+  [test -d "$ac_cv_with_fuse"],
+  [CFLAGS="$CFLAGS -I${ac_cv_with_fuse}/include"
+  LDFLAGS="$LDFLAGS -L${ac_cv_with_fuse}/lib"],
+  [AC_MSG_WARN([no such directory: $ac_cv_with_fuse])
   ])
  ])
+ 
+AS_IF(
+ [test "x$ac_cv_enable_winapi" = xno],
+ [AC_CHECK_HEADERS([fuse.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_fuse_h" = xyes],
+  [AC_CHECK_LIB(
+   fuse,
+   fuse_daemonize,
+   [],
+   [ac_cv_libfuse=no])
+  AC_CHECK_LIB(
+   fuse,
+   fuse_destroy,
+   [ac_libbde_dummy=yes],
+   [ac_cv_libfuse=no])
+  AC_CHECK_LIB(
+   fuse,
+   fuse_mount,
+   [ac_libbde_dummy=yes],
+   [ac_cv_libfuse=no])
+  AC_CHECK_LIB(
+   fuse,
+   fuse_new,
+   [ac_libbde_dummy=yes],
+   [ac_cv_libfuse=no])
+  ])
+ ])
+
+AS_IF(
+ [test "x$ac_cv_libfuse" = xyes],
+ [AC_SUBST(
+  [libewf_spec_requires_libfuse],
+  [openssl])
+ AC_SUBST(
+  [libewf_spec_build_requires_libfuse],
+  [openssl-devel])
+ ])
+
+dnl TODO add check for -D_FILE_OFFSET_BITS=64
 
 dnl Check if ewftools should be build as static executables
 AS_IF(
@@ -882,7 +925,8 @@ Building:
    MD5 support:                                     $ac_cv_libhmac_md5
    SHA1 support:                                    $ac_cv_libhmac_sha1
    SHA256 support:                                  $ac_cv_libhmac_sha256
-   GUID/UUID support:                               $ac_libewf_have_guid_support
+   GUID/UUID support:                               $ac_cv_libuuid
+   FUSE support:                                    $ac_cv_libfuse
 
 Features:
    Wide character type support:                     $ac_cv_enable_wide_character_type

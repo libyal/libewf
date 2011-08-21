@@ -1,5 +1,4 @@
 /*
- * ewfverify
  * Verifies the integrity of the media data within the EWF file
  *
  * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>

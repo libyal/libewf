@@ -1,5 +1,4 @@
 /*
- * ewfacquire
  * Reads data from a file or device and writes it in EWF format
  *
  * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>

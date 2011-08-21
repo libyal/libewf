@@ -1,8 +1,7 @@
 /*
- * ewfmount
- * Mount media data in EWF files
+ * Mounts an EWF file
  *
- * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (C) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -10,12 +9,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,6 +26,16 @@
 #include <libcstring.h>
 #include <liberror.h>
 
+#include <stdio.h>
+
+#if defined( HAVE_ERRNO_H )
+#include <errno.h>
+#endif
+
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
@@ -34,20 +43,19 @@
 #include <libsystem.h>
 
 #if defined( HAVE_FUSE_H )
+#define FUSE_USE_VERSION	26
+
 #include <fuse.h>
 #endif
 
-#include "byte_size_string.h"
-#include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libewf.h"
-#include "guid.h"
-#include "info_handle.h"
+#include "mount_handle.h"
 
-info_handle_t *ewfmount_info_handle = NULL;
-int ewfmount_abort                  = 0;
+mount_handle_t *ewfmount_mount_handle = NULL;
+int ewfmount_abort                    = 0;
 
-/* Prints the executable usage information
+/* Prints the executable usage mountrmation
  */
 void usage_fprint(
       FILE *stream )
@@ -56,49 +64,44 @@ void usage_fprint(
 	{
 		return;
 	}
-	fprintf( stream, "Use ewfmount to mount data in EWF format (Expert Witness Compression\n"
-	                 "Format).\n\n" );
+	fprintf( stream, "Use ewfmount to mount the EWF format (Expert Witness\n"
+                         "Compression Format)\n\n" );
 
-	fprintf( stream, "Usage: ewfmount [ -A codepage ] [ -hvVx ] ewf_files mount_point\n\n" );
+	fprintf( stream, "Usage: ewfmount [ -hvV ] source mount_point\n\n" );
 
-	fprintf( stream, "\tewf_files:     the first or the entire set of EWF segment files\n"
-	                 "\tmount_point:   the directory that will be the mount point\n\n" );
+	fprintf( stream, "\tsource:      the source file or device\n" );
+	fprintf( stream, "\tmount_point: the directory to serve as mount point\n\n" );
 
-	fprintf( stream, "\t-A:             codepage of header section, options: ascii (default),\n"
-	                 "\t                windows-874, windows-1250, windows-1251, windows-1252,\n"
-	                 "\t                windows-1253, windows-1254, windows-1255, windows-1256,\n"
-	                 "\t                windows-1257, windows-1258\n" );
-	fprintf( stream, "\t-h:             shows this help\n" );
-	fprintf( stream, "\t-o opt,[opt...] mount options\n" );
-	fprintf( stream, "\t-v:             verbose output to stderr\n" );
-	fprintf( stream, "\t-V:             print version\n" );
+	fprintf( stream, "\t-h:          shows this help\n" );
+	fprintf( stream, "\t-v:          verbose output to stderr\n" );
+	fprintf( stream, "\t-V:          print version\n" );
 }
 
 /* Signal handler for ewfmount
  */
 void ewfmount_signal_handler(
-      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
+      libsystem_signal_t signal )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfmount_signal_handler";
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
-
 	ewfmount_abort = 1;
 
-	if( ( ewfmount_info_handle != NULL )
-	 && ( info_handle_signal_abort(
-	       ewfmount_info_handle,
-	       &error ) != 1 ) )
+	if( ewfmount_mount_handle != NULL )
 	{
-		libsystem_notify_printf(
-		 "%s: unable to signal info handle to abort.\n",
-		 function );
+		if( mount_handle_signal_abort(
+		     ewfmount_mount_handle,
+		     &error ) != 1 )
+		{
+			libsystem_notify_printf(
+			 "%s: unable to signal mount handle to abort.\n",
+			 function );
 
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
+			libsystem_notify_print_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
@@ -111,6 +114,497 @@ void ewfmount_signal_handler(
 	}
 }
 
+#if defined( HAVE_FUSE_H )
+
+#if ( SIZEOF_OFF_T != 8 ) && ( SIZEOF_OFF_T != 4 )
+#error Size of off_t not supported
+#endif
+
+static char *ewfmount_fuse_path         = "/ewf1";
+static size_t ewfmount_fuse_path_length = 5;
+
+/* Opens a file
+ * Returns 0 if successful or a negative errno value otherwise
+ */
+int ewfmount_fuse_open(
+     const char *path,
+     struct fuse_file_info *file_info )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfmount_fuse_open";
+	size_t path_length      = 0;
+	int result              = 0;
+
+	if( path == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	if( file_info == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file info.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	path_length = libcstring_narrow_string_length(
+	               path );
+
+	if( ( path_length != ewfmount_fuse_path_length )
+	 || ( libcstring_narrow_string_compare(
+	       path,
+	       ewfmount_fuse_path,
+	       ewfmount_fuse_path_length ) != 0 ) )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported path.",
+		 function );
+
+		result = -ENOENT;
+
+		goto on_error;
+	}
+	if( ( file_info->flags & 0x03 ) != O_RDONLY )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: write access currently not supported.",
+		 function );
+
+		result = -EACCES;
+
+		goto on_error;
+	}
+	return( 0 );
+
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+/* Reads a buffer of data at the specified offset
+ * Returns number of bytes read if successful or a negative errno value otherwise
+ */
+int ewfmount_fuse_read(
+     const char *path,
+     char *buffer,
+     size_t size,
+     off_t offset,
+     struct fuse_file_info *file_info )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfmount_fuse_read";
+	size_t path_length      = 0;
+	ssize_t read_count      = 0;
+	int result              = 0;
+
+	if( path == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	if( size > (size_t) INT_MAX )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid size value exceeds maximum.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	if( file_info == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file info.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	path_length = libcstring_narrow_string_length(
+	               path );
+
+	if( ( path_length != ewfmount_fuse_path_length )
+	 || ( libcstring_narrow_string_compare(
+	       path,
+	       ewfmount_fuse_path,
+	       ewfmount_fuse_path_length ) != 0 ) )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported path.",
+		 function );
+
+		result = -ENOENT;
+
+		goto on_error;
+	}
+	if( mount_handle_seek_offset(
+	     ewfmount_mount_handle,
+	     (off64_t) offset,
+	     SEEK_SET,
+	     &error ) == -1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset in mount handle.",
+		 function );
+
+		result = -EIO;
+
+		goto on_error;
+	}
+	read_count = mount_handle_read_buffer(
+	              ewfmount_mount_handle,
+	              (uint8_t *) buffer,
+	              size,
+	              &error );
+
+	if( read_count == -1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read from mount handle.",
+		 function );
+
+		result = -EIO;
+
+		goto on_error;
+	}
+	return( (int) read_count );
+
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+/* Reads a directory
+ * Returns 0 if successful or a negative errno value otherwise
+ */
+int ewfmount_fuse_readdir(
+     const char *path,
+     void *buffer,
+     fuse_fill_dir_t filler,
+     off_t offset,
+     struct fuse_file_info *file_info )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfmount_fuse_readdir";
+	size_t path_length      = 0;
+	int result              = 0;
+
+	if( path == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	path_length = libcstring_narrow_string_length(
+	               path );
+
+	if( ( path_length != 1 )
+	 || ( path[ 0 ] != '/' ) )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported path.",
+		 function );
+
+		result = -ENOENT;
+
+		goto on_error;
+	}
+#ifdef X
+	if( file_info == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file info.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	if( file_info->fh == (uint64_t) NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file info - missing file handle.",
+		 function );
+
+		result = -EBADF;
+
+		goto on_error;
+	}
+#endif
+	if( filler(
+	     buffer,
+	     ".",
+	     NULL,
+	     0 ) == 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set directory entry.",
+		 function );
+
+		result = -EIO;
+
+		goto on_error;
+	}
+	if( filler(
+	     buffer,
+	     "..",
+	     NULL,
+	     0 ) == 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set directory entry.",
+		 function );
+
+		result = -EIO;
+
+		goto on_error;
+	}
+	if( filler(
+	     buffer,
+	     &( ewfmount_fuse_path[ 1 ] ),
+	     NULL,
+	     0 ) == 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set directory entry.",
+		 function );
+
+		result = -EIO;
+
+		goto on_error;
+	}
+	return( 0 );
+
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+/* Retrieves the file stat info
+ * Returns 0 if successful or a negative errno value otherwise
+ */
+int ewfmount_fuse_getattr(
+     const char *path,
+     struct stat *stat_info )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfmount_fuse_getattr";
+	size64_t media_siz e    = 0;
+	size_t path_length      = 0;
+	int result              = -ENOENT;
+
+	if( path == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	if( stat_info == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stat info.",
+		 function );
+
+		result = -EINVAL;
+
+		goto on_error;
+	}
+	if( memory_set(
+	     stat_info,
+	     0,
+	     sizeof( struct stat ) ) == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid stat info.",
+		 function );
+
+		result = errno;
+
+		goto on_error;
+	}
+	path_length = libcstring_narrow_string_length(
+	               path );
+
+	if( path_length == 1 )
+	{
+		if( path[ 0 ] == '/' )
+		{
+			stat_info->st_mode  = S_IFDIR | 0755;
+			stat_info->st_nlink = 2;
+
+			result = 0;
+		}
+	}
+	else if( path_length == ewfmount_fuse_path_length )
+	{
+		if( libcstring_narrow_string_compare(
+		     path,
+		     ewfmount_fuse_path,
+		     ewfmount_fuse_path_length ) == 0 )
+		{
+			stat_info->st_mode  = S_IFREG | 0444;
+			stat_info->st_nlink = 1;
+
+			if( mount_handle_get_media_size(
+			     ewfmount_mount_handle,
+			     &media_size,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unsupported to retrieve media size.",
+				 function );
+
+				result = -EBADFD;
+
+				goto on_error;
+			}
+#if SIZEOF_OFF_T == 4
+			if( media_size > (size64_t) UINT32_MAX )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: unsupported to media size value out of bounds.",
+				 function );
+
+				result = -ERANGE;
+
+				goto on_error;
+			}
+#endif
+			stat_info->st_size = (off_t) media_size;
+
+			result = 0;
+		}
+	}
+	if( result == 0 )
+	{
+		stat_info->st_atime = 0;
+		stat_info->st_mtime = 0;
+		stat_info->st_ctime = 0;
+		stat_info->st_uid   = geteuid();
+		stat_info->st_gid   = getegid();
+	}
+	return( result );
+
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+#endif /* defined( HAVE_FUSE_H ) */
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -119,22 +613,20 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcstring_system_character_t * const *argv_filenames = NULL;
+	libewf_error_t *error                      = NULL;
+	libcstring_system_character_t *mount_point = NULL;
+	libcstring_system_character_t *source      = NULL;
+	char *program                              = "ewfmount";
+	libcstring_system_integer_t option         = 0;
+	size_t string_length                       = 0;
+	int result                                 = 0;
+	int verbose                                = 0;
 
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                                = NULL;
+#if defined( HAVE_FUSE_H )
+	struct fuse_operations ewfmount_fuse_operations;
+	struct fuse_chan *ewfmount_fuse_channel    = NULL;
+	struct fuse *ewfmount_fuse_handle          = NULL;
 #endif
-	info_handle_t *info_handle                            = NULL;
-	liberror_error_t *error                               = NULL;
-
-	libcstring_system_character_t *option_header_codepage = NULL;
-	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfmount" );
-
-	libcstring_system_integer_t option                    = 0;
-	uint8_t verbose                                       = 0;
-	int number_of_filenames                               = 0;
-	int print_header                                      = 1;
-	int result                                            = 0;
 
 	libsystem_notify_set_stream(
 	 stderr,
@@ -142,33 +634,36 @@ int main( int argc, char * const argv[] )
 	libsystem_notify_set_verbose(
 	 1 );
 
-	if( libsystem_initialize(
-	     "ewftools",
-	     &error ) != 1 )
+        if( libsystem_initialize(
+             "ewftools",
+             &error ) != 1 )
 	{
-		ewfoutput_version_fprint(
-		 stderr,
-		 program );
-
 		fprintf(
 		 stderr,
 		 "Unable to initialize system values.\n" );
 
-		goto on_error;
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( EXIT_FAILURE );
 	}
+	ewfoutput_version_fprint(
+	 stdout,
+	 program );
+
+/* TODO add option to pass extenal password/key, what about BEK file */
+
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:hvV" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "hvV" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
 			case (libcstring_system_integer_t) '?':
 			default:
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
@@ -177,18 +672,9 @@ int main( int argc, char * const argv[] )
 				usage_fprint(
 				 stdout );
 
-				goto on_error;
-
-			case (libcstring_system_integer_t) 'A':
-				option_header_codepage = optarg;
-
-				break;
+				return( EXIT_FAILURE );
 
 			case (libcstring_system_integer_t) 'h':
-				ewfoutput_version_fprint(
-				 stdout,
-				 program );
-
 				usage_fprint(
 				 stdout );
 
@@ -200,10 +686,6 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'V':
-				ewfoutput_version_fprint(
-				 stdout,
-				 program );
-
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -212,562 +694,155 @@ int main( int argc, char * const argv[] )
 	}
 	if( optind == argc )
 	{
-		ewfoutput_version_fprint(
-		 stderr,
-		 program );
-
 		fprintf(
 		 stderr,
-		 "Missing EWF image file(s).\n" );
+		 "Missing source file or device.\n" );
 
 		usage_fprint(
 		 stdout );
 
-		goto on_error;
+		return( EXIT_FAILURE );
 	}
-	if( ( getuid() == 0 )
-	 || ( geteuid() == 0 ) )
+	source = argv[ optind++ ];
+
+	if( optind == argc )
 	{
 		fprintf(
 		 stderr,
-		 "Running %" PRIs_LIBCSTRING_SYSTEM " as root is a security risk.\n",
-		 program );
+		 "Missing mount point.\n" );
 
-		goto on_error;
-	}
-	if( sizeof( void* ) > sizeof( uint64_t ) )
-	{
-		fprintf(
-		 stderr,
-		 "Running %" PRIs_LIBCSTRING_SYSTEM " cannot be run due to a limitation in fuse.\n",
-		 program );
+		usage_fprint(
+		 stdout );
 
-		goto on_error;
+		return( EXIT_FAILURE );
 	}
+	mount_point = argv[ optind ];
+
 	libsystem_notify_set_verbose(
-	 verbose );
-	libewf_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
+	libewf_notify_set_verbose(
+	 verbose );
 
-	if( info_handle_initialize(
-	     &info_handle,
+	if( mount_handle_initialize(
+	     &ewfmount_mount_handle,
 	     &error ) != 1 )
 	{
-		ewfoutput_version_fprint(
-		 stderr,
-		 program );
-
 		fprintf(
 		 stderr,
-		 "Unable to create info handle.\n" );
+		 "Unable to initialize mount handle.\n" );
 
 		goto on_error;
 	}
-	if( option_output_format != NULL )
-	{
-		result = info_handle_set_output_format(
-		          info_handle,
-		          option_output_format,
-		          &error );
-
-		if( result == -1 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			fprintf(
-			 stderr,
-			 "Unable to set output format.\n" );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-
-			fprintf(
-			 stderr,
-			 "Unsupported output format defaulting to: text.\n" );
-		}
-	}
-	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
-	{
-		if( info_handle_dfxml_header_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			fprintf(
-			 stderr,
-			 "Unable to print header.\n" );
-
-			goto on_error;
-		}
-	}
-	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
-	{
-		ewfoutput_version_fprint(
-		 stdout,
-		 program );
-
-		print_header = 0;
-	}
-	if( ( option_output_format == NULL )
-	 && ( option_date_format != NULL ) )
-	{
-		result = info_handle_set_date_format(
-		          info_handle,
-		          option_date_format,
-		          &error );
-
-		if( result == -1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to set date format.\n" );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unsupported date format defaulting to: ctime.\n" );
-		}
-	}
-	if( option_header_codepage != NULL )
-	{
-		result = info_handle_set_header_codepage(
-		          info_handle,
-		          option_header_codepage,
-		          &error );
-
-		if( result == -1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to set header codepage in info handle.\n" );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unsupported header codepage defaulting to: ascii.\n" );
-		}
-	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_initialize(
-	     &glob,
-	     &error ) != 1 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
-		fprintf(
-		 stderr,
-		 "Unable to initialize glob.\n" );
-
-		goto on_error;
-	}
-	if( libsystem_glob_resolve(
-	     glob,
-	     &( argv[ optind ] ),
-	     argc - optind,
-	     &error ) != 1 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
-		fprintf(
-		 stderr,
-		 "Unable to resolve glob.\n" );
-
-		goto on_error;
-	}
-	argv_filenames      = glob->result;
-	number_of_filenames = glob->number_of_results;
-#else
-	argv_filenames      = &( argv[ optind ] );
-	number_of_filenames = argc - optind;
-
-#endif
-	if( libsystem_signal_attach(
-	     ewfmount_signal_handler,
-	     &error ) != 1 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
-		fprintf(
-		 stderr,
-		 "Unable to attach signal handler.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	result = info_handle_open_input(
-	          info_handle,
-	          argv_filenames,
-	          number_of_filenames,
+	result = mount_handle_open(
+	          ewfmount_mount_handle,
+	          source,
 	          &error );
 
-	if( ewfmount_abort != 0 )
+	if( result == -1 )
 	{
-		goto on_abort;
-	}
-	if( result != 1 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
 		fprintf(
 		 stderr,
-		 "Unable to open EWF file(s).\n" );
+		 "Unable to open: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+		 source );
 
 		goto on_error;
 	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_free(
-	     &glob,
-	     &error ) != 1 )
+	else if( result == 0 )
 	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
 		fprintf(
 		 stderr,
-		 "Unable to free glob.\n" );
+		 "Unable to unlock keys.\n" );
 
 		goto on_error;
 	}
-#endif
-	if( ( info_option == 'a' )
-	 || ( info_option == 'i' ) )
+#if defined( HAVE_FUSE_H )
+	if( memory_set(
+	     &ewfmount_fuse_operations,
+	     0,
+	     sizeof( struct fuse_operations ) ) == NULL )
 	{
-		if( info_handle_header_values_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print header values.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-	}
-	if( ( info_option == 'a' )
-	 || ( info_option == 'm' ) )
-	{
-		if( info_handle_media_information_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print media information.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		if( info_handle_hash_values_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print hash values.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		if( info_handle_sessions_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print sessions.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		if( info_handle_tracks_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print tracks.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-	}
-	if( ( info_option == 'a' )
-	 || ( info_option == 'e' ) )
-	{
-		if( info_handle_acquiry_errors_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print acquiry errors.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-	}
-	if( info_handle_single_files_fprint(
-	     info_handle,
-	     &error ) != 1 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
 		fprintf(
 		 stderr,
-		 "Unable to print single files.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
-	{
-		if( info_handle_dfxml_footer_fprint(
-		     info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewfoutput_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print footer.\n" );
-
-			goto on_error;
-		}
-	}
-on_abort:
-	if( info_handle_close(
-	     info_handle,
-	     &error ) != 0 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
-		fprintf(
-		 stderr,
-		 "Unable to close EWF file(s).\n" );
+		 "Unable to clear fuse operations.\n" );
 
 		goto on_error;
 	}
-	if( libsystem_signal_detach(
-	     &error ) != 1 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
+	ewfmount_fuse_operations.open    = &ewfmount_fuse_open;
+	ewfmount_fuse_operations.read    = &ewfmount_fuse_read;
+	ewfmount_fuse_operations.readdir = &ewfmount_fuse_readdir;
+	ewfmount_fuse_operations.getattr = &ewfmount_fuse_getattr;
 
-			print_header = 0;
-		}
+	ewfmount_fuse_channel = fuse_mount(
+	                         mount_point,
+	                         NULL );
+
+	if( ewfmount_fuse_channel == NULL )
+	{
 		fprintf(
 		 stderr,
-		 "Unable to detach signal handler.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	if( info_handle_free(
-	     &info_handle,
-	     &error ) != 1 )
-	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
-		fprintf(
-		 stderr,
-		 "Unable to free info handle.\n" );
+		 "Unable to create fuse channel.\n" );
 
 		goto on_error;
 	}
-	if( ewfmount_abort != 0 )
+	ewfmount_fuse_handle = fuse_new(
+	                        ewfmount_fuse_channel,
+	                        NULL,
+	                        &ewfmount_fuse_operations,
+	                        sizeof( struct fuse_operations ),
+	                        ewfmount_mount_handle );
+	               
+	if( ewfmount_fuse_handle == NULL )
 	{
-		if( print_header != 0 )
-		{
-			ewfoutput_version_fprint(
-			 stderr,
-			 program );
-
-			print_header = 0;
-		}
 		fprintf(
-		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
-		 program );
+		 stderr,
+		 "Unable to create fuse handle.\n" );
 
-		return( EXIT_FAILURE );
+		goto on_error;
 	}
+	if( fuse_daemonize(
+	     0 ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to daemonize fuse.\n" );
+
+		goto on_error;
+	}
+	result = fuse_loop(
+	          ewfmount_fuse_handle );
+
+	if( result != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to run fuse loop.\n" );
+
+		goto on_error;
+	}
+	fuse_destroy(
+	 ewfmount_fuse_handle );
+
+	fprintf(
+	 stdout,
+	 "%s: SUCCESS\n",
+	 program );
+
 	return( EXIT_SUCCESS );
+#else
+	fprintf(
+	 stderr,
+	 "No sub system to mount EWF format.\n" );
+
+	fprintf(
+	 stdout,
+	 "%s: FAILED\n",
+	 program );
+
+	return( EXIT_FAILURE );
+#endif
 
 on_error:
 	if( error != NULL )
@@ -777,20 +852,19 @@ on_error:
 		liberror_error_free(
 		 &error );
 	}
-	if( info_handle != NULL )
+#if defined( HAVE_FUSE_H )
+	if( ewfmount_fuse_handle != NULL )
 	{
-		info_handle_free(
-		 &info_handle,
-		 NULL );
-	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( glob != NULL )
-	{
-		libsystem_glob_free(
-		 &glob,
-		 NULL );
+		fuse_destroy(
+		 ewfmount_fuse_handle );
 	}
 #endif
+	if( ewfmount_mount_handle != NULL )
+	{
+		mount_handle_free(
+		 &ewfmount_mount_handle,
+		 NULL );
+	}
 	return( EXIT_FAILURE );
 }
 

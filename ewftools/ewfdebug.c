@@ -1,5 +1,4 @@
 /*
- * ewfdebug
  * Debugs EWF files
  *
  * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>

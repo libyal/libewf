@@ -1,4 +1,4 @@
-.Dd August 1, 2011
+.Dd August 21, 2011
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -487,7 +487,8 @@ None
 .Sh FILES
 None
 .Sh NOTES
-libewf allows to be compiled with wide character support.
+libewf supports both UTF-8 and UTF-16 encoded strings except for filenames. 
+Some platforms like WINAPI require wide character support for Unicode filenames.
 To compile libewf with wide character support use
 .Ar ./configure --enable-wide-character-type=yes
 or pass the definition
@@ -499,8 +500,6 @@ or pass the definition
 To have other code to determine if libewf was compiled with wide character support it defines
 .Ar LIBEWF_HAVE_WIDE_CHARACTER_TYPE
  in libewf/features.h.
-
-The Windows API has both extended ASCII (ANSI) and UTF16 functions and some functions have wrapper macros that hide the actual implementation.
 
 The header in a set of EWF files contains an extended ASCII string using the codepage of the system it was created on. The function 
 .Ar libewf_handle_set_header_codepage

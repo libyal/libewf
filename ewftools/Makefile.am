@@ -23,6 +23,7 @@ bin_PROGRAMS = \
 	ewfdebug \
 	ewfexport \
 	ewfinfo \
+	ewfmount \
 	ewfverify
 
 ewfacquire_SOURCES = \
@@ -163,6 +164,31 @@ ewfinfo_SOURCES = \
 	platform.c platform.h
 
 ewfinfo_LDADD = \
+	../libcstring/libcstring.la \
+	../liberror/liberror.la \
+	../libewf/libewf.la \
+	../libsystem/libsystem.la \
+	@LIBINTL@ \
+	@LIBUUID_LIBADD@ \
+	@MEMWATCH_LIBADD@
+
+ewfmount_SOURCES = \
+	byte_size_string.c byte_size_string.h \
+	digest_hash.c digest_hash.h \
+	ewfmount.c \
+	ewfinput.c ewfinput.h \
+	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h \
+	ewftools_libhmac.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
+	ewftools_libsmraw.h \
+	ewftools_libuna.h \
+	guid.c guid.h \
+	mount_handle.c mount_handle.h \
+	platform.c platform.h
+
+ewfmount_LDADD = \
 	../libcstring/libcstring.la \
 	../liberror/liberror.la \
 	../libewf/libewf.la \

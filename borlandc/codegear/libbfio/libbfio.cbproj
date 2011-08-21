@@ -59,6 +59,10 @@
 			</CppCompile>
 			<None Include="..\..\..\libbfio\libbfio_file_pool.h">
 			</None>
+			<CppCompile Include="..\..\..\libbfio\libbfio_file_range.c">
+			</CppCompile>
+			<None Include="..\..\..\libbfio\libbfio_file_range.h">
+			</None>
 			<CppCompile Include="..\..\..\libbfio\libbfio_support.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libbfio\libbfio_list_type.c">
