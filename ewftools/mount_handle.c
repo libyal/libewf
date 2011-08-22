@@ -99,6 +99,7 @@ int mount_handle_initialize(
 
 			goto on_error;
 		}
+		( *mount_handle )->input_format = MOUNT_HANDLE_INPUT_FORMAT_RAW;
 	}
 	return( 1 );
 
@@ -196,17 +197,17 @@ int mount_handle_signal_abort(
 	return( 1 );
 }
 
-/* Opens the mount handle
- * Returns 1 if successful, 0 if the keys could not be read or -1 on error
+/* Sets the format
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
-int mount_handle_open(
+int mount_handle_set_format(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *filename,
+     const libcstring_system_character_t *string,
      liberror_error_t **error )
 {
-	static char *function  = "mount_handle_open";
-	size_t filename_length = 0;
-	int result             = 0;
+	static char *function = "mount_handle_set_format";
+	size_t string_length  = 0;
+	int result            = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -219,8 +220,178 @@ int mount_handle_open(
 
 		return( -1 );
 	}
-/* TODO */
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string_length == 3 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "raw" ),
+		     3 ) == 0 )
+		{
+			mount_handle->input_format = MOUNT_HANDLE_INPUT_FORMAT_RAW;
+			result                     = 1;
+		}
+	}
+	else if( string_length == 5 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "files" ),
+		     5 ) == 0 )
+		{
+			mount_handle->input_format = MOUNT_HANDLE_INPUT_FORMAT_FILES;
+			result                     = 1;
+		}
+	}
 	return( result );
+}
+
+/* Opens the input of the mount handle
+ * Returns 1 if successful or -1 on error
+ */
+int mount_handle_open_input(
+     mount_handle_t *mount_handle,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t **libewf_filenames = NULL;
+	static char *function                            = "mount_handle_open_input";
+	size_t first_filename_length                     = 0;
+
+	if( mount_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( filenames == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_filenames <= 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 "%s: invalid number of filenames.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_filenames == 1 )
+	{
+		first_filename_length = libcstring_system_string_length(
+		                         filenames[ 0 ] );
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libewf_glob_wide(
+		     filenames[ 0 ],
+		     first_filename_length,
+		     LIBEWF_FORMAT_UNKNOWN,
+		     &libewf_filenames,
+		     &number_of_filenames,
+		     error ) != 1 )
+#else
+		if( libewf_glob(
+		     filenames[ 0 ],
+		     first_filename_length,
+		     LIBEWF_FORMAT_UNKNOWN,
+		     &libewf_filenames,
+		     &number_of_filenames,
+		     error ) != 1 )
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to resolve filename(s).",
+			 function );
+
+			return( -1 );
+		}
+		filenames = (libcstring_system_character_t * const *) libewf_filenames;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libewf_handle_open_wide(
+	     mount_handle->input_handle,
+	     filenames,
+	     number_of_filenames,
+	     LIBEWF_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libewf_handle_open(
+	     mount_handle->input_handle,
+	     filenames,
+	     number_of_filenames,
+	     LIBEWF_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file(s).",
+		 function );
+
+		if( libewf_filenames != NULL )
+		{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			libewf_glob_wide_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#else
+			libewf_glob_free(
+			 libewf_filenames,
+			 number_of_filenames,
+			 NULL );
+#endif
+		}
+		return( -1 );
+	}
+	if( libewf_filenames != NULL )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libewf_glob_wide_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#else
+		if( libewf_glob_free(
+		     libewf_filenames,
+		     number_of_filenames,
+		     error ) != 1 )
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free globbed filenames.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
 }
 
 /* Closes the mount handle
@@ -327,7 +498,7 @@ off64_t mount_handle_seek_offset(
 	offset = libewf_handle_seek_offset(
 	          mount_handle->input_handle,
 	          offset,
-	          SEEK_SET,
+	          whence,
 	          error );
 
 	if( offset == -1 )

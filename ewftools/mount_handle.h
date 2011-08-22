@@ -35,10 +35,20 @@
 extern "C" {
 #endif
 
+enum MOUNT_HANDLE_INPUT_FORMATS
+{
+	MOUNT_HANDLE_INPUT_FORMAT_FILES	= (int) 'f',
+	MOUNT_HANDLE_INPUT_FORMAT_RAW	= (int) 'r'
+};
+
 typedef struct mount_handle mount_handle_t;
 
 struct mount_handle
 {
+	/* The input format
+	 */
+	uint8_t input_format;
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
@@ -60,19 +70,15 @@ int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
      liberror_error_t **error );
 
-int mount_handle_set_password(
+int mount_handle_set_format(
      mount_handle_t *mount_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
-int mount_handle_set_recovery_password(
+int mount_handle_open_input(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *string,
-     liberror_error_t **error );
-
-int mount_handle_open(
-     mount_handle_t *mount_handle,
-     const libcstring_system_character_t *filename,
+     libcstring_system_character_t * const * filenames,
+     int number_of_filenames,
      liberror_error_t **error );
 
 int mount_handle_close(

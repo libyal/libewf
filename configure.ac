@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110821],
+ [20110822],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -127,9 +127,15 @@ COMMON_ARG_WITH(
  [auto-detect],
  [DIR])
 COMMON_ARG_WITH(
- [fuse],
- [fuse],
- [search for fuse in includedir and libdir or in the specified DIR, or no if not to use fuse],
+ [libuuid],
+ [libuuid],
+ [search for libuuid in includedir and libdir or in the specified DIR, or no if not to use libuuid],
+ [auto-detect],
+ [DIR])
+COMMON_ARG_WITH(
+ [libfuse],
+ [libfuse],
+ [search for libfuse in includedir and libdir or in the specified DIR, or no if not to use libfuse],
  [auto-detect],
  [DIR])
 
@@ -609,149 +615,30 @@ AM_CONDITIONAL(
 dnl Check for enabling GUID/UUID support
 AS_IF(
  [test "x$ac_cv_enable_guid" = xyes],
- [AS_IF(
-  [test "x$ac_cv_enable_winapi" = xyes],
-  [AC_SUBST(
-   [LIBUUID_LIBADD],
-   [-lrpcrt4])
-   ac_cv_libuuid=librpcrt4],
-  [AC_CHECK_HEADERS(
-   [uuid/uuid.h],
-   [],
-   [ac_cv_libuuid=no])
-  AS_IF(
-   [test "x$ac_cv_libuuid" != xno],
-   [ac_cv_libuuid=native
-   AC_CHECK_FUNC(
-    [uuid_generate],
-    [],
-    [ac_cv_libuuid=libuuid
-     AC_CHECK_LIB(
-     [uuid],
-     [uuid_generate],
-     [AC_SUBST(
-      [LIBUUID_LIBADD],
-      [-luuid])
-     AC_DEFINE(
-      [HAVE_LIBUUID],
-      [1],
-      [Define to 1 if you have the 'uuid' library (-luuid).]) ],
-     [ac_cv_libuuid=no])
-    ])
-   ])
-  ])
-
- AS_IF(
-  [test "x$ac_cv_libuuid" != xno],
-  [AC_DEFINE(
-   [HAVE_GUID_SUPPORT],
-   [1],
-   [Define to 1 if GUID/UUID support is available.])
-  ])
- ],
- [ac_cv_libuuid=disabled])
-
-AS_IF(
- [test "x$ac_cv_libuuid" = xnative],
- [AC_CHECK_FUNC(
-  [uuid_generate_random],
-  [AC_DEFINE(
-   [HAVE_UUID_GENERATE_RANDOM],
-   [1],
-   [Define to 1 if uuid_generate_random funtion is available.])
-  ])
- AC_CHECK_FUNC(
-  [uuid_generate_time],
-  [AC_DEFINE(
-   [HAVE_UUID_GENERATE_TIME],
-   [1],
-   [Define to 1 if uuid_generate_time funtion is available.])
-  ])
- ])
+ [AC_CHECK_LIBUUID])
 
 AS_IF(
  [test "x$ac_cv_libuuid" = xlibuuid],
- [AC_CHECK_LIB(
-  [uuid],
-  [uuid_generate_random],
-  [AC_DEFINE(
-   [HAVE_UUID_GENERATE_RANDOM],
-   [1],
-   [Define to 1 if uuid_generate_random funtion is available in libuuid.])
-  ])
- AC_CHECK_LIB(
-  [uuid],
-  [uuid_generate_time],
-  [AC_DEFINE(
-   [HAVE_UUID_GENERATE_TIME],
-   [1],
-   [Define to 1 if uuid_generate_time funtion is available in libuuid.])
-  ])
- AC_SUBST(
+ [AC_SUBST(
   [libewf_spec_requires_libuuid],
   [libuuid])
  AC_SUBST(
   [libewf_spec_build_requires_libuuid],
-  [libuuid-devel]) ],
- [AC_SUBST(
-  [libewf_spec_requires_libuuid],
-  [])
- AC_SUBST(
-  [libewf_spec_build_requires_libuuid],
-  [])
- ac_libewf_dummy=yes])
+  [libuuid-devel])
+ ])
 
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
-AS_IF(
- [test "x$ac_cv_with_fuse" != xno && test "x$ac_cv_with_fuse" != xauto-detect],
- [AS_IF(
-  [test -d "$ac_cv_with_fuse"],
-  [CFLAGS="$CFLAGS -I${ac_cv_with_fuse}/include"
-  LDFLAGS="$LDFLAGS -L${ac_cv_with_fuse}/lib"],
-  [AC_MSG_WARN([no such directory: $ac_cv_with_fuse])
-  ])
- ])
- 
-AS_IF(
- [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_HEADERS([fuse.h])
-
- AS_IF(
-  [test "x$ac_cv_header_fuse_h" = xyes],
-  [AC_CHECK_LIB(
-   fuse,
-   fuse_daemonize,
-   [],
-   [ac_cv_libfuse=no])
-  AC_CHECK_LIB(
-   fuse,
-   fuse_destroy,
-   [ac_libbde_dummy=yes],
-   [ac_cv_libfuse=no])
-  AC_CHECK_LIB(
-   fuse,
-   fuse_mount,
-   [ac_libbde_dummy=yes],
-   [ac_cv_libfuse=no])
-  AC_CHECK_LIB(
-   fuse,
-   fuse_new,
-   [ac_libbde_dummy=yes],
-   [ac_cv_libfuse=no])
-  ])
- ])
+AC_CHECK_LIBFUSE
 
 AS_IF(
  [test "x$ac_cv_libfuse" = xyes],
  [AC_SUBST(
   [libewf_spec_requires_libfuse],
-  [openssl])
+  [libfuse])
  AC_SUBST(
   [libewf_spec_build_requires_libfuse],
-  [openssl-devel])
+  [libfuse-devel])
  ])
-
-dnl TODO add check for -D_FILE_OFFSET_BITS=64
 
 dnl Check if ewftools should be build as static executables
 AS_IF(
@@ -843,7 +730,8 @@ AS_IF(
   ["-DMEMWATCH -DMEMWATCH_STDIO"])
  AC_SUBST(
   [MEMWATCH_LIBADD],
-  [../common/libmemwatch.la]) ])
+  [../common/libmemwatch.la])
+ ])
 
 AM_CONDITIONAL(
  [HAVE_MEMWATCH],

@@ -6,7 +6,7 @@
     <PROJECT value="..\Release\libsystem.lib"/>
     <OBJFILES value="libsystem_date_time.obj libsystem_error_string.obj libsystem_file.obj 
       libsystem_getopt.obj libsystem_glob.obj libsystem_notify.obj 
-      libsystem_path.obj libsystem_signal.obj libsystem_split_values.obj 
+      libsystem_path.obj libsystem_signal.obj libsystem_split_string.obj 
       libsystem_string.obj libsystem_support.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>

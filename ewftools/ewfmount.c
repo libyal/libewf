@@ -67,11 +67,13 @@ void usage_fprint(
 	fprintf( stream, "Use ewfmount to mount the EWF format (Expert Witness\n"
                          "Compression Format)\n\n" );
 
-	fprintf( stream, "Usage: ewfmount [ -hvV ] source mount_point\n\n" );
+	fprintf( stream, "Usage: ewfmount [ -f format ] [ -hvV ] ewf_files mount_point\n\n" );
 
-	fprintf( stream, "\tsource:      the source file or device\n" );
+	fprintf( stream, "\tewf_files:   the first or the entire set of EWF segment files\n\n" );
 	fprintf( stream, "\tmount_point: the directory to serve as mount point\n\n" );
 
+	fprintf( stream, "\t-f:          specify the input format, options: raw (default),\n"
+	                 "\t             files (restricted to logical volume files)\n" );
 	fprintf( stream, "\t-h:          shows this help\n" );
 	fprintf( stream, "\t-v:          verbose output to stderr\n" );
 	fprintf( stream, "\t-V:          print version\n" );
@@ -477,7 +479,7 @@ int ewfmount_fuse_getattr(
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfmount_fuse_getattr";
-	size64_t media_siz e    = 0;
+	size64_t media_size     = 0;
 	size_t path_length      = 0;
 	int result              = -ENOENT;
 
@@ -613,19 +615,25 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libewf_error_t *error                      = NULL;
-	libcstring_system_character_t *mount_point = NULL;
-	libcstring_system_character_t *source      = NULL;
-	char *program                              = "ewfmount";
-	libcstring_system_integer_t option         = 0;
-	size_t string_length                       = 0;
-	int result                                 = 0;
-	int verbose                                = 0;
+	libcstring_system_character_t * const *argv_filenames = NULL;
+
+	libewf_error_t *error                                 = NULL;
+	libcstring_system_character_t *option_format          = NULL;
+	libcstring_system_character_t *mount_point            = NULL;
+	char *program                                         = "ewfmount";
+	libcstring_system_integer_t option                    = 0;
+	int number_of_filenames                               = 0;
+	int result                                            = 0;
+	int verbose                                           = 0;
+
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	libsystem_glob_t *glob                                = NULL;
+#endif
 
 #if defined( HAVE_FUSE_H )
 	struct fuse_operations ewfmount_fuse_operations;
-	struct fuse_chan *ewfmount_fuse_channel    = NULL;
-	struct fuse *ewfmount_fuse_handle          = NULL;
+	struct fuse_chan *ewfmount_fuse_channel               = NULL;
+	struct fuse *ewfmount_fuse_handle                     = NULL;
 #endif
 
 	libsystem_notify_set_stream(
@@ -674,6 +682,11 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
+			case (libcstring_system_integer_t) 'f':
+				option_format = optarg;
+
+				break;
+
 			case (libcstring_system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
@@ -696,16 +709,15 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Missing source file or device.\n" );
+		 "Missing EWF image file(s).\n" );
+
 
 		usage_fprint(
 		 stdout );
 
 		return( EXIT_FAILURE );
 	}
-	source = argv[ optind++ ];
-
-	if( optind == argc )
+	if( ( optind + 1 ) == argc )
 	{
 		fprintf(
 		 stderr,
@@ -716,7 +728,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	mount_point = argv[ optind ];
+	mount_point = argv[ argc - 1 ];
 
 	libsystem_notify_set_verbose(
 	 verbose );
@@ -725,6 +737,36 @@ int main( int argc, char * const argv[] )
 	 NULL );
 	libewf_notify_set_verbose(
 	 verbose );
+
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_initialize(
+	     &glob,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize glob.\n" );
+
+		goto on_error;
+	}
+	if( libsystem_glob_resolve(
+	     glob,
+	     &( argv[ optind ] ),
+	     argc - optind - 1,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to resolve glob.\n" );
+
+		goto on_error;
+	}
+	argv_filenames      = glob->result;
+	number_of_filenames = glob->number_of_results;
+#else
+	argv_filenames      = &( argv[ optind ] );
+	number_of_filenames = argc - optind - 1;
+#endif
 
 	if( mount_handle_initialize(
 	     &ewfmount_mount_handle,
@@ -736,25 +778,46 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	result = mount_handle_open(
-	          ewfmount_mount_handle,
-	          source,
-	          &error );
+	if( option_format != NULL )
+	{
+		result = mount_handle_set_format(
+			  ewfmount_mount_handle,
+			  option_format,
+			  &error );
 
-	if( result == -1 )
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set format.\n" );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported input format defaulting to: raw.\n" );
+		}
+	}
+/* TODO */
+	if( ewfmount_mount_handle->format != MOUNT_HANDLE_INPUT_FORMAT_RAW )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-		 source );
+		 "Format: files not yet supported.\n" );
 
 		goto on_error;
 	}
-	else if( result == 0 )
+	if( mount_handle_open_input(
+	     ewfmount_mount_handle,
+	     argv_filenames,
+	     number_of_filenames,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to unlock keys.\n" );
+		 "Unable to open EWF file(s).\n" );
 
 		goto on_error;
 	}

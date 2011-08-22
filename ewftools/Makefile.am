@@ -195,6 +195,7 @@ ewfmount_LDADD = \
 	../libsystem/libsystem.la \
 	@LIBINTL@ \
 	@LIBUUID_LIBADD@ \
+	@LIBFUSE_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
 ewfverify_SOURCES = \

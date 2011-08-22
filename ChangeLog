@@ -13,7 +13,6 @@ TODO
 Next beta/stable release:
 * full test
 * disable ewfdebug
-* remove fuse check
 * clean up configure.ac and acinclude.m4
   - check if all functions are checked for
 
@@ -237,10 +236,8 @@ Tools:
 * ewfrecover
   - create a tool recover ewf files
 * ewfmount
-  - create a tool fuse mount ewf files
-  - create mount handle
   - LEV support
-  - Linux use fuse, Windows use imgdisk, MacOS use API?
+  - Windows use imgdisk, MacOS use API?
 * process status
   - improve and remove "This could take a while." ?
 * libsystem path implement GetVolumeInformation
@@ -280,6 +277,13 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
+
+20110822
+* worked on ewfmount
+* updated builder5 files
+
+20110821
+* worked on ewfmount
 
 20110820
 * updated libhmac, libbfio

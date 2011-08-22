@@ -5,9 +5,9 @@
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libbfio.lib"/>
     <OBJFILES value="libbfio_error.obj libbfio_error_string.obj libbfio_file.obj 
-      libbfio_handle.obj libbfio_legacy.obj libbfio_list_type.obj 
-      libbfio_memory_range.obj libbfio_offset_list.obj libbfio_pool.obj 
-      libbfio_file_pool.obj libbfio_support.obj"/>
+      libbfio_file_pool.obj libbfio_file_range.obj libbfio_handle.obj 
+      libbfio_legacy.obj libbfio_list_type.obj libbfio_memory_range.obj 
+      libbfio_offset_list.obj libbfio_pool.obj libbfio_support.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
