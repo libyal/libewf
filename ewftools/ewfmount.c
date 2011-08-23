@@ -888,21 +888,11 @@ int main( int argc, char * const argv[] )
 	fuse_destroy(
 	 ewfmount_fuse_handle );
 
-	fprintf(
-	 stdout,
-	 "%s: SUCCESS\n",
-	 program );
-
 	return( EXIT_SUCCESS );
 #else
 	fprintf(
 	 stderr,
 	 "No sub system to mount EWF format.\n" );
-
-	fprintf(
-	 stdout,
-	 "%s: FAILED\n",
-	 program );
 
 	return( EXIT_FAILURE );
 #endif
