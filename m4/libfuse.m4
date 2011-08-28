@@ -13,17 +13,20 @@ AC_DEFUN([AC_CHECK_LIBFUSE],
    ])
   ])
 
- AS_IF(
-  [test x"$ac_cv_with_libfuse" != xno],
-  [dnl Check for headers
-  AC_CHECK_HEADERS([fuse.h])
-  ])
+ dnl Check for headers
+ ac_cv_libfuse=no
 
  AS_IF(
-  [test "x$ac_cv_header_fuse_h" = xno],
-  [AS_UNSET([ac_cv_header_fuse_h])
-  CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
-  AC_CHECK_HEADERS([fuse.h])
+  [test x"$ac_cv_with_libfuse" != xno],
+  [AC_CHECK_HEADERS([fuse.h])
+
+  dnl libfuse sometimes requires -D_FILE_OFFSET_BITS=64 to be set
+  AS_IF(
+   [test "x$ac_cv_header_fuse_h" = xno],
+   [AS_UNSET([ac_cv_header_fuse_h])
+   CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
+   AC_CHECK_HEADERS([fuse.h])
+  ])
 
   AS_IF(
    [test "x$ac_cv_header_fuse_h" = xno],

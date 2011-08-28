@@ -772,7 +772,7 @@ int main( int argc, char * const argv[] )
 		}
 	}
 /* TODO add FILES support */
-	if( ewfmount_mount_handle->format != MOUNT_HANDLE_INPUT_FORMAT_RAW )
+	if( ewfmount_mount_handle->input_format != MOUNT_HANDLE_INPUT_FORMAT_RAW )
 	{
 		fprintf(
 		 stderr,

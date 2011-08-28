@@ -278,6 +278,9 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110828
+* updated libbfio
+
 20110823
 * updated libbfio, libfvalue
 * worked on ewfmount
