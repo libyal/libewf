@@ -25,7 +25,7 @@ AC_DEFUN([AC_CHECK_LIBODRAW],
    AC_CHECK_LIB(
     odraw,
     libodraw_get_version,
-    [],
+    [ac_cv_libodraw_dummy=yes],
     [ac_cv_libodraw=no])
  
    dnl Handle functions
@@ -141,6 +141,15 @@ AC_DEFUN([AC_CHECK_LIBODRAW],
      [ac_cv_libodraw=no])
     ])
    ])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libodraw" = xyes],
+  [AC_DEFINE(
+   [HAVE_LIBODRAW],
+   [1],
+   [Define to 1 if you have the `odraw' library (-lodraw).])
+  LIBS="-lodraw $LIBS"
   ])
 
  AS_IF(

@@ -25,7 +25,7 @@ AC_DEFUN([AC_CHECK_LIBMFDATA],
    AC_CHECK_LIB(
     mfdata,
     libmfdata_get_version,
-    [],
+    [ac_cv_libmfdata_dummy=yes],
     [ac_cv_libmfdata=no])
   
    dnl Segment table functions
@@ -102,6 +102,15 @@ AC_DEFUN([AC_CHECK_LIBMFDATA],
     [ac_cv_libmfdata_dummy=yes],
     [ac_cv_libmfdata=no])
    ])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libmfdata" = xyes],
+  [AC_DEFINE(
+   [HAVE_LIBMFDATA],
+   [1],
+   [Define to 1 if you have the `mfdata' library (-lmfdata).])
+  LIBS="-lmfdata $LIBS"
   ])
 
  AS_IF(

@@ -23,12 +23,11 @@
 #define _IMAGING_HANDLE_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
 
 #include <libcstring.h>
 #include <liberror.h>
-
-#include <stdio.h>
 
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"

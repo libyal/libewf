@@ -25,7 +25,7 @@ AC_DEFUN([AC_CHECK_LIBSMRAW],
    AC_CHECK_LIB(
     smraw,
     libsmraw_get_version,
-    [],
+    [ac_cv_libsmraw_dummy=yes],
     [ac_cv_libsmraw=no])
  
    dnl Handle functions
@@ -121,6 +121,15 @@ AC_DEFUN([AC_CHECK_LIBSMRAW],
     [ac_cv_libsmraw_dummy=yes],
     [ac_cv_libsmraw=no])
    ])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libsmraw" = xyes],
+  [AC_DEFINE(
+   [HAVE_LIBSMRAW],
+   [1],
+   [Define to 1 if you have the `smraw' library (-lsmraw).])
+  LIBS="-lsmraw $LIBS"
   ])
 
  AS_IF(

@@ -25,13 +25,13 @@ AC_DEFUN([AC_CHECK_LIBSMDEV],
    AC_CHECK_LIB(
     smdev,
     libsmdev_get_version,
-    [],
+    [ac_cv_libsmdev_dummy=yes],
     [ac_cv_libsmdev=no])
  
    AC_CHECK_LIB(
     smdev,
     libsmdev_check_device,
-    [],
+    [ac_cv_libsmdev_dummy=yes],
     [ac_cv_libsmdev=no])
  
    AS_IF(
@@ -162,6 +162,15 @@ AC_DEFUN([AC_CHECK_LIBSMDEV],
     [ac_cv_libsmdev_dummy=yes],
     [ac_cv_libsmdev=no])
    ])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libsmdev" = xyes],
+  [AC_DEFINE(
+   [HAVE_LIBSMDEV],
+   [1],
+   [Define to 1 if you have the `smdev' library (-lsmdev).])
+  LIBS="-lsmdev $LIBS"
   ])
 
  AS_IF(

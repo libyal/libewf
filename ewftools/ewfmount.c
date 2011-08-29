@@ -20,13 +20,12 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 #include <memory.h>
 #include <types.h>
 
 #include <libcstring.h>
 #include <liberror.h>
-
-#include <stdio.h>
 
 #if defined( HAVE_ERRNO_H )
 #include <errno.h>
