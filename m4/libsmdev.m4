@@ -252,7 +252,7 @@ storage_bus_type = BusTypeUnknown;]] )],
 dnl Function to detect if libsmdev dependencies are available
 AC_DEFUN([AC_CHECK_LOCAL_LIBSMDEV],
  [dnl Headers included in libsmdev/libsmdev_handle.c and libsmdev/libsmdev_support.c
- AC_CHECK_HEADERS([fcntl.h sys/stat.h unistd.h])
+ AC_CHECK_HEADERS([errno.h fcntl.h sys/stat.h unistd.h])
 
  dnl Headers included in libsmdev/libsmdev_metadata.c
  AS_IF(
@@ -284,10 +284,91 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBSMDEV],
   [AC_CHECK_HEADERS([linux/usbdevice_fs.h linux/usb/ch9.h])
  ])
 
+ dnl File input/output functions used in libbfio/libbfio_file.h
+ AC_CHECK_FUNCS(
+  [close],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: close],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [fstat],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: fstat],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [ftruncate],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: ftruncate],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [lseek],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: lseek],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [open],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: open],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [read],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: read],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [stat],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: stat],
+   [1])
+  ])
+ 
+ AC_CHECK_FUNCS(
+  [write],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing function: write],
+   [1])
+  ])
+
  AC_CHECK_FUNC_POSIX_FADVISE
 
+ dnl Check for error string functions used in libsmdev/libsmdev_error_string.c
+ AC_FUNC_STRERROR_R()
+
+ AS_IF(
+  [test "x$ac_cv_have_decl_strerror_r" = xno],
+  [AC_CHECK_FUNCS(
+   [strerror],
+   [],
+   [AC_MSG_FAILURE(
+    [Missing functions: strerror_r and strerror],
+    [1])
+   ])
+  ])
+
+ dnl Check if winioctl.h defines STORAGE_BUS_TYPE
  AS_IF(
   [test "x$ac_cv_enable_winapi" = xyes],
   [AC_CHECK_HEADER_WINIOCTL_H_STORAGE_BUS_TYPE])
+
  ])
 

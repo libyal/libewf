@@ -278,6 +278,10 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110831
+* updated libuna, libbfio, libhmac, libfvalue, libodraw, libsmdev
+* updated m4/libsmdev.m4
+
 20110829
 * bug fix in ewfmount
 
