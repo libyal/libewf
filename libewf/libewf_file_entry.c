@@ -27,6 +27,7 @@
 #include <liberror.h>
 #include <libnotify.h>
 
+#include "libewf_definitions.h"
 #include "libewf_extern.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
@@ -1049,8 +1050,12 @@ ssize_t libewf_file_entry_read_buffer(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_read_buffer";
 	off64_t data_offset                               = 0;
+	off64_t duplicate_data_offset                     = 0;
 	size64_t data_size                                = 0;
+	size64_t size                                     = 0;
+	size_t read_size                                  = 0;
 	ssize_t read_count                                = 0;
+	uint32_t flags                                    = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1109,6 +1114,20 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
+	if( libewf_single_file_entry_get_size(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     &size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_single_file_entry_get_data_offset(
 	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
 	     &data_offset,
@@ -1137,17 +1156,90 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
-	if( internal_file_entry->offset >= (off64_t) data_size )
+	if( libewf_single_file_entry_get_flags(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     &flags,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve flags.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( flags & LIBEWF_FILE_ENTRY_FLAG_SPARSE_DATA ) == 0 )
+	{
+		if( ( ( size == 0 )
+		  &&  ( data_size != 1 ) )
+		 || ( ( size != 0 )
+		  &&  ( data_size != size ) ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported data size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( data_size != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported data size.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_single_file_entry_get_duplicate_data_offset(
+		     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+		     &duplicate_data_offset,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve duplicate data offset.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( internal_file_entry->offset >= (off64_t) size )
 	{
 		return( 0 );
 	}
-	if( (off64_t) ( internal_file_entry->offset + buffer_size ) > (off64_t) data_size )
+	if( (off64_t) ( internal_file_entry->offset + buffer_size ) > (off64_t) size )
 	{
-		buffer_size = (size_t) ( data_size - internal_file_entry->offset );
+		buffer_size = (size_t) ( size - internal_file_entry->offset );
+	}
+	if( ( flags & LIBEWF_FILE_ENTRY_FLAG_SPARSE_DATA ) == 0 )
+	{
+		data_offset += internal_file_entry->offset;
+		read_size    = buffer_size;
+	}
+	else if( duplicate_data_offset >= 0 )
+	{
+		data_offset = duplicate_data_offset + internal_file_entry->offset;
+		read_size   = buffer_size;
+	}
+	else
+	{
+		read_size = 1;
 	}
 	if( libewf_handle_seek_offset(
 	     (libewf_handle_t *) internal_file_entry->internal_handle,
-	     data_offset + internal_file_entry->offset,
+	     data_offset,
 	     SEEK_SET,
 	     error ) == -1 )
 	{
@@ -1157,15 +1249,15 @@ ssize_t libewf_file_entry_read_buffer(
 		 LIBERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset: %" PRIi64 ".",
 		 function,
-		 data_offset + internal_file_entry->offset );
+		 data_offset );
 
 		return( -1 );
 	}
 	read_count = libewf_handle_read_buffer(
-	              (libewf_handle_t *) internal_file_entry->internal_handle,
-	              buffer,
-	              buffer_size,
-	              error );
+		      (libewf_handle_t *) internal_file_entry->internal_handle,
+		      buffer,
+		      read_size,
+		      error );
 
 	if( read_count <= -1 )
 	{
@@ -1180,6 +1272,27 @@ ssize_t libewf_file_entry_read_buffer(
 	}
 	internal_file_entry->offset += read_count;
 
+	if( ( flags & LIBEWF_FILE_ENTRY_FLAG_SPARSE_DATA ) != 0 )
+	{
+		if( read_count == 1 )
+		{
+			if( memory_set(
+			     &( ( (uint8_t *) buffer )[ 1 ] ),
+			     ( (uint8_t *) buffer )[ 0 ],
+			     buffer_size - 1 ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to set sparse data in buffer.",
+				 function );
+
+				return( -1 );
+			}
+			read_count = (ssize_t) buffer_size;
+		}
+	}
 	return( read_count );
 }
 
@@ -1242,7 +1355,7 @@ off64_t libewf_file_entry_seek_offset(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_seek_offset";
-	size64_t data_size                                = 0;
+	size64_t size                                     = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1268,16 +1381,16 @@ off64_t libewf_file_entry_seek_offset(
 
 		return( -1 );
 	}
-	if( libewf_single_file_entry_get_data_size(
+	if( libewf_single_file_entry_get_size(
 	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
-	     &data_size,
+	     &size,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size.",
+		 "%s: unable to retrieve size.",
 		 function );
 
 		return( -1 );
@@ -1301,7 +1414,7 @@ off64_t libewf_file_entry_seek_offset(
 	}
 	else if( whence == SEEK_END )
 	{	
-		offset += (off64_t) data_size;
+		offset += (off64_t) size;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )

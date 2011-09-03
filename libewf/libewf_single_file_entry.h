@@ -65,6 +65,10 @@ struct libewf_single_file_entry
 	 */
 	size64_t size;
 
+	/* The duplicate data offset
+	 */
+	off64_t duplicate_data_offset;
+
 	/* The creation date and time
 	 * stored as a Unix timestamp
 	 */
@@ -125,6 +129,11 @@ int libewf_single_file_entry_get_data_offset(
 int libewf_single_file_entry_get_data_size(
      libewf_single_file_entry_t *single_file_entry,
      size64_t *data_size,
+     liberror_error_t **error );
+
+int libewf_single_file_entry_get_duplicate_data_offset(
+     libewf_single_file_entry_t *single_file_entry,
+     off64_t *duplicate_data_offset,
      liberror_error_t **error );
 
 int libewf_single_file_entry_get_utf8_name_size(

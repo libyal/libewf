@@ -80,6 +80,8 @@ int libewf_single_file_entry_initialize(
 
 			goto on_error;
 		}
+		( *single_file_entry )->data_offset           = -1;
+		( *single_file_entry )->duplicate_data_offset = -1;
 	}
 	return( 1 );
 
@@ -435,6 +437,43 @@ int libewf_single_file_entry_get_data_size(
 		return( -1 );
 	}
 	*data_size = single_file_entry->data_size;
+
+	return( 1 );
+}
+
+/* Retrieves the duplicate data offset
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_file_entry_get_duplicate_data_offset(
+     libewf_single_file_entry_t *single_file_entry,
+     off64_t *duplicate_data_offset,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_duplicate_data_offset";
+
+	if( single_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( duplicate_data_offset == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid duplicate data offset.",
+		 function );
+
+		return( -1 );
+	}
+	*duplicate_data_offset = single_file_entry->duplicate_data_offset;
 
 	return( 1 );
 }

@@ -1353,6 +1353,22 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'u' ) )
 			{
+				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set duplicate data offset.",
+					 function );
+
+					goto on_error;
+				}
+				single_file_entry->duplicate_data_offset = (off64_t) value_64bit;
 			}
 			/* MD5 digest hash
 			 */
@@ -1551,6 +1567,13 @@ int libewf_single_files_parse_file_entry(
 			}
 		}
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "\n" );
+	}
+#endif
 	if( libfvalue_split_utf8_string_free(
 	     &values,
 	     error ) != 1 )

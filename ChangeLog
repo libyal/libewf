@@ -1,4 +1,11 @@
 TODO
+* check this:
+  ewfacquire from libewf-20100226 crashes when imaging a
+  device where it cannot identify the device's serial number.
+* fix libsmdev - optical disc sessions
+* Single files
+  - HFS+ Private Directory Data\x01 (why 0x01 ?)
+  - du value ?
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -277,6 +284,12 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
+
+20110903
+* ewfverify
+  - fix for verifying empty single files
+  - added error tollerance for "corrupt" single files
+  - added support for sparse data
 
 20110901
 * updated libsmraw

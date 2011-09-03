@@ -4618,7 +4618,7 @@ int export_handle_export_file_entry(
 	ssize_t read_count                         = 0;
 	uint8_t file_entry_type                    = 0;
 	int result                                 = 0;
-	int return_value                           = 1;
+	int return_value                           = 0;
 
 	if( export_handle == NULL )
 	{
@@ -4877,6 +4877,8 @@ int export_handle_export_file_entry(
 
 				goto on_error;
 			}
+			return_value = 1;
+
 			/* If there is no file entry data an empty file is written
 			 */
 			if( file_entry_data_size > 0 )
@@ -5167,7 +5169,7 @@ int export_handle_export_file_entry_sub_file_entries(
 		          log_handle,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			liberror_error_set(
 			 error,

@@ -1930,6 +1930,7 @@ int verification_handle_verify_file_entry(
 	uint8_t file_entry_type                    = 0;
 	int md5_hash_compare                       = 0;
 	int result                                 = 0;
+	int return_value                           = 0;
 	int sha1_hash_compare                      = 0;
 	int sha256_hash_compare                    = 0;
 
@@ -2115,6 +2116,21 @@ int verification_handle_verify_file_entry(
 
 			goto on_error;
 		}
+		if( verification_handle_initialize_integrity_hash(
+		     verification_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize integrity hash(es).",
+			 function );
+
+			goto on_error;
+		}
+		result = 1;
+
 		if( file_entry_data_size > 0 )
 		{
 			if( verification_handle->process_buffer_size == 0 )
@@ -2124,19 +2140,6 @@ int verification_handle_verify_file_entry(
 			else
 			{
 				process_buffer_size = verification_handle->process_buffer_size;
-			}
-			if( verification_handle_initialize_integrity_hash(
-			     verification_handle,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to initialize integrity hash(es).",
-				 function );
-
-				goto on_error;
 			}
 			/* This function in not necessary for normal use
 			 * but it was added for testing
@@ -2186,7 +2189,7 @@ int verification_handle_verify_file_entry(
 				              read_size,
 				              error );
 
-				if( read_count != (ssize_t) read_size )
+				if( read_count == (ssize_t) -1 )
 				{
 					liberror_error_set(
 					 error,
@@ -2196,6 +2199,12 @@ int verification_handle_verify_file_entry(
 					 function );
 
 					goto on_error;
+				}
+				else if( read_count != (ssize_t) read_size )
+				{
+					result = 0;
+
+					break;
 				}
 				file_entry_data_size -= read_size;
 
@@ -2219,7 +2228,9 @@ int verification_handle_verify_file_entry(
 			 file_entry_data );
 
 			file_entry_data = NULL;
-
+		}
+		if( result != 0 )
+		{
 			if( verification_handle_finalize_integrity_hash(
 			     verification_handle,
 			     error ) != 1 )
@@ -2282,60 +2293,61 @@ int verification_handle_verify_file_entry(
 			 && ( verification_handle->stored_md5_hash_available != 0 ) )
 			{
 				md5_hash_compare = libcstring_system_string_compare(
-				                    verification_handle->stored_md5_hash_string,
-				                    verification_handle->calculated_md5_hash_string,
-				                    33 );
+						    verification_handle->stored_md5_hash_string,
+						    verification_handle->calculated_md5_hash_string,
+						    33 );
 			}
 			if( ( verification_handle->calculate_sha1 != 0 )
 			 && ( verification_handle->stored_sha1_hash_available != 0 ) )
 			{
 				sha1_hash_compare = libcstring_system_string_compare(
-				                     verification_handle->stored_sha1_hash_string,
-				                     verification_handle->calculated_sha1_hash_string,
-				                     41 );
+						     verification_handle->stored_sha1_hash_string,
+						     verification_handle->calculated_sha1_hash_string,
+						     41 );
 			}
 			if( ( verification_handle->calculate_sha256 != 0 )
 			 && ( verification_handle->stored_sha256_hash_available != 0 ) )
 			{
 				sha256_hash_compare = libcstring_system_string_compare(
-				                       verification_handle->stored_sha256_hash_string,
-				                       verification_handle->calculated_sha256_hash_string,
-				                       65 );
+						       verification_handle->stored_sha256_hash_string,
+						       verification_handle->calculated_sha256_hash_string,
+						       65 );
 			}
-			if( ( md5_hash_compare == 0 )
-			 && ( sha1_hash_compare == 0 )
-			 && ( sha256_hash_compare == 0 ) )
-			{
-				result = 1;
-			}
-			else
-			{
-				fprintf(
-				 verification_handle->notify_stream,
-				 "FAILED\n" );
-
-				if( log_handle != NULL )
-				{
-					log_handle_printf(
-					 log_handle,
-				 	 "FAILED\n" );
-				}
-				result = 0;
-			}
+		}
+		if( ( result != 0 )
+		 && ( md5_hash_compare == 0 )
+		 && ( sha1_hash_compare == 0 )
+		 && ( sha256_hash_compare == 0 ) )
+		{
+			return_value = 1;
+		}
+		else
+		{
 			fprintf(
 			 verification_handle->notify_stream,
-			 "\n" );
+			 "FAILED\n" );
+
+			if( log_handle != NULL )
+			{
+				log_handle_printf(
+				 log_handle,
+				 "FAILED\n" );
+			}
+			return_value = 0;
 		}
+		fprintf(
+		 verification_handle->notify_stream,
+		 "\n" );
 	}
 	else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 	{
-		result = verification_handle_verify_sub_file_entries(
-		          verification_handle,
-		          file_entry,
-		          target_path,
-		          target_path_size - 1,
-		          log_handle,
-		          error );
+		return_value = verification_handle_verify_sub_file_entries(
+		                verification_handle,
+		                file_entry,
+		                target_path,
+		                target_path_size - 1,
+		                log_handle,
+		                error );
 
 		if( result == -1 )
 		{
@@ -2354,7 +2366,7 @@ int verification_handle_verify_file_entry(
 		memory_free(
 		 target_path );
 	}
-	return( result );
+	return( return_value );
 
 on_error:
 	if( file_entry_data != NULL )
