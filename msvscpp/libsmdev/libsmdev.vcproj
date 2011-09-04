@@ -187,7 +187,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_optical_disk.c"
+				RelativePath="..\..\libsmdev\libsmdev_optical_disc.c"
 				>
 			</File>
 			<File
@@ -269,7 +269,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_optical_disk.h"
+				RelativePath="..\..\libsmdev\libsmdev_optical_disc.h"
 				>
 			</File>
 			<File

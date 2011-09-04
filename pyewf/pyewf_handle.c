@@ -267,8 +267,8 @@ PyObject *pyewf_new_handle(
 		 "%s: unable to initialize handle.",
 		 function );
 
-		Py_DECREF(
-		 pyewf_handle );
+		Py_DecRef(
+		 (PyObject *) pyewf_handle );
 
 		return( NULL );
 	}
@@ -609,7 +609,7 @@ PyObject *pyewf_handle_open(
 		}
 		( filenames[ filename_index ] )[ filename_length ] = 0;
 
-		Py_DECREF(
+		Py_DecRef(
 		 string_object );
 	}
 	if( libewf_handle_open(

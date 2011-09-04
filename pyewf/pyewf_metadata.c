@@ -319,7 +319,7 @@ PyObject *pyewf_handle_get_header_values(
 			liberror_error_free(
 			 &error );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -334,7 +334,7 @@ PyObject *pyewf_handle_get_header_values(
 			 "%s: unable to create header value identifier.",
 			 function );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -372,7 +372,7 @@ PyObject *pyewf_handle_get_header_values(
 			memory_free(
 			 header_value_identifier );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -415,7 +415,7 @@ PyObject *pyewf_handle_get_header_values(
 			memory_free(
 			 header_value_identifier );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -441,7 +441,7 @@ PyObject *pyewf_handle_get_header_values(
 				memory_free(
 				 header_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );
@@ -482,7 +482,7 @@ PyObject *pyewf_handle_get_header_values(
 				memory_free(
 				 header_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );
@@ -505,7 +505,7 @@ PyObject *pyewf_handle_get_header_values(
 				memory_free(
 				 header_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );
@@ -526,9 +526,9 @@ PyObject *pyewf_handle_get_header_values(
 				memory_free(
 				 header_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 string_object );
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );
@@ -783,7 +783,7 @@ PyObject *pyewf_handle_get_hash_values(
 			liberror_error_free(
 			 &error );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -798,7 +798,7 @@ PyObject *pyewf_handle_get_hash_values(
 			 "%s: unable to create hash value identifier.",
 			 function );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -836,7 +836,7 @@ PyObject *pyewf_handle_get_hash_values(
 			memory_free(
 			 hash_value_identifier );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -879,7 +879,7 @@ PyObject *pyewf_handle_get_hash_values(
 			memory_free(
 			 hash_value_identifier );
 
-			Py_DECREF(
+			Py_DecRef(
 			 dictionary_object );
 
 			return( NULL );
@@ -905,7 +905,7 @@ PyObject *pyewf_handle_get_hash_values(
 				memory_free(
 				 hash_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );
@@ -946,7 +946,7 @@ PyObject *pyewf_handle_get_hash_values(
 				memory_free(
 				 hash_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );
@@ -969,7 +969,7 @@ PyObject *pyewf_handle_get_hash_values(
 				memory_free(
 				 hash_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );
@@ -990,9 +990,9 @@ PyObject *pyewf_handle_get_hash_values(
 				memory_free(
 				 hash_value_identifier );
 
-				Py_DECREF(
+				Py_DecRef(
 				 string_object );
-				Py_DECREF(
+				Py_DecRef(
 				 dictionary_object );
 
 				return( NULL );

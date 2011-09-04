@@ -1,11 +1,7 @@
 TODO
-* check this:
-  ewfacquire from libewf-20100226 crashes when imaging a
-  device where it cannot identify the device's serial number.
 * fix libsmdev - optical disc sessions
 * Single files
   - HFS+ Private Directory Data\x01 (why 0x01 ?)
-  - du value ?
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -284,6 +280,13 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
+
+20110904
+* pyewf: code clean up
+* libsmdev:
+  - worked on improved session/track support
+  - reduced IO timeouts
+  - bug fix for information value strings
 
 20110903
 * ewfverify

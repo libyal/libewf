@@ -1,4 +1,4 @@
-dnl Functions to for Python bindings
+dnl Functions for Python bindings
 
 dnl Function to detect if Python build environment is available
 AC_DEFUN([AC_CHECK_PYTHON_DEVEL],

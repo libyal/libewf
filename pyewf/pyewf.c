@@ -323,7 +323,7 @@ PyObject *pyewf_glob(
 			 number_of_filenames,
 			 NULL );
 
-			Py_DECREF(
+			Py_DecRef(
 			 list_object );
 
 			return( NULL );
@@ -344,9 +344,9 @@ PyObject *pyewf_glob(
 			 number_of_filenames,
 			 NULL );
 
-			Py_DECREF(
+			Py_DecRef(
 			 string_object );
-			Py_DECREF(
+			Py_DecRef(
 			 list_object );
 
 			return( NULL );
@@ -378,7 +378,7 @@ PyObject *pyewf_glob(
 		liberror_error_free(
 		 &error );
 
-		Py_DECREF(
+		Py_DecRef(
 		 list_object );
 
 		return( NULL );
@@ -416,8 +416,8 @@ PyMODINIT_FUNC initpyewf(
 	{
 		return;
 	}
-	Py_INCREF(
-	 &pyewf_handle_type_object );
+	Py_IncRef(
+	 (PyObject * ) &pyewf_handle_type_object );
 
 	handle_type_object = &pyewf_handle_type_object;
 

@@ -39,7 +39,7 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libsmdev\libsmdev_optical_disk.h">
+			<None Include="..\..\..\libsmdev\libsmdev_optical_disc.h">
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_metadata.h">
 			</None>
@@ -97,7 +97,7 @@
 			</None>
 			<None Include="..\..\..\libsmdev\libsmdev_ata.h">
 			</None>
-			<CppCompile Include="..\..\..\libsmdev\libsmdev_optical_disk.c">
+			<CppCompile Include="..\..\..\libsmdev\libsmdev_optical_disc.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libsmdev\libsmdev_offset_list.c">
 			</CppCompile>
