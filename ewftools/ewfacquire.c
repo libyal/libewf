@@ -340,6 +340,7 @@ int ewfacquire_determine_sessions(
 	uint64_t number_of_sectors = 0;
 	uint64_t start_sector      = 0;
 	uint8_t type               = 0;
+	int has_audio_tracks       = 0;
 	int number_of_sessions     = 0;
 	int number_of_tracks       = 0;
 	int session_index          = 0;
@@ -529,8 +530,16 @@ int ewfacquire_determine_sessions(
 
 					return( -1 );
 				}
+				has_audio_tracks = 1;
 			}
 		}
+	}
+	if( has_audio_tracks != 0 )
+	{
+		fprintf(
+		 stdout,
+		 "WARNING: the EWF format does not support audio tracks.\n"
+		 "         audio track data will be filled with 0-byte values\n\n" );
 	}
 	return( 1 );
 }

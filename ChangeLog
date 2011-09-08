@@ -281,6 +281,18 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110908
+* added chunk offset grouping after chunk table section write
+  reduced memory usage during write
+
+20110906
+* libsmdev:
+  - worked on improved session/track support
+
+20110905
+* libsmdev:
+  - worked on improved session/track support
+
 20110904
 * pyewf: code clean up
 * libsmdev:

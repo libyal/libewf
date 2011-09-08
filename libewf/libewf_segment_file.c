@@ -2261,12 +2261,14 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
          uint32_t section_number_of_chunks,
          liberror_error_t **error )
 {
-	libewf_section_t *section     = NULL;
-	uint8_t *table_section_string = NULL;
-	static char *function         = "libewf_segment_file_write_chunks_section_correction";
-	off64_t base_offset           = 0;
-	ssize_t total_write_count     = 0;
-	ssize_t write_count           = 0;
+	libewf_section_t *backup_group_section = NULL;
+	libewf_section_t *group_section        = NULL;
+	libewf_section_t *section              = NULL;
+	uint8_t *table_section_string          = NULL;
+	static char *function                  = "libewf_segment_file_write_chunks_section_correction";
+	off64_t base_offset                    = 0;
+	ssize_t total_write_count              = 0;
+	ssize_t write_count                    = 0;
 
 	if( segment_file == NULL )
 	{
@@ -2432,6 +2434,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 			return( -1 );
 		}
+		group_section = section;
 	}
 	else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 	{
@@ -2564,6 +2567,8 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 			goto on_error;
 		}
+		group_section = section;
+
 		section = NULL;
 
 		if( libewf_section_initialize(
@@ -2621,7 +2626,55 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 			goto on_error;
 		}
+		backup_group_section = section;
+	
 		section = NULL;
+	}
+	/* Group the elements to reduce the memory usage
+	 */
+	if( libmfdata_list_set_group_by_index(
+	     chunk_table_list,
+	     number_of_chunks - section_number_of_chunks,
+	     (int) section_number_of_chunks,
+	     file_io_pool_entry,
+	     group_section->start_offset,
+	     group_section->size,
+	     0,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set chunk group: %d - %d.",
+		 function,
+		 number_of_chunks - section_number_of_chunks,
+		 number_of_chunks );
+
+		return( -1 );
+	}
+	if( backup_group_section != NULL )
+	{
+		if( libmfdata_list_set_backup_data_range_by_index(
+		     chunk_table_list,
+		     number_of_chunks - section_number_of_chunks,
+		     file_io_pool_entry,
+		     backup_group_section->start_offset,
+		     backup_group_section->size,
+		     0,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set backup data range of chunk group: %d - %d.",
+			 function,
+			 number_of_chunks - section_number_of_chunks,
+			 number_of_chunks );
+
+			return( -1 );
+		}
 	}
 	return( total_write_count );
 
