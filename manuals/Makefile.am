@@ -3,6 +3,7 @@ man_MANS = \
 	ewfacquirestream.1 \
 	ewfexport.1 \
 	ewfinfo.1 \
+	ewfmount.1 \
 	ewfverify.1 \
 	libewf.3
 
@@ -11,6 +12,7 @@ EXTRA_DIST = \
 	ewfacquirestream.1 \
 	ewfexport.1 \
 	ewfinfo.1 \
+	ewfmount.1 \
 	ewfverify.1 \
 	libewf.3
 

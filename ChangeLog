@@ -281,6 +281,14 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110918
+* updated spec file
+* added ewfmount.1 man page
+* update libsmraw, libodraw, libsmdev
+
+20110914
+* prepated temporary libsmdev version
+
 20110908
 * added chunk offset grouping after chunk table section write
   reduced memory usage during write

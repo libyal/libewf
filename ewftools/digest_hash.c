@@ -99,7 +99,9 @@ int digest_hash_copy_to_string(
 
 		return( -1 );
 	}
-	for( digest_hash_iterator = 0; digest_hash_iterator < digest_hash_size; digest_hash_iterator++ )
+	for( digest_hash_iterator = 0;
+	     digest_hash_iterator < digest_hash_size;
+	     digest_hash_iterator++ )
 	{
 		digest_digit = digest_hash[ digest_hash_iterator ] / 16;
 

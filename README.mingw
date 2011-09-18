@@ -1,12 +1,12 @@
 Creating a DLL using MinGW
 
-To compile a libewf DLL using mingw you'll need:
-* mingw with:
+To compile a libewf DLL using MinGW you'll need:
+* MinGW with:
   * Windows Crypto API (libadvapi32)
   * UUID/GUID support (librpcrt4)
-* mingw build of zlib library and headers
+* MinGW build of zlib library and headers
 
-If no mingw build of zlib is available, you'll need to build it from the sources.
+If no MinGW build of zlib is available, you'll need to build it from the sources.
 For this you can use a script similar to the following:
 
 #!/bin/sh
@@ -23,17 +23,17 @@ CXXFLAGS="$MINGWFLAGS"
 ./configure --prefix=/opt/local/i386-mingw32
 CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" make
 
-And install it in the mingw build tree with:
+And install it in the MinGW build tree with:
 sudo make install
 
-To build a DLL using mingw use:
+To build a DLL using MinGW use:
 mingw32-configure --enable-winapi=yes
 mingw32-make
 
 It is recommended that you use WINAPI support but it is possible to compile 
 libewf without it (--enable-winapi=no). Without WINAPI support libewf will
-need a mingw build of openssl libcrypto for MD5 and SHA1 support and optionally
-a mingw build of libuuid for GUID/UUID support. As of version 20101208 the default
+need a MinGW build of openssl libcrypto for MD5 and SHA1 support and optionally
+a MinGW build of libuuid for GUID/UUID support. As of version 20101208 the default
 behaviour is that libewf will try to auto-detect MinGW and enable WINAPI support.
 
 If mingw32-configure and mingw32-make are not available you'll need to build

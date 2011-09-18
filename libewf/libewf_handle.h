@@ -44,7 +44,7 @@
 #include "libewf_types.h"
 #include "libewf_write_io_handle.h"
 
-#if defined( _MSC_VER ) || defined( __BORLANDC__ )
+#if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32_VERSION ) || defined( __MINGW64_VERSION_MAJOR )
 
 /* This inclusion is needed otherwise some linkers
  * mess up exporting the legacy functions

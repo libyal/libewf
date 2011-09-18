@@ -1,0 +1,73 @@
+.Dd September 18, 2011
+.Dt ewfmount
+.Os libewf
+.Sh NAME
+.Nm ewfmount
+.Nd mount data stored in EWF files
+.Sh SYNOPSIS
+.Nm ewfmount
+.Op Fl f Ar format
+.Op Fl hvV
+.Ar ewf_files
+.Sh DESCRIPTION
+.Nm ewfmount
+is a utility to mount data stored in EWF files.
+.Pp
+.Nm ewfmount
+is part of the
+.Nm libewf
+package.
+.Nm libewf
+is a library to support the Expert Witness Compression Format (EWF).
+.Nm libewf
+supports both the SMART format (EWF-S01) and the EnCase format (EWF-E01).
+.Nm libewf
+currently does not support the Logical Volume format (EWF-L01). EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
+.Nm libewf
+allows you to read and write media data in the EWF format.
+.Pp
+.Ar ewf_files
+the first or the entire set of EWF segment files
+.Ar mount_point
+the directory to serve as mount point
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl f Ar format
+specify the input format, options: raw (default), files (restricted to logical volume files)
+.It Fl h
+shows this help
+.It Fl v
+verbose output to stderr
+.It Fl V
+print version
+.El
+.Sh ENVIRONMENT
+None
+.Sh FILES
+None
+.Sh EXAMPLES
+.Bd -literal
+# ewfmount floppy.E01 floppy/
+ewfmount 20110918
+
+
+.Ed
+.Sh DIAGNOSTICS
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
+.Sh BUGS
+Please report bugs of any kind to <jbmetz@users.sourceforge.net> or on the project website: http://libewf.sourceforge.net/
+.Sh AUTHOR
+.Pp
+These man pages were written by Joachim Metz.
+.Sh COPYRIGHT
+.Pp
+Copyright 2006-2011 Joachim Metz <jbmetz@users.sourceforge.net>.
+.Pp
+This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.Sh SEE ALSO
+.Xr ewfacquire 1 ,
+.Xr ewfacquirestream 1 ,
+.Xr ewfexport 1 ,
+.Xr ewfinfo 1 ,
+.Xr ewfverify 1

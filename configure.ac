@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110908],
+ [20110918],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -163,7 +163,8 @@ AC_CHECK_WINAPI
 dnl Check for type definitions
 AC_CHECK_LOCAL_TYPES
 
-dnl TODO move to sub m4 file, add comment where it's used or remove
+dnl Type used in libewf/libewf_date_time_values.h, libewf/libewf_date_time.h
+dnl and libewf/libewf_header_values.c
 AC_STRUCT_TM
 
 dnl Check for headers
