@@ -40,6 +40,8 @@ SPEC_FILES = \
 	libewf.spec.in
 
 EXTRA_DIST = \
+	README.dll \
+	README.macosx \
 	README.mingw \
 	README.static \
 	$(GETTEXT_FILES) \

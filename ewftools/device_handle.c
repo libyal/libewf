@@ -411,7 +411,6 @@ int device_handle_open_input(
 		          filenames[ 0 ],
 	                  error );
 #endif
-
 		if( result == -1 )
 		{
 			liberror_error_set(

@@ -281,6 +281,9 @@ Closed:
 * write resume, allow resume from volume/disk section + test scenario
   - why bother no media data has been written anyway
 
+20110922
+* updated README files
+
 20110918
 * updated spec file
 * added ewfmount.1 man page

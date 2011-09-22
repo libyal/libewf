@@ -56,3 +56,11 @@ CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP CFLAGS="$CFL
 You should end up with the following DLL:
 libewf-<version>/libewf/.libs/libewf-2.dll
 
+And the following executables:
+libewf-<version>/ewftools/.libs/ewfacquire.exe
+libewf-<version>/ewftools/.libs/ewfacquirestream.exe
+libewf-<version>/ewftools/.libs/ewfexport.exe
+libewf-<version>/ewftools/.libs/ewfinfo.exe
+libewf-<version>/ewftools/.libs/ewfmount.exe
+libewf-<version>/ewftools/.libs/ewfverify.exe
+

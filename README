@@ -1,5 +1,5 @@
 Dependencies
-Libewf requires:
+libewf requires:
 * zlib
 
 ewftools require:
@@ -8,140 +8,18 @@ ewftools require:
 * libuuid or Windows RPC API
   (optional but recommended)
 
-
-Creating a DLL
-Multiple methods of creating a DLL are supported:
-* using Borland C++
-* using CodeGear
-* using Cygwin
-* using Microsoft Visual Studio C++
-* using MingW
-
-
-Creating a DLL using Borland C++
-* Borland C++ Builder
-  The provided CodeGear project files were created using the 5.0 SP1
-  version.
-* The zlib 1.2.5 source package including from the zlib project site:
-  http://www.gzip.org/zlib/
-
-Extract the contents of the zlib DLL package to:
-libewf-<version>/borlandc/zlib-1.2.5
-
-Make sure to check if your build environment defines the correct WINVER for your build.
-The code uses WINAPI version specific functions based on WINVER.
-You can define a custom WINVER in the CodeGear project files or in libewf-<version>/common/config_borlandc.h
-
-You should be able to build the libewf DLL using the provided project files.
-
-
-Creating a DLL using Cygwin
-You'll need Cygwin with:
-* binutils
-* gcc-core
-* bison (for libodraw)
-* flex (for libodraw)
-* autoconf
-* automake
-* make
-* libtool
-* gettext
-* libiconv
-* zlib-devel
-* openssl-devel (optional but recommended)
-* libuuid-devel (optional but recommended)
-
-Building the library:
-./configure
-make library
-
-You should end up with the following DLL:
-libewf-<version>/libewf/.libs/cygewf-0.dll
-
-Older versions of Cygwin might require e2fsprogs for libuuid support
-Install the e2fsprogs package and run the commands as following:
-LDFLAGS=-L/usr/lib/e2fsprogs ./configure
-make library
-
-
-Creating a DLL using CodeGear
-You'll need:
-* Embarcadero CodeGear C++ Builder
-  The provided CodeGear project files were created using the 2009
-  version. Note that some version of CodeGear have a broken
-  compiler/linker and you'll need to turn off code optimization
-  to be able to build libewf.
-* The zlib 1.2.5 source package including from the zlib project site:
-  http://www.gzip.org/zlib/
-
-Extract the contents of the zlib DLL package to:
-libewf-<version>/borlandc/zlib-1.2.5
-
-Make sure to check if your build environment defines the correct WINVER for your build.
-The code uses WINAPI version specific functions based on WINVER.
-You can define a custom WINVER in the CodeGear project files or in libewf-<version>/common/config_borlandc.h
-
-You should be able to build the libewf DLL using the provided project files.
-
-
-Creating a DLL using Microsoft Visual Studio C++
-You'll need:
-* Microsoft Visual Studio C++
-  The provided Visual Studio project files were created using
-  the 2008 express version. The express verion is available on the
-  Microsoft website
-* Microsoft Windows SDK (if not already included) for the Windows Crypto API
-  The Windows SDK is available on the Microsoft website
-* The zlib 1.2.5 source package including from the zlib project site:
-  http://www.gzip.org/zlib/
-
-Extract the contents of the zlib DLL package to:
-libewf-<version>/msvscpp/zlib-1.2.5
-
-Make sure to check if your build environment defines the correct WINVER for your build.
-The code uses WINAPI version specific functions based on WINVER.
-You can define a custom WINVER in the msvscpp project files or in libewf-<version>/common/config_msc.h
-
-You should be able to build the libewf DLL using the provided project files.
-Note that the project files contain a Release and VSDebug configuration.
-
-
-Creating a DLL using MingW
-See README.mingw
-
-
-Using a DLL
-Make sure you use define LIBEWF_DLL_IMPORT before including <libewf.h>,
-i.e. CFLAGS=-DLIBEWF_DLL_IMPORT
-
-When the libewf DLL was build with Microsoft Visual Studio
-you'll need the zlib DLL. To run the executables on other platforms
-than the build platform, you'll need the Microsoft Visual Studio redistributable DLLs.
-If you want to create your own Microsoft Visual Studio project files note that libewf needs
-to be compiled with the paramete /MD, because stderr is passed from the executables.
-
-
-Mac OS X
-* missing libtoolize
-* building multiple architure binaries
-
-
-Missing libtoolize
-Use glibtoolize instead
-
-
-Building multiple architecture binaries
-E.g. on Mac OS X 10.4 to build an PPC and Intel 32-bit multi binary, run the following commands:
-CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386" \
-LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386" \
-./configure --disable-dependency-tracking --prefix=$PWD/macosx/tmp/
-make
-make install
-
-The binaries are installed in $PWD/macosx/tmp/
+ewfmount requires:
+* libfuse
+  (optional but recommended)
 
 
 Solaris
 To build libewf on Solaris make sure that /usr/ccs/bin and /usr/swf/bin are defined in the PATH environment variable
 
+
+Also see:
+* README.dll
+* README.macosx
+* README.mingw
+* README.static
 
