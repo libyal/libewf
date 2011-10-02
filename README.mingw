@@ -7,7 +7,12 @@ To compile a libewf DLL using MinGW you'll need:
 * MinGW build of zlib library and headers
 
 If no MinGW build of zlib is available, you'll need to build it from the sources.
-For this you can use a script similar to the following:
+
+Normally the following would suffice:
+./configure --host=i386-mingw32 --prefix=/opt/local/i386-mingw32
+make
+
+If this does not work try a script similar to the following:
 
 #!/bin/sh
 CC=/opt/local/bin/i386-mingw32-gcc
@@ -23,10 +28,11 @@ CXXFLAGS="$MINGWFLAGS"
 ./configure --prefix=/opt/local/i386-mingw32
 CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" make
 
-And install it in the MinGW build tree with:
+To install the zlib DLL in the MinGW build tree with:
 sudo make install
 
-To build a DLL using MinGW use:
+
+To build a libewf DLL using MinGW use:
 mingw32-configure --enable-winapi=yes
 mingw32-make
 
@@ -36,8 +42,11 @@ need a MinGW build of openssl libcrypto for MD5 and SHA1 support and optionally
 a MinGW build of libuuid for GUID/UUID support. As of version 20101208 the default
 behaviour is that libewf will try to auto-detect MinGW and enable WINAPI support.
 
-If mingw32-configure and mingw32-make are not available you'll need to build
-it by hand. For this you can use a script similar to the following:
+If mingw32-configure and mingw32-make are not available you can build it with:
+./configure --host=i386-mingw32 --prefix=/opt/local/i386-mingw32 --enable-winapi=yes
+make
+
+If this does not work try a script similar to the following:
 
 #!/bin/sh
 CC=/opt/local/bin/i386-mingw32-gcc
@@ -50,7 +59,7 @@ MINGWFLAGS="-mwin32 -mconsole -march=i586 "
 CFLAGS="$MINGWFLAGS"
 CXXFLAGS="$MINGWFLAGS"
 
-CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP ./configure --target=i586-mingw32msvc --host=i586 --enable-winapi=yes
+CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP ./configure --host=i386-mingw32 --prefix=/opt/local/i386-mingw32 --enable-winapi=yes
 CC=$CC CXX=$CXX AR=$AR OBJDUMP=$OBJDUMP RANLIB=$RANLIB STRIP=$STRIP CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" make
 
 You should end up with the following DLL:
@@ -63,4 +72,7 @@ libewf-<version>/ewftools/.libs/ewfexport.exe
 libewf-<version>/ewftools/.libs/ewfinfo.exe
 libewf-<version>/ewftools/.libs/ewfmount.exe
 libewf-<version>/ewftools/.libs/ewfverify.exe
+
+To install the libewf DLL in the MinGW build tree use:
+sudo make install
 

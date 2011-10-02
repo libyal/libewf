@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20110926],
+ [20111002],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -178,22 +178,21 @@ dnl Other headers
 
 dnl Check for functions
 dnl Date and time functions used in libewf/libewf_date_time.h
-AC_CHECK_FUNCS(
- [localtime_r],
- [],
- [AC_CHECK_FUNCS(
-  [localtime],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: localtime_r and localtime],
-   [1]) ]) ])
+AC_CHECK_FUNCS([localtime localtime_r mktime])
+
+AS_IF(
+ [test "x$ac_cv_func_localtime" != xyes && test "x$ac_cv_func_localtime_r" != xyes],
+ [AC_MSG_FAILURE(
+  [Missing functions: localtime and localtime_r],
+  [1])
+ ])
  
-AC_CHECK_FUNCS(
- [mktime],
- [],
+AS_IF(
+ [test "x$ac_cv_func_mktime" != xyes],
  [AC_MSG_FAILURE(
   [Missing function: mktime],
-  [1]) ])
+  [1])
+ ])
 
 dnl Check for internationalization functions in libewf/libewf_i18n.c 
 AC_CHECK_FUNCS([bindtextdomain])
@@ -201,22 +200,8 @@ AC_CHECK_FUNCS([bindtextdomain])
 dnl System functions
 AS_IF(
  [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_FUNCS(
-  [geteuid],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: geteuid],
-   [1]) ])
-
- AC_CHECK_FUNCS(
-  [getuid],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing function: getuid],
-   [1]) ])
+ [AC_CHECK_FUNCS([getegid geteuid getuid uname])
  ])
-
-AC_CHECK_FUNCS([uname])
 
 dnl Check for printf conversion specifier support
 AC_CHECK_FUNC_PRINTF_JD
@@ -232,7 +217,7 @@ AC_CHECK_LOCAL_LIBSYSTEM
 
 dnl Check for zlib compression support
 AS_IF(
- [test x"$ac_cv_with_zlib" != x && test "x$ac_cv_with_zlib" != xauto-detect],
+ [test "x$ac_cv_with_zlib" != x && test "x$ac_cv_with_zlib" != xauto-detect],
  [AS_IF(
   [test -d "$ac_cv_with_zlib"],
   [CFLAGS="$CFLAGS -I${ac_cv_with_zlib}/include"
@@ -743,7 +728,7 @@ CFLAGS="$CFLAGS -Wall";
 
 dnl Check if DLL support is needed in ewftools
 AS_IF(
- [test x"$enable_shared" = xyes],
+ [test "x$enable_shared" = xyes],
  [AS_CASE(
   [$host],
   [*cygwin* | *mingw*],

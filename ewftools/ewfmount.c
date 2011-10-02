@@ -561,8 +561,17 @@ int ewfmount_fuse_getattr(
 		stat_info->st_atime = 0;
 		stat_info->st_mtime = 0;
 		stat_info->st_ctime = 0;
-		stat_info->st_uid   = geteuid();
-		stat_info->st_gid   = getegid();
+
+#if defined( HAVE_GETEUID )
+		stat_info->st_uid = geteuid();
+#else
+		stat_info->st_uid = 0;
+#endif
+#if defined( HAVE_GETEGID )
+		stat_info->st_gid = getegid();
+#else
+		stat_info->st_gid = 0;
+#endif
 	}
 	return( result );
 

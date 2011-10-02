@@ -4,7 +4,7 @@ dnl Function to detect if libuuid is available
 AC_DEFUN([AC_CHECK_LIBUUID],
  [dnl Check if parameters were provided
  AS_IF(
-  [test x"$ac_cv_with_libuuid" != x && test "x$ac_cv_with_libuuid" != xno && test "x$ac_cv_with_libuuid" != xauto-detect],
+  [test "x$ac_cv_with_libuuid" != x && test "x$ac_cv_with_libuuid" != xno && test "x$ac_cv_with_libuuid" != xauto-detect],
   [AS_IF(
    [test -d "$ac_cv_with_libuuid"],
    [CFLAGS="$CFLAGS -I${ac_cv_with_libuuid}/include"

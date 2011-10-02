@@ -4,7 +4,7 @@ dnl Function to detect if libsmraw is available
 AC_DEFUN([AC_CHECK_LIBSMRAW],
  [dnl Check if parameters were provided
  AS_IF(
-  [test x"$ac_cv_with_libsmraw" != x && test "x$ac_cv_with_libsmraw" != xno && test "x$ac_cv_with_libsmraw" != xauto-detect],
+  [test "x$ac_cv_with_libsmraw" != x && test "x$ac_cv_with_libsmraw" != xno && test "x$ac_cv_with_libsmraw" != xauto-detect],
   [AS_IF(
    [test -d "$ac_cv_with_libsmraw"],
    [CFLAGS="$CFLAGS -I${ac_cv_with_libsmraw}/include"
@@ -14,7 +14,7 @@ AC_DEFUN([AC_CHECK_LIBSMRAW],
   ])
 
  AS_IF(
-  [test x"$ac_cv_with_libsmraw" != xno],
+  [test "x$ac_cv_with_libsmraw" != xno],
   [dnl Check for headers
   AC_CHECK_HEADERS([libsmraw.h])
  

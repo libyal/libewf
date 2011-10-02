@@ -4,7 +4,7 @@ dnl Function to detect if libhmac is available
 AC_DEFUN([AC_CHECK_LIBHMAC],
  [dnl Check if parameters were provided
  AS_IF(
-  [test x"$ac_cv_with_libhmac" != x && test "x$ac_cv_with_libhmac" != xno && test "x$ac_cv_with_libhmac" != xauto-detect],
+  [test "x$ac_cv_with_libhmac" != x && test "x$ac_cv_with_libhmac" != xno && test "x$ac_cv_with_libhmac" != xauto-detect],
   [AS_IF(
    [test -d "$ac_cv_with_libhmac"],
    [CFLAGS="$CFLAGS -I${ac_cv_with_libhmac}/include"
@@ -14,7 +14,7 @@ AC_DEFUN([AC_CHECK_LIBHMAC],
   ])
 
  AS_IF(
-  [test x"$ac_cv_with_libhmac" != xno],
+  [test "x$ac_cv_with_libhmac" != xno],
   [dnl Check for headers
   AC_CHECK_HEADERS([libhmac.h])
 
@@ -195,21 +195,21 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_EVP],
    [ac_cv_libhmac_sha256=no])
 
   AS_IF(
-   [test x"$ac_cv_libhmac_md5" = xlibcrypto_evp],
+   [test "x$ac_cv_libhmac_md5" = xlibcrypto_evp],
    [AC_DEFINE(
     [HAVE_EVP_MD5],
     [1],
     [Define to 1 if you have the `EVP_md5' function".])
    ])
   AS_IF(
-   [test x"$ac_cv_libhmac_sha1" = xlibcrypto_evp],
+   [test "x$ac_cv_libhmac_sha1" = xlibcrypto_evp],
    [AC_DEFINE(
     [HAVE_EVP_SHA1],
     [1],
     [Define to 1 if you have the `EVP_sha1' function".])
    ])
   AS_IF(
-   [test x"$ac_cv_libhmac_sha256" = xlibcrypto_evp],
+   [test "x$ac_cv_libhmac_sha256" = xlibcrypto_evp],
    [AC_DEFINE(
     [HAVE_EVP_SHA256],
     [1],
@@ -297,7 +297,7 @@ dnl Function to detect if libhmac dependencies are available
 AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC],
  [dnl Check if parameters were provided 
  AS_IF(
-  [test x"$ac_cv_with_openssl" != x && test "x$ac_cv_with_openssl" != xno && test "x$ac_cv_with_openssl" != xauto-detect],
+  [test "x$ac_cv_with_openssl" != x && test "x$ac_cv_with_openssl" != xno && test "x$ac_cv_with_openssl" != xauto-detect],
   [AS_IF(
    [test -d "$ac_cv_with_openssl"],
    [CFLAGS="$CFLAGS -I${ac_cv_with_openssl}/include"

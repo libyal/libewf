@@ -4,7 +4,7 @@ dnl Function to detect if libsmdev is available
 AC_DEFUN([AC_CHECK_LIBSMDEV],
  [dnl Check if parameters were provided
  AS_IF(
-  [test x"$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xno && test "x$ac_cv_with_libsmdev" != xauto-detect],
+  [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xno && test "x$ac_cv_with_libsmdev" != xauto-detect],
   [AS_IF(
    [test -d "$ac_cv_with_libsmdev"],
    [CFLAGS="$CFLAGS -I${ac_cv_with_libsmdev}/include"
@@ -14,7 +14,7 @@ AC_DEFUN([AC_CHECK_LIBSMDEV],
   ])
 
  AS_IF(
-  [test x"$ac_cv_with_libsmdev" != xno],
+  [test "x$ac_cv_with_libsmdev" != xno],
   [dnl Check for headers
   AC_CHECK_HEADERS([libsmdev.h])
  

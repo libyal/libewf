@@ -32,16 +32,16 @@ dnl Function to detect whether WINAPI support should be enabled
 AC_DEFUN([AC_CHECK_WINAPI],
  [AS_IF(
   [test "x$ac_cv_enable_winapi" = xauto-detect],
-  [ac_cv_target_string="$target";
+  [ac_check_winapi_target_string="$target"
 
   AS_IF(
-   [test "x$ac_cv_target_string" = x],
-   [ac_cv_target_string="$build"])
+   [test "x$ac_check_winapi_target_string" = x],
+   [ac_check_winapi_target_string="$host"])
 
   AS_CASE(
-   [$ac_cv_target_string],
+   [$ac_check_winapi_target_string],
    [*mingw*],[AC_MSG_NOTICE(
-              [Detected MinGW enabling WINAPI support for cross-compilation])
+              [detected MinGW enabling WINAPI support for cross-compilation])
              ac_cv_enable_winapi=yes],
    [*],[ac_cv_enable_winapi=no])
   ])
@@ -167,14 +167,18 @@ if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
 
 dnl Function to determine the operating system
 AC_DEFUN([LIBEWF_DETERMINE_OPERATING_SYSTEM],
- [ac_cv_target_string="$target";
+ [ac_libewf_determine_operating_system_target_string="$target";
 
  AS_IF(
-  [test "x$ac_cv_target_string" = x],
-  [ac_cv_target_string="$build"])
+  [test "x$ac_libewf_determine_operating_system_target_string" = x],
+  [ac_libewf_determine_operating_system_target_string="$host"])
+
+ AS_IF(
+  [test "x$ac_libewf_determine_operating_system_target_string" = x],
+  [ac_libewf_determine_operating_system_target_string="$build"])
 
  AS_CASE(
-  [$ac_cv_target_string],
+  [$ac_libewf_determine_operating_system_target_string],
   [*cygwin*], [ac_libewf_operating_system="Cygwin";],
   [*darwin*], [ac_libewf_operating_system="Darwin";],
   [*freebsd*], [ac_libewf_operating_system="FreeBSD";],

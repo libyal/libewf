@@ -4,7 +4,7 @@ dnl Function to detect if libodraw is available
 AC_DEFUN([AC_CHECK_LIBODRAW],
  [dnl Check if parameters were provided
  AS_IF(
-  [test x"$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xno && test "x$ac_cv_with_libodraw" != xauto-detect],
+  [test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xno && test "x$ac_cv_with_libodraw" != xauto-detect],
   [AS_IF(
    [test -d "$ac_cv_with_libodraw"],
    [CFLAGS="$CFLAGS -I${ac_cv_with_libodraw}/include"
@@ -14,7 +14,7 @@ AC_DEFUN([AC_CHECK_LIBODRAW],
   ])
 
  AS_IF(
-  [test x"$ac_cv_with_libodraw" != xno],
+  [test "x$ac_cv_with_libodraw" != xno],
   [dnl Check for headers
   AC_CHECK_HEADERS([libodraw.h])
  

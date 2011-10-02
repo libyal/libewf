@@ -4,7 +4,7 @@ dnl Function to detect if libfuse is available
 AC_DEFUN([AC_CHECK_LIBFUSE],
  [dnl Check if parameters were provided
  AS_IF(
-  [test x"$ac_cv_with_libfuse" != x && test "x$ac_cv_with_libfuse" != xno && test "x$ac_cv_with_libfuse" != xauto-detect],
+  [test "x$ac_cv_with_libfuse" != x && test "x$ac_cv_with_libfuse" != xno && test "x$ac_cv_with_libfuse" != xauto-detect],
   [AS_IF(
    [test -d "$ac_cv_with_libfuse"],
    [CFLAGS="$CFLAGS -I${ac_cv_with_libfuse}/include"
@@ -17,7 +17,7 @@ AC_DEFUN([AC_CHECK_LIBFUSE],
  ac_cv_libfuse=no
 
  AS_IF(
-  [test x"$ac_cv_with_libfuse" != xno],
+  [test "x$ac_cv_with_libfuse" != xno],
   [AC_CHECK_HEADERS([fuse.h])
 
   dnl libfuse sometimes requires -D_FILE_OFFSET_BITS=64 to be set
