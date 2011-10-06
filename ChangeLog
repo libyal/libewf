@@ -1,4 +1,5 @@
 TODO
+* update pc and spec file
 * libsmdev - check optical disc sessions
 * ewf.net single files support
 * ideas for libmfdata
@@ -278,6 +279,10 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111006
+* updated configure.ac and m4 files
+* bug fix in ewfacuire for handling -w option
 
 20111002
 * bug fix for cross compilation

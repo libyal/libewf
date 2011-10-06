@@ -1,7 +1,9 @@
 dnl Functions for libmfdata
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if libmfdata available
-AC_DEFUN([AC_CHECK_LIBMFDATA],
+AC_DEFUN([AX_LIBMFDATA_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_libmfdata" != x && test "x$ac_cv_with_libmfdata" != xno && test "x$ac_cv_with_libmfdata" != xauto-detect],
@@ -121,6 +123,58 @@ AC_DEFUN([AC_CHECK_LIBMFDATA],
   [AC_SUBST(
    [HAVE_LIBMFDATA],
    [0])
+  ])
+ ])
+
+dnl Function to detect how to enable libmfdata
+AC_DEFUN([AX_LIBMFDATA_CHECK_ENABLE],
+ [AX_COMMON_ARG_WITH(
+  [libmfdata],
+  [libmfdata],
+  [search for libmfdata in includedir and libdir or in the specified DIR, or no if to use local version],
+  [auto-detect],
+  [DIR])
+
+ AX_LIBMFDATA_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libmfdata" != xyes],
+  [AC_DEFINE(
+   [HAVE_LOCAL_LIBMFDATA],
+   [1],
+   [Define to 1 if the local version of libmfdata is used.])
+  AC_SUBST(
+   [HAVE_LOCAL_LIBMFDATA],
+   [1])
+  AC_SUBST(
+   [LIBMFDATA_CPPFLAGS],
+   [-I../libmfdata])
+  AC_SUBST(
+   [LIBMFDATA_LIBADD],
+   [../libmfdata/libmfdata.la])
+
+  ac_cv_libmfdata=local
+  ])
+
+ AM_CONDITIONAL(
+  [HAVE_LOCAL_LIBMFDATA],
+  [test "x$ac_cv_libmfdata" = xlocal])
+
+ AS_IF(
+  [test "x$ac_cv_libmfdata" = xyes],
+  [AC_SUBST(
+   [ax_libmfdata_pc_libs_private],
+   [-lmfdata])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libmfdata" = xyes],
+  [AC_SUBST(
+   [ax_libmfdata_spec_requires],
+   [libmfdata])
+  AC_SUBST(
+   [ax_libmfdata_spec_build_requires],
+   [libmfdata-devel])
   ])
  ])
 

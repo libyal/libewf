@@ -1282,7 +1282,6 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_size                      = NULL;
 	libcstring_system_character_t *option_target_filename           = NULL;
 	libcstring_system_character_t *option_toc_filename              = NULL;
-	libcstring_system_character_t *option_zero_buffer_on_error      = NULL;
 	libcstring_system_character_t *program                          = _LIBCSTRING_SYSTEM_STRING( "ewfacquire" );
 	libcstring_system_character_t *request_string                   = NULL;
 
@@ -1297,6 +1296,7 @@ int main( int argc, char * const argv[] )
 	uint8_t resume_acquiry                                          = 0;
 	uint8_t swap_byte_pairs                                         = 0;
 	uint8_t verbose                                                 = 0;
+	uint8_t zero_buffer_on_error                                    = 0;
 	int8_t acquiry_parameters_confirmed                             = 0;
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
@@ -1500,7 +1500,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_SUCCESS );
 
 			case (libcstring_system_integer_t) 'w':
-				option_zero_buffer_on_error = optarg;
+				zero_buffer_on_error = 1;
 
 				break;
 
@@ -1621,7 +1621,7 @@ int main( int argc, char * const argv[] )
 			 ewfacquire_device_handle->number_of_error_retries );
 		}
 	}
-	if( option_zero_buffer_on_error != NULL )
+	if( zero_buffer_on_error != 0 )
 	{
 		ewfacquire_device_handle->zero_buffer_on_error = 1;
 	}
@@ -2585,7 +2585,7 @@ int main( int argc, char * const argv[] )
 				goto on_error;
 			}
 		}
-		if( option_zero_buffer_on_error == NULL )
+		if( zero_buffer_on_error == 0 )
 		{
 			result = device_handle_prompt_for_zero_buffer_on_error(
 				  ewfacquire_device_handle,
@@ -2660,7 +2660,7 @@ int main( int argc, char * const argv[] )
 			option_size                     = NULL;
 			option_target_filename          = NULL;
 			option_toc_filename             = NULL;
-			option_zero_buffer_on_error     = NULL;
+			zero_buffer_on_error            = 0;
 
 			if( resume_acquiry != 0 )
 			{

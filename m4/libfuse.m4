@@ -1,7 +1,9 @@
 dnl Functions for libfuse
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if libfuse is available
-AC_DEFUN([AC_CHECK_LIBFUSE],
+AC_DEFUN([AX_LIBFUSE_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_libfuse" != x && test "x$ac_cv_with_libfuse" != xno && test "x$ac_cv_with_libfuse" != xauto-detect],
@@ -75,6 +77,35 @@ AC_DEFUN([AC_CHECK_LIBFUSE],
   [AC_SUBST(
    [HAVE_LIBFUSE],
    [0])
+  ])
+ ])
+
+dnl Function to detect how to enable libfuse
+AC_DEFUN([AX_LIBFUSE_CHECK_ENABLE],
+ [AX_COMMON_ARG_WITH(
+  [libfuse],
+  [libfuse],
+  [search for libfuse in includedir and libdir or in the specified DIR, or no if not to use libfuse],
+  [auto-detect],
+  [DIR])
+
+ AX_LIBFUSE_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libfuse" = xyes],
+  [AC_SUBST(
+   [ax_libfuse_pc_libs_private],
+   [-lfuse])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libfuse" = xyes],
+  [AC_SUBST(
+   [ax_libfuse_spec_requires],
+   [libfuse])
+  AC_SUBST(
+   [ax_libfuse_spec_build_requires],
+   [libfuse-devel])
   ])
  ])
 

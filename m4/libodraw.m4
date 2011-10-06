@@ -1,7 +1,9 @@
 dnl Functions for libodraw
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if libodraw is available
-AC_DEFUN([AC_CHECK_LIBODRAW],
+AC_DEFUN([AX_LIBODRAW_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xno && test "x$ac_cv_with_libodraw" != xauto-detect],
@@ -164,7 +166,61 @@ AC_DEFUN([AC_CHECK_LIBODRAW],
  ])
 
 dnl Function to detect if libodraw dependencies are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBODRAW],
+AC_DEFUN([AX_LIBODRAW_CHECK_LOCAL],
  [AM_PROG_LEX
  AC_PROG_YACC])
+
+dnl Function to detect how to enable libodraw
+AC_DEFUN([AX_LIBODRAW_CHECK_ENABLE],
+ [AX_COMMON_ARG_WITH(
+  [libodraw],
+  [libodraw],
+  [search for libodraw in includedir and libdir or in the specified DIR, or no if to use local version],
+  [auto-detect],
+  [DIR])
+
+ AX_LIBODRAW_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libodraw" != xyes],
+  [AX_LIBODRAW_CHECK_LOCAL
+
+  AC_DEFINE(
+   [HAVE_LOCAL_LIBODRAW],
+   [1],
+   [Define to 1 if the local version of libodraw is used.])
+  AC_SUBST(
+   [HAVE_LOCAL_LIBODRAW],
+   [1])
+  AC_SUBST(
+   [LIBODRAW_CPPFLAGS],
+   [-I../libodraw])
+  AC_SUBST(
+   [LIBODRAW_LIBADD],
+   [../libodraw/libodraw.la])
+
+  ac_cv_libodraw=local
+  ])
+
+ AM_CONDITIONAL(
+  [HAVE_LOCAL_LIBODRAW],
+  [test "x$ac_cv_libodraw" = xlocal])
+
+ AS_IF(
+  [test "x$ac_cv_libodraw" = xyes],
+  [AC_SUBST(
+   [ax_libodraw_pc_libs_private],
+   [-lodraw])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libodraw" = xyes],
+  [AC_SUBST(
+   [ax_libodraw_spec_requires],
+   [libodraw])
+  AC_SUBST(
+   [ax_libodraw_spec_build_requires],
+   [libodraw-devel])
+  ])
+ ])
 

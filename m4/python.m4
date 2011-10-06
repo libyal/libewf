@@ -1,7 +1,9 @@
 dnl Functions for Python bindings
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if Python build environment is available
-AC_DEFUN([AC_CHECK_PYTHON_DEVEL],
+AC_DEFUN([AX_PYTHON_CHECK],
  [AC_REQUIRE([AM_PATH_PYTHON])
 
  dnl Check for Python include path
@@ -50,4 +52,31 @@ AC_DEFUN([AC_CHECK_PYTHON_DEVEL],
  AC_SUBST(
  [PYTHON_EXTRA_LIBS])
  ])
+
+dnl Function to detect if to enable Python
+AC_DEFUN([AX_PYTHON_CHECK_ENABLE],
+ [AX_COMMON_ARG_ENABLE(
+  [python],
+  [python],
+  [build Python bindings],
+  [no])
+
+ AS_IF(
+  [test "x$ac_cv_enable_python" != xno],
+  [AM_PATH_PYTHON([2.5])
+  AX_PYTHON_CHECK
+  ac_cv_enable_python=yes])
+
+ AS_IF(
+  [test "x$ac_cv_enable_python" = xyes],
+  [AC_DEFINE(
+   [HAVE_PYTHON],
+   [1],
+   [Define to 1 if you have Python])
+  ])
+
+ AM_CONDITIONAL(
+  HAVE_PYTHON,
+  [test "x$ac_cv_enable_python" = xyes])
+])
 

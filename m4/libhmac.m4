@@ -1,7 +1,9 @@
 dnl Functions for libhmac
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if libhmac is available
-AC_DEFUN([AC_CHECK_LIBHMAC],
+AC_DEFUN([AX_LIBHMAC_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_libhmac" != x && test "x$ac_cv_with_libhmac" != xno && test "x$ac_cv_with_libhmac" != xauto-detect],
@@ -62,7 +64,7 @@ AC_DEFUN([AC_CHECK_LIBHMAC],
  ])
 
 dnl Function to detect whether a certain #define is present in a certain WINAPI header
-AC_DEFUN([AC_CHECK_WINAPI_DEFINE],
+AC_DEFUN([AX_LIBHMAC_CHECK_WINAPI_DEFINE],
  [AC_CACHE_CHECK(
   [whether $1 defines $2],
   [ac_cv_winapi_define_$2],
@@ -82,12 +84,12 @@ AC_DEFUN([AC_CHECK_WINAPI_DEFINE],
  ])
 
 dnl Function to detect if wincrypt MD5, SHA1 and SHA256 functions are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_WINCRYPT],
+AC_DEFUN([AX_LIBHMAC_CHECK_WINCRYPT],
  [AC_SUBST(
   [LIBCRYPTO_LIBADD],
   [-ladvapi32])
  
- AC_CHECK_WINAPI_DEFINE(
+ AX_LIBHMAC_CHECK_WINAPI_DEFINE(
   [wincrypt.h],
   [CALG_MD5])
  
@@ -96,7 +98,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_WINCRYPT],
   [ac_cv_libhmac_md5=libadvapi32],
   [ac_cv_libhmac_md5=local])
  
- AC_CHECK_WINAPI_DEFINE(
+ AX_LIBHMAC_CHECK_WINAPI_DEFINE(
   [wincrypt.h],
   [CALG_SHA1])
  
@@ -105,7 +107,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_WINCRYPT],
   [ac_cv_libhmac_sha1=libadvapi32],
   [ac_cv_libhmac_sha1=local])
  
- AC_CHECK_WINAPI_DEFINE(
+ AX_LIBHMAC_CHECK_WINAPI_DEFINE(
   [wincrypt.h],
   [CALG_SHA_256])
  
@@ -116,7 +118,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_WINCRYPT],
  ])
  
 dnl Function to detect whether openssl/evp.h can be used in combination with zlib.h
-AC_DEFUN([AC_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE],
+AC_DEFUN([AX_OPENSSL_CHECK_EVP_ZLIB_COMPATIBILE],
  [AC_CACHE_CHECK(
   [if openssl/evp.h can be used in combination with zlib.h],
   [ac_cv_openssl_evp_zlib_compatible],
@@ -132,13 +134,13 @@ AC_DEFUN([AC_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE],
  ])
 
 dnl Function to detect if openssl EVP MD5, SHA1 and SHA256 functions are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_EVP],
+AC_DEFUN([AX_OPENSSL_CHECK_EVP],
  [AC_CHECK_HEADERS([openssl/evp.h])
  
  AS_IF(
   [test "x$ac_cv_header_openssl_evp_h" = xno],
   [ac_cv_libcrypto=no],
-  [AC_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE
+  [AX_OPENSSL_CHECK_EVP_ZLIB_COMPATIBILE
  
   AS_IF(
    [test "x$ac_cv_openssl_evp_zlib_compatible" = xyes],
@@ -219,7 +221,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_EVP],
  ])
 
 dnl Function to detect if openssl MD5 functions are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_MD5],
+AC_DEFUN([AX_OPENSSL_CHECK_MD5],
  [AC_CHECK_HEADERS([openssl/md5.h])
  
  AS_IF(
@@ -244,7 +246,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_MD5],
  ])
  
 dnl Function to detect if openssl SHA1 functions are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_SHA1],
+AC_DEFUN([AX_OPENSSL_CHECK_SHA1],
  [AC_CHECK_HEADERS([openssl/sha.h])
  
  AS_IF(
@@ -269,7 +271,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_SHA1],
  ])
  
 dnl Function to detect if openssl SHA256 functions are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_SHA256],
+AC_DEFUN([AX_OPENSSL_CHECK_SHA256],
  [AC_CHECK_HEADERS([openssl/sha.h])
  
  AS_IF(
@@ -294,7 +296,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC_OPENSSL_SHA256],
  ])
  
 dnl Function to detect if libhmac dependencies are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC],
+AC_DEFUN([AX_LIBHMAC_CHECK_LOCAL],
  [dnl Check if parameters were provided 
  AS_IF(
   [test "x$ac_cv_with_openssl" != x && test "x$ac_cv_with_openssl" != xno && test "x$ac_cv_with_openssl" != xauto-detect],
@@ -314,7 +316,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC],
  dnl Check for Windows crypto API support
  AS_IF(
   [test "x$ac_cv_enable_winapi" = xyes],
-  [AC_CHECK_LOCAL_LIBHMAC_WINCRYPT])
+  [AX_LIBHMAC_CHECK_WINCRYPT])
 
  dnl Check for libcrypto (openssl) support
  AS_IF(
@@ -322,22 +324,22 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC],
   [dnl Check for libcrypto (openssl) EVP support
   AS_IF(
    [test "x$ac_cv_libhmac_md5" = xno && test "x$ac_cv_libhmac_sha1" = xno && test "x$ac_cv_libhmac_sha256" = xno],
-   [AC_CHECK_LOCAL_LIBHMAC_OPENSSL_EVP])
+   [AX_OPENSSL_CHECK_EVP])
 
   dnl Check for libcrypto (openssl) MD5 support
   AS_IF(
    [test "x$ac_cv_with_openssl" != xno && test "x$ac_cv_libhmac_md5" = xno],
-   [AC_CHECK_LOCAL_LIBHMAC_OPENSSL_MD5])
+   [AX_OPENSSL_CHECK_MD5])
  
   dnl Check for libcrypto (openssl) SHA1 support
   AS_IF(
    [test "x$ac_cv_with_openssl" != xno && test "x$ac_cv_libhmac_sha1" = xno],
-   [AC_CHECK_LOCAL_LIBHMAC_OPENSSL_SHA1])
+   [AX_OPENSSL_CHECK_SHA1])
   
   dnl Check for libcrypto (openssl) SHA256 support
   AS_IF(
    [test "x$ac_cv_with_openssl" != xno && test "x$ac_cv_libhmac_sha256" = xno],
-   [AC_CHECK_LOCAL_LIBHMAC_OPENSSL_SHA256])
+   [AX_OPENSSL_CHECK_SHA256])
   ])
   
  dnl Fallback to local versions if necessary 
@@ -394,6 +396,84 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBHMAC],
     [LIBDL_LIBADD],
     ["-ldl"])],
    [])
+  ])
+ ])
+
+dnl Function to detect how to enable libhmac
+AC_DEFUN([AX_LIBHMAC_CHECK_ENABLE],
+ [AX_COMMON_ARG_WITH(
+  [libhmac],
+  [libhmac],
+  [search for libhmac in includedir and libdir or in the specified DIR, or no if to use local version],
+  [auto-detect],
+  [DIR])
+
+ AX_COMMON_ARG_WITH(
+  [openssl],
+  [openssl],
+  [search for openssl in includedir and libdir or in the specified DIR, or no if not to use openssl],
+  [auto-detect],
+  [DIR])
+
+ AX_LIBHMAC_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libhmac" != xyes],
+  [AX_LIBHMAC_CHECK_LOCAL
+
+  AC_DEFINE(
+   [HAVE_LOCAL_LIBHMAC],
+   [1],
+   [Define to 1 if the local version of libhmac is used.])
+  AC_SUBST(
+   [HAVE_LOCAL_LIBHMAC],
+   [1])
+  AC_SUBST(
+   [LIBHMAC_CPPFLAGS],
+   [-I../libhmac])
+  AC_SUBST(
+   [LIBHMAC_LIBADD],
+   [../libhmac/libhmac.la])
+
+  ac_cv_libhmac=local
+  ])
+
+ AM_CONDITIONAL(
+  [HAVE_LOCAL_LIBHMAC],
+  [test "x$ac_cv_libhmac" = xlocal])
+
+ AS_IF(
+  [test "x$ac_cv_libhmac" = xyes],
+  [AC_SUBST(
+   [ax_libhmac_pc_libs_private],
+   [-lhmac])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libhmac" = xyes],
+  [AC_SUBST(
+   [ax_libhmac_spec_requires],
+   [libhmac])
+  AC_SUBST(
+   [ax_libhmac_spec_build_requires],
+   [libhmac-devel])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libcrypto" = xyes],
+  [AC_SUBST(
+   [ax_libcrypto_pc_libs_private],
+   [-lcrypto])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libcrypto" != xno],
+  [AC_SUBST(
+   [ax_libcrypto_spec_requires],
+   [openssl])
+  AC_SUBST(
+   [ax_libcrypto_spec_build_requires],
+   [openssl-devel])
   ])
  ])
 

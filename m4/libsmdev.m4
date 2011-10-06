@@ -1,7 +1,9 @@
 dnl Functions for libsmdev
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if libsmdev is available
-AC_DEFUN([AC_CHECK_LIBSMDEV],
+AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xno && test "x$ac_cv_with_libsmdev" != xauto-detect],
@@ -185,7 +187,7 @@ AC_DEFUN([AC_CHECK_LIBSMDEV],
  ])
 
 dnl Function to detect if posix_fadvise is available
-AC_DEFUN([AC_CHECK_FUNC_POSIX_FADVISE],
+AC_DEFUN([AX_LIBSMDEV_CHECK_FUNC_POSIX_FADVISE],
  [AC_CHECK_FUNCS([posix_fadvise])
 
  AS_IF(
@@ -224,7 +226,7 @@ posix_fadvise( 0, 0, 0, POSIX_FADV_SEQUENTIAL )]] )],
  ])
 
 dnl Check if winioctl.h defines STORAGE_BUS_TYPE
-AC_DEFUN([AC_CHECK_HEADER_WINIOCTL_H_STORAGE_BUS_TYPE],
+AC_DEFUN([AX_LIBSMDEV_CHECK_HEADER_WINIOCTL_H_STORAGE_BUS_TYPE],
  [AC_CACHE_CHECK(
   [whether winioctl.h defines STORAGE_BUS_TYPE],
   [ac_cv_header_winioctl_h_storage_bus_type],
@@ -250,7 +252,7 @@ storage_bus_type = BusTypeUnknown;]] )],
  ])
 
 dnl Function to detect if libsmdev dependencies are available
-AC_DEFUN([AC_CHECK_LOCAL_LIBSMDEV],
+AC_DEFUN([AX_LIBSMDEV_CHECK_LOCAL],
  [dnl Headers included in libsmdev/libsmdev_handle.c and libsmdev/libsmdev_support.c
  AC_CHECK_HEADERS([errno.h fcntl.h sys/stat.h unistd.h])
 
@@ -349,7 +351,7 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBSMDEV],
    [1])
   ])
 
- AC_CHECK_FUNC_POSIX_FADVISE
+ AX_LIBSMDEV_CHECK_FUNC_POSIX_FADVISE
 
  dnl Check for error string functions used in libsmdev/libsmdev_error_string.c
  AC_FUNC_STRERROR_R()
@@ -368,7 +370,60 @@ AC_DEFUN([AC_CHECK_LOCAL_LIBSMDEV],
  dnl Check if winioctl.h defines STORAGE_BUS_TYPE
  AS_IF(
   [test "x$ac_cv_enable_winapi" = xyes],
-  [AC_CHECK_HEADER_WINIOCTL_H_STORAGE_BUS_TYPE])
+  [AX_LIBSMDEV_CHECK_HEADER_WINIOCTL_H_STORAGE_BUS_TYPE])
+ ])
 
+dnl Function to detect how to enable libsmdev
+AC_DEFUN([AX_LIBSMDEV_CHECK_ENABLE],
+ [AX_COMMON_ARG_WITH(
+  [libmsdev],
+  [libmsdev],
+  [search for libmsdev in includedir and libdir or in the specified DIR, or no if to use local version],
+  [auto-detect],
+  [DIR])
+
+ AX_LIBSMDEV_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libsmdev" != xyes],
+  [AX_LIBSMDEV_CHECK_LOCAL
+
+  AC_DEFINE(
+   [HAVE_LOCAL_LIBSMDEV],
+   [1],
+   [Define to 1 if the local version of libsmdev is used.])
+  AC_SUBST(
+   [HAVE_LOCAL_LIBSMDEV],
+   [1])
+  AC_SUBST(
+   [LIBSMDEV_CPPFLAGS],
+   [-I../libsmdev])
+  AC_SUBST(
+   [LIBSMDEV_LIBADD],
+   [../libsmdev/libsmdev.la])
+
+  ac_cv_libsmdev=local
+  ])
+
+ AM_CONDITIONAL(
+  [HAVE_LOCAL_LIBSMDEV],
+  [test "x$ac_cv_libsmdev" = xlocal])
+
+ AS_IF(
+  [test "x$ac_cv_libsmdev" = xyes],
+  [AC_SUBST(
+   [ax_libsmdev_pc_libs_private],
+   [-lsmdev])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libsmdev" = xyes],
+  [AC_SUBST(
+   [ax_libsmdev_spec_requires],
+   [libsmdev])
+  AC_SUBST(
+   [ax_libsmdev_spec_build_requires],
+   [libsmdev-devel])
+  ])
  ])
 

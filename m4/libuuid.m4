@@ -1,7 +1,9 @@
 dnl Functions for libuuid
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if libuuid is available
-AC_DEFUN([AC_CHECK_LIBUUID],
+AC_DEFUN([AX_LIBUUID_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_libuuid" != x && test "x$ac_cv_with_libuuid" != xno && test "x$ac_cv_with_libuuid" != xauto-detect],
@@ -98,6 +100,30 @@ AC_DEFUN([AC_CHECK_LIBUUID],
      [Define to 1 if uuid_generate_time funtion is available in libuuid.])
     ])
    ])
+  ])
+ ])
+
+dnl Function to detect how to enable libuuid
+AC_DEFUN([AX_LIBUUID_CHECK_ENABLE],
+ [AX_COMMON_ARG_WITH(
+  [libuuid],
+  [libuuid],
+  [search for libuuid in includedir and libdir or in the specified DIR, or no if not to use libuuid],
+  [auto-detect],
+  [DIR])
+
+ AS_IF(
+  [test "x$ac_cv_enable_guid" = xyes],
+  [AX_LIBUUID_CHECK_LIB])
+
+ AS_IF(
+  [test "x$ac_cv_libuuid" = xlibuuid],
+  [AC_SUBST(
+   [ax_libuuid_spec_requires],
+   [libuuid])
+  AC_SUBST(
+   [ax_libuuid_spec_build_requires],
+   [libuuid-devel])
   ])
  ])
 

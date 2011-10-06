@@ -1,7 +1,9 @@
 dnl Functions for libsmraw
+dnl
+dnl Version: 20111006
 
 dnl Function to detect if libsmraw is available
-AC_DEFUN([AC_CHECK_LIBSMRAW],
+AC_DEFUN([AX_LIBSMRAW_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_libsmraw" != x && test "x$ac_cv_with_libsmraw" != xno && test "x$ac_cv_with_libsmraw" != xauto-detect],
@@ -140,6 +142,57 @@ AC_DEFUN([AC_CHECK_LIBSMRAW],
   [AC_SUBST(
    [HAVE_LIBSMRAW],
    [0])
+  ])
+ ])
+
+dnl Function to detect how to enable libsmraw
+AC_DEFUN([AX_LIBSMRAW_CHECK_ENABLE],
+ [AX_COMMON_ARG_WITH(
+  [libmsraw],
+  [libmsraw],
+  [search for libmsraw in includedir and libdir or in the specified DIR, or no if to use local version],
+  [auto-detect],
+  [DIR])
+
+ AX_LIBSMRAW_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libsmraw" != xyes],
+  [AC_DEFINE(
+   [HAVE_LOCAL_LIBSMRAW],
+   [1],
+   [Define to 1 if the local version of libsmraw is used.])
+  AC_SUBST(
+   [HAVE_LOCAL_LIBSMRAW],
+   [1])
+  AC_SUBST(
+   [LIBSMRAW_CPPFLAGS],
+   [-I../libsmraw])
+  AC_SUBST(
+   [LIBSMRAW_LIBADD],
+   [../libsmraw/libsmraw.la])
+  ac_cv_libsmraw=local
+  ])
+
+ AM_CONDITIONAL(
+  [HAVE_LOCAL_LIBSMRAW],
+  [test "x$ac_cv_libsmraw" = xlocal])
+
+ AS_IF(
+  [test "x$ac_cv_libsmraw" = xyes],
+  [AC_SUBST(
+   [ax_libsmraw_pc_libs_private],
+   [-lsmraw])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libsmraw" = xyes],
+  [AC_SUBST(
+   [ax_libsmraw_spec_requires],
+   [libsmraw])
+  AC_SUBST(
+   [ax_libsmraw_spec_build_requires],
+   [libsmraw-devel])
   ])
  ])
 
