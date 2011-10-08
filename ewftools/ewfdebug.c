@@ -66,10 +66,12 @@ void usage_fprint(
 /* Signal handler for ewfdebug
  */
 void ewfdebug_signal_handler(
-      libsystem_signal_t signal )
+      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfdebug_signal_handler";
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfdebug_abort = 1;
 

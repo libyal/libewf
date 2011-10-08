@@ -1,4 +1,4 @@
-dnl Function to detect if libhmac dependencies are available
+dnl Function to detect if libewf dependencies are available
 AC_DEFUN([AX_LIBEWF_CHECK_LOCAL],
  [dnl Check for type definitions
  dnl Type used in libewf/libewf_date_time_values.h, libewf/libewf_date_time.h

@@ -1,6 +1,6 @@
 dnl Functions for libsmdev
 dnl
-dnl Version: 20111007
+dnl Version: 20111008
 
 dnl Function to detect if libsmdev is available
 dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -288,70 +288,64 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LOCAL],
  ])
 
  dnl File input/output functions used in libbfio/libbfio_file.h
- AC_CHECK_FUNCS(
-  [close],
-  [],
+ AC_CHECK_FUNCS([close fstat ftruncate lseek open read stat write])
+
+ AS_IF(
+  [test "x$ac_cv_func_close" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: close],
    [1])
   ])
  
- AC_CHECK_FUNCS(
-  [fstat],
-  [],
+ AS_IF(
+  [test "x$ac_cv_func_fstat" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: fstat],
    [1])
   ])
  
- AC_CHECK_FUNCS(
-  [ftruncate],
-  [],
+ AS_IF(
+  [test "x$ac_cv_func_ftruncate" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: ftruncate],
    [1])
   ])
  
- AC_CHECK_FUNCS(
-  [lseek],
-  [],
+ AS_IF(
+  [test "x$ac_cv_func_lseek" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: lseek],
    [1])
   ])
  
- AC_CHECK_FUNCS(
-  [open],
-  [],
+ AS_IF(
+  [test "x$ac_cv_func_open" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: open],
    [1])
   ])
  
- AC_CHECK_FUNCS(
-  [read],
-  [],
+ AS_IF(
+  [test "x$ac_cv_func_read" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: read],
    [1])
   ])
  
- AC_CHECK_FUNCS(
-  [stat],
-  [],
+ AS_IF(
+  [test "x$ac_cv_func_stat" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: stat],
    [1])
   ])
  
- AC_CHECK_FUNCS(
-  [write],
-  [],
+ AS_IF(
+  [test "x$ac_cv_func_write" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: write],
    [1])
   ])
-
+ 
  AX_LIBSMDEV_CHECK_FUNC_POSIX_FADVISE
 
  dnl Check for error string functions used in libsmdev/libsmdev_error_string.c
@@ -359,11 +353,12 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LOCAL],
 
  AS_IF(
   [test "x$ac_cv_have_decl_strerror_r" = xno],
-  [AC_CHECK_FUNCS(
-   [strerror],
-   [],
+  [AC_CHECK_FUNCS([strerror])
+
+  AS_IF(
+   [test "x$ac_cv_func_strerror" != xyes],
    [AC_MSG_FAILURE(
-    [Missing functions: strerror_r and strerror],
+    [Missing functions: strerror and strerror_r],
     [1])
    ])
   ])

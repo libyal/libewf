@@ -1,6 +1,4 @@
 TODO
-* update pc and spec file
-* libsmdev - check optical disc sessions
 * ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
@@ -238,6 +236,7 @@ Tools:
 * ewfrecover
   - create a tool recover ewf files
 * ewfmount
+  - apply current time to fuse
   - LEV support
   - Windows use imgdisk, MacOS use API?
 * process status
@@ -279,6 +278,12 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111008
+* updated configure.ac and m4 files
+* updated libsmdev, libodraw, libsmraw, libhmac
+* bug fix in libsystem
+* improved session and tracks detection in libsmdev
 
 20111006
 * updated configure.ac and m4 files

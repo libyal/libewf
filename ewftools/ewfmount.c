@@ -82,10 +82,12 @@ void usage_fprint(
 /* Signal handler for ewfmount
  */
 void ewfmount_signal_handler(
-      libsystem_signal_t signal )
+      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfmount_signal_handler";
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfmount_abort = 1;
 
@@ -340,13 +342,16 @@ int ewfmount_fuse_readdir(
      const char *path,
      void *buffer,
      fuse_fill_dir_t filler,
-     off_t offset,
-     struct fuse_file_info *file_info )
+     off_t offset LIBSYSTEM_ATTRIBUTE_UNUSED,
+     struct fuse_file_info *file_info LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
 	liberror_error_t *error = NULL;
 	static char *function   = "ewfmount_fuse_readdir";
 	size_t path_length      = 0;
 	int result              = 0;
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( offset )
+	LIBSYSTEM_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
@@ -558,9 +563,14 @@ int ewfmount_fuse_getattr(
 	}
 	if( result == 0 )
 	{
-		stat_info->st_atime = 0;
-		stat_info->st_mtime = 0;
-		stat_info->st_ctime = 0;
+		stat_info->st_atime = libsystem_date_time_time(
+		                       NULL );
+
+		stat_info->st_mtime = libsystem_date_time_time(
+		                       NULL );
+
+		stat_info->st_ctime = libsystem_date_time_time(
+		                       NULL );
 
 #if defined( HAVE_GETEUID )
 		stat_info->st_uid = geteuid();
