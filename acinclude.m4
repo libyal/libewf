@@ -1,3 +1,36 @@
+dnl Function to detect if libhmac dependencies are available
+AC_DEFUN([AX_LIBEWF_CHECK_LOCAL],
+ [dnl Check for type definitions
+ dnl Type used in libewf/libewf_date_time_values.h, libewf/libewf_date_time.h
+ dnl and libewf/libewf_header_values.c
+ AC_STRUCT_TM
+
+ dnl Check for headers
+ dnl Headers included in libewf/libewf_date_time.h
+ AC_HEADER_TIME
+
+ dnl Check for functions
+ dnl Date and time functions used in libewf/libewf_date_time.h
+ AC_CHECK_FUNCS([localtime localtime_r mktime])
+
+ AS_IF(
+  [test "x$ac_cv_func_localtime" != xyes && test "x$ac_cv_func_localtime_r" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing functions: localtime and localtime_r],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_mktime" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: mktime],
+   [1])
+  ])
+
+ dnl Check for internationalization functions in libewf/libewf_i18n.c 
+ AC_CHECK_FUNCS([bindtextdomain])
+ ])
+
 dnl Function to detect whether version 1 API support should be enabled
 AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_V1_API],
  [AX_COMMON_ARG_ENABLE(
@@ -26,7 +59,7 @@ AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_V1_API],
  ])
 
 dnl Function to detect whether low level function support should be enabled
-AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_LOW_LEVEL_FUNCTION],
+AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_LOW_LEVEL_FUNCTIONS],
  [AX_COMMON_ARG_ENABLE(
   [low-level-functions],
   [low_level_functions],

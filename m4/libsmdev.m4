@@ -1,8 +1,9 @@
 dnl Functions for libsmdev
 dnl
-dnl Version: 20111006
+dnl Version: 20111007
 
 dnl Function to detect if libsmdev is available
+dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(

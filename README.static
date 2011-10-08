@@ -1,4 +1,4 @@
-Libewf supports two types of static compilation
+Libewf supports the following types of static compilation:
 * static libary
 * static excutables
 

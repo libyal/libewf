@@ -1,8 +1,9 @@
 dnl Functions for libmfdata
 dnl
-dnl Version: 20111006
+dnl Version: 20111007
 
 dnl Function to detect if libmfdata available
+dnl ac_libmfdata_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 AC_DEFUN([AX_LIBMFDATA_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(

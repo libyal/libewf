@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111006],
+ [20111007],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -52,48 +52,7 @@ AX_TYPES_CHECK_LOCAL
 dnl Check if wide character type should be enabled
 AX_COMMON_CHECK_ENABLE_WIDE_CHARACTER_TYPE
 
-dnl Type used in libewf/libewf_date_time_values.h, libewf/libewf_date_time.h
-dnl and libewf/libewf_header_values.c
-AC_STRUCT_TM
-
-dnl Check for headers
-dnl Headers included in libewf/libewf_date_time.h
-AC_HEADER_TIME
-
-dnl Headers included in ewftools/platform.c
-AC_CHECK_HEADERS([sys/utsname.h])
-
-dnl Other headers
-
-dnl Check for functions
-dnl Date and time functions used in libewf/libewf_date_time.h
-AC_CHECK_FUNCS([localtime localtime_r mktime])
-
-AS_IF(
- [test "x$ac_cv_func_localtime" != xyes && test "x$ac_cv_func_localtime_r" != xyes],
- [AC_MSG_FAILURE(
-  [Missing functions: localtime and localtime_r],
-  [1])
- ])
- 
-AS_IF(
- [test "x$ac_cv_func_mktime" != xyes],
- [AC_MSG_FAILURE(
-  [Missing function: mktime],
-  [1])
- ])
-
-dnl Check for internationalization functions in libewf/libewf_i18n.c 
-AC_CHECK_FUNCS([bindtextdomain])
-
-dnl System functions
-AS_IF(
- [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_FUNCS([getegid geteuid getuid uname])
- ])
-
 dnl Checks for libraries and library functions
-dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 AX_COMMON_CHECK_LOCAL
 AX_LIBCSTRING_CHECK_LOCAL
 AX_LIBERROR_CHECK_LOCAL
@@ -101,6 +60,7 @@ AX_LIBNOTIFY_CHECK_LOCAL
 AX_LIBSYSTEM_CHECK_LOCAL
 
 dnl Check for zlib compression support
+dnl ac_zlib_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 AX_COMMON_ARG_WITH(
  [zlib],
  [zlib],
@@ -132,7 +92,7 @@ AC_CHECK_LIB(
 AC_CHECK_LIB(
  z,
  compress2,
- [ac_libewf_dummy=yes],
+ [ac_zlib_dummy=yes],
  [AC_MSG_FAILURE(
   [Missing function: compress2 in library: zlib.],
   [1])
@@ -150,7 +110,7 @@ AC_CHECK_LIB(
 AC_CHECK_LIB(
  z,
  uncompress,
- [ac_libewf_dummy=yes],
+ [ac_zlib_dummy=yes],
  [AC_MSG_FAILURE(
   [Missing function: uncompress in library: zlib.],
   [1])
@@ -186,11 +146,23 @@ AX_LIBUUID_CHECK_ENABLE
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AX_LIBFUSE_CHECK_ENABLE
 
+dnl Check for library function support
+AX_LIBEWF_CHECK_LOCAL
+
+dnl Check for headers
+AC_CHECK_HEADERS([sys/utsname.h])
+
+dnl Check for functions
+AS_IF(
+ [test "x$ac_cv_enable_winapi" = xno],
+ [AC_CHECK_FUNCS([getegid geteuid getuid uname])
+ ])
+
 dnl Check if ewftools should be build as static executables
 AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
 
 dnl Check if ewftools should be build with low level read and write functions
-AX_COMMON_CHECK_ENABLE_LOW_LEVEL_FUNCTIONS
+AX_LIBEWF_CHECK_ENABLE_LOW_LEVEL_FUNCTIONS
 
 dnl Check if libewf should be build with verbose output
 AX_COMMON_CHECK_ENABLE_VERBOSE_OUTPUT

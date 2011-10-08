@@ -3,6 +3,7 @@ dnl
 dnl Version: 20111006
 
 dnl Function to detect if libsmraw is available
+dnl ac_libsmraw_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 AC_DEFUN([AX_LIBSMRAW_CHECK_LIB],
  [dnl Check if parameters were provided
  AS_IF(
