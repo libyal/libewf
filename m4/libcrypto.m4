@@ -1,6 +1,6 @@
 dnl Functions for libcrypto
 dnl
-dnl Version: 20111007
+dnl Version: 20111009
  
 dnl Function to detect whether openssl/evp.h can be used in combination with zlib.h
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE],
@@ -426,7 +426,7 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_ENABLE],
  AX_LIBCRYPTO_CHECK_LIB
 
  AS_IF(
-  [test "x$ac_cv_libcrypto" = xyes],
+  [test "x$ac_cv_libcrypto" != xno],
   [AC_SUBST(
    [ax_libcrypto_pc_libs_private],
    [-lcrypto])

@@ -54,7 +54,7 @@
 mount_handle_t *ewfmount_mount_handle = NULL;
 int ewfmount_abort                    = 0;
 
-/* Prints the executable usage mountrmation
+/* Prints the executable usage information
  */
 void usage_fprint(
       FILE *stream )
@@ -655,7 +655,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "hvV" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "f:hvV" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{

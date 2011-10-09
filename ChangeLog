@@ -279,6 +279,9 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111009
+* small fixes in ewfmount
+
 20111008
 * updated configure.ac and m4 files
 * updated libsmdev, libodraw, libsmraw, libhmac
