@@ -30,7 +30,184 @@ AC_DEFUN([AX_LIBMFDATA_CHECK_LIB],
     libmfdata_get_version,
     [ac_cv_libmfdata_dummy=yes],
     [ac_cv_libmfdata=no])
-  
+
+   dnl Cache functions
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_cache_initialize,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_cache_free,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_cache_clone,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   dnl File functions
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_set_file_value,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   dnl File list functions
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_initialize,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_free,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_resize,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_clone,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_get_number_of_files,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_get_file_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_get_file_value_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_set_file_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_set_file_value_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_file_list_append_file,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   dnl File functions
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_initialize,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_free,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_resize,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_clone,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_is_group,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_is_set,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_get_number_of_elements,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_get_data_range_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_get_element_value_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_get_group_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_set_data_range_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_set_backup_data_range_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_set_element_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_set_element_value_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_set_group_by_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_append_group,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
+   dnl List element functions
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_element_get_element_index,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+   AC_CHECK_LIB(
+    mfdata,
+    libmfdata_list_element_set_element_value,
+    [ac_cv_libmfdata_dummy=yes],
+    [ac_cv_libmfdata=no])
+
    dnl Segment table functions
    AC_CHECK_LIB(
     mfdata,

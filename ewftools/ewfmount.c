@@ -537,7 +537,7 @@ int ewfmount_fuse_getattr(
 				 "%s: unsupported to retrieve media size.",
 				 function );
 
-				result = -EBADFD;
+				result = -ENODEV;
 
 				goto on_error;
 			}

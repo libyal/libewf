@@ -13,8 +13,6 @@ TODO
 Next beta/stable release:
 * full test
 * disable ewfdebug
-* clean up configure.ac and acinclude.m4
-  - check if all functions are checked for
 
 Roadmap:
 * lvf support
@@ -279,8 +277,15 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111010
+* fix in spec file
+* ewfmount changed EBADFD into ENODEV
+* checked if all functions are checked for
+* bug fix in included header macros
+
 20111009
 * small fixes in ewfmount
+* small changes in configure
 
 20111008
 * updated configure.ac and m4 files

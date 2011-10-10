@@ -31,7 +31,71 @@ AC_DEFUN([AX_LIBHMAC_CHECK_LIB],
     [ac_cv_libhmac_dummy=yes],
     [ac_cv_libhmac=no])
 
-    dnl TODO check if all LIBHMAC functions are available
+   dnl MD5 functions
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_md5_initialize,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_md5_update,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_md5_finalize,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_md5_free,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+
+   dnl SHA1 functions
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha1_initialize,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha1_update,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha1_finalize,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha1_free,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+
+   dnl SHA256 functions
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha256_initialize,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha256_update,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha256_finalize,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
+   AC_CHECK_LIB(
+    hmac,
+    libhmac_sha256_free,
+    [ac_cv_libhmac_dummy=yes],
+    [ac_cv_libhmac=no])
    ])
   ])
 
