@@ -41,11 +41,17 @@
 
 #include <libsystem.h>
 
-#if defined( HAVE_FUSE_H )
+#if defined( HAVE_FUSE_H ) || defined( HAVE_OSXFUSE_FUSE_H )
 #define FUSE_USE_VERSION	26
 
+#if defined( HAVE_FUSE_H )
 #include <fuse.h>
+
+#elif defined( HAVE_OSXFUSE_FUSE_H )
+#include <osxfuse/fuse.h>
 #endif
+
+#endif /* defined( HAVE_FUSE_H ) || defined( HAVE_OSXFUSE_FUSE_H ) */
 
 #include "ewfoutput.h"
 #include "ewftools_libewf.h"
@@ -118,7 +124,7 @@ void ewfmount_signal_handler(
 	}
 }
 
-#if defined( HAVE_FUSE_H )
+#if defined( HAVE_LIBFUSE )
 
 #if ( SIZEOF_OFF_T != 8 ) && ( SIZEOF_OFF_T != 4 )
 #error Size of off_t not supported
@@ -596,7 +602,7 @@ on_error:
 	return( result );
 }
 
-#endif /* defined( HAVE_FUSE_H ) */
+#endif /* defined( HAVE_LIBFUSE ) */
 
 /* The main program
  */
@@ -621,7 +627,7 @@ int main( int argc, char * const argv[] )
 	libsystem_glob_t *glob                                = NULL;
 #endif
 
-#if defined( HAVE_FUSE_H )
+#if defined( HAVE_LIBFUSE )
 	struct fuse_operations ewfmount_fuse_operations;
 	struct fuse_chan *ewfmount_fuse_channel               = NULL;
 	struct fuse *ewfmount_fuse_handle                     = NULL;
@@ -810,7 +816,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( HAVE_FUSE_H )
+#if defined( HAVE_LIBFUSE )
 	if( memory_set(
 	     &ewfmount_fuse_operations,
 	     0,
@@ -897,7 +903,7 @@ on_error:
 		liberror_error_free(
 		 &error );
 	}
-#if defined( HAVE_FUSE_H )
+#if defined( HAVE_LIBFUSE )
 	if( ewfmount_fuse_handle != NULL )
 	{
 		fuse_destroy(

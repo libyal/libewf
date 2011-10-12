@@ -28,9 +28,7 @@
  * before including libewf.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#if !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBEWF_DLL_IMPORT
-#endif
 #endif
 
 #include <libewf.h>

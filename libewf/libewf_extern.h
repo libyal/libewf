@@ -32,9 +32,7 @@
  * before including libewf/extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#if !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBEWF_DLL_EXPORT
-#endif
 #endif
 
 #include <libewf/extern.h>

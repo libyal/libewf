@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111010],
+ [20111011],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -201,7 +201,7 @@ CFLAGS="$CFLAGS -Wall";
 
 dnl Check if DLL support is needed in ewftools
 AS_IF(
- [test "x$enable_shared" = xyes],
+ [test "x$enable_shared" = xyes && test "x$ac_cv_enable_static_executables" = xno],
  [AS_CASE(
   [$host],
   [*cygwin* | *mingw*],

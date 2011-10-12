@@ -2340,7 +2340,7 @@ int libewf_file_entry_get_amount_of_sub_file_entries(
 
 /* Sets the notify values
  *
- * This function is deprecated use libewf_notify_set_value instead
+ * This function is deprecated use libewf_notify_set_verbose and libewf_notify_set_stream instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN void libewf_set_notify_values(

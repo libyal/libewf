@@ -277,11 +277,16 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111011
+* fixes in comment in include header
+* implemented OSXFuse support
+* bug fix for libfuse detection
+
 20111010
 * fix in spec file
 * ewfmount changed EBADFD into ENODEV
 * checked if all functions are checked for
-* bug fix in included header macros
+* bug fix in include header macros
 
 20111009
 * small fixes in ewfmount
