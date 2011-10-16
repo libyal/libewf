@@ -189,11 +189,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net.cpp"
+				RelativePath="..\..\ewf.net\ewf.net_datetime.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_file_entry.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewf.net\ewf.net_handle.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_support.cpp"
 				>
 			</File>
 		</Filter>
@@ -203,11 +211,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net.h"
+				RelativePath="..\..\ewf.net\ewf.net_datetime.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_definitions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_file_entry.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewf.net\ewf.net_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_support.h"
 				>
 			</File>
 		</Filter>

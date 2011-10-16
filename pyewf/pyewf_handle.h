@@ -52,8 +52,13 @@ struct pyewf_handle
 extern PyMethodDef pyewf_handle_object_methods[];
 extern PyTypeObject pyewf_handle_type_object;
 
-PyObject *pyewf_new_handle(
+PyObject *pyewf_handle_new(
            PyObject *self );
+
+PyObject *pyewf_handle_new_open(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
 
 int pyewf_handle_init(
      pyewf_handle_t *pyewf_handle );
@@ -98,6 +103,9 @@ PyObject *pyewf_handle_seek_offset(
            PyObject *keywords );
 
 PyObject *pyewf_handle_get_offset(
+           pyewf_handle_t *pyewf_handle );
+
+PyObject *pyewf_handle_get_root_file_entry(
            pyewf_handle_t *pyewf_handle );
 
 #if defined( __cplusplus )

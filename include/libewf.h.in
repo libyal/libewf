@@ -2180,39 +2180,43 @@ int libewf_file_entry_get_size(
      libewf_error_t **error );
 
 /* Retrieves the creation date and time
+ * The date and time is formatted as a POSIX timestamp
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_file_entry_get_creation_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *creation_time,
+     uint32_t *creation_time,
      libewf_error_t **error );
 
 /* Retrieves the modification date and time
+ * The date and time is formatted as a POSIX timestamp
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_file_entry_get_modification_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *modification_time,
+     uint32_t *modification_time,
      libewf_error_t **error );
 
 /* Retrieves the access date and time
+ * The date and time is formatted as a POSIX timestamp
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_file_entry_get_access_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *access_time,
+     uint32_t *access_time,
      libewf_error_t **error );
 
 /* Retrieves the entry modification date and time
+ * The date and time is formatted as a POSIX timestamp
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_file_entry_get_entry_modification_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *entry_modification_time,
+     uint32_t *entry_modification_time,
      libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded MD5 hash value
@@ -2284,6 +2288,15 @@ off64_t libewf_file_entry_seek_offset(
          off64_t offset,
          int whence,
          libewf_error_t **error );
+
+/* Retrieves the current offset of the data
+ * Returns the offset if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *offset,
+     libewf_error_t **error );
 
 /* -------------------------------------------------------------------------
  * Single file entry functions - deprecated

@@ -19,6 +19,9 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if !defined( _EWF_NET_FILE_ENTRY_H )
+#define _EWF_NET_FILE_ENTRY_H
+
 #using <mscorlib.dll>
 
 using namespace System;
@@ -31,15 +34,47 @@ public ref class FileEntry sealed
 	private:
 		System::IntPtr ewf_file_entry;
 
-	private:
-		FileEntry( System::IntPtr ewf_file_entry );
-
 	public:
-		FileEntry( void );
+		FileEntry( System::IntPtr ewf_file_entry );
 		~FileEntry( void );
 
-		/* TODO add functions ? */
+#if _MSC_VER >= 1600
+		System::String^ GetName( void );
+#endif /* _MSC_VER >= 1600 */
+
+		System::UInt64 GetSize( void );
+
+		System::DateTime^ GetCreationTime( void );
+
+		System::DateTime^ GetModificationTime( void );
+
+		System::DateTime^ GetAccessTime( void );
+
+		System::DateTime^ GetEntryModificationTime( void );
+
+#if _MSC_VER >= 1600
+		System::String^ GetHashValueMD5( void );
+#endif /* _MSC_VER >= 1600 */
+
+		int GetNumberOfSubFileEntries( void );
+
+		FileEntry^ GetSubFileEntry( int sub_file_entry_index );
+
+		int ReadBuffer( array<System::Byte>^ buffer,
+		                int size );
+
+		int ReadRandom( array<System::Byte>^ buffer,
+		                int size,
+		                System::Int64 offset );
+
+		System::Int64 SeekOffset( System::Int64 offset,
+		                          System::IO::SeekOrigin origin );
+
+		System::Int64 GetOffset( void );
+
 };
 
 } // namespace EWF
+
+#endif
 

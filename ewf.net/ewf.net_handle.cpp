@@ -35,7 +35,8 @@
 #include <msclr/marshal.h>
 #endif
 
-#include "ewf.net.h"
+#include "ewf.net_definitions.h"
+#include "ewf.net_file_entry.h"
 #include "ewf.net_handle.h"
 
 #using <mscorlib.dll>
@@ -767,10 +768,10 @@ System::Int64 Handle::SeekOffset( System::Int64 offset,
 			     "ewf.net " + function + ": unsupported origin" );
 	}
 	ewf_offset = libewf_handle_seek_offset(
-	                handle,
-	                ewf_offset,
-	                ewf_whence,
-	                &error );
+	              handle,
+	              ewf_offset,
+	              ewf_whence,
+	              &error );
 
 	if( ewf_offset == -1 )
 	{
@@ -2431,6 +2432,60 @@ void Handle::SetHashValue( System::String^ identifier,
 }
 
 #endif /* _MSC_VER >= 1600 */
+
+FileEntry^ Handle::GetRootFileEntry( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error               = NULL;
+	libewf_file_entry_t *ewf_file_entry = NULL;
+	libewf_handle_t *handle             = NULL;
+	FileEntry^ file_entry               = nullptr;
+	System::String^ error_string        = nullptr;
+	System::String^ function            = "Handle::GetRootFileEntry";
+	int result                          = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_root_file_entry(
+	          handle,
+	          &ewf_file_entry,
+	          &error );
+
+	if( result == -1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve root file entry." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	else if( result == 0 )
+	{
+		return( nullptr );
+	}
+	file_entry = gcnew FileEntry( Marshal::ReadIntPtr(
+	                                        (IntPtr) &ewf_file_entry ) );
+
+	return( file_entry );
+}
 
 } // namespace EWF
 

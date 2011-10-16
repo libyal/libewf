@@ -33,6 +33,7 @@
 #include <libewf.h>
 
 #include "pyewf.h"
+#include "pyewf_file_entry.h"
 #include "pyewf_handle.h"
 #include "pyewf_python.h"
 
@@ -75,9 +76,14 @@ PyMethodDef pyewf_module_methods[] = {
 	  "Globs filenames according to the EWF segment file naming schema" },
 
 	{ "new_handle",
-	  (PyCFunction) pyewf_new_handle,
+	  (PyCFunction) pyewf_handle_new,
 	  METH_NOARGS,
 	  "Creates a new pyewf handle object" },
+
+	{ "open",
+	  (PyCFunction) pyewf_handle_new_open,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "Creates a new pyewf handle object and opens it" },
 
 	/* TODO these function are deprecated and will be removed after a while */
 
@@ -397,8 +403,9 @@ PyObject *pyewf_glob(
 PyMODINIT_FUNC initpyewf(
                 void ) 
 {
-	PyObject *module                 = NULL;
-	PyTypeObject *handle_type_object = NULL;
+	PyObject *module                     = NULL;
+	PyTypeObject *file_entry_type_object = NULL;
+	PyTypeObject *handle_type_object     = NULL;
 
 	/* Create the module
 	 */
@@ -425,5 +432,24 @@ PyMODINIT_FUNC initpyewf(
 	 module,
 	"pyewf_handle",
 	(PyObject *) handle_type_object );
+
+	/* Setup the file entry type object
+	 */
+	pyewf_file_entry_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyewf_file_entry_type_object ) < 0 )
+	{
+		return;
+	}
+	Py_IncRef(
+	 (PyObject * ) &pyewf_file_entry_type_object );
+
+	file_entry_type_object = &pyewf_file_entry_type_object;
+
+	PyModule_AddObject(
+	 module,
+	"pyewf_file_entry",
+	(PyObject *) file_entry_type_object );
 }
 

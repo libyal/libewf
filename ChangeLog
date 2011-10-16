@@ -1,5 +1,4 @@
 TODO
-* ewf.net single files support
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -11,7 +10,7 @@ TODO
 * check performance
 
 Next beta/stable release:
-* full test
+* full test - interoperability tests
 * disable ewfdebug
 
 Roadmap:
@@ -165,11 +164,15 @@ Possible performance improvements:
 Python bindings (pyewf)
 * add WINAPI wide character support for open() and glob()
 * add more functions
+  - sessions
+  - acquiry errors
+  - read errors
 
 .Net bindings (ewf.net)
-* add single file functions
-  ewf.net_file_entry.h
-* add more functions
+* handle 
+  - add more functions
+* file entry
+  - add more functions
 * mono support ?
 
 API changes
@@ -234,9 +237,8 @@ Tools:
 * ewfrecover
   - create a tool recover ewf files
 * ewfmount
-  - apply current time to fuse
-  - LEV support
-  - Windows use imgdisk, MacOS use API?
+  - Windows use ImDisk
+  - MacOS native API support ?
 * process status
   - improve and remove "This could take a while." ?
 * libsystem path implement GetVolumeInformation
@@ -276,6 +278,19 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111017
+* worked on ewf.net file entry support
+
+20111016
+* added libewf_file_entry_get_offset
+* worked on pyewf file entry support
+* changed file entry date and time values to 32-bit values
+* worked on ewfmount LEV support
+* worked on ewf.net file entry support
+
+20111015
+* worked on pyewf file entry support
 
 20111011
 * fixes in comment in include header

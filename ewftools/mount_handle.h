@@ -53,6 +53,10 @@ struct mount_handle
 	 */
 	libewf_handle_t *input_handle;
 
+	/* The libewf root file entry
+	 */
+	libewf_file_entry_t *root_file_entry;
+
 	/* The nofication output stream
 	 */
 	FILE *notify_stream;
@@ -100,6 +104,22 @@ off64_t mount_handle_seek_offset(
 int mount_handle_get_media_size(
      mount_handle_t *mount_handle,
      size64_t *size,
+     liberror_error_t **error );
+
+int mount_handle_get_file_entry_for_path(
+     mount_handle_t *mount_handle,
+     const libcstring_system_character_t *path,
+     size_t path_length,
+     libewf_file_entry_t **file_entry,
+     liberror_error_t **error );
+
+int mount_handle_get_sub_file_entry_for_path(
+     mount_handle_t *mount_handle,
+     libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *path,
+     size_t path_length,
+     size_t path_index,
+     libewf_file_entry_t **sub_file_entry,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

@@ -1,7 +1,9 @@
 EXTRA_DIST = \
+	ewf.net_datetime.cpp ewf.net_datetime.h \
+	ewf.net_definitions.h \
 	ewf.net_file_entry.cpp ewf.net_file_entry.h \
 	ewf.net_handle.cpp ewf.net_handle.h \
-	ewf.net.cpp ewf.net.h \
+	ewf.net_support.cpp ewf.net_support.h \
 	ewf.net.rc \
 	ewf.net.rc.in
 

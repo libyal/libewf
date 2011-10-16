@@ -921,7 +921,7 @@ int libewf_single_files_parse_record_values(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_MEMORY,
 					 LIBERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set access time.",
+					 "%s: unable to set media size.",
 					 function );
 
 					goto on_error;
@@ -997,6 +997,7 @@ int libewf_single_files_parse_file_entry(
 	size_t value_string_index                     = 0;
 	uint64_t number_of_sub_entries                = 0;
 	uint64_t value_64bit                          = 0;
+	uint32_t value_32bit                          = 0;
 	int number_of_lines                           = 0;
 	int number_of_types                           = 0;
 	int number_of_values                          = 0;
@@ -1281,10 +1282,10 @@ int libewf_single_files_parse_file_entry(
 			if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			 && ( type_string[ 1 ] == (uint8_t) 'c' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_decimal_copy_to_32bit(
 				     value_string,
 				     value_string_size,
-				     &value_64bit,
+				     &value_32bit,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1296,7 +1297,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->access_time = value_64bit;
+				single_file_entry->access_time = value_32bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
@@ -1329,10 +1330,10 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'c' )
 			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_decimal_copy_to_32bit(
 				     value_string,
 				     value_string_size,
-				     &value_64bit,
+				     &value_32bit,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1344,7 +1345,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->creation_time = value_64bit;
+				single_file_entry->creation_time = value_32bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
@@ -1461,10 +1462,10 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'm' )
 			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_decimal_copy_to_32bit(
 				     value_string,
 				     value_string_size,
-				     &value_64bit,
+				     &value_32bit,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1476,7 +1477,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->entry_modification_time = value_64bit;
+				single_file_entry->entry_modification_time = value_32bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
 			      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
@@ -1491,10 +1492,10 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'w' )
 			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_decimal_copy_to_32bit(
 				     value_string,
 				     value_string_size,
-				     &value_64bit,
+				     &value_32bit,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1506,7 +1507,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->modification_time = value_64bit;
+				single_file_entry->modification_time = value_32bit;
 			}
 		}
 		else if( type_string_size == 2 )

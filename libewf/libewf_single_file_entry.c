@@ -771,7 +771,7 @@ int libewf_single_file_entry_get_size(
  */
 int libewf_single_file_entry_get_creation_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint64_t *creation_time,
+     uint32_t *creation_time,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_creation_time";
@@ -808,7 +808,7 @@ int libewf_single_file_entry_get_creation_time(
  */
 int libewf_single_file_entry_get_modification_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint64_t *modification_time,
+     uint32_t *modification_time,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_modification_time";
@@ -845,7 +845,7 @@ int libewf_single_file_entry_get_modification_time(
  */
 int libewf_single_file_entry_get_access_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint64_t *access_time,
+     uint32_t *access_time,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_access_time";
@@ -882,7 +882,7 @@ int libewf_single_file_entry_get_access_time(
  */
 int libewf_single_file_entry_get_entry_modification_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint64_t *entry_modification_time,
+     uint32_t *entry_modification_time,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_entry_modification_time";

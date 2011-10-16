@@ -2442,7 +2442,7 @@ int verification_handle_verify_sub_file_entries(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to free retrieve sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
 			goto on_error;
 		}
@@ -2462,7 +2462,7 @@ int verification_handle_verify_sub_file_entries(
 			 LIBERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to verification sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
 			goto on_error;
 		}
@@ -2480,7 +2480,7 @@ int verification_handle_verify_sub_file_entries(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
 			goto on_error;
 		}

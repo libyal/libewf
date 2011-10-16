@@ -140,10 +140,11 @@ int ewfmount_fuse_open(
      const char *path,
      struct fuse_file_info *file_info )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "ewfmount_fuse_open";
-	size_t path_length      = 0;
-	int result              = 0;
+	liberror_error_t *error         = NULL;
+	libewf_file_entry_t *file_entry = NULL;
+	static char *function           = "ewfmount_fuse_open";
+	size_t path_length              = 0;
+	int result                      = 0;
 
 	if( path == NULL )
 	{
@@ -174,22 +175,74 @@ int ewfmount_fuse_open(
 	path_length = libcstring_narrow_string_length(
 	               path );
 
-	if( ( path_length != ewfmount_fuse_path_length )
-	 || ( libcstring_narrow_string_compare(
-	       path,
-	       ewfmount_fuse_path,
-	       ewfmount_fuse_path_length ) != 0 ) )
+	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported path.",
-		 function );
+		if( mount_handle_get_file_entry_for_path(
+		     ewfmount_mount_handle,
+		     path,
+		     path_length,
+		     &file_entry,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file entry for: %s.",
+			 function,
+			 path );
 
-		result = -ENOENT;
+			result = -ENOENT;
 
-		goto on_error;
+			goto on_error;
+		}
+		if( libewf_file_entry_free(
+		     &file_entry,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file entry.",
+			 function );
+
+			result = -ENODEV;
+
+			goto on_error;
+		}
+	}
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
+	{
+		if( path_length != ewfmount_fuse_path_length )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported path length.",
+			 function );
+
+			result = -ENOENT;
+
+			goto on_error;
+		}
+		if( libcstring_narrow_string_compare(
+		     path,
+		     ewfmount_fuse_path,
+		     ewfmount_fuse_path_length ) != 0 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported path.",
+			 function );
+
+			result = -ENOENT;
+
+			goto on_error;
+		}
 	}
 	if( ( file_info->flags & 0x03 ) != O_RDONLY )
 	{
@@ -225,13 +278,16 @@ int ewfmount_fuse_read(
      char *buffer,
      size_t size,
      off_t offset,
-     struct fuse_file_info *file_info )
+     struct fuse_file_info *file_info LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "ewfmount_fuse_read";
-	size_t path_length      = 0;
-	ssize_t read_count      = 0;
-	int result              = 0;
+	liberror_error_t *error         = NULL;
+	libewf_file_entry_t *file_entry = NULL;
+	static char *function           = "ewfmount_fuse_read";
+	size_t path_length              = 0;
+	ssize_t read_count              = 0;
+	int result                      = 0;
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
@@ -259,74 +315,149 @@ int ewfmount_fuse_read(
 
 		goto on_error;
 	}
-	if( file_info == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file info.",
-		 function );
-
-		result = -EINVAL;
-
-		goto on_error;
-	}
 	path_length = libcstring_narrow_string_length(
 	               path );
 
-	if( ( path_length != ewfmount_fuse_path_length )
-	 || ( libcstring_narrow_string_compare(
-	       path,
-	       ewfmount_fuse_path,
-	       ewfmount_fuse_path_length ) != 0 ) )
+	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported path.",
-		 function );
+		if( mount_handle_get_file_entry_for_path(
+		     ewfmount_mount_handle,
+		     path,
+		     path_length,
+		     &file_entry,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file entry for: %s.",
+			 function,
+			 path );
 
-		result = -ENOENT;
+			result = -ENOENT;
 
-		goto on_error;
+			goto on_error;
+		}
+		if( libewf_file_entry_seek_offset(
+		     file_entry,
+		     (off64_t) offset,
+		     SEEK_SET,
+		     &error ) == -1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset in file entry.",
+			 function );
+
+			result = -EIO;
+
+			goto on_error;
+		}
+		read_count = libewf_file_entry_read_buffer(
+			      file_entry,
+			      (uint8_t *) buffer,
+			      size,
+			      &error );
+
+		if( read_count == -1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read from file entry.",
+			 function );
+
+			result = -EIO;
+
+			goto on_error;
+		}
+		if( libewf_file_entry_free(
+		     &file_entry,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file entry.",
+			 function );
+
+			result = -ENODEV;
+
+			goto on_error;
+		}
 	}
-	if( mount_handle_seek_offset(
-	     ewfmount_mount_handle,
-	     (off64_t) offset,
-	     SEEK_SET,
-	     &error ) == -1 )
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in mount handle.",
-		 function );
+		if( path_length != ewfmount_fuse_path_length )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported path length.",
+			 function );
 
-		result = -EIO;
+			result = -ENOENT;
 
-		goto on_error;
-	}
-	read_count = mount_handle_read_buffer(
-	              ewfmount_mount_handle,
-	              (uint8_t *) buffer,
-	              size,
-	              &error );
+			goto on_error;
+		}
+		if( libcstring_narrow_string_compare(
+		     path,
+		     ewfmount_fuse_path,
+		     ewfmount_fuse_path_length ) != 0 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported path.",
+			 function );
 
-	if( read_count == -1 )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read from mount handle.",
-		 function );
+			result = -ENOENT;
 
-		result = -EIO;
+			goto on_error;
+		}
+		if( mount_handle_seek_offset(
+		     ewfmount_mount_handle,
+		     (off64_t) offset,
+		     SEEK_SET,
+		     &error ) == -1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset in mount handle.",
+			 function );
 
-		goto on_error;
+			result = -EIO;
+
+			goto on_error;
+		}
+		read_count = mount_handle_read_buffer(
+			      ewfmount_mount_handle,
+			      (uint8_t *) buffer,
+			      size,
+			      &error );
+
+		if( read_count == -1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read from mount handle.",
+			 function );
+
+			result = -EIO;
+
+			goto on_error;
+		}
 	}
 	return( (int) read_count );
 
@@ -351,10 +482,16 @@ int ewfmount_fuse_readdir(
      off_t offset LIBSYSTEM_ATTRIBUTE_UNUSED,
      struct fuse_file_info *file_info LIBSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "ewfmount_fuse_readdir";
-	size_t path_length      = 0;
-	int result              = 0;
+	liberror_error_t *error             = NULL;
+	libewf_file_entry_t *file_entry     = NULL;
+	libewf_file_entry_t *sub_file_entry = NULL;
+	char *file_entry_name               = NULL;
+	static char *function               = "ewfmount_fuse_readdir";
+	size_t file_entry_name_size         = 0;
+	size_t path_length                  = 0;
+	int number_of_sub_file_entries      = 0;
+	int result                          = 0;
+	int sub_file_entry_index            = 0;
 
 	LIBSYSTEM_UNREFERENCED_PARAMETER( offset )
 	LIBSYSTEM_UNREFERENCED_PARAMETER( file_info )
@@ -375,19 +512,44 @@ int ewfmount_fuse_readdir(
 	path_length = libcstring_narrow_string_length(
 	               path );
 
-	if( ( path_length != 1 )
-	 || ( path[ 0 ] != '/' ) )
+	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported path.",
-		 function );
+		if( mount_handle_get_file_entry_for_path(
+		     ewfmount_mount_handle,
+		     path,
+		     path_length,
+		     &file_entry,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file entry for: %s.",
+			 function,
+			 path );
 
-		result = -ENOENT;
+			result = -ENOENT;
 
-		goto on_error;
+			goto on_error;
+		}
+	}
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
+	{
+		if( ( path_length != 1 )
+		 || ( path[ 0 ] != '/' ) )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported path.",
+			 function );
+
+			result = -ENOENT;
+
+			goto on_error;
+		}
 	}
 	if( filler(
 	     buffer,
@@ -423,22 +585,188 @@ int ewfmount_fuse_readdir(
 
 		goto on_error;
 	}
-	if( filler(
-	     buffer,
-	     &( ewfmount_fuse_path[ 1 ] ),
-	     NULL,
-	     0 ) == 1 )
+	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set directory entry.",
-		 function );
+		if( libewf_file_entry_get_number_of_sub_file_entries(
+		     file_entry,
+		     &number_of_sub_file_entries,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of sub file entries.",
+			 function );
 
-		result = -EIO;
+			result = -ENODEV;
 
-		goto on_error;
+			goto on_error;
+		}
+		for( sub_file_entry_index = 0;
+		     sub_file_entry_index < number_of_sub_file_entries;
+		     sub_file_entry_index++ )
+		{
+			if( libewf_file_entry_get_sub_file_entry(
+			     file_entry,
+			     sub_file_entry_index,
+			     &sub_file_entry,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to free retrieve sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libewf_file_entry_get_utf16_name_size(
+				  sub_file_entry,
+				  &file_entry_name_size,
+				  &error );
+#else
+			result = libewf_file_entry_get_utf8_name_size(
+				  sub_file_entry,
+				  &file_entry_name_size,
+				  &error );
+#endif
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve the file entry name size.",
+				 function );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
+			if( file_entry_name_size > 0 )
+			{
+				file_entry_name = libcstring_system_string_allocate(
+					           file_entry_name_size );
+
+				if( file_entry_name == NULL )
+				{
+					liberror_error_set(
+					 &error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create file entry name.",
+					 function );
+
+					result = -ENODEV;
+
+					goto on_error;
+				}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+				result = libewf_file_entry_get_utf16_name(
+					  sub_file_entry,
+					  (uint16_t *) file_entry_name,
+					  file_entry_name_size,
+					  &error );
+#else
+				result = libewf_file_entry_get_utf8_name(
+					  sub_file_entry,
+					  (uint8_t *) file_entry_name,
+					  file_entry_name_size,
+					  &error );
+#endif
+				if( result != 1 )
+				{
+					liberror_error_set(
+					 &error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve the file entry name.",
+					 function );
+
+					result = -ENODEV;
+
+					goto on_error;
+				}
+				if( filler(
+				     buffer,
+				     file_entry_name,
+				     NULL,
+				     0 ) == 1 )
+				{
+					liberror_error_set(
+					 &error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set directory entry.",
+					 function );
+
+					result = -EIO;
+
+					goto on_error;
+				}
+				memory_free(
+				 file_entry_name );
+
+				file_entry_name = NULL;
+			}
+			if( libewf_file_entry_free(
+			     &sub_file_entry,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
+		}
+		if( libewf_file_entry_free(
+		     &file_entry,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file entry.",
+			 function );
+
+			result = -ENODEV;
+
+			goto on_error;
+		}
+	}
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_RAW )
+	{
+		if( filler(
+		     buffer,
+		     &( ewfmount_fuse_path[ 1 ] ),
+		     NULL,
+		     0 ) == 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set directory entry.",
+			 function );
+
+			result = -EIO;
+
+			goto on_error;
+		}
 	}
 	return( 0 );
 
@@ -450,6 +778,23 @@ on_error:
 		liberror_error_free(
 		 &error );
 	}
+	if( file_entry_name != NULL )
+	{
+		memory_free(
+		 file_entry_name );
+	}
+	if( sub_file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &sub_file_entry,
+		 NULL );
+	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
 	return( result );
 }
 
@@ -460,11 +805,14 @@ int ewfmount_fuse_getattr(
      const char *path,
      struct stat *stat_info )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "ewfmount_fuse_getattr";
-	size64_t media_size     = 0;
-	size_t path_length      = 0;
-	int result              = -ENOENT;
+	liberror_error_t *error         = NULL;
+	libewf_file_entry_t *file_entry = NULL;
+	static char *function           = "ewfmount_fuse_getattr";
+	size64_t file_size              = 0;
+	size_t path_length              = 0;
+	uint32_t value_32bit            = 0;
+	int result                      = -ENOENT;
+	int number_of_sub_file_entries  = 0;
 
 	if( path == NULL )
 	{
@@ -521,26 +869,67 @@ int ewfmount_fuse_getattr(
 			result = 0;
 		}
 	}
-	else if( path_length == ewfmount_fuse_path_length )
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		if( libcstring_narrow_string_compare(
-		     path,
-		     ewfmount_fuse_path,
-		     ewfmount_fuse_path_length ) == 0 )
-		{
-			stat_info->st_mode  = S_IFREG | 0444;
-			stat_info->st_nlink = 1;
+		result = mount_handle_get_file_entry_for_path(
+		          ewfmount_mount_handle,
+		          path,
+		          path_length,
+		          &file_entry,
+		          &error );
 
-			if( mount_handle_get_media_size(
-			     ewfmount_mount_handle,
-			     &media_size,
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file entry for: %s.",
+			 function,
+			 path );
+
+			result = -ENOENT;
+
+			goto on_error;
+		}
+		else if( result == 1 )
+		{
+			if( libewf_file_entry_get_number_of_sub_file_entries(
+			     file_entry,
+			     &number_of_sub_file_entries,
 			     &error ) != 1 )
 			{
 				liberror_error_set(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unsupported to retrieve media size.",
+				 "%s: unable to retrieve number of sub file entries.",
+				 function );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
+			if( number_of_sub_file_entries == 0 )
+			{
+				stat_info->st_mode = S_IFREG | 0444;
+			}
+			else
+			{
+				stat_info->st_mode = S_IFDIR | 0555;
+			}
+			stat_info->st_nlink = 1;
+
+			if( libewf_file_entry_get_size(
+			     file_entry,
+			     &file_size,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unsupported to retrieve file entry size.",
 				 function );
 
 				result = -ENODEV;
@@ -548,13 +937,13 @@ int ewfmount_fuse_getattr(
 				goto on_error;
 			}
 #if SIZEOF_OFF_T == 4
-			if( media_size > (size64_t) UINT32_MAX )
+			if( file_size > (size64_t) UINT32_MAX )
 			{
 				liberror_error_set(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: unsupported to media size value out of bounds.",
+				 "%s: unsupported to file entry size value out of bounds.",
 				 function );
 
 				result = -ERANGE;
@@ -562,22 +951,139 @@ int ewfmount_fuse_getattr(
 				goto on_error;
 			}
 #endif
-			stat_info->st_size = (off_t) media_size;
+			stat_info->st_size = (off_t) file_size;
 
+			if( libewf_file_entry_get_modification_time(
+			     file_entry,
+			     &value_32bit,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unsupported to retrieve file entry modification time.",
+				 function );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
+			stat_info->st_mtime = value_32bit;
+
+			if( libewf_file_entry_get_access_time(
+			     file_entry,
+			     &value_32bit,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unsupported to retrieve file entry access time.",
+				 function );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
+			stat_info->st_atime = value_32bit;
+
+			if( libewf_file_entry_get_entry_modification_time(
+			     file_entry,
+			     &value_32bit,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unsupported to retrieve file entry wntry modification time.",
+				 function );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
+			stat_info->st_ctime = value_32bit;
+
+			if( libewf_file_entry_free(
+			     &file_entry,
+			     &error ) != 1 )
+			{
+				liberror_error_set(
+				 &error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free file entry.",
+				 function );
+
+				result = -ENODEV;
+
+				goto on_error;
+			}
 			result = 0;
+		}
+	}
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_RAW )
+	{
+		if( path_length == ewfmount_fuse_path_length )
+		{
+			if( libcstring_narrow_string_compare(
+			     path,
+			     ewfmount_fuse_path,
+			     ewfmount_fuse_path_length ) == 0 )
+			{
+				stat_info->st_mode  = S_IFREG | 0444;
+				stat_info->st_nlink = 1;
+
+				if( mount_handle_get_media_size(
+				     ewfmount_mount_handle,
+				     &file_size,
+				     &error ) != 1 )
+				{
+					liberror_error_set(
+					 &error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unsupported to retrieve media size.",
+					 function );
+
+					result = -ENODEV;
+
+					goto on_error;
+				}
+#if SIZEOF_OFF_T == 4
+				if( file_size > (size64_t) UINT32_MAX )
+				{
+					liberror_error_set(
+					 &error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: unsupported to media size value out of bounds.",
+					 function );
+
+					result = -ERANGE;
+
+					goto on_error;
+				}
+#endif
+				stat_info->st_size = (off_t) file_size;
+
+				stat_info->st_atime = libsystem_date_time_time(
+				                       NULL );
+
+				stat_info->st_mtime = libsystem_date_time_time(
+				                       NULL );
+
+				stat_info->st_ctime = libsystem_date_time_time(
+				                       NULL );
+				result = 0;
+			}
 		}
 	}
 	if( result == 0 )
 	{
-		stat_info->st_atime = libsystem_date_time_time(
-		                       NULL );
-
-		stat_info->st_mtime = libsystem_date_time_time(
-		                       NULL );
-
-		stat_info->st_ctime = libsystem_date_time_time(
-		                       NULL );
-
 #if defined( HAVE_GETEUID )
 		stat_info->st_uid = geteuid();
 #else
@@ -598,6 +1104,12 @@ on_error:
 		 error );
 		liberror_error_free(
 		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
 	}
 	return( result );
 }
@@ -794,15 +1306,6 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unsupported input format defaulting to: raw.\n" );
 		}
-	}
-/* TODO add FILES support */
-	if( ewfmount_mount_handle->input_format != MOUNT_HANDLE_INPUT_FORMAT_RAW )
-	{
-		fprintf(
-		 stderr,
-		 "Format: files not yet supported.\n" );
-
-		goto on_error;
 	}
 	if( mount_handle_open_input(
 	     ewfmount_mount_handle,

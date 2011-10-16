@@ -129,25 +129,25 @@ int libewf_file_entry_get_size(
 LIBEWF_EXTERN \
 int libewf_file_entry_get_creation_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *creation_time,
+     uint32_t *creation_time,
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_modification_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *modification_time,
+     uint32_t *modification_time,
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_access_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *access_time,
+     uint32_t *access_time,
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_entry_modification_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *entry_modification_time,
+     uint32_t *entry_modification_time,
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -198,6 +198,12 @@ off64_t libewf_file_entry_seek_offset(
          off64_t offset,
          int whence,
          liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_entry_get_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *offset,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

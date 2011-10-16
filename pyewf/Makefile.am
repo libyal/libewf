@@ -10,6 +10,8 @@ pyexec_LTLIBRARIES = pyewf.la
 
 pyewf_la_SOURCES = \
 	pyewf.c pyewf.h \
+	pyewf_datetime.c pyewf_datetime.h \
+	pyewf_file_entry.c pyewf_file_entry.h \
 	pyewf_handle.c pyewf_handle.h \
 	pyewf_metadata.c pyewf_metadata.h \
 	pyewf_python.h

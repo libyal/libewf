@@ -106,7 +106,7 @@ PyObject *pyewf_handle_get_header_value(
 	     keyword_list,
 	     &header_value_identifier ) == 0 )
 	{
-		return( NULL );
+		goto on_error;
 	}
 	header_value_identifier_length = libcstring_narrow_string_length(
 	                                  header_value_identifier );
@@ -143,7 +143,7 @@ PyObject *pyewf_handle_get_header_value(
 		liberror_error_free(
 		 &error );
 
-		return( NULL );
+		goto on_error;
 	}
 	/* Check if header value is present
 	 */
@@ -161,7 +161,7 @@ PyObject *pyewf_handle_get_header_value(
 		 "%s: unable to create header value.",
 		 function );
 
-		return( NULL );
+		goto on_error;
 	}
 	result = libewf_handle_get_utf8_header_value(
 	          pyewf_handle->handle,
@@ -196,10 +196,7 @@ PyObject *pyewf_handle_get_header_value(
 		liberror_error_free(
 		 &error );
 
-		memory_free(
-		 header_value );
-
-		return( NULL );
+		goto on_error;
 	}
 	/* Check if the header value is present
 	 */
@@ -223,15 +220,20 @@ PyObject *pyewf_handle_get_header_value(
 		 function,
 		 header_value_identifier );
 
-		memory_free(
-		 header_value );
-
-		return( NULL );
+		goto on_error;
 	}
 	memory_free(
 	 header_value );
 
 	return( string_object );
+
+on_error:
+	if( header_value != NULL )
+	{
+		memory_free(
+		 header_value );
+	}
+	return( NULL );
 }
 
 /* Retrieves the header values
@@ -282,7 +284,7 @@ PyObject *pyewf_handle_get_header_values(
 		liberror_error_free(
 		 &error );
 
-		return( NULL );
+		goto on_error;
 	}
 	dictionary_object = PyDict_New();
 
@@ -319,10 +321,7 @@ PyObject *pyewf_handle_get_header_values(
 			liberror_error_free(
 			 &error );
 
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		header_value_identifier = (char *) memory_allocate(
 		                                    sizeof( char ) * header_value_identifier_size );
@@ -334,10 +333,7 @@ PyObject *pyewf_handle_get_header_values(
 			 "%s: unable to create header value identifier.",
 			 function );
 
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		if( libewf_handle_get_header_value_identifier(
 		     pyewf_handle->handle,
@@ -369,13 +365,7 @@ PyObject *pyewf_handle_get_header_values(
 			liberror_error_free(
 			 &error );
 
-			memory_free(
-			 header_value_identifier );
-
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		header_value_identifier_length = libcstring_narrow_string_length(
 						  header_value_identifier );
@@ -412,13 +402,7 @@ PyObject *pyewf_handle_get_header_values(
 			liberror_error_free(
 			 &error );
 
-			memory_free(
-			 header_value_identifier );
-
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		/* Ignore emtpy header values
 		 */
@@ -438,13 +422,7 @@ PyObject *pyewf_handle_get_header_values(
 				 "%s: unable to create header value.",
 				 function );
 
-				memory_free(
-				 header_value_identifier );
-
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
 			if( libewf_handle_get_utf8_header_value(
 			     pyewf_handle->handle,
@@ -477,15 +455,7 @@ PyObject *pyewf_handle_get_header_values(
 				liberror_error_free(
 				 &error );
 
-				memory_free(
-				 header_value );
-				memory_free(
-				 header_value_identifier );
-
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
 			string_object = PyUnicode_DecodeUTF8(
 			                 header_value,
@@ -500,15 +470,7 @@ PyObject *pyewf_handle_get_header_values(
 				 function,
 				 header_value_identifier );
 
-				memory_free(
-				 header_value );
-				memory_free(
-				 header_value_identifier );
-
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
 			if( PyDict_SetItemString(
 			     dictionary_object,
@@ -521,25 +483,44 @@ PyObject *pyewf_handle_get_header_values(
 				 function,
 				 header_value_identifier );
 
-				memory_free(
-				 header_value );
-				memory_free(
-				 header_value_identifier );
-
-				Py_DecRef(
-				 string_object );
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
+			string_object = NULL;
+
 			memory_free(
 			 header_value );
+
+			header_value = NULL;
 		}
 		memory_free(
 		 header_value_identifier );
+
+		header_value_identifier = NULL;
 	}
 	return( dictionary_object );
+
+on_error:
+	if( string_object != NULL )
+	{
+		Py_DecRef(
+		 string_object );
+	}
+	if( header_value != NULL )
+	{
+		memory_free(
+		 header_value );
+	}
+	if( header_value_identifier != NULL )
+	{
+		memory_free(
+		 header_value_identifier );
+	}
+	if( dictionary_object != NULL )
+	{
+		Py_DecRef(
+		 dictionary_object );
+	}
+	return( NULL );
 }
 
 /* Retrieves a hash value
@@ -570,7 +551,7 @@ PyObject *pyewf_handle_get_hash_value(
 	     keyword_list,
 	     &hash_value_identifier ) == 0 )
 	{
-		return( NULL );
+		goto on_error;
 	}
 	hash_value_identifier_length = libcstring_narrow_string_length(
 	                                hash_value_identifier );
@@ -607,7 +588,7 @@ PyObject *pyewf_handle_get_hash_value(
 		liberror_error_free(
 		 &error );
 
-		return( NULL );
+		goto on_error;
 	}
 	/* Check if hash value is present
 	 */
@@ -625,7 +606,7 @@ PyObject *pyewf_handle_get_hash_value(
 		 "%s: unable to create hash value.",
 		 function );
 
-		return( NULL );
+		goto on_error;
 	}
 	result = libewf_handle_get_utf8_hash_value(
 	          pyewf_handle->handle,
@@ -660,10 +641,7 @@ PyObject *pyewf_handle_get_hash_value(
 		liberror_error_free(
 		 &error );
 
-		memory_free(
-		 hash_value );
-
-		return( NULL );
+		goto on_error;
 	}
 	/* Check if the hash value is present
 	 */
@@ -687,15 +665,20 @@ PyObject *pyewf_handle_get_hash_value(
 		 function,
 		 hash_value_identifier );
 
-		memory_free(
-		 hash_value );
-
-		return( NULL );
+		goto on_error;
 	}
 	memory_free(
 	 hash_value );
 
 	return( string_object );
+
+on_error:
+	if( hash_value != NULL )
+	{
+		memory_free(
+		 hash_value );
+	}
+	return( NULL );
 }
 
 /* Retrieves the hash values
@@ -746,7 +729,7 @@ PyObject *pyewf_handle_get_hash_values(
 		liberror_error_free(
 		 &error );
 
-		return( NULL );
+		goto on_error;
 	}
 	dictionary_object = PyDict_New();
 
@@ -783,10 +766,7 @@ PyObject *pyewf_handle_get_hash_values(
 			liberror_error_free(
 			 &error );
 
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		hash_value_identifier = (char *) memory_allocate(
 		                                  sizeof( char ) * hash_value_identifier_size );
@@ -798,10 +778,7 @@ PyObject *pyewf_handle_get_hash_values(
 			 "%s: unable to create hash value identifier.",
 			 function );
 
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		if( libewf_handle_get_hash_value_identifier(
 		     pyewf_handle->handle,
@@ -833,16 +810,10 @@ PyObject *pyewf_handle_get_hash_values(
 			liberror_error_free(
 			 &error );
 
-			memory_free(
-			 hash_value_identifier );
-
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		hash_value_identifier_length = libcstring_narrow_string_length(
-						  hash_value_identifier );
+		                                hash_value_identifier );
 
 		result = libewf_handle_get_utf8_hash_value_size(
 		          pyewf_handle->handle,
@@ -876,13 +847,7 @@ PyObject *pyewf_handle_get_hash_values(
 			liberror_error_free(
 			 &error );
 
-			memory_free(
-			 hash_value_identifier );
-
-			Py_DecRef(
-			 dictionary_object );
-
-			return( NULL );
+			goto on_error;
 		}
 		/* Ignore emtpy hash values
 		 */
@@ -902,13 +867,7 @@ PyObject *pyewf_handle_get_hash_values(
 				 "%s: unable to create hash value.",
 				 function );
 
-				memory_free(
-				 hash_value_identifier );
-
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
 			if( libewf_handle_get_utf8_hash_value(
 			     pyewf_handle->handle,
@@ -941,15 +900,7 @@ PyObject *pyewf_handle_get_hash_values(
 				liberror_error_free(
 				 &error );
 
-				memory_free(
-				 hash_value );
-				memory_free(
-				 hash_value_identifier );
-
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
 			string_object = PyUnicode_DecodeUTF8(
 			                 hash_value,
@@ -964,15 +915,7 @@ PyObject *pyewf_handle_get_hash_values(
 				 function,
 				 hash_value_identifier );
 
-				memory_free(
-				 hash_value );
-				memory_free(
-				 hash_value_identifier );
-
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
 			if( PyDict_SetItemString(
 			     dictionary_object,
@@ -985,24 +928,43 @@ PyObject *pyewf_handle_get_hash_values(
 				 function,
 				 hash_value_identifier );
 
-				memory_free(
-				 hash_value );
-				memory_free(
-				 hash_value_identifier );
-
-				Py_DecRef(
-				 string_object );
-				Py_DecRef(
-				 dictionary_object );
-
-				return( NULL );
+				goto on_error;
 			}
+			string_object = NULL;
+
 			memory_free(
 			 hash_value );
+
+			hash_value = NULL;
 		}
 		memory_free(
 		 hash_value_identifier );
+
+		hash_value_identifier = NULL;
 	}
 	return( dictionary_object );
+
+on_error:
+	if( string_object != NULL )
+	{
+		Py_DecRef(
+		 string_object );
+	}
+	if( hash_value != NULL )
+	{
+		memory_free(
+		 hash_value );
+	}
+	if( hash_value_identifier != NULL )
+	{
+		memory_free(
+		 hash_value_identifier );
+	}
+	if( dictionary_object != NULL )
+	{
+		Py_DecRef(
+		 dictionary_object );
+	}
+	return( NULL );
 }
 

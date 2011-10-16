@@ -1,5 +1,5 @@
 /*
- * Library function of libewf .net managed wrapper
+ * Definitions of libewf .net managed wrapper
  *
  * Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,21 +19,10 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#using <mscorlib.dll>
-
-using namespace System;
+#if !defined( _EWF_NET_DEFINITIONS_H )
+#define _EWF_NET_DEFINITIONS_H
 
 #define EWF_NET_ERROR_STRING_SIZE	512
 
-namespace EWF {
-
-public ref class EWF sealed
-{
-	public:
-		System::String^ GetVersion( void );
-
-		/* TODO add codepage functions ? */
-};
-
-} // namespace EWF
+#endif
 

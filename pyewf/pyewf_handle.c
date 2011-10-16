@@ -34,6 +34,7 @@
 #include <libewf.h>
 
 #include "pyewf.h"
+#include "pyewf_file_entry.h"
 #include "pyewf_handle.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
@@ -135,6 +136,13 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	  (PyCFunction) pyewf_handle_get_hash_values,
 	  METH_NOARGS,
 	  "Retrieves all hash values" },
+
+	/* Functions to access the (single) file entries */
+
+	{ "get_root_file_entry",
+	  (PyCFunction) pyewf_handle_get_root_file_entry,
+	  METH_NOARGS,
+	  "Retrieves the root file entry" },
 
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
@@ -240,10 +248,10 @@ PyTypeObject pyewf_handle_type_object = {
 /* Creates a new pyewf handle object
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyewf_new_handle(
+PyObject *pyewf_handle_new(
            PyObject *self )
 {
-	static char *function        = "pyewf_new_handle";
+	static char *function        = "pyewf_handle_new";
 	pyewf_handle_t *pyewf_handle = NULL;
 
 	pyewf_handle = PyObject_New(
@@ -257,7 +265,7 @@ PyObject *pyewf_new_handle(
 		 "%s: unable to initialize handle.",
 		 function );
 
-		return( NULL );
+		goto on_error;
 	}
 	if( pyewf_handle_init(
 	     pyewf_handle ) != 0 )
@@ -267,12 +275,38 @@ PyObject *pyewf_new_handle(
 		 "%s: unable to initialize handle.",
 		 function );
 
-		Py_DecRef(
-		 (PyObject *) pyewf_handle );
-
-		return( NULL );
+		goto on_error;
 	}
 	return( (PyObject *) pyewf_handle );
+
+on_error:
+	if( pyewf_handle != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyewf_handle );
+	}
+	return( NULL );
+}
+
+/* Creates a new handle object and opens it
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_new_open(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *pyewf_handle = NULL;
+
+	pyewf_handle = pyewf_handle_new(
+	                self );
+
+	pyewf_handle_open(
+	 (pyewf_handle_t *) pyewf_handle,
+	 arguments,
+	 keywords );
+
+	return( pyewf_handle );
 }
 
 /* Intializes a handle object
@@ -501,7 +535,7 @@ PyObject *pyewf_handle_open(
 	      &sequence_object,
 	      &access_flags ) == 0 )
 	{
-		return( NULL );
+		goto on_error;
 	}
 	if( PySequence_Check(
 	     sequence_object ) == 0 )
@@ -511,7 +545,7 @@ PyObject *pyewf_handle_open(
 		 "%s: argument: files must be a list or tuple.",
 		 function );
 
-		return( NULL );
+		goto on_error;
 	}
 	number_of_filenames = PySequence_Size(
 	                       sequence_object );
@@ -524,7 +558,7 @@ PyObject *pyewf_handle_open(
 		 "%s: invalid number of files.",
 		 function );
 
-		return( NULL );
+		goto on_error;
 	}
 	filenames = (char **) memory_allocate(
 	                       sizeof( char * ) * number_of_filenames );
@@ -536,7 +570,7 @@ PyObject *pyewf_handle_open(
 		 "%s: unable to create filenames.",
 		 function );
 
-		return( NULL );
+		goto on_error;
 	}
 	if( memory_set(
 	     filenames,
@@ -575,15 +609,7 @@ PyObject *pyewf_handle_open(
 			 function,
 			 filename_index );
 
-			for( ; filename_index > 0; filename_index-- )
-			{
-				memory_free(
-				 filenames[ filename_index - 1 ] );
-			}
-			memory_free(
-			 filenames );
-
-			return( NULL );
+			goto on_error;
 		}
 		if( libcstring_narrow_string_copy(
 		     filenames[ filename_index ],
@@ -597,15 +623,7 @@ PyObject *pyewf_handle_open(
 			 function,
 			 filename_index );
 
-			for( ; filename_index > 0; filename_index-- )
-			{
-				memory_free(
-				 filenames[ filename_index - 1 ] );
-			}
-			memory_free(
-			 filenames );
-
-			return( NULL );
+			goto on_error;
 		}
 		( filenames[ filename_index ] )[ filename_length ] = 0;
 
@@ -640,17 +658,7 @@ PyObject *pyewf_handle_open(
 		liberror_error_free(
 		 &error );
 
-		for( filename_index = 0;
-		     filename_index < number_of_filenames;
-		     filename_index++ )
-		{
-			memory_free(
-			 filenames[ filename_index ] );
-		}
-		memory_free(
-		 filenames );
-
-		return( NULL );
+		goto on_error;
 	}
 	for( filename_index = 0;
 	     filename_index < number_of_filenames;
@@ -663,6 +671,19 @@ PyObject *pyewf_handle_open(
 	 filenames );
 
 	return( Py_None );
+
+on_error:
+	if( filenames != NULL )
+	{
+		for( ; filename_index > 0; filename_index-- )
+		{
+			memory_free(
+			 filenames[ filename_index - 1 ] );
+		}
+		memory_free(
+		 filenames );
+	}
+	return( NULL );
 }
 
 /* Closes EWF file(s)
@@ -1280,5 +1301,81 @@ PyObject *pyewf_handle_get_offset(
 	}
 	return( PyLong_FromLongLong(
 	         current_offset ) );
+}
+
+/* Retrieves the root file entry
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_root_file_entry(
+           pyewf_handle_t *pyewf_handle )
+{
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	liberror_error_t *error              = NULL;
+	libewf_file_entry_t *root_file_entry = NULL;
+	PyObject *file_entry_object          = NULL;
+	static char *function                = "pyewf_handle_get_root_file_entry";
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	if( libewf_handle_get_root_file_entry(
+	     pyewf_handle->handle,
+	     &root_file_entry,
+	     &error ) != 1 )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+                {
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve root file entry.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve root file entry.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	file_entry_object = pyewf_file_entry_new(
+	                     NULL );
+
+	if( file_entry_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create file entry object.",
+		 function );
+
+		goto on_error;
+	}
+	( (pyewf_file_entry_t *) file_entry_object )->file_entry = root_file_entry;
+
+	return( file_entry_object );
+
+on_error:
+	if( root_file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &root_file_entry,
+		 NULL );
+	}
+	return( NULL );
 }
 

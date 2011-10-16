@@ -1,5 +1,5 @@
 /*
- * Library function of libewf .net managed wrapper
+ * Support function of libewf .net managed wrapper
  *
  * Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -27,7 +27,8 @@
 
 #include <vcclr.h>
 
-#include "ewf.net.h"
+#include "ewf.net_definitions.h"
+#include "ewf.net_support.h"
 
 #using <mscorlib.dll>
 
@@ -56,7 +57,7 @@ using namespace System::Security::Permissions;
 
 namespace EWF {
 
-System::String^ EWF::GetVersion( void )
+System::String^ Support::GetVersion( void )
 {
 	return( gcnew System::String(
 	               libewf_get_version() ) );

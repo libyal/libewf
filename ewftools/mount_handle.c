@@ -137,6 +137,22 @@ int mount_handle_free(
 	}
 	if( *mount_handle != NULL )
 	{
+		if( ( *mount_handle )->root_file_entry != NULL )
+		{
+			if( libewf_file_entry_free(
+			     &( ( *mount_handle )->root_file_entry ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free root file entry.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( libewf_handle_free(
 		     &( ( *mount_handle )->input_handle ),
 		     error ) != 1 )
@@ -391,6 +407,23 @@ int mount_handle_open_input(
 			return( -1 );
 		}
 	}
+	if( mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
+	{
+		if( libewf_handle_get_root_file_entry(
+		     mount_handle->input_handle,
+		     &( mount_handle->root_file_entry ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve root file entry.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	return( 1 );
 }
 
@@ -551,5 +584,404 @@ int mount_handle_get_media_size(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Retrieves the file entry of a specific path
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
+ */
+int mount_handle_get_file_entry_for_path(
+     mount_handle_t *mount_handle,
+     const libcstring_system_character_t *path,
+     size_t path_length,
+     libewf_file_entry_t **file_entry,
+     liberror_error_t **error )
+{
+	static char *function = "mount_handle_get_file_entry_for_path";
+	int result            = 0;
+
+	if( mount_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( path == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		return( -1 );
+	}
+	if( path_length == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path length.",
+		 function );
+
+		return( -1 );
+	}
+	if( path[ 0 ] != (libcstring_system_character_t) '/' )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported path.",
+		 function );
+
+		return( -1 );
+	}
+	if( path_length == 1 )
+	{
+		if( file_entry == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid file entry.",
+			 function );
+
+			return( -1 );
+		}
+		result = libewf_handle_get_root_file_entry(
+		          mount_handle->input_handle,
+		          file_entry,
+		          error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve root file entry.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		result = mount_handle_get_sub_file_entry_for_path(
+			  mount_handle,
+			  mount_handle->root_file_entry,
+			  path,
+			  path_length,
+			  1,
+			  file_entry,
+			  error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sub file entry.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( result );
+}
+
+/* Retrieves the sub file entry of a specific path in a specific file entry
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
+ */
+int mount_handle_get_sub_file_entry_for_path(
+     mount_handle_t *mount_handle,
+     libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *path,
+     size_t path_length,
+     size_t path_index,
+     libewf_file_entry_t **sub_file_entry,
+     liberror_error_t **error )
+{
+	libcstring_system_character_t *name               = NULL;
+	libcstring_system_character_t *path_segment_end   = NULL;
+	libcstring_system_character_t *path_segment_start = NULL;
+	libewf_file_entry_t *check_sub_file_entry         = NULL;
+	static char *function                             = "mount_handle_get_sub_file_entry_for_path";
+	size_t name_size                                  = 0;
+	size_t path_segment_length                        = 0;
+	int number_of_sub_file_entries                    = 0;
+	int path_segment_match                            = 0;
+	int result                                        = 0;
+	int sub_file_entry_index                          = 0;
+
+	if( mount_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( path == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( path_index == 0 )
+	 || ( path_index >= path_length ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid path index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	path_segment_start = (libcstring_system_character_t *) &( path[ path_index ] );
+
+	path_segment_end = libcstring_system_string_search_character(
+	                    path_segment_start,
+	                    (libcstring_system_character_t) '/',
+	                    path_length - path_index );
+
+	if( path_segment_end == NULL )
+	{
+		path_segment_length = path_length - path_index;
+	}
+	else
+	{
+		path_segment_length = (size_t) ( path_segment_end - path_segment_start );
+	}
+	if( path_segment_length == 0 )
+	{
+		return( 0 );
+	}
+	if( libewf_file_entry_get_number_of_sub_file_entries(
+	     file_entry,
+	     &number_of_sub_file_entries,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of sub file entries.",
+		 function );
+
+		goto on_error;
+	}
+	for( sub_file_entry_index = 0;
+	     sub_file_entry_index < number_of_sub_file_entries;
+	     sub_file_entry_index++ )
+	{
+		if( libewf_file_entry_get_sub_file_entry(
+		     file_entry,
+		     sub_file_entry_index,
+		     &check_sub_file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to free retrieve sub file entry: %d.",
+			 function,
+			 sub_file_entry_index );
+
+			goto on_error;
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_file_entry_get_utf16_name_size(
+			  check_sub_file_entry,
+			  &name_size,
+			  error );
+#else
+		result = libewf_file_entry_get_utf8_name_size(
+			  check_sub_file_entry,
+			  &name_size,
+			  error );
+#endif
+		if( result != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve the name size.",
+			 function );
+
+			goto on_error;
+		}
+		if( name_size > 0 )
+		{
+			name = libcstring_system_string_allocate(
+				name_size );
+
+			if( name == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create name.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libewf_file_entry_get_utf16_name(
+				  check_sub_file_entry,
+				  (uint16_t *) name,
+				  name_size,
+				  error );
+#else
+			result = libewf_file_entry_get_utf8_name(
+				  check_sub_file_entry,
+				  (uint8_t *) name,
+				  name_size,
+				  error );
+#endif
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve the name.",
+				 function );
+
+				goto on_error;
+			}
+			if( name_size == ( path_segment_length + 1 ) )
+			{
+				if( libcstring_system_string_compare(
+				     name,
+				     path_segment_start,
+				     path_segment_length ) == 0 )
+				{
+					path_segment_match = 1;
+				}
+			}
+			memory_free(
+			 name );
+
+			name = NULL;
+
+			if( path_segment_match != 0 )
+			{
+				break;
+			}
+		}
+		if( libewf_file_entry_free(
+		     &check_sub_file_entry,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sub file entry: %d.",
+			 function,
+			 sub_file_entry_index );
+
+			goto on_error;
+		}
+	}
+	result = 0;
+
+	if( path_segment_match != 0 )
+	{
+		path_index += path_segment_length + 1;
+
+		if( path_index < path_length )
+		{
+			result = mount_handle_get_sub_file_entry_for_path(
+				  mount_handle,
+				  check_sub_file_entry,
+				  path,
+				  path_length,
+				  path_index,
+				  sub_file_entry,
+				  error );
+
+			if( result == -1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve sub file entry.",
+				 function );
+
+				goto on_error;
+			}
+			if( libewf_file_entry_free(
+			     &check_sub_file_entry,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				goto on_error;
+			}
+		}
+		else
+		{
+			if( sub_file_entry == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: invalid sub file entry.",
+				 function );
+
+				goto on_error;
+			}
+			*sub_file_entry = check_sub_file_entry;
+
+			result = 1;
+		}
+	}
+	return( result );
+
+on_error:
+	if( name != NULL )
+	{
+		memory_free(
+		 name );
+	}
+	if( check_sub_file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &check_sub_file_entry,
+		 NULL );
+	}
+	return( -1 );
 }
 

@@ -19,6 +19,11 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if !defined( _EWF_NET_HANDLE_H )
+#define _EWF_NET_HANDLE_H
+
+#include "ewf.net_file_entry.h"
+
 #using <mscorlib.dll>
 
 using namespace System;
@@ -38,14 +43,14 @@ public ref class Handle sealed
 		Handle( void );
 		~Handle( void );
 
-		int GetAccessFlagsRead( void );
-		int GetAccessFlagsReadWrite( void );
-		int GetAccessFlagsWrite( void );
-		int GetAccessFlagsWriteResume( void );
+		static int GetAccessFlagsRead( void );
+		static int GetAccessFlagsReadWrite( void );
+		static int GetAccessFlagsWrite( void );
+		static int GetAccessFlagsWriteResume( void );
 
-		bool CheckFileSignature( System::String^ filename );
+		static bool CheckFileSignature( System::String^ filename );
 
-		array<System::String^>^ Glob( System::String^ filename );
+		static array<System::String^>^ Glob( System::String^ filename );
 
 		Handle^ Clone( void );
 
@@ -182,10 +187,10 @@ public ref class Handle sealed
 
 #endif /* _MSC_VER >= 1600 */
 
-		/* TODO add single file entry root functions ?
-		 * create separate class for single file entry
-		 */
+		FileEntry^ GetRootFileEntry( void );
 };
 
 } // namespace EWF
+
+#endif
 

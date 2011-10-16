@@ -574,7 +574,7 @@ int libewf_file_entry_get_size(
  */
 int libewf_file_entry_get_creation_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *creation_time,
+     uint32_t *creation_time,
      liberror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -626,7 +626,7 @@ int libewf_file_entry_get_creation_time(
  */
 int libewf_file_entry_get_modification_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *modification_time,
+     uint32_t *modification_time,
      liberror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -678,7 +678,7 @@ int libewf_file_entry_get_modification_time(
  */
 int libewf_file_entry_get_access_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *access_time,
+     uint32_t *access_time,
      liberror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -730,7 +730,7 @@ int libewf_file_entry_get_access_time(
  */
 int libewf_file_entry_get_entry_modification_time(
      libewf_file_entry_t *file_entry,
-     uint64_t *entry_modification_time,
+     uint32_t *entry_modification_time,
      liberror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1439,5 +1439,56 @@ off64_t libewf_file_entry_seek_offset(
 	internal_file_entry->offset = offset;
 
 	return( offset );
+}
+
+/* Retrieves the current offset of the data
+ * Returns the offset if successful or -1 on error
+ */
+int libewf_file_entry_get_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *offset,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_offset";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( offset == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset.",
+		 function );
+
+		return( -1 );
+	}
+	*offset = internal_file_entry->offset;
+
+	return( 1 );
 }
 

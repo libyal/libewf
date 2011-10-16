@@ -3648,10 +3648,10 @@ int info_handle_file_entry_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the name.",
+		 "%s: unable to retrieve the name size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( name_size > 0 )
 	{
@@ -3667,7 +3667,7 @@ int info_handle_file_entry_fprint(
 			 "%s: unable to create name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_file_entry_get_utf16_name(
@@ -3691,10 +3691,7 @@ int info_handle_file_entry_fprint(
 			 "%s: unable to retrieve the name.",
 			 function );
 
-			memory_free(
-			 name );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
@@ -3718,6 +3715,8 @@ int info_handle_file_entry_fprint(
 
 		memory_free(
 		 name );
+
+		name = NULL;
 
 		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
@@ -3762,9 +3761,9 @@ int info_handle_file_entry_fprint(
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to free retrieve sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( info_handle_file_entry_fprint(
 		     info_handle,
@@ -3778,13 +3777,9 @@ int info_handle_file_entry_fprint(
 			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
-			libewf_file_entry_free(
-			 &sub_file_entry,
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libewf_file_entry_free(
 		     &sub_file_entry,
@@ -3796,9 +3791,9 @@ int info_handle_file_entry_fprint(
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sub file entry: %d.",
 			 function,
-			 sub_file_entry_index + 1 );
+			 sub_file_entry_index );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
@@ -3808,6 +3803,20 @@ int info_handle_file_entry_fprint(
 		 "\t\t\t</file_entry>\n" );
 	}
 	return( 1 );
+
+on_error:
+	if( sub_file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &sub_file_entry,
+		 NULL );
+	}
+	if( name != NULL )
+	{
+		memory_free(
+		 name );
+	}
+	return( -1 );
 }
 
 /* Prints the DFXML header to a stream
