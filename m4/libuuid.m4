@@ -1,6 +1,6 @@
 dnl Functions for libuuid
 dnl
-dnl Version: 20111011
+dnl Version: 20111017
 
 dnl Function to detect if libuuid is available
 AC_DEFUN([AX_LIBUUID_CHECK_LIB],
@@ -109,10 +109,7 @@ AC_DEFUN([AX_LIBUUID_CHECK_ENABLE],
   [auto-detect],
   [DIR])
 
- AS_IF(
-  [test "x$ac_cv_enable_guid" = xno],
-  [ac_cv_libuuid=no],
-  [AX_LIBUUID_CHECK_LIB])
+ AX_LIBUUID_CHECK_LIB
 
  AS_IF(
   [test "x$ac_cv_libuuid" = xlibuuid],

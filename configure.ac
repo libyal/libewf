@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111016],
+ [20111017],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -141,7 +141,10 @@ dnl Check for enabling libsmraw for storage media (split) RAW support
 AX_LIBSMRAW_CHECK_ENABLE
 
 dnl Check for enabling GUID/UUID support
-AX_LIBUUID_CHECK_ENABLE
+AS_IF(
+ [test "x$ac_cv_enable_guid" = xno],
+ [ac_cv_libuuid=no],
+ [AX_LIBUUID_CHECK_ENABLE])
 
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AX_LIBFUSE_CHECK_ENABLE

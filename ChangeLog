@@ -281,6 +281,7 @@ Closed:
 
 20111017
 * worked on ewf.net file entry support
+* changes to m4/libuuid.m4
 
 20111016
 * added libewf_file_entry_get_offset
