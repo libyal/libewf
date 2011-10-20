@@ -13,11 +13,12 @@ Creating static executables
 Make sure you have a static version of:
 * glibc
 * zlib
-* libcrypto (openssl)
-* libuuid (can be disabled by --enable-guid=no)
+* openssl (libcrypto) (can be disabled by --with-openssl=no)
+* libuuid (can be disabled by --with-libuuid=no)
+* libfuse (can be disabled by --with-libfuse=no)
 
 Some distrubions provide separate packages for static versions of libraries
 
 Use the following command to tell configure you want to make a static executables:
-./configure --enable-static-executables=yes --enable-guid=no
+./configure --enable-static-executables=yes --with-openssl=no --with-libuuid=no --with-libfuse=no
 
