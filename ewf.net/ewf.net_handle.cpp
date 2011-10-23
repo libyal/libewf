@@ -38,6 +38,7 @@
 #include "ewf.net_definitions.h"
 #include "ewf.net_file_entry.h"
 #include "ewf.net_handle.h"
+#include "ewf.net_sector_range.h"
 
 #using <mscorlib.dll>
 
@@ -90,7 +91,7 @@ Handle::Handle( void )
 			     error_string );
 	}
 	this->ewf_handle = Marshal::ReadIntPtr(
-	                      (IntPtr) &handle );
+	                    (IntPtr) &handle );
 }
 
 Handle::~Handle( void )
@@ -1568,12 +1569,12 @@ int Handle::GetNumberOfAcquiryErrors( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error             = NULL;
-	libewf_handle_t *handle           = NULL;
-	System::String^ error_string      = nullptr;
-	System::String^ function          = "Handle::GetNumberOfAcquiryErrors";
-	uint32_t number_of_acquiry_errors = 0;
-	int result                        = 0;
+	libewf_error_t *error                 = NULL;
+	libewf_handle_t *handle               = NULL;
+	System::String^ error_string          = nullptr;
+	System::String^ function              = "Handle::GetNumberOfAcquiryErrors";
+	uint32_t ewf_number_of_acquiry_errors = 0;
+	int result                            = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
@@ -1581,7 +1582,7 @@ int Handle::GetNumberOfAcquiryErrors( void )
 
 	result = libewf_handle_get_number_of_acquiry_errors(
 	          handle,
-	          &number_of_acquiry_errors,
+	          &ewf_number_of_acquiry_errors,
 	          &error );
 
 	if( result == -1 )
@@ -1607,24 +1608,144 @@ int Handle::GetNumberOfAcquiryErrors( void )
 		throw gcnew System::Exception(
 			     error_string );
 	}
-	if( number_of_acquiry_errors > (uint32_t) INT_MAX )
+	if( ewf_number_of_acquiry_errors > (uint32_t) INT_MAX )
 	{
 		throw gcnew System::Exception(
 			     "ewf.net " + function + ": number of acquiry errors exceeds maximum." );
 	}
-	return( (int) number_of_acquiry_errors );
+	return( (int) ewf_number_of_acquiry_errors );
+}
+
+SectorRange^ Handle::GetAcquiryError( int index )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	SectorRange ^sector_range      = nullptr;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::GetAcquiryError";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( index > (int) UINT32_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": index exceeds maximum." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_acquiry_error(
+	          handle,
+	          (uint32_t) index,
+	          &ewf_first_sector,
+	          &ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of acquiry error: " + index + " from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	sector_range = gcnew SectorRange( Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_first_sector ),
+	                                  Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_number_of_sectors ) );
+
+	return( sector_range );
+}
+
+void Handle::AppendAcquiryError( SectorRange^ sector_range )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::AppendAcquiryError";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( sector_range == nullptr )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": invalid sector range." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_number_of_sectors,
+	 sector_range->number_of_sectors );
+
+	result = libewf_handle_append_checksum_error(
+	          handle,
+	          ewf_first_sector,
+	          ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to append acquiry error to ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
 }
 
 int Handle::GetNumberOfChecksumErrors( void )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
-	libewf_error_t *error              = NULL;
-	libewf_handle_t *handle            = NULL;
-	System::String^ error_string       = nullptr;
-	System::String^ function           = "Handle::GetNumberOfChecksumErrors";
-	uint32_t number_of_checksum_errors = 0;
-	int result                         = 0;
+	libewf_error_t *error                  = NULL;
+	libewf_handle_t *handle                = NULL;
+	System::String^ error_string           = nullptr;
+	System::String^ function               = "Handle::GetNumberOfChecksumErrors";
+	uint32_t ewf_number_of_checksum_errors = 0;
+	int result                             = 0;
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
@@ -1632,7 +1753,7 @@ int Handle::GetNumberOfChecksumErrors( void )
 
 	result = libewf_handle_get_number_of_checksum_errors(
 	          handle,
-	          &number_of_checksum_errors,
+	          &ewf_number_of_checksum_errors,
 	          &error );
 
 	if( result == -1 )
@@ -1658,12 +1779,132 @@ int Handle::GetNumberOfChecksumErrors( void )
 		throw gcnew System::Exception(
 			     error_string );
 	}
-	if( number_of_checksum_errors > (uint32_t) INT_MAX )
+	if( ewf_number_of_checksum_errors > (uint32_t) INT_MAX )
 	{
 		throw gcnew System::Exception(
 			     "ewf.net " + function + ": number of checksum errors exceeds maximum." );
 	}
-	return( (int) number_of_checksum_errors );
+	return( (int) ewf_number_of_checksum_errors );
+}
+
+SectorRange^ Handle::GetChecksumError( int index )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	SectorRange ^sector_range      = nullptr;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::GetChecksumError";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( index > (int) UINT32_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": index exceeds maximum." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_checksum_error(
+	          handle,
+	          (uint32_t) index,
+	          &ewf_first_sector,
+	          &ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of checksum error: " + index + " from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	sector_range = gcnew SectorRange( Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_first_sector ),
+	                                  Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_number_of_sectors ) );
+
+	return( sector_range );
+}
+
+void Handle::AppendChecksumError( SectorRange^ sector_range )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::AppendChecksumError";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( sector_range == nullptr )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": invalid sector range." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_number_of_sectors,
+	 sector_range->number_of_sectors );
+
+	result = libewf_handle_append_checksum_error(
+	          handle,
+	          ewf_first_sector,
+	          ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to append checksum error to ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
 }
 
 int Handle::GetNumberOfSessions( void )
@@ -1715,6 +1956,297 @@ int Handle::GetNumberOfSessions( void )
 			     "ewf.net " + function + ": number of sessions exceeds maximum." );
 	}
 	return( (int) number_of_sessions );
+}
+
+SectorRange^ Handle::GetSession( int index )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	SectorRange ^sector_range      = nullptr;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::GetSession";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( index > (int) UINT32_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": index exceeds maximum." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_session(
+	          handle,
+	          (uint32_t) index,
+	          &ewf_first_sector,
+	          &ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of session: " + index + " from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	sector_range = gcnew SectorRange( Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_first_sector ),
+	                                  Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_number_of_sectors ) );
+
+	return( sector_range );
+}
+
+void Handle::AppendSession( SectorRange^ sector_range )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::AppendSession";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( sector_range == nullptr )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": invalid sector range." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_number_of_sectors,
+	 sector_range->number_of_sectors );
+
+	result = libewf_handle_append_session(
+	          handle,
+	          ewf_first_sector,
+	          ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to append session to ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+}
+
+int Handle::GetNumberOfTracks( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
+	System::String^ error_string = nullptr;
+	System::String^ function     = "Handle::GetNumberOfTracks";
+	uint32_t number_of_tracks    = 0;
+	int result                   = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_number_of_tracks(
+	          handle,
+	          &number_of_tracks,
+	          &error );
+
+	if( result == -1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of tracks from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	if( number_of_tracks > (uint32_t) INT_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": number of tracks exceeds maximum." );
+	}
+	return( (int) number_of_tracks );
+}
+
+SectorRange^ Handle::GetTrack( int index )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	SectorRange ^sector_range      = nullptr;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::GetTrack";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( index > (int) UINT32_MAX )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": index exceeds maximum." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	result = libewf_handle_get_track(
+	          handle,
+	          (uint32_t) index,
+	          &ewf_first_sector,
+	          &ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve number of track: " + index + " from ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	sector_range = gcnew SectorRange( Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_first_sector ),
+	                                  Marshal::ReadInt64(
+	                                   (IntPtr) &ewf_number_of_sectors ) );
+
+	return( sector_range );
+}
+
+void Handle::AppendTrack( SectorRange^ sector_range )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error          = NULL;
+	libewf_handle_t *handle        = NULL;
+	System::String^ error_string   = nullptr;
+	System::String^ function       = "Handle::AppendTrack";
+	uint64_t ewf_first_sector      = 0;
+	uint64_t ewf_number_of_sectors = 0;
+	int result                     = 0;
+
+	if( sector_range == nullptr )
+	{
+		throw gcnew System::Exception(
+			     "ewf.net " + function + ": invalid sector range." );
+	}
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_handle );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
+
+	Marshal::WriteInt64(
+	 (IntPtr) &ewf_number_of_sectors,
+	 sector_range->number_of_sectors );
+
+	result = libewf_handle_append_track(
+	          handle,
+	          ewf_first_sector,
+	          ewf_number_of_sectors,
+	          &error );
+
+	if( result != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to append track to ewf handle." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
 }
 
 #if _MSC_VER >= 1600
@@ -2482,7 +3014,7 @@ FileEntry^ Handle::GetRootFileEntry( void )
 		return( nullptr );
 	}
 	file_entry = gcnew FileEntry( Marshal::ReadIntPtr(
-	                                        (IntPtr) &ewf_file_entry ) );
+	                               (IntPtr) &ewf_file_entry ) );
 
 	return( file_entry );
 }

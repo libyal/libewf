@@ -23,6 +23,7 @@
 #define _EWF_NET_HANDLE_H
 
 #include "ewf.net_file_entry.h"
+#include "ewf.net_sector_range.h"
 
 #using <mscorlib.dll>
 
@@ -126,28 +127,27 @@ public ref class Handle sealed
 
 		int GetNumberOfAcquiryErrors( void );
 
-		/* TODO add aquiry error functions ?
- 
-		bool GetAcquiryError( int index,
-		                      System::UInt64 first_sector,
-		                      System::UInt32 number_of_sectors );
+		SectorRange^ GetAcquiryError( int index );
 
-		void AppendAcquiryError( System::UInt64 first_sector,
-		                         System::UInt32 number_of_sectors );
-
-		*/
+		void AppendAcquiryError( SectorRange^ sector_range );
 
 		int GetNumberOfChecksumErrors( void );
 
-		/* TODO add checksum error functions ?
- 
-		*/
+		SectorRange^ GetChecksumError( int index );
+
+		void AppendChecksumError( SectorRange^ sector_range );
 
 		int GetNumberOfSessions( void );
 
-		/* TODO add session functions ?
- 
-		*/
+		SectorRange^ GetSession( int index );
+
+		void AppendSession( SectorRange^ sector_range );
+
+		int GetNumberOfTracks( void );
+
+		SectorRange^ GetTrack( int index );
+
+		void AppendTrack( SectorRange^ sector_range );
 
 		/* TODO add header codepage functions ?
 

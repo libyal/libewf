@@ -212,7 +212,7 @@ int ewfmount_fuse_open(
 			goto on_error;
 		}
 	}
-	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_RAW )
 	{
 		if( path_length != ewfmount_fuse_path_length )
 		{
@@ -391,7 +391,7 @@ int ewfmount_fuse_read(
 			goto on_error;
 		}
 	}
-	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_RAW )
 	{
 		if( path_length != ewfmount_fuse_path_length )
 		{
@@ -534,7 +534,7 @@ int ewfmount_fuse_readdir(
 			goto on_error;
 		}
 	}
-	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
+	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_RAW )
 	{
 		if( ( path_length != 1 )
 		 || ( path[ 0 ] != '/' ) )
@@ -642,7 +642,7 @@ int ewfmount_fuse_readdir(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve the file entry name size.",
+				 "%s: unable to retrieve the sub file entry name size.",
 				 function );
 
 				result = -ENODEV;
@@ -660,7 +660,7 @@ int ewfmount_fuse_readdir(
 					 &error,
 					 LIBERROR_ERROR_DOMAIN_MEMORY,
 					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create file entry name.",
+					 "%s: unable to create sub file entry name.",
 					 function );
 
 					result = -ENODEV;
@@ -686,7 +686,7 @@ int ewfmount_fuse_readdir(
 					 &error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve the file entry name.",
+					 "%s: unable to retrieve the sub file entry name.",
 					 function );
 
 					result = -ENODEV;
@@ -811,8 +811,8 @@ int ewfmount_fuse_getattr(
 	size64_t file_size              = 0;
 	size_t path_length              = 0;
 	uint32_t value_32bit            = 0;
-	int result                      = -ENOENT;
 	int number_of_sub_file_entries  = 0;
+	int result                      = -ENOENT;
 
 	if( path == NULL )
 	{
@@ -847,9 +847,9 @@ int ewfmount_fuse_getattr(
 	{
 		liberror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid stat info.",
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear stat info.",
 		 function );
 
 		result = errno;
@@ -929,7 +929,7 @@ int ewfmount_fuse_getattr(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unsupported to retrieve file entry size.",
+				 "%s: unable to retrieve file entry size.",
 				 function );
 
 				result = -ENODEV;
@@ -943,7 +943,7 @@ int ewfmount_fuse_getattr(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: unsupported to file entry size value out of bounds.",
+				 "%s: invalid to file entry size value out of bounds.",
 				 function );
 
 				result = -ERANGE;
@@ -962,7 +962,7 @@ int ewfmount_fuse_getattr(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unsupported to retrieve file entry modification time.",
+				 "%s: unable to retrieve file entry modification time.",
 				 function );
 
 				result = -ENODEV;
@@ -980,7 +980,7 @@ int ewfmount_fuse_getattr(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unsupported to retrieve file entry access time.",
+				 "%s: unable to retrieve file entry access time.",
 				 function );
 
 				result = -ENODEV;
@@ -998,7 +998,7 @@ int ewfmount_fuse_getattr(
 				 &error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unsupported to retrieve file entry wntry modification time.",
+				 "%s: unable to retrieve file entry entry modification time.",
 				 function );
 
 				result = -ENODEV;
@@ -1046,7 +1046,7 @@ int ewfmount_fuse_getattr(
 					 &error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unsupported to retrieve media size.",
+					 "%s: unable to retrieve media size.",
 					 function );
 
 					result = -ENODEV;
@@ -1060,7 +1060,7 @@ int ewfmount_fuse_getattr(
 					 &error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: unsupported to media size value out of bounds.",
+					 "%s: invalid media size value out of bounds.",
 					 function );
 
 					result = -ERANGE;

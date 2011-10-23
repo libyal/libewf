@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111020],
+ [20111023],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(

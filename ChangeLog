@@ -1,4 +1,5 @@
 TODO
+* add get file entry by path functions
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -278,6 +279,10 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111023
+* worked on ewf.net
+* bug fixes in ewfmount
 
 20111020
 * updated README.static

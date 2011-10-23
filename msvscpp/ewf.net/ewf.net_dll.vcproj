@@ -201,6 +201,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewf.net\ewf.net_sector_range.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewf.net\ewf.net_support.cpp"
 				>
 			</File>
@@ -224,6 +228,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewf.net\ewf.net_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_sector_range.h"
 				>
 			</File>
 			<File
