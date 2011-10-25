@@ -589,14 +589,14 @@ int mount_handle_get_media_size(
 /* Retrieves the file entry of a specific path
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
-int mount_handle_get_file_entry_for_path(
+int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
      const libcstring_system_character_t *path,
      size_t path_length,
      libewf_file_entry_t **file_entry,
      liberror_error_t **error )
 {
-	static char *function = "mount_handle_get_file_entry_for_path";
+	static char *function = "mount_handle_get_file_entry_by_path";
 	int result            = 0;
 
 	if( mount_handle == NULL )
@@ -675,7 +675,7 @@ int mount_handle_get_file_entry_for_path(
 	}
 	else
 	{
-		result = mount_handle_get_sub_file_entry_for_path(
+		result = mount_handle_get_sub_file_entry_by_path(
 			  mount_handle,
 			  mount_handle->root_file_entry,
 			  path,
@@ -702,7 +702,7 @@ int mount_handle_get_file_entry_for_path(
 /* Retrieves the sub file entry of a specific path in a specific file entry
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
-int mount_handle_get_sub_file_entry_for_path(
+int mount_handle_get_sub_file_entry_by_path(
      mount_handle_t *mount_handle,
      libewf_file_entry_t *file_entry,
      const libcstring_system_character_t *path,
@@ -715,7 +715,7 @@ int mount_handle_get_sub_file_entry_for_path(
 	libcstring_system_character_t *path_segment_end   = NULL;
 	libcstring_system_character_t *path_segment_start = NULL;
 	libewf_file_entry_t *check_sub_file_entry         = NULL;
-	static char *function                             = "mount_handle_get_sub_file_entry_for_path";
+	static char *function                             = "mount_handle_get_sub_file_entry_by_path";
 	size_t name_size                                  = 0;
 	size_t path_segment_length                        = 0;
 	int number_of_sub_file_entries                    = 0;
@@ -915,7 +915,7 @@ int mount_handle_get_sub_file_entry_for_path(
 
 		if( path_index < path_length )
 		{
-			result = mount_handle_get_sub_file_entry_for_path(
+			result = mount_handle_get_sub_file_entry_by_path(
 				  mount_handle,
 				  check_sub_file_entry,
 				  path,

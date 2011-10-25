@@ -177,7 +177,7 @@ int ewfmount_fuse_open(
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		if( mount_handle_get_file_entry_for_path(
+		if( mount_handle_get_file_entry_by_path(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
@@ -320,7 +320,7 @@ int ewfmount_fuse_read(
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		if( mount_handle_get_file_entry_for_path(
+		if( mount_handle_get_file_entry_by_path(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
@@ -514,7 +514,7 @@ int ewfmount_fuse_readdir(
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		if( mount_handle_get_file_entry_for_path(
+		if( mount_handle_get_file_entry_by_path(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
@@ -871,7 +871,7 @@ int ewfmount_fuse_getattr(
 	}
 	else if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
 	{
-		result = mount_handle_get_file_entry_for_path(
+		result = mount_handle_get_file_entry_by_path(
 		          ewfmount_mount_handle,
 		          path,
 		          path_length,
