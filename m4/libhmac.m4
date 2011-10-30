@@ -1,6 +1,6 @@
 dnl Functions for libhmac
 dnl
-dnl Version: 20111007
+dnl Version: 20111030
 
 dnl Function to detect if libhmac is available
 dnl ac_libhmac_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -17,7 +17,8 @@ AC_DEFUN([AX_LIBHMAC_CHECK_LIB],
   ])
 
  AS_IF(
-  [test "x$ac_cv_with_libhmac" != xno],
+  [test "x$ac_cv_with_libhmac" = xno],
+  [ac_cv_libhmac=no],
   [dnl Check for headers
   AC_CHECK_HEADERS([libhmac.h])
 

@@ -34,7 +34,7 @@
 				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="libodraw\libodraw.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="libsmdev\libsmdev.cbproj">
 				<Dependencies>liberror\liberror.cbproj;libnotify\libnotify.cbproj;libuna\libuna.cbproj;libcstring\libcstring.cbproj</Dependencies>

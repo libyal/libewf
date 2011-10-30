@@ -235,7 +235,6 @@ int libewf_tree_node_clone(
 	libewf_tree_node_t *destination_sub_node = NULL;
 	libewf_tree_node_t *source_sub_node      = NULL;
 	static char *function                    = "libewf_tree_node_clone";
-	int result                               = 1;
 	int sub_node_iterator                    = 0;
 
 	if( destination_node == NULL )
@@ -324,12 +323,7 @@ int libewf_tree_node_clone(
 		 "%s: unable to clone tree node value.",
 		 function );
 
-		libewf_tree_node_free(
-		 destination_node,
-		 NULL,
-		 NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	/* Clone the sub nodes
 	 */
@@ -349,18 +343,14 @@ int libewf_tree_node_clone(
 			 function,
 			 sub_node_iterator );
 
-			result = -1;
-
-			break;
+			goto on_error;
 		}
-		result = libewf_tree_node_clone(
-			  &destination_sub_node,
-			  source_sub_node,
-			  value_free_function,
-			  value_clone_function,
-			  error );
-
-		if( result != 1 )
+		if( libewf_tree_node_clone(
+		     &destination_sub_node,
+		     source_sub_node,
+		     value_free_function,
+		     value_clone_function,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
@@ -370,7 +360,7 @@ int libewf_tree_node_clone(
 			 function,
 			 sub_node_iterator );
 
-			break;
+			goto on_error;
 		}
 		if( libewf_tree_node_append_node(
 		     *destination_node,
@@ -385,31 +375,29 @@ int libewf_tree_node_clone(
 			 function,
 			 sub_node_iterator );
 
-			result = -1;
-
-			break;
+			goto on_error;
 		}
 		destination_sub_node = NULL;
 		source_sub_node      = source_sub_node->next_node;
 	}
-	if( result != 1 )
-	{
-		if( libewf_tree_node_free(
-		     destination_node,
-		     value_free_function,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free destination tree node.",
-			 function );
+	return( 1 );
 
-			result = -1;
-		}
+on_error:
+	if( destination_sub_node != NULL )
+	{
+		libewf_tree_node_free(
+		 &destination_sub_node,
+		 value_free_function,
+		 NULL );
 	}
-	return( result );
+	if( destination_node != NULL )
+	{
+		libewf_tree_node_free(
+		 destination_node,
+		 value_free_function,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves the value from the tree node
@@ -605,7 +593,7 @@ int libewf_tree_node_append_value(
 		 "%s: unable to create tree node.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_tree_node_append_node(
 	     parent_node,
@@ -619,12 +607,7 @@ int libewf_tree_node_append_value(
 		 "%s: unable to append tree node.",
 		 function );
 
-		libewf_tree_node_free(
-		 &tree_node,
-		 NULL,
-		 NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_tree_node_set_value(
 	     tree_node,
@@ -638,14 +621,19 @@ int libewf_tree_node_append_value(
 		 "%s: unable to set value in tree node.",
 		 function );
 
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( tree_node != NULL )
+	{
 		libewf_tree_node_free(
 		 &tree_node,
 		 NULL,
 		 NULL );
-
-		return( -1 );
 	}
-	return( 1 );
+	return( -1 );
 }
 
 /* Inserts a tree node in the parent node
@@ -910,7 +898,7 @@ int libewf_tree_node_insert_value(
 		 "%s: unable to create tree node.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_tree_node_set_value(
 	     tree_node,
@@ -924,12 +912,7 @@ int libewf_tree_node_insert_value(
 		 "%s: unable to set value in tree node.",
 		 function );
 
-		libewf_tree_node_free(
-		 &tree_node,
-		 NULL,
-		 NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	result = libewf_tree_node_insert_node(
 	          parent_node,
@@ -938,13 +921,6 @@ int libewf_tree_node_insert_value(
 	          insert_flags,
 	          error );
 
-	if( result != 1 )
-	{
-		libewf_tree_node_free(
-		 &tree_node,
-		 NULL,
-		 NULL );
-	}
 	if( result == -1 )
 	{
 		liberror_error_set(
@@ -953,8 +929,37 @@ int libewf_tree_node_insert_value(
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to insert node.",
 		 function );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		if( libewf_tree_node_free(
+		     &tree_node,
+		     NULL,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free tree node.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	return( result );
+
+on_error:
+	if( tree_node != NULL )
+	{
+		libewf_tree_node_free(
+		 &tree_node,
+		 NULL,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Removes a tree node from the parent node

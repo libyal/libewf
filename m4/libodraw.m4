@@ -1,6 +1,6 @@
 dnl Functions for libodraw
 dnl
-dnl Version: 20111007
+dnl Version: 20111030
 
 dnl Function to detect if libodraw is available
 dnl ac_libodraw_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -17,7 +17,8 @@ AC_DEFUN([AX_LIBODRAW_CHECK_LIB],
   ])
 
  AS_IF(
-  [test "x$ac_cv_with_libodraw" != xno],
+  [test "x$ac_cv_with_libodraw" = xno],
+  [ac_cv_libodraw=no],
   [dnl Check for headers
   AC_CHECK_HEADERS([libodraw.h])
  

@@ -374,7 +374,6 @@ int libewf_header_values_set_value_by_index(
 	if( libfvalue_value_initialize(
 	     &header_value,
 	     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-	     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -390,6 +389,7 @@ int libewf_header_values_set_value_by_index(
 	     header_value,
 	     identifier,
 	     identifier_size,
+	     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -1982,7 +1982,6 @@ int libewf_header_values_parse_utf8_header_string(
 				if( libfvalue_value_initialize(
 				     &header_value,
 				     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-				     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -1998,6 +1997,7 @@ int libewf_header_values_parse_utf8_header_string(
 				     header_value,
 				     identifier,
 				     identifier_size,
+				     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -2015,7 +2015,7 @@ int libewf_header_values_parse_utf8_header_string(
 				     value_string,
 				     value_string_size,
 				     LIBFVALUE_ENDIAN_NATIVE,
-				     0,
+				     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 				     error ) != 1 )
 				{
 					liberror_error_set(

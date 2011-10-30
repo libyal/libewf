@@ -3602,7 +3602,6 @@ int libewf_handle_set_utf8_header_value(
 		if( libfvalue_value_initialize(
 		     &header_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -3618,6 +3617,7 @@ int libewf_handle_set_utf8_header_value(
 		     header_value,
 		     identifier,
 		     identifier_length + 1,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -4163,7 +4163,6 @@ int libewf_handle_set_utf16_header_value(
 		if( libfvalue_value_initialize(
 		     &header_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -4179,6 +4178,7 @@ int libewf_handle_set_utf16_header_value(
 		     header_value,
 		     identifier,
 		     identifier_length + 1,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -5167,7 +5167,6 @@ int libewf_handle_set_utf8_hash_value(
 		if( libfvalue_value_initialize(
 		     &hash_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -5183,6 +5182,7 @@ int libewf_handle_set_utf8_hash_value(
 		     hash_value,
 		     identifier,
 		     identifier_length + 1,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -5654,7 +5654,6 @@ int libewf_handle_set_utf16_hash_value(
 		if( libfvalue_value_initialize(
 		     &hash_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -5670,6 +5669,7 @@ int libewf_handle_set_utf16_hash_value(
 		     hash_value,
 		     identifier,
 		     identifier_length + 1,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(

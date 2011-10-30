@@ -280,6 +280,12 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111030
+* updated configure.ac and m4 files
+* updated libhmac, libodraw, libsmraw, libfvalue, libsmdev
+* updated tree type
+* changes for libfvalue
+
 20111023
 * worked on ewf.net
 * bug fixes in ewfmount

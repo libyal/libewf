@@ -30,7 +30,6 @@ USE("..\..\..\libodraw\libodraw_handle.h", File);
 USE("..\..\..\libodraw\libodraw_io_handle.h", File);
 USE("..\..\..\libodraw\libodraw_metadata.h", File);
 USE("..\..\..\libodraw\libodraw_libbfio.h", File);
-USE("..\..\..\libodraw\libodraw_libfvalue.h", File);
 USE("..\..\..\libodraw\libodraw_libuna.h", File);
 USE("..\..\..\libodraw\libodraw_notify.h", File);
 USE("..\..\..\libodraw\libodraw_sector_range.h", File);

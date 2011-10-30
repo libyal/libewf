@@ -151,7 +151,6 @@ int libewf_hash_values_parse_md5_hash(
 		if( libfvalue_value_initialize(
 		     &hash_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -167,6 +166,7 @@ int libewf_hash_values_parse_md5_hash(
 		     hash_value,
 		     (uint8_t *) "MD5",
 		     4,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -183,7 +183,7 @@ int libewf_hash_values_parse_md5_hash(
 		     (uint8_t *) md5_hash_string,
 		     33,
 		     LIBFVALUE_ENDIAN_NATIVE,
-		     0,
+		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -325,7 +325,6 @@ int libewf_hash_values_parse_sha1_hash(
 		if( libfvalue_value_initialize(
 		     &hash_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED | LIBFVALUE_VALUE_FLAG_DATA_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -341,6 +340,7 @@ int libewf_hash_values_parse_sha1_hash(
 		     hash_value,
 		     (uint8_t *) "SHA1",
 		     5,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -357,7 +357,7 @@ int libewf_hash_values_parse_sha1_hash(
 		     (uint8_t *) sha1_hash_string,
 		     41,
 		     LIBFVALUE_ENDIAN_NATIVE,
-		     0,
+		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			liberror_error_set(
