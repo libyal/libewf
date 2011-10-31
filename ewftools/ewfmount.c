@@ -1153,6 +1153,7 @@ int main( int argc, char * const argv[] )
 
         if( libsystem_initialize(
              "ewftools",
+             _IONBF,
              &error ) != 1 )
 	{
 		fprintf(

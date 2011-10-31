@@ -135,6 +135,8 @@ int libewf_set_codepage(
 	 && ( codepage != LIBEWF_CODEPAGE_KOI8_R )
 	 && ( codepage != LIBEWF_CODEPAGE_KOI8_U )
 	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_874 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_932 )
+	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_936 )
 	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1250 )
 	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1251 )
 	 && ( codepage != LIBEWF_CODEPAGE_WINDOWS_1252 )

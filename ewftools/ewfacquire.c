@@ -122,9 +122,9 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\tsource: the source file(s) or device\n\n" );
 
 	fprintf( stream, "\t-A:     codepage of header section, options: ascii (default),\n"
-	                 "\t        windows-874, windows-1250, windows-1251, windows-1252,\n"
-	                 "\t        windows-1253, windows-1254, windows-1255, windows-1256,\n"
-	                 "\t        windows-1257, windows-1258\n" );
+	                 "\t        windows-874, windows-932, windows-936, windows-1250,\n"
+	                 "\t        windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	                 "\t        windows-1255, windows-1256, windows-1257 or windows-1258\n" );
 	fprintf( stream, "\t-b:     specify the number of sectors to read at once (per chunk),\n"
 	                 "\t        options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096,\n"
 	                 "\t        8192, 16384 or 32768\n" );
@@ -1309,6 +1309,7 @@ int main( int argc, char * const argv[] )
 
 	if( libsystem_initialize(
 	     "ewftools",
+	     _IONBF,
 	     &error ) != 1 )
 	{
 		ewfoutput_version_fprint(

@@ -1,0 +1,191 @@
+Making check in include
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/include'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/include'
+Making check in common
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/common'
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/common'
+Making check in libcstring
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libcstring'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libcstring'
+Making check in liberror
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/liberror'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/liberror'
+Making check in libnotify
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libnotify'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libnotify'
+Making check in libuna
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libuna'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libuna'
+Making check in libbfio
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libbfio'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libbfio'
+Making check in libmfdata
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libmfdata'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libmfdata'
+Making check in libfvalue
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libfvalue'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libfvalue'
+Making check in libewf
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libewf'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libewf'
+Making check in libhmac
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libhmac'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libhmac'
+Making check in libodraw
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libodraw'
+make  check-am
+make[2]: Entering directory `/home/lordyesta/Projects/libewf/libodraw'
+make[2]: Nothing to be done for `check-am'.
+make[2]: Leaving directory `/home/lordyesta/Projects/libewf/libodraw'
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libodraw'
+Making check in libsmdev
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libsmdev'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libsmdev'
+Making check in libsmraw
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libsmraw'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libsmraw'
+Making check in libsystem
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/libsystem'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/libsystem'
+Making check in ewftools
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/ewftools'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/ewftools'
+Making check in ewf.net
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/ewf.net'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/ewf.net'
+Making check in pyewf
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/pyewf'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/pyewf'
+Making check in po
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/po'
+make libewf.pot-update
+make[2]: Entering directory `/home/lordyesta/Projects/libewf/po'
+if LC_ALL=C grep 'GNU libewf' ../* 2>/dev/null | grep -v 'libtool:' >/dev/null; then \
+  package_gnu='GNU '; \
+else \
+  package_gnu=''; \
+fi; \
+if test -n 'jbmetz@users.sourceforge.net' || test 'jbmetz@users.sourceforge.net' = '@'PACKAGE_BUGREPORT'@'; then \
+  msgid_bugs_address='jbmetz@users.sourceforge.net'; \
+else \
+  msgid_bugs_address='jbmetz@users.sourceforge.net'; \
+fi; \
+case `/usr/bin/xgettext --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
+  '' | 0.[0-9] | 0.[0-9].* | 0.1[0-5] | 0.1[0-5].* | 0.16 | 0.16.[0-1]*) \
+    /usr/bin/xgettext --default-domain=libewf --directory=.. \
+      --add-comments=TRANSLATORS: --keyword=_ --keyword=N_  \
+      --files-from=./POTFILES.in \
+      --copyright-holder='Joachim Metz' \
+      --msgid-bugs-address="$msgid_bugs_address" \
+    ;; \
+  *) \
+    /usr/bin/xgettext --default-domain=libewf --directory=.. \
+      --add-comments=TRANSLATORS: --keyword=_ --keyword=N_  \
+      --files-from=./POTFILES.in \
+      --copyright-holder='Joachim Metz' \
+      --package-name="${package_gnu}libewf" \
+      --package-version='20111031' \
+      --msgid-bugs-address="$msgid_bugs_address" \
+    ;; \
+esac
+test ! -f libewf.po || { \
+  if test -f ./libewf.pot; then \
+    sed -f remove-potcdate.sed < ./libewf.pot > libewf.1po && \
+    sed -f remove-potcdate.sed < libewf.po > libewf.2po && \
+    if cmp libewf.1po libewf.2po >/dev/null 2>&1; then \
+      rm -f libewf.1po libewf.2po libewf.po; \
+    else \
+      rm -f libewf.1po libewf.2po ./libewf.pot && \
+      mv libewf.po ./libewf.pot; \
+    fi; \
+  else \
+    mv libewf.po ./libewf.pot; \
+  fi; \
+}
+make[2]: Leaving directory `/home/lordyesta/Projects/libewf/po'
+test ! -f ./libewf.pot || \
+  test -z "" || make 
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/po'
+Making check in documents
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/documents'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/documents'
+Making check in manuals
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/manuals'
+make[1]: Nothing to be done for `check'.
+make[1]: Leaving directory `/home/lordyesta/Projects/libewf/manuals'
+Making check in tests
+make[1]: Entering directory `/home/lordyesta/Projects/libewf/tests'
+make  ewf_test_glob ewf_test_read ewf_test_read_write ewf_test_read_write_delta ewf_test_seek ewf_test_truncate ewf_test_write ewf_test_write_chunk test_ewfacquire.sh test_ewfacquire_optical.sh test_ewfacquire_resume.sh test_ewfacquirestream.sh test_ewfinfo.sh test_ewfexport.sh test_ewfexport_logical.sh test_ewfverify.sh test_ewfverify_logical.sh test_glob.sh test_pyewf.sh test_read.sh test_read_write.sh test_read_write_delta.sh test_seek.sh test_write.sh
+make[2]: Entering directory `/home/lordyesta/Projects/libewf/tests'
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_glob.o -MD -MP -MF .deps/ewf_test_glob.Tpo -c -o ewf_test_glob.o ewf_test_glob.c
+mv -f .deps/ewf_test_glob.Tpo .deps/ewf_test_glob.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_glob ewf_test_glob.o ../libcstring/libcstring.la ../libewf/libewf.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o .libs/ewf_test_glob ewf_test_glob.o  ../libcstring/.libs/libcstring.a ../libewf/.libs/libewf.so -lz -Wl,-rpath -Wl,/usr/local/lib
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_read.o -MD -MP -MF .deps/ewf_test_read.Tpo -c -o ewf_test_read.o ewf_test_read.c
+mv -f .deps/ewf_test_read.Tpo .deps/ewf_test_read.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_read ewf_test_read.o ../libcstring/libcstring.la ../liberror/liberror.la ../libewf/libewf.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o .libs/ewf_test_read ewf_test_read.o  ../libcstring/.libs/libcstring.a ../liberror/.libs/liberror.a ../libewf/.libs/libewf.so -lz -Wl,-rpath -Wl,/usr/local/lib
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_read_write.o -MD -MP -MF .deps/ewf_test_read_write.Tpo -c -o ewf_test_read_write.o ewf_test_read_write.c
+mv -f .deps/ewf_test_read_write.Tpo .deps/ewf_test_read_write.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_read_write ewf_test_read_write.o ../libcstring/libcstring.la ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o .libs/ewf_test_read_write ewf_test_read_write.o  ../libcstring/.libs/libcstring.a ../liberror/.libs/liberror.a ../libewf/.libs/libewf.so ../libsystem/.libs/libsystem.a -lz -Wl,-rpath -Wl,/usr/local/lib
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_read_write_delta.o -MD -MP -MF .deps/ewf_test_read_write_delta.Tpo -c -o ewf_test_read_write_delta.o ewf_test_read_write_delta.c
+mv -f .deps/ewf_test_read_write_delta.Tpo .deps/ewf_test_read_write_delta.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_read_write_delta ewf_test_read_write_delta.o ../libcstring/libcstring.la ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o .libs/ewf_test_read_write_delta ewf_test_read_write_delta.o  ../libcstring/.libs/libcstring.a ../liberror/.libs/liberror.a ../libewf/.libs/libewf.so ../libsystem/.libs/libsystem.a -lz -Wl,-rpath -Wl,/usr/local/lib
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_seek.o -MD -MP -MF .deps/ewf_test_seek.Tpo -c -o ewf_test_seek.o ewf_test_seek.c
+mv -f .deps/ewf_test_seek.Tpo .deps/ewf_test_seek.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_seek ewf_test_seek.o ../libcstring/libcstring.la ../liberror/liberror.la ../libewf/libewf.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o .libs/ewf_test_seek ewf_test_seek.o  ../libcstring/.libs/libcstring.a ../liberror/.libs/liberror.a ../libewf/.libs/libewf.so -lz -Wl,-rpath -Wl,/usr/local/lib
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_truncate.o -MD -MP -MF .deps/ewf_test_truncate.Tpo -c -o ewf_test_truncate.o ewf_test_truncate.c
+mv -f .deps/ewf_test_truncate.Tpo .deps/ewf_test_truncate.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_truncate ewf_test_truncate.o ../libcstring/libcstring.la ../liberror/liberror.la ../libsystem/libsystem.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o ewf_test_truncate ewf_test_truncate.o  ../libcstring/.libs/libcstring.a ../liberror/.libs/liberror.a ../libsystem/.libs/libsystem.a -lz
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_write.o -MD -MP -MF .deps/ewf_test_write.Tpo -c -o ewf_test_write.o ewf_test_write.c
+mv -f .deps/ewf_test_write.Tpo .deps/ewf_test_write.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_write ewf_test_write.o ../libcstring/libcstring.la ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o .libs/ewf_test_write ewf_test_write.o  ../libcstring/.libs/libcstring.a ../liberror/.libs/liberror.a ../libewf/.libs/libewf.so ../libsystem/.libs/libsystem.a -lz -Wl,-rpath -Wl,/usr/local/lib
+gcc -DHAVE_CONFIG_H -I. -I../common  -I../include -I../common -I../libcstring -I../liberror -I../libsystem  -D_FILE_OFFSET_BITS=64  -g -O2 -Wall -MT ewf_test_write_chunk.o -MD -MP -MF .deps/ewf_test_write_chunk.Tpo -c -o ewf_test_write_chunk.o ewf_test_write_chunk.c
+mv -f .deps/ewf_test_write_chunk.Tpo .deps/ewf_test_write_chunk.Po
+/bin/sh ../libtool --tag=CC   --mode=link gcc  -g -O2 -Wall   -o ewf_test_write_chunk ewf_test_write_chunk.o ../libcstring/libcstring.la ../liberror/liberror.la ../libewf/libewf.la ../libsystem/libsystem.la  -lz 
+libtool: link: gcc -g -O2 -Wall -o .libs/ewf_test_write_chunk ewf_test_write_chunk.o  ../libcstring/.libs/libcstring.a ../liberror/.libs/liberror.a ../libewf/.libs/libewf.so ../libsystem/.libs/libsystem.a -lz -Wl,-rpath -Wl,/usr/local/lib
+make[2]: Nothing to be done for `test_ewfacquire.sh'.
+make[2]: Nothing to be done for `test_ewfacquire_optical.sh'.
+make[2]: Nothing to be done for `test_ewfacquire_resume.sh'.
+make[2]: Nothing to be done for `test_ewfacquirestream.sh'.
+make[2]: Nothing to be done for `test_ewfinfo.sh'.
+make[2]: Nothing to be done for `test_ewfexport.sh'.
+make[2]: Nothing to be done for `test_ewfexport_logical.sh'.
+make[2]: Nothing to be done for `test_ewfverify.sh'.
+make[2]: Nothing to be done for `test_ewfverify_logical.sh'.
+make[2]: Nothing to be done for `test_glob.sh'.
+make[2]: Nothing to be done for `test_pyewf.sh'.
+make[2]: Nothing to be done for `test_read.sh'.
+make[2]: Nothing to be done for `test_read_write.sh'.
+make[2]: Nothing to be done for `test_read_write_delta.sh'.
+make[2]: Nothing to be done for `test_seek.sh'.
+make[2]: Nothing to be done for `test_write.sh'.
+make[2]: Leaving directory `/home/lordyesta/Projects/libewf/tests'
+make  check-TESTS
+make[2]: Entering directory `/home/lordyesta/Projects/libewf/tests'
+Testing glob: for basename: PREFIX.e01 and schema: .e01  (PASS)
+Testing glob: for basename: PREFIX.e01 and schema: .e01  (PASS)
+Testing glob: for basename: PREFIX.e01 and schema: .e01  (PASS)
+Testing glob: for basename: PREFIX.e01 and schema: .e01  (PASS)

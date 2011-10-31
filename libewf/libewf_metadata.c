@@ -2703,6 +2703,8 @@ int libewf_handle_set_header_codepage(
 	}
 	if( ( header_codepage != LIBEWF_CODEPAGE_ASCII )
 	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_874 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_932 )
+	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_936 )
 	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1250 )
 	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1251 )
 	 && ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1252 )

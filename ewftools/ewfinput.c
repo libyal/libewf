@@ -866,6 +866,22 @@ int ewfinput_determine_header_codepage(
 					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_874;
 					result           = 1;
 				}
+				else if( libcstring_system_string_compare(
+				          &( string[ 8 ] ),
+				          _LIBCSTRING_SYSTEM_STRING( "932" ),
+				          3 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_932;
+					result           = 1;
+				}
+				else if( libcstring_system_string_compare(
+				          &( string[ 8 ] ),
+				          _LIBCSTRING_SYSTEM_STRING( "936" ),
+				          3 ) == 0 )
+				{
+					*header_codepage = LIBEWF_CODEPAGE_WINDOWS_936;
+					result           = 1;
+				}
 			}
 			else if( string_length == 12 )
 			{

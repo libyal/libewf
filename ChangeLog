@@ -280,6 +280,12 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111031
+* updated README.macosx
+* added setvbuf
+* updated libcstring, libsystem, libuna, libbfio, libfvalue, libhmac
+* added windows codepage 932 and 936 support
+
 20111030
 * updated configure.ac and m4 files
 * updated libhmac, libodraw, libsmraw, libfvalue, libsmdev
