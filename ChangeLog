@@ -280,6 +280,9 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111101
+* small changes
+
 20111031
 * updated README.macosx
 * added setvbuf
