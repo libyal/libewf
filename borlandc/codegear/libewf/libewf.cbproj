@@ -218,6 +218,10 @@
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_single_file_entry.h">
 			</None>
+			<CppCompile Include="..\..\..\libewf\libewf_single_file_tree.c">
+			</CppCompile>
+			<None Include="..\..\..\libewf\libewf_single_file_tree.h">
+			</None>
 			<CppCompile Include="..\..\..\libewf\libewf_single_files.c">
 			</CppCompile>
 			<None Include="..\..\..\libewf\libewf_single_files.h">

@@ -472,12 +472,6 @@ int libewf_handle_parse_hash_values(
      libewf_internal_handle_t *internal_handle,
      liberror_error_t **error );
 
-LIBEWF_EXTERN \
-int libewf_handle_get_root_file_entry(
-     libewf_handle_t *handle,
-     libewf_file_entry_t **root_file_entry,
-     liberror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

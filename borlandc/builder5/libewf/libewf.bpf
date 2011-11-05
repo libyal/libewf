@@ -78,6 +78,8 @@ USEUNIT("..\..\..\libewf\libewf_segment_table.c");
 USE("..\..\..\libewf\libewf_segment_table.h", File);
 USEUNIT("..\..\..\libewf\libewf_single_file_entry.c");
 USE("..\..\..\libewf\libewf_single_file_entry.h", File);
+USEUNIT("..\..\..\libewf\libewf_single_file_tree.c");
+USE("..\..\..\libewf\libewf_single_file_tree.h", File);
 USEUNIT("..\..\..\libewf\libewf_single_files.c");
 USE("..\..\..\libewf\libewf_single_files.h", File);
 USEUNIT("..\..\..\libewf\libewf_support.c");

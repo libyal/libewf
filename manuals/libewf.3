@@ -1,4 +1,4 @@
-.Dd October 16, 2011
+.Dd November  5, 2011
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -334,6 +334,9 @@ Meta data functions
 .Fn libewf_handle_get_utf16_hash_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, uint16_t *utf16_string, size_t utf16_string_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_utf16_hash_value "libewf_handle_t *handle, const uint8_t *identifier, size_t identifier_length, const uint16_t *utf16_string, size_t utf16_string_length, libewf_error_t **error"
+.Ft int libewf_handle_get_root_file_entry "libewf_handle_t *handle, libewf_file_entry_t **root_file_entry, libewf_error_t **error"
+.Ft int libewf_file_get_file_entry_by_utf8_path "libewf_handle_t *handle, const uint8_t *utf8_string, size_t utf8_string_length, libewf_file_entry_t **file_entry, libewf_error_t **error"
+.Ft int libewf_file_get_file_entry_by_utf16_path "libewf_handle_t *handle, const uint16_t *utf16_string, size_t utf16_string_length, libewf_file_entry_t **file_entry, libewf_error_t **error"
 .Pp
 Single file entry functions
 .Ft int
@@ -364,10 +367,6 @@ Single file entry functions
 .Fn libewf_file_entry_get_utf8_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf8_string, size_t utf8_string_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_utf16_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf16_string, size_t utf16_string_size, libewf_error_t **error"
-.Ft int
-.Fn libewf_file_entry_get_number_of_sub_file_entries "libewf_file_entry_t *file_entry, int *number_of_sub_file_entries, libewf_error_t **error"
-.Ft int
-.Fn libewf_file_entry_get_sub_file_entry "libewf_file_entry_t *file_entry, int sub_file_entry_index, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_file_entry_read_buffer "libewf_file_entry_t *file_entry, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
@@ -376,6 +375,18 @@ Single file entry functions
 .Fn libewf_file_entry_seek_offset "libewf_file_entry_t *file_entry, off64_t offset, int whence, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_offset "libewf_file_entry_t *file_entry, off64_t *offset, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_number_of_sub_file_entries "libewf_file_entry_t *file_entry, int *number_of_sub_file_entries, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_sub_file_entry "libewf_file_entry_t *file_entry, int sub_file_entry_index, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_sub_file_entry_by_utf8_name "libewf_file_entry_t *file_entry, const uint8_t *utf8_string, size_t utf8_string_length, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_sub_file_entry_by_utf8_path "libewf_file_entry_t *file_entry, const uint8_t *utf8_string, size_t utf8_string_length, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_sub_file_entry_by_utf16_name "libewf_file_entry_t *file_entry, const uint16_t *utf16_string, size_t utf16_string_length, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_sub_file_entry_by_utf16_path "libewf_file_entry_t *file_entry, const uint16_t *utf16_string, size_t utf16_string_length, libewf_file_entry_t **sub_file_entry, libewf_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libewf_get_version

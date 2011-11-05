@@ -113,15 +113,6 @@ int mount_handle_get_file_entry_by_path(
      libewf_file_entry_t **file_entry,
      liberror_error_t **error );
 
-int mount_handle_get_sub_file_entry_by_path(
-     mount_handle_t *mount_handle,
-     libewf_file_entry_t *file_entry,
-     const libcstring_system_character_t *path,
-     size_t path_length,
-     size_t path_index,
-     libewf_file_entry_t **sub_file_entry,
-     liberror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

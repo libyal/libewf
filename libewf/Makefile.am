@@ -65,6 +65,7 @@ libewf_la_SOURCES = \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_single_files.c libewf_single_files.h \
 	libewf_single_file_entry.c libewf_single_file_entry.h \
+	libewf_single_file_tree.c libewf_single_file_tree.h \
 	libewf_support.c libewf_support.h \
 	libewf_tree_type.c libewf_tree_type.h \
 	libewf_types.h \

@@ -1,5 +1,4 @@
 TODO
-* add get file entry by path functions
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -279,6 +278,18 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111105
+* worked on libewf_file_get_file_entry_by_utf8_path and
+  libewf_file_get_file_entry_by_utf16_path
+* changes to ewfmount to deal with file names containing
+  the path separator character /
+
+20111103
+* worked on libewf_file_get_file_entry_by_utf8_path and
+  libewf_file_get_file_entry_by_utf16_path
+* code clean up changed name of file entry item flags and moved it to
+  definitions
 
 20111101
 * small changes

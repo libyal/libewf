@@ -492,6 +492,28 @@ int libewf_internal_handle_set_format(
      uint8_t format,
      liberror_error_t **error );
 
+LIBEWF_EXTERN \
+int libewf_handle_get_root_file_entry(
+     libewf_handle_t *handle,
+     libewf_file_entry_t **root_file_entry,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_get_file_entry_by_utf8_path(
+     libewf_handle_t *handle,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libewf_file_entry_t **file_entry,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_get_file_entry_by_utf16_path(
+     libewf_handle_t *handle,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libewf_file_entry_t **file_entry,
+     liberror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

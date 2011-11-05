@@ -485,9 +485,10 @@ int ewfmount_fuse_readdir(
 	liberror_error_t *error             = NULL;
 	libewf_file_entry_t *file_entry     = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
-	char *file_entry_name               = NULL;
+	char *name                          = NULL;
 	static char *function               = "ewfmount_fuse_readdir";
-	size_t file_entry_name_size         = 0;
+	size_t name_index                   = 0;
+	size_t name_size                    = 0;
 	size_t path_length                  = 0;
 	int number_of_sub_file_entries      = 0;
 	int result                          = 0;
@@ -628,12 +629,12 @@ int ewfmount_fuse_readdir(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libewf_file_entry_get_utf16_name_size(
 				  sub_file_entry,
-				  &file_entry_name_size,
+				  &name_size,
 				  &error );
 #else
 			result = libewf_file_entry_get_utf8_name_size(
 				  sub_file_entry,
-				  &file_entry_name_size,
+				  &name_size,
 				  &error );
 #endif
 			if( result != 1 )
@@ -649,12 +650,12 @@ int ewfmount_fuse_readdir(
 
 				goto on_error;
 			}
-			if( file_entry_name_size > 0 )
+			if( name_size > 0 )
 			{
-				file_entry_name = libcstring_system_string_allocate(
-					           file_entry_name_size );
+				name = libcstring_system_string_allocate(
+					name_size );
 
-				if( file_entry_name == NULL )
+				if( name == NULL )
 				{
 					liberror_error_set(
 					 &error,
@@ -670,14 +671,14 @@ int ewfmount_fuse_readdir(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libewf_file_entry_get_utf16_name(
 					  sub_file_entry,
-					  (uint16_t *) file_entry_name,
-					  file_entry_name_size,
+					  (uint16_t *) name,
+					  name_size,
 					  &error );
 #else
 				result = libewf_file_entry_get_utf8_name(
 					  sub_file_entry,
-					  (uint8_t *) file_entry_name,
-					  file_entry_name_size,
+					  (uint8_t *) name,
+					  name_size,
 					  &error );
 #endif
 				if( result != 1 )
@@ -693,9 +694,20 @@ int ewfmount_fuse_readdir(
 
 					goto on_error;
 				}
+				/* Exchange / for \
+				 */
+				for( name_index = 0;
+				     name_index < name_size;
+				     name_index++ )
+				{
+					if( name[ name_index ] == (libcstring_system_character_t) '/' )
+					{
+						 name[ name_index ] = (libcstring_system_character_t) '\\';
+					}
+				}
 				if( filler(
 				     buffer,
-				     file_entry_name,
+				     name,
 				     NULL,
 				     0 ) == 1 )
 				{
@@ -711,9 +723,9 @@ int ewfmount_fuse_readdir(
 					goto on_error;
 				}
 				memory_free(
-				 file_entry_name );
+				 name );
 
-				file_entry_name = NULL;
+				name = NULL;
 			}
 			if( libewf_file_entry_free(
 			     &sub_file_entry,
@@ -778,10 +790,10 @@ on_error:
 		liberror_error_free(
 		 &error );
 	}
-	if( file_entry_name != NULL )
+	if( name != NULL )
 	{
 		memory_free(
-		 file_entry_name );
+		 name );
 	}
 	if( sub_file_entry != NULL )
 	{

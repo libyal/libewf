@@ -30,7 +30,6 @@
 #include "libewf_codepage.h"
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
-#include "libewf_file_entry.h"
 #include "libewf_handle.h"
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
@@ -38,7 +37,6 @@
 #include "libewf_metadata.h"
 #include "libewf_sector_list.h"
 #include "libewf_segment_file_handle.h"
-#include "libewf_single_files.h"
 #include "libewf_types.h"
 
 #include "ewf_definitions.h"
@@ -5918,86 +5916,6 @@ int libewf_handle_parse_hash_values(
 	}
 	if( result != 1 )
 	{
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves the root (single) file entry
- * Returns 1 if successful, 0 if no file entries are present or -1 on error
- */
-int libewf_handle_get_root_file_entry(
-     libewf_handle_t *handle,
-     libewf_file_entry_t **root_file_entry,
-     liberror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_root_file_entry";
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->single_files == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing single files.",
-		 function );
-
-		return( -1 );
-	}
-	if( root_file_entry == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid root file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( *root_file_entry != NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: root file entry already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->single_files->root_file_entry_node == NULL )
-	{
-		return( 0 );
-	}
-	if( libewf_file_entry_initialize(
-	     root_file_entry,
-	     internal_handle,
-	     internal_handle->single_files->root_file_entry_node,
-	     LIBEWF_FILE_ENTRY_FLAGS_DEFAULT,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create root file entry.",
-		 function );
-
 		return( -1 );
 	}
 	return( 1 );

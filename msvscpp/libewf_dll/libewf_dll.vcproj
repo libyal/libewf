@@ -290,6 +290,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_single_file_tree.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_single_files.c"
 				>
 			</File>
@@ -509,6 +513,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_single_file_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_tree.h"
 				>
 			</File>
 			<File
