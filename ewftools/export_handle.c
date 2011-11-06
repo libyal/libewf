@@ -426,60 +426,6 @@ int export_handle_signal_abort(
 	return( 1 );
 }
 
-/* Create a directory
- * Returns 1 if successful or -1 on error
- */
-int export_handle_make_directory(
-     export_handle_t *export_handle,
-     libcstring_system_character_t *directory_name,
-     log_handle_t *log_handle,
-     liberror_error_t **error )
-{
-	static char *function = "export_handle_make_directory";
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( directory_name == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid directory name.",
-		 function );
-
-		return( -1 );
-	}
-	if( libsystem_directory_make(
-	     directory_name ) != 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to make directory: %" PRIs_LIBCSTRING_SYSTEM ".",
-		 function,
-		 directory_name );
-
-		return( -1 );
-	}
-	log_handle_printf(
-	 log_handle,
-	 "Created directory: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-	 directory_name );
-
-	return( 1 );
-}
-
 /* Opens the input of the export handle
  * Returns 1 if successful or -1 on error
  */
@@ -5013,10 +4959,8 @@ int export_handle_export_file_entry(
 		}
 		else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 		{
-			if( export_handle_make_directory(
-			     export_handle,
+			if( libsystem_directory_make(
 			     target_path,
-			     log_handle,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -5029,6 +4973,10 @@ int export_handle_export_file_entry(
 
 				goto on_error;
 			}
+			log_handle_printf(
+			 log_handle,
+			 "Created directory: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+			 target_path );
 		}
 	}
 	else

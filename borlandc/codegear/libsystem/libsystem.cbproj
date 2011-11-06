@@ -51,9 +51,9 @@
 			</None>
 			<None Include="..\..\..\libsystem\libsystem_definitions.h">
 			</None>
+			<CppCompile Include="..\..\..\libsystem\libsystem_directory.c">
+			</CppCompile>
 			<None Include="..\..\..\libsystem\libsystem_directory.h">
-			</None>
-			<None Include="..\..\..\libsystem\libsystem_directory_io.h">
 			</None>
 			<CppCompile Include="..\..\..\libsystem\libsystem_error_string.c">
 			</CppCompile>
