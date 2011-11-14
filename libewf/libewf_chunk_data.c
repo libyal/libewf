@@ -56,6 +56,17 @@ int libewf_chunk_data_initialize(
 
 		return( -1 );
 	}
+	if( *chunk_data != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid chunk data value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( data_size > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
@@ -67,52 +78,50 @@ int libewf_chunk_data_initialize(
 
 		return( -1 );
 	}
+	*chunk_data = memory_allocate_structure(
+	               libewf_chunk_data_t );
+
 	if( *chunk_data == NULL )
 	{
-		*chunk_data = memory_allocate_structure(
-		               libewf_chunk_data_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create chunk data.",
+		 function );
 
-		if( *chunk_data == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create chunk data.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *chunk_data,
-		     0,
-		     sizeof( libewf_chunk_data_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear chunk data.",
-			 function );
-
-			goto on_error;
-		}
-		( *chunk_data )->data = (uint8_t *) memory_allocate(
-		                                     sizeof( uint8_t ) * data_size );
-
-		if( ( *chunk_data )->data == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create data.",
-			 function );
-
-			goto on_error;
-		}
-		( *chunk_data )->allocated_data_size = data_size;
+		goto on_error;
 	}
+	if( memory_set(
+	     *chunk_data,
+	     0,
+	     sizeof( libewf_chunk_data_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear chunk data.",
+		 function );
+
+		goto on_error;
+	}
+	( *chunk_data )->data = (uint8_t *) memory_allocate(
+	                                     sizeof( uint8_t ) * data_size );
+
+	if( ( *chunk_data )->data == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create data.",
+		 function );
+
+		goto on_error;
+	}
+	( *chunk_data )->allocated_data_size = data_size;
+
 	return( 1 );
 
 on_error:
@@ -130,7 +139,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_data_free(
-     intptr_t *chunk_data,
+     libewf_chunk_data_t **chunk_data,
      liberror_error_t **error )
 {
 	static char *function = "libewf_chunk_data_free";
@@ -146,19 +155,23 @@ int libewf_chunk_data_free(
 
 		return( -1 );
 	}
-	if( ( (libewf_chunk_data_t *) chunk_data )->data != NULL )
+	if( *chunk_data != NULL )
 	{
+		if( ( *chunk_data )->data != NULL )
+		{
+			memory_free(
+			 ( *chunk_data )->data );
+		}
+		if( ( *chunk_data )->compressed_data != NULL )
+		{
+			memory_free(
+			 ( *chunk_data )->compressed_data );
+		}
 		memory_free(
-		 ( (libewf_chunk_data_t *) chunk_data )->data );
-	}
-	if( ( (libewf_chunk_data_t *) chunk_data )->compressed_data != NULL )
-	{
-		memory_free(
-		 ( (libewf_chunk_data_t *) chunk_data )->compressed_data );
-	}
-	memory_free(
-	 chunk_data );
+		 *chunk_data );
 
+		*chunk_data = NULL;
+	}
 	return( 1 );
 }
 

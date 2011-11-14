@@ -69,7 +69,7 @@ int libewf_chunk_table_initialize(
      liberror_error_t **error );
 
 int libewf_chunk_table_free(
-     intptr_t *chunk_table,
+     libewf_chunk_table_t **chunk_table,
      liberror_error_t **error );
 
 int libewf_chunk_table_clone(

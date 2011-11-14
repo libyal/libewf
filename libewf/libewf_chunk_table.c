@@ -62,6 +62,17 @@ int libewf_chunk_table_initialize(
 
 		return( -1 );
 	}
+	if( *chunk_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid chunk table value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( io_handle == NULL )
 	{
 		liberror_error_set(
@@ -73,38 +84,36 @@ int libewf_chunk_table_initialize(
 
 		return( -1 );
 	}
+	*chunk_table = memory_allocate_structure(
+	                libewf_chunk_table_t );
+
 	if( *chunk_table == NULL )
 	{
-		*chunk_table = memory_allocate_structure(
-		                libewf_chunk_table_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create chunk table.",
+		 function );
 
-		if( *chunk_table == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create chunk table.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *chunk_table,
-		     0,
-		     sizeof( libewf_chunk_table_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear chunk table.",
-			 function );
-
-			goto on_error;
-		}
-		( *chunk_table )->io_handle = io_handle;
+		goto on_error;
 	}
+	if( memory_set(
+	     *chunk_table,
+	     0,
+	     sizeof( libewf_chunk_table_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear chunk table.",
+		 function );
+
+		goto on_error;
+	}
+	( *chunk_table )->io_handle = io_handle;
+
 	return( 1 );
 
 on_error:
@@ -122,7 +131,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_table_free(
-     intptr_t *chunk_table,
+     libewf_chunk_table_t **chunk_table,
      liberror_error_t **error )
 {
 	static char *function = "libewf_chunk_table_free";
@@ -138,9 +147,13 @@ int libewf_chunk_table_free(
 
 		return( -1 );
 	}
-	memory_free(
-	 chunk_table );
+	if( *chunk_table != NULL )
+	{
+		memory_free(
+		 *chunk_table );
 
+		*chunk_table = NULL;
+	}
 	return( 1 );
 }
 
@@ -394,7 +407,7 @@ int libewf_chunk_table_read_chunk(
 	     list_element,
 	     cache,
 	     (intptr_t *) chunk_data,
-	     &libewf_chunk_data_free,
+	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
 	     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
@@ -413,7 +426,7 @@ on_error:
 	if( chunk_data != NULL )
 	{
 		libewf_chunk_data_free(
-		 (intptr_t *) chunk_data,
+		 &chunk_data,
 		 NULL );
 	}
 	return( -1 );
@@ -754,7 +767,7 @@ int libewf_chunk_table_read_offsets(
 	table_offsets_data = NULL;
 
 	if( libewf_section_free(
-	     section,
+	     &section,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -768,8 +781,6 @@ int libewf_chunk_table_read_offsets(
 
 		goto on_error;
 	}
-	section = NULL;
-
 #if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
 	if( libnotify_verbose != 0 )
 	{
@@ -867,7 +878,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );

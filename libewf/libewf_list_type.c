@@ -28,6 +28,7 @@
 #include "libewf_list_type.h"
 
 /* Creates a list element
+ * Make sure the value element is pointing to is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_list_element_initialize(
@@ -47,36 +48,44 @@ int libewf_list_element_initialize(
 
 		return( -1 );
 	}
+	if( *element != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid element value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*element = memory_allocate_structure(
+	            libewf_list_element_t );
+
 	if( *element == NULL )
 	{
-		*element = memory_allocate_structure(
-		            libewf_list_element_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create list element.",
+		 function );
 
-		if( *element == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create list element.",
-			 function );
+		goto on_error;
+	}
+	if( memory_set(
+	     *element,
+	     0,
+	     sizeof( libewf_list_element_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear list element.",
+		 function );
 
-			goto on_error;
-		}
-		if( memory_set(
-		     *element,
-		     0,
-		     sizeof( libewf_list_element_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear list element.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
@@ -98,7 +107,7 @@ on_error:
 int libewf_list_element_free(
      libewf_list_element_t **element,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      liberror_error_t **error )
 {
@@ -133,7 +142,7 @@ int libewf_list_element_free(
 		if( value_free_function != NULL )
 		{
 			if( value_free_function(
-			     ( *element )->value,
+			     &( ( *element )->value ),
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -218,6 +227,7 @@ int libewf_list_element_set_value(
 }
 
 /* Creates a list
+ * Make sure the value list is pointing to is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_list_initialize(
@@ -237,36 +247,44 @@ int libewf_list_initialize(
 
 		return( -1 );
 	}
+	if( *list != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid list value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*list = memory_allocate_structure(
+	         libewf_list_t );
+
 	if( *list == NULL )
 	{
-		*list = memory_allocate_structure(
-		         libewf_list_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create list.",
+		 function );
 
-		if( *list == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create list.",
-			 function );
+		goto on_error;
+	}
+	if( memory_set(
+	     *list,
+	     0,
+	     sizeof( libewf_list_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear list.",
+		 function );
 
-			goto on_error;
-		}
-		if( memory_set(
-		     *list,
-		     0,
-		     sizeof( libewf_list_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear list.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
@@ -288,7 +306,7 @@ on_error:
 int libewf_list_free(
      libewf_list_t **list,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      liberror_error_t **error )
 {
@@ -337,15 +355,15 @@ int libewf_list_free(
 int libewf_list_empty(
      libewf_list_t *list,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_list_empty";
-	int element_index                   = 0;
-	int number_of_elements              = 0;
-	int result                          = 1;
+	static char *function                = "libewf_list_empty";
+	int element_index                    = 0;
+	int number_of_elements               = 0;
+	int result                           = 1;
 
 	if( list == NULL )
 	{
@@ -425,7 +443,7 @@ int libewf_list_clone(
      libewf_list_t **destination_list,
      libewf_list_t *source_list,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,
@@ -434,9 +452,9 @@ int libewf_list_clone(
      liberror_error_t **error )
 {
 	libewf_list_element_t *source_list_element = NULL;
-	intptr_t *destination_value                = NULL;
-	static char *function                      = "libewf_list_clone";
-	int element_index                          = 0;
+	intptr_t *destination_value                 = NULL;
+	static char *function                       = "libewf_list_clone";
+	int element_index                           = 0;
 
 	if( destination_list == NULL )
 	{
@@ -570,7 +588,7 @@ on_error:
 	if( destination_value != NULL )
 	{
 		value_free_function(
-		 destination_value,
+		 &destination_value,
 		 NULL );
 	}
 	if( *destination_list != NULL )
@@ -630,8 +648,8 @@ int libewf_list_get_element_by_index(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_list_get_element_by_index";
-	int element_iterator                = 0;
+	static char *function                = "libewf_list_get_element_by_index";
+	int element_iterator                 = 0;
 
 	if( list == NULL )
 	{
@@ -739,8 +757,8 @@ int libewf_list_get_value_by_index(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_list_get_value_by_index";
-	int result                          = 0;
+	static char *function                = "libewf_list_get_value_by_index";
+	int result                           = 0;
 
 	result = libewf_list_get_element_by_index(
 	          list,
@@ -835,7 +853,7 @@ int libewf_list_prepend_value(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_list_prepend_value";
+	static char *function                = "libewf_list_prepend_value";
 
 	if( libewf_list_element_initialize(
 	     &list_element,
@@ -948,7 +966,7 @@ int libewf_list_append_value(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_list_append_value";
+	static char *function                = "libewf_list_append_value";
 
 	if( libewf_list_element_initialize(
 	     &list_element,
@@ -1026,9 +1044,9 @@ int libewf_list_insert_element(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_list_insert_element";
-	int element_index                   = 0;
-	int result                          = -1;
+	static char *function                = "libewf_list_insert_element";
+	int element_index                    = 0;
+	int result                           = -1;
 
 	if( list == NULL )
 	{
@@ -1249,8 +1267,8 @@ int libewf_list_insert_value(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_list_insert_value";
-	int result                          = 0;
+	static char *function                = "libewf_list_insert_value";
+	int result                           = 0;
 
 	if( libewf_list_element_initialize(
 	     &list_element,

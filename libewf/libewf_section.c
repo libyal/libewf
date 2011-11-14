@@ -122,36 +122,44 @@ int libewf_section_initialize(
 
 		return( -1 );
 	}
+	if( *section != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid csection value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*section = memory_allocate_structure(
+	            libewf_section_t );
+
 	if( *section == NULL )
 	{
-		*section = memory_allocate_structure(
-		            libewf_section_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create section.",
+		 function );
 
-		if( *section == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create section.",
-			 function );
+		goto on_error;
+	}
+	if( memory_set(
+	     *section,
+	     0,
+	     sizeof( libewf_section_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear section.",
+		 function );
 
-			goto on_error;
-		}
-		if( memory_set(
-		     *section,
-		     0,
-		     sizeof( libewf_section_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear section.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
@@ -170,7 +178,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_free(
-     libewf_section_t *section,
+     libewf_section_t **section,
      liberror_error_t **error )
 {
 	static char *function = "libewf_section_free";
@@ -186,9 +194,13 @@ int libewf_section_free(
 
 		return( -1 );
 	}
-	memory_free(
-	 section );
+	if( *section != NULL )
+	{
+		memory_free(
+		 *section );
 
+		*section = NULL;
+	}
 	return( 1 );
 }
 
@@ -196,8 +208,8 @@ int libewf_section_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_clone(
-     intptr_t **destination_section,
-     intptr_t *source_section,
+     libewf_section_t **destination_section,
+     libewf_section_t *source_section,
      liberror_error_t **error )
 {
 	static char *function = "libewf_section_clone";
@@ -230,7 +242,7 @@ int libewf_section_clone(
 
 		return( 1 );
 	}
-	*destination_section = memory_allocate_structure_as_value(
+	*destination_section = memory_allocate_structure(
 	                        libewf_section_t );
 
 	if( *destination_section == NULL )

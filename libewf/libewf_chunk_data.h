@@ -74,7 +74,7 @@ int libewf_chunk_data_initialize(
      liberror_error_t **error );
 
 int libewf_chunk_data_free(
-     intptr_t *chunk_data,
+     libewf_chunk_data_t **chunk_data,
      liberror_error_t **error );
 
 int libewf_chunk_data_pack(

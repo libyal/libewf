@@ -28,6 +28,7 @@
 #include "libewf_tree_type.h"
 
 /* Creates a tree node
+ * Make sure the value node is pointing to is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_tree_node_initialize(
@@ -47,36 +48,44 @@ int libewf_tree_node_initialize(
 
 		return( -1 );
 	}
+	if( *node != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid node value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*node = memory_allocate_structure(
+	         libewf_tree_node_t );
+
 	if( *node == NULL )
 	{
-		*node = memory_allocate_structure(
-		         libewf_tree_node_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create node.",
+		 function );
 
-		if( *node == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create node.",
-			 function );
+		goto on_error;
+	}
+	if( memory_set(
+	     *node,
+	     0,
+	     sizeof( libewf_tree_node_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear node.",
+		 function );
 
-			goto on_error;
-		}
-		if( memory_set(
-		     *node,
-		     0,
-		     sizeof( libewf_tree_node_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear node.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
@@ -98,7 +107,7 @@ on_error:
 int libewf_tree_node_free(
      libewf_tree_node_t **node,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      liberror_error_t **error )
 {
@@ -190,7 +199,7 @@ int libewf_tree_node_free(
 			if( value_free_function != NULL )
 			{
 				if( value_free_function(
-				     ( *node )->value,
+				     &( ( *node )->value ),
 				     error ) != 1 )
 				{
 					liberror_error_set(
@@ -224,7 +233,7 @@ int libewf_tree_node_clone(
      libewf_tree_node_t **destination_node,
      libewf_tree_node_t *source_node,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,

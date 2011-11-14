@@ -76,109 +76,118 @@ int libewf_handle_initialize(
 
 		return( -1 );
 	}
-	if( *handle == NULL )
+	if( *handle != NULL )
 	{
-		internal_handle = memory_allocate_structure(
-		                   libewf_internal_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle value already set.",
+		 function );
 
-		if( internal_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     internal_handle,
-		     0,
-		     sizeof( libewf_internal_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear handle.",
-			 function );
-
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
-		if( libewf_io_handle_initialize(
-		     &( internal_handle->io_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create IO handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_media_values_initialize(
-		     &( internal_handle->media_values ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create media values.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_sector_list_initialize(
-		     &( internal_handle->sessions ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create sessions sector list.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_sector_list_initialize(
-		     &( internal_handle->tracks ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create tracks sector list.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_sector_list_initialize(
-		     &( internal_handle->acquiry_errors ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create acquiry errors sector list.",
-			 function );
-
-			goto on_error;
-		}
-		internal_handle->date_format                    = LIBEWF_DATE_FORMAT_CTIME;
-		internal_handle->maximum_number_of_open_handles = LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES;
-
-		*handle = (libewf_handle_t *) internal_handle;
+		return( -1 );
 	}
+	internal_handle = memory_allocate_structure(
+	                   libewf_internal_handle_t );
+
+	if( internal_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     internal_handle,
+	     0,
+	     sizeof( libewf_internal_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear handle.",
+		 function );
+
+		memory_free(
+		 internal_handle );
+
+		return( -1 );
+	}
+	if( libewf_io_handle_initialize(
+	     &( internal_handle->io_handle ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_media_values_initialize(
+	     &( internal_handle->media_values ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create media values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_list_initialize(
+	     &( internal_handle->sessions ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sessions sector list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_list_initialize(
+	     &( internal_handle->tracks ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create tracks sector list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_list_initialize(
+	     &( internal_handle->acquiry_errors ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create acquiry errors sector list.",
+		 function );
+
+		goto on_error;
+	}
+	internal_handle->date_format                    = LIBEWF_DATE_FORMAT_CTIME;
+	internal_handle->maximum_number_of_open_handles = LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES;
+
+	*handle = (libewf_handle_t *) internal_handle;
+
 	return( 1 );
 
 on_error:
@@ -1956,7 +1965,7 @@ int libewf_handle_open_file_io_pool(
 	if( libmfdata_list_initialize(
 	     &( internal_handle->chunk_table_list ),
 	     (intptr_t *) chunk_table,
-	     &libewf_chunk_table_free,
+	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_table_free,
 	     &libewf_chunk_table_clone,
 	     &libewf_chunk_table_read_chunk,
 	     &libewf_chunk_table_read_offsets,
@@ -1971,7 +1980,7 @@ int libewf_handle_open_file_io_pool(
 		 function );
 
 		libewf_chunk_table_free(
-		 (intptr_t *) chunk_table,
+		 &chunk_table,
 		 NULL );
 
 		goto on_error;
@@ -3313,7 +3322,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -3701,7 +3710,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -5839,7 +5848,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->chunk_table_cache,
 				     (int) chunk_index,
 				     (intptr_t *) chunk_data,
-				     &libewf_chunk_data_free,
+				     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
 				     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 				     error ) != 1 )
 				{
@@ -5852,7 +5861,7 @@ ssize_t libewf_handle_write_buffer(
 					 chunk_index );
 
 					libewf_chunk_data_free(
-					 (intptr_t *) chunk_data,
+					 &chunk_data,
 					 NULL );
 
 					return( -1 );
@@ -6113,7 +6122,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->chunk_table_cache,
 				     (int) chunk_index,
 				     (intptr_t *) internal_handle->chunk_data,
-				     &libewf_chunk_data_free,
+				     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
 				     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 				     error ) != 1 )
 				{
@@ -6393,7 +6402,7 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->chunk_table_cache,
 		     (int) chunk_index,
 		     (intptr_t *) internal_handle->chunk_data,
-		     &libewf_chunk_data_free,
+		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
 		     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{

@@ -3356,7 +3356,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 					return( -1 );
 				}
 				if( libewf_section_free(
-				     (libewf_section_t *) last_list_element->value,
+				     (libewf_section_t **) &( last_list_element->value ),
 				     error ) != 1 )
 				{
 					liberror_error_set(

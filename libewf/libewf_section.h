@@ -81,12 +81,12 @@ int libewf_section_initialize(
      liberror_error_t **error );
 
 int libewf_section_free(
-     libewf_section_t *section,
+     libewf_section_t **section,
      liberror_error_t **error );
 
 int libewf_section_clone(
-     intptr_t **destination_section,
-     intptr_t *source_section,
+     libewf_section_t **destination_section,
+     libewf_section_t *source_section,
      liberror_error_t **error );
 
 int libewf_section_set(

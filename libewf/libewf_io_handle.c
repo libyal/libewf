@@ -51,41 +51,50 @@ int libewf_io_handle_initialize(
 
 		return( -1 );
 	}
-	if( *io_handle == NULL )
+	if( *io_handle != NULL )
 	{
-		*io_handle = memory_allocate_structure(
-		              libewf_io_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid IO handle value already set.",
+		 function );
 
-		if( io_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create IO handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *io_handle,
-		     0,
-		     sizeof( libewf_io_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear IO handle.",
-			 function );
-
-			goto on_error;
-		}
-		( *io_handle )->format            = LIBEWF_FORMAT_ENCASE5;
-		( *io_handle )->ewf_format        = EWF_FORMAT_E01;
-		( *io_handle )->compression_level = EWF_COMPRESSION_NONE;
-		( *io_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
+		return( -1 );
 	}
+	*io_handle = memory_allocate_structure(
+	              libewf_io_handle_t );
+
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *io_handle,
+	     0,
+	     sizeof( libewf_io_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	( *io_handle )->format            = LIBEWF_FORMAT_ENCASE5;
+	( *io_handle )->ewf_format        = EWF_FORMAT_E01;
+	( *io_handle )->compression_level = EWF_COMPRESSION_NONE;
+	( *io_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
+
 	return( 1 );
 
 on_error:

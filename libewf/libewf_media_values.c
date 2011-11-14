@@ -48,41 +48,50 @@ int libewf_media_values_initialize(
 
 		return( -1 );
 	}
+	if( *media_values != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid media values value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*media_values = memory_allocate_structure(
+	                 libewf_media_values_t );
+
 	if( *media_values == NULL )
 	{
-		*media_values = memory_allocate_structure(
-		                 libewf_media_values_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create media values.",
+		 function );
 
-		if( *media_values == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create media values.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *media_values,
-		     0,
-		     sizeof( libewf_media_values_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear media values.",
-			 function );
-
-			goto on_error;
-		}
-		( *media_values )->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
-		( *media_values )->sectors_per_chunk = 64;
-		( *media_values )->bytes_per_sector  = 512;
-		( *media_values )->media_flags       = 0x01;
+		goto on_error;
 	}
+	if( memory_set(
+	     *media_values,
+	     0,
+	     sizeof( libewf_media_values_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear media values.",
+		 function );
+
+		goto on_error;
+	}
+	( *media_values )->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
+	( *media_values )->sectors_per_chunk = 64;
+	( *media_values )->bytes_per_sector  = 512;
+	( *media_values )->media_flags       = 0x01;
+
 	return( 1 );
 
 on_error:

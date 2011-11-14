@@ -60,6 +60,17 @@ int libewf_file_entry_initialize(
 
 		return( -1 );
 	}
+	if( *file_entry != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file entry value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( flags & ~( LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
 	{
 		liberror_error_set(
@@ -72,64 +83,62 @@ int libewf_file_entry_initialize(
 
 		return( -1 );
 	}
-	if( *file_entry == NULL )
-	{
-		internal_file_entry = memory_allocate_structure(
-		                       libewf_internal_file_entry_t );
+	internal_file_entry = memory_allocate_structure(
+	                       libewf_internal_file_entry_t );
 
-		if( internal_file_entry == NULL )
+	if( internal_file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     internal_file_entry,
+	     0,
+	     sizeof( libewf_internal_file_entry_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear file entry.",
+		 function );
+
+		goto on_error;
+	}
+	internal_file_entry->internal_handle = internal_handle;
+	internal_file_entry->flags           = flags;
+
+	if( ( flags & LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
+	{
+		internal_file_entry->file_entry_tree_node = file_entry_tree_node;
+	}
+	else
+	{
+		if( libewf_tree_node_clone(
+		     &( internal_file_entry->file_entry_tree_node ),
+		     file_entry_tree_node,
+		     &libewf_single_file_entry_free,
+		     &libewf_single_file_entry_clone,
+		     error ) != 1 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create file entry.",
+			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy file entry tree node.",
 			 function );
 
 			goto on_error;
 		}
-		if( memory_set(
-		     internal_file_entry,
-		     0,
-		     sizeof( libewf_internal_file_entry_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear file entry.",
-			 function );
-
-			goto on_error;
-		}
-		internal_file_entry->internal_handle = internal_handle;
-		internal_file_entry->flags           = flags;
-
-		if( ( flags & LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
-		{
-			internal_file_entry->file_entry_tree_node = file_entry_tree_node;
-		}
-		else
-		{
-			if( libewf_tree_node_clone(
-			     &( internal_file_entry->file_entry_tree_node ),
-			     file_entry_tree_node,
-			     &libewf_single_file_entry_free,
-			     &libewf_single_file_entry_clone,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy file entry tree node.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		*file_entry = (libewf_file_entry_t *) internal_file_entry;
 	}
+	*file_entry = (libewf_file_entry_t *) internal_file_entry;
+
 	return( 1 );
 
 on_error:

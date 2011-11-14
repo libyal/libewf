@@ -151,7 +151,7 @@ int libewf_segment_file_free(
 	{
 		if( libewf_list_free(
 		     &( segment_file->section_list ),
-		     (int(*)(intptr_t *, liberror_error_t **)) &libewf_section_free,
+		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_section_free,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -241,8 +241,8 @@ int libewf_segment_file_clone(
 	if( libewf_list_clone(
 	     &( ( (libewf_segment_file_t *) *destination_segment_file )->section_list ),
 	     ( (libewf_segment_file_t *) source_segment_file )->section_list,
-	     (int(*)(intptr_t *, liberror_error_t **)) &libewf_section_free,
-	     &libewf_section_clone,
+	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_section_free,
+	     (int(*)(intptr_t **, intptr_t *, liberror_error_t **)) &libewf_section_clone,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -687,7 +687,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	if( segment_file != NULL )
@@ -1748,7 +1748,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -1860,7 +1860,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -2054,7 +2054,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -2214,7 +2214,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		}
 	}
 	if( libewf_section_free(
-	     section,
+	     &section,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -2228,15 +2228,13 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		goto on_error;
 	}
-	section = NULL;
-
 	return( write_count );
 
 on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -2682,7 +2680,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -3085,11 +3083,12 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 			goto on_error;
 		}
+		section = NULL;
 	}
 	else
 	{
 		if( libewf_section_free(
-		     section,
+		     &section,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -3104,8 +3103,6 @@ ssize_t libewf_segment_file_write_delta_chunk(
 			goto on_error;
 		}
 	}
-	section = NULL;
-
 	if( write_checksum != 0 )
 	{
 		chunk_size += sizeof( uint32_t );
@@ -3135,7 +3132,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );
@@ -3702,7 +3699,7 @@ on_error:
 	if( section != NULL )
 	{
 		libewf_section_free(
-		 section,
+		 &section,
 		 NULL );
 	}
 	return( -1 );

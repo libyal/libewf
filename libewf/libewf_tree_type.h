@@ -56,11 +56,11 @@ enum LIBEWF_TREE_NODE_INSERT_FLAGS
 {
 	/* Allow duplicate entries
 	 */
-	LIBEWF_TREE_NODE_INSERT_FLAG_NON_UNIQUE_ENTRIES		= 0x00,
+	LIBEWF_TREE_NODE_INSERT_FLAG_NON_UNIQUE_ENTRIES	= 0x00,
 
 	/* Only allow unique entries, no duplicates
 	 */
-	LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES		= 0x01,
+	LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES	= 0x01,
 };
 
 typedef struct libewf_tree_node libewf_tree_node_t;
@@ -103,7 +103,7 @@ int libewf_tree_node_initialize(
 int libewf_tree_node_free(
      libewf_tree_node_t **node,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      liberror_error_t **error );
 
@@ -111,7 +111,7 @@ int libewf_tree_node_clone(
      libewf_tree_node_t **destination_node,
      libewf_tree_node_t *source_node,
      int (*value_free_function)(
-            intptr_t *value,
+            intptr_t **value,
             liberror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,

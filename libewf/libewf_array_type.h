@@ -86,21 +86,21 @@ int libewf_array_initialize(
 int libewf_array_free(
      libewf_array_t **array,
      int (*entry_free_function)(
-            intptr_t *entry,
+            intptr_t **entry,
             liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_array_empty(
      libewf_array_t *array,
      int (*entry_free_function)(
-            intptr_t *entry,
+            intptr_t **entry,
             liberror_error_t **error ),
      liberror_error_t **error );
 
 int libewf_array_clear(
      libewf_array_t *array,
      int (*entry_free_function)(
-            intptr_t *entry,
+            intptr_t **entry,
             liberror_error_t **error ),
      liberror_error_t **error );
 
@@ -108,7 +108,7 @@ int libewf_array_clone(
      libewf_array_t **destination_array,
      libewf_array_t *source_array,
      int (*entry_free_function)(
-            intptr_t *entry,
+            intptr_t **entry,
             liberror_error_t **error ),
      int (*entry_clone_function)(
             intptr_t **destination,
@@ -120,7 +120,7 @@ int libewf_array_resize(
      libewf_array_t *array,
      int number_of_entries,
      int (*entry_free_function)(
-            intptr_t *entry,
+            intptr_t **entry,
             liberror_error_t **error ),
      liberror_error_t **error );
 
