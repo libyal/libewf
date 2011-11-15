@@ -55,52 +55,61 @@ int libewf_segment_table_initialize(
 
 		return( -1 );
 	}
+	if( *segment_table != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid segment table value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*segment_table = memory_allocate_structure(
+	                  libewf_segment_table_t );
+
 	if( *segment_table == NULL )
 	{
-		*segment_table = memory_allocate_structure(
-		                  libewf_segment_table_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create segment table.",
+		 function );
 
-		if( *segment_table == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment table.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *segment_table,
-		     0,
-		     sizeof( libewf_segment_table_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear segment table.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_array_initialize(
-		     &( ( *segment_table )->segment_files_array ),
-		     0,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment files array.",
-			 function );
-
-			goto on_error;
-		}
-		( *segment_table )->maximum_segment_size = maximum_segment_size;
+		goto on_error;
 	}
+	if( memory_set(
+	     *segment_table,
+	     0,
+	     sizeof( libewf_segment_table_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear segment table.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_array_initialize(
+	     &( ( *segment_table )->segment_files_array ),
+	     0,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment files array.",
+		 function );
+
+		goto on_error;
+	}
+	( *segment_table )->maximum_segment_size = maximum_segment_size;
+
 	return( 1 );
 
 on_error:
@@ -144,7 +153,7 @@ int libewf_segment_table_free(
 		}
 		if( libewf_array_free(
 		     &( ( *segment_table )->segment_files_array ),
-		     &libewf_segment_file_handle_free,
+		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_handle_free,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -265,8 +274,8 @@ int libewf_segment_table_clone(
 	if( libewf_array_clone(
 	     &( ( *destination_segment_table )->segment_files_array ),
 	     source_segment_table->segment_files_array,
-	     &libewf_segment_file_handle_free,
-	     &libewf_segment_file_handle_clone,
+	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_handle_free,
+	     (int (*)(intptr_t **, intptr_t *, liberror_error_t **)) &libewf_segment_file_handle_clone,
 	     error ) != 1 )
 	{
 		liberror_error_set(

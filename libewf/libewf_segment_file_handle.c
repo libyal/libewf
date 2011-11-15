@@ -48,6 +48,17 @@ int libewf_segment_file_handle_initialize(
 
 		return( -1 );
 	}
+	if( *segment_file_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid segment file handle value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file_index < 0 )
 	{
 		liberror_error_set(
@@ -59,38 +70,36 @@ int libewf_segment_file_handle_initialize(
 
 		return( -1 );
 	}
+	*segment_file_handle = memory_allocate_structure(
+	                        libewf_segment_file_handle_t );
+
 	if( *segment_file_handle == NULL )
 	{
-		*segment_file_handle = memory_allocate_structure(
-		                        libewf_segment_file_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create segment file handle.",
+		 function );
 
-		if( *segment_file_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment file handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *segment_file_handle,
-		     0,
-		     sizeof( libewf_segment_file_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear segment file handle.",
-			 function );
-
-			goto on_error;
-		}
-		( *segment_file_handle )->segment_file_index = segment_file_index;
+		goto on_error;
 	}
+	if( memory_set(
+	     *segment_file_handle,
+	     0,
+	     sizeof( libewf_segment_file_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear segment file handle.",
+		 function );
+
+		goto on_error;
+	}
+	( *segment_file_handle )->segment_file_index = segment_file_index;
+
 	return( 1 );
 
 on_error:
@@ -108,7 +117,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_free(
-     intptr_t *segment_file_handle,
+     libewf_segment_file_handle_t **segment_file_handle,
      liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_free";
@@ -124,9 +133,13 @@ int libewf_segment_file_handle_free(
 
 		return( -1 );
 	}
-	memory_free(
-	 segment_file_handle );
+	if( *segment_file_handle != NULL )
+	{
+		memory_free(
+		 *segment_file_handle );
 
+		*segment_file_handle = NULL;
+	}
 	return( 1 );
 }
 
@@ -134,8 +147,8 @@ int libewf_segment_file_handle_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_clone(
-     intptr_t **destination_segment_file_handle,
-     intptr_t *source_segment_file_handle,
+     libewf_segment_file_handle_t **destination_segment_file_handle,
+     libewf_segment_file_handle_t *source_segment_file_handle,
      liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_clone";
@@ -168,7 +181,7 @@ int libewf_segment_file_handle_clone(
 
 		return( 1 );
 	}
-	*destination_segment_file_handle = memory_allocate_structure_as_value(
+	*destination_segment_file_handle = memory_allocate_structure(
 	                                    libewf_segment_file_handle_t );
 
 	if( *destination_segment_file_handle == NULL )

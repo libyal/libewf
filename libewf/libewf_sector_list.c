@@ -48,36 +48,44 @@ int libewf_sector_list_value_initialize(
 
 		return( -1 );
 	}
+	if( *sector_list_value != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid sector list value value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*sector_list_value = memory_allocate_structure(
+	                      libewf_sector_list_value_t );
+
 	if( *sector_list_value == NULL )
 	{
-		*sector_list_value = memory_allocate_structure(
-		                      libewf_sector_list_value_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create sector list value.",
+		 function );
 
-		if( *sector_list_value == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create sector list value.",
-			 function );
+		goto on_error;
+	}
+	if( memory_set(
+	     *sector_list_value,
+	     0,
+	     sizeof( libewf_sector_list_value_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear sector list value.",
+		 function );
 
-			goto on_error;
-		}
-		if( memory_set(
-		     *sector_list_value,
-		     0,
-		     sizeof( libewf_sector_list_value_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear sector list value.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
@@ -95,7 +103,7 @@ on_error:
 /* Frees a sector list value
  */
 int libewf_sector_list_value_free(
-     intptr_t *sector_list_value,
+     libewf_sector_list_value_t **sector_list_value,
      liberror_error_t **error )
 {
 	static char *function = "libewf_sector_list_value_free";
@@ -111,9 +119,13 @@ int libewf_sector_list_value_free(
 
 		return( -1 );
 	}
-	memory_free(
-	 sector_list_value );
+	if( *sector_list_value != NULL )
+	{
+		memory_free(
+		 *sector_list_value );
 
+		*sector_list_value = NULL;
+	}
 	return( 1 );
 }
 
@@ -121,8 +133,8 @@ int libewf_sector_list_value_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_sector_list_value_clone(
-     intptr_t **destination_sector_list_value,
-     intptr_t *source_sector_list_value,
+     libewf_sector_list_value_t **destination_sector_list_value,
+     libewf_sector_list_value_t *source_sector_list_value,
      liberror_error_t **error )
 {
 	static char *function = "libewf_sector_list_value_clone";
@@ -155,7 +167,7 @@ int libewf_sector_list_value_clone(
 
 		return( 1 );
 	}
-	*destination_sector_list_value = memory_allocate_structure_as_value(
+	*destination_sector_list_value = memory_allocate_structure(
 	                                  libewf_sector_list_value_t );
 
 	if( *destination_sector_list_value == NULL )
@@ -365,8 +377,8 @@ int libewf_sector_list_empty(
 			list_element->next_element = NULL;
 
 			if( libewf_list_element_free(
-			     & list_element,
-			     &libewf_sector_list_value_free,
+			     &list_element,
+			     (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -394,7 +406,7 @@ int libewf_sector_list_clone(
 {
 	libewf_list_element_t *destination_list_element = NULL;
 	libewf_list_element_t *source_list_element      = NULL;
-	intptr_t *destination_value                     = NULL;
+	libewf_sector_list_value_t *destination_value   = NULL;
 	static char *function                           = "libewf_sector_list_clone";
 	int element_index                               = 0;
 
@@ -484,7 +496,7 @@ int libewf_sector_list_clone(
 		}
 		if( libewf_sector_list_value_clone(
 		     &destination_value,
-		     source_list_element->value,
+		     (libewf_sector_list_value_t *) source_list_element->value,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -499,7 +511,7 @@ int libewf_sector_list_clone(
 		}
 		if( libewf_list_element_set_value(
 		     destination_list_element,
-		     destination_value,
+		     (intptr_t *) destination_value,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -536,14 +548,14 @@ on_error:
 	if( destination_value != NULL )
 	{
 		libewf_sector_list_value_free(
-		 destination_value,
+		 &destination_value,
 		 NULL );
 	}
 	if( destination_list_element != NULL )
 	{
 		libewf_list_element_free(
 		 &destination_list_element,
-		 &libewf_sector_list_value_free,
+		 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 		 NULL );
 	}
 	if( *destination_sector_list != NULL )
@@ -978,7 +990,7 @@ int libewf_sector_list_append_sector(
 
 					if( libewf_list_element_free(
 					     &remove_element,
-					     &libewf_sector_list_value_free,
+					     (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 					     error ) != 1 )
 					{
 						liberror_error_set(
@@ -1056,7 +1068,7 @@ int libewf_sector_list_append_sector(
 
 					if( libewf_list_element_free(
 					     &remove_element,
-					     &libewf_sector_list_value_free,
+					     (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 					     error ) != 1 )
 					{
 						liberror_error_set(
@@ -1118,7 +1130,7 @@ int libewf_sector_list_append_sector(
 			 function );
 
 			libewf_sector_list_value_free(
-			 (intptr_t *) sector_list_value,
+			 &sector_list_value,
 			 NULL );
 
 			return( -1 );
@@ -1133,9 +1145,10 @@ int libewf_sector_list_append_sector(
 			 function );
 
 			libewf_sector_list_value_free(
-			 (intptr_t *) sector_list_value,
+			 &sector_list_value,
 			 NULL );
 
+			return( -1 );
 		}
 		list_element->value = (intptr_t *) sector_list_value;
 
@@ -1152,7 +1165,7 @@ int libewf_sector_list_append_sector(
 
 				libewf_list_element_free(
 				 &list_element,
-				 &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );
@@ -1168,7 +1181,7 @@ int libewf_sector_list_append_sector(
 
 				libewf_list_element_free(
 				 &list_element,
-				 &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );
@@ -1189,7 +1202,7 @@ int libewf_sector_list_append_sector(
 
 				libewf_list_element_free(
 				 &list_element,
-				 &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );
@@ -1205,7 +1218,7 @@ int libewf_sector_list_append_sector(
 
 				libewf_list_element_free(
 				 &list_element,
-				 &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );

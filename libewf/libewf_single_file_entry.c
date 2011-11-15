@@ -50,39 +50,48 @@ int libewf_single_file_entry_initialize(
 
 		return( -1 );
 	}
+	if( *single_file_entry != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid single file entry value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*single_file_entry = memory_allocate_structure(
+	                      libewf_single_file_entry_t );
+
 	if( *single_file_entry == NULL )
 	{
-		*single_file_entry = memory_allocate_structure(
-		                      libewf_single_file_entry_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create single file entry.",
+		 function );
 
-		if( *single_file_entry == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create single file entry.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *single_file_entry,
-		     0,
-		     sizeof( libewf_single_file_entry_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear single file entry.",
-			 function );
-
-			goto on_error;
-		}
-		( *single_file_entry )->data_offset           = -1;
-		( *single_file_entry )->duplicate_data_offset = -1;
+		goto on_error;
 	}
+	if( memory_set(
+	     *single_file_entry,
+	     0,
+	     sizeof( libewf_single_file_entry_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear single file entry.",
+		 function );
+
+		goto on_error;
+	}
+	( *single_file_entry )->data_offset           = -1;
+	( *single_file_entry )->duplicate_data_offset = -1;
+
 	return( 1 );
 
 on_error:
@@ -100,7 +109,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_file_entry_free(
-     intptr_t *single_file_entry,
+     libewf_single_file_entry_t **single_file_entry,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_free";
@@ -116,19 +125,23 @@ int libewf_single_file_entry_free(
 
 		return( 1 );
 	}
-	if( ( (libewf_single_file_entry_t *) single_file_entry )->name != NULL )
+	if( *single_file_entry != NULL )
 	{
+		if( ( *single_file_entry )->name != NULL )
+		{
+			memory_free(
+			 ( *single_file_entry )->name );
+		}
+		if( ( *single_file_entry )->md5_hash != NULL )
+		{
+			memory_free(
+			 ( *single_file_entry )->md5_hash );
+		}
 		memory_free(
-		 ( (libewf_single_file_entry_t *) single_file_entry )->name );
-	}
-	if( ( (libewf_single_file_entry_t *) single_file_entry )->md5_hash != NULL )
-	{
-		memory_free(
-		 ( (libewf_single_file_entry_t *) single_file_entry )->md5_hash );
-	}
-	memory_free(
-	 single_file_entry );
+		 *single_file_entry );
 
+		*single_file_entry = NULL;
+	}
 	return( 1 );
 }
 
@@ -136,8 +149,8 @@ int libewf_single_file_entry_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_file_entry_clone(
-     intptr_t **destination_single_file_entry,
-     intptr_t *source_single_file_entry,
+     libewf_single_file_entry_t **destination_single_file_entry,
+     libewf_single_file_entry_t *source_single_file_entry,
      liberror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_clone";
@@ -170,7 +183,7 @@ int libewf_single_file_entry_clone(
 
 		return( 1 );
 	}
-	*destination_single_file_entry = memory_allocate_structure_as_value(
+	*destination_single_file_entry = memory_allocate_structure(
 			                  libewf_single_file_entry_t );
 
 	if( *destination_single_file_entry == NULL )
@@ -203,15 +216,15 @@ int libewf_single_file_entry_clone(
 
 		return( -1 );
 	}
-	( (libewf_single_file_entry_t *) *destination_single_file_entry )->name     = NULL;
-	( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash = NULL;
+	( *destination_single_file_entry )->name     = NULL;
+	( *destination_single_file_entry )->md5_hash = NULL;
 
-	if( ( (libewf_single_file_entry_t *) source_single_file_entry )->name != NULL )
+	if( source_single_file_entry->name != NULL )
 	{
-		( (libewf_single_file_entry_t *) *destination_single_file_entry )->name = (uint8_t *) memory_allocate(
-		                                                                                       sizeof( uint8_t ) * ( (libewf_single_file_entry_t *) source_single_file_entry )->name_size );
+		( *destination_single_file_entry )->name = (uint8_t *) memory_allocate(
+		                                                        sizeof( uint8_t ) * source_single_file_entry->name_size );
 
-		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name == NULL )
+		if( ( *destination_single_file_entry )->name == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -223,9 +236,9 @@ int libewf_single_file_entry_clone(
 			goto on_error;
 		}
 		if( memory_copy(
-		     ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name,
-		     ( (libewf_single_file_entry_t *) source_single_file_entry )->name,
-		     ( (libewf_single_file_entry_t *) source_single_file_entry )->name_size ) == NULL )
+		     ( *destination_single_file_entry )->name,
+		     source_single_file_entry->name,
+		     source_single_file_entry->name_size ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -236,14 +249,14 @@ int libewf_single_file_entry_clone(
 
 			goto on_error;
 		}
-		( (libewf_single_file_entry_t *) *destination_single_file_entry )->name_size = ( (libewf_single_file_entry_t *) source_single_file_entry )->name_size;
+		( *destination_single_file_entry )->name_size = source_single_file_entry->name_size;
 	}
-	if( ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash != NULL )
+	if( source_single_file_entry->md5_hash != NULL )
 	{
-		( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash = (uint8_t *) memory_allocate(
-		                                                                                           sizeof( uint8_t ) * ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash_size );
+		( *destination_single_file_entry )->md5_hash = (uint8_t *) memory_allocate(
+		                                                            sizeof( uint8_t ) * source_single_file_entry->md5_hash_size );
 
-		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash == NULL )
+		if( ( *destination_single_file_entry )->md5_hash == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -255,9 +268,9 @@ int libewf_single_file_entry_clone(
 			goto on_error;
 		}
 		if( memory_copy(
-		     ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash,
-		     ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash,
-		     ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash_size ) == NULL )
+		     ( *destination_single_file_entry )->md5_hash,
+		     source_single_file_entry->md5_hash,
+		     source_single_file_entry->md5_hash_size ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -268,22 +281,22 @@ int libewf_single_file_entry_clone(
 
 			goto on_error;
 		}
-		( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash_size = ( (libewf_single_file_entry_t *) source_single_file_entry )->md5_hash_size;
+		( *destination_single_file_entry )->md5_hash_size = source_single_file_entry->md5_hash_size;
 	}
 	return( 1 );
 
 on_error:
 	if( *destination_single_file_entry != NULL )
 	{
-		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash != NULL )
+		if( ( *destination_single_file_entry )->md5_hash != NULL )
 		{
 			memory_free(
-			 ( (libewf_single_file_entry_t *) *destination_single_file_entry )->md5_hash );
+			 ( *destination_single_file_entry )->md5_hash );
 		}
-		if( ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name != NULL )
+		if( ( *destination_single_file_entry )->name != NULL )
 		{
 			memory_free(
-			 ( (libewf_single_file_entry_t *) *destination_single_file_entry )->name );
+			 ( *destination_single_file_entry )->name );
 		}
 		memory_free(
 		 *destination_single_file_entry );

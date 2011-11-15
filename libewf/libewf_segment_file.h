@@ -81,12 +81,12 @@ int libewf_segment_file_initialize(
      liberror_error_t **error );
 
 int libewf_segment_file_free(
-     libewf_segment_file_t *segment_file,
+     libewf_segment_file_t **segment_file,
      liberror_error_t **error );
 
 int libewf_segment_file_clone(
-     intptr_t **destination_segment_file,
-     intptr_t *source_segment_file,
+     libewf_segment_file_t **destination_segment_file,
+     libewf_segment_file_t *source_segment_file,
      liberror_error_t **error );
 
 ssize_t libewf_segment_file_read_file_header(

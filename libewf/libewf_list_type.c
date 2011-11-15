@@ -360,10 +360,10 @@ int libewf_list_empty(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function                = "libewf_list_empty";
-	int element_index                    = 0;
-	int number_of_elements               = 0;
-	int result                           = 1;
+	static char *function               = "libewf_list_empty";
+	int element_index                   = 0;
+	int number_of_elements              = 0;
+	int result                          = 1;
 
 	if( list == NULL )
 	{
@@ -452,9 +452,9 @@ int libewf_list_clone(
      liberror_error_t **error )
 {
 	libewf_list_element_t *source_list_element = NULL;
-	intptr_t *destination_value                 = NULL;
-	static char *function                       = "libewf_list_clone";
-	int element_index                           = 0;
+	intptr_t *destination_value                = NULL;
+	static char *function                      = "libewf_list_clone";
+	int element_index                          = 0;
 
 	if( destination_list == NULL )
 	{
@@ -648,8 +648,8 @@ int libewf_list_get_element_by_index(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function                = "libewf_list_get_element_by_index";
-	int element_iterator                 = 0;
+	static char *function               = "libewf_list_get_element_by_index";
+	int element_iterator                = 0;
 
 	if( list == NULL )
 	{
@@ -757,8 +757,8 @@ int libewf_list_get_value_by_index(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function                = "libewf_list_get_value_by_index";
-	int result                           = 0;
+	static char *function               = "libewf_list_get_value_by_index";
+	int result                          = 0;
 
 	result = libewf_list_get_element_by_index(
 	          list,
@@ -853,7 +853,7 @@ int libewf_list_prepend_value(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function                = "libewf_list_prepend_value";
+	static char *function               = "libewf_list_prepend_value";
 
 	if( libewf_list_element_initialize(
 	     &list_element,
@@ -966,7 +966,7 @@ int libewf_list_append_value(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function                = "libewf_list_append_value";
+	static char *function               = "libewf_list_append_value";
 
 	if( libewf_list_element_initialize(
 	     &list_element,
@@ -1044,9 +1044,9 @@ int libewf_list_insert_element(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function                = "libewf_list_insert_element";
-	int element_index                    = 0;
-	int result                           = -1;
+	static char *function               = "libewf_list_insert_element";
+	int element_index                   = 0;
+	int result                          = -1;
 
 	if( list == NULL )
 	{
@@ -1267,8 +1267,8 @@ int libewf_list_insert_value(
      liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
-	static char *function                = "libewf_list_insert_value";
-	int result                           = 0;
+	static char *function               = "libewf_list_insert_value";
+	int result                          = 0;
 
 	if( libewf_list_element_initialize(
 	     &list_element,

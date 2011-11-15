@@ -46,12 +46,12 @@ int libewf_segment_file_handle_initialize(
      liberror_error_t **error );
 
 int libewf_segment_file_handle_free(
-     intptr_t *segment_file_handle,
+     libewf_segment_file_handle_t **segment_file_handle,
      liberror_error_t **error );
 
 int libewf_segment_file_handle_clone(
-     intptr_t **destination_segment_file_handle,
-     intptr_t *source_segment_file_handle,
+     libewf_segment_file_handle_t **destination_segment_file_handle,
+     libewf_segment_file_handle_t *source_segment_file_handle,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

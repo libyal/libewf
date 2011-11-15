@@ -126,6 +126,7 @@ Error handling/tollerance
 * handle corruption in both table and table2 sections
   - non-overlapping corruption
   - overlapping corruption
+* handle missing sections
 * handle missing segment files
 * handle corrupt segment files
 * handle missing delta segment files
@@ -281,6 +282,10 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111115
+* code clean up
+* updated libmfdata
 
 20111114
 * code clean up

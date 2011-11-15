@@ -123,8 +123,8 @@ int libewf_file_entry_initialize(
 		if( libewf_tree_node_clone(
 		     &( internal_file_entry->file_entry_tree_node ),
 		     file_entry_tree_node,
-		     &libewf_single_file_entry_free,
-		     &libewf_single_file_entry_clone,
+		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_single_file_entry_free,
+		     (int (*)(intptr_t **, intptr_t *, liberror_error_t **)) &libewf_single_file_entry_clone,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -187,7 +187,7 @@ int libewf_file_entry_free(
 			{
 				if( libewf_tree_node_free(
 				     &( internal_file_entry->file_entry_tree_node ),
-				     &libewf_single_file_entry_free,
+				     (int (*)(intptr_t **, liberror_error_t **)) &libewf_single_file_entry_free,
 				     error ) != 1 )
 				{
 					liberror_error_set(

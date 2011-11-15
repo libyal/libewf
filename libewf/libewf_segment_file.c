@@ -69,49 +69,57 @@ int libewf_segment_file_initialize(
 
 		return( -1 );
 	}
+	if( *segment_file != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid segment file value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*segment_file = memory_allocate_structure(
+	                 libewf_segment_file_t );
+
 	if( *segment_file == NULL )
 	{
-		*segment_file = memory_allocate_structure(
-		                 libewf_segment_file_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create segment file.",
+		 function );
 
-		if( *segment_file == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment file.",
-			 function );
+		goto on_error;
+	}
+	if( memory_set(
+	     *segment_file,
+	     0,
+	     sizeof( libewf_segment_file_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear segment file.",
+		 function );
 
-			goto on_error;
-		}
-		if( memory_set(
-		     *segment_file,
-		     0,
-		     sizeof( libewf_segment_file_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear segment file.",
-			 function );
+		goto on_error;
+	}
+	if( libewf_list_initialize(
+	     &( ( *segment_file )->section_list ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create section list.",
+		 function );
 
-			goto on_error;
-		}
-		if( libewf_list_initialize(
-		     &( ( *segment_file )->section_list ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create section list.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
@@ -130,7 +138,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_free(
-     libewf_segment_file_t *segment_file,
+     libewf_segment_file_t **segment_file,
      liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_free";
@@ -147,26 +155,30 @@ int libewf_segment_file_free(
 
 		return( -1 );
 	}
-	if( segment_file->section_list != NULL )
+	if( *segment_file == NULL )
 	{
-		if( libewf_list_free(
-		     &( segment_file->section_list ),
-		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_section_free,
-		     error ) != 1 )
+		if( ( *segment_file )->section_list != NULL )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free section list.",
-			 function );
+			if( libewf_list_free(
+			     &( ( *segment_file )->section_list ),
+			     (int (*)(intptr_t **, liberror_error_t **)) &libewf_section_free,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free section list.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
-	}
-	memory_free(
-	 segment_file );
+		memory_free(
+		 *segment_file );
 
+		*segment_file = NULL;
+	}
 	return( result );
 }
 
@@ -174,8 +186,8 @@ int libewf_segment_file_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_clone(
-     intptr_t **destination_segment_file,
-     intptr_t *source_segment_file,
+     libewf_segment_file_t **destination_segment_file,
+     libewf_segment_file_t *source_segment_file,
      liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_clone";
@@ -208,7 +220,7 @@ int libewf_segment_file_clone(
 
 		return( 1 );
 	}
-	*destination_segment_file = memory_allocate_structure_as_value(
+	*destination_segment_file = memory_allocate_structure(
 	                             libewf_segment_file_t );
 
 	if( *destination_segment_file == NULL )
@@ -236,11 +248,11 @@ int libewf_segment_file_clone(
 
 		goto on_error;
 	}
-	( (libewf_segment_file_t *) *destination_segment_file )->section_list = NULL;
+	( *destination_segment_file )->section_list = NULL;
 
 	if( libewf_list_clone(
-	     &( ( (libewf_segment_file_t *) *destination_segment_file )->section_list ),
-	     ( (libewf_segment_file_t *) source_segment_file )->section_list,
+	     &( ( *destination_segment_file )->section_list ),
+	     source_segment_file->section_list,
 	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_section_free,
 	     (int(*)(intptr_t **, intptr_t *, liberror_error_t **)) &libewf_section_clone,
 	     error ) != 1 )
@@ -668,7 +680,7 @@ int libewf_segment_file_read(
 	     file,
 	     cache,
 	     (intptr_t *) segment_file,
-	     (int(*)(intptr_t *, liberror_error_t **)) &libewf_segment_file_free,
+	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_free,
 	     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
@@ -693,7 +705,7 @@ on_error:
 	if( segment_file != NULL )
 	{
 		libewf_segment_file_free(
-		 segment_file,
+		 &segment_file,
 		 NULL );
 	}
 	return( -1 );

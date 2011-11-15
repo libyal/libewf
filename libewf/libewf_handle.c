@@ -2159,7 +2159,7 @@ int libewf_handle_open_file_io_pool(
 				 file_io_pool_entry );
 
 				libewf_segment_file_free(
-				 segment_file,
+				 &segment_file,
 				 NULL );
 
 				goto on_error;
@@ -2189,7 +2189,7 @@ int libewf_handle_open_file_io_pool(
 				 function );
 
 				libewf_segment_file_free(
-				 segment_file,
+				 &segment_file,
 				 NULL );
 
 				goto on_error;
@@ -2205,7 +2205,7 @@ int libewf_handle_open_file_io_pool(
 				 file_io_pool_entry );
 
 				libewf_segment_file_free(
-				 segment_file,
+				 &segment_file,
 				 NULL );
 
 				goto on_error;
@@ -2228,7 +2228,7 @@ int libewf_handle_open_file_io_pool(
 						 function );
 
 						libewf_segment_file_free(
-						 segment_file,
+						 &segment_file,
 						 NULL );
 
 						goto on_error;
@@ -2250,7 +2250,7 @@ int libewf_handle_open_file_io_pool(
 					 segment_file->segment_number );
 
 					libewf_segment_file_free(
-					 segment_file,
+					 &segment_file,
 					 NULL );
 
 					goto on_error;
@@ -2273,7 +2273,7 @@ int libewf_handle_open_file_io_pool(
 						 function );
 
 						libewf_segment_file_free(
-						 segment_file,
+						 &segment_file,
 						 NULL );
 
 						goto on_error;
@@ -2295,7 +2295,7 @@ int libewf_handle_open_file_io_pool(
 					 segment_file->segment_number );
 
 					libewf_segment_file_free(
-					 segment_file,
+					 &segment_file,
 					 NULL );
 
 					goto on_error;
@@ -2319,7 +2319,7 @@ int libewf_handle_open_file_io_pool(
 						 file_io_pool_entry );
 
 						libewf_segment_file_free(
-						 segment_file,
+						 &segment_file,
 						 NULL );
 
 						goto on_error;
@@ -2328,7 +2328,7 @@ int libewf_handle_open_file_io_pool(
 			}
 		}
 		if( libewf_segment_file_free(
-		     segment_file,
+		     &segment_file,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -2340,8 +2340,6 @@ int libewf_handle_open_file_io_pool(
 
 			goto on_error;
 		}
-		segment_file = NULL;
-
 		if( libewf_handle_open_read_segment_files(
 		     internal_handle,
 		     file_io_pool,
@@ -2760,7 +2758,7 @@ int libewf_handle_open_read_segment_files(
 			 function );
 
 			libewf_segment_file_free(
-			 segment_file,
+			 &segment_file,
 			 NULL );
 
 			goto on_error;
@@ -2776,7 +2774,7 @@ int libewf_handle_open_read_segment_files(
 			 function );
 
 			libewf_segment_file_free(
-			 segment_file,
+			 &segment_file,
 			 NULL );
 
 			goto on_error;
@@ -2791,7 +2789,7 @@ int libewf_handle_open_read_segment_files(
 			 function );
 
 			libewf_segment_file_free(
-			 segment_file,
+			 &segment_file,
 			 NULL );
 
 			goto on_error;
@@ -2803,7 +2801,7 @@ int libewf_handle_open_read_segment_files(
 		     internal_handle->segment_files_cache,
 		     segment_files_list_index,
 		     (intptr_t *) segment_file,
-		     (int(*)(intptr_t *, liberror_error_t **)) &libewf_segment_file_free,
+		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_free,
 		     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{
@@ -2816,7 +2814,7 @@ int libewf_handle_open_read_segment_files(
 			 segment_files_list_index + 1 );
 
 			libewf_segment_file_free(
-			 segment_file,
+			 &segment_file,
 			 NULL );
 
 			goto on_error;
@@ -2857,7 +2855,35 @@ int libewf_handle_open_read_segment_files(
 				 "%s: unable to read section start.",
 				 function );
 
+#if defined( HAVE_ERROR_TOLLERANCE )
+				if( libewf_section_free(
+				     &section,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free section.",
+					 function );
+
+					goto on_error;
+				}
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libnotify_print_error_backtrace(
+					 *error );
+				}
+#endif
+				liberror_error_free(
+				 error );
+
+				break;
+#else
 				goto on_error;
+#endif
 			}
 			if( section->type_length == 4 )
 			{
@@ -3280,6 +3306,7 @@ int libewf_handle_open_read_segment_files(
 				break;
 			}
 		}
+#if !defined( HAVE_ERROR_TOLLERANCE )
 		if( last_section == 0 )
 		{
 			liberror_error_set(
@@ -3304,7 +3331,9 @@ int libewf_handle_open_read_segment_files(
 		}
 #endif
 		segment_file = NULL;
+#endif
 	}
+#if !defined( HAVE_ERROR_TOLLERANCE )
 	if( last_segment_file == 0 )
 	{
 		liberror_error_set(
@@ -3316,6 +3345,7 @@ int libewf_handle_open_read_segment_files(
 
 		goto on_error;
 	}
+#endif
 	return( 1 );
 
 on_error:
@@ -3466,7 +3496,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 function );
 
 			libewf_segment_file_free(
-			 segment_file,
+			 &segment_file,
 			 NULL );
 
 			goto on_error;
@@ -3481,7 +3511,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 function );
 
 			libewf_segment_file_free(
-			 segment_file,
+			 &segment_file,
 			 NULL );
 
 			goto on_error;
@@ -3496,7 +3526,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 function );
 
 			libewf_segment_file_free(
-			 segment_file,
+			 &segment_file,
 			 NULL );
 
 			goto on_error;
@@ -3506,7 +3536,7 @@ int libewf_handle_open_read_delta_segment_files(
 		     internal_handle->segment_files_cache,
 		     segment_files_list_index,
 		     (intptr_t *) segment_file,
-		     (int(*)(intptr_t *, liberror_error_t **)) &libewf_segment_file_free,
+		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_free,
 		     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{

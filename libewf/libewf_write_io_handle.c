@@ -72,41 +72,50 @@ int libewf_write_io_handle_initialize(
 
 		return( -1 );
 	}
-	if( *write_io_handle == NULL )
+	if( *write_io_handle != NULL )
 	{
-		*write_io_handle = memory_allocate_structure(
-		                    libewf_write_io_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid write IO handle value already set.",
+		 function );
 
-		if( write_io_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create write IO handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *write_io_handle,
-		     0,
-		     sizeof( libewf_write_io_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear write IO handle.",
-			 function );
-
-			goto on_error;
-		}
-		( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
-		( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-		( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_OFFSETS_IN_TABLE;
-		( *write_io_handle )->maximum_number_of_segments  = (uint16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
+		return( -1 );
 	}
+	*write_io_handle = memory_allocate_structure(
+	                    libewf_write_io_handle_t );
+
+	if( write_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create write IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *write_io_handle,
+	     0,
+	     sizeof( libewf_write_io_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear write IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
+	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
+	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_OFFSETS_IN_TABLE;
+	( *write_io_handle )->maximum_number_of_segments  = (uint16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
+
 	return( 1 );
 
 on_error:
@@ -269,7 +278,7 @@ int libewf_write_io_handle_clone(
 	}
 	if( source_write_io_handle->table_offsets != NULL )
 	{
-		offsets_size = sizeof( ewf_table_offset_t ) * ( *destination_write_io_handle )->number_of_table_offsets;
+		offsets_size = sizeof( ewf_table_offset_t ) * source_write_io_handle->number_of_table_offsets;
 
 		( *destination_write_io_handle )->table_offsets = (ewf_table_offset_t *) memory_allocate(
 		                                                                          offsets_size );
@@ -2026,7 +2035,7 @@ int libewf_write_io_handle_create_segment_file(
 	     segment_files_cache,
 	     *segment_files_list_index,
 	     (intptr_t *) *segment_file,
-	     (int(*)(intptr_t *, liberror_error_t **)) &libewf_segment_file_free,
+	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_free,
 	     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
@@ -2048,10 +2057,8 @@ on_error:
 	if( *segment_file != NULL )
 	{
 		libewf_segment_file_free(
-		 *segment_file,
+		 segment_file,
 		 NULL );
-
-		*segment_file = NULL;
 	}
 	if( file_io_handle != NULL )
 	{

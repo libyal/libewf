@@ -103,12 +103,12 @@ int libewf_single_file_entry_initialize(
      liberror_error_t **error );
 
 int libewf_single_file_entry_free(
-     intptr_t *single_file_entry,
+     libewf_single_file_entry_t **single_file_entry,
      liberror_error_t **error );
 
 int libewf_single_file_entry_clone(
-     intptr_t **destination_single_file_entry,
-     intptr_t *source_single_file_entry,
+     libewf_single_file_entry_t **destination_single_file_entry,
+     libewf_single_file_entry_t *source_single_file_entry,
      liberror_error_t **error );
 
 int libewf_single_file_entry_get_type(
