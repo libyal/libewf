@@ -283,6 +283,9 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111117
+* updated libmfdata
+
 20111115
 * code clean up
 * updated libmfdata
