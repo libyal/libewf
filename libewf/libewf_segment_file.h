@@ -63,6 +63,10 @@ struct libewf_segment_file
 	 */
 	uint16_t segment_number;
 
+	/* The last section offset
+	 */
+	off64_t last_section_offset;
+
         /* The list of all the sections
          */
         libewf_list_t *section_list;
@@ -71,9 +75,9 @@ struct libewf_segment_file
 	 */
 	uint32_t number_of_chunks;
 
-	/* Value to indicate that the segment file is open for writing
+	/* Flags
 	 */
-	uint8_t write_open;
+	uint8_t flags;
 };
 
 int libewf_segment_file_initialize(

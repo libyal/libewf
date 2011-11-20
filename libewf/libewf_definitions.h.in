@@ -199,6 +199,28 @@ enum LIBEWF_ITEM_FLAGS
 	LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE		= 0x01
 };
 
+/* The segment table flags definitions
+ */
+enum LIBEWF_SEGMENT_TABLE_FLAGS
+{
+	/* The segment table is corrupted
+	 */
+	LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED			= 0x01
+};
+
+/* The segment file flags definitions
+ */
+enum LIBEWF_SEGMENT_FILE_FLAGS
+{
+	/* The segment file is corrupted
+	 */
+	LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED			= 0x01,
+
+	/* The segment file is open for writing
+	 */
+	LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN			= 0x02
+};
+
 #if defined( HAVE_DEBUG_OUTPUT )
 #define LIBEWF_ITEM_FLAGS_DEFAULT				LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE
 #else

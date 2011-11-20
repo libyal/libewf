@@ -1252,7 +1252,7 @@ int libewf_write_io_handle_initialize_resume(
 
 			return( -1 );
 		}
-		segment_file->write_open = 1;
+		segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
 	}
 	return( 1 );
 }
@@ -2012,7 +2012,7 @@ int libewf_write_io_handle_create_segment_file(
 	}
 	( *segment_file )->type           = segment_file_type;
 	( *segment_file )->segment_number = segment_number;
-	( *segment_file )->write_open     = 1;
+	( *segment_file )->flags         |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
 
 	if( libmfdata_file_list_append_file(
 	     segment_files_list,
@@ -2334,7 +2334,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			return( -1 );
 		}
-		if( segment_file->write_open == 0 )
+		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN ) == 0 )
 		{
 			segment_file = NULL;
 

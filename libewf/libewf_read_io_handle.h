@@ -70,6 +70,7 @@ int libewf_read_io_handle_read_chunk_data(
      libmfdata_list_t *chunk_table_list,
      libmfdata_cache_t *chunk_table_cache,
      int chunk_index,
+     off64_t chunk_offset,
      libewf_chunk_data_t **chunk_data,
      liberror_error_t **error );
 

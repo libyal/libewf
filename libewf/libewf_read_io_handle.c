@@ -23,6 +23,7 @@
 #include <types.h>
 
 #include <liberror.h>
+#include <libnotify.h>
 
 #include "libewf_chunk_data.h"
 #include "libewf_definitions.h"
@@ -269,12 +270,15 @@ int libewf_read_io_handle_read_chunk_data(
      libmfdata_list_t *chunk_table_list,
      libmfdata_cache_t *chunk_table_cache,
      int chunk_index,
+     off64_t chunk_offset,
      libewf_chunk_data_t **chunk_data,
      liberror_error_t **error )
 {
 	static char *function      = "libewf_read_io_handle_read_chunk_data";
+	size_t chunk_size          = 0;
 	uint64_t start_sector      = 0;
 	uint32_t number_of_sectors = 0;
+	int result                 = 0;
 
 	if( read_io_handle == NULL )
 	{
@@ -311,14 +315,16 @@ int libewf_read_io_handle_read_chunk_data(
 	}
 	/* This function will expand element groups
 	 */
-	if( libmfdata_list_get_element_value_by_index(
-	     chunk_table_list,
-	     file_io_pool,
-	     chunk_table_cache,
-	     chunk_index,
-	     (intptr_t **) chunk_data,
-	     0,
-	     error ) != 1 )
+	result = libmfdata_list_get_element_value_by_index(
+	          chunk_table_list,
+	          file_io_pool,
+	          chunk_table_cache,
+	          chunk_index,
+	          (intptr_t **) chunk_data,
+	          0,
+	          error );
+
+	if( result != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -328,34 +334,163 @@ int libewf_read_io_handle_read_chunk_data(
 		 function,
 		 chunk_index );
 
-		return( -1 );
-	}
-	if( *chunk_data == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing chunk data: %d.",
-		 function,
-		 chunk_index );
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( ( error != NULL )
+		 && ( *error != NULL ) )
+		{
+			libnotify_print_error_backtrace(
+			 *error );
+		}
+#endif
+		liberror_error_free(
+		 error );
 
-		return( -1 );
-	}
-	if( libewf_chunk_data_unpack(
-	     *chunk_data,
-	     media_values->chunk_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to unpack chunk data: %d.",
-		 function,
-		 chunk_index );
+		chunk_size = media_values->chunk_size;
 
-		return( -1 );
+		if( (size64_t) ( chunk_offset + chunk_size ) > media_values->media_size )
+		{
+			chunk_size = (size_t) ( media_values->media_size - chunk_offset );
+		}
+		if( libewf_chunk_data_initialize(
+		     chunk_data,
+		     chunk_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create chunk data.",
+			 function );
+
+			return( -1 );
+		}
+		if( *chunk_data == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunk data: %d.",
+			 function,
+			 chunk_index );
+
+			return( -1 );
+		}
+		( *chunk_data )->data_size  = chunk_size;
+		( *chunk_data )->is_corrupt = 1;
+
+		if( memory_set(
+		     ( *chunk_data )->data,
+		     0,
+		     ( *chunk_data )->data_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to zero chunk data.",
+			 function );
+
+			libewf_chunk_data_free(
+			 chunk_data,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libmfdata_list_set_element_by_index(
+		     chunk_table_list,
+		     chunk_index,
+		     -1,
+		     chunk_offset,
+		     chunk_size,
+		     0,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to set chunk: %d in table.",
+			 function,
+			 chunk_index );
+
+			libewf_chunk_data_free(
+			 chunk_data,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libmfdata_list_set_element_value_by_index(
+		     chunk_table_list,
+		     chunk_table_cache,
+		     chunk_index,
+		     (intptr_t *) *chunk_data,
+		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
+		     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to set chunk data: %d as element value.",
+			 function,
+			 chunk_index );
+
+			libewf_chunk_data_free(
+			 chunk_data,
+			 NULL );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( *chunk_data == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunk data: %d.",
+			 function,
+			 chunk_index );
+
+			return( -1 );
+		}
+		if( libewf_chunk_data_unpack(
+		     *chunk_data,
+		     media_values->chunk_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to unpack chunk data: %d.",
+			 function,
+			 chunk_index );
+
+			return( -1 );
+		}
+		if( read_io_handle->zero_on_error != 0 )
+		{
+			if( memory_set(
+			     ( *chunk_data )->data,
+			     0,
+			     ( *chunk_data )->data_size ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to zero chunk data.",
+				 function );
+
+				return( -1 );
+			}
+		}
 	}
 	if( ( *chunk_data )->is_corrupt != 0 )
 	{
@@ -383,23 +518,6 @@ int libewf_read_io_handle_read_chunk_data(
 			 function );
 
 			return( -1 );
-		}
-		if( read_io_handle->zero_on_error != 0 )
-		{
-			if( memory_set(
-			     ( *chunk_data )->data,
-			     0,
-			     ( *chunk_data )->data_size ) == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to zero chunk data.",
-				 function );
-
-				return( -1 );
-			}
 		}
 	}
 	return( 1 );

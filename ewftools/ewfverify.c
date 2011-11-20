@@ -263,36 +263,6 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_initialize(
-	     &glob,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to initialize glob.\n" );
-
-		goto on_error;
-	}
-	if( libsystem_glob_resolve(
-	     glob,
-	     &( argv[ optind ] ),
-	     argc - optind,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to resolve glob.\n" );
-
-		goto on_error;
-	}
-	argv_filenames      = glob->result;
-	number_of_filenames = glob->number_of_results;
-#else
-	argv_filenames      = &( argv[ optind ] );
-	number_of_filenames = argc - optind;
-#endif
-
 	if( verification_handle_initialize(
 	     &ewfverify_verification_handle,
 	     calculate_md5,
@@ -304,49 +274,6 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libsystem_signal_attach(
-	     ewfverify_signal_handler,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to attach signal handler.\n" );
-
-		libsystem_notify_print_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	result = verification_handle_open_input(
-	          ewfverify_verification_handle,
-	          argv_filenames,
-	          number_of_filenames,
-	          &error );
-
-	if( ewfverify_abort != 0 )
-	{
-		goto on_abort;
-	}
-	if( result != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to open EWF image file(s).\n" );
-
-		goto on_error;
-	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_free(
-	     &glob,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free glob.\n" );
-
-		goto on_error;
-	}
-#endif
 	if( option_header_codepage != NULL )
 	{
 		result = verification_handle_set_header_codepage(
@@ -391,17 +318,6 @@ int main( int argc, char * const argv[] )
 			 "Unsupported input format defaulting to: raw.\n" );
 		}
 	}
-	if( verification_handle_set_zero_chunk_on_error(
-	     ewfverify_verification_handle,
-	     zero_chunk_on_error,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to set zero on chunk error.\n" );
-
-		goto on_error;
-	}
 	if( option_process_buffer_size != NULL )
 	{
 		result = verification_handle_set_process_buffer_size(
@@ -442,6 +358,90 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
+	}
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_initialize(
+	     &glob,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize glob.\n" );
+
+		goto on_error;
+	}
+	if( libsystem_glob_resolve(
+	     glob,
+	     &( argv[ optind ] ),
+	     argc - optind,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to resolve glob.\n" );
+
+		goto on_error;
+	}
+	argv_filenames      = glob->result;
+	number_of_filenames = glob->number_of_results;
+#else
+	argv_filenames      = &( argv[ optind ] );
+	number_of_filenames = argc - optind;
+#endif
+
+	if( libsystem_signal_attach(
+	     ewfverify_signal_handler,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to attach signal handler.\n" );
+
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	result = verification_handle_open_input(
+	          ewfverify_verification_handle,
+	          argv_filenames,
+	          number_of_filenames,
+	          &error );
+
+	if( ewfverify_abort != 0 )
+	{
+		goto on_abort;
+	}
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open EWF image file(s).\n" );
+
+		goto on_error;
+	}
+#if !defined( LIBSYSTEM_HAVE_GLOB )
+	if( libsystem_glob_free(
+	     &glob,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free glob.\n" );
+
+		goto on_error;
+	}
+#endif
+	if( verification_handle_set_zero_chunk_on_error(
+	     ewfverify_verification_handle,
+	     zero_chunk_on_error,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set zero on chunk error.\n" );
+
+		goto on_error;
 	}
 	if( log_filename != NULL )
 	{

@@ -155,7 +155,7 @@ int libewf_segment_file_free(
 
 		return( -1 );
 	}
-	if( *segment_file == NULL )
+	if( *segment_file != NULL )
 	{
 		if( ( *segment_file )->section_list != NULL )
 		{
@@ -3703,7 +3703,7 @@ ssize_t libewf_segment_file_write_close(
 
 		goto on_error;
 	}
-	segment_file->write_open = 0;
+	segment_file->flags &= ~( LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN );
 
 	return( total_write_count );
 

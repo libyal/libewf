@@ -26,6 +26,7 @@ Roadmap:
   - make write debug output similar to read debug output
 * error tollerance
   - allow for missing segment file(s)
+  - allow for missing section(s)
   - allow for missing chunk(s)
 * bindings
   - Python (partial)
@@ -282,6 +283,10 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111120
+* updated libfvalue, libmfdata
+* worked on error tollerance
 
 20111117
 * updated libmfdata

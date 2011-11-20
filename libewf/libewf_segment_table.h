@@ -56,6 +56,10 @@ struct libewf_segment_table
 	/* The segment files (handles) array
 	 */
 	libewf_array_t *segment_files_array;
+
+	/* Flags
+	 */
+	uint8_t flags;
 };
 
 int libewf_segment_table_initialize(

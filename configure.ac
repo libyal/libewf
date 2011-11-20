@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111117],
+ [20111120],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -183,7 +183,7 @@ dnl Check for the host operation system will be used as a fall back in the ewfto
 AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM
 
 dnl Set memwatch support
-ac_cv_enable_memwatch=no
+ac_cv_enable_memwatch=yes
 
 AS_IF(
  [test "x$ac_cv_enable_memwatch" != xno],

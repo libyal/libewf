@@ -2635,6 +2635,17 @@ int libewf_handle_open_read_segment_files(
 
 		return( -1 );
 	}
+	if( internal_handle->segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->single_files == NULL )
 	{
 		liberror_error_set(
@@ -2855,7 +2866,6 @@ int libewf_handle_open_read_segment_files(
 				 "%s: unable to read section start.",
 				 function );
 
-#if defined( HAVE_ERROR_TOLLERANCE )
 				if( libewf_section_free(
 				     &section,
 				     error ) != 1 )
@@ -2880,10 +2890,11 @@ int libewf_handle_open_read_segment_files(
 				liberror_error_free(
 				 error );
 
+				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+
+				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+
 				break;
-#else
-				goto on_error;
-#endif
 			}
 			if( section->type_length == 4 )
 			{
@@ -3301,39 +3312,56 @@ int libewf_handle_open_read_segment_files(
 			}
 			section = NULL;
 
+			segment_file->last_section_offset = section_offset;
+
 			if( last_section != 0 )
 			{
 				break;
 			}
 		}
-#if !defined( HAVE_ERROR_TOLLERANCE )
-		if( last_section == 0 )
+		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED ) == 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing next or done section.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
-		{
-			if( (size64_t) section_offset < segment_file_size )
+			if( last_section == 0 )
 			{
-				libnotify_printf(
-				 "%s: trailing data in segment file: %" PRIu16 "\n",
-				 function,
-				 segment_files_list_index );
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing next or done section.",
+				 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libnotify_print_error_backtrace(
+					 *error );
+				}
+#endif
+				liberror_error_free(
+				 error );
+
+				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+
+				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+
+				goto on_error;
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			else if( libnotify_verbose != 0 )
+			{
+				if( (size64_t) section_offset < segment_file_size )
+				{
+					libnotify_printf(
+					 "%s: trailing data in segment file: %" PRIu16 "\n",
+					 function,
+					 segment_files_list_index );
+				}
+			}
+#endif
 		}
-#endif
 		segment_file = NULL;
-#endif
 	}
-#if !defined( HAVE_ERROR_TOLLERANCE )
 	if( last_segment_file == 0 )
 	{
 		liberror_error_set(
@@ -3343,9 +3371,19 @@ int libewf_handle_open_read_segment_files(
 		 "%s: missing done section.",
 		 function );
 
-		goto on_error;
-	}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( ( error != NULL )
+		 && ( *error != NULL ) )
+		{
+			libnotify_print_error_backtrace(
+			 *error );
+		}
 #endif
+		liberror_error_free(
+		 error );
+
+		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+	}
 	return( 1 );
 
 on_error:
@@ -3387,6 +3425,17 @@ int libewf_handle_open_read_delta_segment_files(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
 		return( -1 );
@@ -4596,6 +4645,7 @@ ssize_t libewf_handle_read_buffer(
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_read_buffer";
+	off64_t chunk_offset                      = 0;
 	size_t buffer_offset                      = 0;
 	size_t read_size                          = 0;
 	ssize_t total_read_count                  = 0;
@@ -4713,8 +4763,9 @@ ssize_t libewf_handle_read_buffer(
 
 		return( -1 );
 	}
-	chunk_data_offset = internal_handle->io_handle->current_offset
-			  - ( chunk_index * internal_handle->media_values->chunk_size );
+	chunk_offset = chunk_index * internal_handle->media_values->chunk_size;
+
+	chunk_data_offset = internal_handle->io_handle->current_offset - chunk_offset;
 
 	if( chunk_data_offset >= (uint64_t) SSIZE_MAX )
 	{
@@ -4736,6 +4787,7 @@ ssize_t libewf_handle_read_buffer(
 		     internal_handle->chunk_table_list,
 		     internal_handle->chunk_table_cache,
 		     (int) chunk_index,
+		     chunk_offset,
 		     &chunk_data,
 		     error ) != 1 )
 		{
@@ -4800,6 +4852,7 @@ ssize_t libewf_handle_read_buffer(
 		buffer_size      -= read_size;
 		total_read_count += (ssize_t) read_size;
 		chunk_index      += 1;
+		chunk_offset     += internal_handle->media_values->chunk_size;
 		chunk_data_offset = 0;
 
 		internal_handle->io_handle->current_offset += (off64_t) read_size;
@@ -5559,6 +5612,7 @@ ssize_t libewf_handle_write_buffer(
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_write_buffer";
+	off64_t chunk_offset                      = 0;
 	size_t buffer_offset                      = 0;
 	size_t chunk_data_size                    = 0;
 	size_t write_size                         = 0;
@@ -5726,8 +5780,9 @@ ssize_t libewf_handle_write_buffer(
 
 		return( -1 );
 	}
-	chunk_data_offset = internal_handle->io_handle->current_offset
-			  - ( chunk_index * internal_handle->media_values->chunk_size );
+	chunk_offset = chunk_index * internal_handle->media_values->chunk_size;
+
+	chunk_data_offset = internal_handle->io_handle->current_offset - chunk_offset;
 
 	if( chunk_data_offset >= (uint64_t) SSIZE_MAX )
 	{
@@ -5784,6 +5839,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->chunk_table_list,
 				     internal_handle->chunk_table_cache,
 				     (int) chunk_index,
+				     chunk_offset,
 				     &chunk_data,
 				     error ) != 1 )
 				{
@@ -6170,6 +6226,7 @@ ssize_t libewf_handle_write_buffer(
 			}
 		}
 		chunk_index      += 1;
+		chunk_offset     += internal_handle->media_values->chunk_size;
 		chunk_data_offset = 0;
 
 		internal_handle->io_handle->current_offset += (off64_t) write_size;
@@ -6648,7 +6705,7 @@ ssize_t libewf_handle_write_finalize(
 	}
 	/* Check if the last segment file is still open for writing
 	 */
-	if( segment_file->write_open != 0 )
+	if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN ) != 0 )
 	{
 		if( libbfio_pool_get_offset(
 		     internal_handle->file_io_pool,
