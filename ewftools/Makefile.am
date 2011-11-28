@@ -24,6 +24,7 @@ bin_PROGRAMS = \
 	ewfexport \
 	ewfinfo \
 	ewfmount \
+	ewfrecover \
 	ewfverify
 
 ewfacquire_SOURCES = \
@@ -198,6 +199,39 @@ ewfmount_LDADD = \
 	@LIBFUSE_LIBADD@ \
 	@MEMWATCH_LIBADD@
 
+ewfrecover_SOURCES = \
+	byte_size_string.c byte_size_string.h \
+	digest_hash.c digest_hash.h \
+	ewfcommon.h \
+	ewfrecover.c \
+	ewfinput.c ewfinput.h \
+	ewfoutput.c ewfoutput.h \
+	ewftools_libewf.h \
+	ewftools_libhmac.h \
+	ewftools_libodraw.h \
+	ewftools_libsmdev.h \
+	ewftools_libsmraw.h \
+	ewftools_libuna.h \
+	export_handle.c export_handle.h \
+	guid.c guid.h \
+	log_handle.c log_handle.h \
+	platform.c platform.h \
+	process_status.c process_status.h \
+	storage_media_buffer.c storage_media_buffer.h
+
+ewfrecover_LDADD = \
+	../libcstring/libcstring.la \
+	../liberror/liberror.la \
+	../libewf/libewf.la \
+	../libsystem/libsystem.la \
+	@LIBHMAC_LIBADD@ \
+	@LIBSMRAW_LIBADD@ \
+	@LIBINTL@ \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBUUID_LIBADD@ \
+	@LIBDL_LIBADD@ \
+	@MEMWATCH_LIBADD@
+
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	digest_hash.c digest_hash.h \
@@ -246,6 +280,8 @@ splint:
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfinfo_SOURCES) 
 	@echo "Running splint on ewfmount ..." 
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfmount_SOURCES) 
+	@echo "Running splint on ewfrecover ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfrecover_SOURCES) 
 	@echo "Running splint on ewfverify ..." 
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfverify_SOURCES) 
 

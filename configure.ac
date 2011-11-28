@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111120],
+ [20111121],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -183,7 +183,7 @@ dnl Check for the host operation system will be used as a fall back in the ewfto
 AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM
 
 dnl Set memwatch support
-ac_cv_enable_memwatch=yes
+ac_cv_enable_memwatch=no
 
 AS_IF(
  [test "x$ac_cv_enable_memwatch" != xno],
@@ -213,6 +213,11 @@ AS_IF(
    ["-DLIBEWF_DLL_IMPORT"])
   ])
  ])
+
+dnl Set the date for dpkg files
+AC_SUBST(
+ [DATE],
+ [`date -R`])
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])

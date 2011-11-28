@@ -697,6 +697,14 @@ int libewf_handle_set_maximum_delta_segment_size(
      size64_t maximum_delta_segment_size,
      libewf_error_t **error );
 
+/* Determine if the segment files are corrupted
+ * Returns 1 if corrupted, 0 if not or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_segment_files_corrupted(
+     libewf_handle_t *handle,
+     libewf_error_t **error );
+
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size includes the end of string character
  * Returns 1 if successful or -1 on error

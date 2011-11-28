@@ -1236,6 +1236,7 @@ int verification_handle_verify_input(
 	ssize_t process_count                        = 0;
 	ssize_t read_count                           = 0;
 	uint32_t number_of_checksum_errors           = 0;
+	int is_corrupted                             = 0;
 	int md5_hash_compare                         = 0;
 	int sha1_hash_compare                        = 0;
 	int sha256_hash_compare                      = 0;
@@ -1663,6 +1664,21 @@ int verification_handle_verify_input(
 			}
 		}
 	}
+	is_corrupted = libewf_handle_segment_files_corrupted(
+	                verification_handle->input_handle,
+	                error );
+
+	if( is_corrupted == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if segment files are corrupted.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_handle_get_number_of_checksum_errors(
 	     verification_handle->input_handle,
 	     &number_of_checksum_errors,
@@ -1703,7 +1719,8 @@ int verification_handle_verify_input(
 	}
 	/* Note that a set of EWF files can be verified without an integrity hash
 	 */
-	if( ( number_of_checksum_errors == 0 )
+	if( ( is_corrupted == 0 )
+	 && ( number_of_checksum_errors == 0 )
 	 && ( md5_hash_compare == 0 )
 	 && ( sha1_hash_compare == 0 )
 	 && ( sha256_hash_compare == 0 ) )

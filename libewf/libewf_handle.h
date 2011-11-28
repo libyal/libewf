@@ -329,6 +329,11 @@ int libewf_handle_set_maximum_number_of_open_handles(
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_handle_segment_files_corrupted(
+     libewf_handle_t *handle,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_get_segment_filename_size(
      libewf_handle_t *handle,
      size_t *filename_size,

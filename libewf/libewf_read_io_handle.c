@@ -474,21 +474,24 @@ int libewf_read_io_handle_read_chunk_data(
 
 			return( -1 );
 		}
-		if( read_io_handle->zero_on_error != 0 )
+		if( ( *chunk_data )->is_corrupt != 0 )
 		{
-			if( memory_set(
-			     ( *chunk_data )->data,
-			     0,
-			     ( *chunk_data )->data_size ) == NULL )
+			if( read_io_handle->zero_on_error != 0 )
 			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to zero chunk data.",
-				 function );
+				if( memory_set(
+				     ( *chunk_data )->data,
+				     0,
+				     ( *chunk_data )->data_size ) == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to zero chunk data.",
+					 function );
 
-				return( -1 );
+					return( -1 );
+				}
 			}
 		}
 	}

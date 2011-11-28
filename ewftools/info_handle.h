@@ -147,6 +147,14 @@ int info_handle_section_value_size_fprint(
      size64_t value_size,
      liberror_error_t **error );
 
+int info_handle_section_value_boolean_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     int value_boolean,
+     liberror_error_t **error );
+
 int info_handle_header_value_fprint(
      info_handle_t *info_handle,
      const char *identifier,

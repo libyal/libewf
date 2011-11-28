@@ -2892,7 +2892,7 @@ int libewf_handle_open_read_segment_files(
 
 				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
 
-				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
 
 				break;
 			}
@@ -3343,7 +3343,7 @@ int libewf_handle_open_read_segment_files(
 
 				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
 
-				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
 
 				goto on_error;
 			}
@@ -3382,7 +3382,7 @@ int libewf_handle_open_read_segment_files(
 		liberror_error_free(
 		 error );
 
-		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
+		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
 	}
 	return( 1 );
 
@@ -7085,6 +7085,47 @@ int libewf_handle_set_maximum_number_of_open_handles(
 	internal_handle->maximum_number_of_open_handles = maximum_number_of_open_handles;
 
 	return( 1 );
+}
+
+/* Determine if the segment files are corrupted
+ * Returns 1 if corrupted, 0 if not or -1 on error
+ */
+int libewf_handle_segment_files_corrupted(
+     libewf_handle_t *handle,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_segment_files_corrupted";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->segment_table->flags & LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED ) != 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 
 /* Retrieves the segment filename size

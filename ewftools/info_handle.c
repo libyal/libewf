@@ -742,7 +742,7 @@ int info_handle_section_footer_fprint(
 	return( 1 );
 }
 
-/* Prints a section value string to a stream
+/* Prints a string value to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_section_value_string_fprint(
@@ -838,7 +838,7 @@ int info_handle_section_value_string_fprint(
 	return( 1 );
 }
 
-/* Prints a section 32-bit value to a stream
+/* Prints a 32-bit value to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_section_value_32bit_fprint(
@@ -896,7 +896,7 @@ int info_handle_section_value_32bit_fprint(
 	return( 1 );
 }
 
-/* Prints a section 64-bit value to a stream
+/* Prints a 64-bit value to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_section_value_64bit_fprint(
@@ -954,7 +954,7 @@ int info_handle_section_value_64bit_fprint(
 	return( 1 );
 }
 
-/* Prints a section 64-bit size value to a stream
+/* Prints a 64-bit size value to a stream
  * Returns 1 if successful or -1 on error
  */
 int info_handle_section_value_size_fprint(
@@ -1041,6 +1041,82 @@ int info_handle_section_value_size_fprint(
 			 info_handle->notify_stream,
 			 "%" PRIu64 " bytes\n",
 			 value_size );
+		}
+	}
+	return( 1 );
+}
+
+/* Prints a boolean value to a stream
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_section_value_boolean_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     size_t description_length,
+     int value_boolean,
+     liberror_error_t **error )
+{
+	static char *function = "info_handle_section_value_boolean_fprint";
+
+	if( info_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		if( value_boolean != 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t\t<%s>yes</%s>\n",
+			 identifier,
+			 identifier );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t\t<%s>no</%s>\n",
+			 identifier,
+			 identifier );
+		}
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t%s:",
+		 description );
+
+		description_length += 1;
+
+		while( description_length < 24 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t" );
+
+			description_length += 8;
+		}
+		if( value_boolean != 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "yes\n" );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "no\n" );
 		}
 	}
 	return( 1 );
@@ -1971,6 +2047,7 @@ int info_handle_media_information_fprint(
 	uint8_t media_flags                               = 0;
 	uint8_t format                                    = 0;
 	int8_t compression_level                          = 0;
+	int is_corrupted                                  = 0;
 	int result                                        = 1;
 
 	if( info_handle == NULL )
@@ -2128,7 +2205,7 @@ int info_handle_media_information_fprint(
 			     info_handle,
 			     "sectors_per_chunk",
 			     "Sectors per chunk",
-			     16,
+			     17,
 			     value_32bit,
 			     error ) != 1 )
 			{
@@ -2162,7 +2239,7 @@ int info_handle_media_information_fprint(
 			     info_handle,
 			     "error_granularity",
 			     "Error granularity",
-			     16,
+			     17,
 			     value_32bit,
 			     error ) != 1 )
 			{
@@ -2212,9 +2289,9 @@ int info_handle_media_information_fprint(
 			if( info_handle_section_value_string_fprint(
 			     info_handle,
 			     "compression_level",
-			     16,
+			     17,
 			     "Compression level",
-			     16,
+			     17,
 			     value_string,
 			     error ) != 1 )
 			{
@@ -2283,6 +2360,41 @@ int info_handle_media_information_fprint(
 					result = -1;
 				}
 			}
+		}
+	}
+	is_corrupted = libewf_handle_segment_files_corrupted(
+	                info_handle->input_handle,
+	                error );
+
+	if( is_corrupted == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if segment files are corrupted.",
+		 function );
+
+		result = -1;
+	}
+	else if( is_corrupted != 0 )
+	{
+		if( info_handle_section_value_boolean_fprint(
+		     info_handle,
+		     "is_corrupted",
+		     "Is corrupted",
+		     12,
+		     is_corrupted,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section boolean value: is_corrupted.",
+			 function );
+
+			result = -1;
 		}
 	}
 	if( info_handle_section_footer_fprint(
@@ -2401,28 +2513,19 @@ int info_handle_media_information_fprint(
 				 media_flags );
 			}
 #endif
-			if( ( media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
-			{
-				value_string = _LIBCSTRING_SYSTEM_STRING( "yes" );
-			}
-			else
-			{
-				value_string = _LIBCSTRING_SYSTEM_STRING( "no" );
-			}
-			if( info_handle_section_value_string_fprint(
+			if( info_handle_section_value_boolean_fprint(
 			     info_handle,
 			     "is_physical",
-			     10,
 			     "Is physical",
 			     10,
-			     value_string,
+			     media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL,
 			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print section value string: media_type.",
+				 "%s: unable to print section boolean value: is_physical.",
 				 function );
 
 				result = -1;
