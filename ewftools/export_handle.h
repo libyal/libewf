@@ -170,6 +170,10 @@ struct export_handle
 	 */
 	uint32_t bytes_per_sector;
 
+	/* The input media size
+	 */
+	size64_t input_media_size;
+
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* The last offset of the input data
 	 */
@@ -309,9 +313,19 @@ int export_handle_prompt_for_sectors_per_chunk(
      const libcstring_system_character_t *request_string,
      liberror_error_t **error );
 
-int export_handle_set_maximum_segment_size(
+int export_handle_prompt_for_maximum_segment_size(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int export_handle_prompt_for_export_offset(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int export_handle_prompt_for_export_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
      liberror_error_t **error );
 
 int export_handle_set_string(
@@ -336,9 +350,19 @@ int export_handle_set_sectors_per_chunk(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
-int export_handle_prompt_for_maximum_segment_size(
+int export_handle_set_maximum_segment_size(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int export_handle_set_export_offset(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int export_handle_set_export_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
      liberror_error_t **error );
 
 int export_handle_set_header_codepage(

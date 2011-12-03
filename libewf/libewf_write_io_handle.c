@@ -36,6 +36,8 @@
 #include "libewf_header_values.h"
 #include "libewf_libbfio.h"
 #include "libewf_libfvalue.h"
+#include "libewf_libmfcache.h"
+#include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
 #include "libewf_section.h"
@@ -625,7 +627,7 @@ int libewf_write_io_handle_initialize_resume(
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libmfdata_file_list_t *segment_files_list,
-     libmfdata_cache_t *segment_files_cache,
+     libmfcache_cache_t *segment_files_cache,
      libmfdata_list_t *chunk_table_list,
      libewf_chunk_table_t *chunk_table,
      libewf_segment_table_t *segment_table,
@@ -1789,7 +1791,7 @@ int libewf_write_io_handle_create_segment_file(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libmfdata_file_list_t *segment_files_list,
-     libmfdata_cache_t *segment_files_cache,
+     libmfcache_cache_t *segment_files_cache,
      libewf_segment_table_t *segment_table,
      uint16_t segment_number,
      uint16_t maximum_number_of_segments,
@@ -2085,7 +2087,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libmfdata_file_list_t *segment_files_list,
-         libmfdata_cache_t *segment_files_cache,
+         libmfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *segment_table,
          libmfdata_list_t *chunk_table_list,
          libfvalue_table_t *header_values,
@@ -3013,7 +3015,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
          libmfdata_file_list_t *delta_segment_files_list,
-         libmfdata_cache_t *segment_files_cache,
+         libmfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *delta_segment_table,
          libmfdata_list_t *chunk_table_list,
          libewf_header_sections_t *header_sections,
@@ -3567,7 +3569,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      uint32_t number_of_chunks_written_to_last_segment,
      libewf_media_values_t *media_values,
      libmfdata_file_list_t *segment_files_list,
-     libmfdata_cache_t *segment_files_cache,
+     libmfcache_cache_t *segment_files_cache,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,

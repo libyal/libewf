@@ -71,112 +71,121 @@ int imaging_handle_initialize(
 
 		return( -1 );
 	}
+	if( *imaging_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid imaging handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*imaging_handle = memory_allocate_structure(
+	                   imaging_handle_t );
+
 	if( *imaging_handle == NULL )
 	{
-		*imaging_handle = memory_allocate_structure(
-		                   imaging_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create imaging handle.",
+		 function );
 
-		if( *imaging_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create imaging handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *imaging_handle,
-		     0,
-		     sizeof( imaging_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear imaging handle.",
-			 function );
-
-			memory_free(
-			 *imaging_handle );
-
-			*imaging_handle = NULL;
-
-			return( -1 );
-		}
-		( *imaging_handle )->input_buffer = libcstring_system_string_allocate(
-		                                     IMAGING_HANDLE_INPUT_BUFFER_SIZE );
-
-		if( ( *imaging_handle )->input_buffer == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create input buffer.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     ( *imaging_handle )->input_buffer,
-		     0,
-		     sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear imaging handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_handle_initialize(
-		     &( ( *imaging_handle )->output_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize output handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( calculate_md5 != 0 )
-		{
-			( *imaging_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
-									   33 );
-
-			if( ( *imaging_handle )->calculated_md5_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated MD5 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		( *imaging_handle )->calculate_md5            = calculate_md5;
-		( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
-		( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
-		( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
-		( *imaging_handle )->media_flags              = LIBEWF_MEDIA_FLAG_PHYSICAL;
-		( *imaging_handle )->bytes_per_sector         = 512;
-		( *imaging_handle )->sectors_per_chunk        = 64;
-		( *imaging_handle )->sector_error_granularity = 64;
-		( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-		( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
-		( *imaging_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
-		( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
+		goto on_error;
 	}
+	if( memory_set(
+	     *imaging_handle,
+	     0,
+	     sizeof( imaging_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear imaging handle.",
+		 function );
+
+		memory_free(
+		 *imaging_handle );
+
+		*imaging_handle = NULL;
+
+		return( -1 );
+	}
+	( *imaging_handle )->input_buffer = libcstring_system_string_allocate(
+	                                     IMAGING_HANDLE_INPUT_BUFFER_SIZE );
+
+	if( ( *imaging_handle )->input_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create input buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     ( *imaging_handle )->input_buffer,
+	     0,
+	     sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear imaging handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_handle_initialize(
+	     &( ( *imaging_handle )->output_handle ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize output handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( calculate_md5 != 0 )
+	{
+		( *imaging_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
+								   33 );
+
+		if( ( *imaging_handle )->calculated_md5_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated MD5 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	( *imaging_handle )->calculate_md5            = calculate_md5;
+	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
+	( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
+	( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
+	( *imaging_handle )->media_flags              = LIBEWF_MEDIA_FLAG_PHYSICAL;
+	( *imaging_handle )->bytes_per_sector         = 512;
+	( *imaging_handle )->sectors_per_chunk        = 64;
+	( *imaging_handle )->sector_error_granularity = 64;
+	( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+	( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
+	( *imaging_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
+
 	return( 1 );
 
 on_error:
@@ -2467,6 +2476,120 @@ int imaging_handle_prompt_for_maximum_segment_size(
 	return( result );
 }
 
+/* Prompts the user for the acquiry offset
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int imaging_handle_prompt_for_acquiry_offset(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	static char *function        = "imaging_handle_prompt_for_acquiry_offset";
+	uint64_t input_size_variable = 0;
+	int result                   = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_get_size_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          0,
+	          imaging_handle->input_media_size,
+	          imaging_handle->acquiry_offset,
+	          &input_size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size variable.",
+		 function );
+
+		return( -1 );
+	}
+	imaging_handle->acquiry_offset = input_size_variable;
+
+	return( result );
+}
+
+/* Prompts the user for the acquiry size
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int imaging_handle_prompt_for_acquiry_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	static char *function        = "imaging_handle_prompt_for_acquiry_size";
+	uint64_t default_input_size  = 0;
+	uint64_t input_size_variable = 0;
+	uint64_t maximum_input_size  = 0;
+	int result                   = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	maximum_input_size = imaging_handle->input_media_size
+	                   - imaging_handle->acquiry_offset;
+
+	if( ( imaging_handle->acquiry_size == 0 )
+	 || ( imaging_handle->acquiry_size > maximum_input_size ) )
+	{
+		default_input_size = maximum_input_size;
+	}
+	else
+	{
+		default_input_size = imaging_handle->acquiry_size;
+	}
+	result = ewfinput_get_size_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          0,
+	          maximum_input_size,
+	          default_input_size,
+	          &input_size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size variable.",
+		 function );
+
+		return( -1 );
+	}
+	imaging_handle->acquiry_size = input_size_variable;
+
+	return( result );
+}
+
 /* Retrieves the output values of the imaging handle
  * Returns 1 if successful or -1 on error
  */
@@ -3129,14 +3252,14 @@ int imaging_handle_set_sector_error_granularity(
 	}
 	else if( result != 0 )
 	{
-		if( size_variable > (uint64_t) UINT32_MAX )
+		if( ( size_variable > (uint64_t) UINT32_MAX )
+		 || ( size_variable > imaging_handle->sectors_per_chunk ) )
 		{
+			size_variable = imaging_handle->sectors_per_chunk;
+
 			result = 0;
 		}
-		else
-		{
-			imaging_handle->sector_error_granularity = (uint32_t) size_variable;
-		}
+		imaging_handle->sector_error_granularity = (uint32_t) size_variable;
 	}
 	return( result );
 }
@@ -3184,7 +3307,106 @@ int imaging_handle_set_maximum_segment_size(
 
 		return( -1 );
 	}
+        else if( result != 0 )
+	{
+		if( ( imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+		 || ( ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+		 &&  ( imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+		 || ( ( imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+		 &&  ( imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+		{
+			imaging_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
+			result = 0;
+		}
+	}
 	return( result );
+}
+
+/* Sets the acquiry offset
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_set_acquiry_offset(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_set_acquiry_offset";
+	size_t string_length  = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( libsystem_string_decimal_copy_to_64_bit(
+	     string,
+	     string_length + 1,
+	     &( imaging_handle->acquiry_offset ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine acquiry offset.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets the acquiry size
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_set_acquiry_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_set_acquiry_size";
+	size_t string_length  = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( libsystem_string_decimal_copy_to_64_bit(
+	     string,
+	     string_length + 1,
+	     &( imaging_handle->acquiry_size ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine acquiry size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Sets the header codepage
@@ -3276,6 +3498,8 @@ int imaging_handle_set_process_buffer_size(
 	{
 		if( size_variable > (uint64_t) SSIZE_MAX )
 		{
+			imaging_handle->process_buffer_size = 0;
+
 			result = 0;
 		}
 		else

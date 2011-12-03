@@ -1401,11 +1401,11 @@ int main( int argc, char * const argv[] )
 		      || ( ewfacquirestream_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE1 )
 		      || ( ewfacquirestream_imaging_handle->ewf_format == LIBEWF_FORMAT_SMART ) )
 		{
+			ewfacquirestream_imaging_handle->ewf_format = LIBEWF_FORMAT_ENCASE6;
+
 			fprintf(
 			 stderr,
 			 "Unsupported EWF format defaulting to: encase6.\n" );
-
-			ewfacquirestream_imaging_handle->ewf_format = LIBEWF_FORMAT_ENCASE6;
 		}
 	}
 	if( option_media_type != NULL )
@@ -1513,12 +1513,7 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		else if( ( result == 0 )
-		      || ( ewfacquirestream_imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-		      || ( ( ewfacquirestream_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( ewfacquirestream_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-		      || ( ( ewfacquirestream_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( ewfacquirestream_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+		else if( result == 0 )
 		{
 			ewfacquirestream_imaging_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
@@ -1530,14 +1525,12 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_offset != NULL )
 	{
-		string_length = libcstring_system_string_length(
-				 option_offset );
+		result = imaging_handle_set_acquiry_offset(
+			  ewfacquirestream_imaging_handle,
+			  option_offset,
+			  &error );
 
-		if( libsystem_string_to_uint64(
-		     option_offset,
-		     string_length + 1,
-		     &( ewfacquirestream_imaging_handle->acquiry_offset ),
-		     &error ) != 1 )
+		if( result == -1 )
 		{
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -1548,20 +1541,17 @@ int main( int argc, char * const argv[] )
 
 			fprintf(
 			 stderr,
-			 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
-			 ewfacquirestream_imaging_handle->acquiry_offset );
+			 "Unsupported acquiry offset defaulting to: 0.\n" );
 		}
 	}
 	if( option_size != NULL )
 	{
-		string_length = libcstring_system_string_length(
-				 option_size );
+		result = imaging_handle_set_acquiry_size(
+			  ewfacquirestream_imaging_handle,
+			  option_size,
+			  &error );
 
-		if( libsystem_string_to_uint64(
-		     option_size,
-		     string_length + 1,
-		     &( ewfacquirestream_imaging_handle->acquiry_size ),
-		     &error ) != 1 )
+		if( result == -1 )
 		{
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -1590,8 +1580,7 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		else if( ( result == 0 )
-		      || ( ewfacquirestream_imaging_handle->process_buffer_size > (size_t) SSIZE_MAX ) )
+		else if( result == 0 )
 		{
 			ewfacquirestream_imaging_handle->process_buffer_size = 0;
 

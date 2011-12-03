@@ -32,6 +32,8 @@
 #include "libewf_hash_values.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libmfcache.h"
+#include "libewf_libmfdata.h"
 #include "libewf_list_type.h"
 #include "libewf_section.h"
 #include "libewf_sector_list.h"
@@ -529,7 +531,7 @@ int libewf_segment_file_read(
      libbfio_pool_t *file_io_pool,
      int file_io_pool_entry,
      libmfdata_file_t *file,
-     libmfdata_cache_t *cache,
+     libmfcache_cache_t *cache,
      uint8_t read_flags LIBEWF_ATTRIBUTE_UNUSED,
      liberror_error_t **error )
 {

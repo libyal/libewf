@@ -64,136 +64,145 @@ int verification_handle_initialize(
 
 		return( -1 );
 	}
+	if( *verification_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid verification handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*verification_handle = memory_allocate_structure(
+	                        verification_handle_t );
+
 	if( *verification_handle == NULL )
 	{
-		*verification_handle = memory_allocate_structure(
-		                        verification_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create verification handle.",
+		 function );
 
-		if( *verification_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create verification handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *verification_handle,
-		     0,
-		     sizeof( verification_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear verification handle.",
-			 function );
-
-			memory_free(
-			 *verification_handle );
-
-			*verification_handle = NULL;
-
-			return( -1 );
-		}
-		if( libewf_handle_initialize(
-		     &( ( *verification_handle )->input_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize input handle.",
-			 function );
-
-			goto on_error;
-		}
-#ifdef TODO
-		/* TODO: have application determine limit value and set to value - 4 */
-		if( libewf_handle_set_maximum_number_of_open_handles(
-		     ( *verification_handle )->input_handle,
-		     1000,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set maximum number of open handles.",
-			 function );
-
-			goto on_error;
-		}
-#endif
-		if( calculate_md5 != 0 )
-		{
-			( *verification_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
-			                                                        33 );
-
-			if( ( *verification_handle )->calculated_md5_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated MD5 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		( *verification_handle )->stored_md5_hash_string = libcstring_system_string_allocate(
-		                                                    33 );
-
-		if( ( *verification_handle )->stored_md5_hash_string == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create stored MD5 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
-		( *verification_handle )->stored_sha1_hash_string = libcstring_system_string_allocate(
-		                                                     41 );
-
-		if( ( *verification_handle )->stored_sha1_hash_string == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create stored SHA1 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
-		( *verification_handle )->stored_sha256_hash_string = libcstring_system_string_allocate(
-		                                                       65 );
-
-		if( ( *verification_handle )->stored_sha256_hash_string == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create stored SHA256 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
-		( *verification_handle )->input_format        = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
-		( *verification_handle )->calculate_md5       = calculate_md5;
-		( *verification_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
-		( *verification_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
-		( *verification_handle )->notify_stream       = VERIFICATION_HANDLE_NOTIFY_STREAM;
+		goto on_error;
 	}
+	if( memory_set(
+	     *verification_handle,
+	     0,
+	     sizeof( verification_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear verification handle.",
+		 function );
+
+		memory_free(
+		 *verification_handle );
+
+		*verification_handle = NULL;
+
+		return( -1 );
+	}
+	if( libewf_handle_initialize(
+	     &( ( *verification_handle )->input_handle ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize input handle.",
+		 function );
+
+		goto on_error;
+	}
+#ifdef TODO
+	/* TODO: have application determine limit value and set to value - 4 */
+	if( libewf_handle_set_maximum_number_of_open_handles(
+	     ( *verification_handle )->input_handle,
+	     1000,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set maximum number of open handles.",
+		 function );
+
+		goto on_error;
+	}
+#endif
+	if( calculate_md5 != 0 )
+	{
+		( *verification_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
+									33 );
+
+		if( ( *verification_handle )->calculated_md5_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated MD5 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	( *verification_handle )->stored_md5_hash_string = libcstring_system_string_allocate(
+							    33 );
+
+	if( ( *verification_handle )->stored_md5_hash_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create stored MD5 digest hash string.",
+		 function );
+
+		goto on_error;
+	}
+	( *verification_handle )->stored_sha1_hash_string = libcstring_system_string_allocate(
+							     41 );
+
+	if( ( *verification_handle )->stored_sha1_hash_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create stored SHA1 digest hash string.",
+		 function );
+
+		goto on_error;
+	}
+	( *verification_handle )->stored_sha256_hash_string = libcstring_system_string_allocate(
+							       65 );
+
+	if( ( *verification_handle )->stored_sha256_hash_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create stored SHA256 digest hash string.",
+		 function );
+
+		goto on_error;
+	}
+	( *verification_handle )->input_format        = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
+	( *verification_handle )->calculate_md5       = calculate_md5;
+	( *verification_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
+	( *verification_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *verification_handle )->notify_stream       = VERIFICATION_HANDLE_NOTIFY_STREAM;
+
 	return( 1 );
 
 on_error:

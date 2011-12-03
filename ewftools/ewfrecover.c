@@ -131,7 +131,6 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
-	libcstring_system_character_t input_buffer[ EWFRECOVER_INPUT_BUFFER_SIZE ];
 
 	libcstring_system_character_t * const *argv_filenames      = NULL;
 
@@ -147,18 +146,14 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_process_buffer_size  = NULL;
 	libcstring_system_character_t *option_target_filename      = NULL;
 	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfrecover" );
-	libcstring_system_character_t *request_string              = NULL;
 
 	log_handle_t *log_handle                                   = NULL;
 
 	libcstring_system_integer_t option                         = 0;
-	size64_t media_size                                        = 0;
-	size_t string_length                                       = 0;
 	uint8_t calculate_md5                                      = 1;
 	uint8_t print_status_information                           = 1;
 	uint8_t verbose                                            = 0;
 	uint8_t zero_chunk_on_error                                = 0;
-	int interactive_mode                                       = 1;
 	int number_of_filenames                                    = 0;
 	int result                                                 = 1;
 
@@ -265,11 +260,6 @@ int main( int argc, char * const argv[] )
 
 			case (libcstring_system_integer_t) 't':
 				option_target_filename = optarg;
-
-				break;
-
-			case (libcstring_system_integer_t) 'u':
-				interactive_mode = 0;
 
 				break;
 
@@ -405,17 +395,6 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 #endif
-	if( export_handle_get_input_media_size(
-	     ewfrecover_export_handle,
-	     &media_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve input media size.\n" );
-
-		goto on_error;
-	}
 	if( option_header_codepage != NULL )
 	{
 		result = export_handle_set_header_codepage(
@@ -454,7 +433,7 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	else if( interactive_mode == 0 )
+	else
 	{
 		/* Make sure the target filename is set in unattended mode
 		 */
@@ -499,95 +478,6 @@ int main( int argc, char * const argv[] )
 	}
 	/* Initialize values
 	 */
-	if( ( ewfrecover_export_handle->export_size == 0 )
-	 || ( ewfrecover_export_handle->export_size > ( media_size - ewfrecover_export_handle->export_offset ) ) )
-	{
-		ewfrecover_export_handle->export_size = media_size - ewfrecover_export_handle->export_offset;
-	}
-	/* Request the necessary case data
-	 */
-	if( interactive_mode != 0 )
-	{
-		if( libsystem_signal_detach(
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to detach signal handler.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-		fprintf(
-		 stderr,
-		 "Information for recover required, please provide the necessary input\n" );
-
-		if( option_target_filename == NULL )
-		{
-			request_string = _LIBCSTRING_SYSTEM_STRING( "Target path and filename without extension" );
-		}
-		if( request_string != NULL )
-		{
-			do
-			{
-				result = export_handle_prompt_for_string(
-					  ewfrecover_export_handle,
-					  request_string,
-					  &( ewfrecover_export_handle->target_filename ),
-					  &( ewfrecover_export_handle->target_filename_size ),
-					  &error );
-
-				if( result == -1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to determine target.\n" );
-
-					goto on_error;
-				}
-				else if( result == 0 )
-				{
-					fprintf(
-					 stdout,
-					 "Target is required, please try again or terminate using Ctrl^C.\n" );
-				}
-			}
-			while( result != 1 );
-		}
-		if( libsystem_signal_attach(
-		     ewfrecover_signal_handler,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to attach signal handler.\n" );
-
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-		}
-	}
-	else
-	{
-		if( ewfrecover_export_handle->maximum_segment_size == 0 )
-		{
-			if( ewfrecover_export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-			{
-				ewfrecover_export_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-			}
-			else
-			{
-				ewfrecover_export_handle->maximum_segment_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
-			}
-		}
-	}
-	fprintf(
-	 stderr,
-	 "\n" );
-
 	if( log_filename != NULL )
 	{
 		if( log_handle_initialize(

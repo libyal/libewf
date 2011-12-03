@@ -106,72 +106,81 @@ int device_handle_initialize(
 
 		return( -1 );
 	}
+	if( *device_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid device handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*device_handle = memory_allocate_structure(
+	                  device_handle_t );
+
 	if( *device_handle == NULL )
 	{
-		*device_handle = memory_allocate_structure(
-		                  device_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create device handle.",
+		 function );
 
-		if( *device_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create device handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *device_handle,
-		     0,
-		     sizeof( device_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear device handle.",
-			 function );
-
-			memory_free(
-			 *device_handle );
-
-			*device_handle = NULL;
-
-			return( -1 );
-		}
-		( *device_handle )->input_buffer = libcstring_system_string_allocate(
-		                                    DEVICE_HANDLE_INPUT_BUFFER_SIZE );
-
-		if( ( *device_handle )->input_buffer == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create input buffer.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     ( *device_handle )->input_buffer,
-		     0,
-		     sizeof( libcstring_system_character_t ) * DEVICE_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear device handle.",
-			 function );
-
-			goto on_error;
-		}
-		( *device_handle )->number_of_error_retries = 2;
-		( *device_handle )->notify_stream           = DEVICE_HANDLE_NOTIFY_STREAM;
+		goto on_error;
 	}
+	if( memory_set(
+	     *device_handle,
+	     0,
+	     sizeof( device_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear device handle.",
+		 function );
+
+		memory_free(
+		 *device_handle );
+
+		*device_handle = NULL;
+
+		return( -1 );
+	}
+	( *device_handle )->input_buffer = libcstring_system_string_allocate(
+	                                    DEVICE_HANDLE_INPUT_BUFFER_SIZE );
+
+	if( ( *device_handle )->input_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create input buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     ( *device_handle )->input_buffer,
+	     0,
+	     sizeof( libcstring_system_character_t ) * DEVICE_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear device handle.",
+		 function );
+
+		goto on_error;
+	}
+	( *device_handle )->number_of_error_retries = 2;
+	( *device_handle )->notify_stream           = DEVICE_HANDLE_NOTIFY_STREAM;
+
 	return( 1 );
 
 on_error:
@@ -2195,13 +2204,11 @@ int device_handle_set_number_of_error_retries(
 	string_length = libcstring_system_string_length(
 	                 string );
 
-	result = libsystem_string_to_uint64(
-	          string,
-	          string_length + 1,
-	          &size_variable,
-	          error );
-
-	if( result == -1 )
+	if( libsystem_string_decimal_copy_to_64_bit(
+	     string,
+	     string_length + 1,
+	     &size_variable,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
@@ -2212,16 +2219,13 @@ int device_handle_set_number_of_error_retries(
 
 		return( -1 );
 	}
-	else if( result != 0 )
+	if( size_variable > (uint64_t) UINT8_MAX )
 	{
-		if( size_variable > (uint64_t) UINT8_MAX )
-		{
-			result = 0;
-		}
-		else
-		{
-			device_handle->number_of_error_retries = (uint8_t) size_variable;
-		}
+		result = 0;
+	}
+	else
+	{
+		device_handle->number_of_error_retries = (uint8_t) size_variable;
 	}
 	return( result );
 }

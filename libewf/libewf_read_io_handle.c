@@ -28,6 +28,7 @@
 #include "libewf_chunk_data.h"
 #include "libewf_definitions.h"
 #include "libewf_libbfio.h"
+#include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
@@ -268,7 +269,7 @@ int libewf_read_io_handle_read_chunk_data(
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libmfdata_list_t *chunk_table_list,
-     libmfdata_cache_t *chunk_table_cache,
+     libmfcache_cache_t *chunk_table_cache,
      int chunk_index,
      off64_t chunk_offset,
      libewf_chunk_data_t **chunk_data,

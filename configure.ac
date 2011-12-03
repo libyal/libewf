@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111121],
+ [20111203],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -122,11 +122,14 @@ AX_LIBUNA_CHECK_ENABLE
 dnl Check for enabling libbfio for basic file IO support
 AX_LIBBFIO_CHECK_ENABLE
 
-dnl Check for enabling libmfdata for multi-file data support
-AX_LIBMFDATA_CHECK_ENABLE
-
 dnl Check for enabling libfvalue for file value support
 AX_LIBFVALUE_CHECK_ENABLE
+
+dnl Check for enabling libmfcache for multi-file value cache support
+AX_LIBMFCACHE_CHECK_ENABLE
+
+dnl Check for enabling libmfdata for multi-file data types support
+AX_LIBMFDATA_CHECK_ENABLE
 
 dnl Check for enabling libhmac for message digest hash function support
 AX_LIBHMAC_CHECK_ENABLE
@@ -228,8 +231,9 @@ AC_CONFIG_FILES([liberror/Makefile])
 AC_CONFIG_FILES([libnotify/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libbfio/Makefile])
-AC_CONFIG_FILES([libmfdata/Makefile])
 AC_CONFIG_FILES([libfvalue/Makefile])
+AC_CONFIG_FILES([libmfcache/Makefile])
+AC_CONFIG_FILES([libmfdata/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([libhmac/Makefile])
 AC_CONFIG_FILES([libodraw/Makefile])
@@ -271,8 +275,9 @@ AC_MSG_NOTICE([
 Building:
    libuna support:                                  $ac_cv_libuna
    libbfio support:                                 $ac_cv_libbfio
-   libmfdata support:                               $ac_cv_libmfdata
    libfvalue support:                               $ac_cv_libfvalue
+   libmfcache support:                              $ac_cv_libmfcache
+   libmfdata support:                               $ac_cv_libmfdata
    libhmac support:                                 $ac_cv_libhmac
    libodraw support:                                $ac_cv_libodraw
    libsmdev support:                                $ac_cv_libsmdev

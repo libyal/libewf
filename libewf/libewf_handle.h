@@ -33,6 +33,7 @@
 #include "libewf_hash_sections.h"
 #include "libewf_libbfio.h"
 #include "libewf_libfvalue.h"
+#include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
@@ -114,7 +115,7 @@ struct libewf_internal_handle
 
 	/* The segment files cache
 	 */
-	libmfdata_cache_t *segment_files_cache;
+	libmfcache_cache_t *segment_files_cache;
 
 	/* The segment file table
 	 */
@@ -130,7 +131,7 @@ struct libewf_internal_handle
 
 	/* The chunk table cache
 	 */
-	libmfdata_cache_t *chunk_table_cache;
+	libmfcache_cache_t *chunk_table_cache;
 
 	/* The stored header sections
 	 */

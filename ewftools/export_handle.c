@@ -72,108 +72,117 @@ int export_handle_initialize(
 
 		return( -1 );
 	}
+	if( *export_handle != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid export handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*export_handle = memory_allocate_structure(
+	                  export_handle_t );
+
 	if( *export_handle == NULL )
 	{
-		*export_handle = memory_allocate_structure(
-		                  export_handle_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create export handle.",
+		 function );
 
-		if( *export_handle == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create export handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *export_handle,
-		     0,
-		     sizeof( export_handle_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear export handle.",
-			 function );
-
-			memory_free(
-			 *export_handle );
-
-			*export_handle = NULL;
-
-			return( -1 );
-		}
-		if( libewf_handle_initialize(
-		     &( ( *export_handle )->input_handle ),
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize input handle.",
-			 function );
-
-			goto on_error;
-		}
-		( *export_handle )->input_buffer = libcstring_system_string_allocate(
-		                                    EXPORT_HANDLE_INPUT_BUFFER_SIZE );
-
-		if( ( *export_handle )->input_buffer == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create input buffer.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     ( *export_handle )->input_buffer,
-		     0,
-		     sizeof( libcstring_system_character_t ) * EXPORT_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear export handle.",
-			 function );
-
-			goto on_error;
-		}
-		if( calculate_md5 != 0 )
-		{
-			( *export_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
-			                                                  33 );
-
-			if( ( *export_handle )->calculated_md5_hash_string == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create calculated MD5 digest hash string.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		( *export_handle )->calculate_md5       = calculate_md5;
-		( *export_handle )->compression_level   = LIBEWF_COMPRESSION_NONE;
-		( *export_handle )->output_format       = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
-		( *export_handle )->ewf_format          = LIBEWF_FORMAT_ENCASE6;
-		( *export_handle )->sectors_per_chunk   = 64;
-		( *export_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
-		( *export_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
-		( *export_handle )->notify_stream       = EXPORT_HANDLE_NOTIFY_STREAM;
+		goto on_error;
 	}
+	if( memory_set(
+	     *export_handle,
+	     0,
+	     sizeof( export_handle_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear export handle.",
+		 function );
+
+		memory_free(
+		 *export_handle );
+
+		*export_handle = NULL;
+
+		return( -1 );
+	}
+	if( libewf_handle_initialize(
+	     &( ( *export_handle )->input_handle ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize input handle.",
+		 function );
+
+		goto on_error;
+	}
+	( *export_handle )->input_buffer = libcstring_system_string_allocate(
+					    EXPORT_HANDLE_INPUT_BUFFER_SIZE );
+
+	if( ( *export_handle )->input_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create input buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     ( *export_handle )->input_buffer,
+	     0,
+	     sizeof( libcstring_system_character_t ) * EXPORT_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear export handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( calculate_md5 != 0 )
+	{
+		( *export_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
+								  33 );
+
+		if( ( *export_handle )->calculated_md5_hash_string == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated MD5 digest hash string.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	( *export_handle )->calculate_md5       = calculate_md5;
+	( *export_handle )->compression_level   = LIBEWF_COMPRESSION_NONE;
+	( *export_handle )->output_format       = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+	( *export_handle )->ewf_format          = LIBEWF_FORMAT_ENCASE6;
+	( *export_handle )->sectors_per_chunk   = 64;
+	( *export_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
+	( *export_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *export_handle )->notify_stream       = EXPORT_HANDLE_NOTIFY_STREAM;
+
 	return( 1 );
 
 on_error:
@@ -593,6 +602,20 @@ int export_handle_open_input(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_get_media_size(
+	     export_handle->input_handle,
+	     &( export_handle->input_media_size ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media size.",
 		 function );
 
 		return( -1 );
@@ -1755,44 +1778,6 @@ int export_handle_finalize_integrity_hash(
 	return( 1 );
 }
 
-/* Retrieves the input media size
- * Returns the 1 if succesful or -1 on error
- */
-int export_handle_get_input_media_size(
-     export_handle_t *export_handle,
-     size64_t *media_size,
-     liberror_error_t **error )
-{
-	static char *function = "export_handle_get_input_media_size";
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_handle_get_media_size(
-	     export_handle->input_handle,
-	     media_size,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
 /* Retrieves the input chunk size
  * Returns 1 if successful or -1 on error
  */
@@ -2325,12 +2310,126 @@ int export_handle_prompt_for_maximum_segment_size(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve fixed string variable.",
+		 "%s: unable to retrieve byte size variable.",
 		 function );
 
 		return( -1 );
 	}
 	export_handle->maximum_segment_size = input_size_variable;
+
+	return( result );
+}
+
+/* Prompts the user for the export offset
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int export_handle_prompt_for_export_offset(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	static char *function        = "export_handle_prompt_for_export_offset";
+	uint64_t input_size_variable = 0;
+	int result                   = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_get_size_variable(
+	          export_handle->notify_stream,
+	          export_handle->input_buffer,
+	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          0,
+	          export_handle->input_media_size,
+	          export_handle->export_offset,
+	          &input_size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size variable.",
+		 function );
+
+		return( -1 );
+	}
+	export_handle->export_offset = input_size_variable;
+
+	return( result );
+}
+
+/* Prompts the user for the export size
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int export_handle_prompt_for_export_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error )
+{
+	static char *function        = "export_handle_prompt_for_export_size";
+	uint64_t default_input_size  = 0;
+	uint64_t input_size_variable = 0;
+	uint64_t maximum_input_size  = 0;
+	int result                   = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	maximum_input_size = export_handle->input_media_size
+	                   - export_handle->export_offset;
+
+	if( ( export_handle->export_size == 0 )
+	 || ( export_handle->export_size > maximum_input_size ) )
+	{
+		default_input_size = maximum_input_size;
+	}
+	else
+	{
+		default_input_size = export_handle->export_size;
+	}
+	result = ewfinput_get_size_variable(
+	          export_handle->notify_stream,
+	          export_handle->input_buffer,
+	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          0,
+	          maximum_input_size,
+	          default_input_size,
+	          &input_size_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size variable.",
+		 function );
+
+		return( -1 );
+	}
+	export_handle->export_size = input_size_variable;
 
 	return( result );
 }
@@ -2652,7 +2751,119 @@ int export_handle_set_maximum_segment_size(
 
 		return( -1 );
 	}
+	if( result != 0 )
+	{
+		if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+		{
+			if( ( export_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+			 || ( ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+			  &&  ( export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+			 || ( ( export_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
+			  &&  ( export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+			{
+				export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
+				result = 0;
+			}
+		}
+		else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
+		{
+			if( ( ( export_handle->maximum_segment_size != 0 )
+			  &&  ( export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) ) )
+			{
+				export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
+				result = 0;
+			}
+		}
+	}
 	return( result );
+}
+
+/* Sets the export offset
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_set_export_offset(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_export_offset";
+	size_t string_length  = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( libsystem_string_decimal_copy_to_64_bit(
+	     string,
+	     string_length + 1,
+	     &( export_handle->export_offset ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine export offset.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets the export size
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_set_export_size(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_set_export_size";
+	size_t string_length  = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( libsystem_string_decimal_copy_to_64_bit(
+	     string,
+	     string_length + 1,
+	     &( export_handle->export_size ),
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine export size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Sets the header codepage
@@ -2744,6 +2955,8 @@ int export_handle_set_process_buffer_size(
 	{
 		if( size_variable > (uint64_t) SSIZE_MAX )
 		{
+			export_handle->process_buffer_size = 0;
+
 			result = 0;
 		}
 		else
@@ -2771,7 +2984,6 @@ int export_handle_set_additional_digest_types(
 	uint8_t calculate_sha256                      = 0;
 	int number_of_segments                        = 0;
 	int segment_index                             = 0;
-	int result                                    = 0;
 
 	if( export_handle == NULL )
 	{
@@ -2970,7 +3182,7 @@ int export_handle_set_additional_digest_types(
 	 && ( export_handle->calculate_sha256 == 0 ) )
 	{
 		export_handle->calculated_sha256_hash_string = libcstring_system_string_allocate(
-		                                                 65 );
+		                                                65 );
 
 		if( export_handle->calculated_sha256_hash_string == NULL )
 		{
@@ -2998,7 +3210,7 @@ int export_handle_set_additional_digest_types(
 
 		goto on_error;
 	}
-	return( result );
+	return( 1 );
 
 on_error:
 	if( string_elements != NULL )

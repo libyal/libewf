@@ -2007,11 +2007,8 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		else if( ( result == 0 )
-		      && ( ewfacquire_imaging_handle->sector_error_granularity > ewfacquire_imaging_handle->sectors_per_chunk ) )
+		else if( result == 0 )
 		{
-			ewfacquire_imaging_handle->sector_error_granularity = ewfacquire_imaging_handle->sectors_per_chunk;
-
 			fprintf(
 			 stderr,
 			 "Unsupported sector error granularity defaulting to: %" PRIu32 ".\n",
@@ -2033,15 +2030,8 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		else if( ( result == 0 )
-		      || ( ewfacquire_imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-		      || ( ( ewfacquire_imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-		      || ( ( ewfacquire_imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( ewfacquire_imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+		else if( result == 0 )
 		{
-			ewfacquire_imaging_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
 			fprintf(
 			 stderr,
 			 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
@@ -2050,14 +2040,12 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_offset != NULL )
 	{
-		string_length = libcstring_system_string_length(
-				 option_offset );
+		result = imaging_handle_set_acquiry_offset(
+			  ewfacquire_imaging_handle,
+			  option_offset,
+			  &error );
 
-		if( libsystem_string_to_uint64(
-		     option_offset,
-		     string_length + 1,
-		     &( ewfacquire_imaging_handle->acquiry_offset ),
-		     &error ) != 1 )
+		if( result == -1 )
 		{
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -2068,20 +2056,17 @@ int main( int argc, char * const argv[] )
 
 			fprintf(
 			 stderr,
-			 "Unsupported acquiry offset defaulting to: %" PRIu64 ".\n",
-			 ewfacquire_imaging_handle->acquiry_offset );
+			 "Unsupported acquiry offset defaulting to: 0.\n" );
 		}
 	}
 	if( option_size != NULL )
 	{
-		string_length = libcstring_system_string_length(
-				 option_size );
+		result = imaging_handle_set_acquiry_size(
+			  ewfacquire_imaging_handle,
+			  option_size,
+			  &error );
 
-		if( libsystem_string_to_uint64(
-		     option_size,
-		     string_length + 1,
-		     &( ewfacquire_imaging_handle->acquiry_size ),
-		     &error ) != 1 )
+		if( result == -1 )
 		{
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -2110,8 +2095,7 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		else if( ( result == 0 )
-		      || ( ewfacquire_imaging_handle->process_buffer_size > (size_t) SSIZE_MAX ) )
+		else if( result == 0 )
 		{
 			ewfacquire_imaging_handle->process_buffer_size = 0;
 
@@ -2138,11 +2122,8 @@ int main( int argc, char * const argv[] )
 	}
 	/* Initialize values
 	 */
-	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
-	 || ( ewfacquire_imaging_handle->acquiry_size > ( media_size - ewfacquire_imaging_handle->acquiry_offset ) ) )
-	{
-		ewfacquire_imaging_handle->acquiry_size = media_size - ewfacquire_imaging_handle->acquiry_offset;
-	}
+	ewfacquire_imaging_handle->input_media_size = media_size;
+
 	/* Request the necessary case data
 	 */
 	while( ( interactive_mode != 0 )
@@ -2430,26 +2411,20 @@ int main( int argc, char * const argv[] )
 		{
 			if( option_offset == NULL )
 			{
-				if( ewfinput_get_size_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Start to acquire at offset" ),
-				     0,
-				     media_size,
-				     0,
-				     &( ewfacquire_imaging_handle->acquiry_offset ),
-				     &error ) == -1 )
+				result = imaging_handle_prompt_for_acquiry_offset(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Start to acquire at offset" ),
+					  &error );
+
+				if( result == -1 )
 				{
 					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
 
-					ewfacquire_imaging_handle->acquiry_offset = 0;
-
 					fprintf(
-					 stdout,
+					 stderr,
 					 "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
 					 ewfacquire_imaging_handle->acquiry_offset );
 				}
@@ -2459,27 +2434,21 @@ int main( int argc, char * const argv[] )
 		{
 			if( option_size == NULL )
 			{
-				if( ewfinput_get_size_variable(
-				     stdout,
-				     input_buffer,
-				     EWFACQUIRE_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "The number of bytes to acquire" ),
-				     0,
-				     media_size - ewfacquire_imaging_handle->acquiry_offset,
-				     media_size - ewfacquire_imaging_handle->acquiry_offset,
-				     &( ewfacquire_imaging_handle->acquiry_size ),
-				     &error ) == -1 )
+				result = imaging_handle_prompt_for_acquiry_size(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "The number of bytes to acquire" ),
+					  &error );
+
+				if( result == -1 )
 				{
 					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
 
-					ewfacquire_imaging_handle->acquiry_size = media_size - ewfacquire_imaging_handle->acquiry_offset;
-
 					fprintf(
-					 stdout,
-					 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
+					 stderr,
+					 "Unable to determine acquiry size defaulting to: %" PRIu64 ".\n",
 					 ewfacquire_imaging_handle->acquiry_size );
 				}
 			}

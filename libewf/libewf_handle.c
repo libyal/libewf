@@ -38,6 +38,7 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libfvalue.h"
+#include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_metadata.h"
 #include "libewf_sector_list.h"
@@ -588,7 +589,7 @@ int libewf_handle_clone(
 	}
 	if( internal_source_handle->segment_files_cache != NULL )
 	{
-		if( libmfdata_cache_clone(
+		if( libmfcache_cache_clone(
 		     &( internal_destination_handle->segment_files_cache ),
 		     internal_source_handle->segment_files_cache,
 		     error ) != 1 )
@@ -656,7 +657,7 @@ int libewf_handle_clone(
 	}
 	if( internal_source_handle->chunk_table_cache != NULL )
 	{
-		if( libmfdata_cache_clone(
+		if( libmfcache_cache_clone(
 		     &( internal_destination_handle->chunk_table_cache ),
 		     internal_source_handle->chunk_table_cache,
 		     error ) != 1 )
@@ -781,7 +782,7 @@ on_error:
 		}
 		if( internal_destination_handle->chunk_table_cache != NULL )
 		{
-			libmfdata_cache_free(
+			libmfcache_cache_free(
 			 &( internal_destination_handle->chunk_table_cache ),
 			 NULL );
 		}
@@ -799,7 +800,7 @@ on_error:
 		}
 		if( internal_destination_handle->segment_files_cache != NULL )
 		{
-			libmfdata_cache_free(
+			libmfcache_cache_free(
 			 &( internal_destination_handle->segment_files_cache ),
 			 NULL );
 		}
@@ -1934,7 +1935,7 @@ int libewf_handle_open_file_io_pool(
 
 		goto on_error;
 	}
-	if( libmfdata_cache_initialize(
+	if( libmfcache_cache_initialize(
 	     &( internal_handle->segment_files_cache ),
 	     8,
 	     error ) != 1 )
@@ -1985,7 +1986,7 @@ int libewf_handle_open_file_io_pool(
 
 		goto on_error;
 	}
-	if( libmfdata_cache_initialize(
+	if( libmfcache_cache_initialize(
 	     &( internal_handle->chunk_table_cache ),
 	     8,
 	     error ) != 1 )
@@ -2536,7 +2537,7 @@ on_error:
 	}
 	if( internal_handle->chunk_table_cache != NULL )
 	{
-		libmfdata_cache_free(
+		libmfcache_cache_free(
 		 &( internal_handle->chunk_table_cache ),
 		 NULL );
 	}
@@ -2548,7 +2549,7 @@ on_error:
 	}
 	if( internal_handle->segment_files_cache != NULL )
 	{
-		libmfdata_cache_free(
+		libmfcache_cache_free(
 		 &( internal_handle->segment_files_cache ),
 		 NULL );
 	}
@@ -3937,7 +3938,7 @@ int libewf_handle_close(
 	}
 	if( internal_handle->segment_files_cache != NULL )
 	{
-		if( libmfdata_cache_free(
+		if( libmfcache_cache_free(
 		     &( internal_handle->segment_files_cache ),
 		     error ) != 1 )
 		{
@@ -4001,7 +4002,7 @@ int libewf_handle_close(
 	}
 	if( internal_handle->chunk_table_cache != NULL )
 	{
-		if( libmfdata_cache_free(
+		if( libmfcache_cache_free(
 		     &( internal_handle->chunk_table_cache ),
 		     error ) != 1 )
 		{

@@ -205,6 +205,10 @@ struct imaging_handle
 	 */
 	libewf_handle_t *secondary_output_handle;
 
+	/* The input media size
+	 */
+	size64_t input_media_size;
+
 	/* The process buffer size
 	 */
 	size_t process_buffer_size;
@@ -351,6 +355,16 @@ int imaging_handle_prompt_for_maximum_segment_size(
      const libcstring_system_character_t *request_string,
      liberror_error_t **error );
 
+int imaging_handle_prompt_for_acquiry_offset(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
+int imaging_handle_prompt_for_acquiry_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     liberror_error_t **error );
+
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
      liberror_error_t **error );
@@ -398,6 +412,16 @@ int imaging_handle_set_sector_error_granularity(
      liberror_error_t **error );
 
 int imaging_handle_set_maximum_segment_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_acquiry_offset(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     liberror_error_t **error );
+
+int imaging_handle_set_acquiry_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );

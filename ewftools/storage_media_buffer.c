@@ -49,6 +49,17 @@ int storage_media_buffer_initialize(
 
 		return( -1 );
 	}
+	if( *buffer != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid buffer value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( size > (size_t) SSIZE_MAX )
 	{
 		liberror_error_set(
@@ -60,106 +71,103 @@ int storage_media_buffer_initialize(
 
 		return( -1 );
 	}
+	*buffer = memory_allocate_structure(
+	           storage_media_buffer_t );
+
 	if( *buffer == NULL )
 	{
-		*buffer = memory_allocate_structure(
-		           storage_media_buffer_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create buffer.",
+		 function );
 
-		if( *buffer == NULL )
+		goto on_error;
+	}
+	if( memory_set(
+	     *buffer,
+	     0,
+	     sizeof( storage_media_buffer_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear buffer.",
+		 function );
+
+		memory_free(
+		 *buffer );
+
+		*buffer = NULL;
+
+		return( -1 );
+	}
+	if( size > 0 )
+	{
+		raw_buffer_size = size;
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* Add 4 bytes to allow for write checksum buffer alignment
+		 */
+		raw_buffer_size += 4;
+#endif
+
+/* TODO can low level functions and direct IO be combined ? */
+#if defined( memory_allocate_aligned )
+		if( memory_allocate_aligned(
+		     (void **) &( ( *buffer )->raw_buffer ),
+		     raw_buffer_size,
+		     512 ) != 0 )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create buffer.",
+			 "%s: unable to create aligned raw buffer.",
 			 function );
 
 			goto on_error;
 		}
-		if( memory_set(
-		     *buffer,
-		     0,
-		     sizeof( storage_media_buffer_t ) ) == NULL )
+#else
+		( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
+		                                       sizeof( uint8_t ) * raw_buffer_size );
+			
+		if( ( *buffer )->raw_buffer == NULL )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear buffer.",
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create raw buffer.",
 			 function );
 
-			memory_free(
-			 *buffer );
-
-			*buffer = NULL;
-
-			return( -1 );
+			goto on_error;
 		}
-		if( size > 0 )
-		{
-			raw_buffer_size = size;
-
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			/* Add 4 bytes to allow for write checksum buffer alignment
-			 */
-			raw_buffer_size += 4;
-#endif
-
-/* TODO can low level functions and direct IO be combined ? */
-#if defined( memory_allocate_aligned )
-			if( memory_allocate_aligned(
-			     (void **) &( ( *buffer )->raw_buffer ),
-			     raw_buffer_size,
-			     512 ) != 0 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create aligned raw buffer.",
-				 function );
-
-				goto on_error;
-			}
-#else
-			( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
-			                                       sizeof( uint8_t ) * raw_buffer_size );
-			
-			if( ( *buffer )->raw_buffer == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create raw buffer.",
-				 function );
-
-				goto on_error;
-			}
 #endif /* defined( memory_allocate_aligned ) */
 
-			( *buffer )->raw_buffer_size = size;
+		( *buffer )->raw_buffer_size = size;
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-			( *buffer )->checksum_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
+		( *buffer )->checksum_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
 
-			( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
-			                                               sizeof( uint8_t ) * ( size * 2 ) );
+		( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
+		                                               sizeof( uint8_t ) * ( size * 2 ) );
 			
-			if( ( *buffer )->compression_buffer == NULL )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create compression buffer.",
-				 function );
+		if( ( *buffer )->compression_buffer == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create compression buffer.",
+			 function );
 
-				goto on_error;
-			}
-			( *buffer )->compression_buffer_size = size * 2;
-#endif
+			goto on_error;
 		}
+		( *buffer )->compression_buffer_size = size * 2;
+#endif
 	}
 	return( 1 );
 

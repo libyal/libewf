@@ -56,42 +56,51 @@ int process_status_initialize(
 
 		return( -1 );
 	}
+	if( *process_status != NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid process status value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*process_status = memory_allocate_structure(
+	                   process_status_t );
+
 	if( *process_status == NULL )
 	{
-		*process_status = memory_allocate_structure(
-		                   process_status_t );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create process status.",
+		 function );
 
-		if( *process_status == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create process status.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     *process_status,
-		     0,
-		     sizeof( process_status_t ) ) == NULL )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear process status.",
-			 function );
-
-			goto on_error;
-		}
-		( *process_status )->status_process_string    = status_process_string;
-		( *process_status )->status_update_string     = status_update_string;
-		( *process_status )->status_summary_string    = status_summary_string;
-		( *process_status )->output_stream            = output_stream;
-		( *process_status )->print_status_information = print_status_information;
+		goto on_error;
 	}
+	if( memory_set(
+	     *process_status,
+	     0,
+	     sizeof( process_status_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear process status.",
+		 function );
+
+		goto on_error;
+	}
+	( *process_status )->status_process_string    = status_process_string;
+	( *process_status )->status_update_string     = status_update_string;
+	( *process_status )->status_summary_string    = status_summary_string;
+	( *process_status )->output_stream            = output_stream;
+	( *process_status )->print_status_information = print_status_information;
+
 	return( 1 );
 
 on_error:

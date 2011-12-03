@@ -1295,7 +1295,7 @@ int ewfinput_get_size_variable(
 
 				return( 0 );
 			}
-			if( libsystem_string_to_uint64(
+			if( libsystem_string_decimal_copy_to_64_bit(
 			     input_buffer,
 			     input_length,
 			     size_variable,

@@ -29,6 +29,7 @@
 
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_section.h"
 
@@ -81,7 +82,7 @@ int libewf_chunk_table_read_chunk(
      intptr_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libmfdata_list_element_t *list_element,
-     libmfdata_cache_t *cache,
+     libmfcache_cache_t *cache,
      int file_io_pool_entry,
      off64_t element_data_offset,
      size64_t element_data_size,
@@ -95,7 +96,7 @@ int libewf_chunk_table_read_offsets(
      libmfdata_list_t *chunk_table_list,
      int element_index,
      int number_of_elements,
-     libmfdata_cache_t *cache,
+     libmfcache_cache_t *cache,
      int file_io_pool_entry,
      off64_t element_group_offset,
      size64_t element_group_size,

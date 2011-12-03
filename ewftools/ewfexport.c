@@ -213,7 +213,6 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
-	libcstring_system_character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
 	libcstring_system_character_t * const *argv_filenames         = NULL;
 
@@ -241,8 +240,6 @@ int main( int argc, char * const argv[] )
 	log_handle_t *log_handle                                      = NULL;
 
 	libcstring_system_integer_t option                            = 0;
-	size64_t media_size                                           = 0;
-	size_t string_length                                          = 0;
 	uint8_t calculate_md5                                         = 1;
 	uint8_t print_status_information                              = 1;
 	uint8_t swap_byte_pairs                                       = 0;
@@ -535,17 +532,6 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 #endif
-	if( export_handle_get_input_media_size(
-	     ewfexport_export_handle,
-	     &media_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve input media size.\n" );
-
-		goto on_error;
-	}
 	if( option_header_codepage != NULL )
 	{
 		result = export_handle_set_header_codepage(
@@ -683,48 +669,22 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		if( ewfexport_export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
+		else if( result == 0 )
 		{
-			if( ( result == 0 )
-			 || ( ewfexport_export_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-			 || ( ( ewfexport_export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-			  &&  ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-			 || ( ( ewfexport_export_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
-			  &&  ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
-			{
-				ewfexport_export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-				fprintf(
-				 stderr,
-				 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
-				 ewfexport_export_handle->maximum_segment_size );
-			}
-		}
-		else if( ewfexport_export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
-		{
-			if( ( result == 0 )
-			 || ( ( ewfexport_export_handle->maximum_segment_size != 0 )
-			  &&  ( ewfexport_export_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) ) )
-			{
-				ewfexport_export_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-				fprintf(
-				 stderr,
-				 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
-				 ewfexport_export_handle->maximum_segment_size );
-			}
+			fprintf(
+			 stderr,
+			 "Unsupported maximum segment size defaulting to: %" PRIu64 ".\n",
+			 ewfexport_export_handle->maximum_segment_size );
 		}
 	}
 	if( option_offset != NULL )
 	{
-		string_length = libcstring_system_string_length(
-				 option_offset );
+		result = export_handle_set_export_offset(
+			  ewfexport_export_handle,
+			  option_offset,
+			  &error );
 
-		if( libsystem_string_to_uint64(
-		     option_offset,
-		     string_length + 1,
-		     &ewfexport_export_handle->export_offset,
-		     &error ) != 1 )
+		if( result == -1 )
 		{
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -735,20 +695,17 @@ int main( int argc, char * const argv[] )
 
 			fprintf(
 			 stderr,
-			 "Unsupported export offset defaulting to: %" PRIu64 ".\n",
-			 ewfexport_export_handle->export_offset );
+			 "Unsupported export offset defaulting to: 0.\n" );
 		}
 	}
 	if( option_size != NULL )
 	{
-		string_length = libcstring_system_string_length(
-				 option_size );
+		result = export_handle_set_export_size(
+			  ewfexport_export_handle,
+			  option_size,
+			  &error );
 
-		if( libsystem_string_to_uint64(
-		     option_size,
-		     string_length + 1,
-		     &ewfexport_export_handle->export_size,
-		     &error ) != 1 )
+		if( result == -1 )
 		{
 			libsystem_notify_print_error_backtrace(
 			 error );
@@ -777,11 +734,8 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		else if( ( result == 0 )
-		      || ( ewfexport_export_handle->process_buffer_size > (size_t) SSIZE_MAX ) )
+		else if( result == 0 )
 		{
-			ewfexport_export_handle->process_buffer_size = 0;
-
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
@@ -802,13 +756,6 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-	}
-	/* Initialize values
-	 */
-	if( ( ewfexport_export_handle->export_size == 0 )
-	 || ( ewfexport_export_handle->export_size > ( media_size - ewfexport_export_handle->export_offset ) ) )
-	{
-		ewfexport_export_handle->export_size = media_size - ewfexport_export_handle->export_offset;
 	}
 	/* Request the necessary case data
 	 */
@@ -993,23 +940,17 @@ int main( int argc, char * const argv[] )
 		{
 			if( option_offset == NULL )
 			{
-				if( ewfinput_get_size_variable(
-				     stderr,
-				     input_buffer,
-				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Start export at offset" ),
-				     0,
-				     media_size,
-				     ewfexport_export_handle->export_offset,
-				     &( ewfexport_export_handle->export_offset ),
-				     &error ) == -1 )
+				result = export_handle_prompt_for_export_offset(
+					  ewfexport_export_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Start export at offset" ),
+					  &error );
+
+				if( result == -1 )
 				{
 					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
-
-					ewfexport_export_handle->export_offset = 0;
 
 					fprintf(
 					 stderr,
@@ -1019,23 +960,17 @@ int main( int argc, char * const argv[] )
 			}
 			if( option_size == NULL )
 			{
-				if( ewfinput_get_size_variable(
-				     stderr,
-				     input_buffer,
-				     EWFEXPORT_INPUT_BUFFER_SIZE,
-				     _LIBCSTRING_SYSTEM_STRING( "Number of bytes to export" ),
-				     0,
-				     media_size - ewfexport_export_handle->export_offset,
-				     ewfexport_export_handle->export_size,
-				     &( ewfexport_export_handle->export_size ),
-				     &error ) == -1 )
+				result = export_handle_prompt_for_export_size(
+					  ewfexport_export_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Number of bytes to export" ),
+					  &error );
+
+				if( result == -1 )
 				{
 					libsystem_notify_print_error_backtrace(
 					 error );
 					liberror_error_free(
 					 &error );
-
-					ewfexport_export_handle->export_size = media_size - ewfexport_export_handle->export_offset;
 
 					fprintf(
 					 stderr,
