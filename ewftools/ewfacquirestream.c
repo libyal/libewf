@@ -1532,11 +1532,14 @@ int main( int argc, char * const argv[] )
 
 		if( result == -1 )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			fprintf(
+			 stderr,
+			 "Unable to set acquiry offset.\n" );
 
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
 			ewfacquirestream_imaging_handle->acquiry_offset = 0;
 
 			fprintf(
@@ -1553,11 +1556,14 @@ int main( int argc, char * const argv[] )
 
 		if( result == -1 )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			fprintf(
+			 stderr,
+			 "Unable to set acquiry size.\n" );
 
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
 			ewfacquirestream_imaging_handle->acquiry_size = 0;
 
 			fprintf(
@@ -1582,8 +1588,6 @@ int main( int argc, char * const argv[] )
 		}
 		else if( result == 0 )
 		{
-			ewfacquirestream_imaging_handle->process_buffer_size = 0;
-
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );

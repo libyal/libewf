@@ -63,7 +63,7 @@ int main( int argc, char * const argv[] )
 	string_length = libcstring_system_string_length(
 	                 argv[ 1 ]  );
 
-	if( libsystem_string_to_uint64(
+	if( libsystem_string_decimal_copy_to_64_bit(
 	     argv[ 1 ],
 	     string_length + 1,
 	     &file_size,

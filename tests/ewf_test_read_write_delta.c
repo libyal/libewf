@@ -354,7 +354,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_offset );
 
-		if( libsystem_string_to_uint64(
+		if( libsystem_string_decimal_copy_to_64_bit(
 		     option_offset,
 		     string_length + 1,
 		     (uint64_t *) &write_offset,
@@ -372,7 +372,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_size );
 
-		if( libsystem_string_to_uint64(
+		if( libsystem_string_decimal_copy_to_64_bit(
 		     option_size,
 		     string_length + 1,
 		     &write_size,

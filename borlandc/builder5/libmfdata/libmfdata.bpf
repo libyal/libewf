@@ -5,10 +5,6 @@
 USE("..\..\..\libmfdata\libmfdata_unused.h", File);
 USEUNIT("..\..\..\libmfdata\libmfdata_array_type.c");
 USE("..\..\..\libmfdata\libmfdata_array_type.h", File);
-USEUNIT("..\..\..\libmfdata\libmfdata_cache.c");
-USE("..\..\..\libmfdata\libmfdata_cache.h", File);
-USEUNIT("..\..\..\libmfdata\libmfdata_cache_value.c");
-USE("..\..\..\libmfdata\libmfdata_cache_value.h", File);
 USE("..\..\..\libmfdata\libmfdata_date_time.h", File);
 USE("..\..\..\libmfdata\libmfdata_definitions.h", File);
 USEUNIT("..\..\..\libmfdata\libmfdata_error.c");
@@ -20,6 +16,7 @@ USEUNIT("..\..\..\libmfdata\libmfdata_file_list.c");
 USE("..\..\..\libmfdata\libmfdata_file_list.h", File);
 USE("..\..\..\libmfdata\libmfdata_inline.h", File);
 USE("..\..\..\libmfdata\libmfdata_libbfio.h", File);
+USE("..\..\..\libmfdata\libmfdata_libmfcache.h", File);
 USEUNIT("..\..\..\libmfdata\libmfdata_list.c");
 USE("..\..\..\libmfdata\libmfdata_list.h", File);
 USEUNIT("..\..\..\libmfdata\libmfdata_list_element.c");

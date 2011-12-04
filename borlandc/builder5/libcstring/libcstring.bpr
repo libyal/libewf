@@ -4,7 +4,8 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="..\Release\libcstring.lib"/>
-    <OBJFILES value="libcstring_locale.obj libcstring_system_string.obj libcstring_wide.obj"/>
+    <OBJFILES value="libcstring_locale.obj libcstring_system_string.obj 
+      libcstring_wide_string.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>

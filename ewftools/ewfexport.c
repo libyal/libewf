@@ -686,11 +686,15 @@ int main( int argc, char * const argv[] )
 
 		if( result == -1 )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			fprintf(
+			 stderr,
+			 "Unable to set export offset.\n" );
 
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfexport_export_handle->export_offset >= ewfexport_export_handle->input_media_size ) )
+		{
 			ewfexport_export_handle->export_offset = 0;
 
 			fprintf(
@@ -707,11 +711,15 @@ int main( int argc, char * const argv[] )
 
 		if( result == -1 )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			fprintf(
+			 stderr,
+			 "Unable to set export size.\n" );
 
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfexport_export_handle->export_size > ( ewfexport_export_handle->input_media_size - ewfexport_export_handle->export_offset ) ) )
+		{
 			ewfexport_export_handle->export_size = 0;
 
 			fprintf(
@@ -756,6 +764,13 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
+	}
+	/* Initialize values
+	 */
+	if( ewfexport_export_handle->export_size == 0 )
+	{
+		ewfexport_export_handle->export_size = ewfexport_export_handle->input_media_size
+		                                     - ewfexport_export_handle->export_offset;
 	}
 	/* Request the necessary case data
 	 */

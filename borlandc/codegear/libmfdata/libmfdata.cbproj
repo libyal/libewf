@@ -19,14 +19,14 @@
 			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror;..\..\..\libnotify;..\..\..\libbfio;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror;..\..\..\libnotify;..\..\..\libbfio;..\..\..\libmfcache;$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;$(Defines)</Defines>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFCACHE;HAVE_LOCAL_LIBMFDATA;$(Defines)</Defines>
 			<IncludePath>..\..\..\libmfdata;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
@@ -44,14 +44,6 @@
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_array_type.c">
 			</CppCompile>
 			<None Include="..\..\..\libmfdata\libmfdata_array_type.h">
-			</None>
-			<CppCompile Include="..\..\..\libmfdata\libmfdata_cache.c">
-			</CppCompile>
-			<None Include="..\..\..\libmfdata\libmfdata_cache.h">
-			</None>
-			<CppCompile Include="..\..\..\libmfdata\libmfdata_cache_value.c">
-			</CppCompile>
-			<None Include="..\..\..\libmfdata\libmfdata_cache_value.h">
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_date_time.h">
 			</None>
@@ -74,6 +66,8 @@
 			<None Include="..\..\..\libmfdata\libmfdata_inline.h">
 			</None>
 			<None Include="..\..\..\libmfdata\libmfdata_libbfio.h">
+			</None>
+			<None Include="..\..\..\libmfdata\libmfdata_libmfcache.h">
 			</None>
 			<CppCompile Include="..\..\..\libmfdata\libmfdata_list.c">
 			</CppCompile>

@@ -53,6 +53,7 @@ USE("..\..\..\libewf\libewf_io_handle.h", File);
 USEUNIT("..\..\..\libewf\libewf_legacy.c");
 USE("..\..\..\libewf\libewf_legacy.h", File);
 USE("..\..\..\libewf\libewf_libbfio.h", File);
+USE("..\..\..\libewf\libewf_libmfcache.h", File);
 USE("..\..\..\libewf\libewf_libmfdata.h", File);
 USE("..\..\..\libewf\libewf_libfvalue.h", File);
 USE("..\..\..\libewf\libewf_libuna.h", File);

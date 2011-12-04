@@ -406,7 +406,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_chunk_size );
 
-		if( libsystem_string_to_uint64(
+		if( libsystem_string_decimal_copy_to_64_bit(
 		     option_chunk_size,
 		     string_length + 1,
 		     &chunk_size,
@@ -466,7 +466,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_maximum_segment_size );
 
-		if( libsystem_string_to_uint64(
+		if( libsystem_string_decimal_copy_to_64_bit(
 		     option_maximum_segment_size,
 		     string_length + 1,
 		     &maximum_segment_size,
@@ -484,7 +484,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_media_size );
 
-		if( libsystem_string_to_uint64(
+		if( libsystem_string_decimal_copy_to_64_bit(
 		     option_media_size,
 		     string_length + 1,
 		     &media_size,

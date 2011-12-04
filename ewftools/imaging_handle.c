@@ -3324,7 +3324,7 @@ int imaging_handle_set_maximum_segment_size(
 }
 
 /* Sets the acquiry offset
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_acquiry_offset(
      imaging_handle_t *imaging_handle,
@@ -3333,6 +3333,7 @@ int imaging_handle_set_acquiry_offset(
 {
 	static char *function = "imaging_handle_set_acquiry_offset";
 	size_t string_length  = 0;
+	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -3345,29 +3346,44 @@ int imaging_handle_set_acquiry_offset(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
-	                 string );
-
-	if( libsystem_string_decimal_copy_to_64_bit(
-	     string,
-	     string_length + 1,
-	     &( imaging_handle->acquiry_offset ),
-	     error ) != 1 )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine acquiry offset.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+	if( string[ 0 ] != (libcstring_system_character_t) '-' )
+	{
+		string_length = libcstring_system_string_length(
+				 string );
+
+		if( libsystem_string_decimal_copy_to_64_bit(
+		     string,
+		     string_length + 1,
+		     &( imaging_handle->acquiry_offset ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine acquiry offset.",
+			 function );
+
+			return( -1 );
+		}
+		result = 1;
+	}
+	return( result );
 }
 
 /* Sets the acquiry size
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
 int imaging_handle_set_acquiry_size(
      imaging_handle_t *imaging_handle,
@@ -3376,6 +3392,7 @@ int imaging_handle_set_acquiry_size(
 {
 	static char *function = "imaging_handle_set_acquiry_size";
 	size_t string_length  = 0;
+	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -3388,25 +3405,40 @@ int imaging_handle_set_acquiry_size(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
-	                 string );
-
-	if( libsystem_string_decimal_copy_to_64_bit(
-	     string,
-	     string_length + 1,
-	     &( imaging_handle->acquiry_size ),
-	     error ) != 1 )
+	if( string == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine acquiry size.",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+	if( string[ 0 ] != (libcstring_system_character_t) '-' )
+	{
+		string_length = libcstring_system_string_length(
+				 string );
+
+		if( libsystem_string_decimal_copy_to_64_bit(
+		     string,
+		     string_length + 1,
+		     &( imaging_handle->acquiry_size ),
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine acquiry size.",
+			 function );
+
+			return( -1 );
+		}
+		result = 1;
+	}
+	return( result );
 }
 
 /* Sets the header codepage

@@ -285,11 +285,16 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111204
+* updated msvscpp files
+* updated builder5 files
+* updated codegear files
+
 20111203
 * worked on ewfrecover
 * code clean in ewftools
 * updated libcstring, libsystem
-* added libfcache
+* added libmfcache
 
 20111121
 * fixed bug introduced by error tollerance changes

@@ -14,8 +14,9 @@
       libewf_metadata.obj libewf_notify.obj libewf_read_io_handle.obj 
       libewf_section.obj libewf_sector_list.obj libewf_segment_file.obj 
       libewf_segment_file_handle.obj libewf_segment_table.obj 
-      libewf_single_file_entry.obj libewf_single_files.obj libewf_support.obj 
-      libewf_tree_type.obj libewf_write_io_handle.obj"/>
+      libewf_single_file_entry.obj libewf_single_file_tree.obj 
+      libewf_single_files.obj libewf_support.obj libewf_tree_type.obj 
+      libewf_write_io_handle.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -29,10 +30,10 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT;"/>
+    <USERDEFINES value="UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBMFCACHE;HAVE_LOCAL_LIBMFDATA;LIBEWF_DLL_EXPORT;"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="libewf.bpf"/>
-    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libmfdata;..\..\..\libmfcache;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -46,7 +47,7 @@
   <LINKER>
     <ALLOBJ value="$(OBJFILES)"/>
     <ALLLIB value="libcstring.lib liberror.lib libnotify.lib libuna.lib libbfio.lib 
-      libmfdata.lib libfvalue.lib zlib.lib import32.lib cw32i.lib"/>
+      libmfcache.lib libmfdata.lib libfvalue.lib zlib.lib import32.lib cw32i.lib"/>
   </LINKER>
   <IDEOPTIONS>
 [Version Info]
@@ -77,13 +78,15 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=6
-Item0=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item2=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item3=..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item4=..\..\..\libewf;$(BCB)\include;$(BCB)\include\vcl
-Item5=$(BCB)\include;$(BCB)\include\vcl
+Count=8
+Item0=..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libmfdata;..\..\..\libmfcache;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libmfdata;..\..\..\libmfcache..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item3=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item4=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item5=..\..\..\libewf;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item6=..\..\..\libewf;$(BCB)\include;$(BCB)\include\vcl
+Item7=$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
 Count=14
@@ -107,8 +110,9 @@ Count=1
 Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=1
-Item0=UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT;
+Count=2
+Item0=UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBMFCACHE;HAVE_LOCAL_LIBMFDATA;LIBEWF_DLL_EXPORT;
+Item1=UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;LIBEWF_DLL_EXPORT;
 
 [HistoryLists\hlIntOutputDir]
 Count=1
@@ -132,5 +136,10 @@ RemoteDebug=0
 ShowInfoMsgs=0
 LinkDebugVcl=0
 LinkCGLIB=0
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
   </IDEOPTIONS>
 </PROJECT>

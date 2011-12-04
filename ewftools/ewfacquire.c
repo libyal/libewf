@@ -333,7 +333,6 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 int ewfacquire_determine_sessions(
      imaging_handle_t *imaging_handle,
      device_handle_t *device_handle,
-     uint64_t media_size,
      liberror_error_t **error )
 {
 	static char *function      = "ewfacquire_determine_sessions";
@@ -445,7 +444,7 @@ int ewfacquire_determine_sessions(
 			 stderr,
 			 "Unable to determine number of session on optical disc - defaulting to single session.\n" );
 		}
-		number_of_sectors = media_size / imaging_handle->bytes_per_sector;
+		number_of_sectors = imaging_handle->input_media_size / imaging_handle->bytes_per_sector;
 
 		if( number_of_sectors > (uint64_t) UINT32_MAX )
 		{
@@ -550,7 +549,6 @@ int ewfacquire_determine_sessions(
 int ewfacquire_read_input(
      imaging_handle_t *imaging_handle,
      device_handle_t *device_handle,
-     size64_t media_size,
      off64_t resume_acquiry_offset,
      uint8_t swap_byte_pairs,
      uint8_t print_status_information,
@@ -621,7 +619,7 @@ int ewfacquire_read_input(
 
 		return( -1 );
 	}
-	if( ( imaging_handle->acquiry_size > media_size )
+	if( ( imaging_handle->acquiry_size > imaging_handle->input_media_size )
 	 || ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX ) )
 	{
 		liberror_error_set(
@@ -635,8 +633,8 @@ int ewfacquire_read_input(
 	}
 	if( imaging_handle->acquiry_offset > 0 )
 	{
-		if( ( imaging_handle->acquiry_offset > (uint64_t) media_size )
-		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > (uint64_t) media_size ) )
+		if( ( imaging_handle->acquiry_offset > (uint64_t) imaging_handle->input_media_size )
+		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > (uint64_t) imaging_handle->input_media_size ) )
 		{
 			liberror_error_set(
 			 error,
@@ -665,7 +663,7 @@ int ewfacquire_read_input(
 	}
 	if( resume_acquiry_offset > 0 )
 	{
-		if( ( imaging_handle->acquiry_offset + (uint64_t) resume_acquiry_offset ) > (uint64_t) media_size )
+		if( ( imaging_handle->acquiry_offset + (uint64_t) resume_acquiry_offset ) > (uint64_t) imaging_handle->input_media_size )
 		{
 			liberror_error_set(
 			 error,
@@ -1290,7 +1288,6 @@ int main( int argc, char * const argv[] )
 	libcstring_system_integer_t option                              = 0;
 	off64_t resume_acquiry_offset                                   = 0;
 	size_t string_length                                            = 0;
-	uint64_t media_size                                             = 0;
 	uint8_t calculate_md5                                           = 1;
 	uint8_t print_status_information                                = 1;
 	uint8_t resume_acquiry                                          = 0;
@@ -1640,17 +1637,6 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( device_handle_get_media_size(
-	     ewfacquire_device_handle,
-	     &media_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve media size.\n" );
-
-		goto on_error;
-	}
 	if( device_handle_media_information_fprint(
 	     ewfacquire_device_handle,
 	     stdout,
@@ -1675,6 +1661,17 @@ int main( int argc, char * const argv[] )
 		fprintf(
 		 stderr,
 		 "Unable to create imaging handle.\n" );
+
+		goto on_error;
+	}
+	if( device_handle_get_media_size(
+	     ewfacquire_device_handle,
+	     &( ewfacquire_imaging_handle->input_media_size ),
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve media size.\n" );
 
 		goto on_error;
 	}
@@ -2047,11 +2044,15 @@ int main( int argc, char * const argv[] )
 
 		if( result == -1 )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			fprintf(
+			 stderr,
+			 "Unable to set acquiry offset.\n" );
 
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfacquire_imaging_handle->acquiry_offset >= ewfacquire_imaging_handle->input_media_size ) )
+		{
 			ewfacquire_imaging_handle->acquiry_offset = 0;
 
 			fprintf(
@@ -2068,11 +2069,15 @@ int main( int argc, char * const argv[] )
 
 		if( result == -1 )
 		{
-			libsystem_notify_print_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			fprintf(
+			 stderr,
+			 "Unable to set acquiry size.\n" );
 
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfacquire_imaging_handle->acquiry_size > ( ewfacquire_imaging_handle->input_media_size - ewfacquire_imaging_handle->acquiry_offset ) ) )
+		{
 			ewfacquire_imaging_handle->acquiry_size = 0;
 
 			fprintf(
@@ -2097,8 +2102,6 @@ int main( int argc, char * const argv[] )
 		}
 		else if( result == 0 )
 		{
-			ewfacquire_imaging_handle->process_buffer_size = 0;
-
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
@@ -2122,8 +2125,11 @@ int main( int argc, char * const argv[] )
 	}
 	/* Initialize values
 	 */
-	ewfacquire_imaging_handle->input_media_size = media_size;
-
+	if( ewfacquire_imaging_handle->acquiry_size == 0 )
+	{
+		ewfacquire_imaging_handle->acquiry_size = ewfacquire_imaging_handle->input_media_size
+		                                        - ewfacquire_imaging_handle->acquiry_offset;
+	}
 	/* Request the necessary case data
 	 */
 	while( ( interactive_mode != 0 )
@@ -2407,7 +2413,7 @@ int main( int argc, char * const argv[] )
 			}
 		}
 		if( ( resume_acquiry == 0 )
-		 || ( ewfacquire_imaging_handle->acquiry_size != media_size ) )
+		 || ( ewfacquire_imaging_handle->acquiry_size != ewfacquire_imaging_handle->input_media_size ) )
 		{
 			if( option_offset == NULL )
 			{
@@ -2768,7 +2774,6 @@ int main( int argc, char * const argv[] )
 			if( ewfacquire_determine_sessions(
 			     ewfacquire_imaging_handle,
 			     ewfacquire_device_handle,
-			     media_size,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2820,7 +2825,6 @@ int main( int argc, char * const argv[] )
 	result = ewfacquire_read_input(
 		  ewfacquire_imaging_handle,
 		  ewfacquire_device_handle,
-		  media_size,
 		  resume_acquiry_offset,
 		  swap_byte_pairs,
 		  print_status_information,
