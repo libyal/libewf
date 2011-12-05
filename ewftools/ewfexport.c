@@ -651,7 +651,8 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsupported sectors per chunk defaulting to: 64.\n" );
+			 "Unsupported sectors per chunk defaulting to: %" PRIu32 ".\n",
+			 ewfexport_export_handle->sectors_per_chunk );
 		}
 	}
 	if( option_maximum_segment_size != NULL )
@@ -1116,6 +1117,7 @@ int main( int argc, char * const argv[] )
 		     program,
 		     acquiry_software_version,
 		     zero_chunk_on_error,
+		     0,
 		     &error ) != 1 )
 		{
 			fprintf(

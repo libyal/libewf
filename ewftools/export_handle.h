@@ -276,16 +276,6 @@ int export_handle_finalize_integrity_hash(
      export_handle_t *export_handle,
      liberror_error_t **error );
 
-int export_handle_get_input_media_size(
-     export_handle_t *export_handle,
-     size64_t *media_size,
-     liberror_error_t **error );
-
-int export_handle_get_input_chunk_size(
-     export_handle_t *export_handle,
-     size32_t *chunk_size,
-     liberror_error_t **error );
-
 int export_handle_get_output_chunk_size(
      export_handle_t *export_handle,
      size32_t *chunk_size,
@@ -386,6 +376,7 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
      uint8_t zero_chunk_on_error,
+     uint8_t copy_input_values,
      liberror_error_t **error );
 
 int export_handle_set_hash_value(

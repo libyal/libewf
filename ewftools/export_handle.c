@@ -1778,43 +1778,6 @@ int export_handle_finalize_integrity_hash(
 	return( 1 );
 }
 
-/* Retrieves the input chunk size
- * Returns 1 if successful or -1 on error
- */
-int export_handle_get_input_chunk_size(
-     export_handle_t *export_handle,
-     size32_t *chunk_size,
-     liberror_error_t **error )
-{
-	static char *function = "export_handle_get_input_chunk_size";
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk size.",
-		 function );
-
-		return( -1 );
-	}
-	*chunk_size = export_handle->input_chunk_size;
-
-	return( 1 );
-}
-
 /* Retrieves the chunk size
  * Returns 1 if successful or -1 on error
  */
@@ -3263,6 +3226,7 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_software,
      libcstring_system_character_t *acquiry_software_version,
      uint8_t zero_chunk_on_error,
+     uint8_t copy_input_values,
      liberror_error_t **error )
 {
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
@@ -3467,19 +3431,40 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( libewf_handle_set_media_size(
-		     export_handle->ewf_output_handle,
-		     (size64_t) export_handle->export_size,
-		     error ) != 1 )
+		if( copy_input_values == 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set media size.",
-			 function );
+			if( libewf_handle_set_media_size(
+			     export_handle->ewf_output_handle,
+			     (size64_t) export_handle->export_size,
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set media size.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
+		}
+		else
+		{
+			if( libewf_handle_get_compression_values(
+			     export_handle->input_handle,
+			     &( export_handle->compression_level ),
+			     &( export_handle->compression_flags ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve compression values.",
+				 function );
+
+				return( -1 );
+			}
 		}
 		if( libewf_handle_set_compression_values(
 		     export_handle->ewf_output_handle,
@@ -3507,6 +3492,23 @@ int export_handle_set_output_values(
 		}
 		/* Format needs to be set before segment file size
 		 */
+		if( copy_input_values != 0 )
+		{
+			if( libewf_handle_get_format(
+			     export_handle->input_handle,
+			     &( export_handle->ewf_format ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve format.",
+				 function );
+
+				return( -1 );
+			}
+		}
 		if( libewf_handle_set_format(
 		     export_handle->ewf_output_handle,
 		     export_handle->ewf_format,
@@ -3520,6 +3522,23 @@ int export_handle_set_output_values(
 			 function );
 
 			return( -1 );
+		}
+		if( copy_input_values != 0 )
+		{
+			if( libewf_handle_get_maximum_segment_size(
+			     export_handle->input_handle,
+			     &( export_handle->maximum_segment_size ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve maximum segment size.",
+				 function );
+
+				return( -1 );
+			}
 		}
 		if( libewf_handle_set_maximum_segment_size(
 		     export_handle->ewf_output_handle,
@@ -3535,68 +3554,71 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( libewf_handle_set_sectors_per_chunk(
-		     export_handle->ewf_output_handle,
-		     export_handle->sectors_per_chunk,
-		     error ) != 1 )
+		if( copy_input_values == 0 )
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set sectors per chunk in output handle.",
-			 function );
-
-			return( -1 );
-		}
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
-		if( ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
-		 || ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( export_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
-		{
-			guid_type = GUID_TYPE_RANDOM;
-		}
-		else if( ( export_handle->ewf_format == LIBEWF_FORMAT_LINEN5 )
-		      || ( export_handle->ewf_format == LIBEWF_FORMAT_LINEN6 ) )
-		{
-			guid_type = GUID_TYPE_TIME;
-		}
-		if( guid_type != 0 )
-		{
-			/* Sets the GUID if necessary
-			 */
-			if( guid_generate(
-			     guid,
-			     GUID_SIZE,
-			     guid_type,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to generate GUID.",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_handle_set_guid(
+			if( libewf_handle_set_sectors_per_chunk(
 			     export_handle->ewf_output_handle,
-			     guid,
-			     16,
+			     export_handle->sectors_per_chunk,
 			     error ) != 1 )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set GUID.",
+				 "%s: unable to set sectors per chunk in output handle.",
 				 function );
 
 				return( -1 );
 			}
-		}
+#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+			if( ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
+			 || ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+			 || ( export_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
+			{
+				guid_type = GUID_TYPE_RANDOM;
+			}
+			else if( ( export_handle->ewf_format == LIBEWF_FORMAT_LINEN5 )
+			      || ( export_handle->ewf_format == LIBEWF_FORMAT_LINEN6 ) )
+			{
+				guid_type = GUID_TYPE_TIME;
+			}
+			if( guid_type != 0 )
+			{
+				/* Sets the GUID if necessary
+				 */
+				if( guid_generate(
+				     guid,
+				     GUID_SIZE,
+				     guid_type,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to generate GUID.",
+					 function );
+
+					return( -1 );
+				}
+				if( libewf_handle_set_guid(
+				     export_handle->ewf_output_handle,
+				     guid,
+				     16,
+				     error ) != 1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set GUID.",
+					 function );
+
+					return( -1 );
+				}
+			}
 #endif
+		}
 	}
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	      && ( export_handle->use_stdout == 0 ) )

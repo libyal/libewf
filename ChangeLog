@@ -285,6 +285,9 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111205
+* worked on ewfrecover
+
 20111204
 * updated msvscpp files
 * updated builder5 files
