@@ -1,5 +1,8 @@
 TODO
+* ewfexport, ewfverify
+  - conditially print "in segment file" on error
 * complete ewfrecover
+  - max segment size
 * error tollerance
   - segment file index
 * ideas for libmfdata
@@ -284,6 +287,12 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111208
+* worked on dealing with missing segment files
+
+20111207
+* worked on dealing with missing segment files
 
 20111205
 * worked on ewfrecover

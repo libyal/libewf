@@ -8120,7 +8120,7 @@ int libewf_handle_set_maximum_delta_segment_size(
 
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 int libewf_handle_get_filename_size(
      libewf_handle_t *handle,
@@ -8129,6 +8129,7 @@ int libewf_handle_get_filename_size(
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename_size";
+	int result                       = 0;
 
 	if( handle == NULL )
 	{
@@ -8141,10 +8142,12 @@ int libewf_handle_get_filename_size(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_file_io_handle(
-	     handle,
-	     &file_io_handle,
-	     error ) != 1 )
+	result = libewf_handle_get_file_io_handle(
+	          handle,
+	          &file_io_handle,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -8155,26 +8158,29 @@ int libewf_handle_get_filename_size(
 
 		return( -1 );
 	}
-	if( libbfio_file_get_name_size(
-	     file_io_handle,
-	     filename_size,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve filename size.",
-		 function );
+		if( libbfio_file_get_name_size(
+		     file_io_handle,
+		     filename_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve filename size.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the filename of the (delta) segment file of the current chunk
  * The filename size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 int libewf_handle_get_filename(
      libewf_handle_t *handle,
@@ -8184,6 +8190,7 @@ int libewf_handle_get_filename(
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename";
+	int result                       = 0;
 
 	if( handle == NULL )
 	{
@@ -8196,10 +8203,12 @@ int libewf_handle_get_filename(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_file_io_handle(
-	     handle,
-	     &file_io_handle,
-	     error ) != 1 )
+	result = libewf_handle_get_file_io_handle(
+	          handle,
+	          &file_io_handle,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -8210,29 +8219,32 @@ int libewf_handle_get_filename(
 
 		return( -1 );
 	}
-	if( libbfio_file_get_name(
-	     file_io_handle,
-	     filename,
-	     filename_size,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve filename.",
-		 function );
+		if( libbfio_file_get_name(
+		     file_io_handle,
+		     filename,
+		     filename_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve filename.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size includes the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 int libewf_handle_get_filename_size_wide(
      libewf_handle_t *handle,
@@ -8241,6 +8253,7 @@ int libewf_handle_get_filename_size_wide(
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename_size_wide";
+	int result                       = 0;
 
 	if( handle == NULL )
 	{
@@ -8253,10 +8266,12 @@ int libewf_handle_get_filename_size_wide(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_file_io_handle(
-	     handle,
-	     &file_io_handle,
-	     error ) != 1 )
+	result = libewf_handle_get_file_io_handle(
+	          handle,
+	          &file_io_handle,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -8267,26 +8282,29 @@ int libewf_handle_get_filename_size_wide(
 
 		return( -1 );
 	}
-	if( libbfio_file_get_name_size_wide(
-	     file_io_handle,
-	     filename_size,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve filename size.",
-		 function );
+		if( libbfio_file_get_name_size_wide(
+		     file_io_handle,
+		     filename_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve filename size.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the filename of the (delta) segment file of the current chunk
  * The filename size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 int libewf_handle_get_filename_wide(
      libewf_handle_t *handle,
@@ -8296,6 +8314,7 @@ int libewf_handle_get_filename_wide(
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename_wide";
+	int result                       = 0;
 
 	if( handle == NULL )
 	{
@@ -8308,10 +8327,12 @@ int libewf_handle_get_filename_wide(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_file_io_handle(
-	     handle,
-	     &file_io_handle,
-	     error ) != 1 )
+	result = libewf_handle_get_file_io_handle(
+	          handle,
+	          &file_io_handle,
+	          error );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -8322,28 +8343,31 @@ int libewf_handle_get_filename_wide(
 
 		return( -1 );
 	}
-	if( libbfio_file_get_name_wide(
-	     file_io_handle,
-	     filename,
-	     filename_size,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve filename.",
-		 function );
+		if( libbfio_file_get_name_wide(
+		     file_io_handle,
+		     filename,
+		     filename_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve filename.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 
 #endif
 
 /* Retrieves the file IO handle of the (delta) segment file of the current chunk
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such file IO handle or -1 on error
  */
 int libewf_handle_get_file_io_handle(
      libewf_handle_t *handle,
@@ -8446,6 +8470,10 @@ int libewf_handle_get_file_io_handle(
 		 chunk_index );
 
 		return( -1 );
+	}
+	if( file_io_pool_entry == -1 )
+	{
+		return( 0 );
 	}
 	if( libbfio_pool_get_handle(
 	     internal_handle->file_io_pool,

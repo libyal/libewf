@@ -3615,7 +3615,8 @@ int verification_handle_checksum_errors_fprint(
 	uint64_t number_of_sectors                   = 0;
 	uint32_t number_of_errors                    = 0;
 	uint32_t error_index                         = 0;
-	int result                                   = 1;
+	int result                                   = 0;
+	int return_value                             = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -3685,7 +3686,7 @@ int verification_handle_checksum_errors_fprint(
 				start_sector      = 0;
 				number_of_sectors = 0;
 
-				result = -1;
+				return_value = -1;
 
 				continue;
 			}
@@ -3724,16 +3725,17 @@ int verification_handle_checksum_errors_fprint(
 					goto on_error;
 				}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				if( libewf_handle_get_filename_size_wide(
-				     verification_handle->input_handle,
-				     &filename_size,
-				     error ) != 1 )
+				result= libewf_handle_get_filename_size_wide(
+				         verification_handle->input_handle,
+				         &filename_size,
+				         error );
 #else
-				if( libewf_handle_get_filename_size(
-				     verification_handle->input_handle,
-				     &filename_size,
-				     error ) != 1 )
+				result = libewf_handle_get_filename_size(
+				          verification_handle->input_handle,
+				          &filename_size,
+				          error );
 #endif
+				if( result == -1 )
 				{
 					liberror_error_set(
 					 error,
@@ -3744,87 +3746,92 @@ int verification_handle_checksum_errors_fprint(
 
 					goto on_error;
 				}
-				filename = libcstring_system_string_allocate(
-				            filename_size ); 
-
-
-				if( filename == NULL )
+				else if( result != 0 )
 				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create filename.",
-					 function );
+					filename = libcstring_system_string_allocate(
+					            filename_size ); 
 
-					goto on_error;
-				}
+
+					if( filename == NULL )
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_MEMORY,
+						 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+						 "%s: unable to create filename.",
+						 function );
+
+						goto on_error;
+					}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				if( libewf_handle_get_filename_wide(
-				     verification_handle->input_handle,
-				     filename,
-				     256,
-				     error ) != 1 )
+					if( libewf_handle_get_filename_wide(
+					     verification_handle->input_handle,
+					     filename,
+					     256,
+					     error ) != 1 )
 #else
-				if( libewf_handle_get_filename(
-				     verification_handle->input_handle,
-				     filename,
-				     256,
-				     error ) != 1 )
+					if( libewf_handle_get_filename(
+					     verification_handle->input_handle,
+					     filename,
+					     256,
+					     error ) != 1 )
 #endif
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve filename.",
-					 function );
+					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve filename.",
+						 function );
 
-					goto on_error;
+						goto on_error;
+					}
+					if( last_filename == NULL )
+					{
+						fprintf(
+						 stream,
+						 " %s",
+						 filename );
+
+						last_filename      = filename;
+						last_filename_size = filename_size;
+					}
+					else if( ( last_filename_size != filename_size )
+					      || ( memory_compare(
+						    last_filename,
+						    filename,
+						    filename_size ) != 0 ) )
+					{
+						fprintf(
+						 stream,
+						 ", %s",
+						 filename );
+
+						memory_free(
+						 last_filename );
+
+						last_filename      = filename;
+						last_filename_size = filename_size;
+					}
+					else
+					{
+						memory_free(
+						 filename );
+					}
+					filename      = NULL;
+					filename_size = 0;
 				}
-				if( last_filename == NULL )
-				{
-					fprintf(
-					 stream,
-					 " %s",
-					 filename );
+				start_sector += verification_handle->chunk_size;
 
-					last_filename      = filename;
-					last_filename_size = filename_size;
-				}
-				else if( ( last_filename_size != filename_size )
-				      || ( memory_compare(
-				            last_filename,
-				            filename,
-				            filename_size ) != 0 ) )
+				if( last_filename != NULL )
 				{
-					fprintf(
-					 stream,
-					 ", %s",
-					 filename );
-
 					memory_free(
 					 last_filename );
 
-					last_filename      = filename;
-					last_filename_size = filename_size;
+					last_filename      = NULL;
+					last_filename_size = 0;
 				}
-				else
-				{
-					memory_free(
-					 filename );
-				}
-				filename      = NULL;
-				filename_size = 0;
-
-				start_sector += verification_handle->chunk_size;
 			}
-			memory_free(
-			 last_filename );
-
-			last_filename      = NULL;
-			last_filename_size = 0;
-
 			fprintf(
 			 stream,
 			 "\n" );
@@ -3833,7 +3840,7 @@ int verification_handle_checksum_errors_fprint(
 		 stream,
 		 "\n" );
 	}
-	return( result );
+	return( return_value );
 
 on_error:
 	if( last_filename != NULL )

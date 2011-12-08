@@ -707,7 +707,7 @@ int libewf_handle_segment_files_corrupted(
 
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size includes the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_handle_get_filename_size(
@@ -717,7 +717,7 @@ int libewf_handle_get_filename_size(
 
 /* Retrieves the filename of the (delta) segment file of the current chunk
  * The filename size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_handle_get_filename(
@@ -729,7 +729,7 @@ int libewf_handle_get_filename(
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size includes the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_handle_get_filename_size_wide(
@@ -739,7 +739,7 @@ int libewf_handle_get_filename_size_wide(
 
 /* Retrieves the filename of the (delta) segment file of the current chunk
  * The filename size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such filename or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_handle_get_filename_wide(
@@ -751,7 +751,7 @@ int libewf_handle_get_filename_wide(
 
 #if defined( LIBEWF_HAVE_BFIO )
 /* Retrieves the file io handle of the (delta) segment file of the current chunk
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if no such file IO handle or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_handle_get_file_io_handle(

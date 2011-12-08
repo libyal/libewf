@@ -5533,7 +5533,8 @@ int export_handle_checksum_errors_fprint(
 	uint64_t number_of_sectors                   = 0;
 	uint32_t number_of_errors                    = 0;
 	uint32_t error_index                         = 0;
-	int result                                   = 1;
+	int result                                   = 0;
+	int return_value                             = 1;
 
 	if( export_handle == NULL )
 	{
@@ -5569,7 +5570,7 @@ int export_handle_checksum_errors_fprint(
 		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( number_of_errors > 0 )
 	{
@@ -5603,7 +5604,7 @@ int export_handle_checksum_errors_fprint(
 				start_sector      = 0;
 				number_of_sectors = 0;
 
-				result = -1;
+				return_value = -1;
 			}
 			last_sector = start_sector + number_of_sectors - 1;
 
@@ -5637,24 +5638,21 @@ int export_handle_checksum_errors_fprint(
 					 function,
 					 start_sector );
 
-					if( last_filename != NULL )
-					{
-						memory_free(
-						 last_filename );
-					}
-					return( -1 );
+					goto on_error;
 				}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				if( libewf_handle_get_filename_size_wide(
-				     export_handle->input_handle,
-				     &filename_size,
-				     error ) != 1 )
+				result = libewf_handle_get_filename_size_wide(
+				          export_handle->input_handle,
+				          &filename_size,
+				          error );
 #else
-				if( libewf_handle_get_filename_size(
-				     export_handle->input_handle,
-				     &filename_size,
-				     error ) != 1 )
+				result = libewf_handle_get_filename_size(
+				          export_handle->input_handle,
+				          &filename_size,
+				          error );
 #endif
+
+				if( result == -1 )
 				{
 					liberror_error_set(
 					 error,
@@ -5663,104 +5661,91 @@ int export_handle_checksum_errors_fprint(
 					 "%s: unable to retrieve filename size.",
 					 function );
 
-					if( last_filename != NULL )
-					{
-						memory_free(
-						 last_filename );
-					}
-					return( -1 );
+					goto on_error;
 				}
-				filename = libcstring_system_string_allocate(
-				            filename_size ); 
-
-
-				if( filename == NULL )
+				else if( result != 0 )
 				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create filename.",
-					 function );
+					filename = libcstring_system_string_allocate(
+					            filename_size ); 
 
-					if( last_filename != NULL )
+
+					if( filename == NULL )
 					{
-						memory_free(
-						 last_filename );
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_MEMORY,
+						 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+						 "%s: unable to create filename.",
+						 function );
+
+						goto on_error;
 					}
-					return( -1 );
-				}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				if( libewf_handle_get_filename_wide(
-				     export_handle->input_handle,
-				     filename,
-				     256,
-				     error ) != 1 )
+					if( libewf_handle_get_filename_wide(
+					     export_handle->input_handle,
+					     filename,
+					     256,
+					     error ) != 1 )
 #else
-				if( libewf_handle_get_filename(
-				     export_handle->input_handle,
-				     filename,
-				     256,
-				     error ) != 1 )
+					if( libewf_handle_get_filename(
+					     export_handle->input_handle,
+					     filename,
+					     256,
+					     error ) != 1 )
 #endif
-				{
-					liberror_error_set(
-					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve filename.",
-					 function );
-
-					if( last_filename != NULL )
 					{
+						liberror_error_set(
+						 error,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve filename.",
+						 function );
+
+						goto on_error;
+					}
+					if( last_filename == NULL )
+					{
+						fprintf(
+						 stream,
+						 " %s",
+						 filename );
+
+						last_filename      = filename;
+						last_filename_size = filename_size;
+					}
+					else if( ( last_filename_size != filename_size )
+					      || ( memory_compare(
+						    last_filename,
+						    filename,
+						    filename_size ) != 0 ) )
+					{
+						fprintf(
+						 stream,
+						 ", %s",
+						 filename );
+
 						memory_free(
 						 last_filename );
+
+						last_filename      = filename;
+						last_filename_size = filename_size;
 					}
-					memory_free(
-					 filename );
-
-					return( -1 );
-				}
-				if( last_filename == NULL )
-				{
-					fprintf(
-					 stream,
-					 " %s",
-					 filename );
-
-					last_filename      = filename;
-					last_filename_size = filename_size;
-				}
-				else if( ( last_filename_size != filename_size )
-				      || ( memory_compare(
-				            last_filename,
-				            filename,
-				            filename_size ) != 0 ) )
-				{
-					fprintf(
-					 stream,
-					 ", %s",
-					 filename );
-
-					memory_free(
-					 last_filename );
-
-					last_filename      = filename;
-					last_filename_size = filename_size;
-				}
-				else
-				{
-					memory_free(
-					 filename );
+					else
+					{
+						memory_free(
+						 filename );
+					}
 				}
 				start_sector += export_handle->input_chunk_size;
 			}
-			memory_free(
-			 last_filename );
+			if( last_filename != NULL )
+			{
+				memory_free(
+				 last_filename );
 
-			last_filename      = NULL;
-			last_filename_size = 0;
-
+				last_filename      = NULL;
+				last_filename_size = 0;
+			}
 			fprintf(
 			 stream,
 			 "\n" );
@@ -5769,6 +5754,19 @@ int export_handle_checksum_errors_fprint(
 		 stream,
 		 "\n" );
 	}
-	return( result );
+	return( return_value );
+
+on_error:
+	if( last_filename != NULL )
+	{
+		memory_free(
+		 last_filename );
+	}
+	if( filename != NULL )
+	{
+		memory_free(
+		 filename );
+	}
+	return( -1 );
 }
 
