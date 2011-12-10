@@ -276,6 +276,10 @@ int export_handle_finalize_integrity_hash(
      export_handle_t *export_handle,
      liberror_error_t **error );
 
+int export_handle_input_is_corrupted(
+     export_handle_t *export_handle,
+     liberror_error_t **error );
+
 int export_handle_get_output_chunk_size(
      export_handle_t *export_handle,
      size32_t *chunk_size,

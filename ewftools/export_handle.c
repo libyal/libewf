@@ -1778,6 +1778,45 @@ int export_handle_finalize_integrity_hash(
 	return( 1 );
 }
 
+/* Determines if the input is corrupted
+ * Returns 1 if corrupted, 0 if not or -1 on error
+ */
+int export_handle_input_is_corrupted(
+     export_handle_t *export_handle,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_get_output_chunk_size";
+	int result            = 0;
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_handle_segment_files_corrupted(
+	          export_handle->input_handle,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if segment files are corrupted.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Retrieves the chunk size
  * Returns 1 if successful or -1 on error
  */

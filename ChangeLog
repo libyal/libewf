@@ -1,10 +1,6 @@
 TODO
-* ewfexport, ewfverify
-  - conditially print "in segment file" on error
 * complete ewfrecover
   - max segment size
-* error tollerance
-  - segment file index
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
