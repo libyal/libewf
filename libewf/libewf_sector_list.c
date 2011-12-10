@@ -1535,7 +1535,7 @@ int libewf_sector_list_get_sector_by_value(
 		sector_list_value = (libewf_sector_list_value_t *) list_element->value;
 
 		if( ( sector_value >= sector_list_value->first_sector )
-		 && ( sector_value <= (uint64_t) ( sector_list_value->first_sector + sector_list_value->number_of_sectors ) ) )
+		 && ( sector_value < (uint64_t) ( sector_list_value->first_sector + sector_list_value->number_of_sectors ) ) )
 		{
 			*first_sector      = sector_list_value->first_sector;
 			*number_of_sectors = sector_list_value->number_of_sectors;
