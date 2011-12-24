@@ -55,12 +55,12 @@ extern libcstring_system_character_t *ewfinput_sector_per_block_sizes[ 12 ];
 extern libcstring_system_character_t *ewfinput_yes_no[ 2 ];
 
 int ewfinput_determine_ewf_format(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *ewf_format,
      liberror_error_t **error );
 
 int ewfinput_determine_sectors_per_chunk(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint32_t *sectors_per_chunk,
      liberror_error_t **error );
 
@@ -71,22 +71,22 @@ int ewfinput_determine_compression_values(
      liberror_error_t **error );
 
 int ewfinput_determine_media_type(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *media_type,
      liberror_error_t **error );
 
 int ewfinput_determine_media_flags(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *media_flags,
      liberror_error_t **error );
 
 int ewfinput_determine_header_codepage(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      int *header_codepage,
      liberror_error_t **error );
 
 int ewfinput_determine_yes_no(
-     const libcstring_system_character_t *argument,
+     const libcstring_system_character_t *string,
      uint8_t *yes_no_value,
      liberror_error_t **error );
 

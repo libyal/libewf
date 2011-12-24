@@ -1,4 +1,9 @@
 TODO
+* update libbfio msvscpp, codegear and builder5 files
+* configure.ac
+  - fix date -R
+* ewftools
+  - check behaviour of set and prompt functions
 * complete ewfrecover
   - max segment size
 * ideas for libmfdata
@@ -283,6 +288,13 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20111224
+* updated libsystem, libuna, libhmac, libfvalue, libodraw
+* updated libbfio
+
+20111221
+* small fixes in ewftools
 
 20111208
 * worked on dealing with missing segment files

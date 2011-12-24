@@ -2069,16 +2069,16 @@ int export_handle_prompt_for_compression_level(
 	return( result );
 }
 
-/* Prompts the user for the format
+/* Prompts the user for the output format
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
-int export_handle_prompt_for_format(
+int export_handle_prompt_for_output_format(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
      liberror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
-	static char *function                                = "export_handle_prompt_for_format";
+	static char *function                                = "export_handle_prompt_for_output_format";
 	size_t fixed_string_variable_length                  = 0;
 	int result                                           = 0;
 
@@ -2167,7 +2167,7 @@ int export_handle_prompt_for_format(
 				  &( export_handle->ewf_format ),
 				  error );
 
-			if( result == -1 )
+			if( result != 1 )
 			{
 				liberror_error_set(
 				 error,
@@ -2177,10 +2177,6 @@ int export_handle_prompt_for_format(
 				 function );
 
 				return( -1 );
-			}
-			else if( result != 0 )
-			{
-				export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
 			}
 		}
 	}
@@ -2595,15 +2591,15 @@ int export_handle_set_compression_values(
 	return( result );
 }
 
-/* Sets the format
+/* Sets the output format
  * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
-int export_handle_set_format(
+int export_handle_set_output_format(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error )
 {
-	static char *function = "export_handle_set_format";
+	static char *function = "export_handle_set_output_format";
 	size_t string_length  = 0;
 	int result            = 0;
 
@@ -2660,10 +2656,6 @@ int export_handle_set_format(
 			 function );
 
 			return( -1 );
-		}
-		else if( result != 0 )
-		{
-			export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
 		}
 	}
 	return( result );

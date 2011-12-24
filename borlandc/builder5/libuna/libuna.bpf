@@ -4,10 +4,10 @@
 #pragma hdrstop
 USEUNIT("..\..\..\libuna\libuna_base16_stream.c");
 USE("..\..\..\libuna\libuna_base16_stream.h", File);
+USEUNIT("..\..\..\libuna\libuna_base32_stream.c");
+USE("..\..\..\libuna\libuna_base32_stream.h", File);
 USEUNIT("..\..\..\libuna\libuna_base64_stream.c");
 USE("..\..\..\libuna\libuna_base64_stream.h", File);
-USEUNIT("..\..\..\libuna\libuna_base64url_stream.c");
-USE("..\..\..\libuna\libuna_base64url_stream.h", File);
 USEUNIT("..\..\..\libuna\libuna_byte_stream.c");
 USE("..\..\..\libuna\libuna_byte_stream.h", File);
 USEUNIT("..\..\..\libuna\libuna_codepage_iso_8859_2.c");

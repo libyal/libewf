@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBMFDATA_LIBMFCACHE_H )
-#define _LIBMFDATA_LIBMFCACHE_H
+#if !defined( _LIBEWF_LIBMFCACHE_H )
+#define _LIBEWF_LIBMFCACHE_H
 
 #include <common.h>
 

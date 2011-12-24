@@ -612,7 +612,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_format != NULL )
 	{
-		result = export_handle_set_format(
+		result = export_handle_set_output_format(
 			  ewfexport_export_handle,
 			  option_format,
 			  &error );
@@ -621,7 +621,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to set format.\n" );
+			 "Unable to set output format.\n" );
 
 			goto on_error;
 		}
@@ -795,7 +795,7 @@ int main( int argc, char * const argv[] )
 
 		if( option_format == NULL )
 		{
-			result = export_handle_prompt_for_format(
+			result = export_handle_prompt_for_output_format(
 				  ewfexport_export_handle,
 			          _LIBCSTRING_SYSTEM_STRING( "Export to format" ),
 				  &error );
@@ -804,7 +804,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to determine format.\n" );
+				 "Unable to determine output format.\n" );
 
 				goto on_error;
 			}

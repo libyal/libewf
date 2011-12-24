@@ -2061,7 +2061,7 @@ int imaging_handle_prompt_for_format(
 			  &( imaging_handle->ewf_format ),
 			  error );
 
-		if( result == -1 )
+		if( result != 1 )
 		{
 			liberror_error_set(
 			 error,

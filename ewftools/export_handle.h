@@ -297,7 +297,7 @@ int export_handle_prompt_for_compression_level(
      const libcstring_system_character_t *request_string,
      liberror_error_t **error );
 
-int export_handle_prompt_for_format(
+int export_handle_prompt_for_output_format(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
      liberror_error_t **error );
@@ -334,7 +334,7 @@ int export_handle_set_compression_values(
      const libcstring_system_character_t *string,
      liberror_error_t **error );
 
-int export_handle_set_format(
+int export_handle_set_output_format(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
      liberror_error_t **error );
