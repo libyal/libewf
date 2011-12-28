@@ -1059,7 +1059,7 @@ int libewf_handle_open(
 			if( libbfio_file_set_name(
 			     file_io_handle,
 			     filenames[ filename_iterator ],
-			     filename_length + 1,
+			     filename_length,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -1461,7 +1461,7 @@ int libewf_handle_open_wide(
 			if( libbfio_file_set_name_wide(
 			     file_io_handle,
 			     filenames[ filename_iterator ],
-			     filename_length + 1,
+			     filename_length,
 			     error ) != 1 )
 			{
 				liberror_error_set(

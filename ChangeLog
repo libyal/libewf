@@ -289,9 +289,14 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
-20111224
-* updated libsystem, libuna, libhmac, libfvalue, libodraw
+20111228
+* updated libuna, libbfio
+
+20111226
 * updated libbfio
+
+20111224
+* updated libsystem, libuna, libbfio, libhmac, libfvalue, libodraw
 
 20111221
 * small fixes in ewftools
