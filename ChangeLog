@@ -289,8 +289,12 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20111231
+* updated libhmac, libsmraw, libsmdev
+
 20111228
-* updated libuna, libbfio
+* updated libcstring, libuna, libbfio
+* updated msvscpp, builder5 and codegear files
 
 20111226
 * updated libbfio

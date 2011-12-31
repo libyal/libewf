@@ -18,10 +18,10 @@
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
     <LINKER value="TLib"/>
-    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBSMRAW"/>
+    <USERDEFINES value="UNICODE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBMFCACHE;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBSMRAW"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
     <MAINSOURCE value="libsmraw.bpf"/>
-    <INCLUDEPATH value="..\..\..\libsmraw;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libsmraw;..\..\..\libmfcache;..\..\..\libmfdata;;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libsmraw;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
