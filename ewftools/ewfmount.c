@@ -1,7 +1,7 @@
 /*
  * Mounts an EWF file
  *
- * Copyright (C) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (C) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *

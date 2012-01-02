@@ -3,7 +3,7 @@
  * This header should be included in header files that export or import
  * library functions
  *
- * Copyright (c) 2006-2011, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *

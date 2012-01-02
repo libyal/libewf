@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20111231],
+ [20120102],
  [jbmetz@users.sourceforge.net])
 
 AC_CONFIG_SRCDIR(
@@ -220,7 +220,7 @@ AS_IF(
 dnl Set the date for dpkg files
 AC_SUBST(
  [DATE],
- [`date -R 2>/dev/null`])
+ [`date -R 2> /dev/null`])
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])

@@ -2,7 +2,7 @@
 #
 # ewfacquire testing script for optical disc (split) RAW image input
 #
-# Copyright (c) 2010-2011, Joachim Metz <jbmetz@users.sourceforge.net>
+# Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
 #
 # Refer to AUTHORS for acknowledgements.
 #
