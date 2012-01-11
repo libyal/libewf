@@ -286,6 +286,9 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120111
+* updated spec file
+
 20120102
 * 2012 update
 
