@@ -286,6 +286,11 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120118
+* updated gettext files
+* updated libbfio
+* preparations for beta testing
+
 20120111
 * updated spec file
 
