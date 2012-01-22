@@ -3690,6 +3690,25 @@ ssize_t libewf_segment_file_write_close(
 
 	segment_file->number_of_chunks = number_of_chunks_written_to_segment;
 
+	/* Make sure the next time the file is opened
+	 * it is not truncated
+	 */
+	if( libbfio_pool_reopen(
+	     file_io_pool,
+	     file_io_pool_entry,
+	     LIBBFIO_OPEN_READ_WRITE,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to reopen segment file: %" PRIu16 ".",
+		 function,
+		 segment_file->segment_number );
+
+		goto on_error;
+	}
 	if( libbfio_pool_close(
 	     file_io_pool,
 	     file_io_pool_entry,
@@ -3775,22 +3794,6 @@ int libewf_segment_file_write_sections_correction(
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
-
-		return( -1 );
-	}
-	if( libbfio_pool_open(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     LIBBFIO_OPEN_READ_WRITE,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file IO pool entry: %d.",
-		 function,
-		 file_io_pool_entry );
 
 		return( -1 );
 	}

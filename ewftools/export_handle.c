@@ -5715,13 +5715,13 @@ int export_handle_checksum_errors_fprint(
 					if( libewf_handle_get_filename_wide(
 					     export_handle->input_handle,
 					     filename,
-					     256,
+					     filename_size,
 					     error ) != 1 )
 #else
 					if( libewf_handle_get_filename(
 					     export_handle->input_handle,
 					     filename,
-					     256,
+					     filename_size,
 					     error ) != 1 )
 #endif
 					{
