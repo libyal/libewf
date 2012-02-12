@@ -286,6 +286,9 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120208
+* added dpkg files
+
 20120122
 * bug fix in write finalize
 
