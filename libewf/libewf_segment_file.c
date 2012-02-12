@@ -356,7 +356,8 @@ ssize_t libewf_segment_file_read_file_header(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &file_header,
-		 sizeof( ewf_file_header_t ) );
+		 sizeof( ewf_file_header_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint16_little_endian(
@@ -371,7 +372,8 @@ ssize_t libewf_segment_file_read_file_header(
 		 function );
 		libnotify_print_data(
 		 file_header.signature,
-		 8 );
+		 8,
+		 0 );
 
 		libnotify_printf(
 	 	 "%s: segment number\t\t\t: %" PRIu16 "\n",

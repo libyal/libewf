@@ -460,7 +460,8 @@ ssize_t libewf_section_start_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &section_start,
-		 sizeof( ewf_section_start_t ) );
+		 sizeof( ewf_section_start_t ),
+		 0 );
 	}
 #endif
 	if( memory_copy(
@@ -514,7 +515,8 @@ ssize_t libewf_section_start_read(
 		 function );
 		libnotify_print_data(
 		 section_start.padding,
-		 40 );
+		 40,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -1138,7 +1140,8 @@ ssize_t libewf_section_compressed_string_read(
 		 function );
 		libnotify_print_data(
 		 *uncompressed_string,
-		 *uncompressed_string_size );
+		 *uncompressed_string_size,
+		 0 );
 	}
 #endif
 	return( read_count );
@@ -1469,7 +1472,8 @@ ssize_t libewf_section_data_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) data,
-		 sizeof( ewf_data_t ) );
+		 sizeof( ewf_data_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -1509,7 +1513,8 @@ ssize_t libewf_section_data_read(
 		 function );
 		libnotify_print_data(
 		 data->unknown1,
-		 3 );
+		 3,
+		 0 );
 
 		libnotify_printf(
 		 "%s: number of chunks\t\t\t\t: %" PRIu32 "\n",
@@ -1560,7 +1565,8 @@ ssize_t libewf_section_data_read(
 		 function );
 		libnotify_print_data(
 		 data->unknown2,
-		 3 );
+		 3,
+		 0 );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 data->palm_volume_start_sector,
@@ -1575,7 +1581,8 @@ ssize_t libewf_section_data_read(
 		 function );
 		libnotify_print_data(
 		 data->unknown3,
-		 4 );
+		 4,
+		 0 );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 data->smart_logs_start_sector,
@@ -1595,7 +1602,8 @@ ssize_t libewf_section_data_read(
 		 function );
 		libnotify_print_data(
 		 data->unknown4,
-		 3 );
+		 3,
+		 0 );
 
 		libnotify_printf(
 		 "%s: error granularity\t\t\t\t: %" PRIu32 "\n",
@@ -1607,28 +1615,32 @@ ssize_t libewf_section_data_read(
 		 function );
 		libnotify_print_data(
 		 data->unknown5,
-		 4 );
+		 4,
+		 0 );
 
 		libnotify_printf(
 		 "%s: guid:\n",
 		 function );
 		libnotify_print_data(
 		 data->guid,
-		 16 );
+		 16,
+		 0 );
 
 		libnotify_printf(
 		 "%s: unknown6:\n",
 		 function );
 		libnotify_print_data(
 		 data->unknown6,
-		 963 );
+		 963,
+		 0 );
 
 		libnotify_printf(
 		 "%s: signature:\n",
 		 function );
 		libnotify_print_data(
 		 data->signature,
-		 5 );
+		 5,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -2099,7 +2111,8 @@ ssize_t libewf_section_digest_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &digest,
-		 sizeof( ewf_digest_t ) );
+		 sizeof( ewf_digest_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -2114,21 +2127,24 @@ ssize_t libewf_section_digest_read(
 		 function );
 		libnotify_print_data(
 		 digest.md5_hash,
-		 16 );
+		 16,
+		 0 );
 
 		libnotify_printf(
 		 "%s: SHA1 hash:\n",
 		 function );
 		libnotify_print_data(
 		 digest.sha1_hash,
-		 20 );
+		 20,
+		 0 );
 
 		libnotify_printf(
 		 "%s: padding:\n",
 		 function );
 		libnotify_print_data(
 		 digest.padding1,
-		 40 );
+		 40,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -2372,14 +2388,16 @@ ssize_t libewf_section_digest_write(
 		 function );
 		libnotify_print_data(
 		 digest.md5_hash,
-		 16 );
+		 16,
+		 0 );
 
 		libnotify_printf(
 		 "%s: SHA1 hash:\n",
 		 function );
 		libnotify_print_data(
 		 digest.sha1_hash,
-		 20 );
+		 20,
+		 0 );
 	}
 #endif
 	calculated_checksum = ewf_checksum_calculate(
@@ -2505,7 +2523,8 @@ ssize_t libewf_section_error2_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &error2_header,
-		 sizeof( ewf_error2_header_t ) );
+		 sizeof( ewf_error2_header_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -2529,7 +2548,8 @@ ssize_t libewf_section_error2_read(
 		 function );
 		libnotify_print_data(
 		 error2_header.unknown,
-		 200 );
+		 200,
+		 0 );
 
 		libnotify_printf(
 	 	 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -2615,7 +2635,8 @@ ssize_t libewf_section_error2_read(
 			 function );
 			libnotify_print_data(
 			 (uint8_t *) error2_sectors,
-			 error2_sectors_size );
+			 error2_sectors_size,
+			 0 );
 		}
 #endif
 		read_count = libbfio_pool_read(
@@ -3093,7 +3114,8 @@ ssize_t libewf_section_hash_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &hash,
-		 sizeof( ewf_hash_t ) );
+		 sizeof( ewf_hash_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -3108,14 +3130,16 @@ ssize_t libewf_section_hash_read(
 		 function );
 		libnotify_print_data(
 		 hash.md5_hash,
-		 16 );
+		 16,
+		 0 );
 
 		libnotify_printf(
 		 "%s: unknown1:\n",
 		 function );
 		libnotify_print_data(
 		 hash.unknown1,
-		 16 );
+		 16,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -3304,7 +3328,8 @@ ssize_t libewf_section_hash_write(
 		 function );
 		libnotify_print_data(
 		 hash.md5_hash,
-		 16 );
+		 16,
+		 0 );
 	}
 #endif
 	calculated_checksum = ewf_checksum_calculate(
@@ -3799,7 +3824,8 @@ ssize_t libewf_section_ltree_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) ltree_header,
-		 sizeof( ewf_ltree_header_t ) );
+		 sizeof( ewf_ltree_header_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -3814,7 +3840,8 @@ ssize_t libewf_section_ltree_read(
 		 function );
 		libnotify_print_data(
 		 ltree_header->unknown1,
-		 16 );
+		 16,
+		 0 );
 
 		libnotify_printf(
 		 "%s: tree size\t\t\t\t\t: %" PRIu32 "\n",
@@ -3826,21 +3853,24 @@ ssize_t libewf_section_ltree_read(
 		 function );
 		libnotify_print_data(
 		 ltree_header->unknown2,
-		 4 );
+		 4,
+		 0 );
 
 		libnotify_printf(
 		 "%s: unknown3:\n",
 		 function );
 		libnotify_print_data(
 		 ltree_header->unknown3,
-		 4 );
+		 4,
+		 0 );
 
 		libnotify_printf(
 		 "%s: unknown4:\n",
 		 function );
 		libnotify_print_data(
 		 ltree_header->unknown4,
-		 20 );
+		 20,
+		 0 );
 	}
 #endif
 	memory_free(
@@ -4117,7 +4147,8 @@ ssize_t libewf_section_session_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &session_header,
-		 sizeof( ewf_session_header_t ) );
+		 sizeof( ewf_session_header_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -4141,7 +4172,8 @@ ssize_t libewf_section_session_read(
 		 function );
 		libnotify_print_data(
 		 session_header.unknown1,
-		 28 );
+		 28,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -4227,7 +4259,8 @@ ssize_t libewf_section_session_read(
 			 function );
 			libnotify_print_data(
 			 (uint8_t *) session_entries,
-			 session_entries_size );
+			 session_entries_size,
+			 0 );
 		}
 #endif
 		read_count = libbfio_pool_read(
@@ -4326,7 +4359,8 @@ ssize_t libewf_section_session_read(
 			 sessions_entry_index );
 			libnotify_print_data(
 			 ( session_entries[ sessions_entry_index ] ).unknown2,
-			 24 );
+			 24,
+			 0 );
 		}
 #endif
 		/* Note that EnCase says the first session starts at session 16
@@ -4369,7 +4403,8 @@ ssize_t libewf_section_session_read(
 				 sessions_entry_index );
 				libnotify_print_data(
 				 ( session_entries[ sessions_entry_index ] ).unknown2,
-				 24 );
+				 24,
+				 0 );
 			}
 #endif
 			if( first_sector < previous_first_sector )
@@ -5159,7 +5194,8 @@ ssize_t libewf_section_table_header_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &table_header,
-		 sizeof( ewf_table_header_t ) );
+		 sizeof( ewf_table_header_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -5187,7 +5223,8 @@ ssize_t libewf_section_table_header_read(
 		 function );
 		libnotify_print_data(
 		 table_header.padding1,
-		 4 );
+		 4,
+		 0 );
 
 		libnotify_printf(
 		 "%s: base offset\t\t\t\t: 0x%08" PRIx64 "\n",
@@ -5199,7 +5236,8 @@ ssize_t libewf_section_table_header_read(
 		 function );
 		libnotify_print_data(
 		 table_header.padding2,
-		 4 );
+		 4,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -5755,7 +5793,8 @@ ssize_t libewf_section_volume_e01_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) volume,
-		 sizeof( ewf_volume_t ) );
+		 sizeof( ewf_volume_t ),
+		 0 );
 	}
 #endif
 	media_values->media_type = volume->media_type;
@@ -5815,7 +5854,8 @@ ssize_t libewf_section_volume_e01_read(
 		 function );
 		libnotify_print_data(
 		 volume->unknown1,
-		 3 );
+		 3,
+		 0 );
 
 		libnotify_printf(
 		 "%s: number of chunks\t\t: %" PRIu32 "\n",
@@ -5866,7 +5906,8 @@ ssize_t libewf_section_volume_e01_read(
 		 function );
 		libnotify_print_data(
 		 volume->unknown2,
-		 3 );
+		 3,
+		 0 );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 volume->palm_volume_start_sector,
@@ -5881,7 +5922,8 @@ ssize_t libewf_section_volume_e01_read(
 		 function );
 		libnotify_print_data(
 		 volume->unknown3,
-		 4 );
+		 4,
+		 0 );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 volume->smart_logs_start_sector,
@@ -5901,7 +5943,8 @@ ssize_t libewf_section_volume_e01_read(
 		 function );
 		libnotify_print_data(
 		 volume->unknown4,
-		 3 );
+		 3,
+		 0 );
 
 		libnotify_printf(
 		 "%s: error granularity\t\t: %" PRIu32 "\n",
@@ -5913,28 +5956,32 @@ ssize_t libewf_section_volume_e01_read(
 		 function );
 		libnotify_print_data(
 		 volume->unknown5,
-		 4 );
+		 4,
+		 0 );
 
 		libnotify_printf(
 		 "%s: guid:\n",
 		 function );
 		libnotify_print_data(
 		 volume->guid,
-		 16 );
+		 16,
+		 0 );
 
 		libnotify_printf(
 		 "%s: unknown6:\n",
 		 function );
 		libnotify_print_data(
 		 volume->unknown6,
-		 963 );
+		 963,
+		 0 );
 
 		libnotify_printf(
 		 "%s: signature:\n",
 		 function );
 		libnotify_print_data(
 		 volume->signature,
-		 5 );
+		 5,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t: 0x%08" PRIx32 "\n",
@@ -6313,7 +6360,8 @@ ssize_t libewf_section_volume_s01_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) volume,
-		 sizeof( ewf_volume_smart_t ) );
+		 sizeof( ewf_volume_smart_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -6344,7 +6392,8 @@ ssize_t libewf_section_volume_s01_read(
 		 function );
 		libnotify_print_data(
 		 volume->unknown1,
-		 4 );
+		 4,
+		 0 );
 
 		libnotify_printf(
 		 "%s: number of chunks\t: %" PRIu32 "\n",
@@ -6371,21 +6420,24 @@ ssize_t libewf_section_volume_s01_read(
 		 function );
 		libnotify_print_data(
 		 volume->unknown2,
-		 20 );
+		 20,
+		 0 );
 
 		libnotify_printf(
 		 "%s: unknown3:\n",
 		 function );
 		libnotify_print_data(
 		 volume->unknown3,
-		 45 );
+		 45,
+		 0 );
 
 		libnotify_printf(
 		 "%s: signature:\n",
 		 function );
 		libnotify_print_data(
 		 volume->signature,
-		 5 );
+		 5,
+		 0 );
 
 		libnotify_printf(
 		 "%s: checksum\t\t\t: 0x%08" PRIx32 "\n",
@@ -7096,7 +7148,8 @@ ssize_t libewf_section_delta_chunk_read(
 		 function );
 		libnotify_print_data(
 		 (uint8_t *) &delta_chunk_header,
-		 sizeof( ewfx_delta_chunk_header_t ) );
+		 sizeof( ewfx_delta_chunk_header_t ),
+		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -7129,7 +7182,8 @@ ssize_t libewf_section_delta_chunk_read(
 		 function );
 		libnotify_print_data(
 		 delta_chunk_header.padding,
-		 6 );
+		 6,
+		 0 );
 
 		libnotify_printf(
 	 	 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",

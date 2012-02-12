@@ -87,6 +87,182 @@ FileEntry::~FileEntry( void )
 	}
 }
 
+System::UInt32 FileEntry::GetFlags( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error           = NULL;
+	libewf_file_entry_t *file_entry = NULL;
+	System::String^ error_string    = nullptr;
+	System::String^ function        = "FileEntry::GetFlags";
+	uint32_t ewf_flags              = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &file_entry,
+	 this->ewf_file_entry );
+
+	if( libewf_file_entry_get_flags(
+	     file_entry,
+	     &ewf_flags,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve flags from ewf file entry." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	return( Marshal::ReadInt32(
+	         (IntPtr) &ewf_flags ) );
+}
+
+System::Int64 FileEntry::GetMediaDataOffset( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error           = NULL;
+	libewf_file_entry_t *file_entry = NULL;
+	System::String^ error_string    = nullptr;
+	System::String^ function        = "FileEntry::MediaDataGetOffset";
+	off64_t ewf_offset              = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &file_entry,
+	 this->ewf_file_entry );
+
+	if( libewf_file_entry_get_media_data_offset(
+	     file_entry,
+	     &ewf_offset,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve media data offset from ewf file entry." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	return( Marshal::ReadInt64(
+	         (IntPtr) &ewf_offset ) );
+}
+
+System::UInt64 FileEntry::GetMediaDataSize( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error           = NULL;
+	libewf_file_entry_t *file_entry = NULL;
+	System::String^ error_string    = nullptr;
+	System::String^ function        = "FileEntry::MediaDataGetSize";
+	size64_t ewf_size               = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &file_entry,
+	 this->ewf_file_entry );
+
+	if( libewf_file_entry_get_media_data_size(
+	     file_entry,
+	     &ewf_size,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve media data size from ewf file entry." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	return( Marshal::ReadInt64(
+	         (IntPtr) &ewf_size ) );
+}
+
+System::Int64 FileEntry::GetDuplicateMediaDataOffset( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error           = NULL;
+	libewf_file_entry_t *file_entry = NULL;
+	System::String^ error_string    = nullptr;
+	System::String^ function        = "FileEntry::DuplicateMediaDataGetOffset";
+	off64_t ewf_offset              = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &file_entry,
+	 this->ewf_file_entry );
+
+	if( libewf_file_entry_get_duplicate_media_data_offset(
+	     file_entry,
+	     &ewf_offset,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve duplicate media data offset from ewf file entry." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	return( Marshal::ReadInt64(
+	         (IntPtr) &ewf_offset ) );
+}
+
 #if _MSC_VER >= 1600
 
 System::String^ FileEntry::GetName( void )

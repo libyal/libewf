@@ -22,7 +22,7 @@
 			<NoVCL>true</NoVCL>
 			<LinkPackageStatics>rtl.lib</LinkPackageStatics>
 			<ILINK_GenerateImportLibrary>true</ILINK_GenerateImportLibrary>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror;..\..\..\libnotify;..\..\..\libuna;..\..\..\libbfio;..\..\..\libfvalue;..\..\..\libmfcache;..\..\..\libmfdata;..\..\zlib-1.2.5;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror;..\..\..\libnotify;..\..\..\libuna;..\..\..\libbfio;..\..\..\libfvalue;..\..\..\libmfcache;..\..\..\libmfdata;..\..\zlib-1.2.6;$(BCC_IncludePath)</BCC_IncludePath>
 			<ProjectType>CppDynamicLibrary</ProjectType>
 			<OutputExt>dll</OutputExt>
 			<BCC_waus>false</BCC_waus>

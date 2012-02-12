@@ -95,7 +95,8 @@ int libewf_debug_dump_data(
 
 	libnotify_print_data(
 	 data,
-	 data_size );
+	 data_size,
+	 0 );
 
 	libnotify_printf(
 	 "%s: possible checksum (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",

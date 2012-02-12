@@ -311,6 +311,162 @@ int libewf_file_entry_get_flags(
 	return( 1 );
 }
 
+/* Retrieves the media data offset
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_media_data_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *media_data_offset,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_media_data_offset";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_single_file_entry_get_data_offset(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     media_data_offset,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data offset.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the media data size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_media_data_size(
+     libewf_file_entry_t *file_entry,
+     size64_t *media_data_size,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_media_data_size";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_single_file_entry_get_data_size(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     media_data_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the duplicate media data offset
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_duplicate_media_data_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *duplicate_media_data_offset,
+     liberror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_media_data_offset";
+
+	if( file_entry == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->file_entry_tree_node == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_single_file_entry_get_duplicate_data_offset(
+	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     duplicate_media_data_offset,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve duplicate data offset.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error

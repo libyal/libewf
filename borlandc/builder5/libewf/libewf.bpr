@@ -33,7 +33,7 @@
     <USERDEFINES value="UNICODE;HAVE_ZLIB_H;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBMFCACHE;HAVE_LOCAL_LIBMFDATA;LIBEWF_DLL_EXPORT;"/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL;_RTLDLL"/>
     <MAINSOURCE value="libewf.bpf"/>
-    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libmfdata;..\..\..\libmfcache;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <INCLUDEPATH value="..\..\..\libewf;..\..\zlib-1.2.6;..\..\..\libmfdata;..\..\..\libmfcache;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl"/>
     <LIBPATH value="..\..\..\libewf;..\Release;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
@@ -79,8 +79,8 @@ Comments=
 
 [HistoryLists\hlIncludePath]
 Count=8
-Item0=..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libmfdata;..\..\..\libmfcache;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
-Item1=..\..\..\libewf;..\..\zlib-1.2.5;..\..\..\libmfdata;..\..\..\libmfcache..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item0=..\..\..\libewf;..\..\zlib-1.2.6;..\..\..\libmfdata;..\..\..\libmfcache;..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=..\..\..\libewf;..\..\zlib-1.2.6;..\..\..\libmfdata;..\..\..\libmfcache..\..\..\libfvalue;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
 Item2=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\libcstring;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
 Item3=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\libnotify;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl
 Item4=..\..\..\libewf;..\..\zlib-1.2.3;..\..\..\libbfio;..\..\..\libuna;..\..\..\liberror;..\..\..\common;..\..\..\include;$(BCB)\include;$(BCB)\include\vcl

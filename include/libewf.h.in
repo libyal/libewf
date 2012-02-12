@@ -2160,6 +2160,33 @@ int libewf_file_entry_get_flags(
      uint32_t *flags,
      libewf_error_t **error );
 
+/* Retrieves the media data offset
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_media_data_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *media_data_offset,
+     libewf_error_t **error );
+
+/* Retrieves the media data size
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_media_data_size(
+     libewf_file_entry_t *file_entry,
+     size64_t *media_data_size,
+     libewf_error_t **error );
+
+/* Retrieves the duplicate media data offset
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_duplicate_media_data_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *duplicate_media_data_offset,
+     libewf_error_t **error );
+
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error

@@ -83,6 +83,24 @@ int libewf_file_entry_get_flags(
      liberror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_file_entry_get_media_data_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *media_data_offset,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_entry_get_media_data_size(
+     libewf_file_entry_t *file_entry,
+     size64_t *media_data_size,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_entry_get_duplicate_media_data_offset(
+     libewf_file_entry_t *file_entry,
+     off64_t *duplicate_media_data_offset,
+     liberror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_file_entry_get_utf8_name_size(
      libewf_file_entry_t *file_entry,
      size_t *utf8_name_size,

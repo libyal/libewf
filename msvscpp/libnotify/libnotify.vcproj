@@ -175,6 +175,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libnotify\libnotify_definitions.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libnotify\libnotify_print.h"
 				>
 			</File>

@@ -286,6 +286,13 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120216
+* update for zlib-1.2.6
+* added API functions for file entry data offset, data size and
+  duplicate data offset
+* added file entry flags and media data value functions to ewf.net
+* updated libnotify, libodraw, libfvalue, libsmraw
+
 20120209
 * small changes
 

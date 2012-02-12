@@ -38,6 +38,14 @@ public ref class FileEntry sealed
 		FileEntry( System::IntPtr ewf_file_entry );
 		~FileEntry( void );
 
+		System::UInt32 GetFlags( void );
+
+		System::Int64 GetMediaDataOffset( void );
+
+		System::UInt64 GetMediaDataSize( void );
+
+		System::Int64 GetDuplicateMediaDataOffset( void );
+
 #if _MSC_VER >= 1600
 		System::String^ GetName( void );
 #endif /* _MSC_VER >= 1600 */

@@ -1,4 +1,4 @@
-.Dd January  2, 2012
+.Dd February 12, 2012
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -347,6 +347,12 @@ Single file entry functions
 .Fn libewf_file_entry_get_type "libewf_file_entry_t *file_entry, uint8_t *type, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_flags "libewf_file_entry_t *file_entry, uint32_t *flags, libewf_error_t **error"
+.Fn int
+.Ft libewf_file_entry_get_media_data_offset "libewf_file_entry_t *file_entry, off64_t *media_data_offset, libewf_error_t **error"
+.Fn int
+.Ft libewf_file_entry_get_media_data_size "libewf_file_entry_t *file_entry, size64_t *media_data_size, libewf_error_t **error"
+.Fn int
+.Ft libewf_file_entry_get_duplicate_media_data_offset "libewf_file_entry_t *file_entry, off64_t *duplicate_media_data_offset, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_utf8_name_size "libewf_file_entry_t *file_entry, size_t *utf8_string_size, libewf_error_t **error"
 .Ft int

@@ -638,7 +638,8 @@ int libewf_chunk_table_read_offsets(
 		 function );
 		libnotify_print_data(
 		 table_offsets_data,
-		 table_offsets_data_size );
+		 table_offsets_data_size,
+		 0 );
 	}
 #endif
 	/* The EWF-S01 format does not contain a checksum after the table offsets
@@ -842,7 +843,8 @@ int libewf_chunk_table_read_offsets(
 			 function );
 			libnotify_print_data(
 			 trailing_data,
-			 (size_t) element_group_size );
+			 (size_t) element_group_size,
+			 0 );
 
 			memory_free(
 			 trailing_data );
