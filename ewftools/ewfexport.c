@@ -113,8 +113,9 @@ void usage_fprint(
 	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t           windows-1255, windows-1256, windows-1257 or windows-1258\n" );
 	fprintf( stream, "\t-b:        specify the number of sectors to read at once (per chunk),\n"
-	                 "\t           options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096,\n"
-	                 "\t           8192, 16384 or 32768 (not used for raw and files formats)\n" );
+	                 "\t           options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048,\n"
+	                 "\t           4096, 8192, 16384 or 32768 (not used for raw and files\n"
+	                 "\t           formats)\n" );
 	fprintf( stream, "\t-B:        specify the number of bytes to export (default is all bytes)\n" );
 	fprintf( stream, "\t-c:        specify the compression level, options: none (default),\n"
 	                 "\t           empty-block, fast or best (not used for raw and files format)\n" );

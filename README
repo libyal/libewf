@@ -15,7 +15,7 @@ ewfmount requires:
 
 Building .deb files
 To build .deb files make sure you've have installed debhelper, dpkg-buildpackage and fakeroot
-* copy or rename the dpkg directory to debian
+* copy the dpkg directory to debian
 * run "dpkg-buildpackage -rfakeroot"
   this will create the .deb files in the parent directory
 

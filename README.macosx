@@ -1,6 +1,7 @@
 Mac OS X
 * missing libtoolize
 * building multiple architure binaries
+* building ewfmount with MacFuse
 * building ewfmount with OSXFuse
 
 
@@ -24,6 +25,20 @@ make
 make install
 
 The binaries are installed in $PWD/macosx/tmp/
+
+
+Building ewfmount with MacFuse
+Note that MacFuse is no longer maintained and OSXFuse is an alternative
+
+Install MacFuse
+http://code.google.com/p/macfuse/
+
+MacFuse is known to include the non-existing file sys/statfs.h, therefore create it:
+sudo touch /usr/include/sys/statfs.h
+
+./configure
+make
+sudo make install
 
 
 Building ewfmount with OSXFuse

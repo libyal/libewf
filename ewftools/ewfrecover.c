@@ -70,7 +70,8 @@ void usage_fprint(
 	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
 	                 "\t           windows-1255, windows-1256, windows-1257 or windows-1258\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
-	fprintf( stream, "\t-l:        logs recover errors and the digest (hash) to the log_filename\n" );
+	fprintf( stream, "\t-l:        logs recover errors and the digest (hash) to the\n"
+	                 "\t           log_filename\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
 	fprintf( stream, "\t-t:        specify the target file to recover to, use - for stdout\n"

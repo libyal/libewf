@@ -22,7 +22,7 @@ pyewf_la_LIBADD = \
 	../libewf/libewf.la
 
 pyewf_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
-pyewf_la_LDFLAGS  = -module $(PYTHON_LDFLAGS)
+pyewf_la_LDFLAGS  = -module -avoid-version $(PYTHON_LDFLAGS)
 
 endif
 

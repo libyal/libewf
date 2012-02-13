@@ -3,6 +3,7 @@ TODO
   - check behaviour of set and prompt functions
 * complete ewfrecover
   - max segment size
+  - add project files: msvscpp, builder5, codegear
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -240,9 +241,6 @@ Tools:
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
-* ewfrecover
-  - create a tool recover ewf files - basically ewfexport without the
-    questions
 * ewfmount
   - Windows use ImDisk
   - MacOS native API support ?
@@ -286,7 +284,12 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
-20120216
+20120213
+* small changes to ewftools
+* pyewf: added -avoid-version to Makefile.am
+* updated macosx package maker files
+
+20120212
 * update for zlib-1.2.6
 * added API functions for file entry data offset, data size and
   duplicate data offset
