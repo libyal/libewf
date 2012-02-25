@@ -1,6 +1,4 @@
 TODO
-* ewftools
-  - check behaviour of set and prompt functions
 * complete ewfrecover
   - max segment size
   - add project files: msvscpp, builder5, codegear
@@ -13,10 +11,6 @@ TODO
   - read performance: flag if checksum has be checked
   - add flags to by-pass cache ? direct read/write
 * check performance
-
-Next beta/stable release:
-* full test - interoperability tests
-* disable ewfdebug
 
 Roadmap:
 * lvf support
@@ -61,8 +55,6 @@ Roadmap:
 Code clean up:
 * clean up configure.ac and acinclude.m4
   - refactor dfxml check
-  - refactor fuse check - to acinclude
-  - refactor guid check - to acinclude
   - refactor zlib check - to acinclude
 * ewfinfo
   - move DFXML code to separate code files, what about separate library ?
@@ -283,6 +275,9 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120225
+* promoted to stable
 
 20120213
 * small changes to ewftools
