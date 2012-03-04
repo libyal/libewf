@@ -2359,8 +2359,15 @@ int libewf_handle_open_file_io_pool(
 				goto on_error;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			libnotify_print_error_backtrace(
-			 *error );
+			if( libnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libnotify_print_error_backtrace(
+					 *error );
+				}
+			}
 #endif
 			liberror_error_free(
 			 error );
@@ -2881,11 +2888,14 @@ int libewf_handle_open_read_segment_files(
 					goto on_error;
 				}
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( ( error != NULL )
-				 && ( *error != NULL ) )
+				if( libnotify_verbose != 0 )
 				{
-					libnotify_print_error_backtrace(
-					 *error );
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libnotify_print_error_backtrace(
+						 *error );
+					}
 				}
 #endif
 				liberror_error_free(
@@ -3332,11 +3342,14 @@ int libewf_handle_open_read_segment_files(
 				 function );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( ( error != NULL )
-				 && ( *error != NULL ) )
+				if( libnotify_verbose != 0 )
 				{
-					libnotify_print_error_backtrace(
-					 *error );
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libnotify_print_error_backtrace(
+						 *error );
+					}
 				}
 #endif
 				liberror_error_free(
@@ -3346,7 +3359,7 @@ int libewf_handle_open_read_segment_files(
 
 				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
 
-				goto on_error;
+				break;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			else if( libnotify_verbose != 0 )
@@ -3373,11 +3386,14 @@ int libewf_handle_open_read_segment_files(
 		 function );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( ( error != NULL )
-		 && ( *error != NULL ) )
+		if( libnotify_verbose != 0 )
 		{
-			libnotify_print_error_backtrace(
-			 *error );
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				libnotify_print_error_backtrace(
+				 *error );
+			}
 		}
 #endif
 		liberror_error_free(

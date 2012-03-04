@@ -4475,11 +4475,14 @@ int libewf_handle_parse_header_values(
 	 || ( result_xheader != 1 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( ( error != NULL )
-		 && ( *error != NULL ) )
+		if( libnotify_verbose != 0 )
 		{
-			libnotify_print_error_backtrace(
-			 *error );
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				libnotify_print_error_backtrace(
+				 *error );
+			}
 		}
 #endif
 		liberror_error_free(

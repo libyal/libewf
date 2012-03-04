@@ -276,6 +276,11 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120304
+* small changes to debug error output
+* small changes for error tolerability
+* updated libfvalue
+
 20120225
 * promoted to stable
 

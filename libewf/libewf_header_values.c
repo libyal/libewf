@@ -1910,11 +1910,14 @@ int libewf_header_values_parse_utf8_header_string(
 						 function );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-						if( ( error != NULL )
-						 && ( *error != NULL ) )
+						if( libnotify_verbose != 0 )
 						{
-							libnotify_print_error_backtrace(
-							 *error );
+							if( ( error != NULL )
+							 && ( *error != NULL ) )
+							{
+								libnotify_print_error_backtrace(
+								 *error );
+							}
 						}
 #endif
 						liberror_error_free(
@@ -3218,11 +3221,14 @@ int libewf_header_values_generate_utf8_header_string(
 			 function );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-			if( ( error != NULL )
-			 && ( *error != NULL ) )
+			if( libnotify_verbose != 0 )
 			{
-				libnotify_print_error_backtrace(
-				 *error );
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libnotify_print_error_backtrace(
+					 *error );
+				}
 			}
 #endif
 			liberror_error_free(
@@ -3293,11 +3299,14 @@ int libewf_header_values_generate_utf8_header_string(
 			 function );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-			if( ( error != NULL )
-			 && ( *error != NULL ) )
+			if( libnotify_verbose != 0 )
 			{
-				libnotify_print_error_backtrace(
-				 *error );
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libnotify_print_error_backtrace(
+					 *error );
+				}
 			}
 #endif
 			liberror_error_free(
@@ -5854,11 +5863,14 @@ int libewf_header_values_parse_xheader_date_value(
 			 function );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( ( error != NULL )
-			 && ( *error != NULL ) )
+			if( libnotify_verbose != 0 )
 			{
-				libnotify_print_error_backtrace(
-				 *error );
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libnotify_print_error_backtrace(
+					 *error );
+				}
 			}
 #endif
 			liberror_error_free(
@@ -6100,11 +6112,14 @@ int libewf_header_values_generate_xheader(
 					 function );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-					if( ( error != NULL )
-					 && ( *error != NULL ) )
+					if( libnotify_verbose != 0 )
 					{
-						libnotify_print_error_backtrace(
-						 *error );
+						if( ( error != NULL )
+						 && ( *error != NULL ) )
+						{
+							libnotify_print_error_backtrace(
+							 *error );
+						}
 					}
 #endif
 					liberror_error_free(

@@ -336,11 +336,14 @@ int libewf_read_io_handle_read_chunk_data(
 		 chunk_index );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( ( error != NULL )
-		 && ( *error != NULL ) )
+		if( libnotify_verbose != 0 )
 		{
-			libnotify_print_error_backtrace(
-			 *error );
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				libnotify_print_error_backtrace(
+				 *error );
+			}
 		}
 #endif
 		liberror_error_free(
