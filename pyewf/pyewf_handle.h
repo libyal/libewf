@@ -2,7 +2,7 @@
  * Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,8 +28,7 @@
 
 #include <liberror.h>
 
-#include <libewf.h>
-
+#include "pyewf_libewf.h"
 #include "pyewf_python.h"
 
 #if defined( __cplusplus )

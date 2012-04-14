@@ -1,4 +1,10 @@
 TODO
+* pyewf
+  - update (+/-)
+  - file entry data ? instead of file entry
+  - set codepage support (requires libclocale)
+* ewfmount
+  - check access rights on fuse mount point
 * complete ewfrecover
   - max segment size
   - add project files: msvscpp, builder5, codegear
@@ -275,6 +281,12 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120414
+* ewfverify: fixed printing the same segment filename multiple times for CRC errors
+* worked on pyewf
+* bug fix in libewf_utf16_string_month_copy_from_time_elements
+* updated libuna: fix in codepage 932
 
 20120304
 * small changes to debug error output

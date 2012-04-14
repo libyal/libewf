@@ -3751,7 +3751,6 @@ int verification_handle_checksum_errors_fprint(
 					filename = libcstring_system_string_allocate(
 					            filename_size ); 
 
-
 					if( filename == NULL )
 					{
 						liberror_error_set(
@@ -3823,14 +3822,14 @@ int verification_handle_checksum_errors_fprint(
 				}
 				start_sector += verification_handle->chunk_size;
 
-				if( last_filename != NULL )
-				{
-					memory_free(
-					 last_filename );
+			}
+			if( last_filename != NULL )
+			{
+				memory_free(
+				 last_filename );
 
-					last_filename      = NULL;
-					last_filename_size = 0;
-				}
+				last_filename      = NULL;
+				last_filename_size = 0;
 			}
 			fprintf(
 			 stream,

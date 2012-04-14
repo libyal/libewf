@@ -1,5 +1,5 @@
 /*
- * The python header wrapper
+ * The internal libewf header
  *
  * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -9,31 +9,29 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _PYEWF_PYTHON_H )
-#define _PYEWF_PYTHON_H
+#if !defined( _PYEWF_LIBEWF_H )
+#define _PYEWF_LIBEWF_H
 
 #include <common.h>
 
-/* Fix defines in pyconfig.h
+/* If Cygwin libtool DLL support is enabled set LIBEWF_DLL_IMPORT
+ * before including libewf.h
  */
-#undef _POSIX_C_SOURCE
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_IMPORT
+#endif
 
-/* Fix defines in pyport.h
- */
-#undef HAVE_FSTAT
-#undef HAVE_STAT
-
-#include <Python.h>
+#include <libewf.h>
 
 #endif
 

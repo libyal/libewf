@@ -741,7 +741,7 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 
 		return( -1 );
 	}
-       	if( *utf8_string_index >= utf8_string_size )
+	if( *utf8_string_index >= utf8_string_size )
 	{
 		liberror_error_set(
 		 error,
@@ -751,7 +751,7 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 		 function );
 
 		return( -1 );
-       	}
+	}
 	if( ( *utf8_string_index + 3 ) >= utf8_string_size )
 	{
 		liberror_error_set(
@@ -1071,7 +1071,7 @@ int libewf_utf8_string_month_copy_from_time_elements(
 
 		return( -1 );
 	}
-       	if( *utf8_string_index >= utf8_string_size )
+	if( *utf8_string_index >= utf8_string_size )
 	{
 		liberror_error_set(
 		 error,
@@ -1081,7 +1081,7 @@ int libewf_utf8_string_month_copy_from_time_elements(
 		 function );
 
 		return( -1 );
-       	}
+	}
 	if( ( *utf8_string_index + 3 ) >= utf8_string_size )
 	{
 		liberror_error_set(
@@ -1497,7 +1497,7 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-       	if( *utf8_string_index >= utf8_string_size )
+	if( *utf8_string_index >= utf8_string_size )
 	{
 		liberror_error_set(
 		 error,
@@ -1507,7 +1507,7 @@ int libewf_utf8_string_time_copy_from_time_elements(
 		 function );
 
 		return( -1 );
-       	}
+	}
 	if( ( *utf8_string_index + 8 ) >= utf8_string_size )
 	{
 		liberror_error_set(
@@ -1952,7 +1952,7 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 
 		return( -1 );
 	}
-       	if( *utf16_string_index >= utf16_string_size )
+	if( *utf16_string_index >= utf16_string_size )
 	{
 		liberror_error_set(
 		 error,
@@ -1962,7 +1962,7 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 		 function );
 
 		return( -1 );
-       	}
+	}
 	if( ( *utf16_string_index + 3 ) >= utf16_string_size )
 	{
 		liberror_error_set(
@@ -2076,7 +2076,7 @@ int libewf_utf16_string_month_copy_from_time_elements(
 
 		return( -1 );
 	}
-       	if( *utf16_string_index >= utf16_string_size )
+	if( *utf16_string_index >= utf16_string_size )
 	{
 		liberror_error_set(
 		 error,
@@ -2086,7 +2086,7 @@ int libewf_utf16_string_month_copy_from_time_elements(
 		 function );
 
 		return( -1 );
-       	}
+	}
 	if( ( *utf16_string_index + 3 ) >= utf16_string_size )
 	{
 		liberror_error_set(
@@ -2147,7 +2147,7 @@ int libewf_utf16_string_month_copy_from_time_elements(
 		case 7:
 			month = "Aug";
 			break;
-		case 16:
+		case 8:
 			month = "Sep";
 			break;
 		case 9:
@@ -2214,7 +2214,7 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-       	if( *utf16_string_index >= utf16_string_size )
+	if( *utf16_string_index >= utf16_string_size )
 	{
 		liberror_error_set(
 		 error,
@@ -2224,7 +2224,7 @@ int libewf_utf16_string_time_copy_from_time_elements(
 		 function );
 
 		return( -1 );
-       	}
+	}
 	if( ( *utf16_string_index + 16 ) >= utf16_string_size )
 	{
 		liberror_error_set(

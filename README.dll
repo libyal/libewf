@@ -15,7 +15,7 @@ There are multiple methods of creating a DLL:
 Creating a DLL using Borland C++
 To create a DLL using Borland C++ you'll need:
 * Borland C++ Builder
-  The provided CodeGear project files were created using the 5.0 SP1
+  The provided Borland C++ project files were created using the 5.0 SP1
   version.
 * The zlib 1.2.6 source package including from the zlib project site:
   http://www.gzip.org/zlib/

@@ -2,7 +2,7 @@
  *  Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,10 +27,10 @@
 #include <libcstring.h>
 #include <liberror.h>
 
-#include <libewf.h>
-
 #include "pyewf.h"
+#include "pyewf_codepage.h"
 #include "pyewf_handle.h"
+#include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
 
@@ -77,6 +77,205 @@ PyObject *pyewf_handle_get_media_size(
 	return( PyLong_FromLongLong(
 	         media_size ) );
 }
+
+/* Retrieves the codepage used for header strings in the file
+ * Returns a Python object holding the offset if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_header_codepage(
+           pyewf_handle_t *pyewf_handle )
+{
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	liberror_error_t *error     = NULL;
+	PyObject *string_object     = NULL;
+	const char *codepage_string = NULL;
+	static char *function       = "pyewf_handle_get_header_codepage";
+	int header_codepage         = 0;
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	if( libewf_handle_get_header_codepage(
+	     pyewf_handle->handle,
+	     &header_codepage,
+	     &error ) != 1 )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve header codepage.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to retrieve header codepage.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	codepage_string = pyewf_codepage_to_string(
+	                   header_codepage );
+
+	if( codepage_string == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: unsupported header codepage: %d.",
+		 function,
+		 header_codepage );
+
+		return( NULL );
+	}
+	string_object = PyString_FromString(
+	                 codepage_string );
+
+	if( string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to convert codepage string into string object.",
+		 function );
+
+		return( NULL );
+	}
+	return( string_object );
+}
+
+#ifdef TODO
+/* TODO implement libclocale */
+
+/* Sets the codepage used for header strings in the file
+ * Returns a Python object holding the offset if successful or NULL on error
+ */
+PyObject *pyewf_handle_set_header_codepage(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	liberror_error_t *error       = NULL;
+	char *codepage_string         = NULL;
+	static char *keyword_list[]   = { "codepage", NULL };
+	static char *function         = "pyewf_handle_set_header_codepage";
+	size_t codepage_string_length = 0;
+	uint32_t feature_flags        = 0;
+	int header_codepage           = 0;
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "s",
+	     keyword_list,
+	     &codepage_string ) == 0 )
+        {
+                return( NULL );
+        }
+	if( codepage_string == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid codepage string.",
+		 function );
+
+		return( NULL );
+	}
+	codepage_string_length = libcstring_narrow_string_length(
+	                          codepage_string );
+
+	feature_flags = LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_KOI8
+	              | LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_WINDOWS;
+
+	if( libclocale_codepage_copy_from_string(
+	     &header_codepage,
+	     codepage_string,
+	     codepage_string_length,
+	     feature_flags,
+	     &error ) != 1 )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_RuntimeError,
+			 "%s: unable to determine header codepage.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_RuntimeError,
+			 "%s: unable to determine header codepage.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( libewf_handle_set_header_codepage(
+	     pyewf_file->handle,
+	     header_codepage,
+	     &error ) != 1 )
+	{
+		if( liberror_error_backtrace_sprint(
+		     error,
+		     error_string,
+		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to set header codepage.",
+			 function );
+		}
+		else
+		{
+			PyErr_Format(
+			 PyExc_IOError,
+			 "%s: unable to set header codepage.\n%s",
+			 function,
+			 error_string );
+		}
+		liberror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	Py_IncRef(
+	 Py_None );
+
+	return( Py_None );
+}
+
+#endif /* TODO */
 
 /* Retrieves a header value
  * Returns a Python object holding the offset if successful or NULL on error

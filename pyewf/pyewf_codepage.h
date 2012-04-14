@@ -1,5 +1,5 @@
 /*
- * The python header wrapper
+ * Codepage functions
  *
  * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
@@ -19,21 +19,24 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _PYEWF_PYTHON_H )
-#define _PYEWF_PYTHON_H
+#if !defined( _PYEWF_CODEPAGE_H )
+#define _PYEWF_CODEPAGE_H
 
 #include <common.h>
+#include <types.h>
 
-/* Fix defines in pyconfig.h
- */
-#undef _POSIX_C_SOURCE
+#if defined( __cplusplus )
+extern "C" {
+#endif
 
-/* Fix defines in pyport.h
- */
-#undef HAVE_FSTAT
-#undef HAVE_STAT
+const char *pyewf_codepage_to_string(
+             int codepage );
 
-#include <Python.h>
+/* TODO add list function */
+
+#if defined( __cplusplus )
+}
+#endif
 
 #endif
 

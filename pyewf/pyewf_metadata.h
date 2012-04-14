@@ -2,7 +2,7 @@
  * Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,6 +35,14 @@ extern "C" {
 
 PyObject *pyewf_handle_get_media_size(
            pyewf_handle_t *pyewf_handle );
+
+PyObject *pyewf_handle_get_header_codepage(
+           pyewf_handle_t *pyewf_handle );
+
+PyObject *pyewf_handle_set_header_codepage(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords );
 
 PyObject *pyewf_handle_get_header_value(
            pyewf_handle_t *pyewf_handle,

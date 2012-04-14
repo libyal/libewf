@@ -2,7 +2,7 @@
  * Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,11 +31,10 @@
 #include <stdlib.h>
 #endif
 
-#include <libewf.h>
-
 #include "pyewf.h"
 #include "pyewf_file_entry.h"
 #include "pyewf_handle.h"
+#include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
 
@@ -44,6 +43,8 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	{ "signal_abort",
 	  (PyCFunction) pyewf_handle_signal_abort,
 	  METH_NOARGS,
+	  "signal_abort() -> None\n"
+	  "\n"
 	  "Signals the handle to abort the current activity" },
 
 	/* Functions to access the media data */
@@ -51,90 +52,141 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	{ "open",
 	  (PyCFunction) pyewf_handle_open,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Opens EWF file(s)" },
+	  "open(filenames, access_flags) -> None\n"
+	  "\n"
+	  "Opens file(s)" },
 
 	{ "close",
 	  (PyCFunction) pyewf_handle_close,
 	  METH_NOARGS,
-	  "Closes EWF file(s)" },
+	  "close() -> None\n"
+	  "\n"
+	  "Closes file(s)" },
 
 	{ "read_buffer",
 	  (PyCFunction) pyewf_handle_read_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Reads a buffer of media data from EWF file(s)" },
+	  "read_buffer(size) -> String\n"
+	  "\n"
+	  "Reads a buffer of media data from the file(s)" },
 
 	{ "read_random",
 	  (PyCFunction) pyewf_handle_read_random,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Reads a buffer of media data at a specific offset from EWF file(s)" },
+	  "read_random(size, offset) -> String\n"
+	  "\n"
+	  "Reads a buffer of media data at a specific offset from the file(s)" },
 
 	{ "write_buffer",
 	  (PyCFunction) pyewf_handle_write_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Writes a buffer of media data to EWF file(s)" },
+	  "write_buffer(string, size) -> None\n"
+	  "\n"
+	  "Writes a buffer of media data to the file(s)" },
 
 	{ "write_random",
 	  (PyCFunction) pyewf_handle_write_random,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Writes a buffer of media data at a specific offset to EWF file(s)" },
+	  "write_random(string, size, offset) -> None\n"
+	  "\n"
+	  "Writes a buffer of media data at a specific offset to the file(s)" },
 
 	{ "seek_offset",
 	  (PyCFunction) pyewf_handle_seek_offset,
 	  METH_VARARGS | METH_KEYWORDS,
+	  "seek_offset(offset, whence) -> None\n"
+	  "\n"
 	  "Seeks an offset within the media data" },
 
 	{ "get_offset",
 	  (PyCFunction) pyewf_handle_get_offset,
 	  METH_NOARGS,
-	  "Returns the current offset within the media data" },
+	  "get_offset() -> Integer\n"
+	  "\n"
+	  "Retrieved the current offset within the media data" },
 
 	/* Some Pythonesque aliases */
 
 	{ "read",
 	  (PyCFunction) pyewf_handle_read_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Reads a buffer of media data from EWF file(s)" },
+	  "read(size) -> String\n"
+	  "\n"
+	  "Reads a buffer of media data from the file(s)" },
 
 	{ "write",
 	  (PyCFunction) pyewf_handle_write_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Writes a buffer of media data to EWF file(s)" },
+	  "write(string, size) -> None\n"
+	  "\n"
+	  "Writes a buffer of media data to the file(s)" },
 
 	{ "seek",
 	  (PyCFunction) pyewf_handle_seek_offset,
 	  METH_VARARGS | METH_KEYWORDS,
+	  "seek(offset, whence) -> None\n"
+	  "\n"
 	  "Seeks an offset within the media data" },
 
 	{ "tell",
 	  (PyCFunction) pyewf_handle_get_offset,
 	  METH_NOARGS,
-	  "Returns the current offset within the media data" },
+	  "tell() -> Integer\n"
+	  "\n"
+	  "Retrieves the current offset within the media data" },
 
 	/* Functions to access the metadata */
 
 	{ "get_media_size",
 	  (PyCFunction) pyewf_handle_get_media_size,
 	  METH_NOARGS,
+	  "get_media_size() -> Integer\n"
+	  "\n"
 	  "Retrieves the size of the media data" },
+
+	{ "get_header_codepage",
+	  (PyCFunction) pyewf_handle_get_header_codepage,
+	  METH_NOARGS,
+	  "get_header_codepage() -> String\n"
+	  "\n"
+	  "Returns the codepage used for header strings in the file(s)" },
+
+#ifdef TODO
+	{ "set_header_codepage",
+	  (PyCFunction) pyewf_handle_set_header_codepage,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "set_header_codepage(codepage) -> None\n"
+	  "\n"
+	  "Set the codepage used for header strings in the file(s)\n"
+	  "Expects the codepage to be a String containing a Python codec definition" },
+#endif
 
 	{ "get_header_value",
 	  (PyCFunction) pyewf_handle_get_header_value,
 	  METH_VARARGS | METH_KEYWORDS,
+	  "get_header_value(identifier) -> Unicode string or None\n"
+	  "\n"
 	  "Retrieves a header value by its name" },
 
 	{ "get_header_values",
 	  (PyCFunction) pyewf_handle_get_header_values,
 	  METH_NOARGS,
+	  "get_header_values() -> Dictionary\n"
+	  "\n"
 	  "Retrieves all header values" },
 
 	{ "get_hash_value",
 	  (PyCFunction) pyewf_handle_get_hash_value,
 	  METH_VARARGS | METH_KEYWORDS,
+	  "get_hash_value(identifier) -> Unicode string or None\n"
+	  "\n"
 	  "Retrieves a hash value by its name" },
 
 	{ "get_hash_values",
 	  (PyCFunction) pyewf_handle_get_hash_values,
 	  METH_NOARGS,
+	  "get_hash_values() -> Dictionary\n"
+	  "\n"
 	  "Retrieves all hash values" },
 
 	/* Functions to access the (single) file entries */
@@ -142,10 +194,31 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	{ "get_root_file_entry",
 	  (PyCFunction) pyewf_handle_get_root_file_entry,
 	  METH_NOARGS,
+	  "get_root_file_entry() -> Object\n"
+	  "\n"
 	  "Retrieves the root file entry" },
 
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
+};
+
+PyGetSetDef pyewf_handle_object_get_set_definitions[] = {
+
+/* TODO setter : pyewf_handle_set_header_codepage */
+	{ "header_codepage",
+	  (getter) pyewf_handle_get_header_codepage,
+	  (setter) 0,
+	  "The codepage used for header strings in the file(s)",
+	  NULL },
+
+	{ "media_size",
+	  (getter) pyewf_handle_get_media_size,
+	  (setter) 0,
+	  "The media size",
+	  NULL },
+
+	/* Sentinel */
+	{ NULL, NULL, NULL, NULL, NULL }
 };
 
 PyTypeObject pyewf_handle_type_object = {
@@ -210,7 +283,7 @@ PyTypeObject pyewf_handle_type_object = {
 	/* tp_members */
 	0,
 	/* tp_getset */
-	0,
+	pyewf_handle_object_get_set_definitions,
 	/* tp_base */
 	0,
 	/* tp_dict */
@@ -372,6 +445,7 @@ void pyewf_handle_free(
 
 	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_free";
+	int result              = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -409,9 +483,15 @@ void pyewf_handle_free(
 
 		return;
 	}
-	if( libewf_handle_free(
-	     &( pyewf_handle->handle ),
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_free(
+	          &( pyewf_handle->handle ),
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( liberror_error_backtrace_sprint(
 		     error,
@@ -454,15 +534,6 @@ PyObject *pyewf_handle_signal_abort(
 		PyErr_Format(
 		 PyExc_TypeError,
 		 "%s: invalid pyewf handle.",
-		 function );
-
-		return( NULL );
-	}
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid pyewf handle - missing libewf handle.",
 		 function );
 
 		return( NULL );
@@ -517,6 +588,7 @@ PyObject *pyewf_handle_open(
 	int access_flags            = 0;
 	int filename_index          = 0;
 	int number_of_filenames     = 0;
+	int result                  = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -630,12 +702,18 @@ PyObject *pyewf_handle_open(
 		Py_DecRef(
 		 string_object );
 	}
-	if( libewf_handle_open(
-	     pyewf_handle->handle,
-             filenames,
-             number_of_filenames,
-             access_flags,
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_open(
+	          pyewf_handle->handle,
+                  filenames,
+                  number_of_filenames,
+                  access_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( liberror_error_backtrace_sprint(
 		     error,
@@ -696,6 +774,7 @@ PyObject *pyewf_handle_close(
 
 	liberror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_close";
+	int result              = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -706,18 +785,15 @@ PyObject *pyewf_handle_close(
 
 		return( NULL );
 	}
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid pyewf handle - missing libewf handle.",
-		 function );
+	Py_BEGIN_ALLOW_THREADS
 
-		return( NULL );
-	}
-	if( libewf_handle_close(
-	     pyewf_handle->handle,
-	     &error ) != 0 )
+	result = libewf_handle_close(
+	          pyewf_handle->handle,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 0 )
 	{
 		if( liberror_error_backtrace_sprint(
 		     error,
@@ -771,15 +847,6 @@ PyObject *pyewf_handle_read_buffer(
 
 		return( NULL );
 	}
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid pyewf handle - missing libewf handle.",
-		 function );
-
-		return( NULL );
-	}
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
@@ -813,12 +880,16 @@ PyObject *pyewf_handle_read_buffer(
 	               NULL,
 	               read_size );
 
+	Py_BEGIN_ALLOW_THREADS
+
 	read_count = libewf_handle_read_buffer(
 	              pyewf_handle->handle,
 	              PyString_AsString(
 	               result_data ),
 	              (size_t) read_size,
 	              &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( read_count != (ssize_t) read_size )
 	{
@@ -875,15 +946,6 @@ PyObject *pyewf_handle_read_random(
 
 		return( NULL );
 	}
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid pyewf handle - missing libewf handle.",
-		 function );
-
-		return( NULL );
-	}
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
@@ -929,6 +991,8 @@ PyObject *pyewf_handle_read_random(
 	               NULL,
 	               read_size );
 
+	Py_BEGIN_ALLOW_THREADS
+
 	read_count = libewf_handle_read_random(
 	              pyewf_handle->handle,
 	              PyString_AsString(
@@ -936,6 +1000,8 @@ PyObject *pyewf_handle_read_random(
 	              (size_t) read_size,
 	              (off64_t) read_offset,
 	              &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( read_count != (ssize_t) read_size )
 	{
@@ -982,20 +1048,12 @@ PyObject *pyewf_handle_write_buffer(
 	ssize_t write_count         = 0;
 	int write_size              = -1;
 
+/* TODO fix this needs a string containing the buffer */
 	if( pyewf_handle == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
 		 "%s: invalid pyewf handle.",
-		 function );
-
-		return( NULL );
-	}
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid pyewf handle - missing libewf handle.",
 		 function );
 
 		return( NULL );
@@ -1033,12 +1091,16 @@ PyObject *pyewf_handle_write_buffer(
 	               NULL,
 	               write_size );
 
+	Py_BEGIN_ALLOW_THREADS
+
 	write_count = libewf_handle_write_buffer(
 	               pyewf_handle->handle,
 	               PyString_AsString(
 	                result_data ),
 	               (size_t) write_size,
 	               &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( write_count != (ssize_t) write_size )
 	{
@@ -1086,20 +1148,12 @@ PyObject *pyewf_handle_write_random(
 	ssize_t write_count         = 0;
 	int write_size              = -1;
 
+/* TODO fix this needs a string containing the buffer */
 	if( pyewf_handle == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
 		 "%s: invalid pyewf handle.",
-		 function );
-
-		return( NULL );
-	}
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid pyewf handle - missing libewf handle.",
 		 function );
 
 		return( NULL );
@@ -1147,6 +1201,8 @@ PyObject *pyewf_handle_write_random(
 	               NULL,
 	               write_size );
 
+	Py_BEGIN_ALLOW_THREADS
+
 	write_count = libewf_handle_write_random(
 	               pyewf_handle->handle,
 	               PyString_AsString(
@@ -1154,6 +1210,8 @@ PyObject *pyewf_handle_write_random(
 	               (size_t) write_size,
 	               write_offset,
 	               &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( write_count != (ssize_t) write_size )
 	{
@@ -1208,15 +1266,6 @@ PyObject *pyewf_handle_seek_offset(
 
 		return( NULL );
 	}
-	if( pyewf_handle->handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid pyewf handle - missing libewf handle.",
-		 function );
-
-		return( NULL );
-	}
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
@@ -1227,11 +1276,17 @@ PyObject *pyewf_handle_seek_offset(
 	{
 		return( NULL );
 	}
-	if( libewf_handle_seek_offset(
-	     pyewf_handle->handle,
-	     offset,
-	     whence,
-	     &error ) < 0 )
+	Py_BEGIN_ALLOW_THREADS
+
+	offset = libewf_handle_seek_offset(
+	          pyewf_handle->handle,
+	          offset,
+	          whence,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+ 	if( offset == -1 )
 	{
 		if( liberror_error_backtrace_sprint(
 		     error,
@@ -1271,6 +1326,17 @@ PyObject *pyewf_handle_get_offset(
 	static char *function   = "pyewf_handle_get_offset";
 	off64_t current_offset  = 0;
 
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	/* Make sure libewf handle is set to NULL
+	 */
 	if( libewf_handle_get_offset(
 	     pyewf_handle->handle,
 	     &current_offset,

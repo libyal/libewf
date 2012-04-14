@@ -2,7 +2,7 @@
  * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,11 +30,10 @@
 #include <stdlib.h>
 #endif
 
-#include <libewf.h>
-
 #include "pyewf.h"
 #include "pyewf_file_entry.h"
 #include "pyewf_handle.h"
+#include "pyewf_libewf.h"
 #include "pyewf_python.h"
 
 /* The pyewf module methods
@@ -406,6 +405,11 @@ PyMODINIT_FUNC initpyewf(
 	PyObject *module                     = NULL;
 	PyTypeObject *file_entry_type_object = NULL;
 	PyTypeObject *handle_type_object     = NULL;
+	PyGILState_STATE gil_state           = 0;
+
+	PyEval_InitThreads();
+
+	gil_state = PyGILState_Ensure();
 
 	/* Create the module
 	 */
@@ -451,5 +455,8 @@ PyMODINIT_FUNC initpyewf(
 	 module,
 	"pyewf_file_entry",
 	(PyObject *) file_entry_type_object );
+
+	PyGILState_Release(
+	 gil_state );
 }
 

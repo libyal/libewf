@@ -1,7 +1,7 @@
 /*
  * Python object definition of the libewf file entry
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,11 +30,10 @@
 #include <stdlib.h>
 #endif
 
-#include <libewf.h>
-
 #include "pyewf.h"
 #include "pyewf_datetime.h"
 #include "pyewf_file_entry.h"
+#include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
 
@@ -45,21 +44,29 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "read_buffer",
 	  (PyCFunction) pyewf_file_entry_read_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Reads a buffer of file entry data from EWF file(s)" },
+	  "read_buffer(size) -> String\n"
+	  "\n"
+	  "Reads a buffer of file entry data" },
 
 	{ "read_random",
 	  (PyCFunction) pyewf_file_entry_read_random,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Reads a buffer of file entry data at a specific offset from EWF file(s)" },
+	  "read_random(size, offset) -> String\n"
+	  "\n"
+	  "Reads a buffer of file entry data at a specific offset" },
 
 	{ "seek_offset",
 	  (PyCFunction) pyewf_file_entry_seek_offset,
 	  METH_VARARGS | METH_KEYWORDS,
+	  "seek_offset(offset, whence) -> None\n"
+	  "\n"
 	  "Seeks an offset within the file entry data" },
 
 	{ "get_offset",
 	  (PyCFunction) pyewf_file_entry_get_offset,
 	  METH_NOARGS,
+	  "get_offset() -> Integer\n"
+	  "\n"
 	  "Returns the current offset within the file entry data" },
 
 	/* Some Pythonesque aliases */
@@ -67,16 +74,22 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "read",
 	  (PyCFunction) pyewf_file_entry_read_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "Reads a buffer of file entry data from EWF file(s)" },
+	  "read(size) -> String\n"
+	  "\n"
+	  "Reads a buffer of file entry data" },
 
 	{ "seek",
 	  (PyCFunction) pyewf_file_entry_seek_offset,
 	  METH_VARARGS | METH_KEYWORDS,
+	  "seek(offset, whence) -> None\n"
+	  "\n"
 	  "Seeks an offset within the file entry data" },
 
 	{ "tell",
 	  (PyCFunction) pyewf_file_entry_get_offset,
 	  METH_NOARGS,
+	  "tell() -> Integer\n"
+	  "\n"
 	  "Returns the current offset within the file entry data" },
 
 	/* Functions to access the metadata */
@@ -84,36 +97,50 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_size",
 	  (PyCFunction) pyewf_file_entry_get_size,
 	  METH_NOARGS,
+	  "get_size() -> Integer\n"
+	  "\n"
 	  "Returns the size of the file entry data" },
 
 	{ "get_creation_time",
 	  (PyCFunction) pyewf_file_entry_get_creation_time,
 	  METH_NOARGS,
+	  "get_creation_time() -> Datetime\n"
+	  "\n"
 	  "Returns the creation date and time of the file entry" },
 
 	{ "get_modification_time",
 	  (PyCFunction) pyewf_file_entry_get_modification_time,
 	  METH_NOARGS,
+	  "get_modification_time() -> Datetime\n"
+	  "\n"
 	  "Returns the modification date and time of the file entry" },
 
 	{ "get_access_time",
 	  (PyCFunction) pyewf_file_entry_get_access_time,
 	  METH_NOARGS,
+	  "get_access_time() -> Datetime\n"
+	  "\n"
 	  "Returns the access date and time of the file entry" },
 
 	{ "get_entry_modification_time",
 	  (PyCFunction) pyewf_file_entry_get_entry_modification_time,
 	  METH_NOARGS,
+	  "get_entry_modification_time() -> Datetime\n"
+	  "\n"
 	  "Returns the entry modification date and time of the file entry" },
 
 	{ "get_name",
 	  (PyCFunction) pyewf_file_entry_get_name,
 	  METH_NOARGS,
+	  "get_name() -> Unicode string or None\n"
+	  "\n"
 	  "Returns the name of the file entry" },
 
 	{ "get_hash_value_md5",
 	  (PyCFunction) pyewf_file_entry_get_hash_value_md5,
 	  METH_NOARGS,
+	  "get_hash_value_md5() -> Unicode string or None\n"
+	  "\n"
 	  "Retrieves the MD5 hash of the file entry data" },
 
 	/* Functions to access the sub file entries */
@@ -121,15 +148,73 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_number_of_sub_file_entries",
 	  (PyCFunction) pyewf_file_entry_get_number_of_sub_file_entries,
 	  METH_NOARGS,
+	  "get_number_of_sub_file_entries() -> Integer\n"
+	  "\n"
 	  "Retrieves the number of sub file entries" },
 
 	{ "get_sub_file_entry",
 	  (PyCFunction) pyewf_file_entry_get_sub_file_entry,
 	  METH_VARARGS | METH_KEYWORDS,
+	  "get_sub_file_entry() -> Object\n"
+	  "\n"
 	  "Retrieves a specific sub file entry" },
 
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
+};
+
+PyGetSetDef pyewf_file_entry_object_get_set_definitions[] = {
+
+	{ "size",
+	  (getter) pyewf_file_entry_get_size,
+	  (setter) 0,
+	  "The size of the file entry data",
+	  NULL },
+
+	{ "creation_time",
+	  (getter) pyewf_file_entry_get_creation_time,
+	  (setter) 0,
+	  "The creation date and time of the file entry",
+	  NULL },
+
+	{ "modification_time",
+	  (getter) pyewf_file_entry_get_modification_time,
+	  (setter) 0,
+	  "The modification date and time of the file entry",
+	  NULL },
+
+	{ "access_time",
+	  (getter) pyewf_file_entry_get_access_time,
+	  (setter) 0,
+	  "The access date and time of the file entry",
+	  NULL },
+
+	{ "entry_modification_time",
+	  (getter) pyewf_file_entry_get_entry_modification_time,
+	  (setter) 0,
+	  "The entry modification date and time of the file entry",
+	  NULL },
+
+	{ "name",
+	  (getter) pyewf_file_entry_get_name,
+	  (setter) 0,
+	  "The name of the file entry",
+	  NULL },
+
+	{ "md5_hash_value",
+	  (getter) pyewf_file_entry_get_hash_value_md5,
+	  (setter) 0,
+	  "The MD5 hash of the file entry data",
+	  NULL },
+
+	{ "number_of_sub_file_entries",
+	  (getter) pyewf_file_entry_get_number_of_sub_file_entries,
+	  (setter) 0,
+	  "The number of sub file entries",
+	  NULL },
+
+	/* Sentinel */
+	{ NULL, NULL, NULL, NULL, NULL }
 };
 
 PyTypeObject pyewf_file_entry_type_object = {
@@ -194,7 +279,7 @@ PyTypeObject pyewf_file_entry_type_object = {
 	/* tp_members */
 	0,
 	/* tp_getset */
-	0,
+	pyewf_file_entry_object_get_set_definitions,
 	/* tp_base */
 	0,
 	/* tp_dict */
@@ -439,12 +524,16 @@ PyObject *pyewf_file_entry_read_buffer(
 	               NULL,
 	               read_size );
 
+	Py_BEGIN_ALLOW_THREADS
+
 	read_count = libewf_file_entry_read_buffer(
 	              pyewf_file_entry->file_entry,
 	              PyString_AsString(
 	               result_data ),
 	              (size_t) read_size,
 	              &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( read_count != (ssize_t) read_size )
 	{
@@ -555,6 +644,8 @@ PyObject *pyewf_file_entry_read_random(
 	               NULL,
 	               read_size );
 
+	Py_BEGIN_ALLOW_THREADS
+
 	read_count = libewf_file_entry_read_random(
 	              pyewf_file_entry->file_entry,
 	              PyString_AsString(
@@ -562,6 +653,8 @@ PyObject *pyewf_file_entry_read_random(
 	              (size_t) read_size,
 	              (off64_t) read_offset,
 	              &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( read_count != (ssize_t) read_size )
 	{
@@ -635,11 +728,17 @@ PyObject *pyewf_file_entry_seek_offset(
 	{
 		return( NULL );
 	}
-	if( libewf_file_entry_seek_offset(
-	     pyewf_file_entry->file_entry,
-	     offset,
-	     whence,
-	     &error ) < 0 )
+	Py_BEGIN_ALLOW_THREADS
+
+	offset = libewf_file_entry_seek_offset(
+	          pyewf_file_entry->file_entry,
+	          offset,
+	          whence,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( offset == -1 )
 	{
 		if( liberror_error_backtrace_sprint(
 		     error,
