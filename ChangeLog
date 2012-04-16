@@ -1,10 +1,14 @@
 TODO
+* fix issue in date/time formatting
+* why is GUID 0 ?
+
 * pyewf
   - update (+/-)
   - file entry data ? instead of file entry
   - set codepage support (requires libclocale)
 * ewfmount
   - check access rights on fuse mount point
+  - add stat info on readdir (see regfmount)
 * complete ewfrecover
   - max segment size
   - add project files: msvscpp, builder5, codegear
@@ -103,7 +107,7 @@ Features
     although if linux write fails (write_count != write_size) before ENOSPC is set
     there is still room left on the device, but cannot be claimed by libewf
 * what about header values parsing with preservation of timestamps?
-  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
+  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?  (NO!)
   - force set header value to require string formatted in the date format ?
 
 Recovery and analysis:
@@ -281,6 +285,11 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120416
+* added fuse destroy function to ewfmount
+* bug fix in libewf_utf8_string_day_of_month_copy_to_time_elements
+* changes to debug output
 
 20120414
 * ewfverify: fixed printing the same segment filename multiple times for CRC errors

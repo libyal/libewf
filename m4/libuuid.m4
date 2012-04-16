@@ -1,6 +1,6 @@
 dnl Functions for libuuid
 dnl
-dnl Version: 20111017
+dnl Version: 20120416
 
 dnl Function to detect if libuuid is available
 AC_DEFUN([AX_LIBUUID_CHECK_LIB],

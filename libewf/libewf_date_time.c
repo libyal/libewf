@@ -36,7 +36,7 @@
 
 #include "libewf_date_time.h"
 
-/* Returns a structured representation of a time using the local time zone, or NULL on error
+/* Returns a structured representation of a time using the local timezone, or NULL on error
  */
 int libewf_date_time_localtime(
      const time_t *timestamp,

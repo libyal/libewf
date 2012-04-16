@@ -1531,6 +1531,11 @@ ssize_t libewf_section_data_read(
 		 function,
 		 bytes_per_sector );
 
+		libnotify_printf(
+		 "%s: number of sectors\t\t\t\t: %" PRIu64 "\n",
+		 function,
+		 number_of_sectors );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 data->chs_cylinders,
 		 value_32bit );
@@ -1619,7 +1624,7 @@ ssize_t libewf_section_data_read(
 		 0 );
 
 		libnotify_printf(
-		 "%s: guid:\n",
+		 "%s: GUID:\n",
 		 function );
 		libnotify_print_data(
 		 data->guid,
@@ -1948,6 +1953,61 @@ ssize_t libewf_section_data_write(
 
 			return( -1 );
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libnotify_verbose != 0 )
+		{
+			libnotify_printf(
+			 "%s: media type\t\t\t\t\t: 0x%02" PRIx8 "\n",
+			 function,
+			 media_values->media_type );
+
+			libnotify_printf(
+			 "%s: number of chunks\t\t\t\t: %" PRIu32 "\n",
+			 function,
+			 media_values->number_of_chunks );
+
+			libnotify_printf(
+			 "%s: sectors per chunk\t\t\t\t: %" PRIu32 "\n",
+			 function,
+			 media_values->sectors_per_chunk );
+
+			libnotify_printf(
+			 "%s: bytes per sector\t\t\t\t: %" PRIu32 "\n",
+			 function,
+			 media_values->bytes_per_sector );
+
+			libnotify_printf(
+			 "%s: number of sectors\t\t\t\t: %" PRIu64 "\n",
+			 function,
+			 media_values->number_of_sectors );
+
+			libnotify_printf(
+			 "%s: media flags\t\t\t\t\t: 0x%02" PRIx8 "\n",
+			 function,
+			 media_values->media_flags );
+
+			libnotify_printf(
+			 "%s: compression level\t\t\t\t: 0x%02" PRIx8 "\n",
+			 function,
+			 io_handle->compression_level );
+
+			libnotify_printf(
+			 "%s: error granularity\t\t\t\t: %" PRIu32 "\n",
+			 function,
+			 media_values->error_granularity );
+
+			libnotify_printf(
+			 "%s: GUID:\n",
+			 function );
+			libnotify_print_data(
+			 media_values->guid,
+			 16,
+			 0 );
+
+			libnotify_printf(
+			 "\n" );
+		}
+#endif
 		( *cached_data_section )->media_type = media_values->media_type;
 		( *cached_data_section )->media_flags = media_values->media_flags;
 
@@ -5872,6 +5932,11 @@ ssize_t libewf_section_volume_e01_read(
 		 function,
 		 media_values->bytes_per_sector );
 
+		libnotify_printf(
+		 "%s: number of sectors\t\t: %" PRIu64 "\n",
+		 function,
+		 media_values->number_of_sectors );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 volume->chs_cylinders,
 		 value_32bit );
@@ -5960,7 +6025,7 @@ ssize_t libewf_section_volume_e01_read(
 		 0 );
 
 		libnotify_printf(
-		 "%s: guid:\n",
+		 "%s: GUID:\n",
 		 function );
 		libnotify_print_data(
 		 volume->guid,
@@ -6151,6 +6216,61 @@ ssize_t libewf_section_volume_e01_write(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: media type\t\t\t\t\t: 0x%02" PRIx8 "\n",
+		 function,
+		 media_values->media_type );
+
+		libnotify_printf(
+		 "%s: number of chunks\t\t\t\t: %" PRIu32 "\n",
+		 function,
+		 media_values->number_of_chunks );
+
+		libnotify_printf(
+		 "%s: sectors per chunk\t\t\t\t: %" PRIu32 "\n",
+		 function,
+		 media_values->sectors_per_chunk );
+
+		libnotify_printf(
+		 "%s: bytes per sector\t\t\t\t: %" PRIu32 "\n",
+		 function,
+		 media_values->bytes_per_sector );
+
+		libnotify_printf(
+		 "%s: number of sectors\t\t: %" PRIu64 "\n",
+		 function,
+		 media_values->number_of_sectors );
+
+		libnotify_printf(
+		 "%s: media flags\t\t\t\t\t: 0x%02" PRIx8 "\n",
+		 function,
+		 media_values->media_flags );
+
+		libnotify_printf(
+		 "%s: compression level\t\t\t\t: 0x%02" PRIx8 "\n",
+		 function,
+		 io_handle->compression_level );
+
+		libnotify_printf(
+		 "%s: error granularity\t\t\t\t: %" PRIu32 "\n",
+		 function,
+		 media_values->error_granularity );
+
+		libnotify_printf(
+		 "%s: GUID:\n",
+		 function );
+		libnotify_print_data(
+		 media_values->guid,
+		 16,
+		 0 );
+
+		libnotify_printf(
+		 "\n" );
+	}
+#endif
 	volume->media_type = media_values->media_type;
 	volume->media_flags = media_values->media_flags;
 
@@ -6411,7 +6531,7 @@ ssize_t libewf_section_volume_s01_read(
 		 media_values->bytes_per_sector );
 
 		libnotify_printf(
-		 "%s: number of sectors\t: %" PRIu32 "\n",
+		 "%s: number of sectors\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_sectors );
 
@@ -6612,6 +6732,38 @@ ssize_t libewf_section_volume_s01_write(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libnotify_verbose != 0 )
+	{
+		libnotify_printf(
+		 "%s: media type\t\t\t\t\t: 0x%02" PRIx8 "\n",
+		 function,
+		 media_values->media_type );
+
+		libnotify_printf(
+		 "%s: number of chunks\t\t\t\t: %" PRIu32 "\n",
+		 function,
+		 media_values->number_of_chunks );
+
+		libnotify_printf(
+		 "%s: sectors per chunk\t\t\t\t: %" PRIu32 "\n",
+		 function,
+		 media_values->sectors_per_chunk );
+
+		libnotify_printf(
+		 "%s: bytes per sector\t\t\t\t: %" PRIu32 "\n",
+		 function,
+		 media_values->bytes_per_sector );
+
+		libnotify_printf(
+		 "%s: number of sectors\t\t\t\t: %" PRIu64 "\n",
+		 function,
+		 media_values->number_of_sectors );
+
+		libnotify_printf(
+		 "\n" );
+	}
+#endif
 	volume->unknown1[ 0 ] = 1;
 
 	byte_stream_copy_from_uint32_little_endian(

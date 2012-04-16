@@ -1126,6 +1126,45 @@ on_error:
 	return( result );
 }
 
+/* Cleans up when fuse is done
+ */
+void ewfmount_fuse_destroy(
+      void *private_data LIBSYSTEM_ATTRIBUTE_UNUSED )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfmount_fuse_destroy";
+
+	LIBSYSTEM_UNREFERENCED_PARAMETER( private_data )
+
+	if( ewfmount_mount_handle != NULL )
+	{
+		if( mount_handle_free(
+		     &ewfmount_mount_handle,
+		     &error ) != 1 )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free mount handle.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return;
+
+on_error:
+	if( error != NULL )
+	{
+		libsystem_notify_print_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return;
+}
+
 #endif /* defined( HAVE_LIBFUSE ) */
 
 /* The main program
@@ -1348,6 +1387,7 @@ int main( int argc, char * const argv[] )
 	ewfmount_fuse_operations.read    = &ewfmount_fuse_read;
 	ewfmount_fuse_operations.readdir = &ewfmount_fuse_readdir;
 	ewfmount_fuse_operations.getattr = &ewfmount_fuse_getattr;
+	ewfmount_fuse_operations.destroy = &ewfmount_fuse_destroy;
 
 	ewfmount_fuse_channel = fuse_mount(
 	                         mount_point,

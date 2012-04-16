@@ -938,7 +938,7 @@ int libewf_generate_date_header_value(
 		 "%s: unsupported year value.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	*date_time_values_string_size = 20;
 

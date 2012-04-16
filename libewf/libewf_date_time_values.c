@@ -1020,7 +1020,7 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
 
 		return( -1 );
 	}
-	time_elements->tm_mday = (int) ( value_8bit - 1 );
+	time_elements->tm_mday = (int) value_8bit;
 
 	return( 1 );
 }
