@@ -27,3 +27,10 @@ Depends: libewf (= ${Source-Version}), ${shlibs:Depends}
 Description: Several tools for reading and writing EWF files
  Several tools for reading and writing EWF files.
 
+Package: libewf-python
+Section: python
+Architecture: any
+Depends: libewf (= ${Source-Version}), ${shlibs:Depends}
+Description: Python bindings for libewf
+ Python bindings for libewf.
+
