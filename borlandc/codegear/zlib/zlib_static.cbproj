@@ -26,7 +26,7 @@
 			<OutputExt>lib</OutputExt>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
 			<Defines>NO_STRICT;ZLIB_WINAPI</Defines>
-			<IncludePath>..\..\zlib-1.2.6;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
+			<IncludePath>..\..\zlib-1.2.7;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
 			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
@@ -38,57 +38,57 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\zlib-1.2.6\inflate.h">
+			<None Include="..\..\zlib-1.2.7\inflate.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\inftrees.c">
+			<CppCompile Include="..\..\zlib-1.2.7\inftrees.c">
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.6\inftrees.h">
+			<None Include="..\..\zlib-1.2.7\inftrees.h">
 			</None>
-			<None Include="..\..\zlib-1.2.6\inffast.h">
+			<None Include="..\..\zlib-1.2.7\inffast.h">
 			</None>
-			<None Include="..\..\zlib-1.2.6\inffixed.h">
+			<None Include="..\..\zlib-1.2.7\inffixed.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\inflate.c">
+			<CppCompile Include="..\..\zlib-1.2.7\inflate.c">
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.6\trees.c">
+			<CppCompile Include="..\..\zlib-1.2.7\trees.c">
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.6\zlib.h">
+			<None Include="..\..\zlib-1.2.7\zlib.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\zutil.c">
+			<CppCompile Include="..\..\zlib-1.2.7\zutil.c">
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.6\zutil.h">
+			<None Include="..\..\zlib-1.2.7\zutil.h">
 			</None>
-			<None Include="..\..\zlib-1.2.6\trees.h">
+			<None Include="..\..\zlib-1.2.7\trees.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\uncompr.c">
+			<CppCompile Include="..\..\zlib-1.2.7\uncompr.c">
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.6\zconf.h">
+			<None Include="..\..\zlib-1.2.7\zconf.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\inffast.c">
+			<CppCompile Include="..\..\zlib-1.2.7\inffast.c">
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.6\crc32.h">
+			<None Include="..\..\zlib-1.2.7\crc32.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\deflate.c">
+			<CppCompile Include="..\..\zlib-1.2.7\deflate.c">
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.6\deflate.h">
+			<None Include="..\..\zlib-1.2.7\deflate.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\adler32.c">
+			<CppCompile Include="..\..\zlib-1.2.7\adler32.c">
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.6\compress.c">
+			<CppCompile Include="..\..\zlib-1.2.7\compress.c">
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.6\crc32.c">
+			<CppCompile Include="..\..\zlib-1.2.7\crc32.c">
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.6\gzread.c">
+			<CppCompile Include="..\..\zlib-1.2.7\gzread.c">
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.6\gzwrite.c">
+			<CppCompile Include="..\..\zlib-1.2.7\gzwrite.c">
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.6\infback.c">
+			<CppCompile Include="..\..\zlib-1.2.7\infback.c">
 			</CppCompile>
-			<CppCompile Include="..\..\zlib-1.2.6\gzclose.c">
+			<CppCompile Include="..\..\zlib-1.2.7\gzclose.c">
 			</CppCompile>
-			<None Include="..\..\zlib-1.2.6\gzguts.h">
+			<None Include="..\..\zlib-1.2.7\gzguts.h">
 			</None>
-			<CppCompile Include="..\..\zlib-1.2.6\gzlib.c">
+			<CppCompile Include="..\..\zlib-1.2.7\gzlib.c">
 			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

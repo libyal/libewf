@@ -2255,21 +2255,21 @@ int verification_handle_verify_file_entry(
 
 			file_entry_data = NULL;
 		}
+		if( verification_handle_finalize_integrity_hash(
+		     verification_handle,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize integrity hash(es).",
+			 function );
+
+			goto on_error;
+		}
 		if( result != 0 )
 		{
-			if( verification_handle_finalize_integrity_hash(
-			     verification_handle,
-			     error ) != 1 )
-			{
-				liberror_error_set(
-				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to finalize integrity hash(es).",
-				 function );
-
-				goto on_error;
-			}
 			if( verification_handle_get_integrity_hash_from_file_entry(
 			     verification_handle,
 			     file_entry,

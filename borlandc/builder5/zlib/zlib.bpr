@@ -13,7 +13,7 @@
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;..\..\zlib-1.2.6"/>
+    <PATHCPP value=".;..\..\zlib-1.2.7"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -21,8 +21,8 @@
     <USERDEFINES value=""/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT"/>
     <MAINSOURCE value="zlib.bpf"/>
-    <INCLUDEPATH value="..\..\zlib-1.2.6;..\..\zlib-1.2.3;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="..\..\zlib-1.2.6;..\..\zlib-1.2.3;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <INCLUDEPATH value="..\..\zlib-1.2.7;..\..\zlib-1.2.3;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="..\..\zlib-1.2.7;..\..\zlib-1.2.3;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par -w-aus"/>
     <LISTFILE value=""/>
   </MACROS>

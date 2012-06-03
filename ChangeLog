@@ -286,6 +286,13 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120603
+* bug fix for MinGW in liberror
+* updates for zlib-1.2.7
+
+20120504
+* bug fix for setting media size of L01 file
+
 20120421
 * small changes to dpkg files
 

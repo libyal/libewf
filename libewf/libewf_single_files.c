@@ -917,7 +917,7 @@ int libewf_single_files_parse_record_values(
 			{
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 't' )
-			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
+			      && ( type_string[ 1 ] == (uint8_t) 'b' ) )
 			{
 				if( libfvalue_utf8_string_decimal_copy_to_64bit(
 				     value_string,

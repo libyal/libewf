@@ -2434,19 +2434,22 @@ int libewf_handle_open_file_io_pool(
 				goto on_error;
 			}
 		}
-		if( libewf_internal_handle_get_media_values(
-		     internal_handle,
-		     &( internal_handle->media_values->media_size ),
-		     error ) != 1 )
+		else
 		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine media values.",
-			 function );
+			if( libewf_internal_handle_get_media_values(
+			     internal_handle,
+			     &( internal_handle->media_values->media_size ),
+			     error ) != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine media values.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
 	}
 	/* Make sure format specific values are set

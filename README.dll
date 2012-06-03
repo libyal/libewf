@@ -17,11 +17,11 @@ To create a DLL using Borland C++ you'll need:
 * Borland C++ Builder
   The provided Borland C++ project files were created using the 5.0 SP1
   version.
-* The zlib 1.2.6 source package including from the zlib project site:
+* The zlib 1.2.7 source package including from the zlib project site:
   http://www.gzip.org/zlib/
 
 Extract the contents of the zlib DLL package to:
-libewf-<version>/borlandc/zlib-1.2.6
+libewf-<version>/borlandc/zlib-1.2.7
 
 Make sure to check if your build environment defines the correct WINVER for your build.
 The code uses WINAPI version specific functions based on WINVER.
@@ -37,11 +37,11 @@ To create a DLL using CodeGear you'll need:
   version. Note that some version of CodeGear have a broken
   compiler/linker and you'll need to turn off code optimization
   to be able to build libewf.
-* The zlib 1.2.6 source package including from the zlib project site:
+* The zlib 1.2.7 source package including from the zlib project site:
   http://www.gzip.org/zlib/
 
 Extract the contents of the zlib DLL package to:
-libewf-<version>/borlandc/zlib-1.2.6
+libewf-<version>/borlandc/zlib-1.2.7
 
 Make sure to check if your build environment defines the correct WINVER for your build.
 The code uses WINAPI version specific functions based on WINVER.
@@ -88,11 +88,11 @@ To create a DLL using Microsoft Visual Studio C++ you'll need:
   Microsoft website
 * Microsoft Windows SDK (if not already included) for the Windows Crypto API
   The Windows SDK is available on the Microsoft website
-* The zlib 1.2.6 source package including from the zlib project site:
+* The zlib 1.2.7 source package including from the zlib project site:
   http://www.gzip.org/zlib/
 
 Extract the contents of the zlib DLL package to:
-libewf-<version>/msvscpp/zlib-1.2.6
+libewf-<version>/msvscpp/zlib-1.2.7
 
 Make sure to check if your build environment defines the correct WINVER for your build.
 The code uses WINAPI version specific functions based on WINVER.
