@@ -1,7 +1,7 @@
 /*
  * Header values functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -57,6 +57,7 @@ enum LIBEWF_HEADER_VALUES_INDEXES
 	LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE,
 	LIBEWF_HEADER_VALUES_INDEX_MODEL,
 	LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER,
+	LIBEWF_HEADER_VALUES_INDEX_DEVICE_LABEL,
 	LIBEWF_HEADER_VALUES_INDEX_PROCESS_IDENTIFIER,
 	LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC,
 	LIBEWF_HEADER_VALUES_INDEX_EXTENTS,
@@ -88,13 +89,19 @@ enum LIBEWF_HEADER_STRING_TYPE
 	 */
 	LIBEWF_HEADER_STRING_TYPE_5	= 5,
 
-	/* header2 string: EnCase6, linen6
+	/* header string: linen6
+	 * header2 string: EnCase6
 	 */
 	LIBEWF_HEADER_STRING_TYPE_6	= 6,
 
 	/* header string: linen5
 	 */
-	LIBEWF_HEADER_STRING_TYPE_7	= 7
+	LIBEWF_HEADER_STRING_TYPE_7	= 7,
+
+	/* header string: linen7
+	 * header2 string: EnCase7
+	 */
+	LIBEWF_HEADER_STRING_TYPE_8	= 8
 };
 
 int libewf_header_values_initialize(

@@ -1,7 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1210,7 +1210,8 @@ ssize_t libewf_file_entry_read_buffer(
 	}
 	else
 	{
-		if( data_size != 1 )
+		if( ( data_size != 1 )
+		 && ( data_size != size ) )
 		{
 			liberror_error_set(
 			 error,

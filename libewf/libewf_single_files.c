@@ -1,7 +1,7 @@
 /*
  * Single file entries functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1815,16 +1815,46 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 
 		goto on_error;
 	}
-	if( ( value_string_size != 2 )
-	 || ( value_string[ 0 ] != (uint8_t) '0' ) )
+	if( value_string_size == 2 )
+	{
+		if( value_string[ 0 ] != (uint8_t) '0' ) 
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported first value: %c.",
+			 function,
+			 value_string[ 0 ] );
+
+			goto on_error;
+		}
+	}
+	else if( value_string_size == 3 )
+	{
+		if( ( value_string[ 0 ] != (uint8_t) '2' )
+		 || ( value_string[ 1 ] != (uint8_t) '6' ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported first value: %c%c.",
+			 function,
+			 value_string[ 0 ],
+			 value_string[ 1 ] );
+
+			goto on_error;
+		}
+	}
+	else
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported first value: 0x%x.",
-		 function,
-		 value_string[ 0 ] );
+		 "%s: unsupported first value.",
+		 function );
 
 		goto on_error;
 	}

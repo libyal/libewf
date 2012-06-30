@@ -1,7 +1,7 @@
 /*
  * Header values functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -283,6 +283,22 @@ int libewf_header_values_initialize(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header value: serial_number.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_header_values_set_value_by_index(
+	     *header_values,
+	     LIBEWF_HEADER_VALUES_INDEX_DEVICE_LABEL,
+	     (uint8_t *) "device_label",
+	     13,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header value: device_label.",
 		 function );
 
 		goto on_error;
@@ -1866,6 +1882,11 @@ int libewf_header_values_parse_utf8_header_string(
 					identifier      = (uint8_t *) "examiner_name";
 					identifier_size = 14;
 				}
+				else if( type_string[ 0 ] == (uint8_t) 'l' )
+				{
+					identifier      = (uint8_t *) "device_label";
+					identifier_size = 13;
+				}
 				else if( ( type_string[ 0 ] == (uint8_t) 'm' )
 				      || ( type_string[ 0 ] == (uint8_t) 'u' ) )
 				{
@@ -2590,6 +2611,7 @@ int libewf_header_values_generate_utf8_header_string(
 	libfvalue_value_t *acquiry_software_version_header_value = NULL;
 	libfvalue_value_t *case_number_header_value              = NULL;
 	libfvalue_value_t *compression_level_header_value        = NULL;
+	libfvalue_value_t *device_label_header_value             = NULL;
 	libfvalue_value_t *description_header_value              = NULL;
 	libfvalue_value_t *examiner_name_header_value            = NULL;
 	libfvalue_value_t *evidence_number_header_value          = NULL;
@@ -2612,6 +2634,7 @@ int libewf_header_values_generate_utf8_header_string(
 	size_t case_number_string_length                         = 0;
 	size_t compression_level_string_length                   = 0;
 	size_t description_string_length                         = 0;
+	size_t device_label_string_length                        = 0;
 	size_t evidence_number_string_length                     = 0;
 	size_t examiner_name_string_length                       = 0;
 	size_t generated_acquiry_date_size                       = 0;
@@ -2625,6 +2648,7 @@ int libewf_header_values_generate_utf8_header_string(
 	size_t serial_number_string_length                       = 0;
 	size_t system_date_string_length                         = 0;
 	size_t unknown_dc_string_length                          = 0;
+	int number_of_characters                                 = 0;
 	int number_of_tabs                                       = 0;
 	int result                                               = 0;
 
@@ -2634,7 +2658,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_4 )
 	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_5 )
 	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_6 )
-	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_7 )
+	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		liberror_error_set(
 		 error,
@@ -2838,7 +2863,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_4 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( libfvalue_table_get_value_by_identifier(
 		     header_values,
@@ -2913,7 +2939,8 @@ int libewf_header_values_generate_utf8_header_string(
 			goto on_error;
 		}
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( libfvalue_table_get_value_by_identifier(
 		     header_values,
@@ -2950,8 +2977,34 @@ int libewf_header_values_generate_utf8_header_string(
 			goto on_error;
 		}
 	}
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		if( libfvalue_table_get_value_by_identifier(
+		     header_values,
+		     (uint8_t *) "device_label",
+		     13,
+		     &device_label_header_value,
+		     0,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value: device_label.",
+			 function );
+
+			goto on_error;
+		}
+	}
+/* TODO pid
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+	}
+*/
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( libfvalue_table_get_value_by_identifier(
 		     header_values,
@@ -2971,6 +3024,11 @@ int libewf_header_values_generate_utf8_header_string(
 			goto on_error;
 		}
 	}
+/* TODO ext
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+	}
+*/
 	/* Determine the header string size
 	 */
 	*header_string_size = 0;
@@ -2981,61 +3039,67 @@ int libewf_header_values_generate_utf8_header_string(
 	 */
 	*header_string_size += 5 + ( 2 * newline_string_length );
 
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_1 )
+	switch( header_string_type )
 	{
-		/* Reserve space for:
-		 * c <tab> n <tab> a <tab> e <tab> t <tab> m <tab> u <tab> p <tab> r <newline>
-		 */
-		number_of_tabs = 8;
+		case LIBEWF_HEADER_STRING_TYPE_1:
+			/* Reserve space for:
+			 * c <tab> n <tab> a <tab> e <tab> t <tab> m <tab> u <tab> p <tab> r <newline>
+			 */
+			number_of_characters = 9;
+			number_of_tabs       = 8;
+			break;
 
-		*header_string_size += 9 + number_of_tabs + newline_string_length;
-	}
-	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_2 )
-	{
-		/* Reserve space for:
-		 * c <tab> n <tab> a <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> r <newline>
-		 */
-		number_of_tabs = 10;
+		case LIBEWF_HEADER_STRING_TYPE_2:
+			/* Reserve space for:
+			 * c <tab> n <tab> a <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> r <newline>
+			 */
+			number_of_characters = 13;
+			number_of_tabs       = 10;
+			break;
 
-		*header_string_size += 13 + number_of_tabs + newline_string_length;
-	}
-	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_3 )
-	{
-		/* Reserve space for:
-		 * c <tab> n <tab> a <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <newline>
-		 */
-		number_of_tabs = 9;
+		case LIBEWF_HEADER_STRING_TYPE_3:
+			/* Reserve space for:
+			 * c <tab> n <tab> a <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <newline>
+			 */
+			number_of_characters = 12;
+			number_of_tabs       = 9;
+			break;
 
-		*header_string_size += 12 + number_of_tabs + newline_string_length;
-	}
-	else if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_4 )
-	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
-	{
-		/* Reserve space for:
-		 * a <tab> c <tab> n <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <newline>
-		 */
-		number_of_tabs = 9;
+		case LIBEWF_HEADER_STRING_TYPE_4:
+		case LIBEWF_HEADER_STRING_TYPE_7:
+			/* Reserve space for:
+			 * a <tab> c <tab> n <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <newline>
+			 */
+			number_of_characters = 12;
+			number_of_tabs       = 9;
+			break;
 
-		*header_string_size += 12 + number_of_tabs + newline_string_length;
-	}
-	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
-	{
-		/* Reserve space for:
-		 * a <tab> c <tab> n <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> dc <newline>
-		 */
-		number_of_tabs = 10;
+		case LIBEWF_HEADER_STRING_TYPE_5:
+			/* Reserve space for:
+			 * a <tab> c <tab> n <tab> e <tab> t <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> dc <newline>
+			 */
+			number_of_characters = 14;
+			number_of_tabs       = 10;
+			break;
 
-		*header_string_size += 14 + number_of_tabs + newline_string_length;
-	}
-	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	{
-		/* Reserve space for:
-		 * a <tab> c <tab> n <tab> e <tab> t <tab> md <tab> sn <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> dc <newline>
-		 */
-		number_of_tabs = 12;
+		case LIBEWF_HEADER_STRING_TYPE_6:
+			/* Reserve space for:
+			 * a <tab> c <tab> n <tab> e <tab> t <tab> md <tab> sn <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> dc <newline>
+			 */
+			number_of_characters = 18;
+			number_of_tabs       = 12;
+			break;
 
-		*header_string_size += 18 + number_of_tabs + newline_string_length;
+		case LIBEWF_HEADER_STRING_TYPE_8:
+			/* Reserve space for:
+			 * a <tab> c <tab> n <tab> e <tab> t <tab> md <tab> sn <tab> l <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> pid <tab> dc <tab> ext <newline>
+			 */
+			number_of_characters = 25;
+			number_of_tabs       = 15;
+			break;
 	}
+	*header_string_size += number_of_characters + number_of_tabs + newline_string_length;
+
 	if( case_number_header_value != NULL )
 	{
 		result = libfvalue_value_get_utf8_string_size(
@@ -3327,7 +3391,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_4 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( acquiry_software_version_header_value != NULL )
 		{
@@ -3462,7 +3527,8 @@ int libewf_header_values_generate_utf8_header_string(
 		}
 		*header_string_size += compression_level_string_length;
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( model_header_value != NULL )
 		{
@@ -3517,8 +3583,38 @@ int libewf_header_values_generate_utf8_header_string(
 			}
 		}
 	}
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		if( device_label_header_value != NULL )
+		{
+			result = libfvalue_value_get_utf8_string_size(
+				  device_label_header_value,
+				  0,
+				  &device_label_string_length,
+				  error );
+
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve string size of header value: device_label",
+				 function );
+
+				goto on_error;
+			}
+			if( device_label_string_length > 0 )
+			{
+				device_label_string_length -= 1;
+
+				*header_string_size += device_label_string_length;
+			}
+		}
+	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( unknown_dc_header_value != NULL )
 		{
@@ -3557,14 +3653,54 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
 	{
-		generated_srce_section = "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n";
+		generated_srce_section = "srce\n"
+		                         "0\t1\n"
+		                         "p\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n"
+		                         "\n";
 
 		srce_section_string_length = libcstring_narrow_string_length(
 		                              generated_srce_section );
 
 		*header_string_size += srce_section_string_length;
+	}
+	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		generated_srce_section = "srce\n"
+		                         "0\t1\n"
+		                         "p\tn\tid\tev\ttb\tlo\tpo\tah\tsh\tgu\taq\n0\t0\n"
+		                         "0\t0\n"
+		                         "\t\t\t\t\t-1\t-1\t00000000000000000000000000000000\t0000000000000000000000000000000000000000\t00000000000000000000000000000000\t\n"
+		                         "\n";
 
-		generated_sub_section = "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n";
+		srce_section_string_length = libcstring_narrow_string_length(
+		                              generated_srce_section );
+
+		*header_string_size += srce_section_string_length;
+	}
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	{
+		generated_sub_section = "sub\n"
+		                        "0\t1\n"
+		                        "p\tn\tid\tnu\tco\tgu\n"
+		                        "0\t0\n"
+		                        "\t\t\t\t1\t\n"
+		                        "\n";
+
+		sub_section_string_length = libcstring_narrow_string_length(
+		                             generated_sub_section );
+
+		*header_string_size += sub_section_string_length;
+	}
+	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		generated_sub_section = "sub\n"
+		                        "0\t1\n"
+		                        "p\tn\tid\tnu\tco\tgu\n"
+		                        "0\t0\n"
+		                        "\t\t\t\t1\t00000000000000000000000000000000\n"
+		                        "\n";
 
 		sub_section_string_length = libcstring_narrow_string_length(
 		                             generated_sub_section );
@@ -3600,7 +3736,8 @@ int libewf_header_values_generate_utf8_header_string(
 	}
 	else if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '3';
 	}
@@ -3624,7 +3761,8 @@ int libewf_header_values_generate_utf8_header_string(
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_4 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) 'a';
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
@@ -3645,7 +3783,8 @@ int libewf_header_values_generate_utf8_header_string(
 	( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 	( *header_string )[ header_string_index++ ] = (uint8_t) 't';
 
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 		( *header_string )[ header_string_index++ ] = (uint8_t) 'm';
@@ -3654,12 +3793,18 @@ int libewf_header_values_generate_utf8_header_string(
 		( *header_string )[ header_string_index++ ] = (uint8_t) 's';
 		( *header_string )[ header_string_index++ ] = (uint8_t) 'n';
 	}
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
+		( *header_string )[ header_string_index++ ] = (uint8_t) 'l';
+	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_2 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_3 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_4 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 		( *header_string )[ header_string_index++ ] = (uint8_t) 'a';
@@ -3681,12 +3826,27 @@ int libewf_header_values_generate_utf8_header_string(
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 		( *header_string )[ header_string_index++ ] = (uint8_t) 'r';
 	}
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
+		( *header_string )[ header_string_index++ ] = (uint8_t) 'p';
+		( *header_string )[ header_string_index++ ] = (uint8_t) 'i';
+		( *header_string )[ header_string_index++ ] = (uint8_t) 'd';
+	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 		( *header_string )[ header_string_index++ ] = (uint8_t) 'd';
 		( *header_string )[ header_string_index++ ] = (uint8_t) 'c';
+	}
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
+		( *header_string )[ header_string_index++ ] = (uint8_t) 'e';
+		( *header_string )[ header_string_index++ ] = (uint8_t) 'x';
+		( *header_string )[ header_string_index++ ] = (uint8_t) 't';
 	}
 	( *header_string )[ header_string_index++ ] = newline_string[ 0 ];
 
@@ -3697,7 +3857,8 @@ int libewf_header_values_generate_utf8_header_string(
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_4 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( ( description_header_value != NULL )
 		 && ( description_string_length > 0 ) )
@@ -3852,7 +4013,8 @@ int libewf_header_values_generate_utf8_header_string(
 		}
 		header_string_index += notes_string_length;
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 
@@ -3905,12 +4067,41 @@ int libewf_header_values_generate_utf8_header_string(
 			header_string_index += serial_number_string_length;
 		}
 	}
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
+
+		if( ( device_label_header_value != NULL )
+		 && ( device_label_string_length > 0 ) )
+		{
+			result = libfvalue_value_copy_to_utf8_string(
+				  device_label_header_value,
+				  0,
+				  &( ( *header_string )[ header_string_index ] ),
+			          *header_string_size - header_string_index,
+				  error );
+
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy string of header value: device_label.",
+				 function );
+
+				goto on_error;
+			}
+			header_string_index += device_label_string_length;
+		}
+	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_2 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_3 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_4 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 
@@ -4148,8 +4339,8 @@ int libewf_header_values_generate_utf8_header_string(
 		}
 		header_string_index += compression_level_string_length;
 	}
-	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 ) )
+/* TODO pid
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 
@@ -4177,6 +4368,67 @@ int libewf_header_values_generate_utf8_header_string(
 			header_string_index += unknown_dc_string_length;
 		}
 	}
+*/
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	{
+		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
+
+		if( ( unknown_dc_header_value != NULL )
+		 && ( unknown_dc_string_length > 0 ) )
+		{
+			result = libfvalue_value_copy_to_utf8_string(
+				  unknown_dc_header_value,
+				  0,
+				  &( ( *header_string )[ header_string_index ] ),
+			          *header_string_size - header_string_index,
+				  error );
+
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy string of header value: unknown_dc.",
+				 function );
+
+				goto on_error;
+			}
+			header_string_index += unknown_dc_string_length;
+		}
+	}
+/* TODO ext
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
+
+		if( ( unknown_dc_header_value != NULL )
+		 && ( unknown_dc_string_length > 0 ) )
+		{
+			result = libfvalue_value_copy_to_utf8_string(
+				  unknown_dc_header_value,
+				  0,
+				  &( ( *header_string )[ header_string_index ] ),
+			          *header_string_size - header_string_index,
+				  error );
+
+			if( result != 1 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy string of header value: unknown_dc.",
+				 function );
+
+				goto on_error;
+			}
+			header_string_index += unknown_dc_string_length;
+		}
+	}
+*/
 	( *header_string )[ header_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
@@ -4191,7 +4443,8 @@ int libewf_header_values_generate_utf8_header_string(
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
 	{
 		if( srce_section_string_length > 0 )
 		{

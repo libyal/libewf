@@ -1,7 +1,7 @@
 /*
  * Section reading/writing functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1473,7 +1473,7 @@ ssize_t libewf_section_data_read(
 		libnotify_print_data(
 		 (uint8_t *) data,
 		 sizeof( ewf_data_t ),
-		 0 );
+		 LIBNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -1637,7 +1637,7 @@ ssize_t libewf_section_data_read(
 		libnotify_print_data(
 		 data->unknown6,
 		 963,
-		 0 );
+		 LIBNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 
 		libnotify_printf(
 		 "%s: signature:\n",
@@ -2584,7 +2584,7 @@ ssize_t libewf_section_error2_read(
 		libnotify_print_data(
 		 (uint8_t *) &error2_header,
 		 sizeof( ewf_error2_header_t ),
-		 0 );
+		 LIBNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
@@ -2609,7 +2609,7 @@ ssize_t libewf_section_error2_read(
 		libnotify_print_data(
 		 error2_header.unknown,
 		 200,
-		 0 );
+		 LIBNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 
 		libnotify_printf(
 	 	 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -5854,7 +5854,7 @@ ssize_t libewf_section_volume_e01_read(
 		libnotify_print_data(
 		 (uint8_t *) volume,
 		 sizeof( ewf_volume_t ),
-		 0 );
+		 LIBNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	media_values->media_type = volume->media_type;
@@ -6038,7 +6038,7 @@ ssize_t libewf_section_volume_e01_read(
 		libnotify_print_data(
 		 volume->unknown6,
 		 963,
-		 0 );
+		 LIBNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 
 		libnotify_printf(
 		 "%s: signature:\n",
@@ -6481,7 +6481,7 @@ ssize_t libewf_section_volume_s01_read(
 		libnotify_print_data(
 		 (uint8_t *) volume,
 		 sizeof( ewf_volume_smart_t ),
-		 0 );
+		 LIBNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
