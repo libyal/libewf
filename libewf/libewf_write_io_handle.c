@@ -773,10 +773,10 @@ int libewf_write_io_handle_initialize_resume(
 
 		return( -1 );
 	}
-	if( section->type_length == 4 )
+	if( section->type_string_length == 4 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "data",
 		     4 ) == 0 )
 		{
@@ -786,44 +786,44 @@ int libewf_write_io_handle_initialize_resume(
 			}
 		}
 		else if( memory_compare(
-			  (void *) section->type,
+			  (void *) section->type_string,
 			  (void *) "hash",
 			  4 ) == 0 )
 		{
 			backtrace_to_last_chunks_sections = 1;
 		}
 	}
-	else if( section->type_length == 5 )
+	else if( section->type_string_length == 5 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "xhash",
 		     6 ) == 0 )
 		{
 			backtrace_to_last_chunks_sections = 1;
 		}
 	}
-	else if( section->type_length == 5 )
+	else if( section->type_string_length == 5 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "digest",
 		     7 ) == 0 )
 		{
 			backtrace_to_last_chunks_sections = 1;
 		}
 		else if( memory_compare(
-			  (void *) section->type,
+			  (void *) section->type_string,
 			  (void *) "error2",
 			  7 ) == 0 )
 		{
 			backtrace_to_last_chunks_sections = 1;
 		}
 	}
-	else if( section->type_length == 7 )
+	else if( section->type_string_length == 7 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "session",
 		     8 ) == 0 )
 		{
@@ -850,7 +850,7 @@ int libewf_write_io_handle_initialize_resume(
 			section = (libewf_section_t *) section_list_element->value;
 
 			if( memory_compare(
-			     (void *) section->type,
+			     (void *) section->type_string,
 			     (void *) "table",
 			     5 ) == 0 )
 			{
@@ -869,10 +869,10 @@ int libewf_write_io_handle_initialize_resume(
 			return( -1 );
 		}
 	}
-	if( section->type_length == 4 )
+	if( section->type_string_length == 4 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "data",
 		     4 ) == 0 )
 		{
@@ -885,7 +885,7 @@ int libewf_write_io_handle_initialize_resume(
 			write_io_handle->create_chunks_section      = 1;
 		}
 		else if( memory_compare(
-			  (void *) section->type,
+			  (void *) section->type_string,
 			  (void *) "done",
 			  4 ) == 0 )
 		{
@@ -894,7 +894,7 @@ int libewf_write_io_handle_initialize_resume(
 			supported_section = 1;
 		}
 		else if( memory_compare(
-			  (void *) section->type,
+			  (void *) section->type_string,
 			  (void *) "next",
 			  4 ) == 0 )
 		{
@@ -903,10 +903,10 @@ int libewf_write_io_handle_initialize_resume(
 			supported_section = 1;
 		}
 	}
-	else if( section->type_length == 5 )
+	else if( section->type_string_length == 5 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "table",
 		     6 ) == 0 )
 		{
@@ -935,7 +935,7 @@ int libewf_write_io_handle_initialize_resume(
 				return( -1 );
 			}
 			if( memory_compare(
-			     (void *) ( (libewf_section_t *) section_list_element->previous_element->value )->type,
+			     (void *) ( (libewf_section_t *) section_list_element->previous_element->value )->type_string,
 			     (void *) "sectors",
 			     8 ) != 0 )
 			{
@@ -945,7 +945,7 @@ int libewf_write_io_handle_initialize_resume(
 				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported previous section: %s.",
 				 function,
-				 ( (libewf_section_t *) section_list_element->previous_element->value )->type );
+				 ( (libewf_section_t *) section_list_element->previous_element->value )->type_string );
 
 				return( -1 );
 			}
@@ -1015,10 +1015,10 @@ int libewf_write_io_handle_initialize_resume(
 			write_io_handle->create_chunks_section      = 1;
 		}
 	}
-	else if( section->type_length == 6 )
+	else if( section->type_string_length == 6 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "table2",
 		     6 ) == 0 )
 		{
@@ -1047,7 +1047,7 @@ int libewf_write_io_handle_initialize_resume(
 				return( -1 );
 			}
 			if( memory_compare(
-			     (void *) ( (libewf_section_t *) section_list_element->previous_element->value )->type,
+			     (void *) ( (libewf_section_t *) section_list_element->previous_element->value )->type_string,
 			     (void *) "table",
 			     6 ) != 0 )
 			{
@@ -1057,7 +1057,7 @@ int libewf_write_io_handle_initialize_resume(
 				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported previous section: %s.",
 				 function,
-				 ( (libewf_section_t *) section_list_element->previous_element->value )->type );
+				 ( (libewf_section_t *) section_list_element->previous_element->value )->type_string );
 
 				return( -1 );
 			}
@@ -1084,7 +1084,7 @@ int libewf_write_io_handle_initialize_resume(
 				return( -1 );
 			}
 			if( memory_compare(
-			     (void *) ( (libewf_section_t *) section_list_element->previous_element->previous_element->value )->type,
+			     (void *) ( (libewf_section_t *) section_list_element->previous_element->previous_element->value )->type_string,
 			     (void *) "sectors",
 			     8 ) != 0 )
 			{
@@ -1094,7 +1094,7 @@ int libewf_write_io_handle_initialize_resume(
 				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported second previous section: %s.",
 				 function,
-				 ( (libewf_section_t *) section_list_element->previous_element->previous_element->value )->type );
+				 ( (libewf_section_t *) section_list_element->previous_element->previous_element->value )->type_string );
 
 				return( -1 );
 			}
@@ -1164,10 +1164,10 @@ int libewf_write_io_handle_initialize_resume(
 			write_io_handle->create_chunks_section      = 1;
 		}
 	}
-	else if( section->type_length == 7 )
+	else if( section->type_string_length == 7 )
 	{
 		if( memory_compare(
-		     (void *) section->type,
+		     (void *) section->type_string,
 		     (void *) "sectors",
 		     7 ) == 0 )
 		{
@@ -1188,7 +1188,7 @@ int libewf_write_io_handle_initialize_resume(
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: write resume from section: %s not supported.",
 		 function,
-		 (char *) section->type );
+		 (char *) section->type_string );
 
 		return( -1 );
 	}
@@ -1344,7 +1344,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk section starts
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * sizeof( ewf_section_start_t );
+		                                    * sizeof( ewf_section_start_v1_t );
 
 		/* Leave space for the table offsets
 		 */
@@ -1356,7 +1356,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk section starts and the offset table checksum
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * ( sizeof( ewf_section_start_t ) + sizeof( uint32_t ) );
+		                                    * ( sizeof( ewf_section_start_v1_t ) + sizeof( uint32_t ) );
 
 		/* Leave space for the table offsets
 		 */
@@ -1368,7 +1368,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * ( ( 3 * sizeof( ewf_section_start_t ) ) + ( 2 * sizeof( uint32_t ) ) );
+		                                    * ( ( 3 * sizeof( ewf_section_start_v1_t ) ) + ( 2 * sizeof( uint32_t ) ) );
 
 		/* Leave space for the table and table2 offsets
 		 */
@@ -1956,7 +1956,7 @@ int libewf_write_io_handle_create_segment_file(
 
 	filename = NULL;
 
-	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
 	{
 		bfio_access_flags = LIBBFIO_OPEN_READ_WRITE_TRUNCATE;
 	}
@@ -2398,7 +2398,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     segment_table,
 		     (uint16_t) ( segment_files_list_index + 1 ),
 		     write_io_handle->maximum_number_of_segments,
-		     LIBEWF_SEGMENT_FILE_TYPE_EWF,
+		     LIBEWF_SEGMENT_FILE_TYPE_EWF1,
 		     &segment_file,
 		     &segment_files_list_index,
 		     &file_io_pool_entry,
@@ -2417,7 +2417,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		/* Reserve space for the done or next section
 		 */
 		write_io_handle->remaining_segment_file_size = segment_table->maximum_segment_size
-		                                             - sizeof( ewf_section_start_t );
+		                                             - sizeof( ewf_section_start_v1_t );
 
 		/* Write the start of the segment file
 		 * like the file header, the header, volume and/or data section, etc.
@@ -2549,19 +2549,19 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			/* Leave space for the chunk section start
 			 */
-			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_start_t );
+			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_start_v1_t );
 		}
 		else if( io_handle->format == LIBEWF_FORMAT_ENCASE1 )
 		{
 			/* Leave space for the chunk section start and the offset table checksum
 			 */
-			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_start_t ) + sizeof( uint32_t );
+			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_start_v1_t ) + sizeof( uint32_t );
 		}
 		else
 		{
 			/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 			 */
-			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_start_t ) ) + ( 2 * sizeof( uint32_t ) );
+			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_start_v1_t ) ) + ( 2 * sizeof( uint32_t ) );
 		}
 		if( libbfio_pool_get_offset(
 		     file_io_pool,
@@ -3313,7 +3313,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			required_segment_file_size = (size64_t) last_section->start_offset
 					           + chunk_buffer_size
 					           + sizeof( uint32_t )
-					           + sizeof( ewf_section_start_t );
+					           + sizeof( ewf_section_start_v1_t );
 
 			/* Check if chunk fits in exisiting delta segment file
 			 */
@@ -3393,7 +3393,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     delta_segment_table,
 			     (uint16_t) ( segment_files_list_index + 1 ),
 			     write_io_handle->maximum_number_of_segments,
-			     LIBEWF_SEGMENT_FILE_TYPE_DWF,
+			     LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA,
 			     &segment_file,
 			     &segment_files_list_index,
 			     &file_io_pool_entry,
@@ -3471,7 +3471,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			return( -1 );
 		}
 		segment_file_offset = existing_chunk_offset
-		                    - sizeof( ewf_section_start_t )
+		                    - sizeof( ewf_section_start_v1_t )
 		                    - sizeof( ewfx_delta_chunk_header_t );
 
 		if( libbfio_pool_seek_offset(

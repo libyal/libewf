@@ -1,4 +1,12 @@
 TODO
+* Ex01/Lx01
+  - file naming schema ?
+  - add types for globbing
+  - add glob tests
+* add debug function for section types
+
+* ewfexport:
+  - EnCase7 L01 ignore root entry like ewfmount
 * add support for device label header value
 
 Check:
@@ -293,6 +301,11 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120701
+* changes due to updates
+* code clean up in export handle
+* added support for exporting EnCase 7 L01 files
 
 20120630
 * worked on EnCase 7 and linen 7 support

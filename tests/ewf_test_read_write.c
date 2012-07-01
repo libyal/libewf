@@ -22,18 +22,16 @@
 #include <common.h>
 #include <memory.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
 
-#include <libsystem.h>
-
 #include "ewf_test_definitions.h"
+#include "ewf_test_libcerror.h"
+#include "ewf_test_libcstring.h"
+#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
 /* Tests libewf_handle_seek_offset
@@ -44,7 +42,7 @@ int ewf_test_seek_offset(
      off64_t input_offset,
      int input_whence,
      off64_t expected_offset,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewf_test_seek_offset";
 	off64_t result_offset = 0;
@@ -59,10 +57,10 @@ int ewf_test_seek_offset(
 	{
 		if( result_offset == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset: %" PRIi64 ".",
 			 function,
 			 input_offset );
@@ -79,7 +77,7 @@ int ewf_test_seek_offset(
 	}
 	if( result_offset == -1 )
 	{
-		liberror_error_free(
+		libcerror_error_free(
 		 error );
 	}
 	return( 1 );
@@ -94,7 +92,7 @@ int ewf_test_read_write_buffer(
      size_t buffer_size,
      size64_t input_size,
      size64_t expected_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function   = "ewf_test_read_write_buffer";
 	size64_t remaining_size = 0;
@@ -121,10 +119,10 @@ int ewf_test_read_write_buffer(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read buffer of size: %" PRIzd ".",
 			 function,
 			 read_size );
@@ -141,10 +139,10 @@ int ewf_test_read_write_buffer(
 	             SEEK_CUR,
 	             error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to seek previous offset.",
 			 function );
 
@@ -155,10 +153,10 @@ int ewf_test_read_write_buffer(
 		     (int) 'B',
 		     (size_t) read_count ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable set value in buffer.",
 			 function );
 
@@ -172,10 +170,10 @@ int ewf_test_read_write_buffer(
 
 		if( write_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write buffer of size: %" PRIzd ".",
 			 function,
 			 read_count );
@@ -213,7 +211,7 @@ int ewf_test_read_write_chunk(
      size_t chunk_buffer_size,
      size64_t input_size,
      size64_t expected_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t checksum_buffer[ 4 ];
 
@@ -246,10 +244,10 @@ int ewf_test_read_write_chunk(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read chunk of size: %" PRIzd ".",
 			 function,
 			 chunk_buffer_size );
@@ -275,10 +273,10 @@ int ewf_test_read_write_chunk(
 
 		if( process_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to prepare chunk of size: %" PRIzd " after read.",
 			 function,
 			 read_count );
@@ -291,10 +289,10 @@ int ewf_test_read_write_chunk(
 	             SEEK_CUR,
 	             error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to seek previous offset.",
 			 function );
 
@@ -305,10 +303,10 @@ int ewf_test_read_write_chunk(
 		     (int) 'C',
 		     data_buffer_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable set value in buffer.",
 			 function );
 
@@ -330,10 +328,10 @@ int ewf_test_read_write_chunk(
 
 		if( process_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to prepare chunk buffer before writing.",
 			 function );
 
@@ -367,10 +365,10 @@ int ewf_test_read_write_chunk(
 		}
 		if( write_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write chunk of size: %" PRIzd ".",
 			 function,
 			 chunk_data_size );
@@ -404,7 +402,7 @@ int ewf_test_read_write_buffer_at_offset(
      off64_t expected_offset,
      size64_t expected_size )
 {
-	liberror_error_t *error   = NULL;
+	libcerror_error_t *error   = NULL;
 	uint8_t *buffer           = NULL;
 	const char *whence_string = NULL;
 	int result                = 0;
@@ -476,11 +474,11 @@ int ewf_test_read_write_buffer_at_offset(
 
 	if( result == -1 )
 	{
-		liberror_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -498,7 +496,7 @@ int ewf_test_read_write_chunk_at_offset(
      off64_t expected_offset,
      size64_t expected_size )
 {
-	liberror_error_t *error   = NULL;
+	libcerror_error_t *error   = NULL;
 	uint8_t *chunk_buffer     = NULL;
 	uint8_t *data_buffer      = NULL;
 	const char *whence_string = NULL;
@@ -596,11 +594,11 @@ int ewf_test_read_write_chunk_at_offset(
 
 	if( result == -1 )
 	{
-		liberror_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
 
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -615,7 +613,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcstring_system_character_t *target_filename = NULL;
-	liberror_error_t *error                        = NULL;
+	libcerror_error_t *error                        = NULL;
 	libewf_handle_t *handle                        = NULL;
 	libcstring_system_integer_t option             = 0;
 	off64_t read_offset                            = 0;
@@ -624,7 +622,7 @@ int main( int argc, char * const argv[] )
 	size32_t chunk_size                            = 0;
 	size_t delta_segment_filename_length           = 0;
 
-	while( ( option = libsystem_getopt(
+	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
 	                   _LIBCSTRING_SYSTEM_STRING( "t:" ) ) ) != (libcstring_system_integer_t) -1 )

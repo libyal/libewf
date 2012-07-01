@@ -3862,7 +3862,7 @@ int info_handle_file_entry_fprint(
 			 "\t" );
 
 			for( indentation_iterator = 1;
-			     indentation_iterator < indentation_level;
+			     indentation_iterator <= indentation_level;
 			     indentation_iterator++ )
 			{
 				fprintf(

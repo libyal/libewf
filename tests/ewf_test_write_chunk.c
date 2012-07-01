@@ -22,18 +22,16 @@
 #include <common.h>
 #include <memory.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
 
-#include <libsystem.h>
-
 #include "ewf_test_definitions.h"
+#include "ewf_test_libcerror.h"
+#include "ewf_test_libcstring.h"
+#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
 /* Tests writing data of media size to EWF file(s) with a maximum segment size
@@ -45,7 +43,7 @@ int ewf_test_write_chunk(
      size64_t maximum_segment_size,
      int8_t compression_level,
      uint8_t compression_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_handle_t *handle             = NULL;
 	uint8_t *checksum_buffer            = NULL;
@@ -66,10 +64,10 @@ int ewf_test_write_chunk(
 	     &handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create handle.",
 		 function );
 
@@ -91,10 +89,10 @@ int ewf_test_write_chunk(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open handle.",
 		 function );
 
@@ -107,10 +105,10 @@ int ewf_test_write_chunk(
 		     media_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable set media size.",
 			 function );
 
@@ -124,10 +122,10 @@ int ewf_test_write_chunk(
 		     maximum_segment_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable set maximum segment size.",
 			 function );
 
@@ -140,10 +138,10 @@ int ewf_test_write_chunk(
 	     compression_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable set compression values.",
 		 function );
 
@@ -156,10 +154,10 @@ int ewf_test_write_chunk(
 	     sectors_per_chunk,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable set sectors per chunk.",
 		 function );
 
@@ -192,10 +190,10 @@ int ewf_test_write_chunk(
 		     (int) 'A' + sector_iterator,
 		     chunk_buffer_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable set value in chunk buffer.",
 			 function );
 
@@ -214,10 +212,10 @@ int ewf_test_write_chunk(
 
 		if( process_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to prepare chunk buffer before writing.",
 			 function );
 
@@ -251,10 +249,10 @@ int ewf_test_write_chunk(
 		}
 		if( write_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write chunk of size: %" PRIzd ".",
 			 function,
 			 chunk_buffer_size );
@@ -288,10 +286,10 @@ int ewf_test_write_chunk(
 	     handle,
 	     error ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close handle.",
 		 function );
 
@@ -301,10 +299,10 @@ int ewf_test_write_chunk(
 	     &handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free handle.",
 		 function );
 
@@ -347,7 +345,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_compression_level    = NULL;
 	libcstring_system_character_t *option_maximum_segment_size = NULL;
 	libcstring_system_character_t *option_media_size           = NULL;
-	liberror_error_t *error                                     = NULL;
+	libcerror_error_t *error                                     = NULL;
 	libcstring_system_integer_t option                          = 0;
 	size64_t chunk_size                                         = 0;
 	size64_t maximum_segment_size                               = 0;
@@ -356,7 +354,7 @@ int main( int argc, char * const argv[] )
 	uint8_t compression_flags                                   = 0;
 	int8_t compression_level                                    = LIBEWF_COMPRESSION_NONE;
 
-	while( ( option = libsystem_getopt(
+	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
 	                   _LIBCSTRING_SYSTEM_STRING( "b:B:c:S:" ) ) ) != (libcstring_system_integer_t) -1 )
@@ -406,7 +404,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_chunk_size );
 
-		if( libsystem_string_decimal_copy_to_64_bit(
+		if( libcsystem_string_decimal_copy_to_64_bit(
 		     option_chunk_size,
 		     string_length + 1,
 		     &chunk_size,
@@ -466,7 +464,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_maximum_segment_size );
 
-		if( libsystem_string_decimal_copy_to_64_bit(
+		if( libcsystem_string_decimal_copy_to_64_bit(
 		     option_maximum_segment_size,
 		     string_length + 1,
 		     &maximum_segment_size,
@@ -484,7 +482,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_media_size );
 
-		if( libsystem_string_decimal_copy_to_64_bit(
+		if( libcsystem_string_decimal_copy_to_64_bit(
 		     option_media_size,
 		     string_length + 1,
 		     &media_size,

@@ -21,15 +21,16 @@
 
 #include <common.h>
 
-#include <libcstring.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
 
-#include <libsystem.h>
+#include "ewf_test_libcfile.h"
+#include "ewf_test_libcnotify.h"
+#include "ewf_test_libcstring.h"
+#include "ewf_test_libcsystem.h"
 
 /* The main program
  */
@@ -39,10 +40,10 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error             = NULL;
-	libsystem_file_handle_t file_handle = LIBSYSTEM_FILE_HANDLE_EMPTY;
-	size64_t file_size                  = 0;
-	size_t string_length                = 0;
+	libcerror_error_t *error = NULL;
+	libcfile_file_t *file    = NULL;
+	size64_t file_size       = 0;
+	size_t string_length     = 0;
 
 	if( argc < 2 )
 	{
@@ -63,7 +64,7 @@ int main( int argc, char * const argv[] )
 	string_length = libcstring_system_string_length(
 	                 argv[ 1 ]  );
 
-	if( libsystem_string_decimal_copy_to_64_bit(
+	if( libcsystem_string_decimal_copy_to_64_bit(
 	     argv[ 1 ],
 	     string_length + 1,
 	     &file_size,
@@ -75,10 +76,20 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libsystem_file_open(
-	     &file_handle,
+	if( libcfile_file_initialize(
+	     &file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create file." );
+
+		goto on_error;
+	}
+	if( libcfile_file_open(
+	     file,
 	     argv[ 2 ],
-	     LIBSYSTEM_FILE_OPEN_WRITE,
+	     LIBCFILE_OPEN_WRITE,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -88,8 +99,8 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libsystem_file_resize(
-	     file_handle,
+	if( libcfile_file_resize(
+	     file,
 	     file_size,
 	     &error ) != 1 )
 	{
@@ -99,8 +110,8 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libsystem_file_close(
-	     &file_handle,
+	if( libcfile_file_close(
+	     file,
 	     &error ) != 0 )
 	{
 		fprintf(
@@ -109,20 +120,30 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+	if( libcfile_file_free(
+	     &file,
+	     &error ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file.\n" );
+
+		goto on_error;
+	}
 	return( EXIT_SUCCESS );
 
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
-	if( file_handle != LIBSYSTEM_FILE_HANDLE_EMPTY )
+	if( file != NULL )
 	{
-		libsystem_file_close(
-		 &file_handle,
+		libcfile_file_free(
+		 &file,
 		 NULL );
 	}
 	return( EXIT_FAILURE );

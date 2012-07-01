@@ -143,7 +143,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *log_filename                = NULL;
 	libcstring_system_character_t *option_header_codepage      = NULL;
 	libcstring_system_character_t *option_process_buffer_size  = NULL;
-	libcstring_system_character_t *option_target_filename      = NULL;
+	libcstring_system_character_t *option_target_path          = NULL;
 	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfrecover" );
 
 	log_handle_t *log_handle                                   = NULL;
@@ -266,7 +266,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 't':
-				option_target_filename = optarg;
+				option_target_path = optarg;
 
 				break;
 
@@ -442,18 +442,18 @@ int main( int argc, char * const argv[] )
 			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
-	if( option_target_filename != NULL )
+	if( option_target_path != NULL )
 	{
 		if( export_handle_set_string(
 		     ewfrecover_export_handle,
-		     option_target_filename,
-		     &( ewfrecover_export_handle->target_filename ),
-		     &( ewfrecover_export_handle->target_filename_size ),
+		     option_target_path,
+		     &( ewfrecover_export_handle->target_path ),
+		     &( ewfrecover_export_handle->target_path_size ),
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to set target filename.\n" );
+			 "Unable to set target path.\n" );
 
 			goto on_error;
 		}
@@ -465,8 +465,8 @@ int main( int argc, char * const argv[] )
 		if( export_handle_set_string(
 		     ewfrecover_export_handle,
 		     _LIBCSTRING_SYSTEM_STRING( "recover" ),
-		     &( ewfrecover_export_handle->target_filename ),
-		     &( ewfrecover_export_handle->target_filename_size ),
+		     &( ewfrecover_export_handle->target_path ),
+		     &( ewfrecover_export_handle->target_path_size ),
 		     &error ) != 1 )
 		{
 			fprintf(
@@ -530,7 +530,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( export_handle_open_output(
 	     ewfrecover_export_handle,
-	     ewfrecover_export_handle->target_filename,
+	     ewfrecover_export_handle->target_path,
 	     &error ) != 1 )
 	{
 		fprintf(

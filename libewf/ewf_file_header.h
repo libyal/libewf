@@ -29,32 +29,73 @@
 extern "C" {
 #endif
 
-typedef struct ewf_file_header ewf_file_header_t;
+typedef struct ewf_file_header_v1 ewf_file_header_v1_t;
 
-struct ewf_file_header
+struct ewf_file_header_v1
 {
-	/* The EWF file signature (magic header)
-	 * consists of 8 bytes containing
+	/* The signature
+	 * Consists of 8 bytes
+         * Contains:
          * EVF 0x09 0x0d 0x0a 0xff 0x00
+         * LVF 0x09 0x0d 0x0a 0xff 0x00
 	 */
 	uint8_t signature[ 8 ];
 
 	/* The fields start
-	 * consists of 1 byte (8 bit) containing
-	 * 0x01
+	 * Consists of 1 byte
+	 * Contains: 0x01
 	 */
 	uint8_t fields_start;
 
-	/* The fields segment number
-	 * consists of 2 bytes (16 bits) containing
+	/* The segment number
+	 * Consists of 2 bytes
 	 */
-	uint8_t fields_segment[ 2 ];
+	uint8_t segment_number[ 2 ];
 
 	/* The fields end
-	 * consists of 2 bytes (16 bits) containing
-	 * 0x00 0x00
+	 * Consists of 2 bytes
+	 * Contains: 0x00 0x00
 	 */
 	uint8_t fields_end[ 2 ];
+};
+
+typedef struct ewf_file_header_v2 ewf_file_header_v2_t;
+
+struct ewf_file_header_v2
+{
+	/* The signature
+	 * Consists of 8 bytes
+         * Contains:
+         * EVF2 0x0d 0x0a 0x81 0x00
+         * LEF2 0x0d 0x0a 0x81 0x00
+	 */
+	uint8_t signature[ 8 ];
+
+	/* The major version
+	 * Consists of 1 byte
+	 */
+	uint8_t major_version;
+
+	/* The minor version
+	 * Consists of 1 byte
+	 */
+	uint8_t minor_version;
+
+	/* The compression method
+	 * Consists of 2 bytes
+	 */
+	uint8_t compression_method[ 2 ];
+
+	/* The segment number
+	 * Consists of 4 bytes
+	 */
+	uint8_t segment_number[ 4 ];
+
+	/* The segment set identifier
+	 * Consists of 16 bytes
+	 * Contains a GUID
+	 */
+	uint8_t set_identifier[ 16 ];
 };
 
 #if defined( __cplusplus )

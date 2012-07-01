@@ -234,7 +234,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_process_buffer_size     = NULL;
 	libcstring_system_character_t *option_sectors_per_chunk       = NULL;
 	libcstring_system_character_t *option_size                    = NULL;
-	libcstring_system_character_t *option_target_filename         = NULL;
+	libcstring_system_character_t *option_target_path             = NULL;
 	libcstring_system_character_t *program                        = _LIBCSTRING_SYSTEM_STRING( "ewfexport" );
 	libcstring_system_character_t *request_string                 = NULL;
 
@@ -401,7 +401,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 't':
-				option_target_filename = optarg;
+				option_target_path = optarg;
 
 				break;
 
@@ -564,18 +564,18 @@ int main( int argc, char * const argv[] )
 			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
-	if( option_target_filename != NULL )
+	if( option_target_path != NULL )
 	{
 		if( export_handle_set_string(
 		     ewfexport_export_handle,
-		     option_target_filename,
-		     &( ewfexport_export_handle->target_filename ),
-		     &( ewfexport_export_handle->target_filename_size ),
+		     option_target_path,
+		     &( ewfexport_export_handle->target_path ),
+		     &( ewfexport_export_handle->target_path_size ),
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to set target filename.\n" );
+			 "Unable to set target path.\n" );
 
 			goto on_error;
 		}
@@ -587,13 +587,13 @@ int main( int argc, char * const argv[] )
 		if( export_handle_set_string(
 		     ewfexport_export_handle,
 		     _LIBCSTRING_SYSTEM_STRING( "export" ),
-		     &( ewfexport_export_handle->target_filename ),
-		     &( ewfexport_export_handle->target_filename_size ),
+		     &( ewfexport_export_handle->target_path ),
+		     &( ewfexport_export_handle->target_path_size ),
 		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to set target filename.\n" );
+			 "Unable to set target path.\n" );
 
 			goto on_error;
 		}
@@ -819,7 +819,7 @@ int main( int argc, char * const argv[] )
 				goto on_error;
 			}
 		}
-		if( option_target_filename == NULL )
+		if( option_target_path == NULL )
 		{
 			if( ewfexport_export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 			{
@@ -841,8 +841,8 @@ int main( int argc, char * const argv[] )
 				result = export_handle_prompt_for_string(
 					  ewfexport_export_handle,
 					  request_string,
-					  &( ewfexport_export_handle->target_filename ),
-					  &( ewfexport_export_handle->target_filename_size ),
+					  &( ewfexport_export_handle->target_path ),
+					  &( ewfexport_export_handle->target_path_size ),
 					  &error );
 
 				if( result == -1 )
@@ -928,9 +928,9 @@ int main( int argc, char * const argv[] )
 		}
 		else if( ewfexport_export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 		{
-			if( ( ewfexport_export_handle->target_filename != NULL )
-			 && ( ( ewfexport_export_handle->target_filename )[ 0 ] == (libcstring_system_character_t) '-' )
-			 && ( ( ewfexport_export_handle->target_filename )[ 1 ] == 0 ) )
+			if( ( ewfexport_export_handle->target_path != NULL )
+			 && ( ( ewfexport_export_handle->target_path )[ 0 ] == (libcstring_system_character_t) '-' )
+			 && ( ( ewfexport_export_handle->target_path )[ 1 ] == 0 ) )
 			{
 				/* No need for segment files when exporting to stdout */
 			}
@@ -1073,7 +1073,7 @@ int main( int argc, char * const argv[] )
 	{
 		result = export_handle_export_single_files(
 		          ewfexport_export_handle,
-		          ewfexport_export_handle->target_filename,
+		          ewfexport_export_handle->target_path,
 		          print_status_information,
 		          log_handle,
 		          &error );
@@ -1094,7 +1094,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( export_handle_open_output(
 		     ewfexport_export_handle,
-		     ewfexport_export_handle->target_filename,
+		     ewfexport_export_handle->target_path,
 		     &error ) != 1 )
 		{
 			fprintf(

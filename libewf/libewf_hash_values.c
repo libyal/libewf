@@ -181,7 +181,7 @@ int libewf_hash_values_parse_md5_hash(
 		     hash_value,
 		     (uint8_t *) md5_hash_string,
 		     33,
-		     LIBFVALUE_ENDIAN_NATIVE,
+		     LIBFVALUE_CODEPAGE_UTF8,
 		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{
@@ -355,7 +355,7 @@ int libewf_hash_values_parse_sha1_hash(
 		     hash_value,
 		     (uint8_t *) sha1_hash_string,
 		     41,
-		     LIBFVALUE_ENDIAN_NATIVE,
+		     LIBFVALUE_CODEPAGE_UTF8,
 		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{

@@ -47,9 +47,11 @@
 extern "C" {
 #endif
 
-extern const uint8_t dvf_file_signature[ 8 ];
-extern const uint8_t evf_file_signature[ 8 ];
-extern const uint8_t lvf_file_signature[ 8 ];
+extern const uint8_t ewf1_dvf_file_signature[ 8 ];
+extern const uint8_t ewf1_evf_file_signature[ 8 ];
+extern const uint8_t ewf1_lvf_file_signature[ 8 ];
+extern const uint8_t ewf2_evf_file_signature[ 8 ];
+extern const uint8_t ewf2_lef_file_signature[ 8 ];
 
 typedef struct libewf_segment_file libewf_segment_file_t;
 
@@ -59,9 +61,21 @@ struct libewf_segment_file
 	 */
 	uint8_t type;
 
+	/* The major version number
+	 */
+	uint8_t major_version;
+
+	/* The minor version number
+	 */
+	uint8_t minor_version;
+
 	/* The segment number
 	 */
-	uint16_t segment_number;
+	uint32_t segment_number;
+
+	/* The set identifier
+	 */
+	uint8_t set_identifier[ 16 ];
 
 	/* The last section offset
 	 */

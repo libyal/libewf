@@ -48,14 +48,18 @@ typedef struct libewf_section libewf_section_t;
 
 struct libewf_section
 {
+	/* The section type
+	 */
+	uint32_t type;
+
         /* The section type string
          * consists of maximum 16 bytes
          */
-        uint8_t type[ 17 ];
+        uint8_t type_string[ 17 ];
 
 	/* The section type string length
 	 */
-	size_t type_length;
+	size_t type_string_length;
 
 	/* The start offset of the section
 	 */
@@ -101,6 +105,7 @@ ssize_t libewf_section_start_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t file_offset,
+         uint8_t format_version,
          libcerror_error_t **error );
 
 ssize_t libewf_section_start_write(

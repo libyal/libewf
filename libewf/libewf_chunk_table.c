@@ -512,6 +512,7 @@ int libewf_chunk_table_read_offsets(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      element_group_offset,
+		      1,
 		      error );
 
 	if( read_count == -1 )

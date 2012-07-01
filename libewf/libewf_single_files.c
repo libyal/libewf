@@ -2022,7 +2022,7 @@ int libewf_single_files_parse_file_entry_offset_values(
 		     offset_value_string_size,
 		     &value_64bit,
 		     64,
-		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL | LIBFVALUE_INTEGER_FORMAT_FLAG_NO_BASE_INDICATOR,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2057,7 +2057,7 @@ int libewf_single_files_parse_file_entry_offset_values(
 		     offset_value_string_size,
 		     &value_64bit,
 		     64,
-		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL | LIBFVALUE_INTEGER_FORMAT_FLAG_NO_BASE_INDICATOR,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

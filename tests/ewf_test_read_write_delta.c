@@ -22,18 +22,16 @@
 #include <common.h>
 #include <memory.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
 
-#include <libsystem.h>
-
 #include "ewf_test_definitions.h"
+#include "ewf_test_libcerror.h"
+#include "ewf_test_libcstring.h"
+#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
 /* Tests reading/writing data of a specific size at a specific offset
@@ -45,7 +43,7 @@ int ewf_test_read_write_delta(
      const libcstring_system_character_t *delta_segment_filename,
      off64_t write_offset,
      size64_t write_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_handle_t *handle              = NULL;
 	uint8_t *buffer                      = NULL;
@@ -59,10 +57,10 @@ int ewf_test_read_write_delta(
 	     &handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create handle.",
 		 function );
 
@@ -94,10 +92,10 @@ int ewf_test_read_write_delta(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open handle.",
 		 function );
 
@@ -122,10 +120,10 @@ int ewf_test_read_write_delta(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set delta segment filename.",
 			 function );
 
@@ -138,10 +136,10 @@ int ewf_test_read_write_delta(
 	     SEEK_SET,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to seek offset: %" PRIi64 ".",
 		 function,
 		 write_offset );
@@ -169,10 +167,10 @@ int ewf_test_read_write_delta(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable read buffer of size: %" PRIzd ".",
 			 function,
 			 read_size );
@@ -184,10 +182,10 @@ int ewf_test_read_write_delta(
 		     (int) 'X',
 		     (size_t) read_count ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable set value in buffer.",
 			 function );
 
@@ -199,10 +197,10 @@ int ewf_test_read_write_delta(
 		     SEEK_CUR,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to seek previous offset.",
 			 function );
 
@@ -216,10 +214,10 @@ int ewf_test_read_write_delta(
 
 		if( write_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write buffer of size: %" PRIzd ".",
 			 function,
 			 read_count );
@@ -228,10 +226,10 @@ int ewf_test_read_write_delta(
 		}
 		if( write_count != read_count )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable write buffer of size: %" PRIzd ".",
 			 function,
 			 read_count );
@@ -250,10 +248,10 @@ int ewf_test_read_write_delta(
 	     handle,
 	     error ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close handle.",
 		 function );
 
@@ -263,10 +261,10 @@ int ewf_test_read_write_delta(
 	     &handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free handle.",
 		 function );
 
@@ -303,13 +301,13 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_offset   = NULL;
 	libcstring_system_character_t *option_size     = NULL;
 	libcstring_system_character_t *target_filename = NULL;
-	liberror_error_t *error                        = NULL;
+	libcerror_error_t *error                        = NULL;
 	libcstring_system_integer_t option             = 0;
 	off64_t write_offset                           = 0;
 	size64_t write_size                            = 0;
 	size_t string_length                           = 0;
 
-	while( ( option = libsystem_getopt(
+	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
 	                   _LIBCSTRING_SYSTEM_STRING( "B:o:t:" ) ) ) != (libcstring_system_integer_t) -1 )
@@ -354,7 +352,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_offset );
 
-		if( libsystem_string_decimal_copy_to_64_bit(
+		if( libcsystem_string_decimal_copy_to_64_bit(
 		     option_offset,
 		     string_length + 1,
 		     (uint64_t *) &write_offset,
@@ -372,7 +370,7 @@ int main( int argc, char * const argv[] )
 		string_length = libcstring_system_string_length(
 				 option_size );
 
-		if( libsystem_string_decimal_copy_to_64_bit(
+		if( libcsystem_string_decimal_copy_to_64_bit(
 		     option_size,
 		     string_length + 1,
 		     &write_size,

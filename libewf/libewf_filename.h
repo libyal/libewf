@@ -34,9 +34,11 @@ extern "C" {
 #endif
 
 int libewf_filename_set_extension(
-     char *extension,
-     uint16_t segment_number,
-     uint16_t maximum_number_of_segments,
+     char *filename,
+     size_t filename_size,
+     size_t *filename_index,
+     uint32_t segment_number,
+     uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
@@ -44,9 +46,11 @@ int libewf_filename_set_extension(
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_filename_set_extension_wide(
-     wchar_t *extension,
-     uint16_t segment_number,
-     uint16_t maximum_number_of_segments,
+     wchar_t *filename,
+     size_t filename_size,
+     size_t *filename_index,
+     uint32_t segment_number,
+     uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,

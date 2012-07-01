@@ -46,9 +46,11 @@
 #include "ewf_section.h"
 #include "ewfx_delta_chunk.h"
 
-const uint8_t dvf_file_signature[ 8 ] = { 0x64, 0x76, 0x66, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
-const uint8_t evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
-const uint8_t lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
+const uint8_t ewf1_dvf_file_signature[ 8 ] = { 0x64, 0x76, 0x66, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
+const uint8_t ewf1_evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
+const uint8_t ewf1_lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00 };
+const uint8_t ewf2_evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x32, 0x0d, 0x0a, 0x81, 0x00 };
+const uint8_t ewf2_lef_file_signature[ 8 ] = { 0x4c, 0x45, 0x46, 0x32, 0x0d, 0x0a, 0x81, 0x00 };
 
 /* Initialize the segment file
  * Returns 1 if successful or -1 on error
@@ -289,10 +291,15 @@ ssize_t libewf_segment_file_read_file_header(
          int file_io_pool_entry,
          libcerror_error_t **error )
 {
-	ewf_file_header_t file_header;
+	uint8_t file_header_data[ 32 ];
 
-	static char *function = "libewf_segment_file_read_file_header";
-	ssize_t read_count    = 0;
+	static char *function        = "libewf_segment_file_read_file_header";
+	size_t file_header_data_size = 0;
+	ssize_t read_count           = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	uint16_t value_16bit         = 0;
+#endif
 
 	if( segment_file == NULL )
 	{
@@ -332,17 +339,86 @@ ssize_t libewf_segment_file_read_file_header(
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              (uint8_t *) &file_header,
-	              sizeof( ewf_file_header_t ),
+	              file_header_data,
+	              8,
 	              error );
 
-	if( read_count != (ssize_t) sizeof( ewf_file_header_t ) )
+	if( read_count != (ssize_t) 8 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read file header.",
+		 "%s: unable to read file header signature.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_compare(
+	     ewf1_evf_file_signature,
+	     file_header_data,
+	     8 ) == 0 )
+	{
+		segment_file->type    = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
+		file_header_data_size = sizeof( ewf_file_header_v1_t );
+	}
+	else if( memory_compare(
+	          ewf1_lvf_file_signature,
+	          file_header_data,
+	          8 ) == 0 )
+	{
+		segment_file->type    = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
+		file_header_data_size = sizeof( ewf_file_header_v1_t );
+	}
+	else if( memory_compare(
+	          ewf2_evf_file_signature,
+	          file_header_data,
+	          8 ) == 0 )
+	{
+		segment_file->type    = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
+		file_header_data_size = sizeof( ewf_file_header_v2_t );
+	}
+	else if( memory_compare(
+	          ewf2_lef_file_signature,
+	          file_header_data,
+	          8 ) == 0 )
+	{
+		segment_file->type    = LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL;
+		file_header_data_size = sizeof( ewf_file_header_v2_t );
+	}
+	else if( memory_compare(
+	          ewf1_dvf_file_signature,
+	          file_header_data,
+	          8 ) == 0 )
+	{
+		segment_file->type    = LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA;
+		file_header_data_size = sizeof( ewf_file_header_v1_t );
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_INPUT,
+		 LIBCERROR_INPUT_ERROR_SIGNATURE_MISMATCH,
+		 "%s: unsupported file header signature.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libbfio_pool_read_buffer(
+	              file_io_pool,
+	              file_io_pool_entry,
+	              &( file_header_data[ 8 ] ),
+	              file_header_data_size - 8,
+	              error );
+
+	if( read_count != (ssize_t) ( file_header_data_size - 8 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read file header data.",
 		 function );
 
 		return( -1 );
@@ -354,15 +430,44 @@ ssize_t libewf_segment_file_read_file_header(
 	 	 "%s: file header:\n",
 		 function );
 		libcnotify_print_data(
-		 (uint8_t *) &file_header,
-		 sizeof( ewf_file_header_t ),
+		 file_header_data,
+		 file_header_data_size,
 		 0 );
 	}
 #endif
-	byte_stream_copy_to_uint16_little_endian(
-	 file_header.fields_segment,
-	 segment_file->segment_number );
+	if( file_header_data_size == sizeof( ewf_file_header_v1_t ) )
+	{
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (ewf_file_header_v1_t *) file_header_data )->segment_number,
+		 segment_file->segment_number );
 
+		segment_file->major_version = 1;
+		segment_file->minor_version = 0;
+	}
+	else if( file_header_data_size == sizeof( ewf_file_header_v2_t ) )
+	{
+		segment_file->major_version = ( (ewf_file_header_v2_t *) file_header_data )->major_version;
+		segment_file->minor_version = ( (ewf_file_header_v2_t *) file_header_data )->minor_version;
+
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_file_header_v2_t *) file_header_data )->segment_number,
+		 segment_file->segment_number );
+
+		if( memory_copy(
+		     segment_file->set_identifier,
+		     ( (ewf_file_header_v2_t *) file_header_data )->set_identifier,
+		     16 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy set identifier.",
+			 function );
+
+			return( -1 );
+		}
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -370,54 +475,60 @@ ssize_t libewf_segment_file_read_file_header(
 	 	 "%s: signature:\n",
 		 function );
 		libcnotify_print_data(
-		 file_header.signature,
+		 file_header_data,
 		 8,
 		 0 );
 
+		if( file_header_data_size == sizeof( ewf_file_header_v1_t ) )
+		{
+			libcnotify_printf(
+		 	 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
+			 function,
+			 ( (ewf_file_header_v1_t *) file_header_data )->fields_start );
+		}
+		else if( file_header_data_size == sizeof( ewf_file_header_v2_t ) )
+		{
+			libcnotify_printf(
+		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
+			 function,
+			 ( (ewf_file_header_v2_t *) file_header_data )->major_version );
+
+			libcnotify_printf(
+		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
+			 function,
+			 ( (ewf_file_header_v2_t *) file_header_data )->minor_version );
+		}
 		libcnotify_printf(
-	 	 "%s: segment number\t\t\t: %" PRIu16 "\n",
+	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
 		 function,
 		 segment_file->segment_number );
 
+		if( file_header_data_size == sizeof( ewf_file_header_v1_t ) )
+		{
+			byte_stream_copy_to_uint16_little_endian(
+			 ( (ewf_file_header_v1_t *) file_header_data )->fields_end,
+			 value_16bit );
+			libcnotify_printf(
+		 	 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
+			 function,
+			 value_16bit );
+		}
+		else if( file_header_data_size == sizeof( ewf_file_header_v2_t ) )
+		{
+/* TODO replace by GUID print */
+			libcnotify_printf(
+			 "%s: set identifier:\n",
+			 function );
+			libcnotify_print_data(
+			 segment_file->set_identifier,
+			 16,
+			 0 );
+		}
 		libcnotify_printf(
 	 	 "\n" );
 	}
 #endif
-	/* Compare the most common signature first
-	 */
-	if( memory_compare(
-	     evf_file_signature,
-	     file_header.signature,
-	     8 ) == 0 )
-	{
-		segment_file->type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
-	}
-	else if( memory_compare(
-	          lvf_file_signature,
-	          file_header.signature,
-	          8 ) == 0 )
-	{
-		segment_file->type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
-	}
-	else if( memory_compare(
-	          dvf_file_signature,
-	          file_header.signature,
-	          8 ) == 0 )
-	{
-		segment_file->type = LIBEWF_SEGMENT_FILE_TYPE_DWF;
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_SIGNATURE_MISMATCH,
-		 "%s: unsupported segment file signature.",
-		 function );
-
-		return( -1 );
-	}
-	return( read_count );
+	return( (ssize_t) file_header_data_size );
 }
 
 /* Writes the segment file header
@@ -429,7 +540,7 @@ ssize_t libewf_segment_file_write_file_header(
          int file_io_pool_entry,
          libcerror_error_t **error )
 {
-	ewf_file_header_t file_header;
+	ewf_file_header_v1_t file_header;
 
 	static char *function         = "libewf_segment_file_write_file_header";
 	const uint8_t *file_signature = NULL;
@@ -457,17 +568,17 @@ ssize_t libewf_segment_file_write_file_header(
 
 		return( -1 );
 	}
-	if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+	if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 	{
-		file_signature = evf_file_signature;
+		file_signature = ewf1_evf_file_signature;
 	}
-	else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
+	else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
 	{
-		file_signature = lvf_file_signature;
+		file_signature = ewf1_lvf_file_signature;
 	}
-	else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
 	{
-		file_signature = dvf_file_signature;
+		file_signature = ewf1_dvf_file_signature;
 	}
 	else
 	{
@@ -489,13 +600,13 @@ ssize_t libewf_segment_file_write_file_header(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set file signature.",
+		 "%s: unable to copy file signature.",
 		 function );
 
 		return( -1 );
 	}
 	byte_stream_copy_from_uint16_little_endian(
-	 file_header.fields_segment,
+	 file_header.segment_number,
 	 segment_file->segment_number );
 
 	file_header.fields_start    = 1;
@@ -506,10 +617,10 @@ ssize_t libewf_segment_file_write_file_header(
 	               file_io_pool,
 	               file_io_pool_entry,
 	               (uint8_t *) &file_header,
-	               sizeof( ewf_file_header_t ),
+	               sizeof( ewf_file_header_v1_t ),
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_file_header_t ) )
+	if( write_count != (ssize_t) sizeof( ewf_file_header_v1_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -615,6 +726,7 @@ int libewf_segment_file_read(
 		              file_io_pool,
 		              file_io_pool_entry,
 		              section_offset,
+		              1,
 		              error );
 
 		if( read_count == -1 )
@@ -628,17 +740,17 @@ int libewf_segment_file_read(
 
 			goto on_error;
 		}
-		if( section->type_length == 4 )
+		if( section->type_string_length == 4 )
 		{
 			if( memory_compare(
-			     (void *) section->type,
+			     (void *) section->type_string,
 			     (void *) "done",
 			     4 ) == 0 )
 			{
 				last_section = 1;
 			}
 			else if( memory_compare(
-				  (void *) section->type,
+				  (void *) section->type_string,
 				  (void *) "next",
 				  4 ) == 0 )
 			{
@@ -1127,7 +1239,7 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 		return( -1 );
 	}
 	chunk_offset = section->start_offset
-	             + sizeof( ewf_section_start_t )
+	             + sizeof( ewf_section_start_v1_t )
 	             + sizeof( ewfx_delta_chunk_header_t );
 
 	if( libmfdata_list_set_element_by_index(
@@ -1928,7 +2040,7 @@ ssize_t libewf_segment_file_write_start(
 	               file_io_pool_entry,
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_file_header_t ) )
+	if( write_count != (ssize_t) sizeof( ewf_file_header_v1_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1942,7 +2054,7 @@ ssize_t libewf_segment_file_write_start(
 	section_offset    += write_count;
 	total_write_count += write_count;
 
-	if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+	if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 	{
 		if( segment_file->segment_number == 1 )
 		{
@@ -3042,7 +3154,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		goto on_error;
 	}
 	chunk_offset = section_offset
-	             + sizeof( ewf_section_start_t )
+	             + sizeof( ewf_section_start_v1_t )
 	             + sizeof( ewfx_delta_chunk_header_t );
 
 	if( libewf_section_initialize(
@@ -3835,10 +3947,10 @@ int libewf_segment_file_write_sections_correction(
 
 			return( -1 );
 		}
-		if( section->type_length == 6 )
+		if( section->type_string_length == 6 )
 		{
 			if( memory_compare(
-			     section->type,
+			     section->type_string,
 			     "volume",
 			     6 ) == 0 )
 			{
@@ -3903,10 +4015,10 @@ int libewf_segment_file_write_sections_correction(
 				}
 			}
 		}
-		else if( section->type_length == 4 )
+		else if( section->type_string_length == 4 )
 		{
 			if( memory_compare(
-			     section->type,
+			     section->type_string,
 			     "data",
 			     4 ) == 0 )
 			{
@@ -3961,7 +4073,7 @@ int libewf_segment_file_write_sections_correction(
 			else if( last_segment_file != 0 )
 			{
 				if( memory_compare(
-				     section->type,
+				     section->type_string,
 				     "next",
 				     4 ) == 0 )
 				{

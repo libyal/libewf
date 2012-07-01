@@ -21,14 +21,13 @@
 
 #include <common.h>
 
-#include <libcstring.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
 
+#include "ewf_test_libcstring.h"
 #include "ewf_test_libewf.h"
 
 /* The main program

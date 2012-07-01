@@ -1,9 +1,13 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	-I$(top_srcdir)/libcstring \
-	-I$(top_srcdir)/liberror \
-	-I$(top_srcdir)/libsystem \
+	@LIBCSTRING_CPPFLAGS@ \
+	@LIBCERROR_CPPFLAGS@ \
+	@LIBCLOCALE_CPPFLAGS@ \
+	@LIBCNOTIFY_CPPFLAGS@ \
+	@LIBUNA_CPPFLAGS@ \
+	@LIBCFILE_CPPFLAGS@ \
+	@LIBCSYSTEM_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@
 
 if HAVE_PYTHON
@@ -62,90 +66,114 @@ check_PROGRAMS = \
 
 ewf_test_glob_SOURCES = \
 	ewf_test_glob.c \
+	ewf_test_libcstring.h \
 	ewf_test_libewf.h
 
 ewf_test_glob_LDADD = \
-	../libcstring/libcstring.la \
+	@LIBCSTRING_LIBADD@ \
 	../libewf/libewf.la \
         @MEMWATCH_LIBADD@
 
 ewf_test_read_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
 	ewf_test_read.c
 
 ewf_test_read_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
 	../libewf/libewf.la \
         @MEMWATCH_LIBADD@
 
 ewf_test_read_write_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcstring.h \
+	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
 	ewf_test_read_write.c
 
 ewf_test_read_write_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
-	../libsystem/libsystem.la \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
         @MEMWATCH_LIBADD@
 
 ewf_test_read_write_delta_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcstring.h \
+	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
 	ewf_test_read_write_delta.c
 
 ewf_test_read_write_delta_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
-	../libsystem/libsystem.la \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
         @MEMWATCH_LIBADD@
 
 ewf_test_seek_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
 	ewf_test_seek.c
 
 ewf_test_seek_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
 	../libewf/libewf.la \
         @MEMWATCH_LIBADD@
 
 ewf_test_truncate_SOURCES = \
-	ewf_test_libewf.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcfile.h \
+	ewf_test_libcnotify.h \
+	ewf_test_libcstring.h \
+	ewf_test_libcsystem.h \
 	ewf_test_truncate.c
 
 ewf_test_truncate_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libsystem/libsystem.la \
+	@LIBCSYSTEM_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
         @MEMWATCH_LIBADD@
 
 ewf_test_write_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
 	ewf_test_write.c
 
 ewf_test_write_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
-	../libsystem/libsystem.la \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
         @MEMWATCH_LIBADD@
 
 ewf_test_write_chunk_SOURCES = \
 	ewf_test_definitions.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
+	ewf_test_libcsystem.h \
 	ewf_test_write_chunk.c
 
 ewf_test_write_chunk_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
-	../libsystem/libsystem.la \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
         @MEMWATCH_LIBADD@
 
 MAINTAINERCLEANFILES = \

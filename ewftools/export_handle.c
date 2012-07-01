@@ -125,7 +125,7 @@ int export_handle_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize input handle.",
+		 "%s: unable to create input handle.",
 		 function );
 
 		goto on_error;
@@ -238,10 +238,10 @@ int export_handle_free(
 		memory_free(
 		 ( *export_handle )->input_buffer );
 
-		if( ( *export_handle )->target_filename != NULL )
+		if( ( *export_handle )->target_path != NULL )
 		{
 			memory_free(
-			 ( *export_handle )->target_filename );
+			 ( *export_handle )->target_path );
 		}
 		if( ( *export_handle )->input_handle != NULL )
 		{
@@ -691,7 +691,7 @@ int export_handle_open_output(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize ewf output handle.",
+			 "%s: unable to create ewf output handle.",
 			 function );
 
 			return( -1 );
@@ -763,7 +763,7 @@ int export_handle_open_output(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to initialize raw output handle.",
+				 "%s: unable to create raw output handle.",
 				 function );
 
 				return( -1 );
@@ -1456,7 +1456,7 @@ int export_handle_initialize_integrity_hash(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize MD5 context.",
+			 "%s: unable to create MD5 context.",
 			 function );
 
 			goto on_error;
@@ -1473,7 +1473,7 @@ int export_handle_initialize_integrity_hash(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize SHA1 context.",
+			 "%s: unable to create SHA1 context.",
 			 function );
 
 			goto on_error;
@@ -1490,7 +1490,7 @@ int export_handle_initialize_integrity_hash(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize SHA256 context.",
+			 "%s: unable to create SHA256 context.",
 			 function );
 
 			goto on_error;
@@ -4729,16 +4729,16 @@ int export_handle_export_single_files(
 		return( -1 );
 	}
 	export_path_size = 1 + libcstring_system_string_length(
-	                        export_handle->target_filename );
+	                        export_handle->target_path );
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcpath_path_sanitize_wide(
-	     export_handle->target_filename,
+	     export_handle->target_path,
 	     &export_path_size,
 	     error ) != 1 )
 #else
 	if( libcpath_path_sanitize(
-	     export_handle->target_filename,
+	     export_handle->target_path,
 	     &export_path_size,
 	     error ) != 1 )
 #endif
@@ -4799,10 +4799,35 @@ int export_handle_export_single_files(
 
 		goto on_error;
 	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcpath_path_make_directory_wide(
+	     export_handle->target_path,
+	     error ) != 1 )
+#else
+	if( libcpath_path_make_directory(
+	     export_handle->target_path,
+	     error ) != 1 )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to create directory: %" PRIs_LIBCSTRING_SYSTEM "",
+		 function,
+		 export_handle->target_path );
+
+		goto on_error;
+	}
+	log_handle_printf(
+	 log_handle,
+	 "Created directory: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+	 export_handle->target_path );
+
 	result = export_handle_export_file_entry(
 	          export_handle,
 	          file_entry,
-	          export_handle->target_filename,
+	          export_handle->target_path,
 	          export_path_size,
 	          export_path_size - 1,
 	          log_handle,
@@ -4901,15 +4926,9 @@ int export_handle_export_file_entry(
 {
 	libcstring_system_character_t *name        = NULL;
 	libcstring_system_character_t *target_path = NULL;
-	FILE *file_entry_data_file_stream          = NULL;
-	uint8_t *file_entry_data                   = NULL;
 	static char *function                      = "export_handle_export_file_entry";
-	size64_t file_entry_data_size              = 0;
 	size_t name_size                           = 0;
-	size_t process_buffer_size                 = EXPORT_HANDLE_BUFFER_SIZE;
-	size_t read_size                           = 0;
 	size_t target_path_size                    = 0;
-	ssize_t read_count                         = 0;
 	uint8_t file_entry_type                    = 0;
 	int result                                 = 0;
 	int return_value                           = 0;
@@ -4921,50 +4940,6 @@ int export_handle_export_file_entry(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_chunk_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing input chunk size.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_chunk_size > (size32_t) INT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid input chunk size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->process_buffer_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid export handle - process buffer size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( file_entry_path_index >= export_path_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: file entry path index value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -5016,7 +4991,7 @@ int export_handle_export_file_entry(
 
 		goto on_error;
 	}
-	if( name_size > 0 )
+	if( name_size > 1 )
 	{
 		name = libcstring_system_string_allocate(
 		        name_size );
@@ -5122,195 +5097,70 @@ int export_handle_export_file_entry(
 
 			goto on_error;
 		}
-	}
-	else
-	{
-		target_path      = (libcstring_system_character_t *) export_path;
-		target_path_size = export_path_size;
-	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libcfile_file_exists_wide(
-		  target_path,
-		  error );
+		result = libcfile_file_exists_wide(
+			  target_path,
+			  error );
 #else
-	result = libcfile_file_exists(
-		  target_path,
-		  error );
+		result = libcfile_file_exists(
+			  target_path,
+			  error );
 #endif
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_GENERIC,
-		 "%s: unable to determine if %" PRIs_LIBCSTRING_SYSTEM " exists.",
-		 function,
-		 target_path );
-
-		goto on_error;
-	}
-	else if( result == 0 )
-	{
-		/* TODO what about NTFS streams ?
-		 */
-		if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_FILE )
+		if( result == -1 )
 		{
-	                fprintf(
-	                 export_handle->notify_stream,
-        	         "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
-	                 &( target_path[ file_entry_path_index ] ) );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_GENERIC,
+			 "%s: unable to determine if %" PRIs_LIBCSTRING_SYSTEM " exists.",
+			 function,
+			 target_path );
 
-			/* Create the file entry data file
-			 */
-			file_entry_data_file_stream = libcsystem_file_stream_open(
-						       target_path,
-						       _LIBCSTRING_SYSTEM_STRING( FILE_STREAM_BINARY_OPEN_WRITE ) );
-
-			if( file_entry_data_file_stream == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 "%s: unable to open: %" PRIs_LIBCSTRING_SYSTEM ".",
-				 function,
-				 target_path );
-
-				goto on_error;
-			}
-			/* Export the file entry data
-			 */
-			if( libewf_file_entry_get_size(
-			     file_entry,
-			     &file_entry_data_size,
-			     error ) != 1 )
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			log_handle_printf(
+			 log_handle,
+			 "Skipping file entry it already exists.\n" );
+		}
+		else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_FILE )
+		{
+			if( file_entry_path_index >= target_path_size )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve file entry data size.",
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: file entry path index value out of bounds.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
-			return_value = 1;
-
-			/* If there is no file entry data an empty file is written
+			/* TODO what about NTFS streams ?
 			 */
-			if( file_entry_data_size > 0 )
-			{
-				if( export_handle->process_buffer_size == 0 )
-				{
-					process_buffer_size = export_handle->input_chunk_size;
-				}
-				else
-				{
-					process_buffer_size = export_handle->process_buffer_size;
-				}
-				/* This function in not necessary for normal use
-				 * but it was added for testing
-				 */
-				if( libewf_file_entry_seek_offset(
-				     file_entry,
-				     0,
-				     SEEK_SET,
-				     error ) != 0 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to seek the start of the file entry data.",
-					 function );
+			fprintf(
+			 export_handle->notify_stream,
+			 "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 &( target_path[ file_entry_path_index ] ) );
 
-					goto on_error;
-				}
-				file_entry_data = (uint8_t *) memory_allocate(
-				                               sizeof( uint8_t ) * process_buffer_size );
+			return_value = export_handle_export_file_entry_data(
+				        export_handle,
+			                file_entry,
+			                target_path,
+			                error );
 
-				if( file_entry_data == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create file entry data.",
-					 function );
-
-					goto on_error;
-				}
-				while( file_entry_data_size > 0 )
-				{
-					if( file_entry_data_size >= EXPORT_HANDLE_BUFFER_SIZE )
-					{
-						read_size = EXPORT_HANDLE_BUFFER_SIZE;
-					}
-					else
-					{
-						read_size = (size_t) file_entry_data_size;
-					}
-					read_count = libewf_file_entry_read_buffer(
-						      file_entry,
-						      file_entry_data,
-						      read_size,
-						      error );
-
-					if( read_count == (ssize_t) -1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_READ_FAILED,
-						 "%s: unable to read file entry data.",
-						 function );
-
-						goto on_error;
-					}
-					else if( read_count != (ssize_t) read_size )
-					{
-						return_value = 0;
-
-						break;
-					}
-					file_entry_data_size -= read_size;
-
-					if( libcsystem_file_stream_write(
-					     file_entry_data_file_stream,
-					     file_entry_data,
-					     read_size ) != read_size )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_WRITE_FAILED,
-						 "%s: unable to write file entry data.",
-						 function );
-
-						goto on_error;
-					}
-				}
-				memory_free(
-				 file_entry_data );
-
-				file_entry_data = NULL;
-			}
-			/* Close the file entry data file
-			 */
-			if( libcsystem_file_stream_close(
-			     file_entry_data_file_stream ) != 0 )
+			if( return_value == -1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-				 "%s: unable to close file entry data file.",
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GENERIC,
+				 "%s: unable to export file entry data.",
 				 function );
 
 				goto on_error;
 			}
-			file_entry_data_file_stream = NULL;
-
 			if( return_value == 0 )
 			{
 				fprintf(
@@ -5321,7 +5171,7 @@ int export_handle_export_file_entry(
 				{
 					log_handle_printf(
 					 log_handle,
-				 	 "FAILED\n" );
+					 "FAILED\n" );
 				}
 			}
 			fprintf(
@@ -5360,7 +5210,10 @@ int export_handle_export_file_entry(
 	{
 		log_handle_printf(
 		 log_handle,
-		 "Skipping file entry it already exists.\n" );
+		 "Skipping file entry without a name.\n" );
+
+		target_path      = (libcstring_system_character_t *) export_path;
+		target_path_size = export_path_size;
 	}
 	if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 	{
@@ -5397,16 +5250,6 @@ int export_handle_export_file_entry(
 	return( return_value );
 
 on_error:
-	if( file_entry_data != NULL )
-	{
-		memory_free(
-		 file_entry_data );
-	}
-	if( file_entry_data_file_stream != NULL )
-	{
-		libcsystem_file_stream_close(
-		 file_entry_data_file_stream );
-	}
 	if( ( target_path != NULL )
 	 && ( target_path != export_path ) )
 	{
@@ -5417,6 +5260,270 @@ on_error:
 	{
 		memory_free(
 		 name );
+	}
+	return( -1 );
+}
+
+/* Exports the data of a (single) file entry
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int export_handle_export_file_entry_data(
+     export_handle_t *export_handle,
+     libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *export_path,
+     libcerror_error_t **error )
+{
+	libcfile_file_t *file         = NULL;
+	uint8_t *file_entry_data      = NULL;
+	static char *function         = "export_handle_export_file_entry_data";
+	size64_t file_entry_data_size = 0;
+	size_t process_buffer_size    = EXPORT_HANDLE_BUFFER_SIZE;
+	size_t read_size              = 0;
+	ssize_t read_count            = 0;
+	ssize_t write_count           = 0;
+	int result                    = 1;
+
+	if( export_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_chunk_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing input chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_chunk_size > (size32_t) INT32_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid input chunk size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->process_buffer_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid export handle - process buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export path.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcfile_file_initialize(
+	     &file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcfile_file_open(
+	     file,
+	     export_path,
+	     LIBCFILE_OPEN_WRITE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 function,
+		 export_path );
+
+		goto on_error;
+	}
+	/* Export the file entry data
+	 */
+	if( libewf_file_entry_get_size(
+	     file_entry,
+	     &file_entry_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry data size.",
+		 function );
+
+		goto on_error;
+	}
+	/* If there is no file entry data an empty file is written
+	 */
+	if( file_entry_data_size > 0 )
+	{
+		if( export_handle->process_buffer_size == 0 )
+		{
+			process_buffer_size = export_handle->input_chunk_size;
+		}
+		else
+		{
+			process_buffer_size = export_handle->process_buffer_size;
+		}
+		/* This function in not necessary for normal use
+		 * but it was added for testing
+		 */
+		if( libewf_file_entry_seek_offset(
+		     file_entry,
+		     0,
+		     SEEK_SET,
+		     error ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to seek the start of the file entry data.",
+			 function );
+
+			goto on_error;
+		}
+		file_entry_data = (uint8_t *) memory_allocate(
+		                               sizeof( uint8_t ) * process_buffer_size );
+
+		if( file_entry_data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create file entry data.",
+			 function );
+
+			goto on_error;
+		}
+		while( file_entry_data_size > 0 )
+		{
+			if( file_entry_data_size >= EXPORT_HANDLE_BUFFER_SIZE )
+			{
+				read_size = EXPORT_HANDLE_BUFFER_SIZE;
+			}
+			else
+			{
+				read_size = (size_t) file_entry_data_size;
+			}
+			read_count = libewf_file_entry_read_buffer(
+			              file_entry,
+			              file_entry_data,
+			              read_size,
+			              error );
+
+			if( read_count == (ssize_t) -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read file entry data.",
+				 function );
+
+				goto on_error;
+			}
+			else if( read_count != (ssize_t) read_size )
+			{
+				result = 0;
+
+				break;
+			}
+			file_entry_data_size -= read_size;
+
+			write_count = libcfile_file_write_buffer(
+			               file,
+			               file_entry_data,
+			               read_size,
+			               error );
+
+			if( write_count != (ssize_t) read_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to write file entry data.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		memory_free(
+		 file_entry_data );
+
+		file_entry_data = NULL;
+	}
+	if( libcfile_file_close(
+	     file,
+	     error ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file.",
+		 function );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( file_entry_data != NULL )
+	{
+		memory_free(
+		 file_entry_data );
+	}
+	if( file != NULL )
+	{
+		libcfile_file_free(
+		 &file,
+		 NULL );
 	}
 	return( -1 );
 }

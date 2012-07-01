@@ -53,13 +53,13 @@ struct export_handle
 	 */
 	libcstring_system_character_t *input_buffer; 
 
-	/* The target filename
+	/* The target path
 	 */
-	libcstring_system_character_t *target_filename;
+	libcstring_system_character_t *target_path;
 
-	/* The target filename size
+	/* The target path size
 	 */
-	size_t target_filename_size;
+	size_t target_path_size;
 
 	/* The compression level
 	 */
@@ -423,6 +423,12 @@ int export_handle_export_file_entry(
      size_t export_path_size,
      size_t file_entry_path_index,
      log_handle_t *log_handle,
+     libcerror_error_t **error );
+
+int export_handle_export_file_entry_data(
+     export_handle_t *export_handle,
+     libewf_file_entry_t *file_entry,
+     const libcstring_system_character_t *export_path,
      libcerror_error_t **error );
 
 int export_handle_export_file_entry_sub_file_entries(

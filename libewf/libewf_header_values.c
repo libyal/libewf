@@ -2054,7 +2054,7 @@ int libewf_header_values_parse_utf8_header_string(
 				     header_value,
 				     value_string,
 				     value_string_size,
-				     LIBFVALUE_ENDIAN_NATIVE,
+				     LIBFVALUE_CODEPAGE_UTF8,
 				     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 				     error ) != 1 )
 				{
@@ -6160,8 +6160,8 @@ int libewf_header_values_parse_xheader_date_value(
 			     header_value,
 			     date_time_values_string,
 			     date_time_values_string_size,
-			     LIBFVALUE_ENDIAN_NATIVE,
-			     0,
+			     LIBFVALUE_CODEPAGE_UTF8,
+			     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 			     error ) != 1 )
 			{
 				libcerror_error_set(

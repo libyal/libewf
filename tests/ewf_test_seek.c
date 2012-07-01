@@ -21,15 +21,14 @@
 
 #include <common.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
 
+#include "ewf_test_libcerror.h"
+#include "ewf_test_libcstring.h"
 #include "ewf_test_libewf.h"
 
 /* Tests seeking an offset
@@ -41,7 +40,7 @@ int ewf_test_seek_offset(
      int input_whence,
      off64_t expected_offset )
 {
-	liberror_error_t *error   = NULL;
+	libcerror_error_t *error   = NULL;
 	const char *whence_string = NULL;
 	static char *function     = "ewf_test_seek_offset";
 	off64_t result_offset     = 0;
@@ -79,10 +78,10 @@ int ewf_test_seek_offset(
 	{
 		if( result_offset == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset: %" PRIi64 ".",
 			 function,
 			 input_offset );
@@ -94,7 +93,7 @@ int ewf_test_seek_offset(
 	{
 		if( result_offset == -1 )
 		{
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 		result = 1;
@@ -117,11 +116,11 @@ int ewf_test_seek_offset(
 
 	if( result == -1 )
 	{
-		liberror_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stdout );
 
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	else if( result == 0 )
@@ -143,7 +142,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	libewf_handle_t *handle = NULL;
 	size64_t media_size     = 0;
 
