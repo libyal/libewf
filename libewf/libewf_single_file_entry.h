@@ -25,9 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #include "libewf_date_time.h"
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -100,100 +99,100 @@ struct libewf_single_file_entry
 
 int libewf_single_file_entry_initialize(
      libewf_single_file_entry_t **single_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_free(
      libewf_single_file_entry_t **single_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_clone(
      libewf_single_file_entry_t **destination_single_file_entry,
      libewf_single_file_entry_t *source_single_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_type(
      libewf_single_file_entry_t *single_file_entry,
      uint8_t *type,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_flags(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_data_offset(
      libewf_single_file_entry_t *single_file_entry,
      off64_t *data_offset,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_data_size(
      libewf_single_file_entry_t *single_file_entry,
      size64_t *data_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_duplicate_data_offset(
      libewf_single_file_entry_t *single_file_entry,
      off64_t *duplicate_data_offset,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf8_name_size(
      libewf_single_file_entry_t *single_file_entry,
      size_t *utf8_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf8_name(
      libewf_single_file_entry_t *single_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf16_name_size(
      libewf_single_file_entry_t *single_file_entry,
      size_t *utf16_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf16_name(
      libewf_single_file_entry_t *single_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_size(
      libewf_single_file_entry_t *single_file_entry,
      size64_t *size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_creation_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *creation_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_modification_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *modification_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_access_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *access_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_entry_modification_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *entry_modification_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf8_hash_value_md5(
      libewf_single_file_entry_t *single_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf16_hash_value_md5(
      libewf_single_file_entry_t *single_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

@@ -2,7 +2,7 @@
  *  Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,7 @@
 #include <types.h>
 
 #include <libcstring.h>
-#include <liberror.h>
+#include <libcerror.h>
 
 #include "pyewf.h"
 #include "pyewf_codepage.h"
@@ -42,7 +42,7 @@ PyObject *pyewf_handle_get_media_size(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_get_media_size";
 	size64_t media_size     = 0;
 
@@ -51,7 +51,7 @@ PyObject *pyewf_handle_get_media_size(
 	     &media_size,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -69,7 +69,7 @@ PyObject *pyewf_handle_get_media_size(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -86,7 +86,7 @@ PyObject *pyewf_handle_get_header_codepage(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *string_object     = NULL;
 	const char *codepage_string = NULL;
 	static char *function       = "pyewf_handle_get_header_codepage";
@@ -106,7 +106,7 @@ PyObject *pyewf_handle_get_header_codepage(
 	     &header_codepage,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -124,7 +124,7 @@ PyObject *pyewf_handle_get_header_codepage(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -170,7 +170,7 @@ PyObject *pyewf_handle_set_header_codepage(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error       = NULL;
+	libcerror_error_t *error       = NULL;
 	char *codepage_string         = NULL;
 	static char *keyword_list[]   = { "codepage", NULL };
 	static char *function         = "pyewf_handle_set_header_codepage";
@@ -218,7 +218,7 @@ PyObject *pyewf_handle_set_header_codepage(
 	     feature_flags,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -236,7 +236,7 @@ PyObject *pyewf_handle_set_header_codepage(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -246,7 +246,7 @@ PyObject *pyewf_handle_set_header_codepage(
 	     header_codepage,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -264,7 +264,7 @@ PyObject *pyewf_handle_set_header_codepage(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -287,7 +287,7 @@ PyObject *pyewf_handle_get_header_value(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error               = NULL;
+	libcerror_error_t *error               = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_value";
 	static char *keyword_list[]           = { "identifier", NULL };
@@ -319,7 +319,7 @@ PyObject *pyewf_handle_get_header_value(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -339,7 +339,7 @@ PyObject *pyewf_handle_get_header_value(
 			 header_value_identifier,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -372,7 +372,7 @@ PyObject *pyewf_handle_get_header_value(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -392,7 +392,7 @@ PyObject *pyewf_handle_get_header_value(
 			 header_value_identifier,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -443,7 +443,7 @@ PyObject *pyewf_handle_get_header_values(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error               = NULL;
+	libcerror_error_t *error               = NULL;
 	PyObject *dictionary_object           = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_values";
@@ -462,7 +462,7 @@ PyObject *pyewf_handle_get_header_values(
 	     &number_of_header_values,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -480,7 +480,7 @@ PyObject *pyewf_handle_get_header_values(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -497,7 +497,7 @@ PyObject *pyewf_handle_get_header_values(
 		     &header_value_identifier_size,
 		     &error ) != 1 )
 		{
-			if( liberror_error_backtrace_sprint(
+			if( libcerror_error_backtrace_sprint(
 			     error,
 			     error_string,
 			     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -517,7 +517,7 @@ PyObject *pyewf_handle_get_header_values(
 				 header_value_index,
 				 error_string );
 			}
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			goto on_error;
@@ -541,7 +541,7 @@ PyObject *pyewf_handle_get_header_values(
 		     header_value_identifier_size,
 		     &error ) != 1 )
 		{
-			if( liberror_error_backtrace_sprint(
+			if( libcerror_error_backtrace_sprint(
 			     error,
 			     error_string,
 			     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -561,7 +561,7 @@ PyObject *pyewf_handle_get_header_values(
 				 header_value_index,
 				 error_string );
 			}
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			goto on_error;
@@ -578,7 +578,7 @@ PyObject *pyewf_handle_get_header_values(
 
 		if( result == -1 )
 		{
-			if( liberror_error_backtrace_sprint(
+			if( libcerror_error_backtrace_sprint(
 			     error,
 			     error_string,
 			     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -598,7 +598,7 @@ PyObject *pyewf_handle_get_header_values(
 				 header_value_identifier,
 				 error_string );
 			}
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			goto on_error;
@@ -631,7 +631,7 @@ PyObject *pyewf_handle_get_header_values(
 			     header_value_size,
 			     &error ) != 1 )
 			{
-				if( liberror_error_backtrace_sprint(
+				if( libcerror_error_backtrace_sprint(
 				     error,
 				     error_string,
 				     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -651,7 +651,7 @@ PyObject *pyewf_handle_get_header_values(
 					 header_value_identifier,
 					 error_string );
 				}
-				liberror_error_free(
+				libcerror_error_free(
 				 &error );
 
 				goto on_error;
@@ -732,7 +732,7 @@ PyObject *pyewf_handle_get_hash_value(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error             = NULL;
+	libcerror_error_t *error             = NULL;
 	PyObject *string_object             = NULL;
 	static char *function               = "pyewf_handle_get_hash_value";
 	static char *keyword_list[]         = { "identifier", NULL };
@@ -764,7 +764,7 @@ PyObject *pyewf_handle_get_hash_value(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -784,7 +784,7 @@ PyObject *pyewf_handle_get_hash_value(
 			 hash_value_identifier,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -817,7 +817,7 @@ PyObject *pyewf_handle_get_hash_value(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -837,7 +837,7 @@ PyObject *pyewf_handle_get_hash_value(
 			 hash_value_identifier,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -888,7 +888,7 @@ PyObject *pyewf_handle_get_hash_values(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error             = NULL;
+	libcerror_error_t *error             = NULL;
 	PyObject *dictionary_object         = NULL;
 	PyObject *string_object             = NULL;
 	static char *function               = "pyewf_handle_get_hash_values";
@@ -907,7 +907,7 @@ PyObject *pyewf_handle_get_hash_values(
 	     &number_of_hash_values,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -925,7 +925,7 @@ PyObject *pyewf_handle_get_hash_values(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -942,7 +942,7 @@ PyObject *pyewf_handle_get_hash_values(
 		     &hash_value_identifier_size,
 		     &error ) != 1 )
 		{
-			if( liberror_error_backtrace_sprint(
+			if( libcerror_error_backtrace_sprint(
 			     error,
 			     error_string,
 			     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -962,7 +962,7 @@ PyObject *pyewf_handle_get_hash_values(
 				 hash_value_index,
 				 error_string );
 			}
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			goto on_error;
@@ -986,7 +986,7 @@ PyObject *pyewf_handle_get_hash_values(
 		     hash_value_identifier_size,
 		     &error ) != 1 )
 		{
-			if( liberror_error_backtrace_sprint(
+			if( libcerror_error_backtrace_sprint(
 			     error,
 			     error_string,
 			     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1006,7 +1006,7 @@ PyObject *pyewf_handle_get_hash_values(
 				 hash_value_index,
 				 error_string );
 			}
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			goto on_error;
@@ -1023,7 +1023,7 @@ PyObject *pyewf_handle_get_hash_values(
 
 		if( result == -1 )
 		{
-			if( liberror_error_backtrace_sprint(
+			if( libcerror_error_backtrace_sprint(
 			     error,
 			     error_string,
 			     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1043,7 +1043,7 @@ PyObject *pyewf_handle_get_hash_values(
 				 hash_value_identifier,
 				 error_string );
 			}
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			goto on_error;
@@ -1076,7 +1076,7 @@ PyObject *pyewf_handle_get_hash_values(
 			     hash_value_size,
 			     &error ) != 1 )
 			{
-				if( liberror_error_backtrace_sprint(
+				if( libcerror_error_backtrace_sprint(
 				     error,
 				     error_string,
 				     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1096,7 +1096,7 @@ PyObject *pyewf_handle_get_hash_values(
 					 hash_value_identifier,
 					 error_string );
 				}
-				liberror_error_free(
+				libcerror_error_free(
 				 &error );
 
 				goto on_error;

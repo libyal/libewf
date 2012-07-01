@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -71,11 +71,11 @@ struct libewf_chunk_data
 int libewf_chunk_data_initialize(
      libewf_chunk_data_t **chunk_data,
      size_t data_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_chunk_data_free(
      libewf_chunk_data_t **chunk_data,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
@@ -85,12 +85,12 @@ int libewf_chunk_data_pack(
      size32_t chunk_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_chunk_data_unpack(
      libewf_chunk_data_t *chunk_data,
      size_t chunk_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

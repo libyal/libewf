@@ -23,10 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_compression.h"
@@ -37,6 +33,9 @@
 #include "libewf_header_values.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
+#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
@@ -61,17 +60,17 @@
  */
 int libewf_handle_initialize(
      libewf_handle_t **handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_initialize";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -79,10 +78,10 @@ int libewf_handle_initialize(
 	}
 	if( *handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle value already set.",
 		 function );
 
@@ -93,10 +92,10 @@ int libewf_handle_initialize(
 
 	if( internal_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create handle.",
 		 function );
 
@@ -107,10 +106,10 @@ int libewf_handle_initialize(
 	     0,
 	     sizeof( libewf_internal_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear handle.",
 		 function );
 
@@ -123,10 +122,10 @@ int libewf_handle_initialize(
 	     &( internal_handle->io_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create IO handle.",
 		 function );
 
@@ -136,10 +135,10 @@ int libewf_handle_initialize(
 	     &( internal_handle->media_values ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create media values.",
 		 function );
 
@@ -149,10 +148,10 @@ int libewf_handle_initialize(
 	     &( internal_handle->sessions ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create sessions sector list.",
 		 function );
 
@@ -162,10 +161,10 @@ int libewf_handle_initialize(
 	     &( internal_handle->tracks ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create tracks sector list.",
 		 function );
 
@@ -175,10 +174,10 @@ int libewf_handle_initialize(
 	     &( internal_handle->acquiry_errors ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create acquiry errors sector list.",
 		 function );
 
@@ -229,7 +228,7 @@ on_error:
  */
 int libewf_handle_free(
      libewf_handle_t **handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_internal_handle_free";
@@ -237,10 +236,10 @@ int libewf_handle_free(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -256,10 +255,10 @@ int libewf_handle_free(
 			     *handle,
 			     error ) != 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_CLOSE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 				 "%s: unable to close handle.",
 				 function );
 
@@ -272,10 +271,10 @@ int libewf_handle_free(
 		     &( internal_handle->io_handle ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free IO handle.",
 			 function );
 
@@ -285,10 +284,10 @@ int libewf_handle_free(
 		     &( internal_handle->media_values ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free media values.",
 			 function );
 
@@ -298,10 +297,10 @@ int libewf_handle_free(
 		     &( internal_handle->sessions ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sessions sector list.",
 			 function );
 
@@ -311,10 +310,10 @@ int libewf_handle_free(
 		     &( internal_handle->tracks ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free tracks sector list.",
 			 function );
 
@@ -324,10 +323,10 @@ int libewf_handle_free(
 		     &( internal_handle->acquiry_errors ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free acquiry errors sector list.",
 			 function );
 
@@ -345,7 +344,7 @@ int libewf_handle_free(
 int libewf_handle_clone(
      libewf_handle_t **destination_handle,
      libewf_handle_t *source_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_destination_handle = NULL;
 	libewf_internal_handle_t *internal_source_handle      = NULL;
@@ -353,10 +352,10 @@ int libewf_handle_clone(
 
 	if( destination_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination handle.",
 		 function );
 
@@ -364,10 +363,10 @@ int libewf_handle_clone(
 	}
 	if( *destination_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination handle value already set.",
 		 function );
 
@@ -383,10 +382,10 @@ int libewf_handle_clone(
 
 	if( internal_source_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid source handle - missing IO handle.",
 		 function );
 
@@ -394,10 +393,10 @@ int libewf_handle_clone(
 	}
 	if( ( internal_source_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: write access currently not supported.",
 		 function );
 
@@ -408,10 +407,10 @@ int libewf_handle_clone(
 
 	if( internal_destination_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination handle.",
 		 function );
 
@@ -422,10 +421,10 @@ int libewf_handle_clone(
 	     0,
 	     sizeof( libewf_internal_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear destination handle.",
 		 function );
 
@@ -436,10 +435,10 @@ int libewf_handle_clone(
 	     internal_source_handle->io_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination IO handle.",
 		 function );
 
@@ -450,10 +449,10 @@ int libewf_handle_clone(
 	     internal_source_handle->media_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination media values.",
 		 function );
 
@@ -464,10 +463,10 @@ int libewf_handle_clone(
 	     internal_source_handle->sessions,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination sessions.",
 		 function );
 
@@ -478,10 +477,10 @@ int libewf_handle_clone(
 	     internal_source_handle->tracks,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination tracks.",
 		 function );
 
@@ -492,10 +491,10 @@ int libewf_handle_clone(
 	     internal_source_handle->acquiry_errors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination acquiry errors.",
 		 function );
 
@@ -508,10 +507,10 @@ int libewf_handle_clone(
 		     internal_source_handle->file_io_pool,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination file IO pool.",
 			 function );
 
@@ -526,10 +525,10 @@ int libewf_handle_clone(
 		     internal_source_handle->read_io_handle,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination read IO handle.",
 			 function );
 
@@ -543,10 +542,10 @@ int libewf_handle_clone(
 		     internal_source_handle->write_io_handle,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination write IO handle.",
 			 function );
 
@@ -560,10 +559,10 @@ int libewf_handle_clone(
 		     internal_source_handle->segment_files_list,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination segment files list.",
 			 function );
 
@@ -577,10 +576,10 @@ int libewf_handle_clone(
 		     internal_source_handle->delta_segment_files_list,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination delta segment files list.",
 			 function );
 
@@ -594,10 +593,10 @@ int libewf_handle_clone(
 		     internal_source_handle->segment_files_cache,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination segment files cache.",
 			 function );
 
@@ -611,10 +610,10 @@ int libewf_handle_clone(
 		     internal_source_handle->segment_table,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination segment table.",
 			 function );
 
@@ -628,10 +627,10 @@ int libewf_handle_clone(
 		     internal_source_handle->delta_segment_table,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination delta segment table.",
 			 function );
 
@@ -645,10 +644,10 @@ int libewf_handle_clone(
 		     internal_source_handle->chunk_table_list,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination chunk table list.",
 			 function );
 
@@ -662,10 +661,10 @@ int libewf_handle_clone(
 		     internal_source_handle->chunk_table_cache,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination chunk table cache.",
 			 function );
 
@@ -679,10 +678,10 @@ int libewf_handle_clone(
 		     internal_source_handle->header_sections,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination header sections.",
 			 function );
 
@@ -696,10 +695,10 @@ int libewf_handle_clone(
 		     internal_source_handle->hash_sections,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination hash sections.",
 			 function );
 
@@ -713,10 +712,10 @@ int libewf_handle_clone(
 		     internal_source_handle->header_values,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination header values.",
 			 function );
 
@@ -731,10 +730,10 @@ int libewf_handle_clone(
 		     internal_source_handle->hash_values,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination hash values.",
 			 function );
 
@@ -875,17 +874,17 @@ on_error:
  */
 int libewf_handle_signal_abort(
      libewf_handle_t *handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_signal_abort";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -895,10 +894,10 @@ int libewf_handle_signal_abort(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -919,7 +918,7 @@ int libewf_handle_open(
      char * const filenames[],
      int number_of_filenames,
      int access_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle          = NULL;
 	libbfio_pool_t *file_io_pool              = NULL;
@@ -933,10 +932,10 @@ int libewf_handle_open(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -946,10 +945,10 @@ int libewf_handle_open(
 
 	if( internal_handle->segment_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - segment table already set.",
 		 function );
 
@@ -957,10 +956,10 @@ int libewf_handle_open(
 	}
 	if( internal_handle->delta_segment_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - delta segment table already set.",
 		 function );
 
@@ -968,10 +967,10 @@ int libewf_handle_open(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -979,10 +978,10 @@ int libewf_handle_open(
 	}
 	if( number_of_filenames <= 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid number of files zero or less.",
 		 function );
 
@@ -994,10 +993,10 @@ int libewf_handle_open(
 	     internal_handle->maximum_number_of_open_handles,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create file IO pool.",
 		 function );
 
@@ -1017,10 +1016,10 @@ int libewf_handle_open(
 			 */
 			if( filename_length <= 4 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 				 "%s: filename: %s is too small.",
 				 function,
 				 filenames[ filename_iterator ] );
@@ -1031,10 +1030,10 @@ int libewf_handle_open(
 			     &file_io_handle,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create file IO handle.",
 				 function );
 
@@ -1046,10 +1045,10 @@ int libewf_handle_open(
 			     1,
 			     error ) != 1 )
 			{
-		                liberror_error_set(
+		                libcerror_error_set(
 		                 error,
-		                 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		                 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		                 "%s: unable to set track offsets read in file IO handle.",
 		                 function );
 
@@ -1062,10 +1061,10 @@ int libewf_handle_open(
 			     filename_length,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set name in file IO handle.",
 				 function );
 
@@ -1078,10 +1077,10 @@ int libewf_handle_open(
 			     LIBBFIO_OPEN_READ,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to append file IO handle to pool.",
 				 function );
 
@@ -1090,9 +1089,9 @@ int libewf_handle_open(
 			file_io_handle = NULL;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: added file IO pool entry: %d with filename: %s.\n",
 				 function,
 				 file_io_pool_entry,
@@ -1133,10 +1132,10 @@ int libewf_handle_open(
 	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create segment table.",
 		 function );
 
@@ -1147,10 +1146,10 @@ int libewf_handle_open(
 	     INT64_MAX,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create delta segment table.",
 		 function );
 
@@ -1173,10 +1172,10 @@ int libewf_handle_open(
 			     filename_length - 4,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in segment table.",
 				 function );
 
@@ -1198,10 +1197,10 @@ int libewf_handle_open(
 			     filename_length - 4,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in delta segment table.",
 				 function );
 
@@ -1226,10 +1225,10 @@ int libewf_handle_open(
 			     filename_length - 4,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in segment table.",
 				 function );
 
@@ -1252,10 +1251,10 @@ int libewf_handle_open(
 		     filename_length,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set basename in segment table.",
 			 function );
 
@@ -1268,10 +1267,10 @@ int libewf_handle_open(
 	     access_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open handle using a file IO pool.",
 		 function );
 
@@ -1321,7 +1320,7 @@ int libewf_handle_open_wide(
      wchar_t * const filenames[],
      int number_of_filenames,
      int access_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle          = NULL;
 	libbfio_pool_t *file_io_pool              = NULL;
@@ -1335,10 +1334,10 @@ int libewf_handle_open_wide(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -1348,10 +1347,10 @@ int libewf_handle_open_wide(
 
 	if( internal_handle->segment_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - segment table already set.",
 		 function );
 
@@ -1359,10 +1358,10 @@ int libewf_handle_open_wide(
 	}
 	if( internal_handle->delta_segment_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - delta segment table already set.",
 		 function );
 
@@ -1370,10 +1369,10 @@ int libewf_handle_open_wide(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -1381,10 +1380,10 @@ int libewf_handle_open_wide(
 	}
 	if( number_of_filenames <= 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid number of files zero or less.",
 		 function );
 
@@ -1396,10 +1395,10 @@ int libewf_handle_open_wide(
 	     internal_handle->maximum_number_of_open_handles,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create file IO pool.",
 		 function );
 
@@ -1419,10 +1418,10 @@ int libewf_handle_open_wide(
 			 */
 			if( filename_length <= 4 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 				 "%s: filename: %ls is too small.",
 				 function,
 				 filenames[ filename_iterator ] );
@@ -1433,10 +1432,10 @@ int libewf_handle_open_wide(
 			     &file_io_handle,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create file IO handle.",
 				 function );
 
@@ -1448,10 +1447,10 @@ int libewf_handle_open_wide(
 			     1,
 			     error ) != 1 )
 			{
-		                liberror_error_set(
+		                libcerror_error_set(
 		                 error,
-		                 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		                 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		                 "%s: unable to set track offsets read in file IO handle.",
 		                 function );
 
@@ -1464,10 +1463,10 @@ int libewf_handle_open_wide(
 			     filename_length,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set name in file IO handle.",
 				 function );
 
@@ -1480,10 +1479,10 @@ int libewf_handle_open_wide(
 			     LIBBFIO_OPEN_READ,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to append file IO handle to pool.",
 				 function );
 
@@ -1492,9 +1491,9 @@ int libewf_handle_open_wide(
 			file_io_handle = NULL;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: added file IO pool entry: %d with filename: %ls.\n",
 				 function,
 				 file_io_pool_entry,
@@ -1535,10 +1534,10 @@ int libewf_handle_open_wide(
 	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create segment table.",
 		 function );
 
@@ -1549,10 +1548,10 @@ int libewf_handle_open_wide(
 	     INT64_MAX,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create delta segment table.",
 		 function );
 
@@ -1575,10 +1574,10 @@ int libewf_handle_open_wide(
 			     filename_length - 4,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in segment table.",
 				 function );
 
@@ -1600,10 +1599,10 @@ int libewf_handle_open_wide(
 			     filename_length - 4,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in delta segment table.",
 				 function );
 
@@ -1628,10 +1627,10 @@ int libewf_handle_open_wide(
 			     filename_length - 4,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set basename in segment table.",
 				 function );
 
@@ -1654,10 +1653,10 @@ int libewf_handle_open_wide(
 		     filename_length,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set basename in segment table.",
 			 function );
 
@@ -1670,10 +1669,10 @@ int libewf_handle_open_wide(
 	     access_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open handle using a file IO pool.",
 		 function );
 
@@ -1719,7 +1718,7 @@ int libewf_handle_open_file_io_pool(
      libewf_handle_t *handle,
      libbfio_pool_t *file_io_pool,
      int access_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle          = NULL;
 	libewf_chunk_table_t *chunk_table         = NULL;
@@ -1734,10 +1733,10 @@ int libewf_handle_open_file_io_pool(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -1747,10 +1746,10 @@ int libewf_handle_open_file_io_pool(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -1758,10 +1757,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->file_io_pool != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - file IO pool already set.",
 		 function );
 
@@ -1769,10 +1768,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->segment_files_list != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - segment files list already set.",
 		 function );
 
@@ -1780,10 +1779,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->delta_segment_files_list != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - delta segment files list already set.",
 		 function );
 
@@ -1791,10 +1790,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->chunk_table_list != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - chunk table list already set.",
 		 function );
 
@@ -1802,10 +1801,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->chunk_table_cache != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - chunk table cache already set.",
 		 function );
 
@@ -1813,10 +1812,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->header_sections != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - header sections already set.",
 		 function );
 
@@ -1824,10 +1823,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->hash_sections != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - hash sections already set.",
 		 function );
 
@@ -1835,10 +1834,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->single_files != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - single files already set.",
 		 function );
 
@@ -1846,10 +1845,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( file_io_pool == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file IO pool.",
 		 function );
 
@@ -1857,10 +1856,10 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( ( access_flags & ~( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME ) ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported access flags.",
 		 function );
 
@@ -1873,10 +1872,10 @@ int libewf_handle_open_file_io_pool(
 		     &( internal_handle->read_io_handle ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create read IO handle.",
 			 function );
 
@@ -1889,10 +1888,10 @@ int libewf_handle_open_file_io_pool(
 		     &( internal_handle->write_io_handle ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create write IO handle.",
 			 function );
 
@@ -1908,10 +1907,10 @@ int libewf_handle_open_file_io_pool(
 	     0,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create segment files list.",
 		 function );
 
@@ -1926,10 +1925,10 @@ int libewf_handle_open_file_io_pool(
 	     0,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create delta segment files list.",
 		 function );
 
@@ -1940,10 +1939,10 @@ int libewf_handle_open_file_io_pool(
 	     8,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to segment files table cache.",
 		 function );
 
@@ -1954,10 +1953,10 @@ int libewf_handle_open_file_io_pool(
 	     internal_handle->io_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create chunk table.",
 		 function );
 
@@ -1966,17 +1965,17 @@ int libewf_handle_open_file_io_pool(
 	if( libmfdata_list_initialize(
 	     &( internal_handle->chunk_table_list ),
 	     (intptr_t *) chunk_table,
-	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_table_free,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_table_free,
 	     &libewf_chunk_table_clone,
 	     &libewf_chunk_table_read_chunk,
 	     &libewf_chunk_table_read_offsets,
 	     LIBMFDATA_FLAG_IO_HANDLE_MANAGED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create chunk table list.",
 		 function );
 
@@ -1991,10 +1990,10 @@ int libewf_handle_open_file_io_pool(
 	     8,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create chunk table cache.",
 		 function );
 
@@ -2004,10 +2003,10 @@ int libewf_handle_open_file_io_pool(
 	     &( internal_handle->header_sections ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header sections.",
 		 function );
 
@@ -2020,10 +2019,10 @@ int libewf_handle_open_file_io_pool(
 		     &( internal_handle->header_values ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header values.",
 			 function );
 
@@ -2034,10 +2033,10 @@ int libewf_handle_open_file_io_pool(
 	     &( internal_handle->hash_sections ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create hash sections.",
 		 function );
 
@@ -2047,10 +2046,10 @@ int libewf_handle_open_file_io_pool(
 	     &( internal_handle->single_files ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create single files.",
 		 function );
 
@@ -2062,10 +2061,10 @@ int libewf_handle_open_file_io_pool(
 		     internal_handle->read_io_handle->checksum_errors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to empty checksum errors sector list.",
 			 function );
 
@@ -2076,10 +2075,10 @@ int libewf_handle_open_file_io_pool(
 	     internal_handle->sessions,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty sessions sector list.",
 		 function );
 
@@ -2089,10 +2088,10 @@ int libewf_handle_open_file_io_pool(
 	     internal_handle->tracks,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty tracks sector list.",
 		 function );
 
@@ -2102,10 +2101,10 @@ int libewf_handle_open_file_io_pool(
 	     internal_handle->acquiry_errors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty acquiry errors sector list.",
 		 function );
 
@@ -2119,10 +2118,10 @@ int libewf_handle_open_file_io_pool(
 		     &number_of_file_io_handles,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the number of handles in the pool.",
 			 function );
 
@@ -2132,10 +2131,10 @@ int libewf_handle_open_file_io_pool(
 		     &segment_file,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create segment file.",
 			 function );
 
@@ -2151,10 +2150,10 @@ int libewf_handle_open_file_io_pool(
 			     &file_io_handle,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to retrieve file IO handle: %d from pool.",
 				 function,
 				 file_io_pool_entry );
@@ -2166,9 +2165,9 @@ int libewf_handle_open_file_io_pool(
 				goto on_error;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: processing file IO pool entry: %d.\n",
 				 function,
 				 file_io_pool_entry );
@@ -2182,10 +2181,10 @@ int libewf_handle_open_file_io_pool(
 
 			if( read_count < 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read segment file header.",
 				 function );
 
@@ -2197,10 +2196,10 @@ int libewf_handle_open_file_io_pool(
 			}
 			if( segment_file->segment_number == 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_INPUT,
-				 LIBERROR_INPUT_ERROR_INVALID_DATA,
+				 LIBCERROR_ERROR_DOMAIN_INPUT,
+				 LIBCERROR_INPUT_ERROR_INVALID_DATA,
 				 "%s: invalid segment number: 0 in file IO pool entry: %d.",
 				 function,
 				 file_io_pool_entry );
@@ -2221,10 +2220,10 @@ int libewf_handle_open_file_io_pool(
 					     (int) segment_file->segment_number,
 					     error ) != 1 )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 						 "%s: unable to resize data file list.",
 						 function );
 
@@ -2242,10 +2241,10 @@ int libewf_handle_open_file_io_pool(
 				     file_io_pool_entry,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 					 "%s: unable to set segment file: %" PRIu16 " in list.",
 					 function,
 					 segment_file->segment_number );
@@ -2266,10 +2265,10 @@ int libewf_handle_open_file_io_pool(
 					     (int) segment_file->segment_number,
 					     error ) != 1 )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 						 "%s: unable to resize delta segment files list.",
 						 function );
 
@@ -2287,10 +2286,10 @@ int libewf_handle_open_file_io_pool(
 				     file_io_pool_entry,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 					 "%s: unable to set delta segment file: %" PRIu16 " in list.",
 					 function,
 					 segment_file->segment_number );
@@ -2311,10 +2310,10 @@ int libewf_handle_open_file_io_pool(
 					     LIBBFIO_OPEN_READ_WRITE,
 					     error ) != 1 )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_IO,
-						 LIBERROR_IO_ERROR_OPEN_FAILED,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_OPEN_FAILED,
 						 "%s: unable to reopen file IO pool entry: %d.",
 						 function,
 						 file_io_pool_entry );
@@ -2332,10 +2331,10 @@ int libewf_handle_open_file_io_pool(
 		     &segment_file,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free segment file.",
 			 function );
 
@@ -2347,10 +2346,10 @@ int libewf_handle_open_file_io_pool(
 		     chunk_table,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read segment files.",
 			 function );
 
@@ -2359,17 +2358,17 @@ int libewf_handle_open_file_io_pool(
 				goto on_error;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
 				if( ( error != NULL )
 				 && ( *error != NULL ) )
 				{
-					libnotify_print_error_backtrace(
+					libcnotify_print_error_backtrace(
 					 *error );
 				}
 			}
 #endif
-			liberror_error_free(
+			libcerror_error_free(
 			 error );
 		}
 		if( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 )
@@ -2379,10 +2378,10 @@ int libewf_handle_open_file_io_pool(
 			     file_io_pool,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read delta segment files.",
 				 function );
 
@@ -2397,10 +2396,10 @@ int libewf_handle_open_file_io_pool(
 		     &( internal_handle->io_handle->format ),
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine format.",
 			 function );
 
@@ -2408,10 +2407,10 @@ int libewf_handle_open_file_io_pool(
 		}
 		if( internal_handle->media_values == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid handle - missing media values.",
 			 function );
 
@@ -2424,10 +2423,10 @@ int libewf_handle_open_file_io_pool(
 			     &( internal_handle->media_values->media_size ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to parse single files.",
 				 function );
 
@@ -2441,10 +2440,10 @@ int libewf_handle_open_file_io_pool(
 			     &( internal_handle->media_values->media_size ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to determine media values.",
 				 function );
 
@@ -2461,10 +2460,10 @@ int libewf_handle_open_file_io_pool(
 		     internal_handle->io_handle->format,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set format.",
 			 function );
 
@@ -2483,10 +2482,10 @@ int libewf_handle_open_file_io_pool(
 			     internal_handle->segment_table,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to initialize write IO handle values.",
 				 function );
 
@@ -2505,10 +2504,10 @@ int libewf_handle_open_file_io_pool(
 		     internal_handle->segment_table,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize write IO handle to resume.",
 			 function );
 
@@ -2597,7 +2596,7 @@ int libewf_handle_open_read_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
      libewf_chunk_table_t *chunk_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_section_t *section           = NULL;
 	libewf_segment_file_t *segment_file = NULL;
@@ -2615,10 +2614,10 @@ int libewf_handle_open_read_segment_files(
 
 	if( internal_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal handle.",
 		 function );
 
@@ -2626,10 +2625,10 @@ int libewf_handle_open_read_segment_files(
 	}
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -2637,10 +2636,10 @@ int libewf_handle_open_read_segment_files(
 	}
 	if( internal_handle->header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing header sections.",
 		 function );
 
@@ -2648,10 +2647,10 @@ int libewf_handle_open_read_segment_files(
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -2659,10 +2658,10 @@ int libewf_handle_open_read_segment_files(
 	}
 	if( internal_handle->single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing single files.",
 		 function );
 
@@ -2673,10 +2672,10 @@ int libewf_handle_open_read_segment_files(
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of segment files in list.",
 		 function );
 
@@ -2684,10 +2683,10 @@ int libewf_handle_open_read_segment_files(
 	}
 	if( number_of_segment_files <= 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: number of segment files value out of bounds.",
 		 function );
 
@@ -2703,10 +2702,10 @@ int libewf_handle_open_read_segment_files(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -2719,10 +2718,10 @@ int libewf_handle_open_read_segment_files(
 		     &segment_file_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve size of file IO pool entry: %d.",
 			 function,
 			 file_io_pool_entry );
@@ -2741,10 +2740,10 @@ int libewf_handle_open_read_segment_files(
 			     maximum_segment_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set maximum segment size in segment table.",
 				 function );
 
@@ -2755,10 +2754,10 @@ int libewf_handle_open_read_segment_files(
 		     &segment_file,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create segment file.",
 			 function );
 
@@ -2772,10 +2771,10 @@ int libewf_handle_open_read_segment_files(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read segment file header.",
 			 function );
 
@@ -2788,10 +2787,10 @@ int libewf_handle_open_read_segment_files(
 		if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF )
 		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported segment file type.",
 			 function );
 
@@ -2803,10 +2802,10 @@ int libewf_handle_open_read_segment_files(
 		}
 		if( segment_file->segment_number != ( segment_files_list_index + 1 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_INPUT,
-			 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
 			 "%s: segment number mismatch.",
 			 function );
 
@@ -2823,14 +2822,14 @@ int libewf_handle_open_read_segment_files(
 		     internal_handle->segment_files_cache,
 		     segment_files_list_index,
 		     (intptr_t *) segment_file,
-		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
 		     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set segment file: %d in list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -2852,10 +2851,10 @@ int libewf_handle_open_read_segment_files(
 			     &section,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create section.",
 				 function );
 
@@ -2870,10 +2869,10 @@ int libewf_handle_open_read_segment_files(
 
 			if( read_count == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read section start.",
 				 function );
 
@@ -2881,27 +2880,27 @@ int libewf_handle_open_read_segment_files(
 				     &section,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 					 "%s: unable to free section.",
 					 function );
 
 					goto on_error;
 				}
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
 					if( ( error != NULL )
 					 && ( *error != NULL ) )
 					{
-						libnotify_print_error_backtrace(
+						libcnotify_print_error_backtrace(
 						 *error );
 					}
 				}
 #endif
-				liberror_error_free(
+				libcerror_error_free(
 				 error );
 
 				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
@@ -2918,11 +2917,11 @@ int libewf_handle_open_read_segment_files(
 				     4 ) == 0 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libnotify_verbose != 0 )
+                			if( libcnotify_verbose != 0 )
 				        {
 						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
 				                {
-				                        libnotify_printf(
+				                        libcnotify_printf(
 				                         "%s: found data section in EWF-S01 format.\n",
 				                         function );
 				                }
@@ -2971,10 +2970,10 @@ int libewf_handle_open_read_segment_files(
 				{
 					if( ( segment_files_list_index + 1 ) != number_of_segment_files )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_INPUT,
-						 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
+						 LIBCERROR_ERROR_DOMAIN_INPUT,
+						 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
 						 "%s: last segment number mismatch.",
 						 function );
 
@@ -3021,9 +3020,9 @@ int libewf_handle_open_read_segment_files(
 					if( internal_handle->io_handle->ewf_format != EWF_FORMAT_L01 )
 				        {
 #if defined( HAVE_VERBOSE_OUTPUT )
-                				if( libnotify_verbose != 0 )
+                				if( libcnotify_verbose != 0 )
 				                {
-				                        libnotify_printf(
+				                        libcnotify_printf(
 				                         "%s: found ltree section in EWF-E01 or EWF-S01 format.\n",
 				                         function );
 				                }
@@ -3064,11 +3063,11 @@ int libewf_handle_open_read_segment_files(
 					  5 ) == 0 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libnotify_verbose != 0 )
+                			if( libcnotify_verbose != 0 )
 				        {
 						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
 				                {
-				                        libnotify_printf(
+				                        libcnotify_printf(
 				                         "%s: found xhash section in EWF-S01 format.\n",
 				                         function );
 				                }
@@ -3092,11 +3091,11 @@ int libewf_handle_open_read_segment_files(
 				     6 ) == 0 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libnotify_verbose != 0 )
+                			if( libcnotify_verbose != 0 )
 				        {
 						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
 				                {
-				                        libnotify_printf(
+				                        libcnotify_printf(
 				                         "%s: found digest section in EWF-S01 format.\n",
 				                         function );
 				                }
@@ -3117,11 +3116,11 @@ int libewf_handle_open_read_segment_files(
 					  6 ) == 0 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libnotify_verbose != 0 )
+                			if( libcnotify_verbose != 0 )
 				        {
 						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
 				                {
-				                        libnotify_printf(
+				                        libcnotify_printf(
 				                         "%s: found error2 section in EWF-S01 format.\n",
 				                         function );
 				                }
@@ -3216,11 +3215,11 @@ int libewf_handle_open_read_segment_files(
 					  7 ) == 0 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libnotify_verbose != 0 )
+                			if( libcnotify_verbose != 0 )
 				        {
 						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
 				                {
-				                        libnotify_printf(
+				                        libcnotify_printf(
 				                         "%s: found sectors section in EWF-S01 format.\n",
 				                         function );
 				                }
@@ -3236,11 +3235,11 @@ int libewf_handle_open_read_segment_files(
 					  7 ) == 0 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libnotify_verbose != 0 )
+                			if( libcnotify_verbose != 0 )
 				        {
 						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
 				                {
-				                        libnotify_printf(
+				                        libcnotify_printf(
 				                         "%s: found session section in EWF-S01 format.\n",
 				                         function );
 				                }
@@ -3275,9 +3274,9 @@ int libewf_handle_open_read_segment_files(
 			if( known_section == 0 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: unsupported section type: %s.\n",
 					 function,
 					 (char *) section->type );
@@ -3293,10 +3292,10 @@ int libewf_handle_open_read_segment_files(
 			}
 			if( read_count == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read section: %s.",
 				 function,
 				 (char *) section->type );
@@ -3315,10 +3314,10 @@ int libewf_handle_open_read_segment_files(
 			     (intptr_t *) section,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to append section to list.",
 				 function );
 
@@ -3337,25 +3336,25 @@ int libewf_handle_open_read_segment_files(
 		{
 			if( last_section == 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing next or done section.",
 				 function );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
 					if( ( error != NULL )
 					 && ( *error != NULL ) )
 					{
-						libnotify_print_error_backtrace(
+						libcnotify_print_error_backtrace(
 						 *error );
 					}
 				}
 #endif
-				liberror_error_free(
+				libcerror_error_free(
 				 error );
 
 				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
@@ -3365,11 +3364,11 @@ int libewf_handle_open_read_segment_files(
 				break;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			else if( libnotify_verbose != 0 )
+			else if( libcnotify_verbose != 0 )
 			{
 				if( (size64_t) section_offset < segment_file_size )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: trailing data in segment file: %" PRIu16 "\n",
 					 function,
 					 segment_files_list_index );
@@ -3381,25 +3380,25 @@ int libewf_handle_open_read_segment_files(
 	}
 	if( last_segment_file == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing done section.",
 		 function );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				libnotify_print_error_backtrace(
+				libcnotify_print_error_backtrace(
 				 *error );
 			}
 		}
 #endif
-		liberror_error_free(
+		libcerror_error_free(
 		 error );
 
 		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
@@ -3422,7 +3421,7 @@ on_error:
 int libewf_handle_open_read_delta_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_section_t *section           = NULL;
 	libewf_segment_file_t *segment_file = NULL;
@@ -3440,10 +3439,10 @@ int libewf_handle_open_read_delta_segment_files(
 
 	if( internal_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal handle.",
 		 function );
 
@@ -3451,10 +3450,10 @@ int libewf_handle_open_read_delta_segment_files(
 	}
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -3465,10 +3464,10 @@ int libewf_handle_open_read_delta_segment_files(
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of delta segment files in list.",
 		 function );
 
@@ -3488,10 +3487,10 @@ int libewf_handle_open_read_delta_segment_files(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data file: %d from segment files list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -3504,10 +3503,10 @@ int libewf_handle_open_read_delta_segment_files(
 		     &segment_file_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve size of file IO pool entry: %d.",
 			 function,
 			 file_io_pool_entry );
@@ -3526,10 +3525,10 @@ int libewf_handle_open_read_delta_segment_files(
 			     maximum_segment_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set maximum segment size in delta segment table.",
 				 function );
 
@@ -3540,10 +3539,10 @@ int libewf_handle_open_read_delta_segment_files(
 		     &segment_file,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create segment file.",
 			 function );
 
@@ -3557,10 +3556,10 @@ int libewf_handle_open_read_delta_segment_files(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read segment file header.",
 			 function );
 
@@ -3572,10 +3571,10 @@ int libewf_handle_open_read_delta_segment_files(
 		}
 		if( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_DWF )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported segment file type.",
 			 function );
 
@@ -3587,10 +3586,10 @@ int libewf_handle_open_read_delta_segment_files(
 		}
 		if( segment_file->segment_number != ( segment_files_list_index + 1 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_INPUT,
-			 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
 			 "%s: segment number mismatch.",
 			 function );
 
@@ -3605,14 +3604,14 @@ int libewf_handle_open_read_delta_segment_files(
 		     internal_handle->segment_files_cache,
 		     segment_files_list_index,
 		     (intptr_t *) segment_file,
-		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
 		     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set segment file: %d in segment files list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -3628,10 +3627,10 @@ int libewf_handle_open_read_delta_segment_files(
 			     &section,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create section.",
 				 function );
 
@@ -3646,10 +3645,10 @@ int libewf_handle_open_read_delta_segment_files(
 
 			if( read_count == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read section start.",
 				 function );
 
@@ -3664,10 +3663,10 @@ int libewf_handle_open_read_delta_segment_files(
 				{
 					if( ( segment_files_list_index + 1 ) != number_of_segment_files )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_INPUT,
-						 LIBERROR_INPUT_ERROR_VALUE_MISMATCH,
+						 LIBCERROR_ERROR_DOMAIN_INPUT,
+						 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
 						 "%s: last segment number mismatch.",
 						 function );
 
@@ -3711,9 +3710,9 @@ int libewf_handle_open_read_delta_segment_files(
 			if( known_section == 0 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: unsupported section type: %s.\n",
 					 function,
 					 (char *) section->type );
@@ -3729,10 +3728,10 @@ int libewf_handle_open_read_delta_segment_files(
 			}
 			if( read_count == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read section: %s.",
 				 function,
 				 (char *) section->type );
@@ -3751,10 +3750,10 @@ int libewf_handle_open_read_delta_segment_files(
 			     (intptr_t *) section,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to append section to list.",
 				 function );
 
@@ -3769,21 +3768,21 @@ int libewf_handle_open_read_delta_segment_files(
 		}
 		if( last_section == 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing next or done section.",
 			 function );
 
 			goto on_error;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
 			if( (size64_t) section_offset < segment_file_size )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: trailing data in segment file: %" PRIu16 "\n",
 				 function,
 				 segment_files_list_index );
@@ -3794,10 +3793,10 @@ int libewf_handle_open_read_delta_segment_files(
 	}
 	if( last_segment_file == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing done section.",
 		 function );
 
@@ -3820,7 +3819,7 @@ on_error:
  */
 int libewf_handle_close(
      libewf_handle_t *handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_close";
@@ -3829,10 +3828,10 @@ int libewf_handle_close(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -3849,10 +3848,10 @@ int libewf_handle_close(
 
 		if( write_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to finalize write.",
 			 function );
 
@@ -3865,10 +3864,10 @@ int libewf_handle_close(
 		     internal_handle->file_io_pool,
 		     error ) != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 			 "%s: unable to close all file IO pool handles.",
 			 function );
 
@@ -3878,10 +3877,10 @@ int libewf_handle_close(
 		     &( internal_handle->file_io_pool ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free file IO pool.",
 			 function );
 
@@ -3897,10 +3896,10 @@ int libewf_handle_close(
 		     &( internal_handle->read_io_handle ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free read IO handle.",
 			 function );
 
@@ -3913,10 +3912,10 @@ int libewf_handle_close(
 		     &( internal_handle->write_io_handle ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free write IO handle.",
 			 function );
 
@@ -3929,10 +3928,10 @@ int libewf_handle_close(
 		     &( internal_handle->segment_files_list ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free segment files list.",
 			 function );
 
@@ -3945,10 +3944,10 @@ int libewf_handle_close(
 		     &( internal_handle->delta_segment_files_list ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free delta segment files list.",
 			 function );
 
@@ -3961,10 +3960,10 @@ int libewf_handle_close(
 		     &( internal_handle->segment_files_cache ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free segment files cache.",
 			 function );
 
@@ -3977,10 +3976,10 @@ int libewf_handle_close(
 		     &( internal_handle->segment_table ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free segment table.",
 			 function );
 
@@ -3993,10 +3992,10 @@ int libewf_handle_close(
 		     &( internal_handle->delta_segment_table ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free delta segment table.",
 			 function );
 
@@ -4009,10 +4008,10 @@ int libewf_handle_close(
 		     &( internal_handle->chunk_table_list ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunk table list.",
 			 function );
 
@@ -4025,10 +4024,10 @@ int libewf_handle_close(
 		     &( internal_handle->chunk_table_cache ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunk table cache.",
 			 function );
 
@@ -4041,10 +4040,10 @@ int libewf_handle_close(
 		     &( internal_handle->header_sections ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free header sections.",
 			 function );
 
@@ -4057,10 +4056,10 @@ int libewf_handle_close(
 		     &( internal_handle->hash_sections ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free hash sections.",
 			 function );
 
@@ -4073,10 +4072,10 @@ int libewf_handle_close(
 		     &( internal_handle->header_values ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free header values.",
 			 function );
 
@@ -4089,10 +4088,10 @@ int libewf_handle_close(
 		     &( internal_handle->hash_values ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free hash values.",
 			 function );
 
@@ -4105,10 +4104,10 @@ int libewf_handle_close(
 		     &( internal_handle->single_files ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free single files.",
 			 function );
 
@@ -4121,10 +4120,10 @@ int libewf_handle_close(
 		     internal_handle->read_io_handle->checksum_errors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to empty checksum errors sector list.",
 			 function );
 
@@ -4135,10 +4134,10 @@ int libewf_handle_close(
 	     internal_handle->sessions,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty sessions sector list.",
 		 function );
 
@@ -4148,10 +4147,10 @@ int libewf_handle_close(
 	     internal_handle->tracks,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty tracks sector list.",
 		 function );
 
@@ -4161,10 +4160,10 @@ int libewf_handle_close(
 	     internal_handle->acquiry_errors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty acquiry errors sector list.",
 		 function );
 
@@ -4188,7 +4187,7 @@ ssize_t libewf_handle_prepare_read_chunk(
          int8_t is_compressed,
          uint32_t chunk_checksum,
          int8_t read_checksum,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	uint8_t *checksum_buffer     = NULL;
 	static char *function        = "libewf_handle_prepare_read_chunk";
@@ -4196,10 +4195,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -4207,10 +4206,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 	}
 	if( chunk_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
 		 function );
 
@@ -4219,10 +4218,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 	if( ( chunk_buffer_size == 0 )
 	 || ( chunk_buffer_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid chunk buffer size value out of bounds.",
 		 function );
 
@@ -4230,10 +4229,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 	}
 	if( uncompressed_chunk_buffer_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed chunk buffer size.",
 		 function );
 
@@ -4243,10 +4242,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 	{
 		if( chunk_buffer_size < sizeof( uint32_t ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid chunk buffer size value out of bounds.",
 			 function );
 
@@ -4269,10 +4268,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 		if( chunk_checksum != calculated_checksum )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_INPUT,
-			 LIBERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
 			 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
 			 function,
 			 chunk_checksum,
@@ -4286,10 +4285,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 	{
 		if( uncompressed_chunk_buffer == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid uncompressed chunk buffer.",
 			 function );
 
@@ -4297,10 +4296,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 		}
 		if( uncompressed_chunk_buffer == chunk_buffer )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid uncompressed chunk buffer is the same as chunk buffer.",
 			 function );
 
@@ -4308,10 +4307,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 		}
 		if( *uncompressed_chunk_buffer_size > (size_t) SSIZE_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid uncompressed chunk buffer size value exceeds maximum.",
 			 function );
 
@@ -4324,10 +4323,10 @@ ssize_t libewf_handle_prepare_read_chunk(
 		     chunk_buffer_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_COMPRESSION,
-			 LIBERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+			 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
 			 "%s: unable to decompress chunk buffer.",
 			 function );
 
@@ -4353,7 +4352,7 @@ ssize_t libewf_handle_read_chunk(
          void *checksum_buffer,
          uint32_t *chunk_checksum,
          int8_t *read_checksum,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -4365,10 +4364,10 @@ ssize_t libewf_handle_read_chunk(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -4378,10 +4377,10 @@ ssize_t libewf_handle_read_chunk(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -4389,10 +4388,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - chunk data set.",
 		 function );
 
@@ -4400,10 +4399,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
@@ -4411,10 +4410,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -4422,10 +4421,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -4433,10 +4432,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( chunk_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
 		 function );
 
@@ -4445,10 +4444,10 @@ ssize_t libewf_handle_read_chunk(
 	if( ( chunk_buffer_size == 0 )
 	 || ( chunk_buffer_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid chunk buffer size value out of bounds.",
 		 function );
 
@@ -4456,10 +4455,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( is_compressed == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid is compressed.",
 		 function );
 
@@ -4467,10 +4466,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( checksum_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid checksum buffer.",
 		 function );
 
@@ -4478,10 +4477,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( chunk_checksum == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk checksum.",
 		 function );
 
@@ -4489,10 +4488,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( read_checksum == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid read checksum.",
 		 function );
 
@@ -4506,10 +4505,10 @@ ssize_t libewf_handle_read_chunk(
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk index value exceeds maximum.",
 		 function );
 
@@ -4526,10 +4525,10 @@ ssize_t libewf_handle_read_chunk(
 	     0,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve chunk data: %" PRIu64 ".",
 		 function,
 		 chunk_index );
@@ -4538,10 +4537,10 @@ ssize_t libewf_handle_read_chunk(
 	}
 	if( chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing chunk data: %" PRIu64 ".",
 		 function,
 		 chunk_index );
@@ -4560,10 +4559,10 @@ ssize_t libewf_handle_read_chunk(
 			if( ( chunk_data->data_size < sizeof( uint32_t ) )
 			 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: invalid chunk data size value out of bounds.",
 				 function );
 
@@ -4573,10 +4572,10 @@ ssize_t libewf_handle_read_chunk(
 		}
 		if( chunk_buffer_size < read_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: invalid chunk buffer size value too small.",
 			 function );
 
@@ -4604,10 +4603,10 @@ ssize_t libewf_handle_read_chunk(
 	     chunk_data_buffer,
 	     read_size ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy chunk data to chunk buffer.",
 		 function );
 
@@ -4620,10 +4619,10 @@ ssize_t libewf_handle_read_chunk(
 		     &( chunk_data_buffer[ read_size ] ),
 		     sizeof( uint32_t ) ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy chunk checksum data in chunk buffer.",
 			 function );
 
@@ -4660,7 +4659,7 @@ ssize_t libewf_handle_read_buffer(
          libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -4674,10 +4673,10 @@ ssize_t libewf_handle_read_buffer(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -4687,10 +4686,10 @@ ssize_t libewf_handle_read_buffer(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -4698,10 +4697,10 @@ ssize_t libewf_handle_read_buffer(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - chunk data set.",
 		 function );
 
@@ -4709,10 +4708,10 @@ ssize_t libewf_handle_read_buffer(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
@@ -4720,10 +4719,10 @@ ssize_t libewf_handle_read_buffer(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -4731,10 +4730,10 @@ ssize_t libewf_handle_read_buffer(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -4742,10 +4741,10 @@ ssize_t libewf_handle_read_buffer(
 	}
 	if( buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
@@ -4753,10 +4752,10 @@ ssize_t libewf_handle_read_buffer(
 	}
 	if( buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid buffer size value exceeds maximum.",
 		 function );
 
@@ -4774,10 +4773,10 @@ ssize_t libewf_handle_read_buffer(
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk index value exceeds maximum.",
 		 function );
 
@@ -4789,10 +4788,10 @@ ssize_t libewf_handle_read_buffer(
 
 	if( chunk_data_offset >= (uint64_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk data offset value exceeds maximum.",
 		 function );
 
@@ -4811,10 +4810,10 @@ ssize_t libewf_handle_read_buffer(
 		     &chunk_data,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read chunk data: %" PRIu64 ".",
 			 function,
 			 chunk_index );
@@ -4823,10 +4822,10 @@ ssize_t libewf_handle_read_buffer(
 		}
 		if( chunk_data == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing chunk data: %" PRIu64 ".",
 			 function,
 			 chunk_index );
@@ -4835,10 +4834,10 @@ ssize_t libewf_handle_read_buffer(
 		}
 		if( chunk_data_offset > chunk_data->data_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: chunk offset exceeds chunk data size.",
 			 function );
 
@@ -4859,10 +4858,10 @@ ssize_t libewf_handle_read_buffer(
 		     &( ( chunk_data->data )[ chunk_data_offset ] ),
 		     read_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy chunk data to buffer.",
 			 function );
 
@@ -4897,7 +4896,7 @@ ssize_t libewf_handle_read_random(
          void *buffer,
          size_t buffer_size,
          off64_t offset,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "libewf_handle_read_random";
 	ssize_t read_count    = 0;
@@ -4908,10 +4907,10 @@ ssize_t libewf_handle_read_random(
 	     SEEK_SET,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.",
 		 function );
 
@@ -4925,10 +4924,10 @@ ssize_t libewf_handle_read_random(
 
 	if( read_count < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read buffer.",
 		 function );
 
@@ -4952,7 +4951,7 @@ ssize_t libewf_handle_prepare_write_chunk(
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
          int8_t *write_checksum,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_prepare_write_chunk";
@@ -4965,10 +4964,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -4978,10 +4977,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -4989,10 +4988,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
@@ -5000,10 +4999,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -5011,10 +5010,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -5022,10 +5021,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( chunk_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
 		 function );
 
@@ -5033,10 +5032,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( chunk_buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk buffer size value exceeds maximum.",
 		 function );
 
@@ -5044,10 +5043,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( chunk_buffer_size > (size_t) internal_handle->media_values->chunk_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
 		 "%s: invalid chunk buffer size: %" PRIzd " value exceeds media values chunk size: %" PRIu32 ".",
 		 function,
 		 chunk_buffer_size,
@@ -5057,10 +5056,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( chunk_checksum == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk checksum.",
 		 function );
 
@@ -5068,10 +5067,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( is_compressed == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid is compressed.",
 		 function );
 
@@ -5079,10 +5078,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( write_checksum == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write checksum.",
 		 function );
 
@@ -5098,10 +5097,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 		if( chunk_index >= (uint64_t) INT_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid chunk index value exceeds maximum.",
 			 function );
 
@@ -5114,10 +5113,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 		if( chunk_exists == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if the chunk: %" PRIu64 " exists in the chunk table list.",
 			 function,
 			 chunk_index );
@@ -5129,10 +5128,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 			if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 			 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing chunk: %" PRIu64 ".",
 				 function,
 				 chunk_index );
@@ -5156,10 +5155,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 			if( result == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to determine if chunk buffer is empty.",
 				 function );
 
@@ -5186,10 +5185,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 		{
 			if( compressed_chunk_buffer == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 				 "%s: invalid compressed chunk buffer.",
 				 function );
 
@@ -5197,10 +5196,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 			}
 			if( compressed_chunk_buffer == chunk_buffer )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 				 "%s: invalid compressed chunk buffer is the same as chunk buffer.",
 				 function );
 
@@ -5208,10 +5207,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 			}
 			if( compressed_chunk_buffer_size == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 				 "%s: invalid compressed chunk buffer size.",
 				 function );
 
@@ -5221,10 +5220,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 			 */
 			if( *compressed_chunk_buffer_size > (size_t) SSIZE_MAX )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 				 "%s: invalid compressed chunk buffer size value exceeds maximum.",
 				 function );
 
@@ -5241,10 +5240,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size ) == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 					 "%s: unable to copy compressed zero byte empty block to compressed chunk buffer.",
 					 function );
 
@@ -5264,10 +5263,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 				if( result != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_COMPRESSION,
-					 LIBERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+					 LIBCERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
 					 "%s: unable to compress chunk.",
 					 function );
 
@@ -5301,10 +5300,10 @@ ssize_t libewf_handle_prepare_write_chunk(
 		     &( ( (uint8_t *) compressed_chunk_buffer )[ *compressed_chunk_buffer_size - sizeof( uint32_t ) ] ),
 		     sizeof( uint32_t ) ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to set checksum.",
 			 function );
 
@@ -5333,7 +5332,7 @@ ssize_t libewf_handle_write_chunk(
          void *checksum_buffer,
          uint32_t chunk_checksum,
          int8_t write_checksum,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_write_chunk";
@@ -5347,10 +5346,10 @@ ssize_t libewf_handle_write_chunk(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -5360,10 +5359,10 @@ ssize_t libewf_handle_write_chunk(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -5371,10 +5370,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - chunk data set.",
 		 function );
 
@@ -5382,10 +5381,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
@@ -5393,10 +5392,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -5404,10 +5403,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -5415,10 +5414,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( internal_handle->write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
@@ -5433,10 +5432,10 @@ ssize_t libewf_handle_write_chunk(
 		     internal_handle->segment_table,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize write IO handle values.",
 			 function );
 
@@ -5445,10 +5444,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( chunk_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
 		 function );
 
@@ -5456,10 +5455,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( data_size > internal_handle->media_values->chunk_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: data size cannot be larger than maximum chunk size.",
 		 function );
 
@@ -5478,10 +5477,10 @@ ssize_t libewf_handle_write_chunk(
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk index value exceeds maximum.",
 		 function );
 
@@ -5493,29 +5492,29 @@ ssize_t libewf_handle_write_chunk(
 		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
 		if( libmfdata_list_get_number_of_elements(
 		     internal_handle->chunk_table_list,
 		     &number_of_chunks,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the number of chunks in the chunk table list.",
 			 function );
 
 			return( -1 );
 		}
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: writing chunk: %" PRIu64 " of total: %d.\n",
 		 function,
 		 chunk_index,
 		 number_of_chunks );
 
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: writing chunk buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
 		 function,
 		 chunk_buffer_size,
@@ -5532,10 +5531,10 @@ ssize_t libewf_handle_write_chunk(
 
 		if( chunk_exists == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if the chunk: %" PRIu64 " exists in the chunk table list.",
 			 function,
 			 chunk_index );
@@ -5544,10 +5543,10 @@ ssize_t libewf_handle_write_chunk(
 		}
 		else if( chunk_exists == 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing chunk: %" PRIu64 ".",
 			 function,
 			 chunk_index );
@@ -5604,10 +5603,10 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( write_count < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write raw chunk data.",
 		 function );
 
@@ -5627,7 +5626,7 @@ ssize_t libewf_handle_write_buffer(
          libewf_handle_t *handle,
          const void *buffer,
          size_t buffer_size,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -5644,10 +5643,10 @@ ssize_t libewf_handle_write_buffer(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -5657,10 +5656,10 @@ ssize_t libewf_handle_write_buffer(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -5668,10 +5667,10 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
@@ -5682,10 +5681,10 @@ ssize_t libewf_handle_write_buffer(
 	{
 		if( internal_handle->chunk_data != NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: invalid handle - chunk data set.",
 			 function );
 
@@ -5694,10 +5693,10 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -5705,10 +5704,10 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -5716,10 +5715,10 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( internal_handle->write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
@@ -5734,10 +5733,10 @@ ssize_t libewf_handle_write_buffer(
 		     internal_handle->segment_table,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize write IO handle values.",
 			 function );
 
@@ -5746,10 +5745,10 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
@@ -5757,10 +5756,10 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid buffer size value exceeds maximum.",
 		 function );
 
@@ -5768,10 +5767,10 @@ ssize_t libewf_handle_write_buffer(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid offset value out of bounds.",
 		 function );
 
@@ -5791,10 +5790,10 @@ ssize_t libewf_handle_write_buffer(
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk index value exceeds maximum.",
 		 function );
 
@@ -5806,10 +5805,10 @@ ssize_t libewf_handle_write_buffer(
 
 	if( chunk_data_offset >= (uint64_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk data offset value exceeds maximum.",
 		 function );
 
@@ -5824,10 +5823,10 @@ ssize_t libewf_handle_write_buffer(
 
 		if( chunk_exists == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if the chunk: %" PRIu64 " exists in the chunk table list.",
 			 function,
 			 chunk_index );
@@ -5839,10 +5838,10 @@ ssize_t libewf_handle_write_buffer(
 		{
 			if( chunk_exists == 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing chunk: %" PRIu64 ".",
 				 function,
 				 chunk_index );
@@ -5863,10 +5862,10 @@ ssize_t libewf_handle_write_buffer(
 				     &chunk_data,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_READ_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
 					 "%s: unable to read chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -5875,10 +5874,10 @@ ssize_t libewf_handle_write_buffer(
 				}
 				if( chunk_data == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: missing chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -5887,10 +5886,10 @@ ssize_t libewf_handle_write_buffer(
 				}
 				if( chunk_data_offset > chunk_data->data_size )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 					 "%s: chunk offset exceeds chunk data size.",
 					 function );
 
@@ -5907,9 +5906,9 @@ ssize_t libewf_handle_write_buffer(
 					break;
 				}
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: updating chunk data: %" PRIu64 " at offset: %" PRIu64 " with size: %" PRIzd ".\n",
 					 function,
 					 chunk_index,
@@ -5927,10 +5926,10 @@ ssize_t libewf_handle_write_buffer(
 				     (size_t) internal_handle->media_values->chunk_size + sizeof( uint32_t ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 					 "%s: unable to create chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -5939,10 +5938,10 @@ ssize_t libewf_handle_write_buffer(
 				}
 				if( chunk_data == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: missing chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -5954,14 +5953,14 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->chunk_table_cache,
 				     (int) chunk_index,
 				     (intptr_t *) chunk_data,
-				     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
+				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
 				     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 					 "%s: unable to set chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -5981,10 +5980,10 @@ ssize_t libewf_handle_write_buffer(
 			     &( ( (uint8_t *) buffer )[ buffer_offset ] ),
 			     write_size ) == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 				 "%s: unable to copy buffer to chunk data.",
 				 function );
 
@@ -6005,10 +6004,10 @@ ssize_t libewf_handle_write_buffer(
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GENERIC,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GENERIC,
 				 "%s: unable to pack chunk data: %" PRIu64 ".",
 				 function,
 				 chunk_index );
@@ -6037,10 +6036,10 @@ ssize_t libewf_handle_write_buffer(
 
 			if( write_count <= 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
 				 "%s: unable to write existing chunk.",
 				 function );
 
@@ -6055,10 +6054,10 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( chunk_exists != 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 				 "%s: chunk: %" PRIu64 " already set.",
 				 function,
 				 chunk_index );
@@ -6074,10 +6073,10 @@ ssize_t libewf_handle_write_buffer(
 				     (size_t) internal_handle->media_values->chunk_size + sizeof( uint32_t ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 					 "%s: unable to create chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -6086,10 +6085,10 @@ ssize_t libewf_handle_write_buffer(
 				}
 				if( internal_handle->chunk_data == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: missing chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -6099,10 +6098,10 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( internal_handle->chunk_data == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: internal handle - missing chunk data: %" PRIu64 ".",
 				 function,
 				 chunk_index );
@@ -6111,10 +6110,10 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( chunk_data_offset > internal_handle->media_values->chunk_size )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: chunk offset exceeds chunk data size.",
 				 function );
 
@@ -6135,10 +6134,10 @@ ssize_t libewf_handle_write_buffer(
 			     &( ( (uint8_t *) buffer )[ buffer_offset ] ),
 			     write_size ) == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 				 "%s: unable to copy buffer to chunk data.",
 				 function );
 
@@ -6176,10 +6175,10 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GENERIC,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GENERIC,
 					 "%s: unable to pack chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -6214,10 +6213,10 @@ ssize_t libewf_handle_write_buffer(
 
 				if( write_count <= 0 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_WRITE_FAILED,
 					 "%s: unable to write new chunk.",
 					 function );
 
@@ -6228,14 +6227,14 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->chunk_table_cache,
 				     (int) chunk_index,
 				     (intptr_t *) internal_handle->chunk_data,
-				     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
+				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
 				     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 					 "%s: unable to set chunk data: %" PRIu64 ".",
 					 function,
 					 chunk_index );
@@ -6274,7 +6273,7 @@ ssize_t libewf_handle_write_random(
          const void *buffer,
          size_t buffer_size,
          off64_t offset,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "libewf_handle_write_random";
 	ssize_t write_count   = 0;
@@ -6285,10 +6284,10 @@ ssize_t libewf_handle_write_random(
 	     SEEK_SET,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.",
 		 function );
 
@@ -6302,10 +6301,10 @@ ssize_t libewf_handle_write_random(
 
 	if( write_count < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write buffer.",
 		 function );
 
@@ -6320,7 +6319,7 @@ ssize_t libewf_handle_write_random(
  */
 ssize_t libewf_handle_write_finalize(
          libewf_handle_t *handle,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	libewf_segment_file_t *segment_file       = NULL;
@@ -6337,10 +6336,10 @@ ssize_t libewf_handle_write_finalize(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -6350,10 +6349,10 @@ ssize_t libewf_handle_write_finalize(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -6361,10 +6360,10 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
@@ -6375,10 +6374,10 @@ ssize_t libewf_handle_write_finalize(
 	{
 		if( internal_handle->chunk_data != NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: invalid handle - chunk data set.",
 			 function );
 
@@ -6387,10 +6386,10 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing write IO handle.",
 		 function );
 
@@ -6398,10 +6397,10 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -6409,10 +6408,10 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -6432,10 +6431,10 @@ ssize_t libewf_handle_write_finalize(
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk index value exceeds maximum.",
 		 function );
 
@@ -6455,10 +6454,10 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to pack chunk data: %" PRIu64 ".",
 			 function,
 			 chunk_index );
@@ -6493,10 +6492,10 @@ ssize_t libewf_handle_write_finalize(
 
 		if( write_count <= 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write new chunk.",
 			 function );
 
@@ -6509,14 +6508,14 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->chunk_table_cache,
 		     (int) chunk_index,
 		     (intptr_t *) internal_handle->chunk_data,
-		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
 		     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set chunk data: %" PRIu64 ".",
 			 function,
 			 chunk_index );
@@ -6537,10 +6536,10 @@ ssize_t libewf_handle_write_finalize(
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of segment files.",
 		 function );
 
@@ -6549,10 +6548,10 @@ ssize_t libewf_handle_write_finalize(
 	if( ( number_of_segment_files < 0 )
 	 || ( number_of_segment_files > (int) UINT16_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-	 	 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+	 	 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid number of segment files value out of bounds.",
 		 function );
 
@@ -6570,10 +6569,10 @@ ssize_t libewf_handle_write_finalize(
 		 */
 		if( internal_handle->header_sections == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid header sections.",
 			 function );
 
@@ -6591,10 +6590,10 @@ ssize_t libewf_handle_write_finalize(
 			     internal_handle->io_handle->header_codepage,
 			     error ) == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create header(s).",
 				 function );
 
@@ -6615,10 +6614,10 @@ ssize_t libewf_handle_write_finalize(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to create segment file: 1.",
 			 function );
 
@@ -6636,10 +6635,10 @@ ssize_t libewf_handle_write_finalize(
 
 		if( write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write segment file start.",
 			 function );
 
@@ -6657,10 +6656,10 @@ ssize_t libewf_handle_write_finalize(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -6676,10 +6675,10 @@ ssize_t libewf_handle_write_finalize(
 		     0,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d value from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -6688,10 +6687,10 @@ ssize_t libewf_handle_write_finalize(
 		}
 		if( segment_file == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %d.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -6710,10 +6709,10 @@ ssize_t libewf_handle_write_finalize(
 		     SEEK_SET,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
 			 function,
 			 internal_handle->write_io_handle->resume_segment_file_offset,
@@ -6733,10 +6732,10 @@ ssize_t libewf_handle_write_finalize(
 		     &segment_file_offset,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve current offset in segment file.",
 			 function );
 
@@ -6749,9 +6748,9 @@ ssize_t libewf_handle_write_finalize(
 			/* Correct the offset, size in the chunks section
 			 */
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: correcting chunks section.\n",
 				 function );
 			}
@@ -6764,10 +6763,10 @@ ssize_t libewf_handle_write_finalize(
 
 				if( reallocation == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 					 "%s: unable to create table offsets.",
 					 function );
 
@@ -6793,10 +6792,10 @@ ssize_t libewf_handle_write_finalize(
 
 			if( write_count == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
 				 "%s: unable to correct chunks section.",
 				 function );
 
@@ -6808,9 +6807,9 @@ ssize_t libewf_handle_write_finalize(
 		/* Close the segment file
 		 */
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: closing last segment file.\n",
 			 function );
 		}
@@ -6834,10 +6833,10 @@ ssize_t libewf_handle_write_finalize(
 
 		if( write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to close segment file.",
 			 function );
 
@@ -6880,10 +6879,10 @@ ssize_t libewf_handle_write_finalize(
 		     error ) != 1 )
 
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write sections corrections to segment files.",
 			 function );
 
@@ -6902,17 +6901,17 @@ off64_t libewf_handle_seek_offset(
          libewf_handle_t *handle,
          off64_t offset,
          int whence,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_seek_offset";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -6922,10 +6921,10 @@ off64_t libewf_handle_seek_offset(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -6933,10 +6932,10 @@ off64_t libewf_handle_seek_offset(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid handle - chunk data set.",
 		 function );
 
@@ -6944,10 +6943,10 @@ off64_t libewf_handle_seek_offset(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -6955,10 +6954,10 @@ off64_t libewf_handle_seek_offset(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -6968,10 +6967,10 @@ off64_t libewf_handle_seek_offset(
 	 && ( whence != SEEK_END )
 	 && ( whence != SEEK_SET ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported whence.",
 		 function );
 
@@ -6986,9 +6985,9 @@ off64_t libewf_handle_seek_offset(
 		offset += (off64_t) internal_handle->media_values->media_size;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: seeking media data offset: %" PRIi64 ".\n",
 		 function,
 		 offset );
@@ -6996,10 +6995,10 @@ off64_t libewf_handle_seek_offset(
 #endif
 	if( offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid offset value out of bounds.",
 		 function );
 
@@ -7016,17 +7015,17 @@ off64_t libewf_handle_seek_offset(
 int libewf_handle_get_offset(
      libewf_handle_t *handle,
      off64_t *offset,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_offset";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7036,10 +7035,10 @@ int libewf_handle_get_offset(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -7047,10 +7046,10 @@ int libewf_handle_get_offset(
 	}
 	if( offset == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset.",
 		 function );
 
@@ -7067,17 +7066,17 @@ int libewf_handle_get_offset(
 int libewf_handle_set_maximum_number_of_open_handles(
      libewf_handle_t *handle,
      int maximum_number_of_open_handles,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_maximum_number_of_open_handles";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7092,10 +7091,10 @@ int libewf_handle_set_maximum_number_of_open_handles(
 		     maximum_number_of_open_handles,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set maximum number of open handles in file IO handle.",
 			 function );
 
@@ -7112,17 +7111,17 @@ int libewf_handle_set_maximum_number_of_open_handles(
  */
 int libewf_handle_segment_files_corrupted(
      libewf_handle_t *handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_segment_files_corrupted";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7132,10 +7131,10 @@ int libewf_handle_segment_files_corrupted(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7155,7 +7154,7 @@ int libewf_handle_segment_files_corrupted(
 int libewf_handle_get_segment_filename_size(
      libewf_handle_t *handle,
      size_t *filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_segment_filename_size";
@@ -7163,10 +7162,10 @@ int libewf_handle_get_segment_filename_size(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7176,10 +7175,10 @@ int libewf_handle_get_segment_filename_size(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7192,10 +7191,10 @@ int libewf_handle_get_segment_filename_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename size.",
 		 function );
 
@@ -7212,7 +7211,7 @@ int libewf_handle_get_segment_filename(
      libewf_handle_t *handle,
      char *filename,
      size_t filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_segment_filename";
@@ -7220,10 +7219,10 @@ int libewf_handle_get_segment_filename(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7233,10 +7232,10 @@ int libewf_handle_get_segment_filename(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7250,10 +7249,10 @@ int libewf_handle_get_segment_filename(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename.",
 		 function );
 
@@ -7269,17 +7268,17 @@ int libewf_handle_set_segment_filename(
      libewf_handle_t *handle,
      const char *filename,
      size_t filename_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_segment_filename";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7289,10 +7288,10 @@ int libewf_handle_set_segment_filename(
 
 	if( internal_handle->write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: segment filename cannot be changed.",
 		 function );
 
@@ -7300,10 +7299,10 @@ int libewf_handle_set_segment_filename(
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7315,10 +7314,10 @@ int libewf_handle_set_segment_filename(
 	     filename_length,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment table basename.",
 		 function );
 
@@ -7336,7 +7335,7 @@ int libewf_handle_set_segment_filename(
 int libewf_handle_get_segment_filename_size_wide(
      libewf_handle_t *handle,
      size_t *filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_segment_filename_size_wide";
@@ -7344,10 +7343,10 @@ int libewf_handle_get_segment_filename_size_wide(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7357,10 +7356,10 @@ int libewf_handle_get_segment_filename_size_wide(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7373,10 +7372,10 @@ int libewf_handle_get_segment_filename_size_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename size.",
 		 function );
 
@@ -7393,7 +7392,7 @@ int libewf_handle_get_segment_filename_wide(
      libewf_handle_t *handle,
      wchar_t *filename,
      size_t filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_segment_filename_wide";
@@ -7401,10 +7400,10 @@ int libewf_handle_get_segment_filename_wide(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7414,10 +7413,10 @@ int libewf_handle_get_segment_filename_wide(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7431,10 +7430,10 @@ int libewf_handle_get_segment_filename_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename.",
 		 function );
 
@@ -7450,17 +7449,17 @@ int libewf_handle_set_segment_filename_wide(
      libewf_handle_t *handle,
      const wchar_t *filename,
      size_t filename_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_segment_filename_wide";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7470,10 +7469,10 @@ int libewf_handle_set_segment_filename_wide(
 
 	if( internal_handle->write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: segment filename cannot be changed.",
 		 function );
 
@@ -7481,10 +7480,10 @@ int libewf_handle_set_segment_filename_wide(
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7496,10 +7495,10 @@ int libewf_handle_set_segment_filename_wide(
 	     filename_length,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment table basename.",
 		 function );
 
@@ -7516,17 +7515,17 @@ int libewf_handle_set_segment_filename_wide(
 int libewf_handle_get_maximum_segment_size(
      libewf_handle_t *handle,
      size64_t *maximum_segment_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_maximum_segment_size";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7536,10 +7535,10 @@ int libewf_handle_get_maximum_segment_size(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7547,10 +7546,10 @@ int libewf_handle_get_maximum_segment_size(
 	}
 	if( maximum_segment_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum segment size.",
 		 function );
 
@@ -7570,17 +7569,17 @@ int libewf_handle_get_maximum_segment_size(
 int libewf_handle_set_maximum_segment_size(
      libewf_handle_t *handle,
      size64_t maximum_segment_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_maximum_segment_size";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7590,10 +7589,10 @@ int libewf_handle_set_maximum_segment_size(
 
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -7601,10 +7600,10 @@ int libewf_handle_set_maximum_segment_size(
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -7614,10 +7613,10 @@ int libewf_handle_set_maximum_segment_size(
 	 || ( internal_handle->write_io_handle == NULL )
 	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: maximum segment size cannot be changed.",
 		 function );
 
@@ -7625,10 +7624,10 @@ int libewf_handle_set_maximum_segment_size(
 	}
 	if( maximum_segment_size > (size64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid maximum segment size value exceeds maximum.",
 		 function );
 
@@ -7636,10 +7635,10 @@ int libewf_handle_set_maximum_segment_size(
 	}
 	if( maximum_segment_size > internal_handle->write_io_handle->maximum_segment_file_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid segment file size value out of bounds.",
 		 function );
 
@@ -7657,7 +7656,7 @@ int libewf_handle_set_maximum_segment_size(
 int libewf_handle_get_delta_segment_filename_size(
      libewf_handle_t *handle,
      size_t *filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_delta_segment_filename_size";
@@ -7665,10 +7664,10 @@ int libewf_handle_get_delta_segment_filename_size(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7678,10 +7677,10 @@ int libewf_handle_get_delta_segment_filename_size(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -7694,10 +7693,10 @@ int libewf_handle_get_delta_segment_filename_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename size.",
 		 function );
 
@@ -7714,7 +7713,7 @@ int libewf_handle_get_delta_segment_filename(
      libewf_handle_t *handle,
      char *filename,
      size_t filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_delta_segment_filename";
@@ -7722,10 +7721,10 @@ int libewf_handle_get_delta_segment_filename(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7735,10 +7734,10 @@ int libewf_handle_get_delta_segment_filename(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -7752,10 +7751,10 @@ int libewf_handle_get_delta_segment_filename(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename.",
 		 function );
 
@@ -7771,17 +7770,17 @@ int libewf_handle_set_delta_segment_filename(
      libewf_handle_t *handle,
      const char *filename,
      size_t filename_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_delta_segment_filename";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7791,10 +7790,10 @@ int libewf_handle_set_delta_segment_filename(
 
 	if( internal_handle->write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: delta segment filename cannot be changed.",
 		 function );
 
@@ -7802,10 +7801,10 @@ int libewf_handle_set_delta_segment_filename(
 	}
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -7817,10 +7816,10 @@ int libewf_handle_set_delta_segment_filename(
 	     filename_length,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment table basename.",
 		 function );
 
@@ -7838,7 +7837,7 @@ int libewf_handle_set_delta_segment_filename(
 int libewf_handle_get_delta_segment_filename_size_wide(
      libewf_handle_t *handle,
      size_t *filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_delta_segment_filename_size_wide";
@@ -7846,10 +7845,10 @@ int libewf_handle_get_delta_segment_filename_size_wide(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7859,10 +7858,10 @@ int libewf_handle_get_delta_segment_filename_size_wide(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -7875,10 +7874,10 @@ int libewf_handle_get_delta_segment_filename_size_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename size.",
 		 function );
 
@@ -7895,7 +7894,7 @@ int libewf_handle_get_delta_segment_filename_wide(
      libewf_handle_t *handle,
      wchar_t *filename,
      size_t filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_delta_segment_filename_wide";
@@ -7903,10 +7902,10 @@ int libewf_handle_get_delta_segment_filename_wide(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7916,10 +7915,10 @@ int libewf_handle_get_delta_segment_filename_wide(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -7933,10 +7932,10 @@ int libewf_handle_get_delta_segment_filename_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename.",
 		 function );
 
@@ -7952,17 +7951,17 @@ int libewf_handle_set_delta_segment_filename_wide(
      libewf_handle_t *handle,
      const wchar_t *filename,
      size_t filename_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_delta_segment_filename_wide";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -7972,10 +7971,10 @@ int libewf_handle_set_delta_segment_filename_wide(
 
 	if( internal_handle->write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: delta segment filename cannot be changed.",
 		 function );
 
@@ -7983,10 +7982,10 @@ int libewf_handle_set_delta_segment_filename_wide(
 	}
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -7998,10 +7997,10 @@ int libewf_handle_set_delta_segment_filename_wide(
 	     filename_length,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment table basename.",
 		 function );
 
@@ -8018,17 +8017,17 @@ int libewf_handle_set_delta_segment_filename_wide(
 int libewf_handle_get_maximum_delta_segment_size(
      libewf_handle_t *handle,
      size64_t *maximum_delta_segment_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_maximum_delta_segment_size";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8038,10 +8037,10 @@ int libewf_handle_get_maximum_delta_segment_size(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -8049,10 +8048,10 @@ int libewf_handle_get_maximum_delta_segment_size(
 	}
 	if( maximum_delta_segment_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum delta segment size.",
 		 function );
 
@@ -8069,17 +8068,17 @@ int libewf_handle_get_maximum_delta_segment_size(
 int libewf_handle_set_maximum_delta_segment_size(
      libewf_handle_t *handle,
      size64_t maximum_delta_segment_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_maximum_delta_segment_size";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8089,10 +8088,10 @@ int libewf_handle_set_maximum_delta_segment_size(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
@@ -8101,10 +8100,10 @@ int libewf_handle_set_maximum_delta_segment_size(
 	if( ( internal_handle->write_io_handle == NULL )
 	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: maximum delta segment size cannot be changed.",
 		 function );
 
@@ -8112,10 +8111,10 @@ int libewf_handle_set_maximum_delta_segment_size(
 	}
 	if( maximum_delta_segment_size > (size64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid maximum delta segment size value exceeds maximum.",
 		 function );
 
@@ -8123,10 +8122,10 @@ int libewf_handle_set_maximum_delta_segment_size(
 	}
 	if( maximum_delta_segment_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid maximum delta segment size value out of bounds.",
 		 function );
 
@@ -8144,7 +8143,7 @@ int libewf_handle_set_maximum_delta_segment_size(
 int libewf_handle_get_filename_size(
      libewf_handle_t *handle,
      size_t *filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename_size";
@@ -8152,10 +8151,10 @@ int libewf_handle_get_filename_size(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8168,10 +8167,10 @@ int libewf_handle_get_filename_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
@@ -8184,10 +8183,10 @@ int libewf_handle_get_filename_size(
 		     filename_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename size.",
 			 function );
 
@@ -8205,7 +8204,7 @@ int libewf_handle_get_filename(
      libewf_handle_t *handle,
      char *filename,
      size_t filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename";
@@ -8213,10 +8212,10 @@ int libewf_handle_get_filename(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8229,10 +8228,10 @@ int libewf_handle_get_filename(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
@@ -8246,10 +8245,10 @@ int libewf_handle_get_filename(
 		     filename_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename.",
 			 function );
 
@@ -8268,7 +8267,7 @@ int libewf_handle_get_filename(
 int libewf_handle_get_filename_size_wide(
      libewf_handle_t *handle,
      size_t *filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename_size_wide";
@@ -8276,10 +8275,10 @@ int libewf_handle_get_filename_size_wide(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8292,10 +8291,10 @@ int libewf_handle_get_filename_size_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
@@ -8308,10 +8307,10 @@ int libewf_handle_get_filename_size_wide(
 		     filename_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename size.",
 			 function );
 
@@ -8329,7 +8328,7 @@ int libewf_handle_get_filename_wide(
      libewf_handle_t *handle,
      wchar_t *filename,
      size_t filename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	static char *function            = "libewf_handle_get_filename_wide";
@@ -8337,10 +8336,10 @@ int libewf_handle_get_filename_wide(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8353,10 +8352,10 @@ int libewf_handle_get_filename_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
 
@@ -8370,10 +8369,10 @@ int libewf_handle_get_filename_wide(
 		     filename_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename.",
 			 function );
 
@@ -8391,7 +8390,7 @@ int libewf_handle_get_filename_wide(
 int libewf_handle_get_file_io_handle(
      libewf_handle_t *handle,
      libbfio_handle_t **file_io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_file_io_handle";
@@ -8403,10 +8402,10 @@ int libewf_handle_get_file_io_handle(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8416,10 +8415,10 @@ int libewf_handle_get_file_io_handle(
 
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -8427,10 +8426,10 @@ int libewf_handle_get_file_io_handle(
 	}
 	if( internal_handle->io_handle->current_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
@@ -8438,10 +8437,10 @@ int libewf_handle_get_file_io_handle(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -8449,10 +8448,10 @@ int libewf_handle_get_file_io_handle(
 	}
 	if( internal_handle->media_values->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid media values - missing chunk size.",
 		 function );
 
@@ -8462,10 +8461,10 @@ int libewf_handle_get_file_io_handle(
 
 	if( chunk_index >= (uint64_t) INT32_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk index value exceeds maximum.",
 		 function );
 
@@ -8480,10 +8479,10 @@ int libewf_handle_get_file_io_handle(
 	     &chunk_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve data range of chunk: %" PRIu64 ".",
 		 function,
 		 chunk_index );
@@ -8500,10 +8499,10 @@ int libewf_handle_get_file_io_handle(
 	     file_io_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle: %d from pool (chunk: %" PRIu64 ").",
 		 function,
 		 file_io_pool_entry,
@@ -8520,16 +8519,16 @@ int libewf_handle_get_file_io_handle(
 int libewf_internal_handle_get_write_maximum_number_of_segments(
      uint8_t ewf_format,
      uint16_t *maximum_number_of_segments,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_internal_handle_get_write_maximum_number_of_segments";
 
 	if( maximum_number_of_segments == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum number of segments.",
 		 function );
 
@@ -8549,10 +8548,10 @@ int libewf_internal_handle_get_write_maximum_number_of_segments(
 	}
 	else
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported EWF format.",
 		 function );
 
@@ -8567,7 +8566,7 @@ int libewf_internal_handle_get_write_maximum_number_of_segments(
 int libewf_internal_handle_get_media_values(
      libewf_internal_handle_t *internal_handle,
      size64_t *media_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_internal_handle_get_media_values";
@@ -8578,10 +8577,10 @@ int libewf_internal_handle_get_media_values(
 
 	if( internal_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8589,10 +8588,10 @@ int libewf_internal_handle_get_media_values(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -8600,10 +8599,10 @@ int libewf_internal_handle_get_media_values(
 	}
 	if( media_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media size.",
 		 function );
 
@@ -8620,22 +8619,22 @@ int libewf_internal_handle_get_media_values(
 		     &number_of_chunks,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of chunks in chunk table list.",
 			 function );
 
 			return( -1 );
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
 			if( ( internal_handle->media_values->number_of_chunks != 0 )
 			 && ( internal_handle->media_values->number_of_chunks != (uint32_t) number_of_chunks ) )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: mismatch of number of chunks in volume: %" PRIu32 " and chunk table: %d\n",
 				 function,
 				 internal_handle->media_values->number_of_chunks,
@@ -8658,10 +8657,10 @@ int libewf_internal_handle_get_media_values(
 			     0,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve chunk data: %d.",
 				 function,
 				 chunk_index );
@@ -8670,10 +8669,10 @@ int libewf_internal_handle_get_media_values(
 			}
 			if( chunk_data == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing chunk data: %d.",
 				 function,
 				 chunk_index );
@@ -8692,10 +8691,10 @@ int libewf_internal_handle_get_media_values(
 			     internal_handle->media_values->chunk_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GENERIC,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GENERIC,
 				 "%s: unable to unpack chunk data: %d.",
 				 function,
 				 chunk_index );
@@ -8709,9 +8708,9 @@ int libewf_internal_handle_get_media_values(
 			if( sector_data_size != chunks_data_size )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: mismatch of media data size in volume: %" PRIu64 " and chunk table: %" PRIu64 "\n",
 					 function,
 					 sector_data_size,
@@ -8738,7 +8737,7 @@ int libewf_internal_handle_set_media_values(
      uint32_t sectors_per_chunk,
      uint32_t bytes_per_sector,
      size64_t media_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function            = "libewf_internal_handle_set_media_values";
 	size32_t chunk_size              = 0;
@@ -8748,10 +8747,10 @@ int libewf_internal_handle_set_media_values(
 
 	if( internal_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8759,10 +8758,10 @@ int libewf_internal_handle_set_media_values(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -8771,10 +8770,10 @@ int libewf_internal_handle_set_media_values(
 	if( ( sectors_per_chunk == 0 )
 	 || ( sectors_per_chunk > (uint32_t) INT32_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid sectors per chunk.",
 		 function );
 
@@ -8783,10 +8782,10 @@ int libewf_internal_handle_set_media_values(
 	if( ( bytes_per_sector == 0 )
 	 || ( bytes_per_sector > (uint32_t) INT32_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid bytes per sector.",
 		 function );
 
@@ -8794,10 +8793,10 @@ int libewf_internal_handle_set_media_values(
 	}
 	if( media_size > (size64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid media size value exceeds maximum.",
 		 function );
 
@@ -8810,10 +8809,10 @@ int libewf_internal_handle_set_media_values(
 	if( ( chunk_size == 0 )
 	 || ( chunk_size > (size32_t) INT32_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid chunk size.",
 		 function );
 
@@ -8826,10 +8825,10 @@ int libewf_internal_handle_set_media_values(
 
 	if( media_size > maximum_input_file_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".",
 		 function,
 		 maximum_input_file_size,
@@ -8856,10 +8855,10 @@ int libewf_internal_handle_set_media_values(
 		}
 		if( number_of_chunks > (uint64_t) UINT32_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid number of chunks value exceeds maximum.",
 			 function );
 
@@ -8873,10 +8872,10 @@ int libewf_internal_handle_set_media_values(
 
 		if( number_of_sectors > (uint64_t) INT64_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid number of sectors value exceeds maximum.",
 			 function );
 
@@ -8893,16 +8892,16 @@ int libewf_internal_handle_set_media_values(
 int libewf_internal_handle_set_format(
      libewf_internal_handle_t *internal_handle,
      uint8_t format,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_internal_handle_set_format";
 
 	if( internal_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -8910,10 +8909,10 @@ int libewf_internal_handle_set_format(
 	}
 	if( internal_handle->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
 		 function );
 
@@ -8933,10 +8932,10 @@ int libewf_internal_handle_set_format(
 	 && ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_EWFX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported format: %d.",
 		 function,
 	         format );
@@ -8983,10 +8982,10 @@ int libewf_internal_handle_set_format(
 		     &( internal_handle->write_io_handle->maximum_number_of_segments ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine the maximum number of allowed segment files.",
 			 function );
 
@@ -9002,17 +9001,17 @@ int libewf_internal_handle_set_format(
 int libewf_handle_get_root_file_entry(
      libewf_handle_t *handle,
      libewf_file_entry_t **root_file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_root_file_entry";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -9022,10 +9021,10 @@ int libewf_handle_get_root_file_entry(
 
 	if( internal_handle->single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing single files.",
 		 function );
 
@@ -9033,10 +9032,10 @@ int libewf_handle_get_root_file_entry(
 	}
 	if( root_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid root file entry.",
 		 function );
 
@@ -9044,10 +9043,10 @@ int libewf_handle_get_root_file_entry(
 	}
 	if( *root_file_entry != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: root file entry already set.",
 		 function );
 
@@ -9064,10 +9063,10 @@ int libewf_handle_get_root_file_entry(
 	     LIBEWF_ITEM_FLAGS_DEFAULT,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create root file entry.",
 		 function );
 
@@ -9085,7 +9084,7 @@ int libewf_file_get_file_entry_by_utf8_path(
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libewf_file_entry_t **file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle         = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
@@ -9099,10 +9098,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -9112,10 +9111,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 
 	if( internal_handle->single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing single files.",
 		 function );
 
@@ -9123,10 +9122,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 	}
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -9134,10 +9133,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 	}
 	if( utf8_string_length > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string length value exceeds maximum.",
 		 function );
 
@@ -9145,10 +9144,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 	}
 	if( file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -9156,10 +9155,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 	}
 	if( *file_entry != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: file entry already set.",
 		 function );
 
@@ -9171,10 +9170,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 	}
 	if( internal_handle->single_files->root_file_entry_node->value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing root file entry values.",
 		 function );
 
@@ -9216,10 +9215,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 		}
 		if( utf8_string_segment_length == 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sub file entry name.",
 			 function );
 
@@ -9235,10 +9234,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve single file entry sub node by name.",
 			 function );
 
@@ -9259,10 +9258,10 @@ int libewf_file_get_file_entry_by_utf8_path(
 		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create file entry.",
 			 function );
 
@@ -9281,7 +9280,7 @@ int libewf_file_get_file_entry_by_utf16_path(
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libewf_file_entry_t **file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle         = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
@@ -9295,10 +9294,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -9308,10 +9307,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 
 	if( internal_handle->single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing single files.",
 		 function );
 
@@ -9319,10 +9318,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 	}
 	if( utf16_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string.",
 		 function );
 
@@ -9330,10 +9329,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 	}
 	if( utf16_string_length > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-16 string length value exceeds maximum.",
 		 function );
 
@@ -9341,10 +9340,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 	}
 	if( file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -9352,10 +9351,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 	}
 	if( *file_entry != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: file entry already set.",
 		 function );
 
@@ -9367,10 +9366,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 	}
 	if( internal_handle->single_files->root_file_entry_node->value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing root file entry values.",
 		 function );
 
@@ -9412,10 +9411,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 		}
 		if( utf16_string_segment_length == 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sub file entry name.",
 			 function );
 
@@ -9431,10 +9430,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve single file entry sub node by name.",
 			 function );
 
@@ -9455,10 +9454,10 @@ int libewf_file_get_file_entry_by_utf16_path(
 		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create file entry.",
 			 function );
 

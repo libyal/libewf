@@ -24,11 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_debug.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
+#include "libewf_libcstring.h"
 #include "libewf_libuna.h"
 
 #include "ewf_checksum.h"
@@ -40,7 +39,7 @@ int libewf_debug_dump_data(
      const char *header_string,
      const uint8_t *data,
      size_t data_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function        = "libewf_debug_dump_data";
 	uint32_t stored_checksum     = 0;
@@ -48,10 +47,10 @@ int libewf_debug_dump_data(
 
 	if( header_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -59,10 +58,10 @@ int libewf_debug_dump_data(
 	}
 	if( data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid data.",
 		 function );
 
@@ -70,10 +69,10 @@ int libewf_debug_dump_data(
 	}
 	if( data_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
@@ -89,16 +88,16 @@ int libewf_debug_dump_data(
 	 &( data[ data_size - sizeof( uint32_t ) ] ),
 	 stored_checksum );
 
-	libnotify_printf(
+	libcnotify_printf(
 	 "%s:\n",
 	 header_string );
 
-	libnotify_print_data(
+	libcnotify_print_data(
 	 data,
 	 data_size,
 	 0 );
 
-	libnotify_printf(
+	libcnotify_printf(
 	 "%s: possible checksum (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 	 function,	
 	 stored_checksum,	
@@ -114,7 +113,7 @@ int libewf_debug_byte_stream_print(
      const char *header_string,
      const uint8_t *byte_stream,
      size_t byte_stream_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *string = NULL;
 	static char *function                 = "libewf_debug_byte_stream_print";
@@ -123,10 +122,10 @@ int libewf_debug_byte_stream_print(
 
 	if( header_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -134,10 +133,10 @@ int libewf_debug_byte_stream_print(
 	}
 	if( byte_stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid byte stream.",
 		 function );
 
@@ -160,10 +159,10 @@ int libewf_debug_byte_stream_print(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine string size.",
 		 function );
 
@@ -174,10 +173,10 @@ int libewf_debug_byte_stream_print(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create string.",
 		 function );
 
@@ -202,10 +201,10 @@ int libewf_debug_byte_stream_print(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy string from byte stream.",
 		 function );
 
@@ -214,7 +213,7 @@ int libewf_debug_byte_stream_print(
 
 		return( -1 );
 	}
-	libnotify_printf(
+	libcnotify_printf(
 	 "%s:\n"
 	 "%" PRIs_LIBCSTRING_SYSTEM "",
 	 header_string,
@@ -233,7 +232,7 @@ int libewf_debug_utf8_stream_print(
      const char *header_string,
      const uint8_t *utf8_stream,
      size_t utf8_stream_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *string = NULL;
 	static char *function                 = "libewf_debug_utf8_stream_print";
@@ -242,10 +241,10 @@ int libewf_debug_utf8_stream_print(
 
 	if( header_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -253,10 +252,10 @@ int libewf_debug_utf8_stream_print(
 	}
 	if( utf8_stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 stream.",
 		 function );
 
@@ -277,10 +276,10 @@ int libewf_debug_utf8_stream_print(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine string size.",
 		 function );
 
@@ -291,10 +290,10 @@ int libewf_debug_utf8_stream_print(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create string.",
 		 function );
 
@@ -317,10 +316,10 @@ int libewf_debug_utf8_stream_print(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy string from UTF-8 stream.",
 		 function );
 
@@ -329,7 +328,7 @@ int libewf_debug_utf8_stream_print(
 
 		return( -1 );
 	}
-	libnotify_printf(
+	libcnotify_printf(
 	 "%s:\n"
 	 "%" PRIs_LIBCSTRING_SYSTEM "",
 	 header_string,
@@ -348,7 +347,7 @@ int libewf_debug_utf16_stream_print(
      const char *header_string,
      const uint8_t *utf16_stream,
      size_t utf16_stream_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *string = NULL;
 	static char *function                 = "libewf_debug_utf16_stream_print";
@@ -357,10 +356,10 @@ int libewf_debug_utf16_stream_print(
 
 	if( header_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -368,10 +367,10 @@ int libewf_debug_utf16_stream_print(
 	}
 	if( utf16_stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 stream.",
 		 function );
 
@@ -394,10 +393,10 @@ int libewf_debug_utf16_stream_print(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine string size.",
 		 function );
 
@@ -408,10 +407,10 @@ int libewf_debug_utf16_stream_print(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create string.",
 		 function );
 
@@ -436,10 +435,10 @@ int libewf_debug_utf16_stream_print(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy string from UTF-16 stream.",
 		 function );
 
@@ -448,7 +447,7 @@ int libewf_debug_utf16_stream_print(
 
 		return( -1 );
 	}
-	libnotify_printf(
+	libcnotify_printf(
 	 "%s:\n"
 	 "%" PRIs_LIBCSTRING_SYSTEM "",
 	 header_string,

@@ -25,9 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #include "libewf_extern.h"
+#include "libewf_libcerror.h"
 #include "libewf_types.h"
 
 #if defined( __cplusplus )
@@ -56,74 +55,74 @@ LIBEWF_EXTERN \
 int libewf_handle_set_maximum_amount_of_open_handles(
      libewf_handle_t *handle,
      int maximum_amount_of_open_handles,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_segment_file_size(
      libewf_handle_t *handle,
      size64_t *segment_file_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_set_segment_file_size(
      libewf_handle_t *handle,
      size64_t segment_file_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_delta_segment_file_size(
      libewf_handle_t *handle,
      size64_t *delta_segment_file_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_set_delta_segment_file_size(
      libewf_handle_t *handle,
      size64_t delta_segment_file_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_amount_of_sectors(
      libewf_handle_t *handle,
      uint64_t *amount_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_write_amount_of_chunks(
      libewf_handle_t *handle,
      uint32_t *amount_of_chunks,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_set_read_wipe_chunk_on_error(
      libewf_handle_t *handle,
      uint8_t wipe_on_error,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_amount_of_acquiry_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_add_acquiry_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_number_of_crc_errors(
      libewf_handle_t *handle,
      uint32_t *number_of_errors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_amount_of_crc_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_crc_error(
@@ -131,33 +130,33 @@ int libewf_handle_get_crc_error(
      uint32_t index,
      uint64_t *first_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_add_crc_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_amount_of_sessions(
      libewf_handle_t *handle,
      uint32_t *amount_of_sessions,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_add_session(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_amount_of_header_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_header_value_size(
@@ -165,7 +164,7 @@ int libewf_handle_get_header_value_size(
      const uint8_t *identifier,
      size_t identifier_length,
      size_t *value_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_header_value(
@@ -174,7 +173,7 @@ int libewf_handle_get_header_value(
      size_t identifier_length,
      uint8_t *value,
      size_t value_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_set_header_value(
@@ -183,13 +182,13 @@ int libewf_handle_set_header_value(
      size_t identifier_length,
      const uint8_t *value,
      size_t value_length,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_amount_of_hash_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_hash_value_size(
@@ -197,7 +196,7 @@ int libewf_handle_get_hash_value_size(
      const uint8_t *identifier,
      size_t identifier_length,
      size_t *value_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_get_hash_value(
@@ -206,7 +205,7 @@ int libewf_handle_get_hash_value(
      size_t identifier_length,
      uint8_t *value,
      size_t value_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_set_hash_value(
@@ -215,26 +214,26 @@ int libewf_handle_set_hash_value(
      size_t identifier_length,
      const uint8_t *value,
      size_t value_length,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_amount_of_sub_file_entries(
      libewf_file_entry_t *file_entry,
      int *amount_of_sub_file_entries,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_name_size(
      libewf_file_entry_t *file_entry,
      size_t *name_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_name(
      libewf_file_entry_t *file_entry,
      uint8_t *name,
      size_t name_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 #endif
 
 #if defined( HAVE_V1_API )

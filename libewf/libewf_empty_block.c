@@ -22,9 +22,8 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #include "libewf_empty_block.h"
+#include "libewf_libcerror.h"
 
 /* The largest primary (or scalar) available
  * supported by a single load and store instruction
@@ -38,7 +37,7 @@ typedef unsigned long int libewf_aligned_t;
 int libewf_empty_block_test(
      const uint8_t *block_buffer,
      size_t block_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_aligned_t *aligned_block_iterator = NULL;
 	libewf_aligned_t *aligned_block_start    = NULL;
@@ -48,10 +47,10 @@ int libewf_empty_block_test(
 
 	if( block_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid block buffer.",
 		 function );
 
@@ -59,10 +58,10 @@ int libewf_empty_block_test(
 	}
 	if( block_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid block size value exceeds maximum.",
 		 function );
 

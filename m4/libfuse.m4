@@ -1,6 +1,6 @@
 dnl Functions for libfuse
 dnl
-dnl Version: 20120405
+dnl Version: 20120509
 
 dnl Function to detect if libfuse is available
 dnl ac_libfuse_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -16,112 +16,124 @@ AC_DEFUN([AX_LIBFUSE_CHECK_LIB],
    ])
   ])
 
- dnl Check for headers
- ac_cv_libfuse=no
-
- dnl Check for libfuse
  AS_IF(
-  [test "x$ac_cv_with_libfuse" != xno],
-  [AC_CHECK_HEADERS(
-   [fuse.h],
-   [ac_cv_header_fuse_h=yes],
-   [ac_cv_header_fuse_h=no])
-
-  dnl libfuse sometimes requires -D_FILE_OFFSET_BITS=64 to be set
+  [test "x$ac_cv_with_libfuse" = xno],
+  [ac_cv_libfuse=no],
+  [dnl Check for a pkg-config file
   AS_IF(
-   [test "x$ac_cv_header_fuse_h" = xno],
-   [AS_UNSET([ac_cv_header_fuse_h])
-   CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
-   AC_CHECK_HEADERS([fuse.h])
-  ])
-
-  AS_IF(
-   [test "x$ac_cv_header_fuse_h" = xno],
-   [ac_cv_libfuse=no],
-   [ac_cv_libfuse=libfuse
-
-   AC_CHECK_LIB(
-    fuse,
-    fuse_daemonize,
-    [ac_cv_libfuse_dummy=yes],
-    [ac_cv_libfuse=no])
-   AC_CHECK_LIB(
-    fuse,
-    fuse_destroy,
-    [ac_cv_libfuse_dummy=yes],
-    [ac_cv_libfuse=no])
-   AC_CHECK_LIB(
-    fuse,
-    fuse_mount,
-    [ac_cv_libfuse_dummy=yes],
-    [ac_cv_libfuse=no])
-   AC_CHECK_LIB(
-    fuse,
-    fuse_new,
-    [ac_cv_libfuse_dummy=yes],
+   [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
+   [PKG_CHECK_MODULES(
+    [fuse],
+    [fuse >= 2.6],
+    [ac_cv_libfuse=libfuse],
     [ac_cv_libfuse=no])
    ])
-  ])
-
- dnl Check for libosxfuse
- AS_IF(
-  [test "x$ac_cv_with_libfuse" != xno && test "x$ac_cv_header_fuse_h" = xno],
-  [AC_CHECK_HEADERS([osxfuse/fuse.h])
-
-  dnl libosxfuse sometimes requires -D_FILE_OFFSET_BITS=64 to be set
-  AS_IF(
-   [test "x$ac_cv_header_osxfuse_fuse_h" = xno],
-   [AS_UNSET([ac_cv_header_osxfuse_fuse_h])
-   CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
-   AC_CHECK_HEADERS([osxfuse/fuse.h])
-  ])
 
   AS_IF(
-   [test "x$ac_cv_header_osxfuse_fuse_h" = xno],
-   [ac_cv_libfuse=no],
-   [ac_cv_libfuse=libosxfuse
+   [test "x$ac_cv_libfuse" = xlibfuse],
+   [ac_cv_libfuse_CPPFLAGS="$pkg_cv_fuse_CFLAGS"
+   ac_cv_libfuse_LIBADD="$pkg_cv_fuse_LIBS"],
+   [dnl Check for headers
+   AC_CHECK_HEADERS(
+    [fuse.h],
+    [ac_cv_header_fuse_h=yes],
+    [ac_cv_header_fuse_h=no])
 
-   AC_CHECK_LIB(
-    osxfuse,
-    fuse_daemonize,
-    [ac_cv_libfuse_dummy=yes],
-    [ac_cv_libfuse=no])
-   AC_CHECK_LIB(
-    osxfuse,
-    fuse_destroy,
-    [ac_cv_libfuse_dummy=yes],
-    [ac_cv_libfuse=no])
-   AC_CHECK_LIB(
-    osxfuse,
-    fuse_mount,
-    [ac_cv_libfuse_dummy=yes],
-    [ac_cv_libfuse=no])
-   AC_CHECK_LIB(
-    osxfuse,
-    fuse_new,
-    [ac_cv_libfuse_dummy=yes],
-    [ac_cv_libfuse=no])
+   dnl libfuse sometimes requires -D_FILE_OFFSET_BITS=64 to be set
+   AS_IF(
+    [test "x$ac_cv_header_fuse_h" = xno],
+    [AS_UNSET([ac_cv_header_fuse_h])
+    CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
+    AC_CHECK_HEADERS([fuse.h])
+   ])
+
+   AS_IF(
+    [test "x$ac_cv_header_fuse_h" = xno],
+    [ac_cv_libfuse=no],
+    [dnl Check for the individual functions
+    ac_cv_libfuse=libfuse
+ 
+    AC_CHECK_LIB(
+     fuse,
+     fuse_daemonize,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+    AC_CHECK_LIB(
+     fuse,
+     fuse_destroy,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+    AC_CHECK_LIB(
+     fuse,
+     fuse_mount,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+    AC_CHECK_LIB(
+     fuse,
+     fuse_new,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+
+    ac_cv_libfuse_LIBADD="-lfuse";
+    ])
+   ])
+ 
+  dnl Check for libosxfuse
+  AS_IF(
+   [test "x$ac_cv_with_libfuse" != xno && test "x$ac_cv_header_fuse_h" = xno],
+   [AC_CHECK_HEADERS([osxfuse/fuse.h])
+ 
+   dnl libosxfuse sometimes requires -D_FILE_OFFSET_BITS=64 to be set
+   AS_IF(
+    [test "x$ac_cv_header_osxfuse_fuse_h" = xno],
+    [AS_UNSET([ac_cv_header_osxfuse_fuse_h])
+    CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
+    AC_CHECK_HEADERS([osxfuse/fuse.h])
+   ])
+ 
+   AS_IF(
+    [test "x$ac_cv_header_osxfuse_fuse_h" = xno],
+    [ac_cv_libfuse=no],
+    [dnl Check for the individual functions
+    ac_cv_libfuse=libosxfuse
+ 
+    AC_CHECK_LIB(
+     osxfuse,
+     fuse_daemonize,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+    AC_CHECK_LIB(
+     osxfuse,
+     fuse_destroy,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+    AC_CHECK_LIB(
+     osxfuse,
+     fuse_mount,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+    AC_CHECK_LIB(
+     osxfuse,
+     fuse_new,
+     [ac_cv_libfuse_dummy=yes],
+     [ac_cv_libfuse=no])
+
+    ac_cv_libfuse_LIBADD="-losxfuse";
+    ])
    ])
   ])
 
  AS_IF(
   [test "x$ac_cv_libfuse" = xlibfuse],
-  [AC_SUBST(
-   [LIBFUSE_LIBADD],
-   ["-lfuse"])
-  AC_DEFINE(
+  [AC_DEFINE(
    [HAVE_LIBFUSE],
    [1],
    [Define to 1 if you have the 'fuse' library (-lfuse).])
   ])
-
  AS_IF(
   [test "x$ac_cv_libfuse" = xlibosxfuse],
-  [AC_SUBST(
-   [LIBFUSE_LIBADD],
-   ["-losxfuse"])
-  AC_DEFINE(
-   [HAVE_LIBFUSE],
+  [AC_DEFINE(
+   [HAVE_LIBOSXFUSE],
    [1],
    [Define to 1 if you have the 'osxfuse' library (-losxfuse).])
   ])
@@ -146,7 +158,21 @@ AC_DEFUN([AX_LIBFUSE_CHECK_ENABLE],
   [auto-detect],
   [DIR])
 
+ dnl Check for a shared library version
  AX_LIBFUSE_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libfuse_CPPFLAGS" != "x"],
+  [AC_SUBST(
+   [LIBFUSE_CPPFLAGS],
+   [$ac_cv_libfuse_CPPFLAGS])
+  ])
+ AS_IF(
+  [test "x$ac_cv_libfuse_LIBADD" != "x"],
+  [AC_SUBST(
+   [LIBFUSE_LIBADD],
+   [$ac_cv_libfuse_LIBADD])
+  ])
 
  AS_IF(
   [test "x$ac_cv_libfuse" = xlibfuse],
@@ -154,7 +180,6 @@ AC_DEFUN([AX_LIBFUSE_CHECK_ENABLE],
    [ax_libfuse_pc_libs_private],
    [-lfuse])
   ])
-
  AS_IF(
   [test "x$ac_cv_libfuse" = xlibosxfuse],
   [AC_SUBST(

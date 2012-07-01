@@ -23,11 +23,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_definitions.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
+#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
@@ -39,16 +38,16 @@
  */
 int libewf_single_files_initialize(
      libewf_single_files_t **single_files,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_files_initialize";
 
 	if( single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single files.",
 		 function );
 
@@ -56,10 +55,10 @@ int libewf_single_files_initialize(
 	}
 	if( *single_files != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid single files value already set.",
 		 function );
 
@@ -70,10 +69,10 @@ int libewf_single_files_initialize(
 
 	if( *single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create single files.",
 		 function );
 
@@ -84,10 +83,10 @@ int libewf_single_files_initialize(
 	     0,
 	     sizeof( libewf_single_files_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear single files.",
 		 function );
 
@@ -111,17 +110,17 @@ on_error:
  */
 int libewf_single_files_free(
      libewf_single_files_t **single_files,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_files_free";
 	int result            = 1;
 
 	if( single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single files.",
 		 function );
 
@@ -138,13 +137,13 @@ int libewf_single_files_free(
 		{
 			if( libewf_tree_node_free(
 			     &( ( *single_files )->root_file_entry_node ),
-			     (int (*)(intptr_t **, liberror_error_t **)) &libewf_single_file_entry_free,
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free single file entry tree.",
 				 function );
 
@@ -165,7 +164,7 @@ int libewf_single_files_free(
 int libewf_single_files_parse(
      libewf_single_files_t *single_files,
      size64_t *media_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t *file_entries_string    = NULL;
 	static char *function           = "libewf_single_files_parse";
@@ -173,10 +172,10 @@ int libewf_single_files_parse(
 
 	if( single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single files.",
 		 function );
 
@@ -184,10 +183,10 @@ int libewf_single_files_parse(
 	}
 	if( single_files->ltree_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid single files - missing ltree data.",
 		 function );
 
@@ -200,10 +199,10 @@ int libewf_single_files_parse(
 	     &file_entries_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine file entries string size.",
 		 function );
 
@@ -214,10 +213,10 @@ int libewf_single_files_parse(
 
 	if( file_entries_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create file entries string.",
 		 function );
 
@@ -231,10 +230,10 @@ int libewf_single_files_parse(
 	     LIBUNA_ENDIAN_LITTLE,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set file entries string.",
 		 function );
 
@@ -247,10 +246,10 @@ int libewf_single_files_parse(
 	     file_entries_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse file entries string.",
 		 function );
 
@@ -278,7 +277,7 @@ int libewf_single_files_parse_file_entries(
      size64_t *media_size,
      const uint8_t *entries_string,
      size_t entries_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *lines = NULL;
 	libfvalue_split_utf8_string_t *types = NULL;
@@ -290,10 +289,10 @@ int libewf_single_files_parse_file_entries(
 
 	if( single_files == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single files.",
 		 function );
 
@@ -301,10 +300,10 @@ int libewf_single_files_parse_file_entries(
 	}
 	if( entries_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid entries string.",
 		 function );
 
@@ -317,10 +316,10 @@ int libewf_single_files_parse_file_entries(
 	     &lines,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split entries string into lines.",
 		 function );
 
@@ -331,10 +330,10 @@ int libewf_single_files_parse_file_entries(
 	     &number_of_lines,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of lines",
 		 function );
 
@@ -349,10 +348,10 @@ int libewf_single_files_parse_file_entries(
 		     &line_string_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve line string: 0.",
 			 function );
 
@@ -362,10 +361,10 @@ int libewf_single_files_parse_file_entries(
 		 || ( line_string_size < 2 )
 		 || ( line_string[ 0 ] == 0 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing line string: 0.",
 			 function );
 
@@ -381,10 +380,10 @@ int libewf_single_files_parse_file_entries(
 		}
 		if( line_string_size != 2 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported single file entries string.",
 			 function );
 
@@ -393,10 +392,10 @@ int libewf_single_files_parse_file_entries(
 		if( ( line_string[ 0 ] < (uint8_t) '0' )
 		 || ( line_string[ 0 ] > (uint8_t) '9' ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported single file entries string.",
 			 function );
 
@@ -415,10 +414,10 @@ int libewf_single_files_parse_file_entries(
 			     &line_string_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve line string: %d.",
 				 function,
 				 line_index );
@@ -429,10 +428,10 @@ int libewf_single_files_parse_file_entries(
 			{
 				if( line_string == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: missing line string: %d.",
 					 function,
 					 line_index );
@@ -455,10 +454,10 @@ int libewf_single_files_parse_file_entries(
 		     &line_index,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBCERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to parse record values.",
 			 function );
 
@@ -477,10 +476,10 @@ int libewf_single_files_parse_file_entries(
 			     &line_string_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve line string: %d.",
 				 function,
 				 line_index );
@@ -491,10 +490,10 @@ int libewf_single_files_parse_file_entries(
 			{
 				if( line_string == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: missing line string: %d.",
 					 function,
 					 line_index );
@@ -522,10 +521,10 @@ int libewf_single_files_parse_file_entries(
 			     &line_string_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve line string: %d.",
 				 function,
 				 line_index );
@@ -541,10 +540,10 @@ int libewf_single_files_parse_file_entries(
 			     &types,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to split entries string into types.",
 				 function );
 
@@ -554,10 +553,10 @@ int libewf_single_files_parse_file_entries(
 			     &( single_files->root_file_entry_node ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create root single file entry node.",
 				 function );
 
@@ -570,10 +569,10 @@ int libewf_single_files_parse_file_entries(
 			     types,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBERROR_CONVERSION_ERROR_GENERIC,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_GENERIC,
 				 "%s: unable to parse file entry.",
 				 function );
 
@@ -588,10 +587,10 @@ int libewf_single_files_parse_file_entries(
 			     &line_string_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve line string: %d.",
 				 function,
 				 line_index );
@@ -601,10 +600,10 @@ int libewf_single_files_parse_file_entries(
 			if( ( line_string_size != 1 )
 			 || ( line_string[ 0 ] != 0 ) )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported empty line string: %d - not empty.",
 				 function,
 				 line_index );
@@ -616,10 +615,10 @@ int libewf_single_files_parse_file_entries(
 		     &types,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free split types.",
 			 function );
 
@@ -630,10 +629,10 @@ int libewf_single_files_parse_file_entries(
 	     &lines,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split lines.",
 		 function );
 
@@ -664,7 +663,7 @@ int libewf_single_files_parse_record_values(
      size64_t *media_size,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *types  = NULL;
 	libfvalue_split_utf8_string_t *values = NULL;
@@ -682,10 +681,10 @@ int libewf_single_files_parse_record_values(
 
 	if( media_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media size.",
 		 function );
 
@@ -693,10 +692,10 @@ int libewf_single_files_parse_record_values(
 	}
 	if( line_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid line index.",
 		 function );
 
@@ -709,10 +708,10 @@ int libewf_single_files_parse_record_values(
 	     &line_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve line string: %d.",
 		 function,
 		 *line_index );
@@ -728,10 +727,10 @@ int libewf_single_files_parse_record_values(
 	     &types,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split entries string into types.",
 		 function );
 
@@ -742,10 +741,10 @@ int libewf_single_files_parse_record_values(
 	     &number_of_types,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of types",
 		 function );
 
@@ -758,10 +757,10 @@ int libewf_single_files_parse_record_values(
 	     &line_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve line string: %d.",
 		 function,
 		 *line_index );
@@ -777,10 +776,10 @@ int libewf_single_files_parse_record_values(
 	     &values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split entries string into values.",
 		 function );
 
@@ -791,10 +790,10 @@ int libewf_single_files_parse_record_values(
 	     &number_of_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of values",
 		 function );
 
@@ -803,9 +802,9 @@ int libewf_single_files_parse_record_values(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( number_of_types != number_of_values )
 	{
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			"%s: mismatch in number of types and values.\n",
 			 function );
 		}
@@ -822,10 +821,10 @@ int libewf_single_files_parse_record_values(
 		     &type_string_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve type string: %d.",
 			 function,
 			 value_index );
@@ -836,10 +835,10 @@ int libewf_single_files_parse_record_values(
 		 || ( type_string_size < 2 )
 		 || ( type_string[ 0 ] == 0 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing type string: %d.",
 			 function,
 			 value_index );
@@ -863,10 +862,10 @@ int libewf_single_files_parse_record_values(
 			     &value_string_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve value string: %d.",
 				 function,
 				 value_index );
@@ -895,9 +894,9 @@ int libewf_single_files_parse_record_values(
 			value_string_size = 0;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: type: %s with value: %s.\n",
 			 function,
 			 (char *) type_string,
@@ -919,16 +918,18 @@ int libewf_single_files_parse_record_values(
 			else if( ( type_string[ 0 ] == (uint8_t) 't' )
 			      && ( type_string[ 1 ] == (uint8_t) 'b' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
+				     64,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set media size.",
 					 function );
 
@@ -942,10 +943,10 @@ int libewf_single_files_parse_record_values(
 	     &values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split values.",
 		 function );
 
@@ -955,10 +956,10 @@ int libewf_single_files_parse_record_values(
 	     &types,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split types.",
 		 function );
 
@@ -990,7 +991,7 @@ int libewf_single_files_parse_file_entry(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      libfvalue_split_utf8_string_t *types,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_single_file_entry_t *single_file_entry = NULL;
 	libfvalue_split_utf8_string_t *values         = NULL;
@@ -1005,7 +1006,6 @@ int libewf_single_files_parse_file_entry(
 	size_t value_string_index                     = 0;
 	uint64_t number_of_sub_entries                = 0;
 	uint64_t value_64bit                          = 0;
-	uint32_t value_32bit                          = 0;
 	int number_of_lines                           = 0;
 	int number_of_types                           = 0;
 	int number_of_values                          = 0;
@@ -1013,10 +1013,10 @@ int libewf_single_files_parse_file_entry(
 
 	if( parent_file_entry_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid parent file entry node.",
 		 function );
 
@@ -1024,10 +1024,10 @@ int libewf_single_files_parse_file_entry(
 	}
 	if( line_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid line index.",
 		 function );
 
@@ -1038,10 +1038,10 @@ int libewf_single_files_parse_file_entry(
 	     &number_of_types,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of types",
 		 function );
 
@@ -1053,10 +1053,10 @@ int libewf_single_files_parse_file_entry(
 	     &number_of_sub_entries,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse file entry number of sub entries.",
 		 function );
 
@@ -1069,10 +1069,10 @@ int libewf_single_files_parse_file_entry(
 	     &line_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve line string: %d.",
 		 function,
 		 *line_index );
@@ -1088,10 +1088,10 @@ int libewf_single_files_parse_file_entry(
 	     &values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split entries string into values.",
 		 function );
 
@@ -1102,10 +1102,10 @@ int libewf_single_files_parse_file_entry(
 	     &number_of_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of values",
 		 function );
 
@@ -1114,9 +1114,9 @@ int libewf_single_files_parse_file_entry(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( number_of_types != number_of_values )
 	{
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			"%s: mismatch in number of types and values.\n",
 			 function );
 		}
@@ -1126,10 +1126,10 @@ int libewf_single_files_parse_file_entry(
 	     &single_file_entry,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create single file entry.",
 		 function );
 
@@ -1146,10 +1146,10 @@ int libewf_single_files_parse_file_entry(
 		     &type_string_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve type string: %d.",
 			 function,
 			 value_index );
@@ -1160,10 +1160,10 @@ int libewf_single_files_parse_file_entry(
 		 || ( type_string_size < 2 )
 		 || ( type_string[ 0 ] == 0 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing type string: %d.",
 			 function,
 			 value_index );
@@ -1187,10 +1187,10 @@ int libewf_single_files_parse_file_entry(
 			     &value_string_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve value string: %d.",
 				 function,
 				 value_index );
@@ -1219,9 +1219,9 @@ int libewf_single_files_parse_file_entry(
 			value_string_size = 0;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: type: %s with value: %s.\n",
 			 function,
 			 (char *) type_string,
@@ -1244,16 +1244,18 @@ int libewf_single_files_parse_file_entry(
 			      && ( type_string[ 1 ] == (uint8_t) 'p' )
 			      && ( type_string[ 2 ] == (uint8_t) 'r' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
+				     64,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set entry flags.",
 					 function );
 
@@ -1261,10 +1263,10 @@ int libewf_single_files_parse_file_entry(
 				}
 				if( value_64bit > (uint64_t) UINT32_MAX )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 					 "%s: invalid entry flags value exceeds maximum.",
 					 function );
 
@@ -1290,22 +1292,24 @@ int libewf_single_files_parse_file_entry(
 			if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			 && ( type_string[ 1 ] == (uint8_t) 'c' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_32bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
-				     &value_32bit,
+				     &value_64bit,
+				     32,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set access time.",
 					 function );
 
 					goto on_error;
 				}
-				single_file_entry->access_time = value_32bit;
+				single_file_entry->access_time = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
@@ -1323,10 +1327,10 @@ int libewf_single_files_parse_file_entry(
 				     value_string_size,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_CONVERSION,
-					 LIBERROR_CONVERSION_ERROR_GENERIC,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
 					 "%s: unable to parse offset values string.",
 					 function );
 
@@ -1338,22 +1342,24 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'c' )
 			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_32bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
-				     &value_32bit,
+				     &value_64bit,
+				     32,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set creation time.",
 					 function );
 
 					goto on_error;
 				}
-				single_file_entry->creation_time = value_32bit;
+				single_file_entry->creation_time = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
@@ -1362,16 +1368,18 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'u' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
+				     64,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set duplicate data offset.",
 					 function );
 
@@ -1389,10 +1397,10 @@ int libewf_single_files_parse_file_entry(
 
 				if( single_file_entry->md5_hash == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 					 "%s: unable to create MD5 hash.",
 					 function );
 
@@ -1419,10 +1427,10 @@ int libewf_single_files_parse_file_entry(
 					}
 					else
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 						 "%s: unsupported character in MD5 hash.",
 						 function );
 
@@ -1450,16 +1458,18 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
 			      && ( type_string[ 1 ] == (uint8_t) 's' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_64bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
+				     64,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set size.",
 					 function );
 
@@ -1470,22 +1480,24 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'm' )
 			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_32bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
-				     &value_32bit,
+				     &value_64bit,
+				     32,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set entry modification time.",
 					 function );
 
 					goto on_error;
 				}
-				single_file_entry->entry_modification_time = value_32bit;
+				single_file_entry->entry_modification_time = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
 			      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
@@ -1500,22 +1512,24 @@ int libewf_single_files_parse_file_entry(
 			else if( ( type_string[ 0 ] == (uint8_t) 'w' )
 			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
 			{
-				if( libfvalue_utf8_string_decimal_copy_to_32bit(
+				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
-				     &value_32bit,
+				     &value_64bit,
+				     32,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set modification time.",
 					 function );
 
 					goto on_error;
 				}
-				single_file_entry->modification_time = value_32bit;
+				single_file_entry->modification_time = (uint32_t) value_64bit;
 			}
 		}
 		else if( type_string_size == 2 )
@@ -1529,10 +1543,10 @@ int libewf_single_files_parse_file_entry(
 
 				if( single_file_entry->name == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 					 "%s: unable to create name.",
 					 function );
 
@@ -1543,10 +1557,10 @@ int libewf_single_files_parse_file_entry(
 				     value_string,
 				     value_string_size - 1 ) == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to set name.",
 					 function );
 
@@ -1577,9 +1591,9 @@ int libewf_single_files_parse_file_entry(
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "\n" );
 	}
 #endif
@@ -1587,10 +1601,10 @@ int libewf_single_files_parse_file_entry(
 	     &values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split values.",
 		 function );
 
@@ -1601,10 +1615,10 @@ int libewf_single_files_parse_file_entry(
 	     (intptr_t *) single_file_entry,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set single file entry in node.",
 		 function );
 
@@ -1617,10 +1631,10 @@ int libewf_single_files_parse_file_entry(
 	     &number_of_lines,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of lines",
 		 function );
 
@@ -1628,10 +1642,10 @@ int libewf_single_files_parse_file_entry(
 	}
 	if( ( *line_index + number_of_sub_entries ) > (uint64_t) number_of_lines )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: number of sub entries exceed the number of available lines.",
 		 function );
 
@@ -1643,10 +1657,10 @@ int libewf_single_files_parse_file_entry(
 		     &file_entry_node,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create single file entry node.",
 			 function );
 
@@ -1659,10 +1673,10 @@ int libewf_single_files_parse_file_entry(
 		     types,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBCERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to parse file entry.",
 			 function );
 
@@ -1673,10 +1687,10 @@ int libewf_single_files_parse_file_entry(
 		     file_entry_node,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append single file entry node to parent.",
 			 function );
 
@@ -1693,7 +1707,7 @@ on_error:
 	{
 		libewf_tree_node_free(
 		 &file_entry_node,
-		 (int (*)(intptr_t **, liberror_error_t **)) &libewf_single_file_entry_free,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
 		 NULL );
 	}
 	if( single_file_entry != NULL )
@@ -1718,7 +1732,7 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      uint64_t *number_of_sub_entries,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *values = NULL;
 	uint8_t *line_string                  = NULL;
@@ -1730,10 +1744,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 
 	if( line_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid line index.",
 		 function );
 
@@ -1746,10 +1760,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	     &line_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve line string: %d.",
 		 function,
 		 *line_index );
@@ -1765,10 +1779,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	     &values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split entries string into values.",
 		 function );
 
@@ -1779,10 +1793,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	     &number_of_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of values",
 		 function );
 
@@ -1790,10 +1804,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	}
 	if( number_of_values != 2 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported number of values.",
 		 function );
 
@@ -1806,10 +1820,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	     &value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value string: 0.",
 		 function );
 
@@ -1819,10 +1833,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	{
 		if( value_string[ 0 ] != (uint8_t) '0' ) 
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported first value: %c.",
 			 function,
 			 value_string[ 0 ] );
@@ -1835,10 +1849,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 		if( ( value_string[ 0 ] != (uint8_t) '2' )
 		 || ( value_string[ 1 ] != (uint8_t) '6' ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported first value: %c%c.",
 			 function,
 			 value_string[ 0 ],
@@ -1849,10 +1863,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	}
 	else
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported first value.",
 		 function );
 
@@ -1865,25 +1879,27 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	     &value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value string: 1.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfvalue_utf8_string_decimal_copy_to_64bit(
+	if( libfvalue_utf8_string_copy_to_integer(
 	     value_string,
 	     value_string_size,
 	     number_of_sub_entries,
+	     64,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to set number fo sub entries.",
 		 function );
 
@@ -1893,10 +1909,10 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	     &values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split values.",
 		 function );
 
@@ -1921,7 +1937,7 @@ int libewf_single_files_parse_file_entry_offset_values(
      libewf_single_file_entry_t *single_file_entry,
      const uint8_t *offset_values_string,
      size_t offset_values_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *offset_values  = NULL;
 	uint8_t *offset_value_string                  = NULL;
@@ -1932,10 +1948,10 @@ int libewf_single_files_parse_file_entry_offset_values(
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -1948,10 +1964,10 @@ int libewf_single_files_parse_file_entry_offset_values(
 	     &offset_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split string into offset values.",
 		 function );
 
@@ -1962,10 +1978,10 @@ int libewf_single_files_parse_file_entry_offset_values(
 	     &number_of_offset_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of offset values",
 		 function );
 
@@ -1974,10 +1990,10 @@ int libewf_single_files_parse_file_entry_offset_values(
 	if( ( number_of_offset_values != 1 )
 	 && ( number_of_offset_values != 3 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported number of offset values.",
 		 function );
 
@@ -1992,25 +2008,27 @@ int libewf_single_files_parse_file_entry_offset_values(
 		     &offset_value_string_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve offset value string: 1.",
 			 function );
 
 			goto on_error;
 		}
-		if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
+		if( libfvalue_utf8_string_copy_to_integer(
 		     offset_value_string,
 		     offset_value_string_size,
 		     &value_64bit,
+		     64,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to set data offset.",
 			 function );
 
@@ -2025,25 +2043,27 @@ int libewf_single_files_parse_file_entry_offset_values(
 		     &offset_value_string_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve offset value string: 2.",
 			 function );
 
 			goto on_error;
 		}
-		if( libfvalue_utf8_string_hexadecimal_copy_to_64bit(
+		if( libfvalue_utf8_string_copy_to_integer(
 		     offset_value_string,
 		     offset_value_string_size,
 		     &value_64bit,
+		     64,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to set data size.",
 			 function );
 
@@ -2055,10 +2075,10 @@ int libewf_single_files_parse_file_entry_offset_values(
 	     &offset_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split offset values.",
 		 function );
 

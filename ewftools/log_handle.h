@@ -1,7 +1,7 @@
 /* 
  * Log handle
  *
- * Copyright (c) 2009-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2009-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,8 +26,8 @@
 #include <file_stream.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -44,20 +44,20 @@ struct log_handle
 
 int log_handle_initialize(
      log_handle_t **log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int log_handle_free(
      log_handle_t **log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int log_handle_open(
      log_handle_t *log_handle,
      const libcstring_system_character_t *filename,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int log_handle_close(
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 void log_handle_printf(
       log_handle_t *log_handle,

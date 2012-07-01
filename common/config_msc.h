@@ -1,7 +1,7 @@
 /*
  * Configuration file for Microsoft Visual Studio C++ compiler
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,27 +24,13 @@
 
 /* Define to the address where bug reports for this package should be sent.
  */
-#define PACKAGE_BUGREPORT "jbmetz@users.sourceforge.net"
+#define PACKAGE_BUGREPORT "joachim.metz@gmail.com"
 
-/* Use the safe size and offset types
+/* Define the size of the wide character for WINAPI
  */
-#define HAVE_SIZE32_T		0
-#define HAVE_SSIZE32_T		0
-#define HAVE_SIZE64_T		0
-#define HAVE_SSIZE64_T		0
-#define HAVE_OFF64_T		0
-
-/* Define the wide character type
- */
-#if !defined( HAVE_WCHAR_H )
-#define HAVE_WCHAR_H		1
+#if !defined( SIZEOF_WCHAR_T )
+#define SIZEOF_WCHAR_T          2
 #endif
-
-#if defined( SIZEOF_WCHAR_T )
-#undef SIZEOF_WCHAR_T
-#endif
-
-#define SIZEOF_WCHAR_T		2
 
 /* Use the C Runtime (CRT) functions instead of the WINAPI functions
 #define USE_CRT_FUNCTIONS	1

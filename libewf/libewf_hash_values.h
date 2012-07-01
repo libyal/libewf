@@ -25,8 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 
 #if defined( __cplusplus )
@@ -42,45 +41,45 @@ enum LIBEWF_HASH_VALUES_INDEXES
 
 int libewf_hash_values_initialize(
      libfvalue_table_t **hash_values,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_hash_values_parse_md5_hash(
      libfvalue_table_t *hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_hash_values_parse_sha1_hash(
      libfvalue_table_t *hash_values,
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_hash_values_parse_xhash(
      libfvalue_table_t *hash_values,
      const uint8_t *xhash,
      size_t xhash_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_hash_values_generate_xhash(
      libfvalue_table_t *hash_values,
      uint8_t **xhash,
      size_t *xhash_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_hash_values_generate_md5_hash(
      libfvalue_table_t *hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
      uint8_t *md5_hash_set,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_hash_values_generate_sha1_hash(
      libfvalue_table_t *hash_values,
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
      uint8_t *sha1_hash_set,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

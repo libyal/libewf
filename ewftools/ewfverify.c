@@ -1,7 +1,7 @@
 /*
  * Verifies the integrity of the media data within the EWF file
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,19 +23,19 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
-
-#include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfoutput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libclocale.h"
+#include "ewftools_libcnotify.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "log_handle.h"
 #include "verification_handle.h"
@@ -82,12 +82,12 @@ void usage_fprint(
 /* Signal handler for ewfverify
  */
 void ewfverify_signal_handler(
-      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
+      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "ewfverify_signal_handler";
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfverify_abort = 1;
 
@@ -97,22 +97,22 @@ void ewfverify_signal_handler(
 		     ewfverify_verification_handle,
 		     &error ) != 1 )
 		{
-			libsystem_notify_printf(
+			libcnotify_printf(
 			 "%s: unable to signal verification handle to abort.\n",
 			 function );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libsystem_file_io_close(
+	if( libcsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -126,12 +126,12 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error                                       = NULL;
+	libcerror_error_t *error                                       = NULL;
 
 	libcstring_system_character_t * const *argv_filenames         = NULL;
 
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                                        = NULL;
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	libcsystem_glob_t *glob                                        = NULL;
 #endif
 
 	libcstring_system_character_t *log_filename                   = NULL;
@@ -151,14 +151,23 @@ int main( int argc, char * const argv[] )
 	int number_of_filenames                                       = 0;
 	int result                                                    = 0;
 
-	libsystem_notify_set_stream(
+	libcnotify_stream_set(
 	 stderr,
 	 NULL );
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 1 );
 
-	if( libsystem_initialize(
-	     "ewftools",
+	if( libclocale_initialize(
+             "ewftools",
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize locale values.\n" );
+
+		goto on_error;
+	}
+	if( libcsystem_initialize(
 	     _IONBF,
 	     &error ) != 1 )
 	{
@@ -172,7 +181,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = libsystem_getopt(
+	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
 	                   _LIBCSTRING_SYSTEM_STRING( "A:d:f:hl:p:qvVw" ) ) ) != (libcstring_system_integer_t) -1 )
@@ -255,7 +264,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 verbose );
 	libewf_notify_set_verbose(
 	 verbose );
@@ -359,8 +368,8 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_initialize(
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -370,7 +379,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libsystem_glob_resolve(
+	if( libcsystem_glob_resolve(
 	     glob,
 	     &( argv[ optind ] ),
 	     argc - optind,
@@ -389,7 +398,7 @@ int main( int argc, char * const argv[] )
 	number_of_filenames = argc - optind;
 #endif
 
-	if( libsystem_signal_attach(
+	if( libcsystem_signal_attach(
 	     ewfverify_signal_handler,
 	     &error ) != 1 )
 	{
@@ -397,9 +406,9 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	result = verification_handle_open_input(
@@ -420,8 +429,8 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_free(
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -482,9 +491,9 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to verify single files.\n" );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 	}
@@ -502,9 +511,9 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to verify input.\n" );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 	}
@@ -532,16 +541,16 @@ int main( int argc, char * const argv[] )
 		}
 	}
 on_abort:
-	if( libsystem_signal_detach(
+	if( libcsystem_signal_detach(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to detach signal handler.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( verification_handle_close(
@@ -593,9 +602,9 @@ on_abort:
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( log_handle != NULL )
@@ -616,10 +625,10 @@ on_error:
 		 &ewfverify_verification_handle,
 		 NULL );
 	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
 	if( glob != NULL )
 	{
-		libsystem_glob_free(
+		libcsystem_glob_free(
 		 &glob,
 		 NULL );
 	}

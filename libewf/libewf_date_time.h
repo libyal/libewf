@@ -25,8 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #if defined( TIME_WITH_SYS_TIME )
 #include <sys/time.h>
 #include <time.h>
@@ -35,6 +33,8 @@
 #else
 #include <time.h>
 #endif
+
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -55,7 +55,7 @@ extern "C" {
 int libewf_date_time_localtime(
      const time_t *timestamp,
      struct tm *time_elements,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

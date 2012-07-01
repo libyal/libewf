@@ -25,11 +25,10 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #include "libewf_array_type.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcstring.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 
@@ -65,57 +64,57 @@ struct libewf_segment_table
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
      size64_t maximum_segment_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_table_free(
      libewf_segment_table_t **segment_table,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_table_clone(
      libewf_segment_table_t **destination_segment_table,
      libewf_segment_table_t *source_segment_table,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_table_get_basename_size(
      libewf_segment_table_t *segment_table,
      size_t *basename_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
      char *basename,
      size_t basename_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      const char *basename,
      size_t basename_length,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_segment_table_get_basename_size_wide(
      libewf_segment_table_t *segment_table,
      size_t *basename_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_table_get_basename_wide(
      libewf_segment_table_t *segment_table,
      wchar_t *basename,
      size_t basename_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_table_set_basename_wide(
      libewf_segment_table_t *segment_table,
      const wchar_t *basename,
      size_t basename_length,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 #endif
 
 int libewf_segment_table_set_maximum_segment_size(
      libewf_segment_table_t *segment_table,
      size64_t maximum_segment_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

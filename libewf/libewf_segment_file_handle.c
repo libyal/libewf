@@ -23,8 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_segment_file_handle.h"
 
 /* Initialize the segment file handle
@@ -33,16 +32,16 @@
 int libewf_segment_file_handle_initialize(
      libewf_segment_file_handle_t **segment_file_handle,
      int segment_file_index,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_initialize";
 
 	if( segment_file_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
 		 function );
 
@@ -50,10 +49,10 @@ int libewf_segment_file_handle_initialize(
 	}
 	if( *segment_file_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid segment file handle value already set.",
 		 function );
 
@@ -61,10 +60,10 @@ int libewf_segment_file_handle_initialize(
 	}
 	if( segment_file_index < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid segment file index value less than zero.",
 		 function );
 
@@ -75,10 +74,10 @@ int libewf_segment_file_handle_initialize(
 
 	if( *segment_file_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create segment file handle.",
 		 function );
 
@@ -89,10 +88,10 @@ int libewf_segment_file_handle_initialize(
 	     0,
 	     sizeof( libewf_segment_file_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear segment file handle.",
 		 function );
 
@@ -118,16 +117,16 @@ on_error:
  */
 int libewf_segment_file_handle_free(
      libewf_segment_file_handle_t **segment_file_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_free";
 
 	if( segment_file_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
 		 function );
 
@@ -149,16 +148,16 @@ int libewf_segment_file_handle_free(
 int libewf_segment_file_handle_clone(
      libewf_segment_file_handle_t **destination_segment_file_handle,
      libewf_segment_file_handle_t *source_segment_file_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_clone";
 
 	if( destination_segment_file_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination segment file handle.",
 		 function );
 
@@ -166,10 +165,10 @@ int libewf_segment_file_handle_clone(
 	}
 	if( *destination_segment_file_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination segment file handle value already set.",
 		 function );
 
@@ -186,10 +185,10 @@ int libewf_segment_file_handle_clone(
 
 	if( *destination_segment_file_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination segment file handle.",
 		 function );
 
@@ -200,10 +199,10 @@ int libewf_segment_file_handle_clone(
 	     source_segment_file_handle,
 	     sizeof( libewf_segment_file_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy source to destination segment file handle.",
 		 function );
 

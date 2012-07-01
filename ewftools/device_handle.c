@@ -1,7 +1,7 @@
 /* 
  * Device handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,14 +23,12 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
-#include <libsystem.h>
-
 #include "byte_size_string.h"
 #include "device_handle.h"
 #include "ewfinput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libodraw.h"
 #include "ewftools_libsmdev.h"
@@ -91,16 +89,16 @@ const char *device_handle_get_track_type(
  */
 int device_handle_initialize(
      device_handle_t **device_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_initialize";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -108,10 +106,10 @@ int device_handle_initialize(
 	}
 	if( *device_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid device handle value already set.",
 		 function );
 
@@ -122,10 +120,10 @@ int device_handle_initialize(
 
 	if( *device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create device handle.",
 		 function );
 
@@ -136,10 +134,10 @@ int device_handle_initialize(
 	     0,
 	     sizeof( device_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear device handle.",
 		 function );
 
@@ -155,10 +153,10 @@ int device_handle_initialize(
 
 	if( ( *device_handle )->input_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create input buffer.",
 		 function );
 
@@ -169,10 +167,10 @@ int device_handle_initialize(
 	     0,
 	     sizeof( libcstring_system_character_t ) * DEVICE_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear device handle.",
 		 function );
 
@@ -204,17 +202,17 @@ on_error:
  */
 int device_handle_free(
      device_handle_t **device_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_free";
 	int result            = 1;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -238,10 +236,10 @@ int device_handle_free(
 				     &( ( *device_handle )->smdev_input_handle ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 					 "%s: unable to free device input handle.",
 					 function );
 
@@ -257,10 +255,10 @@ int device_handle_free(
 				     &( ( *device_handle )->odraw_input_handle ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 					 "%s: unable to free optical disc raw input handle.",
 					 function );
 
@@ -276,10 +274,10 @@ int device_handle_free(
 				     &( ( *device_handle )->smraw_input_handle ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 					 "%s: unable to free raw input handle.",
 					 function );
 
@@ -300,16 +298,16 @@ int device_handle_free(
  */
 int device_handle_signal_abort(
      device_handle_t *device_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_signal_abort";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -323,10 +321,10 @@ int device_handle_signal_abort(
 			     device_handle->smdev_input_handle,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to signal device input handle to abort.",
 				 function );
 
@@ -342,10 +340,10 @@ int device_handle_signal_abort(
 			     device_handle->odraw_input_handle,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to signal optical disc raw input handle to abort.",
 				 function );
 
@@ -361,10 +359,10 @@ int device_handle_signal_abort(
 			     device_handle->smraw_input_handle,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to signal raw input handle to abort.",
 				 function );
 
@@ -382,17 +380,17 @@ int device_handle_open_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_open_input";
 	int result            = 0;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -400,10 +398,10 @@ int device_handle_open_input(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -422,10 +420,10 @@ int device_handle_open_input(
 #endif
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if filename is a device.",
 			 function );
 
@@ -452,10 +450,10 @@ int device_handle_open_input(
 		     number_of_filenames,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to open device input.",
 			 function );
 
@@ -470,10 +468,10 @@ int device_handle_open_input(
 		     number_of_filenames,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to open optical disc raw input.",
 			 function );
 
@@ -488,10 +486,10 @@ int device_handle_open_input(
 		     number_of_filenames,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to open raw input.",
 			 function );
 
@@ -508,16 +506,16 @@ int device_handle_open_smdev_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_open_smdev_input";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -525,10 +523,10 @@ int device_handle_open_smdev_input(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -536,10 +534,10 @@ int device_handle_open_smdev_input(
 	}
 	if( device_handle->smdev_input_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid device handle - device input handle already set.",
 		 function );
 
@@ -549,10 +547,10 @@ int device_handle_open_smdev_input(
 	     &( device_handle->smdev_input_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create device input handle.",
 		 function );
 
@@ -574,10 +572,10 @@ int device_handle_open_smdev_input(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open device input handle.",
 		 function );
 
@@ -602,7 +600,7 @@ int device_handle_open_odraw_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libodraw_data_file_t *data_file = NULL;
 	static char *function           = "device_handle_open_odraw_input";
@@ -612,10 +610,10 @@ int device_handle_open_odraw_input(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -623,10 +621,10 @@ int device_handle_open_odraw_input(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -634,10 +632,10 @@ int device_handle_open_odraw_input(
 	}
 	if( device_handle->odraw_input_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid device handle - optical disc raw input handle already set.",
 		 function );
 
@@ -647,10 +645,10 @@ int device_handle_open_odraw_input(
 	     &( device_handle->odraw_input_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create optical disc raw input handle.",
 		 function );
 
@@ -670,10 +668,10 @@ int device_handle_open_odraw_input(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open optical disc raw table of contents file.",
 		 function );
 
@@ -684,10 +682,10 @@ int device_handle_open_odraw_input(
 	     &number_of_data_files,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of optical disc raw data files.",
 		 function );
 
@@ -695,10 +693,10 @@ int device_handle_open_odraw_input(
 	}
 	if( number_of_filenames != number_of_data_files )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: number of filenames does not match number of data files.",
 		 function );
 
@@ -710,10 +708,10 @@ int device_handle_open_odraw_input(
 	{
 		if( filenames[ data_file_index ] == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing filename: %d.",
 			 function,
 			 data_file_index );
@@ -729,10 +727,10 @@ int device_handle_open_odraw_input(
 		     &data_file,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve optical disc raw data file: %d.",
 			 function,
 			 data_file_index );
@@ -753,10 +751,10 @@ int device_handle_open_odraw_input(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set filename in optical disc raw data file: %d.",
 			 function,
 			 data_file_index );
@@ -767,10 +765,10 @@ int device_handle_open_odraw_input(
 		     &data_file,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free optical disc raw data file: %d.",
 			 function,
 			 data_file_index );
@@ -782,10 +780,10 @@ int device_handle_open_odraw_input(
 	     device_handle->odraw_input_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open optical disc raw data files.",
 		 function );
 
@@ -816,16 +814,16 @@ int device_handle_open_smraw_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_open_smraw_input";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -833,10 +831,10 @@ int device_handle_open_smraw_input(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -844,10 +842,10 @@ int device_handle_open_smraw_input(
 	}
 	if( device_handle->smraw_input_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid device handle - raw input handle already set.",
 		 function );
 
@@ -857,10 +855,10 @@ int device_handle_open_smraw_input(
 	     &( device_handle->smraw_input_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create raw input handle.",
 		 function );
 
@@ -882,10 +880,10 @@ int device_handle_open_smraw_input(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open raw input handle.",
 		 function );
 
@@ -908,16 +906,16 @@ on_error:
  */
 int device_handle_close(
      device_handle_t *device_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_close";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -929,10 +927,10 @@ int device_handle_close(
 		     device_handle->smdev_input_handle,
 		     error ) != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 			 "%s: unable to close device input handle.",
 			 function );
 
@@ -945,10 +943,10 @@ int device_handle_close(
 		     device_handle->odraw_input_handle,
 		     error ) != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 			 "%s: unable to close optical disc raw input handle.",
 			 function );
 
@@ -961,10 +959,10 @@ int device_handle_close(
 		     device_handle->smraw_input_handle,
 		     error ) != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 			 "%s: unable to close raw input handle.",
 			 function );
 
@@ -981,17 +979,17 @@ ssize_t device_handle_read_buffer(
          device_handle_t *device_handle,
          uint8_t *buffer,
          size_t read_size,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "device_handle_read_buffer";
 	ssize_t read_count    = 0;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -999,10 +997,10 @@ ssize_t device_handle_read_buffer(
 	}
 	if( buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
@@ -1018,10 +1016,10 @@ ssize_t device_handle_read_buffer(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read buffer from device input handle.",
 			 function );
 
@@ -1038,10 +1036,10 @@ ssize_t device_handle_read_buffer(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read buffer from optical disc raw input handle.",
 			 function );
 
@@ -1058,10 +1056,10 @@ ssize_t device_handle_read_buffer(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read buffer from raw input handle.",
 			 function );
 
@@ -1078,16 +1076,16 @@ off64_t device_handle_seek_offset(
          device_handle_t *device_handle,
          off64_t offset,
          int whence,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "device_handle_seek_offset";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1103,10 +1101,10 @@ off64_t device_handle_seek_offset(
 
 		if( offset < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset in device input handle.",
 			 function );
 
@@ -1123,10 +1121,10 @@ off64_t device_handle_seek_offset(
 
 		if( offset < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset in optical disc raw input handle.",
 			 function );
 
@@ -1143,10 +1141,10 @@ off64_t device_handle_seek_offset(
 
 		if( offset < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset in raw input handle.",
 			 function );
 
@@ -1164,17 +1162,17 @@ int device_handle_prompt_for_string(
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_prompt_for_string";
 	int result            = 0;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1182,10 +1180,10 @@ int device_handle_prompt_for_string(
 	}
 	if( internal_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string.",
 		 function );
 
@@ -1193,10 +1191,10 @@ int device_handle_prompt_for_string(
 	}
 	if( internal_string_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string size.",
 		 function );
 
@@ -1217,10 +1215,10 @@ int device_handle_prompt_for_string(
 
 	if( *internal_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create internal string.",
 		 function );
 
@@ -1231,10 +1229,10 @@ int device_handle_prompt_for_string(
 	     0,
 	     *internal_string_size ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear internal string.",
 		 function );
 
@@ -1249,10 +1247,10 @@ int device_handle_prompt_for_string(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve string variable.",
 		 function );
 
@@ -1279,7 +1277,7 @@ on_error:
 int device_handle_prompt_for_number_of_error_retries(
      device_handle_t *device_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "device_handle_prompt_for_number_of_error_retries";
 	uint64_t size_variable = 0;
@@ -1287,10 +1285,10 @@ int device_handle_prompt_for_number_of_error_retries(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1309,10 +1307,10 @@ int device_handle_prompt_for_number_of_error_retries(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve size variable.",
 		 function );
 
@@ -1331,7 +1329,7 @@ int device_handle_prompt_for_number_of_error_retries(
 int device_handle_prompt_for_zero_buffer_on_error(
      device_handle_t *device_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "device_handle_prompt_for_zero_buffer_on_error";
@@ -1339,10 +1337,10 @@ int device_handle_prompt_for_zero_buffer_on_error(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1359,10 +1357,10 @@ int device_handle_prompt_for_zero_buffer_on_error(
 	     &fixed_string_variable,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve fixed string variable.",
 		 function );
 
@@ -1375,10 +1373,10 @@ int device_handle_prompt_for_zero_buffer_on_error(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine zero buffer on error.",
 		 function );
 
@@ -1393,16 +1391,16 @@ int device_handle_prompt_for_zero_buffer_on_error(
 int device_handle_get_type(
      device_handle_t *device_handle,
      uint8_t *type,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_type";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1410,10 +1408,10 @@ int device_handle_get_type(
 	}
 	if( type == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid type.",
 		 function );
 
@@ -1430,16 +1428,16 @@ int device_handle_get_type(
 int device_handle_get_media_size(
      device_handle_t *device_handle,
      size64_t *media_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_media_size";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1452,10 +1450,10 @@ int device_handle_get_media_size(
 		     media_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media size from device input handle.",
 			 function );
 
@@ -1469,10 +1467,10 @@ int device_handle_get_media_size(
 		     media_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media size from optical disc raw input handle.",
 			 function );
 
@@ -1486,10 +1484,10 @@ int device_handle_get_media_size(
 		     media_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media size from raw input handle.",
 			 function );
 
@@ -1505,17 +1503,17 @@ int device_handle_get_media_size(
 int device_handle_get_media_type(
      device_handle_t *device_handle,
      uint8_t *media_type,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function    = "device_handle_get_media_type";
 	uint8_t smdev_media_type = 0;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1523,10 +1521,10 @@ int device_handle_get_media_type(
 	}
 	if( media_type == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media type.",
 		 function );
 
@@ -1539,10 +1537,10 @@ int device_handle_get_media_type(
 		     &smdev_media_type,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media type.",
 			 function );
 
@@ -1584,16 +1582,16 @@ int device_handle_get_media_type(
 int device_handle_get_bytes_per_sector(
      device_handle_t *device_handle,
      uint32_t *bytes_per_sector,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_bytes_per_sector";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1606,10 +1604,10 @@ int device_handle_get_bytes_per_sector(
 		     bytes_per_sector,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve bytes per sector from device input handle.",
 			 function );
 
@@ -1623,10 +1621,10 @@ int device_handle_get_bytes_per_sector(
 		     bytes_per_sector,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve bytes per sector from optical disc raw input handle.",
 			 function );
 
@@ -1640,10 +1638,10 @@ int device_handle_get_bytes_per_sector(
 		     bytes_per_sector,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve bytes per sector from raw input handle.",
 			 function );
 
@@ -1666,17 +1664,17 @@ int device_handle_get_information_value(
      size_t information_value_identifier_length,
      libcstring_system_character_t *information_value,
      size_t information_value_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_information_value";
 	int result            = 0;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1703,10 +1701,10 @@ int device_handle_get_information_value(
 #endif
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve information value: %s from device input handle.",
 			 function,
 			 (char *) information_value_identifier );
@@ -1739,10 +1737,10 @@ int device_handle_get_information_value(
 #endif
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve information value: %s from raw input handle.",
 			 function,
 			 (char *) information_value_identifier );
@@ -1759,16 +1757,16 @@ int device_handle_get_information_value(
 int device_handle_get_number_of_sessions(
      device_handle_t *device_handle,
      int *number_of_sessions,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_number_of_sessions";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1781,10 +1779,10 @@ int device_handle_get_number_of_sessions(
 		     number_of_sessions,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of sessions from device input handle.",
 			 function );
 
@@ -1798,10 +1796,10 @@ int device_handle_get_number_of_sessions(
 		     number_of_sessions,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of sessions from optical disc raw input handle.",
 			 function );
 
@@ -1812,10 +1810,10 @@ int device_handle_get_number_of_sessions(
 	{
 		if( number_of_sessions == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid number of sessions raw input handle.",
 			 function );
 
@@ -1834,16 +1832,16 @@ int device_handle_get_session(
      int index,
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_session";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1858,10 +1856,10 @@ int device_handle_get_session(
 		     number_of_sectors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve session: %d from device input handle.",
 			 function,
 			 index );
@@ -1878,10 +1876,10 @@ int device_handle_get_session(
 		     number_of_sectors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve session: %d from optical disc raw input handle.",
 			 function,
 			 index );
@@ -1891,10 +1889,10 @@ int device_handle_get_session(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid index value out of bounds.",
 		 function );
 
@@ -1909,16 +1907,16 @@ int device_handle_get_session(
 int device_handle_get_number_of_tracks(
      device_handle_t *device_handle,
      int *number_of_tracks,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_number_of_tracks";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -1931,10 +1929,10 @@ int device_handle_get_number_of_tracks(
 		     number_of_tracks,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of tracks from device input handle.",
 			 function );
 
@@ -1948,10 +1946,10 @@ int device_handle_get_number_of_tracks(
 		     number_of_tracks,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of tracks from optical disc raw input handle.",
 			 function );
 
@@ -1962,10 +1960,10 @@ int device_handle_get_number_of_tracks(
 	{
 		if( number_of_tracks == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid number of tracks raw input handle.",
 			 function );
 
@@ -1985,7 +1983,7 @@ int device_handle_get_track(
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
      uint8_t *type,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function           = "device_handle_get_track";
 	uint64_t data_file_start_sector = 0;
@@ -1993,10 +1991,10 @@ int device_handle_get_track(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2012,10 +2010,10 @@ int device_handle_get_track(
 		     type,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve track: %d from device input handle.",
 			 function,
 			 index );
@@ -2035,10 +2033,10 @@ int device_handle_get_track(
 		     &data_file_start_sector,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve track: %d from optical disc raw input handle.",
 			 function,
 			 index );
@@ -2048,10 +2046,10 @@ int device_handle_get_track(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid index value out of bounds.",
 		 function );
 
@@ -2068,17 +2066,17 @@ int device_handle_set_string(
      const libcstring_system_character_t *string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_set_string";
 	size_t string_length  = 0;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2086,10 +2084,10 @@ int device_handle_set_string(
 	}
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -2097,10 +2095,10 @@ int device_handle_set_string(
 	}
 	if( internal_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string.",
 		 function );
 
@@ -2108,10 +2106,10 @@ int device_handle_set_string(
 	}
 	if( internal_string_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string size.",
 		 function );
 
@@ -2135,10 +2133,10 @@ int device_handle_set_string(
 
 		if( *internal_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create internal string.",
 			 function );
 
@@ -2149,10 +2147,10 @@ int device_handle_set_string(
 		     string,
 		     string_length ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy string.",
 			 function );
 
@@ -2183,7 +2181,7 @@ on_error:
 int device_handle_set_number_of_error_retries(
      device_handle_t *device_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "device_handle_set_number_of_error_retries";
 	size_t string_length   = 0;
@@ -2192,10 +2190,10 @@ int device_handle_set_number_of_error_retries(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2204,16 +2202,16 @@ int device_handle_set_number_of_error_retries(
 	string_length = libcstring_system_string_length(
 	                 string );
 
-	if( libsystem_string_decimal_copy_to_64_bit(
+	if( libcsystem_string_decimal_copy_to_64_bit(
 	     string,
 	     string_length + 1,
 	     &size_variable,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine number of error retries.",
 		 function );
 
@@ -2236,17 +2234,17 @@ int device_handle_set_number_of_error_retries(
 int device_handle_set_error_values(
      device_handle_t *device_handle,
      size_t error_granularity,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_set_error_values";
 	uint8_t error_flags   = 0;
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2259,10 +2257,10 @@ int device_handle_set_error_values(
 		     device_handle->number_of_error_retries,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set number of error retries in device input handle.",
 			 function );
 
@@ -2273,10 +2271,10 @@ int device_handle_set_error_values(
 		     error_granularity,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set error granularity in device input handle.",
 			 function );
 
@@ -2291,10 +2289,10 @@ int device_handle_set_error_values(
 		     error_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set error flags in device input handle.",
 			 function );
 
@@ -2310,16 +2308,16 @@ int device_handle_set_error_values(
 int device_handle_get_number_of_read_errors(
      device_handle_t *device_handle,
      int *number_of_read_errors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_number_of_read_errors";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2332,10 +2330,10 @@ int device_handle_get_number_of_read_errors(
 		     number_of_read_errors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of read errors.",
 			 function );
 
@@ -2347,10 +2345,10 @@ int device_handle_get_number_of_read_errors(
 	{
 		if( number_of_read_errors == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid number of read errors.",
 			 function );
 
@@ -2369,16 +2367,16 @@ int device_handle_get_read_error(
      int index,
      off64_t *offset,
      size64_t *size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_read_error";
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2393,10 +2391,10 @@ int device_handle_get_read_error(
 		     size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve read error: %d.",
 			 function,
 			 index );
@@ -2407,10 +2405,10 @@ int device_handle_get_read_error(
 	else if( ( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	      || ( device_handle->type == DEVICE_HANDLE_TYPE_FILE ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid index value out of bounds.",
 		 function );
 
@@ -2425,7 +2423,7 @@ int device_handle_get_read_error(
 int device_handle_media_information_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t media_information_value[ 64 ];
 
@@ -2440,10 +2438,10 @@ int device_handle_media_information_fprint(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2451,10 +2449,10 @@ int device_handle_media_information_fprint(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -2471,10 +2469,10 @@ int device_handle_media_information_fprint(
 		     &bus_type,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve bus type.",
 			 function );
 
@@ -2524,10 +2522,10 @@ int device_handle_media_information_fprint(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media information value: vendor.",
 			 function );
 
@@ -2552,10 +2550,10 @@ int device_handle_media_information_fprint(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media information value: model.",
 			 function );
 
@@ -2580,10 +2578,10 @@ int device_handle_media_information_fprint(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media information value: serial_number.",
 			 function );
 
@@ -2645,10 +2643,10 @@ int device_handle_media_information_fprint(
 	     &media_type,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media type.",
 		 function );
 
@@ -2706,10 +2704,10 @@ int device_handle_media_information_fprint(
 	     &media_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media size.",
 		 function );
 
@@ -2742,10 +2740,10 @@ int device_handle_media_information_fprint(
 	     &bytes_per_sector,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -2763,10 +2761,10 @@ int device_handle_media_information_fprint(
 		     stream,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print sessions.",
 			 function );
 
@@ -2777,10 +2775,10 @@ int device_handle_media_information_fprint(
 		     stream,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print tracks.",
 			 function );
 
@@ -2802,7 +2800,7 @@ int device_handle_media_information_fprint(
 int device_handle_read_errors_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function     = "device_handle_read_errors_fprint";
 	off64_t read_error_offset = 0;
@@ -2814,10 +2812,10 @@ int device_handle_read_errors_fprint(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2825,10 +2823,10 @@ int device_handle_read_errors_fprint(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -2839,10 +2837,10 @@ int device_handle_read_errors_fprint(
 	     &bytes_per_sector,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -2850,10 +2848,10 @@ int device_handle_read_errors_fprint(
 	}
 	if( bytes_per_sector == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid bytes per sector returned.",
 		 function );
 
@@ -2864,10 +2862,10 @@ int device_handle_read_errors_fprint(
 	     &number_of_read_errors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of read errors.",
 		 function );
 
@@ -2894,10 +2892,10 @@ int device_handle_read_errors_fprint(
 			     &read_error_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve read error: %d.",
 				 function,
 				 read_error_index );
@@ -2929,7 +2927,7 @@ int device_handle_read_errors_fprint(
 int device_handle_sessions_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "device_handle_sessions_fprint";
 	uint64_t last_sector       = 0;
@@ -2941,10 +2939,10 @@ int device_handle_sessions_fprint(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -2952,10 +2950,10 @@ int device_handle_sessions_fprint(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -2966,10 +2964,10 @@ int device_handle_sessions_fprint(
 	     &number_of_sessions,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of sessions.",
 		 function );
 
@@ -2997,10 +2995,10 @@ int device_handle_sessions_fprint(
 			     &number_of_sectors,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve session: %d.",
 				 function,
 				 session_index );
@@ -3036,7 +3034,7 @@ int device_handle_sessions_fprint(
 int device_handle_tracks_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "device_handle_tracks_fprint";
 	uint64_t last_sector       = 0;
@@ -3049,10 +3047,10 @@ int device_handle_tracks_fprint(
 
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -3060,10 +3058,10 @@ int device_handle_tracks_fprint(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -3074,10 +3072,10 @@ int device_handle_tracks_fprint(
 	     &number_of_tracks,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of tracks.",
 		 function );
 
@@ -3106,10 +3104,10 @@ int device_handle_tracks_fprint(
 			     &type,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve track: %d.",
 				 function,
 				 track_index );

@@ -23,9 +23,8 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
+#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
@@ -35,16 +34,16 @@
  */
 int libewf_single_file_entry_initialize(
      libewf_single_file_entry_t **single_file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_initialize";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -52,10 +51,10 @@ int libewf_single_file_entry_initialize(
 	}
 	if( *single_file_entry != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid single file entry value already set.",
 		 function );
 
@@ -66,10 +65,10 @@ int libewf_single_file_entry_initialize(
 
 	if( *single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create single file entry.",
 		 function );
 
@@ -80,10 +79,10 @@ int libewf_single_file_entry_initialize(
 	     0,
 	     sizeof( libewf_single_file_entry_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear single file entry.",
 		 function );
 
@@ -110,16 +109,16 @@ on_error:
  */
 int libewf_single_file_entry_free(
      libewf_single_file_entry_t **single_file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_free";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -151,16 +150,16 @@ int libewf_single_file_entry_free(
 int libewf_single_file_entry_clone(
      libewf_single_file_entry_t **destination_single_file_entry,
      libewf_single_file_entry_t *source_single_file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_clone";
 
 	if( destination_single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination single file entry.",
 		 function );
 
@@ -168,10 +167,10 @@ int libewf_single_file_entry_clone(
 	}
 	if( *destination_single_file_entry != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination single file entry value already set.",
 		 function );
 
@@ -188,10 +187,10 @@ int libewf_single_file_entry_clone(
 
 	if( *destination_single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination single file entry.",
 		 function );
 
@@ -202,10 +201,10 @@ int libewf_single_file_entry_clone(
 	     source_single_file_entry,
 	     sizeof( libewf_single_file_entry_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy source to destination single file entry.",
 		 function );
 
@@ -226,10 +225,10 @@ int libewf_single_file_entry_clone(
 
 		if( ( *destination_single_file_entry )->name == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination name.",
 			 function );
 
@@ -240,10 +239,10 @@ int libewf_single_file_entry_clone(
 		     source_single_file_entry->name,
 		     source_single_file_entry->name_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination name.",
 			 function );
 
@@ -258,10 +257,10 @@ int libewf_single_file_entry_clone(
 
 		if( ( *destination_single_file_entry )->md5_hash == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination MD5 hash.",
 			 function );
 
@@ -272,10 +271,10 @@ int libewf_single_file_entry_clone(
 		     source_single_file_entry->md5_hash,
 		     source_single_file_entry->md5_hash_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination MD5 hash.",
 			 function );
 
@@ -312,16 +311,16 @@ on_error:
 int libewf_single_file_entry_get_type(
      libewf_single_file_entry_t *single_file_entry,
      uint8_t *type,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_type";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -329,10 +328,10 @@ int libewf_single_file_entry_get_type(
 	}
 	if( type == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid type.",
 		 function );
 
@@ -349,16 +348,16 @@ int libewf_single_file_entry_get_type(
 int libewf_single_file_entry_get_flags(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_flags";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -366,10 +365,10 @@ int libewf_single_file_entry_get_flags(
 	}
 	if( flags == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid flags.",
 		 function );
 
@@ -386,16 +385,16 @@ int libewf_single_file_entry_get_flags(
 int libewf_single_file_entry_get_data_offset(
      libewf_single_file_entry_t *single_file_entry,
      off64_t *data_offset,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_data_offset";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -403,10 +402,10 @@ int libewf_single_file_entry_get_data_offset(
 	}
 	if( data_offset == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid data offset.",
 		 function );
 
@@ -423,16 +422,16 @@ int libewf_single_file_entry_get_data_offset(
 int libewf_single_file_entry_get_data_size(
      libewf_single_file_entry_t *single_file_entry,
      size64_t *data_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_data_size";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -440,10 +439,10 @@ int libewf_single_file_entry_get_data_size(
 	}
 	if( data_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid data size.",
 		 function );
 
@@ -460,16 +459,16 @@ int libewf_single_file_entry_get_data_size(
 int libewf_single_file_entry_get_duplicate_data_offset(
      libewf_single_file_entry_t *single_file_entry,
      off64_t *duplicate_data_offset,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_duplicate_data_offset";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -477,10 +476,10 @@ int libewf_single_file_entry_get_duplicate_data_offset(
 	}
 	if( duplicate_data_offset == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid duplicate data offset.",
 		 function );
 
@@ -498,16 +497,16 @@ int libewf_single_file_entry_get_duplicate_data_offset(
 int libewf_single_file_entry_get_utf8_name_size(
      libewf_single_file_entry_t *single_file_entry,
      size_t *utf8_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_name_size";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -515,10 +514,10 @@ int libewf_single_file_entry_get_utf8_name_size(
 	}
 	if( utf8_string_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string size.",
 		 function );
 
@@ -537,16 +536,16 @@ int libewf_single_file_entry_get_utf8_name(
      libewf_single_file_entry_t *single_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_name";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -554,10 +553,10 @@ int libewf_single_file_entry_get_utf8_name(
 	}
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -565,10 +564,10 @@ int libewf_single_file_entry_get_utf8_name(
 	}
 	if( utf8_string_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: invalid UTF-8 string size value too small.",
 		 function );
 
@@ -583,10 +582,10 @@ int libewf_single_file_entry_get_utf8_name(
 	{
 		if( utf8_string_size < single_file_entry->name_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: invalid UTF-8 string size value too small.",
 			 function );
 
@@ -597,10 +596,10 @@ int libewf_single_file_entry_get_utf8_name(
 		     (char *) single_file_entry->name,
 		     single_file_entry->name_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to set UTF-8 string.",
 			 function );
 
@@ -618,16 +617,16 @@ int libewf_single_file_entry_get_utf8_name(
 int libewf_single_file_entry_get_utf16_name_size(
      libewf_single_file_entry_t *single_file_entry,
      size_t *utf16_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_name_size";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -638,10 +637,10 @@ int libewf_single_file_entry_get_utf16_name_size(
 	{
 		if( utf16_string_size == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid UTF-16 string size.",
 			 function );
 
@@ -657,10 +656,10 @@ int libewf_single_file_entry_get_utf16_name_size(
 		     utf16_string_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve UTF-16 string size.",
 			 function );
 
@@ -678,16 +677,16 @@ int libewf_single_file_entry_get_utf16_name(
      libewf_single_file_entry_t *single_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_name";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -695,10 +694,10 @@ int libewf_single_file_entry_get_utf16_name(
 	}
 	if( utf16_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string.",
 		 function );
 
@@ -706,10 +705,10 @@ int libewf_single_file_entry_get_utf16_name(
 	}
 	if( utf16_string_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: invalid UTF-16 string size value too small.",
 		 function );
 
@@ -729,10 +728,10 @@ int libewf_single_file_entry_get_utf16_name(
 		     single_file_entry->name_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy name to UTF-16 string.",
 			 function );
 
@@ -748,16 +747,16 @@ int libewf_single_file_entry_get_utf16_name(
 int libewf_single_file_entry_get_size(
      libewf_single_file_entry_t *single_file_entry,
      size64_t *size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_size";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -765,10 +764,10 @@ int libewf_single_file_entry_get_size(
 	}
 	if( size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid size.",
 		 function );
 
@@ -785,16 +784,16 @@ int libewf_single_file_entry_get_size(
 int libewf_single_file_entry_get_creation_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *creation_time,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_creation_time";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -802,10 +801,10 @@ int libewf_single_file_entry_get_creation_time(
 	}
 	if( creation_time == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid creation time.",
 		 function );
 
@@ -822,16 +821,16 @@ int libewf_single_file_entry_get_creation_time(
 int libewf_single_file_entry_get_modification_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *modification_time,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_modification_time";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -839,10 +838,10 @@ int libewf_single_file_entry_get_modification_time(
 	}
 	if( modification_time == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid modification time.",
 		 function );
 
@@ -859,16 +858,16 @@ int libewf_single_file_entry_get_modification_time(
 int libewf_single_file_entry_get_access_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *access_time,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_access_time";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -876,10 +875,10 @@ int libewf_single_file_entry_get_access_time(
 	}
 	if( access_time == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid access time.",
 		 function );
 
@@ -896,16 +895,16 @@ int libewf_single_file_entry_get_access_time(
 int libewf_single_file_entry_get_entry_modification_time(
      libewf_single_file_entry_t *single_file_entry,
      uint32_t *entry_modification_time,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_entry_modification_time";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -913,10 +912,10 @@ int libewf_single_file_entry_get_entry_modification_time(
 	}
 	if( entry_modification_time == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid entry modification time.",
 		 function );
 
@@ -934,16 +933,16 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
      libewf_single_file_entry_t *single_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_hash_value_md5";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -951,10 +950,10 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
 	}
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -962,10 +961,10 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -973,10 +972,10 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
 	}
 	if( utf8_string_size < single_file_entry->md5_hash_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -991,10 +990,10 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
 	     single_file_entry->md5_hash,
 	     single_file_entry->md5_hash_size ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy MD5 hash to UTF-8 string.",
 		 function );
 
@@ -1010,16 +1009,16 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
      libewf_single_file_entry_t *single_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_hash_value_md5";
 
 	if( single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
 		 function );
 
@@ -1027,10 +1026,10 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 	}
 	if( utf16_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string.",
 		 function );
 
@@ -1038,10 +1037,10 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 	}
 	if( utf16_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-16 string size value exceeds maximum.",
 		 function );
 
@@ -1049,10 +1048,10 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 	}
 	if( utf16_string_size < single_file_entry->md5_hash_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-16 string too small.",
 		 function );
 
@@ -1069,10 +1068,10 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 	     single_file_entry->md5_hash_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy MD5 hash to UTF-16 string.",
 		 function );
 

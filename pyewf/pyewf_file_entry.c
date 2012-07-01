@@ -1,7 +1,7 @@
 /*
  * Python object definition of the libewf file entry
  *
- * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,7 +24,7 @@
 #include <types.h>
 
 #include <libcstring.h>
-#include <liberror.h>
+#include <libcerror.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -388,7 +388,7 @@ void pyewf_file_entry_free(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_file_entry_free";
 
 	if( pyewf_file_entry == NULL )
@@ -431,7 +431,7 @@ void pyewf_file_entry_free(
 	     &( pyewf_file_entry->file_entry ),
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -449,7 +449,7 @@ void pyewf_file_entry_free(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	pyewf_file_entry->ob_type->tp_free(
@@ -466,7 +466,7 @@ PyObject *pyewf_file_entry_read_buffer(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_file_entry_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
@@ -537,7 +537,7 @@ PyObject *pyewf_file_entry_read_buffer(
 
 	if( read_count != (ssize_t) read_size )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -555,7 +555,7 @@ PyObject *pyewf_file_entry_read_buffer(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -573,7 +573,7 @@ PyObject *pyewf_file_entry_read_random(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_file_entry_read_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
@@ -658,7 +658,7 @@ PyObject *pyewf_file_entry_read_random(
 
 	if( read_count != (ssize_t) read_size )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -676,7 +676,7 @@ PyObject *pyewf_file_entry_read_random(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -694,7 +694,7 @@ PyObject *pyewf_file_entry_seek_offset(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	static char *function       = "pyewf_file_entry_seek_offset";
 	static char *keyword_list[] = { "offset", "whence", NULL };
 	off64_t offset              = 0;
@@ -740,7 +740,7 @@ PyObject *pyewf_file_entry_seek_offset(
 
 	if( offset == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -758,7 +758,7 @@ PyObject *pyewf_file_entry_seek_offset(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -774,7 +774,7 @@ PyObject *pyewf_file_entry_get_offset(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_file_entry_get_offset";
 	off64_t current_offset  = 0;
 
@@ -783,7 +783,7 @@ PyObject *pyewf_file_entry_get_offset(
 	     &current_offset,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -801,7 +801,7 @@ PyObject *pyewf_file_entry_get_offset(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -818,7 +818,7 @@ PyObject *pyewf_file_entry_get_size(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_file_entry_get_size";
 	size64_t size           = 0;
 
@@ -827,7 +827,7 @@ PyObject *pyewf_file_entry_get_size(
 	     &size,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -845,7 +845,7 @@ PyObject *pyewf_file_entry_get_size(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -862,7 +862,7 @@ PyObject *pyewf_file_entry_get_creation_time(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error    = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_creation_time";
 	uint32_t posix_time        = 0;
@@ -872,7 +872,7 @@ PyObject *pyewf_file_entry_get_creation_time(
 	     &posix_time,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -890,7 +890,7 @@ PyObject *pyewf_file_entry_get_creation_time(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -909,7 +909,7 @@ PyObject *pyewf_file_entry_get_modification_time(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error    = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_modification_time";
 	uint32_t posix_time        = 0;
@@ -919,7 +919,7 @@ PyObject *pyewf_file_entry_get_modification_time(
 	     &posix_time,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -937,7 +937,7 @@ PyObject *pyewf_file_entry_get_modification_time(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -956,7 +956,7 @@ PyObject *pyewf_file_entry_get_access_time(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error    = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_access_time";
 	uint32_t posix_time        = 0;
@@ -966,7 +966,7 @@ PyObject *pyewf_file_entry_get_access_time(
 	     &posix_time,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -984,7 +984,7 @@ PyObject *pyewf_file_entry_get_access_time(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1003,7 +1003,7 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error    = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_entry_modification_time";
 	uint32_t posix_time        = 0;
@@ -1013,7 +1013,7 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
 	     &posix_time,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1031,7 +1031,7 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1050,7 +1050,7 @@ PyObject *pyewf_file_entry_get_name(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	PyObject *string_object = NULL;
 	static char *function   = "pyewf_file_entry_get_name";
 	const char *errors      = NULL;
@@ -1065,7 +1065,7 @@ PyObject *pyewf_file_entry_get_name(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1083,7 +1083,7 @@ PyObject *pyewf_file_entry_get_name(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -1115,7 +1115,7 @@ PyObject *pyewf_file_entry_get_name(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1133,7 +1133,7 @@ PyObject *pyewf_file_entry_get_name(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -1183,7 +1183,7 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	PyObject *string_object = NULL;
 	static char *function   = "pyewf_file_entry_get_hash_value_md5";
 	const char *errors      = NULL;
@@ -1211,7 +1211,7 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1229,7 +1229,7 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -1279,7 +1279,7 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error        = NULL;
+	libcerror_error_t *error        = NULL;
 	static char *function          = "pyewf_file_entry_get_number_of_sub_file_entries";
 	int number_of_sub_file_entries = 0;
 
@@ -1297,7 +1297,7 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
 	     &number_of_sub_file_entries,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1315,7 +1315,7 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1334,7 +1334,7 @@ PyObject *pyewf_file_entry_get_sub_file_entry(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error             = NULL;
+	libcerror_error_t *error             = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
 	PyObject *file_entry_object         = NULL;
 	static char *keyword_list[]         = { "sub_file_entry_index", NULL };
@@ -1365,7 +1365,7 @@ PyObject *pyewf_file_entry_get_sub_file_entry(
 	     &sub_file_entry,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1385,7 +1385,7 @@ PyObject *pyewf_file_entry_get_sub_file_entry(
 			 sub_file_entry_index,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;

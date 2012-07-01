@@ -1,7 +1,7 @@
 /*
  * Crypographic digest hash
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -22,10 +22,9 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #include "digest_hash.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 
 /* Converts the EWF digest hash to a printable string
  * Returns 1 if successful or -1 on error
@@ -35,7 +34,7 @@ int digest_hash_copy_to_string(
      size_t digest_hash_size,
      libcstring_system_character_t *string,
      size_t string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function       = "digest_hash_copy_to_string";
 	size_t string_iterator      = 0;
@@ -44,10 +43,10 @@ int digest_hash_copy_to_string(
 
 	if( digest_hash == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid digest hash.",
 		 function );
 
@@ -55,10 +54,10 @@ int digest_hash_copy_to_string(
 	}
 	if( digest_hash_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid digest hash size value exceeds maximum.",
 		 function );
 
@@ -66,10 +65,10 @@ int digest_hash_copy_to_string(
 	}
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -77,10 +76,10 @@ int digest_hash_copy_to_string(
 	}
 	if( string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid string size value exceeds maximum.",
 		 function );
 
@@ -90,10 +89,10 @@ int digest_hash_copy_to_string(
 	 */
 	if( string_size < ( ( 2 * digest_hash_size ) + 1 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: string too small.",
 		 function );
 

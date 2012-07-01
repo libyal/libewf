@@ -24,14 +24,13 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_definitions.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_list_type.h"
@@ -48,16 +47,16 @@
 int libewf_chunk_table_initialize(
      libewf_chunk_table_t **chunk_table,
      libewf_io_handle_t *io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_table_initialize";
 
 	if( chunk_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk table.",
 		 function );
 
@@ -65,10 +64,10 @@ int libewf_chunk_table_initialize(
 	}
 	if( *chunk_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid chunk table value already set.",
 		 function );
 
@@ -76,10 +75,10 @@ int libewf_chunk_table_initialize(
 	}
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -90,10 +89,10 @@ int libewf_chunk_table_initialize(
 
 	if( *chunk_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create chunk table.",
 		 function );
 
@@ -104,10 +103,10 @@ int libewf_chunk_table_initialize(
 	     0,
 	     sizeof( libewf_chunk_table_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear chunk table.",
 		 function );
 
@@ -133,16 +132,16 @@ on_error:
  */
 int libewf_chunk_table_free(
      libewf_chunk_table_t **chunk_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_table_free";
 
 	if( chunk_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk table.",
 		 function );
 
@@ -164,16 +163,16 @@ int libewf_chunk_table_free(
 int libewf_chunk_table_clone(
      intptr_t **destination_chunk_table,
      intptr_t *source_chunk_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_table_clone";
 
 	if( destination_chunk_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination chunk table.",
 		 function );
 
@@ -181,10 +180,10 @@ int libewf_chunk_table_clone(
 	}
 	if( *destination_chunk_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination chunk table value already set.",
 		 function );
 
@@ -201,10 +200,10 @@ int libewf_chunk_table_clone(
 
 	if( *destination_chunk_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination chunk table.",
 		 function );
 
@@ -215,10 +214,10 @@ int libewf_chunk_table_clone(
 	     source_chunk_table,
 	     sizeof( libewf_chunk_table_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy source to destination chunk table.",
 		 function );
 
@@ -251,7 +250,7 @@ int libewf_chunk_table_read_chunk(
      size64_t element_data_size,
      uint32_t element_data_flags,
      uint8_t read_flags LIBEWF_ATTRIBUTE_UNUSED,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_chunk_table_read_chunk";
@@ -265,10 +264,10 @@ int libewf_chunk_table_read_chunk(
 
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -276,10 +275,10 @@ int libewf_chunk_table_read_chunk(
 	}
 	if( element_data_size > (size64_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid element data size value exceeds maximum.",
 		 function );
 
@@ -287,27 +286,27 @@ int libewf_chunk_table_read_chunk(
 	}
 	if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported element data flags.",
 		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
 		if( libmfdata_list_element_get_element_index(
 		     list_element,
 		     &element_index,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve element index from list element.",
 			 function );
 
@@ -315,7 +314,7 @@ int libewf_chunk_table_read_chunk(
 		}
 		if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: reading compressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " of size: %" PRIu64 "\n",
 			 function,
 			 element_index,
@@ -325,7 +324,7 @@ int libewf_chunk_table_read_chunk(
 		}
 		else
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: reading uncompressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " of size: %" PRIu64 "\n",
 			 function,
 			 element_index,
@@ -342,10 +341,10 @@ int libewf_chunk_table_read_chunk(
 	     SEEK_SET,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek chunk offset: %" PRIi64 " in file IO pool entry: %d.",
 		 function,
 		 element_data_offset,
@@ -358,10 +357,10 @@ int libewf_chunk_table_read_chunk(
 	     (size_t) element_data_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create chunk data.",
 		 function );
 
@@ -369,16 +368,16 @@ int libewf_chunk_table_read_chunk(
 	}
 	if( chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing chunk data.",
 		 function );
 
 		goto on_error;
 	}
-	read_count = libbfio_pool_read(
+	read_count = libbfio_pool_read_buffer(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      chunk_data->data,
@@ -387,10 +386,10 @@ int libewf_chunk_table_read_chunk(
 
 	if( read_count != (ssize_t) element_data_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read chunk data.",
 		 function );
 
@@ -408,14 +407,14 @@ int libewf_chunk_table_read_chunk(
 	     list_element,
 	     cache,
 	     (intptr_t *) chunk_data,
-	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
 	     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set chunk data as element value.",
 		 function );
 
@@ -448,7 +447,7 @@ int libewf_chunk_table_read_offsets(
      off64_t element_group_offset,
      size64_t element_group_size,
      uint8_t read_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t table_offsets_checksum[ 4 ];
 
@@ -473,10 +472,10 @@ int libewf_chunk_table_read_offsets(
 
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -486,10 +485,10 @@ int libewf_chunk_table_read_offsets(
 
 	if( chunk_table->io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid chunk table - missing IO handle.",
 		 function );
 
@@ -499,10 +498,10 @@ int libewf_chunk_table_read_offsets(
 	     &section,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create section.",
 		 function );
 
@@ -517,10 +516,10 @@ int libewf_chunk_table_read_offsets(
 
 	if( read_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read section start.",
 		 function );
 
@@ -528,10 +527,10 @@ int libewf_chunk_table_read_offsets(
 	}
 	if( element_group_size != section->size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid element group size value out of bounds.",
 		 function );
 
@@ -550,10 +549,10 @@ int libewf_chunk_table_read_offsets(
 	
 	if( read_count < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read table section header.",
 		 function );
 
@@ -563,10 +562,10 @@ int libewf_chunk_table_read_offsets(
 
 	if( number_of_offsets == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_INPUT,
-		 LIBERROR_INPUT_ERROR_INVALID_DATA,
+		 LIBCERROR_ERROR_DOMAIN_INPUT,
+		 LIBCERROR_INPUT_ERROR_INVALID_DATA,
 		 "%s: invalid number of offsets.",
 		 function );
 
@@ -576,10 +575,10 @@ int libewf_chunk_table_read_offsets(
 
 	if( table_offsets_data_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid table offsets data size value exceeds maximum.",
 		 function );
 
@@ -590,10 +589,10 @@ int libewf_chunk_table_read_offsets(
 
 	if( table_offsets_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create table offsets data.",
 		 function );
 
@@ -601,16 +600,16 @@ int libewf_chunk_table_read_offsets(
 	}
 	if( element_group_size < (size64_t) table_offsets_data_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: invalid element group size value too small.",
 		 function );
 
 		return( -1 );
 	}
-	read_count = libbfio_pool_read(
+	read_count = libbfio_pool_read_buffer(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      table_offsets_data,
@@ -619,10 +618,10 @@ int libewf_chunk_table_read_offsets(
 
 	if( read_count != (ssize_t) table_offsets_data_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read table offsets data.",
 		 function );
 
@@ -631,12 +630,12 @@ int libewf_chunk_table_read_offsets(
 	element_group_size -= read_count;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 	 	 "%s: table offsets data:\n",
 		 function );
-		libnotify_print_data(
+		libcnotify_print_data(
 		 table_offsets_data,
 		 table_offsets_data_size,
 		 0 );
@@ -648,16 +647,16 @@ int libewf_chunk_table_read_offsets(
 	{
 		if( element_group_size < (size64_t) sizeof( uint32_t ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: invalid element group size value too small.",
 			 function );
 
 			return( -1 );
 		}
-		read_count = libbfio_pool_read(
+		read_count = libbfio_pool_read_buffer(
 			      file_io_pool,
 			      file_io_pool_entry,
 			      table_offsets_checksum,
@@ -666,10 +665,10 @@ int libewf_chunk_table_read_offsets(
 
 		if( read_count != (ssize_t) sizeof( uint32_t ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read checksum from file descriptor.",
 			 function );
 
@@ -682,14 +681,14 @@ int libewf_chunk_table_read_offsets(
 		 stored_checksum );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 	 		 "%s: table offsets checksum\t\t\t: 0x%" PRIx32 "\n",
 			 function,
 			 table_offsets_checksum );
 
-			libnotify_printf(
+			libcnotify_printf(
 	 		 "\n" );
 		}
 #endif
@@ -701,9 +700,9 @@ int libewf_chunk_table_read_offsets(
 		if( stored_checksum != calculated_checksum )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").\n",
 				 function,
 				 stored_checksum,
@@ -729,10 +728,10 @@ int libewf_chunk_table_read_offsets(
 		     table_offsets_corrupted,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to fill chunk table.",
 			 function );
 
@@ -753,10 +752,10 @@ int libewf_chunk_table_read_offsets(
 		     table_offsets_corrupted,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to correct chunk table.",
 			 function );
 
@@ -772,10 +771,10 @@ int libewf_chunk_table_read_offsets(
 	     &section,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free section.",
 		 function );
 
@@ -784,7 +783,7 @@ int libewf_chunk_table_read_offsets(
 		goto on_error;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
 		if( ( element_group_size > (size64_t) 0 )
 		 && ( chunk_table->io_handle->ewf_format != EWF_FORMAT_S01 )
@@ -793,16 +792,16 @@ int libewf_chunk_table_read_offsets(
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( element_group_size > (size64_t) SSIZE_MAX )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 				 "%s: invalid element group size value exceeds maximum.",
 				 function );
 
 				goto on_error;
 			}
-			libnotify_printf(
+			libcnotify_printf(
 		 	 "%s: trailing data:\n",
 			 function );
 
@@ -811,16 +810,16 @@ int libewf_chunk_table_read_offsets(
 
 			if( trailing_data == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 				 "%s: unable to create trailing data.",
 				 function );
 
 				goto on_error;
 			}
-			read_count = libbfio_pool_read(
+			read_count = libbfio_pool_read_buffer(
 				      file_io_pool,
 				      file_io_pool_entry,
 				      trailing_data,
@@ -829,19 +828,19 @@ int libewf_chunk_table_read_offsets(
 
 			if( read_count != (ssize_t) element_group_size )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read trailing data.",
 				 function );
 
 				goto on_error;
 			}
-			libnotify_printf(
+			libcnotify_printf(
 		 	 "%s: trailing data:\n",
 			 function );
-			libnotify_print_data(
+			libcnotify_print_data(
 			 trailing_data,
 			 (size_t) element_group_size,
 			 0 );
@@ -852,7 +851,7 @@ int libewf_chunk_table_read_offsets(
 			trailing_data = NULL;
 
 #elif defined( HAVE_VERBOSE_OUTPUT )
-			libnotify_printf(
+			libcnotify_printf(
 		 	 "%s: trailing data after table section offsets.\n",
 			 function );
 #endif
@@ -900,7 +899,7 @@ int libewf_chunk_table_fill(
      ewf_table_offset_t *table_offsets,
      uint32_t number_of_offsets,
      uint8_t tainted,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function           = "libewf_chunk_table_fill";
 	off64_t last_chunk_offset       = 0;
@@ -927,10 +926,10 @@ int libewf_chunk_table_fill(
 
 	if( chunk_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk table.",
 		 function );
 
@@ -938,10 +937,10 @@ int libewf_chunk_table_fill(
 	}
 	if( table_section == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table section.",
 		 function );
 
@@ -949,10 +948,10 @@ int libewf_chunk_table_fill(
 	}
 	if( base_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.",
 		 function );
 
@@ -960,10 +959,10 @@ int libewf_chunk_table_fill(
 	}
 	if( table_offsets == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table offsets.",
 		 function );
 
@@ -1005,9 +1004,9 @@ int libewf_chunk_table_fill(
 			if( stored_offset < current_offset )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: chunk offset: %" PRIu32 " larger than stored chunk offset: %" PRIu32 ".\n",
 					 function,
 					 current_offset,
@@ -1017,9 +1016,9 @@ int libewf_chunk_table_fill(
 				corrupted = 1;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			else if( libnotify_verbose != 0 )
+			else if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: chunk offset: %" PRIu32 " larger than next chunk offset: %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -1034,9 +1033,9 @@ int libewf_chunk_table_fill(
 		}
 		if( chunk_size == 0 )
 		{
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: invalid chunk size value is zero.\n",
 				 function );
 			}
@@ -1044,9 +1043,9 @@ int libewf_chunk_table_fill(
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: invalid chunk size value exceeds maximum.\n",
 				 function );
 			}
@@ -1087,9 +1086,9 @@ int libewf_chunk_table_fill(
 		{
 			remarks = "";
 		}
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: %s chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 			 function,
 			 chunk_type,
@@ -1107,10 +1106,10 @@ int libewf_chunk_table_fill(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if chunk: %d is a group.",
 			 function,
 			 chunk_index );
@@ -1128,10 +1127,10 @@ int libewf_chunk_table_fill(
 			     chunk_flags,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set chunk: %d.",
 				 function,
 				 chunk_index );
@@ -1150,10 +1149,10 @@ int libewf_chunk_table_fill(
 			     &previous_chunk_flags,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve data range of chunk: %d.",
 				 function,
 				 chunk_index );
@@ -1162,10 +1161,10 @@ int libewf_chunk_table_fill(
 			}
 			if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 				 "%s: unable to set data range of chunk: %d value already set.",
 				 function,
 				 chunk_index );
@@ -1180,9 +1179,9 @@ int libewf_chunk_table_fill(
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: chunk offset overflow at: %" PRIu32 ".\n",
 				 function,
 				 current_offset );
@@ -1222,10 +1221,10 @@ int libewf_chunk_table_fill(
 
 	if( last_chunk_offset > (off64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid last chunk offset value exceeds maximum.",
 		 function );
 
@@ -1240,9 +1239,9 @@ int libewf_chunk_table_fill(
 		last_chunk_size = table_section->end_offset - last_chunk_offset;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	else if( libnotify_verbose != 0 )
+	else if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: invalid last chunk offset value exceeds table section end offset.\n",
 		 function );
 	}
@@ -1250,9 +1249,9 @@ int libewf_chunk_table_fill(
 	if( last_chunk_size <= 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: invalid last chunk size value is zero or less.\n",
 			 function );
 		}
@@ -1262,9 +1261,9 @@ int libewf_chunk_table_fill(
 	if( last_chunk_size > (off64_t) INT32_MAX )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: invalid last chunk size value exceeds maximum.\n",
 			 function );
 		}
@@ -1306,9 +1305,9 @@ int libewf_chunk_table_fill(
 	{
 		remarks = "";
 	}
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: %s last chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and calculated size %" PRIi64 "%s.\n",
 		 function,
 		 chunk_type,
@@ -1326,10 +1325,10 @@ int libewf_chunk_table_fill(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if chunk: %d is a group.",
 		 function,
 		 chunk_index );
@@ -1347,10 +1346,10 @@ int libewf_chunk_table_fill(
 		     chunk_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set chunk: %d.",
 			 function,
 			 chunk_index );
@@ -1369,10 +1368,10 @@ int libewf_chunk_table_fill(
 		     &previous_chunk_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data range of chunk: %d.",
 			 function,
 			 chunk_index );
@@ -1381,10 +1380,10 @@ int libewf_chunk_table_fill(
 		}
 		if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: unable to set data range of chunk: %d value already set.",
 			 function,
 			 chunk_index );
@@ -1394,9 +1393,9 @@ int libewf_chunk_table_fill(
 		/* No need to overwrite the data range of a delta chunk */
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "\n" );
 	}
 #endif
@@ -1416,7 +1415,7 @@ int libewf_chunk_table_correct(
      ewf_table_offset_t *table_offsets,
      uint32_t number_of_offsets,
      uint8_t tainted,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function           = "libewf_chunk_table_correct";
 	off64_t last_chunk_offset       = 0;
@@ -1445,10 +1444,10 @@ int libewf_chunk_table_correct(
 
 	if( chunk_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk table.",
 		 function );
 
@@ -1456,10 +1455,10 @@ int libewf_chunk_table_correct(
 	}
 	if( table_section == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table section.",
 		 function );
 
@@ -1467,10 +1466,10 @@ int libewf_chunk_table_correct(
 	}
 	if( base_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.",
 		 function );
 
@@ -1478,10 +1477,10 @@ int libewf_chunk_table_correct(
 	}
 	if( table_offsets == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table offsets.",
 		 function );
 
@@ -1523,9 +1522,9 @@ int libewf_chunk_table_correct(
 			if( stored_offset < current_offset )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: chunk offset: %" PRIu32 " larger than stored chunk offset: %" PRIu32 ".\n",
 					 function,
 					 current_offset,
@@ -1535,9 +1534,9 @@ int libewf_chunk_table_correct(
 				corrupted = 1;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			else if( libnotify_verbose != 0 )
+			else if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: chunk offset: %" PRIu32 " larger than next chunk offset: %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -1552,9 +1551,9 @@ int libewf_chunk_table_correct(
 		}
 		if( chunk_size == 0 )
 		{
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: invalid chunk size value is zero.\n",
 				 function );
 			}
@@ -1562,9 +1561,9 @@ int libewf_chunk_table_correct(
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: invalid chunk size value exceeds maximum.\n",
 				 function );
 			}
@@ -1605,9 +1604,9 @@ int libewf_chunk_table_correct(
 		{
 			remarks = "";
 		}
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: %s chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 			 function,
 			 chunk_type,
@@ -1625,10 +1624,10 @@ int libewf_chunk_table_correct(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if chunk: %d is a group.",
 			 function,
 			 chunk_index );
@@ -1646,10 +1645,10 @@ int libewf_chunk_table_correct(
 			     chunk_flags,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set chunk: %d.",
 				 function,
 				 chunk_index );
@@ -1668,10 +1667,10 @@ int libewf_chunk_table_correct(
 			     &previous_chunk_flags,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve data range of chunk: %d.",
 				 function,
 				 chunk_index );
@@ -1683,9 +1682,9 @@ int libewf_chunk_table_correct(
 				if( (off64_t) ( base_offset + current_offset ) != previous_chunk_offset )
 				{
 #if defined( HAVE_DEBUG_OUTPUT )
-					if( libnotify_verbose != 0 )
+					if( libcnotify_verbose != 0 )
 					{
-						libnotify_printf(
+						libcnotify_printf(
 						 "%s: chunk: %d offset mismatch.\n",
 						 function,
 						 chunk_index );
@@ -1696,9 +1695,9 @@ int libewf_chunk_table_correct(
 				else if( (size64_t) chunk_size != previous_chunk_size )
 				{
 #if defined( HAVE_DEBUG_OUTPUT )
-					if( libnotify_verbose != 0 )
+					if( libcnotify_verbose != 0 )
 					{
-						libnotify_printf(
+						libcnotify_printf(
 						 "%s: chunk: %d size mismatch.\n",
 						 function,
 						 chunk_index );
@@ -1710,9 +1709,9 @@ int libewf_chunk_table_correct(
 				      != ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
 				{
 #if defined( HAVE_DEBUG_OUTPUT )
-					if( libnotify_verbose != 0 )
+					if( libcnotify_verbose != 0 )
 					{
-						libnotify_printf(
+						libcnotify_printf(
 						 "%s: chunk: %d compression flag mismatch.\n",
 						 function,
 						 chunk_index );
@@ -1754,10 +1753,10 @@ int libewf_chunk_table_correct(
 					     chunk_flags,
 					     error ) != 1 )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set data range of chunk: %d.",
 						 function,
 						 chunk_index );
@@ -1773,9 +1772,9 @@ int libewf_chunk_table_correct(
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: chunk offset overflow at: %" PRIu32 ".\n",
 				 function,
 				 current_offset );
@@ -1815,10 +1814,10 @@ int libewf_chunk_table_correct(
 
 	if( last_chunk_offset > (off64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid last chunk offset value exceeds maximum.",
 		 function );
 
@@ -1833,9 +1832,9 @@ int libewf_chunk_table_correct(
 		last_chunk_size = table_section->end_offset - last_chunk_offset;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	else if( libnotify_verbose != 0 )
+	else if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: invalid last chunk offset value exceeds table section end offset.\n",
 		 function );
 	}
@@ -1845,9 +1844,9 @@ int libewf_chunk_table_correct(
 	if( last_chunk_size <= 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: invalid last chunk size value is zero or less.\n",
 			 function );
 		}
@@ -1857,9 +1856,9 @@ int libewf_chunk_table_correct(
 	if( last_chunk_size > (off64_t) INT32_MAX )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: invalid last chunk size value exceeds maximum.\n",
 			 function );
 		}
@@ -1901,9 +1900,9 @@ int libewf_chunk_table_correct(
 	{
 		remarks = "";
 	}
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: %s last chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and calculated size %" PRIi64 "%s.\n",
 		 function,
 		 chunk_type,
@@ -1921,10 +1920,10 @@ int libewf_chunk_table_correct(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if chunk: %d is a group.",
 		 function,
 		 chunk_index );
@@ -1942,10 +1941,10 @@ int libewf_chunk_table_correct(
 		     chunk_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set chunk: %d.",
 			 function,
 			 chunk_index );
@@ -1964,10 +1963,10 @@ int libewf_chunk_table_correct(
 		     &previous_chunk_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data range of chunk: %d.",
 			 function,
 			 chunk_index );
@@ -1979,9 +1978,9 @@ int libewf_chunk_table_correct(
 				if( (off64_t) ( base_offset + current_offset ) != previous_chunk_offset )
 				{
 #if defined( HAVE_DEBUG_OUTPUT )
-					if( libnotify_verbose != 0 )
+					if( libcnotify_verbose != 0 )
 					{
-						libnotify_printf(
+						libcnotify_printf(
 						 "%s: chunk: %d offset mismatch.\n",
 						 function,
 						 chunk_index );
@@ -1992,9 +1991,9 @@ int libewf_chunk_table_correct(
 			else if( (size64_t) chunk_size != previous_chunk_size )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: chunk: %d size mismatch.\n",
 					 function,
 					 chunk_index );
@@ -2006,9 +2005,9 @@ int libewf_chunk_table_correct(
 			      != ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: chunk: %d compression flag mismatch.\n",
 					 function,
 					 chunk_index );
@@ -2050,10 +2049,10 @@ int libewf_chunk_table_correct(
 				     chunk_flags,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 					 "%s: unable to set data range of chunk: %d.",
 					 function,
 					 chunk_index );
@@ -2064,9 +2063,9 @@ int libewf_chunk_table_correct(
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "\n" );
 	}
 #endif
@@ -2082,7 +2081,7 @@ int libewf_chunk_table_fill_offsets(
      off64_t base_offset,
      ewf_table_offset_t *table_offsets,
      uint32_t number_of_offsets,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function       = "libewf_chunk_table_fill_offsets";
 	off64_t chunk_offset        = 0;
@@ -2094,10 +2093,10 @@ int libewf_chunk_table_fill_offsets(
 
 	if( chunk_table_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk table list.",
 		 function );
 
@@ -2105,10 +2104,10 @@ int libewf_chunk_table_fill_offsets(
 	}
 	if( base_offset < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.",
 		 function );
 
@@ -2116,10 +2115,10 @@ int libewf_chunk_table_fill_offsets(
 	}
 	if( table_offsets == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table offsets.",
 		 function );
 
@@ -2138,10 +2137,10 @@ int libewf_chunk_table_fill_offsets(
 		     &chunk_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data range of chunk: %d.",
 			 function,
 			 chunk_index );
@@ -2153,10 +2152,10 @@ int libewf_chunk_table_fill_offsets(
 		if( ( chunk_offset < 0 )
 		 || ( chunk_offset > (off64_t) INT32_MAX ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid chunk: %d offset value out of bounds.",
 			 function,
 			 chunk_index );

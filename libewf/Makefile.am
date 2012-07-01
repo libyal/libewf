@@ -1,14 +1,18 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	-I$(top_srcdir)/libcstring \
-	-I$(top_srcdir)/liberror \
-	-I$(top_srcdir)/libnotify \
+	@LIBCSTRING_CPPFLAGS@ \
+	@LIBCERROR_CPPFLAGS@ \
+	@LIBCLOCALE_CPPFLAGS@ \
+	@LIBCNOTIFY_CPPFLAGS@ \
+	@LIBCSPLIT_CPPFLAGS@ \
 	@LIBUNA_CPPFLAGS@ \
+	@LIBCFILE_CPPFLAGS@ \
+	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
+	@LIBFVALUE_CPPFLAGS@ \
 	@LIBMFCACHE_CPPFLAGS@ \
 	@LIBMFDATA_CPPFLAGS@ \
-	@LIBFVALUE_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@
 
 lib_LTLIBRARIES = libewf.la
@@ -51,6 +55,10 @@ libewf_la_SOURCES = \
 	libewf_io_handle.c libewf_io_handle.h \
 	libewf_legacy.c libewf_legacy.h \
 	libewf_libbfio.h \
+	libewf_libcerror.h \
+	libewf_libclocale.h \
+	libewf_libcnotify.h \
+	libewf_libcstring.h \
 	libewf_libmfcache.h \
 	libewf_libmfdata.h \
 	libewf_libfvalue.h \
@@ -75,14 +83,18 @@ libewf_la_SOURCES = \
 	libewf_write_io_handle.c libewf_write_io_handle.h
 
 libewf_la_LIBADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libnotify/libnotify.la \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
+	@LIBFVALUE_LIBADD@ \
 	@LIBMFCACHE_LIBADD@ \
-	@LIBMFDATA_LIBADD@ \
-	@LIBFVALUE_LIBADD@
+	@LIBMFDATA_LIBADD@
 
 libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
 

@@ -25,9 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #include "libewf_extern.h"
+#include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_tree_type.h"
@@ -56,48 +55,48 @@ struct libewf_single_files
 
 int libewf_single_files_initialize(
      libewf_single_files_t **single_files,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_files_free(
      libewf_single_files_t **single_files,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_files_parse(
      libewf_single_files_t *single_files,
      size64_t *media_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entries(
      libewf_single_files_t *single_files,
      size64_t *media_size,
      const uint8_t *file_entries_string,
      size_t file_entries_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_files_parse_record_values(
      size64_t *media_size,
      libfvalue_split_utf8_string_t *lines,
      int *line_iterator,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry(
      libewf_tree_node_t *parent_file_entry_node,
      libfvalue_split_utf8_string_t *lines,
      int *line_iterator,
      libfvalue_split_utf8_string_t *types,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry_number_of_sub_entries(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      uint64_t *number_of_sub_entries,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry_offset_values(
      libewf_single_file_entry_t *single_file_entry,
      const uint8_t *offset_values_string,
      size_t offset_values_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

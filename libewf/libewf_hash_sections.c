@@ -22,6 +22,7 @@
 #include <common.h>
 #include <memory.h>
 
+#include "libewf_libcerror.h"
 #include "libewf_hash_sections.h"
 
 /* Initialize the hash sections
@@ -29,16 +30,16 @@
  */
 int libewf_hash_sections_initialize(
      libewf_hash_sections_t **hash_sections,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_hash_sections_initialize";
 
 	if( hash_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.",
 		 function );
 
@@ -46,10 +47,10 @@ int libewf_hash_sections_initialize(
 	}
 	if( *hash_sections != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid hash sections value already set.",
 		 function );
 
@@ -60,10 +61,10 @@ int libewf_hash_sections_initialize(
 
 	if( *hash_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create hash sections.",
 		 function );
 
@@ -74,10 +75,10 @@ int libewf_hash_sections_initialize(
 	     0,
 	     sizeof( libewf_hash_sections_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear hash sections.",
 		 function );
 
@@ -101,16 +102,16 @@ on_error:
  */
 int libewf_hash_sections_free(
      libewf_hash_sections_t **hash_sections,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
         static char *function = "libewf_hash_sections_free";
 
 	if( hash_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.",
 		 function );
 
@@ -137,16 +138,16 @@ int libewf_hash_sections_free(
 int libewf_hash_sections_clone(
      libewf_hash_sections_t **destination_hash_sections,
      libewf_hash_sections_t *source_hash_sections,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_hash_sections_clone";
 
 	if( destination_hash_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination hash sections.",
 		 function );
 
@@ -154,10 +155,10 @@ int libewf_hash_sections_clone(
 	}
 	if( *destination_hash_sections != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination hash sections already set.",
 		 function );
 
@@ -174,10 +175,10 @@ int libewf_hash_sections_clone(
 
 	if( *destination_hash_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination hash sections.",
 		 function );
 
@@ -188,10 +189,10 @@ int libewf_hash_sections_clone(
 	     source_hash_sections,
 	     sizeof( libewf_hash_sections_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy source to destination hash sections.",
 		 function );
 
@@ -207,10 +208,10 @@ int libewf_hash_sections_clone(
 
 		if( ( *destination_hash_sections )->xhash == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination xhash.",
 			 function );
 
@@ -221,10 +222,10 @@ int libewf_hash_sections_clone(
 		     source_hash_sections->xhash,
 		     sizeof( uint8_t ) * source_hash_sections->xhash_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination xhash.",
 			 function );
 

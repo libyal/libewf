@@ -23,9 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( TIME_WITH_SYS_TIME )
 #include <sys/time.h>
 #include <time.h>
@@ -38,6 +35,8 @@
 #include "libewf_date_time.h"
 #include "libewf_date_time_values.h"
 #include "libewf_definitions.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 
 /* Copies date and time values string from a timestamp
@@ -48,7 +47,7 @@ int libewf_date_time_values_copy_from_timestamp(
      uint8_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t timestamp,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	struct tm time_elements;
 
@@ -57,10 +56,10 @@ int libewf_date_time_values_copy_from_timestamp(
 
 	if( date_time_values_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date time values string.",
 		 function );
 
@@ -68,10 +67,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	}
 	if( date_time_values_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid date time values string size.",
 		 function );
 
@@ -79,10 +78,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	}
 	if( date_time_values_string_size < 20 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: date time values string too small.",
 		 function );
 
@@ -93,10 +92,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create time elements.",
 		 function );
 
@@ -104,10 +103,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	}
 	if( ( time_elements.tm_year + 1900 ) > 10000 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported year value.",
 		 function );
 
@@ -116,10 +115,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	if( ( time_elements.tm_mon < 0 )
 	 || ( time_elements.tm_mon > 11 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported month.",
 		 function );
 
@@ -128,10 +127,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	if( ( time_elements.tm_mday < 1 )
 	 || ( time_elements.tm_mday > 31 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported day of month.",
 		 function );
 
@@ -140,10 +139,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	if( ( time_elements.tm_hour < 0 )
 	 || ( time_elements.tm_hour > 23 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported hours.",
 		 function );
 
@@ -152,10 +151,10 @@ int libewf_date_time_values_copy_from_timestamp(
 	if( ( time_elements.tm_min < 0 )
 	 || ( time_elements.tm_min > 59 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported minutes.",
 		 function );
 
@@ -166,26 +165,28 @@ int libewf_date_time_values_copy_from_timestamp(
 	if( ( time_elements.tm_sec < 0 )
 	 || ( time_elements.tm_sec > 60 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported seconds.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_16bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     (uint16_t) time_elements.tm_year + 1900,
+	     (uint64_t) time_elements.tm_year + 1900,
+	     16,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy year to date time values string.",
 		 function );
 
@@ -197,17 +198,19 @@ int libewf_date_time_values_copy_from_timestamp(
 	{
 		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     (uint8_t) time_elements.tm_mon + 1,
+	     (uint64_t) time_elements.tm_mon + 1,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy month to date time values string.",
 		 function );
 
@@ -219,17 +222,19 @@ int libewf_date_time_values_copy_from_timestamp(
 	{
 		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     (uint8_t) time_elements.tm_mday,
+	     (uint64_t) time_elements.tm_mday,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy day of month to date time values string.",
 		 function );
 
@@ -241,17 +246,19 @@ int libewf_date_time_values_copy_from_timestamp(
 	{
 		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     (uint8_t) time_elements.tm_hour,
+	     (uint64_t) time_elements.tm_hour,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy hours to date time values string.",
 		 function );
 
@@ -263,17 +270,19 @@ int libewf_date_time_values_copy_from_timestamp(
 	{
 		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     (uint8_t) time_elements.tm_min,
+	     (uint64_t) time_elements.tm_min,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy minutes to date time values string.",
 		 function );
 
@@ -285,17 +294,19 @@ int libewf_date_time_values_copy_from_timestamp(
 	{
 		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
 	     &date_time_values_string_index,
-	     (uint8_t) time_elements.tm_sec,
+	     (uint64_t) time_elements.tm_sec,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy seconds to date time values string.",
 		 function );
 
@@ -313,7 +324,7 @@ int libewf_date_time_values_copy_to_timestamp(
      const uint8_t *date_time_values_string,
      size_t date_time_values_string_size,
      time_t *timestamp,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	struct tm time_elements;
 
@@ -325,10 +336,10 @@ int libewf_date_time_values_copy_to_timestamp(
 
 	if( date_time_values_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date time values string.",
 		 function );
 
@@ -336,10 +347,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( date_time_values_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid date time values string size.",
 		 function );
 
@@ -347,10 +358,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( timestamp == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid timestamp.",
 		 function );
 
@@ -363,10 +374,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split date time values string.",
 		 function );
 
@@ -377,10 +388,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &number_of_date_time_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of date time values.",
 		 function );
 
@@ -388,10 +399,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( number_of_date_time_values < 6 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported number of date time values in string.",
 		 function );
 
@@ -406,10 +417,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve date time value string: 0.",
 		 function );
 
@@ -421,10 +432,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy year value.",
 		 function );
 
@@ -439,10 +450,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve date time value string: 1.",
 		 function );
 
@@ -450,10 +461,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( date_time_value_string_size != 3 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date time value string size: 1.",
 		 function );
 
@@ -465,10 +476,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy month value.",
 		 function );
 
@@ -483,10 +494,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve date time value string: 2.",
 		 function );
 
@@ -494,10 +505,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( date_time_value_string_size != 3 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date time value string size: 2.",
 		 function );
 
@@ -509,10 +520,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy day of month value.",
 		 function );
 
@@ -527,10 +538,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve date time value string: 3.",
 		 function );
 
@@ -538,10 +549,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( date_time_value_string_size != 3 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date time value string size: 3.",
 		 function );
 
@@ -553,10 +564,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy hours value.",
 		 function );
 
@@ -571,10 +582,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve date time value string: 4.",
 		 function );
 
@@ -582,10 +593,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( date_time_value_string_size != 3 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date time value string size: 4.",
 		 function );
 
@@ -597,10 +608,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy minutes value.",
 		 function );
 
@@ -615,10 +626,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_value_string_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve date time value string: 5.",
 		 function );
 
@@ -626,10 +637,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	}
 	if( date_time_value_string_size != 3 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date time value string size: 5.",
 		 function );
 
@@ -641,10 +652,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy seconds value.",
 		 function );
 
@@ -658,10 +669,10 @@ int libewf_date_time_values_copy_to_timestamp(
 	     &date_time_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split date time elements.",
 		 function );
 
@@ -674,10 +685,10 @@ int libewf_date_time_values_copy_to_timestamp(
 
 	if( *timestamp == (time_t) -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create timestamp.",
 		 function );
 
@@ -703,17 +714,17 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
      size_t utf8_string_size,
      size_t *utf8_string_index,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	const char *day_of_week = NULL;
 	static char *function   = "libewf_utf8_string_day_of_week_copy_from_time_elements";
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -721,10 +732,10 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -732,10 +743,10 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 	}
 	if( utf8_string_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string index.",
 		 function );
 
@@ -743,10 +754,10 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 	}
 	if( *utf8_string_index >= utf8_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid UTF-8 string index value out of bounds.",
 		 function );
 
@@ -754,10 +765,10 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 	}
 	if( ( *utf8_string_index + 3 ) >= utf8_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -765,10 +776,10 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -777,10 +788,10 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 	if( ( time_elements->tm_wday < 0 )
 	 || ( time_elements->tm_wday > 6 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported day of week.",
 		 function );
 
@@ -826,16 +837,16 @@ int libewf_utf8_string_day_of_week_copy_to_time_elements(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_day_of_week_copy_to_time_elements";
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -843,10 +854,10 @@ int libewf_utf8_string_day_of_week_copy_to_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -854,10 +865,10 @@ int libewf_utf8_string_day_of_week_copy_to_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -865,10 +876,10 @@ int libewf_utf8_string_day_of_week_copy_to_time_elements(
 	}
 	if( utf8_string_size < 4 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -925,10 +936,10 @@ int libewf_utf8_string_day_of_week_copy_to_time_elements(
 	}
 	else
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported day of week value.",
 		 function );
 
@@ -944,17 +955,17 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_day_of_month_copy_to_time_elements";
-	uint8_t value_8bit    = 0;
+	uint64_t value_64bit  = 0;
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -962,10 +973,10 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -973,10 +984,10 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -984,43 +995,45 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
 	}
 	if( utf8_string_size < 3 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfvalue_utf8_string_decimal_copy_to_8bit(
+	if( libfvalue_utf8_string_copy_to_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     &value_8bit,
+	     &value_64bit,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to UTF-8 string to 8-bit value.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( value_8bit < 1 )
-	 || ( value_8bit >= 31 ) )
+	if( ( value_64bit < 1 )
+	 || ( value_64bit >= 31 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported day of the month value.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements->tm_mday = (int) value_8bit;
+	time_elements->tm_mday = (int) value_64bit;
 
 	return( 1 );
 }
@@ -1033,17 +1046,17 @@ int libewf_utf8_string_month_copy_from_time_elements(
      size_t utf8_string_size,
      size_t *utf8_string_index,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	const char *month     = NULL;
 	static char *function = "libewf_utf8_string_month_copy_from_time_elements";
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -1051,10 +1064,10 @@ int libewf_utf8_string_month_copy_from_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -1062,10 +1075,10 @@ int libewf_utf8_string_month_copy_from_time_elements(
 	}
 	if( utf8_string_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string index.",
 		 function );
 
@@ -1073,10 +1086,10 @@ int libewf_utf8_string_month_copy_from_time_elements(
 	}
 	if( *utf8_string_index >= utf8_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid UTF-8 string index value out of bounds.",
 		 function );
 
@@ -1084,10 +1097,10 @@ int libewf_utf8_string_month_copy_from_time_elements(
 	}
 	if( ( *utf8_string_index + 3 ) >= utf8_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -1095,10 +1108,10 @@ int libewf_utf8_string_month_copy_from_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1107,10 +1120,10 @@ int libewf_utf8_string_month_copy_from_time_elements(
 	if( ( time_elements->tm_mon < 0 )
 	 || ( time_elements->tm_mon >= 12 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported month.",
 		 function );
 
@@ -1171,17 +1184,17 @@ int libewf_utf8_string_month_copy_to_time_elements(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_month_copy_to_time_elements";
-	uint16_t value_16bit  = 0;
+	uint64_t value_64bit  = 0;
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -1189,10 +1202,10 @@ int libewf_utf8_string_month_copy_to_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -1200,10 +1213,10 @@ int libewf_utf8_string_month_copy_to_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1211,10 +1224,10 @@ int libewf_utf8_string_month_copy_to_time_elements(
 	}
 	if( utf8_string_size < 2 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -1223,43 +1236,45 @@ int libewf_utf8_string_month_copy_to_time_elements(
 	if( ( utf8_string[ 0 ] >= (uint8_t) '0' )
 	 || ( utf8_string[ 0 ] <= (uint8_t) '9' ) )
 	{
-		if( libfvalue_utf8_string_decimal_copy_to_16bit(
+		if( libfvalue_utf8_string_copy_to_integer(
 		     utf8_string,
 		     utf8_string_size,
-		     &value_16bit,
+		     &value_64bit,
+		     16,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to UTF-8 string to 16-bit value.",
 			 function );
 
 			return( -1 );
 		}
-		if( ( value_16bit < 1 )
-		 || ( value_16bit >= 13 ) )
+		if( ( value_64bit < 1 )
+		 || ( value_64bit >= 13 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported month value.",
 			 function );
 
 			return( -1 );
 		}
-		time_elements->tm_mon = (int) ( value_16bit - 1 );
+		time_elements->tm_mon = (int) ( value_64bit - 1 );
 	}
 	else
 	{
 		if( utf8_string_size < 4 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: UTF-8 string too small.",
 			 function );
 
@@ -1351,10 +1366,10 @@ int libewf_utf8_string_month_copy_to_time_elements(
 		}
 		else
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported month value.",
 			 function );
 
@@ -1371,17 +1386,17 @@ int libewf_utf8_string_year_copy_to_time_elements(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_year_copy_to_time_elements";
-	uint32_t value_32bit  = 0;
+	uint64_t value_64bit  = 0;
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -1389,10 +1404,10 @@ int libewf_utf8_string_year_copy_to_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -1400,10 +1415,10 @@ int libewf_utf8_string_year_copy_to_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1411,43 +1426,45 @@ int libewf_utf8_string_year_copy_to_time_elements(
 	}
 	if( utf8_string_size < 5 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfvalue_utf8_string_decimal_copy_to_32bit(
+	if( libfvalue_utf8_string_copy_to_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     &value_32bit,
+	     &value_64bit,
+	     32,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to copy UTF-8 string to 32-bit value.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( value_32bit < 1900 )
-	 || ( value_32bit >= 11900 ) )
+	if( ( value_64bit < 1900 )
+	 || ( value_64bit >= 11900 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported year value.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements->tm_year = (int)( value_32bit - 1900 );
+	time_elements->tm_year = (int)( value_64bit - 1900 );
 
 	return( 1 );
 }
@@ -1460,16 +1477,16 @@ int libewf_utf8_string_time_copy_from_time_elements(
      size_t utf8_string_size,
      size_t *utf8_string_index,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_time_copy_from_time_elements";
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -1477,10 +1494,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -1488,10 +1505,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	}
 	if( utf8_string_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string index.",
 		 function );
 
@@ -1499,10 +1516,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	}
 	if( *utf8_string_index >= utf8_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid UTF-8 string index value out of bounds.",
 		 function );
 
@@ -1510,10 +1527,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	}
 	if( ( *utf8_string_index + 8 ) >= utf8_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -1521,10 +1538,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1533,10 +1550,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	if( ( time_elements->tm_hour < 0 )
 	 || ( time_elements->tm_hour > 23 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported hours.",
 		 function );
 
@@ -1545,10 +1562,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	if( ( time_elements->tm_min < 0 )
 	 || ( time_elements->tm_min > 59 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported minutes.",
 		 function );
 
@@ -1559,10 +1576,10 @@ int libewf_utf8_string_time_copy_from_time_elements(
 	if( ( time_elements->tm_sec < 0 )
 	 || ( time_elements->tm_sec > 60 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported seconds.",
 		 function );
 
@@ -1574,17 +1591,19 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		*utf8_string_index += 1;
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     utf8_string,
 	     utf8_string_size,
 	     utf8_string_index,
-	     (uint8_t) time_elements->tm_hour,
+	     (uint64_t) time_elements->tm_hour,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy hours to UTF-8 string.",
 		 function );
 
@@ -1600,17 +1619,19 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		*utf8_string_index += 1;
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     utf8_string,
 	     utf8_string_size,
 	     utf8_string_index,
-	     (uint8_t) time_elements->tm_min,
+	     (uint64_t) time_elements->tm_min,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy minutes to UTF-8 string.",
 		 function );
 
@@ -1626,17 +1647,19 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		*utf8_string_index += 1;
 	}
-	if( libfvalue_utf8_string_decimal_copy_from_8bit(
+	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     utf8_string,
 	     utf8_string_size,
 	     utf8_string_index,
-	     (uint8_t) time_elements->tm_sec,
+	     (uint64_t) time_elements->tm_sec,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy seconds to UTF-8 string.",
 		 function );
 
@@ -1652,17 +1675,17 @@ int libewf_utf8_string_hours_copy_to_time_elements(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_hours_copy_to_time_elements";
-	uint8_t value_8bit    = 0;
+	uint64_t value_64bit  = 0;
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -1670,10 +1693,10 @@ int libewf_utf8_string_hours_copy_to_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -1681,10 +1704,10 @@ int libewf_utf8_string_hours_copy_to_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1692,42 +1715,44 @@ int libewf_utf8_string_hours_copy_to_time_elements(
 	}
 	if( utf8_string_size < 2 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfvalue_utf8_string_decimal_copy_to_8bit(
+	if( libfvalue_utf8_string_copy_to_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     &value_8bit,
+	     &value_64bit,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to UTF-8 string to 8-bit value.",
 		 function );
 
 		return( -1 );
 	}
-	if( value_8bit >= 24 )
+	if( value_64bit >= 24 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported hours value.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements->tm_hour = (int) value_8bit;
+	time_elements->tm_hour = (int) value_64bit;
 
 	return( 1 );
 }
@@ -1739,17 +1764,17 @@ int libewf_utf8_string_minutes_copy_to_time_elements(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_minutes_copy_to_time_elements";
-	uint8_t value_8bit    = 0;
+	uint64_t value_64bit  = 0;
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -1757,10 +1782,10 @@ int libewf_utf8_string_minutes_copy_to_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -1768,10 +1793,10 @@ int libewf_utf8_string_minutes_copy_to_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1779,42 +1804,44 @@ int libewf_utf8_string_minutes_copy_to_time_elements(
 	}
 	if( utf8_string_size < 2 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfvalue_utf8_string_decimal_copy_to_8bit(
+	if( libfvalue_utf8_string_copy_to_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     &value_8bit,
+	     &value_64bit,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to UTF-8 string to 8-bit value.",
 		 function );
 
 		return( -1 );
 	}
-	if( value_8bit >= 60 )
+	if( value_64bit >= 60 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported minutes value.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements->tm_min = (int) value_8bit;
+	time_elements->tm_min = (int) value_64bit;
 
 	return( 1 );
 }
@@ -1826,17 +1853,17 @@ int libewf_utf8_string_seconds_copy_to_time_elements(
      uint8_t *utf8_string,
      size_t utf8_string_size,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_seconds_copy_to_time_elements";
-	uint8_t value_8bit    = 0;
+	uint64_t value_64bit  = 0;
 
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -1844,10 +1871,10 @@ int libewf_utf8_string_seconds_copy_to_time_elements(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -1855,10 +1882,10 @@ int libewf_utf8_string_seconds_copy_to_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1866,42 +1893,44 @@ int libewf_utf8_string_seconds_copy_to_time_elements(
 	}
 	if( utf8_string_size < 2 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfvalue_utf8_string_decimal_copy_to_8bit(
+	if( libfvalue_utf8_string_copy_to_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     &value_8bit,
+	     &value_64bit,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to UTF-8 string to 8-bit value.",
 		 function );
 
 		return( -1 );
 	}
-	if( value_8bit >= 60 )
+	if( value_64bit >= 60 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported seconds value.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements->tm_sec = (int) value_8bit;
+	time_elements->tm_sec = (int) value_64bit;
 
 	return( 1 );
 }
@@ -1914,17 +1943,17 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
      size_t utf16_string_size,
      size_t *utf16_string_index,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	const char *day_of_week = NULL;
 	static char *function   = "libewf_utf16_string_day_of_week_copy_from_time_elements";
 
 	if( utf16_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string.",
 		 function );
 
@@ -1932,10 +1961,10 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 	}
 	if( utf16_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-16 string size value exceeds maximum.",
 		 function );
 
@@ -1943,10 +1972,10 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 	}
 	if( utf16_string_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string index.",
 		 function );
 
@@ -1954,10 +1983,10 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 	}
 	if( *utf16_string_index >= utf16_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid UTF-16 string index value out of bounds.",
 		 function );
 
@@ -1965,10 +1994,10 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 	}
 	if( ( *utf16_string_index + 3 ) >= utf16_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-16 string too small.",
 		 function );
 
@@ -1976,10 +2005,10 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -1988,10 +2017,10 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 	if( ( time_elements->tm_wday < 0 )
 	 || ( time_elements->tm_wday > 6 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported day of week.",
 		 function );
 
@@ -2038,17 +2067,17 @@ int libewf_utf16_string_month_copy_from_time_elements(
      size_t utf16_string_size,
      size_t *utf16_string_index,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	const char *month     = NULL;
 	static char *function = "libewf_utf16_string_month_copy_from_time_elements";
 
 	if( utf16_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string.",
 		 function );
 
@@ -2056,10 +2085,10 @@ int libewf_utf16_string_month_copy_from_time_elements(
 	}
 	if( utf16_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-16 string size value exceeds maximum.",
 		 function );
 
@@ -2067,10 +2096,10 @@ int libewf_utf16_string_month_copy_from_time_elements(
 	}
 	if( utf16_string_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string index.",
 		 function );
 
@@ -2078,10 +2107,10 @@ int libewf_utf16_string_month_copy_from_time_elements(
 	}
 	if( *utf16_string_index >= utf16_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid UTF-16 string index value out of bounds.",
 		 function );
 
@@ -2089,10 +2118,10 @@ int libewf_utf16_string_month_copy_from_time_elements(
 	}
 	if( ( *utf16_string_index + 3 ) >= utf16_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-16 string too small.",
 		 function );
 
@@ -2100,10 +2129,10 @@ int libewf_utf16_string_month_copy_from_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -2112,10 +2141,10 @@ int libewf_utf16_string_month_copy_from_time_elements(
 	if( ( time_elements->tm_mon < 0 )
 	 || ( time_elements->tm_mon > 11 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported month.",
 		 function );
 
@@ -2177,16 +2206,16 @@ int libewf_utf16_string_time_copy_from_time_elements(
      size_t utf16_string_size,
      size_t *utf16_string_index,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_utf16_string_time_copy_from_time_elements";
 
 	if( utf16_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string.",
 		 function );
 
@@ -2194,10 +2223,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	}
 	if( utf16_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-16 string size value exceeds maximum.",
 		 function );
 
@@ -2205,10 +2234,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	}
 	if( utf16_string_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string index.",
 		 function );
 
@@ -2216,10 +2245,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	}
 	if( *utf16_string_index >= utf16_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid UTF-16 string index value out of bounds.",
 		 function );
 
@@ -2227,10 +2256,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	}
 	if( ( *utf16_string_index + 16 ) >= utf16_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-16 string too small.",
 		 function );
 
@@ -2238,10 +2267,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -2250,10 +2279,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	if( ( time_elements->tm_hour < 0 )
 	 || ( time_elements->tm_hour > 23 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported hours.",
 		 function );
 
@@ -2262,10 +2291,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	if( ( time_elements->tm_min < 0 )
 	 || ( time_elements->tm_min > 59 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported minutes.",
 		 function );
 
@@ -2276,10 +2305,10 @@ int libewf_utf16_string_time_copy_from_time_elements(
 	if( ( time_elements->tm_sec < 0 )
 	 || ( time_elements->tm_sec > 60 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported seconds.",
 		 function );
 
@@ -2291,17 +2320,19 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		*utf16_string_index += 1;
 	}
-	if( libfvalue_utf16_string_decimal_copy_from_8bit(
+	if( libfvalue_utf16_string_with_index_copy_from_integer(
 	     utf16_string,
 	     utf16_string_size,
 	     utf16_string_index,
-	     (uint8_t) time_elements->tm_hour,
+	     (uint64_t) time_elements->tm_hour,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy hours to UTF-16 string.",
 		 function );
 
@@ -2317,17 +2348,19 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		*utf16_string_index += 1;
 	}
-	if( libfvalue_utf16_string_decimal_copy_from_8bit(
+	if( libfvalue_utf16_string_with_index_copy_from_integer(
 	     utf16_string,
 	     utf16_string_size,
 	     utf16_string_index,
-	     (uint8_t) time_elements->tm_min,
+	     (uint64_t) time_elements->tm_min,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy minutes to UTF-16 string.",
 		 function );
 
@@ -2343,17 +2376,19 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		*utf16_string_index += 1;
 	}
-	if( libfvalue_utf16_string_decimal_copy_from_8bit(
+	if( libfvalue_utf16_string_with_index_copy_from_integer(
 	     utf16_string,
 	     utf16_string_size,
 	     utf16_string_index,
-	     (uint8_t) time_elements->tm_sec,
+	     (uint64_t) time_elements->tm_sec,
+	     8,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy seconds to UTF-16 string.",
 		 function );
 
@@ -2372,7 +2407,7 @@ int libewf_date_time_values_copy_to_utf8_string(
      int date_format,
      uint8_t *utf8_string,
      size_t utf8_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	struct tm time_elements;
 
@@ -2383,10 +2418,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 	if( date_time_values_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date time values string.",
 		 function );
 
@@ -2394,10 +2429,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	}
 	if( date_time_values_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid date time values string size.",
 		 function );
 
@@ -2408,10 +2443,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date format.",
 		 function );
 
@@ -2419,10 +2454,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	}
 	if( utf8_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
 		 function );
 
@@ -2430,10 +2465,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	}
 	if( utf8_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-8 string size value exceeds maximum.",
 		 function );
 
@@ -2441,10 +2476,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	}
 	if( utf8_string_size < 20 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -2456,10 +2491,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	     &timestamp,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create timestamp.",
 		 function );
 
@@ -2470,10 +2505,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create time elements.",
 		 function );
 
@@ -2481,10 +2516,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	}
 	if( ( time_elements.tm_year + 1900 ) > 10000 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported year value.",
 		 function );
 
@@ -2494,10 +2529,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	{
 		if( utf8_string_size < 25 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: UTF-8 string too small.",
 			 function );
 
@@ -2510,10 +2545,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy day of week to UTF-8 string.",
 			 function );
 
@@ -2528,10 +2563,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy month to UTF-8 string.",
 			 function );
 
@@ -2543,17 +2578,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 		{
 			utf8_string[ utf8_string_index++ ] = (uint8_t) ' ';
 		}
-		if( libfvalue_utf8_string_decimal_copy_from_8bit(
+		if( libfvalue_utf8_string_with_index_copy_from_integer(
 		     utf8_string,
 		     utf8_string_size,
 		     &utf8_string_index,
-		     (uint8_t) time_elements.tm_mday,
+		     (uint64_t) time_elements.tm_mday,
+		     8,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy day of month to UTF-8 string.",
 			 function );
 
@@ -2568,10 +2605,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy time to UTF-8 string.",
 			 function );
 
@@ -2579,17 +2616,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 		}
 		utf8_string[ utf8_string_index++ ] = (uint8_t) ' ';
 
-		if( libfvalue_utf8_string_decimal_copy_from_16bit(
+		if( libfvalue_utf8_string_with_index_copy_from_integer(
 		     utf8_string,
 		     utf8_string_size,
 		     &utf8_string_index,
-		     (uint16_t) time_elements.tm_year + 1900,
+		     (uint64_t) time_elements.tm_year + 1900,
+		     16,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy year to UTF-8 string.",
 			 function );
 
@@ -2603,10 +2642,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 		if( ( time_elements.tm_mon < 0 )
 		 || ( time_elements.tm_mon > 11 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported month.",
 			 function );
 
@@ -2615,10 +2654,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 		if( ( time_elements.tm_mday < 1 )
 		 || ( time_elements.tm_mday > 31 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported day of month.",
 			 function );
 
@@ -2633,17 +2672,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 				{
 					utf8_string[ utf8_string_index++ ] = (uint8_t) '0';
 				}
-				if( libfvalue_utf8_string_decimal_copy_from_8bit(
+				if( libfvalue_utf8_string_with_index_copy_from_integer(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     (uint8_t) time_elements.tm_mon + 1,
+				     (uint64_t) time_elements.tm_mon + 1,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy month to UTF-8 string.",
 					 function );
 
@@ -2655,17 +2696,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 				{
 					utf8_string[ utf8_string_index++ ] = (uint8_t) '0';
 				}
-				if( libfvalue_utf8_string_decimal_copy_from_8bit(
+				if( libfvalue_utf8_string_with_index_copy_from_integer(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     (uint8_t) time_elements.tm_mday,
+				     (uint64_t) time_elements.tm_mday,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy day of month to UTF-8 string.",
 					 function );
 
@@ -2678,17 +2721,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 				{
 					utf8_string[ utf8_string_index++ ] = (uint8_t) '0';
 				}
-				if( libfvalue_utf8_string_decimal_copy_from_8bit(
+				if( libfvalue_utf8_string_with_index_copy_from_integer(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     (uint8_t) time_elements.tm_mday,
+				     (uint64_t) time_elements.tm_mday,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy day of month to UTF-8 string.",
 					 function );
 
@@ -2700,17 +2745,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 				{
 					utf8_string[ utf8_string_index++ ] = (uint8_t) '0';
 				}
-				if( libfvalue_utf8_string_decimal_copy_from_8bit(
+				if( libfvalue_utf8_string_with_index_copy_from_integer(
 				     utf8_string,
 				     utf8_string_size,
 				     &utf8_string_index,
-				     (uint8_t) time_elements.tm_mon + 1,
+				     (uint64_t) time_elements.tm_mon + 1,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy month to UTF-8 string.",
 					 function );
 
@@ -2719,17 +2766,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 			}
 			utf8_string[ utf8_string_index++ ] = (uint8_t) '/';
 
-			if( libfvalue_utf8_string_decimal_copy_from_16bit(
+			if( libfvalue_utf8_string_with_index_copy_from_integer(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     (uint16_t) time_elements.tm_year + 1900,
+			     (uint64_t) time_elements.tm_year + 1900,
+			     16,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy year to UTF-8 string.",
 				 function );
 
@@ -2739,17 +2788,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 		}
 		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 		{
-			if( libfvalue_utf8_string_decimal_copy_from_16bit(
+			if( libfvalue_utf8_string_with_index_copy_from_integer(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     (uint16_t) time_elements.tm_year + 1900,
+			     (uint64_t) time_elements.tm_year + 1900,
+			     16,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy year to UTF-8 string.",
 				 function );
 
@@ -2761,17 +2812,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 			{
 				utf8_string[ utf8_string_index++ ] = (uint8_t) '0';
 			}
-			if( libfvalue_utf8_string_decimal_copy_from_8bit(
+			if( libfvalue_utf8_string_with_index_copy_from_integer(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     (uint8_t) time_elements.tm_mon + 1,
+			     (uint64_t) time_elements.tm_mon + 1,
+			     8,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy month to UTF-8 string.",
 				 function );
 
@@ -2783,17 +2836,19 @@ int libewf_date_time_values_copy_to_utf8_string(
 			{
 				utf8_string[ utf8_string_index++ ] = (uint8_t) '0';
 			}
-			if( libfvalue_utf8_string_decimal_copy_from_8bit(
+			if( libfvalue_utf8_string_with_index_copy_from_integer(
 			     utf8_string,
 			     utf8_string_size,
 			     &utf8_string_index,
-			     (uint8_t) time_elements.tm_mday,
+			     (uint64_t) time_elements.tm_mday,
+			     8,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy day of month to UTF-8 string.",
 				 function );
 
@@ -2808,10 +2863,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy time to UTF-8 string.",
 			 function );
 
@@ -2824,10 +2879,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 		{
 			if( ( utf8_string_index + 7 ) >= utf8_string_size )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 				 "%s: UTF-8 string too small.",
 				 function );
 
@@ -2850,10 +2905,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	{
 		if( ( utf8_string_index + ( date_time_values_string_size - 20 ) ) >= utf8_string_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: UTF-8 string too small.",
 			 function );
 
@@ -2868,10 +2923,10 @@ int libewf_date_time_values_copy_to_utf8_string(
 	}
 	if( utf8_string_index >= utf8_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-8 string too small.",
 		 function );
 
@@ -2892,7 +2947,7 @@ int libewf_date_time_values_copy_to_utf16_string(
      int date_format,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	struct tm time_elements;
 
@@ -2903,10 +2958,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 	if( date_time_values_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date time values string.",
 		 function );
 
@@ -2914,10 +2969,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	}
 	if( date_time_values_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid date time values string size.",
 		 function );
 
@@ -2928,10 +2983,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date format.",
 		 function );
 
@@ -2939,10 +2994,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	}
 	if( utf16_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-16 string.",
 		 function );
 
@@ -2950,10 +3005,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	}
 	if( utf16_string_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid UTF-16 string size value exceeds maximum.",
 		 function );
 
@@ -2961,10 +3016,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	}
 	if( utf16_string_size < 20 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-16 string too small.",
 		 function );
 
@@ -2976,10 +3031,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	     &timestamp,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create timestamp.",
 		 function );
 
@@ -2990,10 +3045,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	     &time_elements,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create time elements.",
 		 function );
 
@@ -3001,10 +3056,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	}
 	if( ( time_elements.tm_year + 1900 ) > 10000 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported year value.",
 		 function );
 
@@ -3014,10 +3069,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	{
 		if( utf16_string_size < 25 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: UTF-16 string too small.",
 			 function );
 
@@ -3030,10 +3085,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy day of week to UTF-16 string.",
 			 function );
 
@@ -3048,10 +3103,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy month to UTF-16 string.",
 			 function );
 
@@ -3063,17 +3118,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 		{
 			utf16_string[ utf16_string_index++ ] = (uint16_t) ' ';
 		}
-		if( libfvalue_utf16_string_decimal_copy_from_8bit(
+		if( libfvalue_utf16_string_with_index_copy_from_integer(
 		     utf16_string,
 		     utf16_string_size,
 		     &utf16_string_index,
-		     (uint8_t) time_elements.tm_mday,
+		     (uint64_t) time_elements.tm_mday,
+		     8,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy day of month to UTF-16 string.",
 			 function );
 
@@ -3088,10 +3145,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy time to UTF-16 string.",
 			 function );
 
@@ -3099,17 +3156,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 		}
 		utf16_string[ utf16_string_index++ ] = (uint16_t) ' ';
 
-		if( libfvalue_utf16_string_decimal_copy_from_16bit(
+		if( libfvalue_utf16_string_with_index_copy_from_integer(
 		     utf16_string,
 		     utf16_string_size,
 		     &utf16_string_index,
-		     (uint16_t) time_elements.tm_year + 1900,
+		     (uint64_t) time_elements.tm_year + 1900,
+		     16,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy year to UTF-16 string.",
 			 function );
 
@@ -3123,10 +3182,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 		if( ( time_elements.tm_mon < 0 )
 		 || ( time_elements.tm_mon > 11 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported month.",
 			 function );
 
@@ -3135,10 +3194,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 		if( ( time_elements.tm_mday < 1 )
 		 || ( time_elements.tm_mday > 31 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported day of month.",
 			 function );
 
@@ -3153,17 +3212,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 				{
 					utf16_string[ utf16_string_index++ ] = (uint16_t) '0';
 				}
-				if( libfvalue_utf16_string_decimal_copy_from_8bit(
+				if( libfvalue_utf16_string_with_index_copy_from_integer(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     (uint8_t) time_elements.tm_mon + 1,
+				     (uint64_t) time_elements.tm_mon + 1,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy month to UTF-16 string.",
 					 function );
 
@@ -3175,17 +3236,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 				{
 					utf16_string[ utf16_string_index++ ] = (uint16_t) '0';
 				}
-				if( libfvalue_utf16_string_decimal_copy_from_8bit(
+				if( libfvalue_utf16_string_with_index_copy_from_integer(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     (uint8_t) time_elements.tm_mday,
+				     (uint16_t) time_elements.tm_mday,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy day of month to UTF-16 string.",
 					 function );
 
@@ -3198,17 +3261,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 				{
 					utf16_string[ utf16_string_index++ ] = (uint16_t) '0';
 				}
-				if( libfvalue_utf16_string_decimal_copy_from_8bit(
+				if( libfvalue_utf16_string_with_index_copy_from_integer(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     (uint8_t) time_elements.tm_mday,
+				     (uint64_t) time_elements.tm_mday,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy day of month to UTF-16 string.",
 					 function );
 
@@ -3220,17 +3285,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 				{
 					utf16_string[ utf16_string_index++ ] = (uint16_t) '0';
 				}
-				if( libfvalue_utf16_string_decimal_copy_from_8bit(
+				if( libfvalue_utf16_string_with_index_copy_from_integer(
 				     utf16_string,
 				     utf16_string_size,
 				     &utf16_string_index,
-				     (uint8_t) time_elements.tm_mon + 1,
+				     (uint64_t) time_elements.tm_mon + 1,
+				     8,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 					 "%s: unable to copy month to UTF-16 string.",
 					 function );
 
@@ -3239,17 +3306,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 			}
 			utf16_string[ utf16_string_index++ ] = (uint16_t) '/';
 
-			if( libfvalue_utf16_string_decimal_copy_from_16bit(
+			if( libfvalue_utf16_string_with_index_copy_from_integer(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     (uint16_t) time_elements.tm_year + 1900,
+			     (uint64_t) time_elements.tm_year + 1900,
+			     16,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy year to UTF-16 string.",
 				 function );
 
@@ -3259,17 +3328,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 		}
 		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 		{
-			if( libfvalue_utf16_string_decimal_copy_from_16bit(
+			if( libfvalue_utf16_string_with_index_copy_from_integer(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     (uint16_t) time_elements.tm_year + 1900,
+			     (uint64_t) time_elements.tm_year + 1900,
+			     16,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy year to UTF-16 string.",
 				 function );
 
@@ -3281,17 +3352,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 			{
 				utf16_string[ utf16_string_index++ ] = (uint16_t) '0';
 			}
-			if( libfvalue_utf16_string_decimal_copy_from_8bit(
+			if( libfvalue_utf16_string_with_index_copy_from_integer(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     (uint8_t) time_elements.tm_mon + 1,
+			     (uint64_t) time_elements.tm_mon + 1,
+			     8,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy month to UTF-16 string.",
 				 function );
 
@@ -3303,17 +3376,19 @@ int libewf_date_time_values_copy_to_utf16_string(
 			{
 				utf16_string[ utf16_string_index++ ] = (uint16_t) '0';
 			}
-			if( libfvalue_utf16_string_decimal_copy_from_8bit(
+			if( libfvalue_utf16_string_with_index_copy_from_integer(
 			     utf16_string,
 			     utf16_string_size,
 			     &utf16_string_index,
-			     (uint8_t) time_elements.tm_mday,
+			     (uint64_t) time_elements.tm_mday,
+			     8,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy day of month to UTF-16 string.",
 				 function );
 
@@ -3328,10 +3403,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 		     &time_elements,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy time to UTF-16 string.",
 			 function );
 
@@ -3344,10 +3419,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 		{
 			if( ( utf16_string_index + 7 ) >= utf16_string_size )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 				 "%s: UTF-16 string too small.",
 				 function );
 
@@ -3370,10 +3445,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	{
 		if( ( utf16_string_index + ( date_time_values_string_size - 20 ) ) >= utf16_string_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 			 "%s: UTF-16 string too small.",
 			 function );
 
@@ -3388,10 +3463,10 @@ int libewf_date_time_values_copy_to_utf16_string(
 	}
 	if( utf16_string_index >= utf16_string_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: UTF-16 string too small.",
 		 function );
 

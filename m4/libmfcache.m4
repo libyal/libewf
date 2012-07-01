@@ -1,6 +1,6 @@
 dnl Functions for libmfcache
 dnl
-dnl Version: 20111203
+dnl Version: 20120519
 
 dnl Function to detect if libmfcache is available
 dnl ac_libmfcache_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -19,20 +19,39 @@ AC_DEFUN([AX_LIBMFCACHE_CHECK_LIB],
  AS_IF(
   [test "x$ac_cv_with_libmfcache" = xno],
   [ac_cv_libmfcache=no],
-  [dnl Check for headers
-  AC_CHECK_HEADERS([libmfcache.h])
- 
+  [dnl Check for a pkg-config file
   AS_IF(
-   [test "x$ac_cv_header_libmfcache_h" = xno],
-   [ac_cv_libmfcache=no],
-   [ac_cv_libmfcache=yes
-   AC_CHECK_LIB(
-    mfcache,
-    libmfcache_get_version,
-    [ac_cv_libmfcache_dummy=yes],
+   [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
+   [PKG_CHECK_MODULES(
+    [libmfcache],
+    [libmfcache >= 20120425],
+    [ac_cv_libmfcache=yes],
     [ac_cv_libmfcache=no])
+   ])
+
+  AS_IF(
+   [test "x$ac_cv_libmfcache" = xyes],
+   [ac_cv_libmfcache_CPPFLAGS="$pkg_cv_libmfcache_CFLAGS"
+   ac_cv_libmfcache_LIBADD="$pkg_cv_libmfcache_LIBS"],
+   [dnl Check for headers
+   AC_CHECK_HEADERS([libmfcache.h])
+ 
+   AS_IF(
+    [test "x$ac_cv_header_libmfcache_h" = xno],
+    [ac_cv_libmfcache=no],
+    [dnl Check for the individual functions
+    ac_cv_libmfcache=yes
+
+    AC_CHECK_LIB(
+     mfcache,
+     libmfcache_get_version,
+     [ac_cv_libmfcache_dummy=yes],
+     [ac_cv_libmfcache=no])
   
-   dnl TODO add functions
+    dnl TODO add functions
+
+    ac_cv_libmfcache_LIBADD="-lmfcache"
+    ])
    ])
   ])
 
@@ -42,7 +61,6 @@ AC_DEFUN([AX_LIBMFCACHE_CHECK_LIB],
    [HAVE_LIBMFCACHE],
    [1],
    [Define to 1 if you have the `mfcache' library (-lmfcache).])
-  LIBS="-lmfcache $LIBS"
   ])
 
  AS_IF(
@@ -83,8 +101,10 @@ AC_DEFUN([AX_LIBMFCACHE_CHECK_ENABLE],
   [auto-detect],
   [DIR])
 
+ dnl Check for a shared library version
  AX_LIBMFCACHE_CHECK_LIB
 
+ dnl Check if the dependencies for the local library version
  AS_IF(
   [test "x$ac_cv_libmfcache" != xyes],
   [AX_LIBMFCACHE_CHECK_LOCAL
@@ -96,18 +116,28 @@ AC_DEFUN([AX_LIBMFCACHE_CHECK_ENABLE],
   AC_SUBST(
    [HAVE_LOCAL_LIBMFCACHE],
    [1])
-  AC_SUBST(
-   [LIBMFCACHE_CPPFLAGS],
-   [-I../libmfcache])
-  AC_SUBST(
-   [LIBMFCACHE_LIBADD],
-   [../libmfcache/libmfcache.la])
+
+  ac_cv_libmfcache_CPPFLAGS="-I../libmfcache";
+  ac_cv_libmfcache_LIBADD="../libmfcache/libmfcache.la";
+
   ac_cv_libmfcache=local
   ])
 
  AM_CONDITIONAL(
   [HAVE_LOCAL_LIBMFCACHE],
   [test "x$ac_cv_libmfcache" = xlocal])
+ AS_IF(
+  [test "x$ac_cv_libmfcache_CPPFLAGS" != "x"],
+  [AC_SUBST(
+   [LIBMFCACHE_CPPFLAGS],
+   [$ac_cv_libmfcache_CPPFLAGS])
+  ])
+ AS_IF(
+  [test "x$ac_cv_libmfcache_LIBADD" != "x"],
+  [AC_SUBST(
+   [LIBMFCACHE_LIBADD],
+   [$ac_cv_libmfcache_LIBADD])
+  ])
 
  AS_IF(
   [test "x$ac_cv_libmfcache" = xyes],

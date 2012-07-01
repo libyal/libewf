@@ -1,7 +1,7 @@
 /* 
  * Device handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,27 +25,11 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
-#if defined( HAVE_LOCAL_LIBODRAW )
-#include <libodraw_types.h>
-#elif defined( HAVE_LIBODRAW_H )
-#include <libodraw.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBSMDEV )
-#include <libsmdev_types.h>
-#elif defined( HAVE_LIBSMDEV_H )
-#include <libsmdev.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBSMRAW )
-#include <libsmraw_types.h>
-#elif defined( HAVE_LIBSMRAW_H )
-#include <libsmraw.h>
-#endif
-
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libodraw.h"
+#include "ewftools_libsmdev.h"
+#include "ewftools_libsmraw.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -138,92 +122,92 @@ const char *device_handle_get_track_type(
 
 int device_handle_initialize(
      device_handle_t **device_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_free(
      device_handle_t **device_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_signal_abort(
      device_handle_t *device_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_open_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_open_smdev_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_open_odraw_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_open_smraw_input(
      device_handle_t *device_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_close(
      device_handle_t *device_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 ssize_t device_handle_read_buffer(
          device_handle_t *device_handle,
          uint8_t *buffer,
          size_t read_size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 off64_t device_handle_seek_offset(
          device_handle_t *device_handle,
          off64_t offset,
          int whence,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 int device_handle_prompt_for_string(
      device_handle_t *device_handle,
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_prompt_for_number_of_error_retries(
      device_handle_t *device_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_prompt_for_zero_buffer_on_error(
      device_handle_t *device_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_type(
      device_handle_t *device_handle,
      uint8_t *type,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_media_size(
      device_handle_t *device_handle,
      size64_t *media_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_media_type(
      device_handle_t *device_handle,
      uint8_t *media_type,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_bytes_per_sector(
      device_handle_t *device_handle,
      uint32_t *bytes_per_sector,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_information_value(
      device_handle_t *device_handle,
@@ -231,24 +215,24 @@ int device_handle_get_information_value(
      size_t information_value_identifier_length,
      libcstring_system_character_t *information_value,
      size_t information_value_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_number_of_sessions(
      device_handle_t *device_handle,
      int *number_of_sessions,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_session(
      device_handle_t *device_handle,
      int index,
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_number_of_tracks(
      device_handle_t *device_handle,
      int *number_of_tracks,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_track(
      device_handle_t *device_handle,
@@ -256,56 +240,56 @@ int device_handle_get_track(
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
      uint8_t *type,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_set_string(
      device_handle_t *device_handle,
      const libcstring_system_character_t *string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_set_number_of_error_retries(
      device_handle_t *device_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_set_error_values(
      device_handle_t *device_handle,
      size_t error_granularity,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_number_of_read_errors(
      device_handle_t *device_handle,
      int *number_of_errors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_get_read_error(
      device_handle_t *device_handle,
      int index,
      off64_t *offset,
      size64_t *size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_media_information_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_read_errors_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_sessions_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int device_handle_tracks_fprint(
      device_handle_t *device_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

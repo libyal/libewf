@@ -23,9 +23,8 @@
 #define _LIBEWF_SUPPORT_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
-
-#include <stdio.h>
 
 #include "libewf_extern.h"
 #include "libewf_libbfio.h"
@@ -59,31 +58,31 @@ int libewf_get_access_flags_write_resume(
 LIBEWF_EXTERN \
 int libewf_get_codepage(
      int *codepage,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_set_codepage(
      int codepage,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 
 LIBEWF_EXTERN \
 int libewf_check_file_signature(
      const char *filename,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN \
 int libewf_check_file_signature_wide(
      const wchar_t *filename,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 #endif
 
 LIBEWF_EXTERN \
 int libewf_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_glob(
@@ -92,13 +91,13 @@ int libewf_glob(
      uint8_t format,
      char **filenames[],
      int *number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_glob_free(
      char *filenames[],
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN \
@@ -108,13 +107,13 @@ int libewf_glob_wide(
      uint8_t format,
      wchar_t **filenames[],
      int *number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_glob_wide_free(
      wchar_t *filenames[],
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 #endif
 
 #if defined( __cplusplus )

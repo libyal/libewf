@@ -23,11 +23,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #include "libewf_array_type.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcstring.h"
 #include "libewf_libmfdata.h"
 #include "libewf_libuna.h"
 #include "libewf_segment_file.h"
@@ -40,16 +39,16 @@
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
      size64_t maximum_segment_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_initialize";
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -57,10 +56,10 @@ int libewf_segment_table_initialize(
 	}
 	if( *segment_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid segment table value already set.",
 		 function );
 
@@ -71,10 +70,10 @@ int libewf_segment_table_initialize(
 
 	if( *segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create segment table.",
 		 function );
 
@@ -85,10 +84,10 @@ int libewf_segment_table_initialize(
 	     0,
 	     sizeof( libewf_segment_table_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear segment table.",
 		 function );
 
@@ -99,10 +98,10 @@ int libewf_segment_table_initialize(
 	     0,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create segment files array.",
 		 function );
 
@@ -128,17 +127,17 @@ on_error:
  */
 int libewf_segment_table_free(
      libewf_segment_table_t **segment_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_free";
 	int result            = 1;
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -153,13 +152,13 @@ int libewf_segment_table_free(
 		}
 		if( libewf_array_free(
 		     &( ( *segment_table )->segment_files_array ),
-		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_handle_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free the segment files array.",
 			 function );
 
@@ -179,16 +178,16 @@ int libewf_segment_table_free(
 int libewf_segment_table_clone(
      libewf_segment_table_t **destination_segment_table,
      libewf_segment_table_t *source_segment_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_clone";
 
 	if( destination_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination segment table.",
 		 function );
 
@@ -196,10 +195,10 @@ int libewf_segment_table_clone(
 	}
 	if( *destination_segment_table != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination segment table value already set.",
 		 function );
 
@@ -216,10 +215,10 @@ int libewf_segment_table_clone(
 
 	if( *destination_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination segment table.",
 		 function );
 
@@ -230,10 +229,10 @@ int libewf_segment_table_clone(
 	     0,
 	     sizeof( libewf_segment_table_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear source to destination segment table.",
 		 function );
 
@@ -246,10 +245,10 @@ int libewf_segment_table_clone(
 
 		if( *destination_segment_table == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination segment table.",
 			 function );
 
@@ -260,10 +259,10 @@ int libewf_segment_table_clone(
 		     source_segment_table->basename,
 		     sizeof( libcstring_system_character_t ) * source_segment_table->basename_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination basename.",
 			 function );
 
@@ -274,14 +273,14 @@ int libewf_segment_table_clone(
 	if( libewf_array_clone(
 	     &( ( *destination_segment_table )->segment_files_array ),
 	     source_segment_table->segment_files_array,
-	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_handle_free,
-	     (int (*)(intptr_t **, intptr_t *, liberror_error_t **)) &libewf_segment_file_handle_clone,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_segment_file_handle_clone,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination segments files.",
 		 function );
 
@@ -313,7 +312,7 @@ on_error:
 int libewf_segment_table_get_basename_size(
      libewf_segment_table_t *segment_table,
      size_t *basename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_get_basename_size";
 
@@ -323,10 +322,10 @@ int libewf_segment_table_get_basename_size(
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -334,10 +333,10 @@ int libewf_segment_table_get_basename_size(
 	}
 	if( basename_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename size.",
 		 function );
 
@@ -388,10 +387,10 @@ int libewf_segment_table_get_basename_size(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine basename size.",
 		 function );
 
@@ -411,7 +410,7 @@ int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
      char *basename,
      size_t basename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function       = "libewf_segment_table_get_basename";
 	size_t narrow_basename_size = 0;
@@ -422,10 +421,10 @@ int libewf_segment_table_get_basename(
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -433,10 +432,10 @@ int libewf_segment_table_get_basename(
 	}
 	if( basename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename.",
 		 function );
 
@@ -487,10 +486,10 @@ int libewf_segment_table_get_basename(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine narrow basename size.",
 		 function );
 
@@ -502,10 +501,10 @@ int libewf_segment_table_get_basename(
 
 	if( basename_size < narrow_basename_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: basename too small.",
 		 function );
 
@@ -556,10 +555,10 @@ int libewf_segment_table_get_basename(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -571,10 +570,10 @@ int libewf_segment_table_get_basename(
 	     segment_table->basename,
 	     segment_table->basename_size ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -593,7 +592,7 @@ int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      const char *basename,
      size_t basename_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_set_basename";
 
@@ -603,10 +602,10 @@ int libewf_segment_table_set_basename(
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -614,10 +613,10 @@ int libewf_segment_table_set_basename(
 	}
 	if( basename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename.",
 		 function );
 
@@ -672,10 +671,10 @@ int libewf_segment_table_set_basename(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine basename size.",
 		 function );
 
@@ -689,10 +688,10 @@ int libewf_segment_table_set_basename(
 
 	if( segment_table->basename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create basename.",
 		 function );
 
@@ -745,10 +744,10 @@ int libewf_segment_table_set_basename(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -766,10 +765,10 @@ int libewf_segment_table_set_basename(
 	     basename,
 	     basename_length ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -794,7 +793,7 @@ int libewf_segment_table_set_basename(
 int libewf_segment_table_get_basename_size_wide(
      libewf_segment_table_t *segment_table,
      size_t *basename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_get_basename_size_wide";
 
@@ -804,10 +803,10 @@ int libewf_segment_table_get_basename_size_wide(
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -815,10 +814,10 @@ int libewf_segment_table_get_basename_size_wide(
 	}
 	if( basename_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename size.",
 		 function );
 
@@ -871,10 +870,10 @@ int libewf_segment_table_get_basename_size_wide(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine basename size.",
 		 function );
 
@@ -891,7 +890,7 @@ int libewf_segment_table_get_basename_wide(
      libewf_segment_table_t *segment_table,
      wchar_t *basename,
      size_t basename_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function     = "libewf_segment_table_get_basename_wide";
 	size_t wide_basename_size = 0;
@@ -902,10 +901,10 @@ int libewf_segment_table_get_basename_wide(
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -913,10 +912,10 @@ int libewf_segment_table_get_basename_wide(
 	}
 	if( basename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename.",
 		 function );
 
@@ -969,10 +968,10 @@ int libewf_segment_table_get_basename_wide(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine basename size.",
 		 function );
 
@@ -981,10 +980,10 @@ int libewf_segment_table_get_basename_wide(
 #endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
 	if( basename_size < wide_basename_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: basename too small.",
 		 function );
 
@@ -996,10 +995,10 @@ int libewf_segment_table_get_basename_wide(
 	     segment_table->basename,
 	     segment_table->basename_size ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -1051,10 +1050,10 @@ int libewf_segment_table_get_basename_wide(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -1071,7 +1070,7 @@ int libewf_segment_table_set_basename_wide(
      libewf_segment_table_t *segment_table,
      const wchar_t *basename,
      size_t basename_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_set_basename_wide";
 
@@ -1081,10 +1080,10 @@ int libewf_segment_table_set_basename_wide(
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -1092,10 +1091,10 @@ int libewf_segment_table_set_basename_wide(
 	}
 	if( basename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename.",
 		 function );
 
@@ -1152,10 +1151,10 @@ int libewf_segment_table_set_basename_wide(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine basename size.",
 		 function );
 
@@ -1167,10 +1166,10 @@ int libewf_segment_table_set_basename_wide(
 
 	if( segment_table->basename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create basename.",
 		 function );
 
@@ -1182,10 +1181,10 @@ int libewf_segment_table_set_basename_wide(
 	     basename,
 	     basename_length ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -1243,10 +1242,10 @@ int libewf_segment_table_set_basename_wide(
 	}
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -1269,16 +1268,16 @@ int libewf_segment_table_set_basename_wide(
 int libewf_segment_table_set_maximum_segment_size(
      libewf_segment_table_t *segment_table,
      size64_t maximum_segment_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_set_maximum_segment_size";
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 

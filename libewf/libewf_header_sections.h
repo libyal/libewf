@@ -25,8 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 
 #if defined( __cplusplus )
@@ -70,16 +69,16 @@ struct libewf_header_sections
 
 int libewf_header_sections_initialize(
      libewf_header_sections_t **header_sections,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_header_sections_free(
      libewf_header_sections_t **header_sections,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_header_sections_clone(
      libewf_header_sections_t **destination_header_sections,
      libewf_header_sections_t *source_header_sections,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,
@@ -87,13 +86,13 @@ int libewf_header_sections_create(
      int8_t compression_level,
      uint8_t format,
      int header_codepage,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_header_sections_determine_format(
      libewf_header_sections_t *header_sections,
      uint8_t ewf_format,
      uint8_t *format,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

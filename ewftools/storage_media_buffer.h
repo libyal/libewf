@@ -1,7 +1,7 @@
 /* 
  * Storage media buffer
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
+#include "ewftools_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -87,22 +87,22 @@ struct storage_media_buffer
 int storage_media_buffer_initialize(
      storage_media_buffer_t **buffer,
      size_t size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int storage_media_buffer_free(
      storage_media_buffer_t **buffer,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int storage_media_buffer_resize(
      storage_media_buffer_t *buffer,
      size_t size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int storage_media_buffer_get_data(
      storage_media_buffer_t *buffer,
      uint8_t **data,
      size_t *data_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

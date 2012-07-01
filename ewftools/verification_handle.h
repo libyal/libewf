@@ -1,7 +1,7 @@
 /* 
  * Verification handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,10 +25,9 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #include "digest_hash.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "log_handle.h"
@@ -164,62 +163,62 @@ struct verification_handle
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_free(
      verification_handle_t **verification_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_signal_abort(
      verification_handle_t *verification_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_close(
      verification_handle_t *verification_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 ssize_t verification_handle_prepare_read_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 ssize_t verification_handle_read_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t read_size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 int verification_handle_initialize_integrity_hash(
      verification_handle_t *verification_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
      uint8_t *buffer,
      size_t buffer_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_finalize_integrity_hash(
      verification_handle_t *verification_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_verify_input(
      verification_handle_t *verification_handle,
      uint8_t print_status_information,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_verify_single_files(
      verification_handle_t *verification_handle,
      uint8_t print_status_information,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_verify_file_entry(
      verification_handle_t *verification_handle,
@@ -227,7 +226,7 @@ int verification_handle_verify_file_entry(
      const libcstring_system_character_t *file_entry_path,
      size_t file_entry_path_length,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_verify_sub_file_entries(
      verification_handle_t *verification_handle,
@@ -235,62 +234,62 @@ int verification_handle_verify_sub_file_entries(
      const libcstring_system_character_t *file_entry_path,
      size_t file_entry_path_length,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_get_integrity_hash_from_input(
      verification_handle_t *verification_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_get_integrity_hash_from_file_entry(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_set_header_codepage(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_set_format(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_set_process_buffer_size(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_set_additional_digest_types(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_set_zero_chunk_on_error(
      verification_handle_t *verification_handle,
      uint8_t zero_chunk_on_error,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_append_read_error(
       verification_handle_t *verification_handle,
       off64_t start_offset,
       size_t number_of_bytes,
-      liberror_error_t **error );
+      libcerror_error_t **error );
 
 int verification_handle_hash_values_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_additional_hash_values_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int verification_handle_checksum_errors_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

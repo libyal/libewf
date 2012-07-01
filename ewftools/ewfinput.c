@@ -1,7 +1,7 @@
 /*
  * User input functions for the ewftools
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,9 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
@@ -34,10 +31,11 @@
 #include <string.h>
 #endif
 
-#include <libsystem.h>
-
 #include "byte_size_string.h"
 #include "ewfinput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 
 /* Input selection defintions
@@ -96,7 +94,7 @@ libcstring_system_character_t *ewfinput_yes_no[ 2 ] = \
 int ewfinput_determine_ewf_format(
      const libcstring_system_character_t *string,
      uint8_t *ewf_format,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewfinput_determine_ewf_format";
 	size_t string_length  = 0;
@@ -104,10 +102,10 @@ int ewfinput_determine_ewf_format(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -115,10 +113,10 @@ int ewfinput_determine_ewf_format(
 	}
 	if( ewf_format == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid libewf format.",
 		 function );
 
@@ -247,7 +245,7 @@ int ewfinput_determine_ewf_format(
 int ewfinput_determine_sectors_per_chunk(
      const libcstring_system_character_t *string,
      uint32_t *sectors_per_chunk,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk";
 	size_t string_length  = 0;
@@ -255,10 +253,10 @@ int ewfinput_determine_sectors_per_chunk(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -266,10 +264,10 @@ int ewfinput_determine_sectors_per_chunk(
 	}
 	if( sectors_per_chunk == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sectors per chunk.",
 		 function );
 
@@ -396,7 +394,7 @@ int ewfinput_determine_compression_values(
      const libcstring_system_character_t *string,
      int8_t *compression_level,
      uint8_t *compression_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewfinput_determine_compression_values";
 	size_t string_length  = 0;
@@ -404,10 +402,10 @@ int ewfinput_determine_compression_values(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -415,10 +413,10 @@ int ewfinput_determine_compression_values(
 	}
 	if( compression_level == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compression level.",
 		 function );
 
@@ -426,10 +424,10 @@ int ewfinput_determine_compression_values(
 	}
 	if( compression_flags == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compression flags.",
 		 function );
 
@@ -498,7 +496,7 @@ int ewfinput_determine_compression_values(
 int ewfinput_determine_media_type(
      const libcstring_system_character_t *string,
      uint8_t *media_type,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewfinput_determine_media_type";
 	size_t string_length  = 0;
@@ -506,10 +504,10 @@ int ewfinput_determine_media_type(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -517,10 +515,10 @@ int ewfinput_determine_media_type(
 	}
 	if( media_type == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media type.",
 		 function );
 
@@ -582,17 +580,17 @@ int ewfinput_determine_media_type(
 int ewfinput_determine_media_flags(
      const libcstring_system_character_t *string,
      uint8_t *media_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewfinput_determine_media_flags";
 	int result            = -1;
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -600,10 +598,10 @@ int ewfinput_determine_media_flags(
 	}
 	if( media_flags == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media flags.",
 		 function );
 
@@ -650,7 +648,7 @@ int ewfinput_determine_media_flags(
 int ewfinput_determine_header_codepage(
      const libcstring_system_character_t *string,
      int *header_codepage,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewfinput_determine_header_codepage";
 	size_t string_length  = 0;
@@ -658,10 +656,10 @@ int ewfinput_determine_header_codepage(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -669,10 +667,10 @@ int ewfinput_determine_header_codepage(
 	}
 	if( header_codepage == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header codepage.",
 		 function );
 
@@ -977,7 +975,7 @@ int ewfinput_determine_header_codepage(
 int ewfinput_determine_yes_no(
      const libcstring_system_character_t *string,
      uint8_t *yes_no_value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "ewfinput_determine_yes_no";
 	size_t string_length  = 0;
@@ -985,10 +983,10 @@ int ewfinput_determine_yes_no(
 
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -996,10 +994,10 @@ int ewfinput_determine_yes_no(
 	}
 	if( yes_no_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid yes no value.",
 		 function );
 
@@ -1041,7 +1039,7 @@ int ewfinput_get_string_variable(
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t *string_variable,
      size_t string_variable_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *end_of_input  = NULL;
 	libcstring_system_character_t *result_string = NULL;
@@ -1050,10 +1048,10 @@ int ewfinput_get_string_variable(
 
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid output stream.",
 		 function );
 
@@ -1061,10 +1059,10 @@ int ewfinput_get_string_variable(
 	}
 	if( request_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid request string.",
 		 function );
 
@@ -1072,10 +1070,10 @@ int ewfinput_get_string_variable(
 	}
 	if( string_variable == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string variable.",
 		 function );
 
@@ -1083,10 +1081,10 @@ int ewfinput_get_string_variable(
 	}
 	if( string_variable_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string variable size value exceeds maximum.",
 		 function );
 
@@ -1103,7 +1101,7 @@ int ewfinput_get_string_variable(
 		 "%" PRIs_LIBCSTRING_SYSTEM ": ",
 		 request_string );
 
-		result_string = libsystem_file_stream_get_string(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 string_variable,
 		                 string_variable_size - 1 );
@@ -1123,7 +1121,7 @@ int ewfinput_get_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_file_stream_get_string(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 string_variable,
 					                 string_variable_size - 1 );
@@ -1174,7 +1172,7 @@ int ewfinput_get_size_variable(
      uint64_t maximum_size,
      uint64_t default_size,
      uint64_t *size_variable,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *end_of_input  = NULL;
 	libcstring_system_character_t *result_string = NULL;
@@ -1183,10 +1181,10 @@ int ewfinput_get_size_variable(
 
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid output stream.",
 		 function );
 
@@ -1194,10 +1192,10 @@ int ewfinput_get_size_variable(
 	}
 	if( input_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid input buffer.",
 		 function );
 
@@ -1205,10 +1203,10 @@ int ewfinput_get_size_variable(
 	}
 	if( input_buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid input buffer size value exceeds maximum.",
 		 function );
 
@@ -1216,10 +1214,10 @@ int ewfinput_get_size_variable(
 	}
 	if( request_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid request string.",
 		 function );
 
@@ -1227,10 +1225,10 @@ int ewfinput_get_size_variable(
 	}
 	if( size_variable == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid size variable.",
 		 function );
 
@@ -1250,7 +1248,7 @@ int ewfinput_get_size_variable(
 		 maximum_size,
 		 default_size );
 
-		result_string = libsystem_file_stream_get_string(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
 		                 input_buffer_size - 1 );
@@ -1270,7 +1268,7 @@ int ewfinput_get_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_file_stream_get_string(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
 					                 input_buffer_size - 1 );
@@ -1295,7 +1293,7 @@ int ewfinput_get_size_variable(
 
 				return( 0 );
 			}
-			if( libsystem_string_decimal_copy_to_64_bit(
+			if( libcsystem_string_decimal_copy_to_64_bit(
 			     input_buffer,
 			     input_length,
 			     size_variable,
@@ -1339,7 +1337,7 @@ int ewfinput_get_byte_size_variable(
      uint64_t maximum_size,
      uint64_t default_size,
      uint64_t *byte_size_variable,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t minimum_size_string[ 16 ];
 	libcstring_system_character_t maximum_size_string[ 16 ];
@@ -1352,10 +1350,10 @@ int ewfinput_get_byte_size_variable(
 
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid output stream.",
 		 function );
 
@@ -1363,10 +1361,10 @@ int ewfinput_get_byte_size_variable(
 	}
 	if( input_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid input buffer.",
 		 function );
 
@@ -1374,10 +1372,10 @@ int ewfinput_get_byte_size_variable(
 	}
 	if( input_buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid input buffer size value exceeds maximum.",
 		 function );
 
@@ -1385,10 +1383,10 @@ int ewfinput_get_byte_size_variable(
 	}
 	if( request_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid request string.",
 		 function );
 
@@ -1396,10 +1394,10 @@ int ewfinput_get_byte_size_variable(
 	}
 	if( byte_size_variable == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid byte size variable.",
 		 function );
 
@@ -1412,10 +1410,10 @@ int ewfinput_get_byte_size_variable(
 	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create minimum byte size string.",
 		 function );
 
@@ -1428,10 +1426,10 @@ int ewfinput_get_byte_size_variable(
 	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create default byte size string.",
 		 function );
 
@@ -1444,10 +1442,10 @@ int ewfinput_get_byte_size_variable(
 	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create maximum byte size string.",
 		 function );
 
@@ -1467,7 +1465,7 @@ int ewfinput_get_byte_size_variable(
 		 maximum_size_string,
 		 default_size_string );
 
-		result_string = libsystem_file_stream_get_string(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
 		                 input_buffer_size - 1 );
@@ -1487,7 +1485,7 @@ int ewfinput_get_byte_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_file_stream_get_string(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
 					                 input_buffer_size - 1 );
@@ -1556,7 +1554,7 @@ int ewfinput_get_fixed_string_variable(
      uint8_t number_of_values,
      uint8_t default_value,
      libcstring_system_character_t **fixed_string_variable,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 
 	libcstring_system_character_t *end_of_input  = NULL;
@@ -1568,10 +1566,10 @@ int ewfinput_get_fixed_string_variable(
 
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid output stream.",
 		 function );
 
@@ -1579,10 +1577,10 @@ int ewfinput_get_fixed_string_variable(
 	}
 	if( input_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid input buffer.",
 		 function );
 
@@ -1590,10 +1588,10 @@ int ewfinput_get_fixed_string_variable(
 	}
 	if( input_buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid input buffer size value exceeds maximum.",
 		 function );
 
@@ -1601,10 +1599,10 @@ int ewfinput_get_fixed_string_variable(
 	}
 	if( request_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid request string.",
 		 function );
 
@@ -1612,10 +1610,10 @@ int ewfinput_get_fixed_string_variable(
 	}
 	if( default_value >= number_of_values )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: default value exceeds number of values.",
 		 function );
 
@@ -1623,10 +1621,10 @@ int ewfinput_get_fixed_string_variable(
 	}
 	if( fixed_string_variable == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid fixed string variable.",
 		 function );
 
@@ -1659,7 +1657,7 @@ int ewfinput_get_fixed_string_variable(
 		 ") [%" PRIs_LIBCSTRING_SYSTEM "]: ",
 		 values[ default_value ] );
 
-		result_string = libsystem_file_stream_get_string(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
 		                 input_buffer_size - 1 );
@@ -1679,7 +1677,7 @@ int ewfinput_get_fixed_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = libsystem_file_stream_get_string(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
 					                 input_buffer_size - 1 );

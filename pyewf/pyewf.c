@@ -2,7 +2,7 @@
  * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,7 +24,7 @@
 #include <types.h>
 
 #include <libcstring.h>
-#include <liberror.h>
+#include <libcerror.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -184,7 +184,7 @@ PyObject *pyewf_check_file_signature(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	static char *function       = "pyewf_check_file_signature";
 	static char *keyword_list[] = { "filename", NULL };
 	const char *filename        = NULL;
@@ -205,7 +205,7 @@ PyObject *pyewf_check_file_signature(
 
 	if( result == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -223,7 +223,7 @@ PyObject *pyewf_check_file_signature(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -246,7 +246,7 @@ PyObject *pyewf_glob(
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	char **filenames            = NULL;
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *list_object       = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_glob";
@@ -277,7 +277,7 @@ PyObject *pyewf_glob(
 	     &number_of_filenames,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -295,7 +295,7 @@ PyObject *pyewf_glob(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -362,7 +362,7 @@ PyObject *pyewf_glob(
 	     number_of_filenames,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -380,7 +380,7 @@ PyObject *pyewf_glob(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		Py_DecRef(

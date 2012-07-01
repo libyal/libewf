@@ -1,6 +1,6 @@
 dnl Functions for libhmac
 dnl
-dnl Version: 20111030
+dnl Version: 20120509
 
 dnl Function to detect if libhmac is available
 dnl ac_libhmac_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -19,84 +19,103 @@ AC_DEFUN([AX_LIBHMAC_CHECK_LIB],
  AS_IF(
   [test "x$ac_cv_with_libhmac" = xno],
   [ac_cv_libhmac=no],
-  [dnl Check for headers
-  AC_CHECK_HEADERS([libhmac.h])
+  [dnl Check for a pkg-config file
+  AS_IF(
+   [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
+   [PKG_CHECK_MODULES(
+    [libhmac],
+    [libhmac >= 20120425],
+    [ac_cv_libhmac=yes],
+    [ac_cv_libhmac=no])
+   ])
 
   AS_IF(
-   [test "x$ac_cv_header_libhmac_h" = xno],
-   [ac_cv_libhmac=no],
-   [ac_cv_libhmac=yes
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_get_version,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
+   [test "x$ac_cv_libhmac" = xyes],
+   [ac_cv_libhmac_CPPFLAGS="$pkg_cv_libhmac_CFLAGS"
+   ac_cv_libhmac_LIBADD="$pkg_cv_libhmac_LIBS"],
+   [dnl Check for headers
+   AC_CHECK_HEADERS([libhmac.h])
+ 
+   AS_IF(
+    [test "x$ac_cv_header_libhmac_h" = xno],
+    [ac_cv_libhmac=no],
+    [dnl Check for the individual functions
+    ac_cv_libhmac=yes
 
-   dnl MD5 functions
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_md5_initialize,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_md5_update,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_md5_finalize,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_md5_free,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_get_version,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+ 
+    dnl MD5 functions
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_md5_initialize,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_md5_update,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_md5_finalize,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_md5_free,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+ 
+    dnl SHA1 functions
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha1_initialize,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha1_update,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha1_finalize,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha1_free,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+ 
+    dnl SHA256 functions
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha256_initialize,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha256_update,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha256_finalize,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
+    AC_CHECK_LIB(
+     hmac,
+     libhmac_sha256_free,
+     [ac_cv_libhmac_dummy=yes],
+     [ac_cv_libhmac=no])
 
-   dnl SHA1 functions
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha1_initialize,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha1_update,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha1_finalize,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha1_free,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-
-   dnl SHA256 functions
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha256_initialize,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha256_update,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha256_finalize,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
-   AC_CHECK_LIB(
-    hmac,
-    libhmac_sha256_free,
-    [ac_cv_libhmac_dummy=yes],
-    [ac_cv_libhmac=no])
+    ac_cv_libhmac_LIBADD="-lhmac"
+    ])
    ])
   ])
 
@@ -106,7 +125,6 @@ AC_DEFUN([AX_LIBHMAC_CHECK_LIB],
    [HAVE_LIBHMAC],
    [1],
    [Define to 1 if you have the `hmac' library (-lhmac).])
-  LIBS="-lhmac $LIBS"
   ])
 
  AS_IF(
@@ -170,6 +188,11 @@ AC_DEFUN([AX_LIBHMAC_CHECK_LOCAL],
  ])
  
  dnl Fallback to local versions if necessary 
+ ac_cv_libhmac_CPPFLAGS="-I../libhmac";
+ ac_cv_libhmac_LIBADD="../libhmac/libhmac.la";
+
+ ac_cv_libhmac=local
+
  AS_IF(
   [test "x$ac_cv_libhmac_md5" = xno],
   [ac_cv_libhmac_md5=local])
@@ -192,8 +215,10 @@ AC_DEFUN([AX_LIBHMAC_CHECK_ENABLE],
   [auto-detect],
   [DIR])
 
+ dnl Check for a shared library version
  AX_LIBHMAC_CHECK_LIB
 
+ dnl Check if the dependencies for the local library version
  AS_IF(
   [test "x$ac_cv_libhmac" != xyes],
   [AX_LIBHMAC_CHECK_LOCAL
@@ -205,19 +230,23 @@ AC_DEFUN([AX_LIBHMAC_CHECK_ENABLE],
   AC_SUBST(
    [HAVE_LOCAL_LIBHMAC],
    [1])
-  AC_SUBST(
-   [LIBHMAC_CPPFLAGS],
-   [-I../libhmac])
-  AC_SUBST(
-   [LIBHMAC_LIBADD],
-   [../libhmac/libhmac.la])
-
-  ac_cv_libhmac=local
   ])
 
  AM_CONDITIONAL(
   [HAVE_LOCAL_LIBHMAC],
   [test "x$ac_cv_libhmac" = xlocal])
+ AS_IF(
+  [test "x$ac_cv_libhmac_CPPFLAGS" != "x"],
+  [AC_SUBST(
+   [LIBHMAC_CPPFLAGS],
+   [$ac_cv_libhmac_CPPFLAGS])
+  ])
+ AS_IF(
+  [test "x$ac_cv_libhmac_LIBADD" != "x"],
+  [AC_SUBST(
+   [LIBHMAC_LIBADD],
+   [$ac_cv_libhmac_LIBADD])
+  ])
 
  AS_IF(
   [test "x$ac_cv_libhmac" = xyes],

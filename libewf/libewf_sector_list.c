@@ -23,8 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_list_type.h"
 #include "libewf_sector_list.h"
 
@@ -33,16 +32,16 @@
  */
 int libewf_sector_list_value_initialize(
      libewf_sector_list_value_t **sector_list_value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_sector_list_value_initialize";
 
 	if( sector_list_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list value.",
 		 function );
 
@@ -50,10 +49,10 @@ int libewf_sector_list_value_initialize(
 	}
 	if( *sector_list_value != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid sector list value value already set.",
 		 function );
 
@@ -64,10 +63,10 @@ int libewf_sector_list_value_initialize(
 
 	if( *sector_list_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create sector list value.",
 		 function );
 
@@ -78,10 +77,10 @@ int libewf_sector_list_value_initialize(
 	     0,
 	     sizeof( libewf_sector_list_value_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear sector list value.",
 		 function );
 
@@ -104,16 +103,16 @@ on_error:
  */
 int libewf_sector_list_value_free(
      libewf_sector_list_value_t **sector_list_value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_sector_list_value_free";
 
 	if( sector_list_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list value.",
 		 function );
 
@@ -135,16 +134,16 @@ int libewf_sector_list_value_free(
 int libewf_sector_list_value_clone(
      libewf_sector_list_value_t **destination_sector_list_value,
      libewf_sector_list_value_t *source_sector_list_value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_sector_list_value_clone";
 
 	if( destination_sector_list_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination sector list value.",
 		 function );
 
@@ -152,10 +151,10 @@ int libewf_sector_list_value_clone(
 	}
 	if( *destination_sector_list_value != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination sector list value value already set.",
 		 function );
 
@@ -172,10 +171,10 @@ int libewf_sector_list_value_clone(
 
 	if( *destination_sector_list_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination sector list value.",
 		 function );
 
@@ -186,10 +185,10 @@ int libewf_sector_list_value_clone(
 	     source_sector_list_value,
 	     sizeof( libewf_sector_list_value_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy source to destination sector list value.",
 		 function );
 
@@ -213,16 +212,16 @@ on_error:
  */
 int libewf_sector_list_initialize(
      libewf_sector_list_t **sector_list,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_sector_list_initialize";
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -235,10 +234,10 @@ int libewf_sector_list_initialize(
 
 		if( *sector_list == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create sector list.",
 			 function );
 
@@ -249,10 +248,10 @@ int libewf_sector_list_initialize(
 		     0,
 		     sizeof( libewf_sector_list_t ) ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear sector list.",
 			 function );
 
@@ -277,17 +276,17 @@ on_error:
  */
 int libewf_sector_list_free(
      libewf_sector_list_t **sector_list,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_sector_list_free";
 	int result            = 1;
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -301,10 +300,10 @@ int libewf_sector_list_free(
 
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to empty sector list.",
 			 function );
 		}
@@ -321,7 +320,7 @@ int libewf_sector_list_free(
  */
 int libewf_sector_list_empty(
      libewf_sector_list_t *sector_list,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
 	static char *function               = "libewf_sector_list_empty";
@@ -331,10 +330,10 @@ int libewf_sector_list_empty(
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -352,10 +351,10 @@ int libewf_sector_list_empty(
 
 			if( list_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected in element: %d.",
 				 function,
 				 element_index );
@@ -378,13 +377,13 @@ int libewf_sector_list_empty(
 
 			if( libewf_list_element_free(
 			     &list_element,
-			     (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free element: %d.",
 				 function,
 				 element_index );
@@ -402,7 +401,7 @@ int libewf_sector_list_empty(
 int libewf_sector_list_clone(
      libewf_sector_list_t **destination_sector_list,
      libewf_sector_list_t *source_sector_list,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_list_element_t *destination_list_element = NULL;
 	libewf_list_element_t *source_list_element      = NULL;
@@ -412,10 +411,10 @@ int libewf_sector_list_clone(
 
 	if( destination_sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination sector list.",
 		 function );
 
@@ -423,10 +422,10 @@ int libewf_sector_list_clone(
 	}
 	if( *destination_sector_list != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination sector list value already set.",
 		 function );
 
@@ -442,10 +441,10 @@ int libewf_sector_list_clone(
 	     destination_sector_list,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination sector list.",
 		 function );
 
@@ -453,10 +452,10 @@ int libewf_sector_list_clone(
 	}
 	if( *destination_sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing destination sector list.",
 		 function );
 
@@ -470,10 +469,10 @@ int libewf_sector_list_clone(
 	{
 		if( source_list_element == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected in source sector list element: %d.",
 			 function,
 			 element_index );
@@ -484,10 +483,10 @@ int libewf_sector_list_clone(
 		     &destination_list_element,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create destination list element: %d.",
 			 function,
 			 element_index );
@@ -499,10 +498,10 @@ int libewf_sector_list_clone(
 		     (libewf_sector_list_value_t *) source_list_element->value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to clone value of sector list element: %d.",
 			 function,
 			 element_index );
@@ -514,10 +513,10 @@ int libewf_sector_list_clone(
 		     (intptr_t *) destination_value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to set value of destination list element: %d.",
 			 function,
 			 element_index );
@@ -555,7 +554,7 @@ on_error:
 	{
 		libewf_list_element_free(
 		 &destination_list_element,
-		 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 		 NULL );
 	}
 	if( *destination_sector_list != NULL )
@@ -573,16 +572,16 @@ on_error:
 int libewf_sector_list_get_number_of_elements(
      libewf_sector_list_t *sector_list,
      int *number_of_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_sector_list_get_number_of_elements";
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -590,10 +589,10 @@ int libewf_sector_list_get_number_of_elements(
 	}
 	if( number_of_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid number of elements.",
 		 function );
 
@@ -612,7 +611,7 @@ int libewf_sector_list_append_sector(
      uint64_t first_sector,
      uint64_t number_of_sectors,
      uint8_t merge_ranges,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_list_element_t *last_list_element      = NULL;
 	libewf_list_element_t *list_element           = NULL;
@@ -628,10 +627,10 @@ int libewf_sector_list_append_sector(
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -639,10 +638,10 @@ int libewf_sector_list_append_sector(
 	}
 	if( first_sector > (uint64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid first sector value exceeds maximum.",
 		 function );
 
@@ -650,10 +649,10 @@ int libewf_sector_list_append_sector(
 	}
 	if( number_of_sectors > (uint64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid number of sectors value exceeds maximum.",
 		 function );
 
@@ -677,10 +676,10 @@ int libewf_sector_list_append_sector(
 
 		if( list_element == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected for list element: %d.",
 			 function,
 			 sector_list->number_of_elements - 1 );
@@ -689,10 +688,10 @@ int libewf_sector_list_append_sector(
 		}
 		if( list_element->value == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sector list value for list element: %d.",
 			 function,
 			 sector_list->number_of_elements - 1 );
@@ -757,10 +756,10 @@ int libewf_sector_list_append_sector(
 				{
 					if( list_element == NULL )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 						 "%s: corruption detected for list element: %d.",
 						 function,
 						 element_index );
@@ -769,10 +768,10 @@ int libewf_sector_list_append_sector(
 					}
 					if( list_element->value == NULL )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 						 "%s: missing sector list value for list element: %d.",
 						 function,
 						 element_index );
@@ -846,10 +845,10 @@ int libewf_sector_list_append_sector(
 				{
 					if( list_element == NULL )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 						 "%s: corruption detected for list element: %d.",
 						 function,
 						 element_index );
@@ -858,10 +857,10 @@ int libewf_sector_list_append_sector(
 					}
 					if( list_element->value == NULL )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 						 "%s: missing sector list value for list element: %d.",
 						 function,
 						 element_index );
@@ -932,10 +931,10 @@ int libewf_sector_list_append_sector(
 		{
 			if( list_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: invalid list element.",
 				 function );
 
@@ -945,10 +944,10 @@ int libewf_sector_list_append_sector(
 			{
 				if( list_element->previous_element->value == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: missing sector list value for previous list element.",
 					 function );
 
@@ -990,13 +989,13 @@ int libewf_sector_list_append_sector(
 
 					if( libewf_list_element_free(
 					     &remove_element,
-					     (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+					     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 					     error ) != 1 )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 						 "%s: unable to free element: %d.",
 						 function,
 						 element_index );
@@ -1012,10 +1011,10 @@ int libewf_sector_list_append_sector(
 		{
 			if( list_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: invalid list element.",
 				 function );
 
@@ -1025,10 +1024,10 @@ int libewf_sector_list_append_sector(
 			{
 				if( list_element->next_element->value == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: missing sector list value for next list element.",
 					 function );
 
@@ -1068,13 +1067,13 @@ int libewf_sector_list_append_sector(
 
 					if( libewf_list_element_free(
 					     &remove_element,
-					     (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+					     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 					     error ) != 1 )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 						 "%s: unable to free element: %d.",
 						 function,
 						 element_index );
@@ -1093,10 +1092,10 @@ int libewf_sector_list_append_sector(
 		     &sector_list_value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create sector list value.",
 			 function );
 
@@ -1104,10 +1103,10 @@ int libewf_sector_list_append_sector(
 		}
 		if( sector_list_value == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sector list value.",
 			 function );
 
@@ -1122,10 +1121,10 @@ int libewf_sector_list_append_sector(
 		     &list_element,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create list element.",
 			 function );
 
@@ -1137,10 +1136,10 @@ int libewf_sector_list_append_sector(
 		}
 		if( list_element == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing list element.",
 			 function );
 
@@ -1156,32 +1155,32 @@ int libewf_sector_list_append_sector(
 		{
 			if( sector_list->first_element != NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected - first element already set.",
 				 function );
 
 				libewf_list_element_free(
 				 &list_element,
-				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );
 			}
 			if( sector_list->last_element != NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected - last element already set.",
 				 function );
 
 				libewf_list_element_free(
 				 &list_element,
-				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );
@@ -1193,32 +1192,32 @@ int libewf_sector_list_append_sector(
 		{
 			if( sector_list->first_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected - missing first.",
 				 function );
 
 				libewf_list_element_free(
 				 &list_element,
-				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );
 			}
 			if( sector_list->last_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected - missing last.",
 				 function );
 
 				libewf_list_element_free(
 				 &list_element,
-				 (int (*)(intptr_t **, liberror_error_t **)) &libewf_sector_list_value_free,
+				 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_list_value_free,
 				 NULL );
 
 				return( -1 );
@@ -1241,10 +1240,10 @@ int libewf_sector_list_append_sector(
 				}
 				else if( last_list_element->next_element == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: corruption detected - missing next in last list element.",
 					 function );
 
@@ -1270,17 +1269,17 @@ int libewf_sector_list_get_sector(
      int index,
      uint64_t *first_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_sector_list_value_t *sector_list_value = NULL;
 	static char *function                         = "libewf_sector_list_get_sector";
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -1289,10 +1288,10 @@ int libewf_sector_list_get_sector(
 	if( ( index < 0 )
 	 || ( index >= sector_list->number_of_elements ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid index value out of bounds.",
 		 function );
 
@@ -1300,10 +1299,10 @@ int libewf_sector_list_get_sector(
 	}
 	if( first_sector == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid first sector.",
 		 function );
 
@@ -1311,10 +1310,10 @@ int libewf_sector_list_get_sector(
 	}
 	if( number_of_sectors == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid number of sectors.",
 		 function );
 
@@ -1331,10 +1330,10 @@ int libewf_sector_list_get_sector(
 				{
 					if( sector_list->current_element == NULL )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 						 "%s: corruption detected in element: %d.",
 						 function,
 						 sector_list->current_element_index );
@@ -1355,10 +1354,10 @@ int libewf_sector_list_get_sector(
 				{
 					if( sector_list->current_element == NULL )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 						 "%s: corruption detected in element: %d.",
 						 function,
 						 sector_list->current_element_index );
@@ -1385,10 +1384,10 @@ int libewf_sector_list_get_sector(
 			{
 				if( sector_list->current_element == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: corruption detected in element: %d.",
 					 function,
 					 sector_list->current_element_index );
@@ -1408,10 +1407,10 @@ int libewf_sector_list_get_sector(
 			{
 				if( sector_list->current_element == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: corruption detected in element: %d.",
 					 function,
 					 sector_list->current_element_index );
@@ -1424,10 +1423,10 @@ int libewf_sector_list_get_sector(
 	}
 	if( sector_list->current_element == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing sector list element: %d.",
 		 function,
 		 sector_list->current_element_index );
@@ -1436,10 +1435,10 @@ int libewf_sector_list_get_sector(
 	}
 	if( sector_list->current_element->value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing sector list value for list element: %d.",
 		 function,
 		 sector_list->current_element_index );
@@ -1462,7 +1461,7 @@ int libewf_sector_list_get_sector_by_value(
      uint64_t sector_value,
      uint64_t *first_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_list_element_t *list_element           = NULL;
 	libewf_sector_list_value_t *sector_list_value = NULL;
@@ -1471,10 +1470,10 @@ int libewf_sector_list_get_sector_by_value(
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -1482,10 +1481,10 @@ int libewf_sector_list_get_sector_by_value(
 	}
 	if( first_sector == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid first sector.",
 		 function );
 
@@ -1493,10 +1492,10 @@ int libewf_sector_list_get_sector_by_value(
 	}
 	if( number_of_sectors == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid number of sectors.",
 		 function );
 
@@ -1510,10 +1509,10 @@ int libewf_sector_list_get_sector_by_value(
 	{
 		if( list_element == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected for list element: %d.",
 			 function,
 			 element_index );
@@ -1522,10 +1521,10 @@ int libewf_sector_list_get_sector_by_value(
 		}
 		if( list_element->value == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sector list value for list element: %d.",
 			 function,
 			 element_index );
@@ -1554,7 +1553,7 @@ int libewf_sector_list_range_is_present(
      libewf_sector_list_t *sector_list,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_list_element_t *list_element           = NULL;
 	libewf_sector_list_value_t *sector_list_value = NULL;
@@ -1564,10 +1563,10 @@ int libewf_sector_list_range_is_present(
 
 	if( sector_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector list.",
 		 function );
 
@@ -1575,10 +1574,10 @@ int libewf_sector_list_range_is_present(
 	}
 	if( first_sector > (uint64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid first sector value exceeds maximum.",
 		 function );
 
@@ -1586,10 +1585,10 @@ int libewf_sector_list_range_is_present(
 	}
 	if( number_of_sectors > (uint64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid number of sectors value exceeds maximum.",
 		 function );
 
@@ -1604,10 +1603,10 @@ int libewf_sector_list_range_is_present(
 	{
 		if( list_element == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected for list element: %d.",
 			 function,
 			 element_index );
@@ -1616,10 +1615,10 @@ int libewf_sector_list_range_is_present(
 		}
 		if( list_element->value == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sector list value for list element: %d.",
 			 function,
 			 element_index );

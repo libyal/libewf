@@ -23,8 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_tree_type.h"
 
 /* Creates a tree node
@@ -33,16 +32,16 @@
  */
 int libewf_tree_node_initialize(
      libewf_tree_node_t **node,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_tree_node_initialize";
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -50,10 +49,10 @@ int libewf_tree_node_initialize(
 	}
 	if( *node != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid node value already set.",
 		 function );
 
@@ -64,10 +63,10 @@ int libewf_tree_node_initialize(
 
 	if( *node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create node.",
 		 function );
 
@@ -78,10 +77,10 @@ int libewf_tree_node_initialize(
 	     0,
 	     sizeof( libewf_tree_node_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear node.",
 		 function );
 
@@ -108,8 +107,8 @@ int libewf_tree_node_free(
      libewf_tree_node_t **node,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
-     liberror_error_t **error )
+            libcerror_error_t **error ),
+     libcerror_error_t **error )
 {
 	libewf_tree_node_t *sub_node = NULL;
 	static char *function        = "libewf_tree_node_free";
@@ -119,10 +118,10 @@ int libewf_tree_node_free(
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -134,10 +133,10 @@ int libewf_tree_node_free(
 		 || ( ( *node )->previous_node != NULL )
 		 || ( ( *node )->next_node != NULL ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: invalid node - connected to other nodes.",
 			 function );
 
@@ -153,10 +152,10 @@ int libewf_tree_node_free(
 
 			if( sub_node->previous_node != NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 				 "%s: corruption detected in sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -183,10 +182,10 @@ int libewf_tree_node_free(
 			     value_free_function,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -202,10 +201,10 @@ int libewf_tree_node_free(
 				     &( ( *node )->value ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 					 "%s: unable to free value.",
 					function );
 
@@ -234,12 +233,12 @@ int libewf_tree_node_clone(
      libewf_tree_node_t *source_node,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,
             intptr_t *source,
-            liberror_error_t **error ),
-     liberror_error_t **error )
+            libcerror_error_t **error ),
+     libcerror_error_t **error )
 {
 	libewf_tree_node_t *destination_sub_node = NULL;
 	libewf_tree_node_t *source_sub_node      = NULL;
@@ -248,10 +247,10 @@ int libewf_tree_node_clone(
 
 	if( destination_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination tree node.",
 		 function );
 
@@ -259,10 +258,10 @@ int libewf_tree_node_clone(
 	}
 	if( *destination_node != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination tree node already set.",
 		 function );
 
@@ -270,10 +269,10 @@ int libewf_tree_node_clone(
 	}
 	if( value_free_function == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value free function.",
 		 function );
 
@@ -281,10 +280,10 @@ int libewf_tree_node_clone(
 	}
 	if( value_clone_function == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value clone function.",
 		 function );
 
@@ -300,10 +299,10 @@ int libewf_tree_node_clone(
 	     destination_node,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination tree node.",
 		 function );
 
@@ -311,10 +310,10 @@ int libewf_tree_node_clone(
 	}
 	if( *destination_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing destination tree node.",
 		 function );
 
@@ -325,10 +324,10 @@ int libewf_tree_node_clone(
 	     source_node->value,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to clone tree node value.",
 		 function );
 
@@ -344,10 +343,10 @@ int libewf_tree_node_clone(
 	{
 		if( source_sub_node == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected in source sub node: %d.",
 			 function,
 			 sub_node_iterator );
@@ -361,10 +360,10 @@ int libewf_tree_node_clone(
 		     value_clone_function,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to clone sub node: %d.",
 			 function,
 			 sub_node_iterator );
@@ -376,10 +375,10 @@ int libewf_tree_node_clone(
 		     destination_sub_node,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append sub node: %d to destination tree node.",
 			 function,
 			 sub_node_iterator );
@@ -415,16 +414,16 @@ on_error:
 int libewf_tree_node_get_value(
      libewf_tree_node_t *node,
      intptr_t **value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_tree_node_get_value";
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -432,10 +431,10 @@ int libewf_tree_node_get_value(
 	}
 	if( value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value.",
 		 function );
 
@@ -452,16 +451,16 @@ int libewf_tree_node_get_value(
 int libewf_tree_node_set_value(
      libewf_tree_node_t *node,
      intptr_t *value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_tree_node_set_value";
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -478,16 +477,16 @@ int libewf_tree_node_set_value(
 int libewf_tree_node_append_node(
      libewf_tree_node_t *parent_node,
      libewf_tree_node_t *node,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_tree_node_append_node";
 
 	if( parent_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid parent node.",
 		 function );
 
@@ -495,10 +494,10 @@ int libewf_tree_node_append_node(
 	}
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -508,10 +507,10 @@ int libewf_tree_node_append_node(
 	 || ( node->previous_node != NULL )
 	 || ( node->next_node != NULL ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: node already part of another.",
 		 function );
 
@@ -523,10 +522,10 @@ int libewf_tree_node_append_node(
 	{
 		if( parent_node->first_sub_node != NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: corruption detected - first sub node already set.",
 			 function );
 
@@ -534,10 +533,10 @@ int libewf_tree_node_append_node(
 		}
 		if( parent_node->last_sub_node != NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: corruption detected - last sub node already set.",
 			 function );
 
@@ -550,10 +549,10 @@ int libewf_tree_node_append_node(
 	{
 		if( parent_node->first_sub_node == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing first sub node.",
 			 function );
 
@@ -561,10 +560,10 @@ int libewf_tree_node_append_node(
 		}
 		if( parent_node->last_sub_node == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing last sub node.",
 			 function );
 
@@ -586,7 +585,7 @@ int libewf_tree_node_append_node(
 int libewf_tree_node_append_value(
      libewf_tree_node_t *parent_node,
      intptr_t *value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_tree_node_t *tree_node = NULL;
 	static char *function         = "libewf_tree_node_append_value";
@@ -595,10 +594,10 @@ int libewf_tree_node_append_value(
 	     &tree_node,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create tree node.",
 		 function );
 
@@ -609,10 +608,10 @@ int libewf_tree_node_append_value(
 	     tree_node,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append tree node.",
 		 function );
 
@@ -623,10 +622,10 @@ int libewf_tree_node_append_value(
 	     value,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to set value in tree node.",
 		 function );
 
@@ -662,9 +661,9 @@ int libewf_tree_node_insert_node(
      int (*value_compare_function)(
             intptr_t *first_value,
             intptr_t *second_value,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      uint8_t insert_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_tree_node_t *sub_node = NULL;
 	static char *function        = "libewf_tree_node_insert_node";
@@ -673,10 +672,10 @@ int libewf_tree_node_insert_node(
 
 	if( parent_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid parent node.",
 		 function );
 
@@ -684,10 +683,10 @@ int libewf_tree_node_insert_node(
 	}
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -697,10 +696,10 @@ int libewf_tree_node_insert_node(
 	 || ( node->previous_node != NULL )
 	 || ( node->next_node != NULL ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: node already part of another.",
 		 function );
 
@@ -708,10 +707,10 @@ int libewf_tree_node_insert_node(
 	}
 	if( value_compare_function == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value compare function.",
 		 function );
 
@@ -719,10 +718,10 @@ int libewf_tree_node_insert_node(
 	}
 	if( ( insert_flags & ~( LIBEWF_TREE_NODE_INSERT_FLAG_UNIQUE_ENTRIES ) ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported insert flags: 0x%02" PRIx8 ".",
 		 function,
 		 insert_flags );
@@ -733,10 +732,10 @@ int libewf_tree_node_insert_node(
 	{
 		if( parent_node->first_sub_node != NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: corruption detected - first sub node already set.",
 			 function );
 
@@ -744,10 +743,10 @@ int libewf_tree_node_insert_node(
 		}
 		if( parent_node->last_sub_node != NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: corruption detected - last sub node already set.",
 			 function );
 
@@ -760,10 +759,10 @@ int libewf_tree_node_insert_node(
 	{
 		if( parent_node->first_sub_node == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing first sub node.",
 			 function );
 
@@ -771,10 +770,10 @@ int libewf_tree_node_insert_node(
 		}
 		if( parent_node->last_sub_node == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing last sub node.",
 			 function );
 
@@ -793,10 +792,10 @@ int libewf_tree_node_insert_node(
 
 			if( result == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to compare sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -816,10 +815,10 @@ int libewf_tree_node_insert_node(
 			}
 			else if( result != LIBEWF_TREE_NODE_COMPARE_GREATER )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported value compare function return value: %d.",
 				 function,
 				 result );
@@ -839,10 +838,10 @@ int libewf_tree_node_insert_node(
 			}
 			else if( sub_node->previous_node == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected - missing previous node in sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -888,9 +887,9 @@ int libewf_tree_node_insert_value(
      int (*value_compare_function)(
             intptr_t *first_value,
             intptr_t *second_value,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      uint8_t insert_flags,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_tree_node_t *tree_node = NULL;
 	static char *function         = "libewf_tree_node_insert_value";
@@ -900,10 +899,10 @@ int libewf_tree_node_insert_value(
 	     &tree_node,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create tree node.",
 		 function );
 
@@ -914,10 +913,10 @@ int libewf_tree_node_insert_value(
 	     value,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to set value in tree node.",
 		 function );
 
@@ -932,10 +931,10 @@ int libewf_tree_node_insert_value(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to insert node.",
 		 function );
 
@@ -948,10 +947,10 @@ int libewf_tree_node_insert_value(
 		     NULL,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free tree node.",
 			 function );
 
@@ -977,16 +976,16 @@ on_error:
 int libewf_tree_node_remove_node(
      libewf_tree_node_t *parent_node,
      libewf_tree_node_t *node,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_tree_node_remove_node";
 
 	if( parent_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid parent node.",
 		 function );
 
@@ -994,10 +993,10 @@ int libewf_tree_node_remove_node(
 	}
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -1005,10 +1004,10 @@ int libewf_tree_node_remove_node(
 	}
 	if( parent_node != node->parent_node )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: mismatch in parent node.",
 		 function );
 
@@ -1016,10 +1015,10 @@ int libewf_tree_node_remove_node(
 	}
 	if( parent_node->number_of_sub_nodes == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing number of sub nodes.",
 		 function );
 
@@ -1027,10 +1026,10 @@ int libewf_tree_node_remove_node(
 	}
 	if( parent_node->first_sub_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: corruption detected - missing first sub node.",
 		 function );
 
@@ -1038,10 +1037,10 @@ int libewf_tree_node_remove_node(
 	}
 	if( parent_node->last_sub_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: corruption detected - missing last sub node.",
 		 function );
 
@@ -1078,16 +1077,16 @@ int libewf_tree_node_remove_node(
 int libewf_tree_node_get_number_of_sub_nodes(
      libewf_tree_node_t *node,
      int *number_of_sub_nodes,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_tree_node_get_number_of_sub_nodes";
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -1095,10 +1094,10 @@ int libewf_tree_node_get_number_of_sub_nodes(
 	}
 	if( number_of_sub_nodes == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid number of sub nodes.",
 		 function );
 
@@ -1116,7 +1115,7 @@ int libewf_tree_node_get_sub_node_by_index(
      libewf_tree_node_t *node,
      int sub_node_index,
      libewf_tree_node_t **sub_node,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_tree_node_get_sub_node_by_index";
 	int result            = -1;
@@ -1124,10 +1123,10 @@ int libewf_tree_node_get_sub_node_by_index(
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -1136,10 +1135,10 @@ int libewf_tree_node_get_sub_node_by_index(
 	if( ( sub_node_index < 0 )
 	 || ( sub_node_index >= node->number_of_sub_nodes ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid sub node index value out of bounds.",
 		 function );
 
@@ -1147,10 +1146,10 @@ int libewf_tree_node_get_sub_node_by_index(
 	}
 	if( sub_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sub node.",
 		 function );
 
@@ -1169,10 +1168,10 @@ int libewf_tree_node_get_sub_node_by_index(
 		{
 			if( *sub_node == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected for sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -1198,10 +1197,10 @@ int libewf_tree_node_get_sub_node_by_index(
 		{
 			if( *sub_node == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected for sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -1226,7 +1225,7 @@ int libewf_tree_node_get_sub_node_by_index(
 int libewf_tree_node_get_leaf_node_list(
      libewf_tree_node_t *node,
      libewf_list_t **leaf_node_list,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_tree_node_t *sub_node = NULL;
 	static char *function        = "libewf_tree_node_get_leaf_node_list";
@@ -1234,10 +1233,10 @@ int libewf_tree_node_get_leaf_node_list(
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -1245,10 +1244,10 @@ int libewf_tree_node_get_leaf_node_list(
 	}
 	if( leaf_node_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid leaf node list.",
 		 function );
 
@@ -1260,10 +1259,10 @@ int libewf_tree_node_get_leaf_node_list(
 		     leaf_node_list,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create leaf node list.",
 			 function );
 
@@ -1282,10 +1281,10 @@ int libewf_tree_node_get_leaf_node_list(
 		{
 			if( sub_node == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected for sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -1297,10 +1296,10 @@ int libewf_tree_node_get_leaf_node_list(
 			     leaf_node_list,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: unable to traverse sub node: %d.",
 				 function,
 				 sub_node_iterator );
@@ -1312,10 +1311,10 @@ int libewf_tree_node_get_leaf_node_list(
 	}
 	else if( node->value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid node - missing value.",
 		 function );
 
@@ -1326,10 +1325,10 @@ int libewf_tree_node_get_leaf_node_list(
 	          node->value,
 	          error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append tree node to leaf node list.",
 		 function );
 

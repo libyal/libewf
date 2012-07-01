@@ -23,12 +23,11 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_definitions.h"
 #include "libewf_hash_values.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
+#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 
@@ -39,7 +38,7 @@
  */
 int libewf_hash_values_initialize(
      libfvalue_table_t **hash_values,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_hash_values_initialize";
 
@@ -48,10 +47,10 @@ int libewf_hash_values_initialize(
 	     LIBEWF_HASH_VALUES_DEFAULT_NUMBER,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create hash values.",
 		 function );
 
@@ -67,7 +66,7 @@ int libewf_hash_values_parse_md5_hash(
      libfvalue_table_t *hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t md5_hash_string[ 33 ];
 
@@ -80,10 +79,10 @@ int libewf_hash_values_parse_md5_hash(
 
 	if( md5_hash == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid MD5 hash.",
 		 function );
 
@@ -91,10 +90,10 @@ int libewf_hash_values_parse_md5_hash(
 	}
 	if( md5_hash_size < 16 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: MD5 hash too small.",
 		 function );
 
@@ -110,10 +109,10 @@ int libewf_hash_values_parse_md5_hash(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve if hash value: MD5.",
 		 function );
 
@@ -148,15 +147,15 @@ int libewf_hash_values_parse_md5_hash(
 		}
 		md5_hash_string[ md5_hash_string_index++ ] = 0;
 
-		if( libfvalue_value_initialize(
+		if( libfvalue_value_type_initialize(
 		     &hash_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create hash value.",
 			 function );
 
@@ -169,10 +168,10 @@ int libewf_hash_values_parse_md5_hash(
 		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: MD5 identifier.",
 			 function );
 
@@ -186,10 +185,10 @@ int libewf_hash_values_parse_md5_hash(
 		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: MD5 data.",
 			 function );
 
@@ -200,10 +199,10 @@ int libewf_hash_values_parse_md5_hash(
 		     hash_value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: MD5 in table.",
 			 function );
 
@@ -230,7 +229,7 @@ int libewf_hash_values_parse_sha1_hash(
      libfvalue_table_t *hash_values,
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t sha1_hash_string[ 41 ];
 
@@ -243,10 +242,10 @@ int libewf_hash_values_parse_sha1_hash(
 
 	if( hash_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values.",
 		 function );
 
@@ -254,10 +253,10 @@ int libewf_hash_values_parse_sha1_hash(
 	}
 	if( sha1_hash == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid SHA1 hash.",
 		 function );
 
@@ -265,10 +264,10 @@ int libewf_hash_values_parse_sha1_hash(
 	}
 	if( sha1_hash_size < 20 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: SHA1 hash too small.",
 		 function );
 
@@ -284,10 +283,10 @@ int libewf_hash_values_parse_sha1_hash(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve if hash value: SHA1.",
 		 function );
 
@@ -322,15 +321,15 @@ int libewf_hash_values_parse_sha1_hash(
 		}
 		sha1_hash_string[ sha1_hash_string_index++ ] = 0;
 
-		if( libfvalue_value_initialize(
+		if( libfvalue_value_type_initialize(
 		     &hash_value,
 		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create hash value.",
 			 function );
 
@@ -343,10 +342,10 @@ int libewf_hash_values_parse_sha1_hash(
 		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: SHA1 identifier.",
 			 function );
 
@@ -360,10 +359,10 @@ int libewf_hash_values_parse_sha1_hash(
 		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: SHA1 data.",
 			 function );
 
@@ -374,10 +373,10 @@ int libewf_hash_values_parse_sha1_hash(
 		     hash_value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: SHA1 in table.",
 			 function );
 
@@ -404,7 +403,7 @@ int libewf_hash_values_parse_xhash(
      libfvalue_table_t *hash_values,
      const uint8_t *xhash,
      size_t xhash_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_hash_values_parse_xhash";
 
@@ -416,10 +415,10 @@ int libewf_hash_values_parse_xhash(
 	     5,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy UTF-8 string to hash values table.",
 		 function );
 
@@ -436,7 +435,7 @@ int libewf_hash_values_generate_xhash(
      libfvalue_table_t *hash_values,
      uint8_t **xhash,
      size_t *xhash_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libfvalue_value_t *hash_value     = NULL;
 	uint8_t *identifier               = NULL;
@@ -456,10 +455,10 @@ int libewf_hash_values_generate_xhash(
 
 	if( xhash == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xhash.",
 		 function );
 
@@ -467,10 +466,10 @@ int libewf_hash_values_generate_xhash(
 	}
 	if( *xhash != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: xhash already created.",
 		 function );
 
@@ -478,10 +477,10 @@ int libewf_hash_values_generate_xhash(
 	}
 	if( xhash_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xhash size.",
 		 function );
 
@@ -492,10 +491,10 @@ int libewf_hash_values_generate_xhash(
 	     &number_of_hash_values,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of hash values.",
 		 function );
 
@@ -530,10 +529,10 @@ int libewf_hash_values_generate_xhash(
 		     &hash_value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve hash value: %d.",
 			 function,
 			 hash_value_index );
@@ -546,10 +545,10 @@ int libewf_hash_values_generate_xhash(
 		     &identifier_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve identifier of hash value: %d.",
 			 function,
 			 hash_value_index );
@@ -560,9 +559,9 @@ int libewf_hash_values_generate_xhash(
 		 || ( identifier_size == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: missing identifier for hash value: %d.\n",
 				 function,
 				 hash_value_index );
@@ -576,10 +575,10 @@ int libewf_hash_values_generate_xhash(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data of hash value: %s.",
 			 function,
 			 (char *) identifier );
@@ -598,10 +597,10 @@ int libewf_hash_values_generate_xhash(
 
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve string size of hash value: %s.",
 			 function,
 			 (char *) identifier );
@@ -624,10 +623,10 @@ int libewf_hash_values_generate_xhash(
 
 	if( *xhash == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: unable to create xhash.",
 		 function );
 
@@ -644,10 +643,10 @@ int libewf_hash_values_generate_xhash(
 	     xml_head,
 	     xml_head_length ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy XML head string.",
 		 function );
 
@@ -666,10 +665,10 @@ int libewf_hash_values_generate_xhash(
 	     xml_xhash_open_tag,
 	     xml_xhash_open_tag_length ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy xhash open tag string.",
 		 function );
 
@@ -693,10 +692,10 @@ int libewf_hash_values_generate_xhash(
 		     &hash_value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve hash value: %d.",
 			 function,
 			 hash_value_index );
@@ -715,10 +714,10 @@ int libewf_hash_values_generate_xhash(
 		     &identifier_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve identifier of hash value: %d.",
 			 function,
 			 hash_value_index );
@@ -735,9 +734,9 @@ int libewf_hash_values_generate_xhash(
 		 || ( identifier_size == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: missing identifier for hash value: %d.\n",
 				 function,
 				 hash_value_index );
@@ -751,10 +750,10 @@ int libewf_hash_values_generate_xhash(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data of hash value: %s.",
 			 function,
 			 (char *) identifier );
@@ -779,10 +778,10 @@ int libewf_hash_values_generate_xhash(
 
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve string size of hash value: %s.",
 			 function,
 			 (char *) identifier );
@@ -805,10 +804,10 @@ int libewf_hash_values_generate_xhash(
 			     (char *) identifier,
 			     identifier_size - 1 ) == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy %s open tag string.",
 				 function,
 				 (char *) identifier );
@@ -834,10 +833,10 @@ int libewf_hash_values_generate_xhash(
 
 			if( result != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy string of hash value: %s.",
 				 function,
 				 (char *) identifier );
@@ -860,10 +859,10 @@ int libewf_hash_values_generate_xhash(
 			     (char *) identifier,
 			     identifier_size - 1 ) == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 				 "%s: unable to copy %s close tag string.",
 				 function,
 				 (char *) identifier );
@@ -887,10 +886,10 @@ int libewf_hash_values_generate_xhash(
 	     xml_xhash_close_tag,
 	     xml_xhash_close_tag_length ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy xhash close tag string.",
 		 function );
 
@@ -919,7 +918,7 @@ int libewf_hash_values_generate_md5_hash(
      uint8_t *md5_hash,
      size_t md5_hash_size,
      uint8_t *md5_hash_set,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t md5_hash_string[ 33 ];
 
@@ -932,10 +931,10 @@ int libewf_hash_values_generate_md5_hash(
 
 	if( hash_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values.",
 		 function );
 
@@ -943,10 +942,10 @@ int libewf_hash_values_generate_md5_hash(
 	}
 	if( md5_hash == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid MD5 hash.",
 		 function );
 
@@ -954,10 +953,10 @@ int libewf_hash_values_generate_md5_hash(
 	}
 	if( md5_hash_size < 16 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: MD5 hash too small.",
 		 function );
 
@@ -965,10 +964,10 @@ int libewf_hash_values_generate_md5_hash(
 	}
 	if( md5_hash_set == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid MD5 hash set.",
 		 function );
 
@@ -984,10 +983,10 @@ int libewf_hash_values_generate_md5_hash(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve if hash value: MD5.",
 		 function );
 
@@ -1008,10 +1007,10 @@ int libewf_hash_values_generate_md5_hash(
 	     33,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy hash value: MD5 to UTF-8 string.",
 		 function );
 
@@ -1040,10 +1039,10 @@ int libewf_hash_values_generate_md5_hash(
 		}
 		else
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in MD5 string.",
 			 function,
 			 md5_hash_string[ md5_hash_string_index ] );
@@ -1071,10 +1070,10 @@ int libewf_hash_values_generate_md5_hash(
 		}
 		else if( md5_hash_string[ md5_hash_string_index ] != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in MD5 string.",
 			 function,
 			 md5_hash_string[ md5_hash_string_index ] );
@@ -1098,7 +1097,7 @@ int libewf_hash_values_generate_sha1_hash(
      uint8_t *sha1_hash,
      size_t sha1_hash_size,
      uint8_t *sha1_hash_set,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t sha1_hash_string[ 41 ];
 
@@ -1111,10 +1110,10 @@ int libewf_hash_values_generate_sha1_hash(
 
 	if( hash_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values.",
 		 function );
 
@@ -1122,10 +1121,10 @@ int libewf_hash_values_generate_sha1_hash(
 	}
 	if( sha1_hash == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid SHA1 hash.",
 		 function );
 
@@ -1133,10 +1132,10 @@ int libewf_hash_values_generate_sha1_hash(
 	}
 	if( sha1_hash_size < 20 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: SHA1 hash too small.",
 		 function );
 
@@ -1144,10 +1143,10 @@ int libewf_hash_values_generate_sha1_hash(
 	}
 	if( sha1_hash_set == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid SHA1 hash set.",
 		 function );
 
@@ -1163,10 +1162,10 @@ int libewf_hash_values_generate_sha1_hash(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve if hash value: SHA1.",
 		 function );
 
@@ -1187,10 +1186,10 @@ int libewf_hash_values_generate_sha1_hash(
 	     41,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy hash value: SHA1 to UTF-8 string.",
 		 function );
 
@@ -1219,10 +1218,10 @@ int libewf_hash_values_generate_sha1_hash(
 		}
 		else
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in SHA1 string.",
 			 function,
 			 sha1_hash_string[ sha1_hash_string_index ] );
@@ -1250,10 +1249,10 @@ int libewf_hash_values_generate_sha1_hash(
 		}
 		else if( sha1_hash_string[ sha1_hash_string_index ] != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: invalid hexadecimal digit: 0x%02" PRIx8 " in SHA1 string.",
 			 function,
 			 sha1_hash_string[ sha1_hash_string_index ] );

@@ -24,9 +24,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_compression.h"
@@ -35,6 +32,8 @@
 #include "libewf_filename.h"
 #include "libewf_header_values.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
@@ -59,16 +58,16 @@
  */
 int libewf_write_io_handle_initialize(
      libewf_write_io_handle_t **write_io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_initialize";
 
 	if( write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write IO handle.",
 		 function );
 
@@ -76,10 +75,10 @@ int libewf_write_io_handle_initialize(
 	}
 	if( *write_io_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid write IO handle value already set.",
 		 function );
 
@@ -90,10 +89,10 @@ int libewf_write_io_handle_initialize(
 
 	if( write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create write IO handle.",
 		 function );
 
@@ -104,10 +103,10 @@ int libewf_write_io_handle_initialize(
 	     0,
 	     sizeof( libewf_write_io_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear write IO handle.",
 		 function );
 
@@ -136,16 +135,16 @@ on_error:
  */
 int libewf_write_io_handle_free(
      libewf_write_io_handle_t **write_io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_free";
 
 	if( write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write IO handle.",
 		 function );
 
@@ -182,17 +181,17 @@ int libewf_write_io_handle_free(
 int libewf_write_io_handle_clone(
      libewf_write_io_handle_t **destination_write_io_handle,
      libewf_write_io_handle_t *source_write_io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_clone";
 	size_t offsets_size   = 0;
 
 	if( destination_write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination write IO handle.",
 		 function );
 
@@ -200,10 +199,10 @@ int libewf_write_io_handle_clone(
 	}
 	if( *destination_write_io_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination write IO handle value already set.",
 		 function );
 
@@ -220,10 +219,10 @@ int libewf_write_io_handle_clone(
 
 	if( *destination_write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination write IO handle.",
 		 function );
 
@@ -234,10 +233,10 @@ int libewf_write_io_handle_clone(
 	     source_write_io_handle,
 	     sizeof( libewf_write_io_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy source to destination write IO handle.",
 		 function );
 
@@ -254,10 +253,10 @@ int libewf_write_io_handle_clone(
 
 		if( ( *destination_write_io_handle )->data_section == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination data section.",
 			 function );
 
@@ -268,10 +267,10 @@ int libewf_write_io_handle_clone(
 		     source_write_io_handle->data_section,
 		     sizeof( ewf_data_t ) ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination data section.",
 			 function );
 
@@ -287,10 +286,10 @@ int libewf_write_io_handle_clone(
 
 		if( ( *destination_write_io_handle )->table_offsets == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination table offsets.",
 			 function );
 
@@ -301,10 +300,10 @@ int libewf_write_io_handle_clone(
 		     source_write_io_handle->table_offsets,
 		     offsets_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination table offsets.",
 			 function );
 
@@ -342,7 +341,7 @@ int libewf_write_io_handle_initialize_values(
      libewf_io_handle_t *io_handle,
      libewf_media_values_t *media_values,
      libewf_segment_table_t *segment_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t *compressed_zero_byte_empty_block = NULL;
 	uint8_t *zero_byte_empty_block            = NULL;
@@ -353,10 +352,10 @@ int libewf_write_io_handle_initialize_values(
 
 	if( write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write IO handle.",
 		 function );
 
@@ -364,10 +363,10 @@ int libewf_write_io_handle_initialize_values(
 	}
 	if( write_io_handle->values_initialized != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: write values were initialized and cannot be initialized anymore.",
 		 function );
 
@@ -375,10 +374,10 @@ int libewf_write_io_handle_initialize_values(
 	}
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -386,10 +385,10 @@ int libewf_write_io_handle_initialize_values(
 	}
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -397,10 +396,10 @@ int libewf_write_io_handle_initialize_values(
 	}
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -410,10 +409,10 @@ int libewf_write_io_handle_initialize_values(
 	 */
 	if( io_handle->format == LIBEWF_FORMAT_LVF )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: writing format LVF currently not supported.",
 		 function );
 
@@ -437,10 +436,10 @@ int libewf_write_io_handle_initialize_values(
 		 && ( io_handle->format != LIBEWF_FORMAT_FTK )
 		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: EWF file format does not allow for streaming write.",
 			 function );
 
@@ -455,10 +454,10 @@ int libewf_write_io_handle_initialize_values(
 
 		if( required_number_of_segments > (int64_t) write_io_handle->maximum_number_of_segments )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: the maximum number of allowed segment files will be exceeded with the segment file size: %" PRIu64 ".",
 			 function,
 			 segment_table->maximum_segment_size );
@@ -471,10 +470,10 @@ int libewf_write_io_handle_initialize_values(
 		if( ( io_handle->format != LIBEWF_FORMAT_ENCASE6 )
 		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: EWF file format does not allow for a media size greater than 2 TiB.",
 			 function );
 
@@ -488,10 +487,10 @@ int libewf_write_io_handle_initialize_values(
 
 		if( zero_byte_empty_block == NULL )
 		{	
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create zero byte empty block.",
 			 function );
 
@@ -502,10 +501,10 @@ int libewf_write_io_handle_initialize_values(
 		     0,
 		     sizeof( uint8_t ) * (size_t) media_values->chunk_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear zero byte empty block.",
 			 function );
 
@@ -518,10 +517,10 @@ int libewf_write_io_handle_initialize_values(
 
 		if( compressed_zero_byte_empty_block == NULL )
 		{	
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create compressed zero byte empty block.",
 			 function );
 
@@ -549,7 +548,7 @@ int libewf_write_io_handle_initialize_values(
 			write_io_handle->compressed_zero_byte_empty_block_size = media_values->chunk_size + 16;
 #endif
 
-			liberror_error_free(
+			libcerror_error_free(
 			 error );
 
 			reallocation = memory_reallocate(
@@ -558,10 +557,10 @@ int libewf_write_io_handle_initialize_values(
 
 			if( reallocation == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 				 "%s: unable to resize compressed zero byte empty block.",
 				 function );
 
@@ -579,7 +578,7 @@ int libewf_write_io_handle_initialize_values(
 		}
 		if( result != 1 )
 		{
-			liberror_error_free(
+			libcerror_error_free(
 			 error );
 
 			memory_free(
@@ -631,7 +630,7 @@ int libewf_write_io_handle_initialize_resume(
      libmfdata_list_t *chunk_table_list,
      libewf_chunk_table_t *chunk_table,
      libewf_segment_table_t *segment_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_list_element_t *section_list_element = NULL;
 	libewf_section_t *section                   = NULL;
@@ -648,10 +647,10 @@ int libewf_write_io_handle_initialize_resume(
 
 	if( write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write IO handle.",
 		 function );
 
@@ -659,10 +658,10 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -670,10 +669,10 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -684,10 +683,10 @@ int libewf_write_io_handle_initialize_resume(
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of segment files.",
 		 function );
 
@@ -696,10 +695,10 @@ int libewf_write_io_handle_initialize_resume(
 	if( ( number_of_segment_files <= 0 )
 	 || ( number_of_segment_files > (int) UINT16_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-	 	 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+	 	 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid number of segment files value out of bounds.",
 		 function );
 
@@ -716,10 +715,10 @@ int libewf_write_io_handle_initialize_resume(
 	     0,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment file: %d from list.",
 		 function,
 		 segment_files_list_index + 1 );
@@ -728,10 +727,10 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( segment_file == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing segment file.",
 		 function );
 
@@ -739,10 +738,10 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( segment_file->section_list == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid segment file - missing section list.",
 		 function );
 
@@ -752,10 +751,10 @@ int libewf_write_io_handle_initialize_resume(
 
 	if( section_list_element == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing last section list element.",
 		 function );
 
@@ -765,10 +764,10 @@ int libewf_write_io_handle_initialize_resume(
 
 	if( section == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing last section.",
 		 function );
 
@@ -839,10 +838,10 @@ int libewf_write_io_handle_initialize_resume(
 
 			if( section_list_element->value == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing section.",
 				 function );
 
@@ -860,10 +859,10 @@ int libewf_write_io_handle_initialize_resume(
 		}
 		if( section_list_element == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing last chunks section.",
 			 function );
 
@@ -915,10 +914,10 @@ int libewf_write_io_handle_initialize_resume(
 			 */
 			if( section_list_element->previous_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing previous section list element.",
 				 function );
 
@@ -926,10 +925,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( section_list_element->previous_element->value == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing previous section.",
 				 function );
 
@@ -940,10 +939,10 @@ int libewf_write_io_handle_initialize_resume(
 			     (void *) "sectors",
 			     8 ) != 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported previous section: %s.",
 				 function,
 				 ( (libewf_section_t *) section_list_element->previous_element->value )->type );
@@ -952,10 +951,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( chunk_table->previous_last_chunk_filled > chunk_table->last_chunk_filled )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: previous last chunk offset filled cannot be greater than current.",
 				 function );
 
@@ -968,10 +967,10 @@ int libewf_write_io_handle_initialize_resume(
 			     &number_of_chunks,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the number of chunks in the chunk table list.",
 				 function );
 
@@ -979,10 +978,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( number_of_unusable_chunks > number_of_chunks )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: number of unusable chunk cannot be greater than number of chunk.",
 				 function );
 
@@ -998,10 +997,10 @@ int libewf_write_io_handle_initialize_resume(
 			     number_of_chunks - number_of_unusable_chunks,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
 				 "%s: unable to resize chunk table list.",
 				 function );
 
@@ -1027,10 +1026,10 @@ int libewf_write_io_handle_initialize_resume(
 			 */
 			if( section_list_element->previous_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing previous section list element.",
 				 function );
 
@@ -1038,10 +1037,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( section_list_element->previous_element->value == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing previous section.",
 				 function );
 
@@ -1052,10 +1051,10 @@ int libewf_write_io_handle_initialize_resume(
 			     (void *) "table",
 			     6 ) != 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported previous section: %s.",
 				 function,
 				 ( (libewf_section_t *) section_list_element->previous_element->value )->type );
@@ -1064,10 +1063,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( section_list_element->previous_element->previous_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: invalid second previous section list element.",
 				 function );
 
@@ -1075,10 +1074,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( section_list_element->previous_element->previous_element->value == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing second previous section.",
 				 function );
 
@@ -1089,10 +1088,10 @@ int libewf_write_io_handle_initialize_resume(
 			     (void *) "sectors",
 			     8 ) != 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported second previous section: %s.",
 				 function,
 				 ( (libewf_section_t *) section_list_element->previous_element->previous_element->value )->type );
@@ -1101,10 +1100,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( chunk_table->previous_last_chunk_filled > chunk_table->last_chunk_filled )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: previous last chunk offset filled cannot be greater than current.",
 				 function );
 
@@ -1117,10 +1116,10 @@ int libewf_write_io_handle_initialize_resume(
 			     &number_of_chunks,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the number of chunks in the chunk table list.",
 				 function );
 
@@ -1128,10 +1127,10 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			if( number_of_unusable_chunks > number_of_chunks )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: number of unusable chunks cannot be greater than number of chunks.",
 				 function );
 
@@ -1147,10 +1146,10 @@ int libewf_write_io_handle_initialize_resume(
 			     number_of_chunks - number_of_unusable_chunks,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
 				 "%s: unable to resize chunk table list.",
 				 function );
 
@@ -1183,10 +1182,10 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( supported_section == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: write resume from section: %s not supported.",
 		 function,
 		 (char *) section->type );
@@ -1207,10 +1206,10 @@ int libewf_write_io_handle_initialize_resume(
 	{
 		if( write_io_handle->resume_segment_file_offset > (off64_t) segment_table->maximum_segment_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: resume segment file offset cannot be greater than segment file size.",
 			 function );
 
@@ -1228,10 +1227,10 @@ int libewf_write_io_handle_initialize_resume(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -1244,10 +1243,10 @@ int libewf_write_io_handle_initialize_resume(
 		     LIBBFIO_OPEN_READ_WRITE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to reopen segment file: %d.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -1272,7 +1271,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
      uint8_t format,
      uint8_t ewf_format,
      uint8_t unrestrict_offset_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function                      = "libewf_write_io_handle_calculate_chunks_per_segment_file";
 	int64_t calculated_chunks_per_segment_file = 0;
@@ -1282,10 +1281,10 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 
 	if( chunks_per_segment_file == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunks per segment file.",
 		 function );
 
@@ -1293,10 +1292,10 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	if( maximum_chunks_per_section == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum chunks per section.",
 		 function );
 
@@ -1304,10 +1303,10 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -1434,17 +1433,17 @@ int libewf_write_io_handle_calculate_chunks_per_section(
      uint32_t number_of_chunks_written_to_segment,
      uint32_t chunks_per_segment_file,
      uint8_t unrestrict_offset_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function               = "libewf_write_io_handle_calculate_chunks_per_section";
 	uint32_t remaining_number_of_chunks = 0;
 
 	if( chunks_per_section == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunks per section.",
 		 function );
 
@@ -1452,10 +1451,10 @@ int libewf_write_io_handle_calculate_chunks_per_section(
 	}
 	if( maximum_chunks_per_section == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum chunks per section.",
 		 function );
 
@@ -1463,10 +1462,10 @@ int libewf_write_io_handle_calculate_chunks_per_section(
 	}
 	if( number_of_chunks_written_to_segment > chunks_per_segment_file )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: number of chunks written to segment exceeds number of chunks per segment file.",
 		 function );
 
@@ -1502,16 +1501,16 @@ int libewf_write_io_handle_test_segment_file_full(
      uint32_t number_of_chunks_written,
      uint8_t format,
      uint8_t ewf_format,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_test_segment_file_full";
 
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -1523,9 +1522,9 @@ int libewf_write_io_handle_test_segment_file_full(
 	 && ( media_values->number_of_chunks == number_of_chunks_written ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: all required chunks have been written.\n",
 			 function );
 		}
@@ -1539,9 +1538,9 @@ int libewf_write_io_handle_test_segment_file_full(
 	 && ( input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: all required data has been written.\n",
 			 function );
 		}
@@ -1557,9 +1556,9 @@ int libewf_write_io_handle_test_segment_file_full(
 		if( number_of_chunks_written_to_segment >= chunks_per_segment_file )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 			 	"%s: no space left for additional chunk.\n",
 				 function );
 			}
@@ -1573,9 +1572,9 @@ int libewf_write_io_handle_test_segment_file_full(
 	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: no space left for additional chunk - file size exceeded.\n",
 			 function );
 		}
@@ -1584,9 +1583,9 @@ int libewf_write_io_handle_test_segment_file_full(
 		return( 1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: space left for additional chunk.\n",
 		 function );
 	}
@@ -1611,16 +1610,16 @@ int libewf_write_io_handle_test_chunks_section_full(
      uint8_t format,
      uint8_t ewf_format,
      uint8_t unrestrict_offset_table,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_test_chunks_section_full";
 
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -1628,10 +1627,10 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	if( segment_file_offset > (off64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid segment file offset value exceeds maximum.",
 		 function );
 
@@ -1639,10 +1638,10 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	if( maximum_chunks_per_section == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum chunks per section.",
 		 function );
 
@@ -1653,9 +1652,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 	if( chunks_section_offset == 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: no chunks section has been created.\n",
 			 function );
 		}
@@ -1669,9 +1668,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 	 && ( media_values->number_of_chunks == number_of_chunks_written ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: all required chunks have been written.\n",
 			 function );
 		}
@@ -1685,9 +1684,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 	 && ( input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: all required data has been written.\n",
 			 function );
 		}
@@ -1700,9 +1699,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 	 && ( number_of_chunks_written_to_section >= maximum_chunks_per_section ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: no space left for additional chunk - maximum reached.\n",
 			 function );
 		}
@@ -1714,9 +1713,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 	if( number_of_chunks_written_to_section > (uint32_t) INT32_MAX )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: no space left for additional chunk - preventing chunk overflow.\n",
 			 function );
 		}
@@ -1728,9 +1727,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 	if( ( segment_file_offset - chunks_section_offset ) > (off64_t) INT32_MAX )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: no space left for additional chunk - preventing offset overflow.\n",
 			 function );
 		}
@@ -1745,9 +1744,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 		if( number_of_chunks_written_to_section >= chunks_per_section )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: no space left for additional chunk.\n",
 				 function );
 			}
@@ -1761,9 +1760,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 		 	"%s: no space left for additional chunk - file size exceeded.\n",
 			 function );
 		}
@@ -1772,9 +1771,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 		return( 1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 	 	"%s: space left for additional chunk.\n",
 		 function );
 	}
@@ -1799,7 +1798,7 @@ int libewf_write_io_handle_create_segment_file(
      libewf_segment_file_t **segment_file,
      int *segment_files_list_index,
      int *file_io_pool_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle        = NULL;
 	libcstring_system_character_t *filename = NULL;
@@ -1809,10 +1808,10 @@ int libewf_write_io_handle_create_segment_file(
 
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -1820,10 +1819,10 @@ int libewf_write_io_handle_create_segment_file(
 	}
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -1831,10 +1830,10 @@ int libewf_write_io_handle_create_segment_file(
 	}
 	if( segment_file == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
 		 function );
 
@@ -1842,10 +1841,10 @@ int libewf_write_io_handle_create_segment_file(
 	}
 	if( *segment_file != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid segment file - value already set.",
 		 function );
 
@@ -1853,10 +1852,10 @@ int libewf_write_io_handle_create_segment_file(
 	}
 	if( segment_files_list_index == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment files list index.",
 		 function );
 
@@ -1864,10 +1863,10 @@ int libewf_write_io_handle_create_segment_file(
 	}
 	if( file_io_pool_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file IO pool entry.",
 		 function );
 
@@ -1885,10 +1884,10 @@ int libewf_write_io_handle_create_segment_file(
 	     io_handle->ewf_format,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create segment file: %" PRIu16 " filename.",
 		 function,
 		 segment_number );
@@ -1897,19 +1896,19 @@ int libewf_write_io_handle_create_segment_file(
 	}
 	if( filename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing filename.",
 		 function );
 
 		goto on_error;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 		 function,
 		 segment_number,
@@ -1920,10 +1919,10 @@ int libewf_write_io_handle_create_segment_file(
 	     &file_io_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create file IO handle.",
 		 function );
 
@@ -1943,10 +1942,10 @@ int libewf_write_io_handle_create_segment_file(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set filename in file IO handle.",
 		 function );
 
@@ -1972,10 +1971,10 @@ int libewf_write_io_handle_create_segment_file(
 	     bfio_access_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append file IO handle to pool.",
 		 function );
 
@@ -1989,10 +1988,10 @@ int libewf_write_io_handle_create_segment_file(
 	     bfio_access_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open file IO pool entry: %d.",
 		 function,
 		 *file_io_pool_entry );
@@ -2003,10 +2002,10 @@ int libewf_write_io_handle_create_segment_file(
 	     segment_file,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create segment file.",
 		 function );
 
@@ -2022,10 +2021,10 @@ int libewf_write_io_handle_create_segment_file(
 	     *file_io_pool_entry,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment file: %" PRIu16 " in list.",
 		 function,
 		 segment_number );
@@ -2037,14 +2036,14 @@ int libewf_write_io_handle_create_segment_file(
 	     segment_files_cache,
 	     *segment_files_list_index,
 	     (intptr_t *) *segment_file,
-	     (int (*)(intptr_t **, liberror_error_t **)) &libewf_segment_file_free,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
 	     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment file: %" PRIu16 " value in list.",
 		 function,
 		 segment_number );
@@ -2105,7 +2104,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
          int8_t write_checksum,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_segment_file_t *segment_file = NULL;
 	void *reallocation                  = NULL;
@@ -2123,10 +2122,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 	if( write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write IO handle.",
 		 function );
 
@@ -2134,10 +2133,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -2145,10 +2144,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -2156,10 +2155,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	if( segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
 		 function );
 
@@ -2172,10 +2171,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 	if( chunk_exists == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if the chunk: %d exists in the chunk table.",
 		 function,
 		 chunk_index );
@@ -2184,10 +2183,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	else if( chunk_exists != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid chunk: %d already exists.",
 		 function,
 		 chunk_index );
@@ -2205,10 +2204,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	     &number_of_chunks,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of chunks in the chunk table.",
 		 function );
 
@@ -2224,10 +2223,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     (int) media_values->number_of_chunks,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
 			 "%s: unable to resize chunk table.",
 			 function );
 
@@ -2236,10 +2235,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	if( chunk_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
 		 function );
 
@@ -2248,10 +2247,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	if( ( chunk_buffer_size == 0 )
 	 || ( chunk_buffer_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid chunk size value out of bounds.",
 		 function );
 
@@ -2265,9 +2264,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		return( 0 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 	 	"%s: writing chunk: %d with size: %" PRIzd " (data size: %" PRIzd ").\n",
 		 function,
 		 chunk_index,
@@ -2280,10 +2279,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of segment files.",
 		 function );
 
@@ -2292,10 +2291,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	if( ( number_of_segment_files < 0 )
 	 || ( number_of_segment_files > (int) UINT16_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-	 	 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+	 	 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid number of segment files value out of bounds.",
 		 function );
 
@@ -2314,10 +2313,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     0,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %" PRIu16 " from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -2326,10 +2325,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		}
 		if( segment_file == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %" PRIu16 ".",
 			 function,
 			 segment_files_list_index + 1 );
@@ -2347,10 +2346,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	{
 		if( header_sections == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid header sections.",
 			 function );
 
@@ -2368,10 +2367,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			     io_handle->header_codepage,
 			     error ) == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create header(s).",
 				 function );
 
@@ -2383,9 +2382,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		write_io_handle->number_of_chunks_written_to_segment = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: creating segment file with segment number: %" PRIu16 ".\n",
 			 function,
 			 segment_files_list_index + 1 );
@@ -2405,10 +2404,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to create segment file: %" PRIu16 ".",
 			 function,
 			 segment_files_list_index + 1 );
@@ -2435,10 +2434,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		if( write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write segment file start.",
 			 function );
 
@@ -2463,19 +2462,19 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			     write_io_handle->unrestrict_offset_table,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to determine the number of chunks per segment file.",
 				 function );
 
 				return( -1 );
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: calculated number of chunks per segment file: %" PRIu32 ".\n",
 				 function,
 				 write_io_handle->chunks_per_segment_file );
@@ -2495,10 +2494,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -2517,10 +2516,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     SEEK_SET,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
 			 function,
 			 write_io_handle->resume_segment_file_offset,
@@ -2535,9 +2534,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	if( write_io_handle->create_chunks_section == 1 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 		 	"%s: creating chunks section.\n",
 			 function );
 		}
@@ -2570,10 +2569,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     &( write_io_handle->chunks_section_offset ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve current offset in segment file.",
 			 function );
 
@@ -2595,19 +2594,19 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			     write_io_handle->unrestrict_offset_table,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to determine the number of chunks per segment file.",
 				 function );
 
 				return( -1 );
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: calculated number of chunks per segment file: %" PRIu32 ".\n",
 				 function,
 				 write_io_handle->chunks_per_segment_file );
@@ -2626,19 +2625,19 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     write_io_handle->unrestrict_offset_table,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine the number of chunks per chunks section.",
 			 function );
 
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 		 	"%s: calculated number of chunks per section: %" PRIu32 ".\n",
 			 function,
 			 write_io_handle->chunks_per_section );
@@ -2652,10 +2651,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			if( reallocation == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 				 "%s: unable to create table offsets.",
 				 function );
 
@@ -2682,9 +2681,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( write_count == -1 )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: unable to write section start for chunks.\n",
 				 function );
 			}
@@ -2701,10 +2700,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	     &segment_file_offset,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve current offset in segment file.",
 		 function );
 
@@ -2713,9 +2712,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	/* Write the chunk data
 	 */
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 	 	"%s: writing %" PRIzd " bytes to segment file: %d.\n",
 		 function,
 		 chunk_buffer_size,
@@ -2740,18 +2739,18 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 	if( write_count <= -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write chunk data.",
 		 function );
 
 		if( ( error != NULL )
-		 && ( liberror_error_matches(
+		 && ( libcerror_error_matches(
 		       *error,
-		       LIBERROR_ERROR_DOMAIN_OUTPUT,
-		       LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
+		       LIBCERROR_ERROR_DOMAIN_OUTPUT,
+		       LIBCERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
 		{
 			return( -1 );
 		}
@@ -2790,10 +2789,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     &segment_file_offset,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve current offset in segment file.",
 			 function );
 
@@ -2818,10 +2817,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if chunks section is full.",
 			 function );
 
@@ -2837,10 +2836,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     SEEK_SET,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: cannot find offset: %" PRIi64 ".",
 			 function,
 			 segment_file_offset );
@@ -2853,9 +2852,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	 || ( result == 1 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: closing chunks section number of bytes written: %" PRIi64 ".\n",
 			 function,
 			 write_io_handle->chunks_section_write_count );
@@ -2869,10 +2868,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			if( reallocation == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 				 "%s: unable to create table offsets.",
 				 function );
 
@@ -2901,10 +2900,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		if( write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to correct chunks section.",
 			 function );
 
@@ -2932,10 +2931,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			if( result == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to determine if segment file is full.",
 				 function );
 
@@ -2955,9 +2954,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 || ( write_io_handle->input_write_count < (ssize64_t) media_values->media_size ) )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
-				if( libnotify_verbose != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 				 	"%s: closing segment file with segment number: %d.\n",
 					 function,
 					 segment_files_list_index + 1 );
@@ -2984,10 +2983,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 				if( write_count == -1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_WRITE_FAILED,
 					 "%s: unable to close segment file.",
 					 function );
 
@@ -3027,7 +3026,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
          int8_t write_checksum,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	libewf_list_element_t *last_list_element = NULL;
 	libewf_section_t *last_section           = NULL;
@@ -3049,10 +3048,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 	if( write_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write IO handle.",
 		 function );
 
@@ -3060,10 +3059,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	if( io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
 		 function );
 
@@ -3071,10 +3070,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -3082,10 +3081,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	if( delta_segment_table == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid delta segment table.",
 		 function );
 
@@ -3093,10 +3092,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	if( chunk_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
 		 function );
 
@@ -3105,10 +3104,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	if( ( chunk_buffer_size == 0 )
 	 || ( chunk_buffer_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid chunk size value out of bounds.",
 		 function );
 
@@ -3116,10 +3115,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	if( is_compressed != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_CONFLICTING_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_CONFLICTING_VALUE,
 		 "%s: chunk compression cannot be used.",
 		 function );
 
@@ -3134,10 +3133,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	     &existing_chunk_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve data range of chunk: %d.",
 		 function,
 		 chunk_index );
@@ -3145,9 +3144,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: writing delta chunk: %d with size: %" PRIzd ".\n",
 		 function,
 		 chunk_index,
@@ -3161,10 +3160,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		     &number_of_segment_files,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of delta segment files.",
 			 function );
 
@@ -3173,10 +3172,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		if( ( number_of_segment_files < 0 )
 		 || ( number_of_segment_files > (int) UINT16_MAX ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid number of segment files value out of bounds.",
 			 function );
 
@@ -3194,10 +3193,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     &file_io_pool_entry,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve delta segment file: %d from list.",
 				 function,
 				 segment_files_list_index + 1 );
@@ -3213,10 +3212,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     0,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve delta segment file: %d value from list.",
 				 function,
 				 segment_files_list_index + 1 );
@@ -3225,10 +3224,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			}
 			if( segment_file == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing delta segment file: %d.",
 				 function,
 				 segment_files_list_index + 1 );
@@ -3237,10 +3236,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			}
 			if( segment_file->section_list == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: invalid segment file - missing section list.",
 				 function );
 
@@ -3250,10 +3249,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 			if( last_list_element == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing last section list element.",
 				 function );
 
@@ -3263,10 +3262,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 			if( last_list_element->value == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing last section.",
 				 function );
 
@@ -3278,10 +3277,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     &segment_file_offset,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve current offset in segment file.",
 				 function );
 
@@ -3298,10 +3297,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				     SEEK_SET,
 				     error ) == -1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_SEEK_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_SEEK_FAILED,
 					 "%s: unable to seek offset: %" PRIi64 " in delta segment file: %d.",
 					 function,
 					 last_section->start_offset,
@@ -3334,10 +3333,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 				if( write_count == -1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_WRITE_FAILED,
 					 "%s: unable to write last section.",
 					 function );
 
@@ -3355,10 +3354,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				     last_list_element,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_REMOVE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
 					 "%s: unable to remove last section from list.",
 					 function );
 
@@ -3368,10 +3367,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				     (libewf_section_t **) &( last_list_element->value ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 					 "%s: unable to free last section values.",
 					 function );
 
@@ -3400,10 +3399,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     &file_io_pool_entry,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_OPEN_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_OPEN_FAILED,
 				 "%s: unable to create delta segment file: %d.",
 				 function,
 				 segment_files_list_index + 1 );
@@ -3425,10 +3424,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 			if( write_count == -1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
 				 "%s: unable to write segment file start.",
 				 function );
 
@@ -3449,10 +3448,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		     0,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve delta segment file: %d value from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -3461,10 +3460,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		}
 		if( segment_file == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %d.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -3482,10 +3481,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		     SEEK_SET,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek chunk offset: %" PRIi64 ".",
 			 function,
 			 segment_file_offset );
@@ -3495,9 +3494,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		no_section_append = 1;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: writing delta chunk section at offset: %" PRIi64 ".\n",
 		 function,
 		 segment_file_offset );
@@ -3520,10 +3519,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 	if( write_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write delta chunk section.",
 		 function );
 
@@ -3545,10 +3544,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		if( write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write last section.",
 			 function );
 
@@ -3576,7 +3575,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_sector_list_t *tracks,
      libewf_sector_list_t *acquiry_errors,
      ewf_data_t **cached_data_section,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_write_io_handle_finalize_write_sections_corrections";
@@ -3590,10 +3589,10 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 	     &number_of_segment_files,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of segment files.",
 		 function );
 
@@ -3602,10 +3601,10 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 	if( ( number_of_segment_files < 0 )
 	 || ( number_of_segment_files > (int) UINT16_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid number of segment files value out of bounds.",
 		 function );
 
@@ -3627,10 +3626,10 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		     &file_io_pool_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -3646,10 +3645,10 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		     0,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -3658,10 +3657,10 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		}
 		if( segment_file == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %d.",
 			 function,
 			 segment_files_list_index + 1 );
@@ -3684,10 +3683,10 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		     cached_data_section,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write sections correction to segment file: %d.",
 			 function,
 			 segment_files_list_index + 1 );

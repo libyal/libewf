@@ -23,8 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #if defined( TIME_WITH_SYS_TIME )
 #include <sys/time.h>
 #include <time.h>
@@ -35,13 +33,14 @@
 #endif
 
 #include "libewf_date_time.h"
+#include "libewf_libcerror.h"
 
 /* Returns a structured representation of a time using the local timezone, or NULL on error
  */
 int libewf_date_time_localtime(
      const time_t *timestamp,
      struct tm *time_elements,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 #if ( defined( HAVE_LOCALTIME ) && !defined( HAVE_LOCALTIME_R ) ) || ( defined( WINAPI ) && !defined( _MSC_VER ) )
 	struct tm *static_time_elements = NULL;
@@ -50,10 +49,10 @@ int libewf_date_time_localtime(
 
 	if( timestamp == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time stamp.",
 		 function );
 
@@ -61,10 +60,10 @@ int libewf_date_time_localtime(
 	}
 	if( time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid time elements.",
 		 function );
 
@@ -75,10 +74,10 @@ int libewf_date_time_localtime(
 	     time_elements,
 	     timestamp ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set time elements.",
 		 function );
 
@@ -89,10 +88,10 @@ int libewf_date_time_localtime(
 	     timestamp,
 	     time_elements ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set time elements.",
 		 function );
 
@@ -104,10 +103,10 @@ int libewf_date_time_localtime(
 
 	if( static_time_elements == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create static time elements.",
 		 function );
 
@@ -118,10 +117,10 @@ int libewf_date_time_localtime(
 	     static_time_elements,
 	     sizeof( struct tm ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set time elements.",
 		 function );
 

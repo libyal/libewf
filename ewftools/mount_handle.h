@@ -1,7 +1,7 @@
 /* 
  * Mount handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,9 +26,8 @@
 #include <file_stream.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 
 #if defined( __cplusplus )
@@ -64,54 +63,54 @@ struct mount_handle
 
 int mount_handle_initialize(
      mount_handle_t **mount_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int mount_handle_free(
      mount_handle_t **mount_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int mount_handle_set_format(
      mount_handle_t *mount_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int mount_handle_open_input(
      mount_handle_t *mount_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int mount_handle_close(
      mount_handle_t *mount_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 ssize_t mount_handle_read_buffer(
          mount_handle_t *mount_handle,
          uint8_t *buffer,
          size_t size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 off64_t mount_handle_seek_offset(
          mount_handle_t *mount_handle,
          off64_t offset,
          int whence,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 int mount_handle_get_media_size(
      mount_handle_t *mount_handle,
      size64_t *size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
      const libcstring_system_character_t *path,
      size_t path_length,
      libewf_file_entry_t **file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

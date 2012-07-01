@@ -1,7 +1,7 @@
 /*
  * Reads data from a file or device and writes it in EWF format
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,20 +23,20 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
-
-#include <libsystem.h>
 
 #include "byte_size_string.h"
 #include "device_handle.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libclocale.h"
+#include "ewftools_libcnotify.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
@@ -193,12 +193,12 @@ void ewfacquire_usage_fprint(
 /* Signal handler for ewfacquire
  */
 void ewfacquire_signal_handler(
-      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
+      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "ewfacquire_signal_handler";
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfacquire_abort = 1;
 
@@ -208,13 +208,13 @@ void ewfacquire_signal_handler(
 		     ewfacquire_device_handle,
 		     &error ) != 1 )
 		{
-			libsystem_notify_printf(
+			libcnotify_printf(
 			 "%s: unable to signal device handle to abort.\n",
 			 function );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 	}
@@ -224,22 +224,22 @@ void ewfacquire_signal_handler(
 		     ewfacquire_imaging_handle,
 		     &error ) != 1 )
 		{
-			libsystem_notify_printf(
+			libcnotify_printf(
 			 "%s: unable to signal imaging handle to abort.\n",
 			 function );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libsystem_file_io_close(
+	if( libcsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -252,7 +252,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         FILE *stream,
         libcstring_system_character_t *input_buffer,
         size_t input_buffer_size,
-        liberror_error_t **error )
+        libcerror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	int8_t input_confirmed                               = -1;
@@ -282,10 +282,10 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				libsystem_notify_print_error_backtrace(
+				libcnotify_print_error_backtrace(
 				 *error );
 			}
-			liberror_error_free(
+			libcerror_error_free(
 			 error );
 
 			fprintf(
@@ -304,10 +304,10 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 				if( ( error != NULL )
 				 && ( *error != NULL ) )
 				{
-					libsystem_notify_print_error_backtrace(
+					libcnotify_print_error_backtrace(
 					 *error );
 				}
-				liberror_error_free(
+				libcerror_error_free(
 				 error );
 
 				fprintf(
@@ -333,7 +333,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 int ewfacquire_determine_sessions(
      imaging_handle_t *imaging_handle,
      device_handle_t *device_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "ewfacquire_determine_sessions";
 	uint64_t number_of_sectors = 0;
@@ -347,10 +347,10 @@ int ewfacquire_determine_sessions(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -358,10 +358,10 @@ int ewfacquire_determine_sessions(
 	}
 	if( imaging_handle->bytes_per_sector == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid imaging handle - missing bytes per sector.",
 		 function );
 
@@ -372,10 +372,10 @@ int ewfacquire_determine_sessions(
 	     &number_of_sessions,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of sessions.",
 		 function );
 
@@ -394,10 +394,10 @@ int ewfacquire_determine_sessions(
 			     &number_of_sectors,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve session: %d from device handle.",
 				 function,
 				 session_index );
@@ -410,10 +410,10 @@ int ewfacquire_determine_sessions(
 			     number_of_sectors,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to append session: %d to imaging handle.",
 				 function,
 				 session_index );
@@ -429,10 +429,10 @@ int ewfacquire_determine_sessions(
 		     &type,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve device handle type.",
 			 function );
 
@@ -448,10 +448,10 @@ int ewfacquire_determine_sessions(
 
 		if( number_of_sectors > (uint64_t) UINT32_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid number of sectors value out of bounds.",
 			 function );
 
@@ -463,10 +463,10 @@ int ewfacquire_determine_sessions(
 		     (uint64_t) number_of_sectors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to append session to imaging handle.",
 			 function );
 
@@ -478,10 +478,10 @@ int ewfacquire_determine_sessions(
 	     &number_of_tracks,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of tracks.",
 		 function );
 
@@ -501,10 +501,10 @@ int ewfacquire_determine_sessions(
 			     &type,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve track: %d from device handle.",
 				 function,
 				 track_index );
@@ -519,10 +519,10 @@ int ewfacquire_determine_sessions(
 				     number_of_sectors,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 					 "%s: unable to append track: %d to imaging handle.",
 					 function,
 					 track_index );
@@ -553,7 +553,7 @@ int ewfacquire_read_input(
      uint8_t swap_byte_pairs,
      uint8_t print_status_information,
      log_handle_t *log_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
@@ -575,10 +575,10 @@ int ewfacquire_read_input(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -587,10 +587,10 @@ int ewfacquire_read_input(
 #if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( imaging_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid imaging handle - process buffer size value exceeds maximum.",
 		 function );
 
@@ -599,10 +599,10 @@ int ewfacquire_read_input(
 #endif
         if( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid imaging handle - acquire size value exceeds maximum.",
 		 function );
 
@@ -610,10 +610,10 @@ int ewfacquire_read_input(
 	}
 	if( device_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid device handle.",
 		 function );
 
@@ -622,10 +622,10 @@ int ewfacquire_read_input(
 	if( ( imaging_handle->acquiry_size > imaging_handle->input_media_size )
 	 || ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid acquire size value out of bounds.",
 		 function );
 
@@ -636,10 +636,10 @@ int ewfacquire_read_input(
 		if( ( imaging_handle->acquiry_offset > (uint64_t) imaging_handle->input_media_size )
 		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > (uint64_t) imaging_handle->input_media_size ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: unable to acquire beyond media size.",
 			 function );
 
@@ -651,10 +651,10 @@ int ewfacquire_read_input(
 		     SEEK_SET,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to find acquiry offset.",
 			 function );
 
@@ -665,10 +665,10 @@ int ewfacquire_read_input(
 	{
 		if( ( imaging_handle->acquiry_offset + (uint64_t) resume_acquiry_offset ) > (uint64_t) imaging_handle->input_media_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: unable to resume acquire beyond media size.",
 			 function );
 
@@ -680,10 +680,10 @@ int ewfacquire_read_input(
 		     SEEK_CUR,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to find acquiry offset.",
 			 function );
 
@@ -694,10 +694,10 @@ int ewfacquire_read_input(
 		     0,
 		     error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek imaging offset.",
 			 function );
 
@@ -709,10 +709,10 @@ int ewfacquire_read_input(
 	     &chunk_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve chunk size.",
 		 function );
 
@@ -720,10 +720,10 @@ int ewfacquire_read_input(
 	}
 	if( chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing chunk size.",
 		 function );
 
@@ -746,10 +746,10 @@ int ewfacquire_read_input(
 	     process_buffer_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create storage media buffer.",
 		 function );
 
@@ -759,10 +759,10 @@ int ewfacquire_read_input(
 	     imaging_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize integrity hash(es).",
 		 function );
 
@@ -777,10 +777,10 @@ int ewfacquire_read_input(
 	     print_status_information,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create process status",
 		 function );
 
@@ -790,10 +790,10 @@ int ewfacquire_read_input(
 	     process_status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to start process status",
 		 function );
 
@@ -817,10 +817,10 @@ int ewfacquire_read_input(
 
 			if( read_count < 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: error reading data from input.",
 				 function );
 
@@ -828,10 +828,10 @@ int ewfacquire_read_input(
 			}
 			if( read_count == 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unexpected end of input.",
 				 function );
 
@@ -852,10 +852,10 @@ int ewfacquire_read_input(
 				     read_count,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_CONVERSION,
-					 LIBERROR_CONVERSION_ERROR_GENERIC,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
 					 "%s: unable to swap byte pairs.",
 					 function );
 
@@ -879,10 +879,10 @@ int ewfacquire_read_input(
 
 			if( read_count < 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				"%s: unable to read data.",
 				 function );
 
@@ -890,10 +890,10 @@ int ewfacquire_read_input(
 			}
 			if( read_count == 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unexpected end of data.",
 				 function );
 
@@ -906,10 +906,10 @@ int ewfacquire_read_input(
 
 			if( process_count < 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				"%s: unable to prepare buffer after read.",
 				 function );
 
@@ -917,10 +917,10 @@ int ewfacquire_read_input(
 			}
 			if( process_count > (ssize_t) read_size )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: more bytes read than requested.",
 				 function,
 				 process_count,
@@ -947,10 +947,10 @@ int ewfacquire_read_input(
 		     &data_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve storage media buffer data.",
 			 function );
 
@@ -962,10 +962,10 @@ int ewfacquire_read_input(
 		     read_count,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to update integrity hash(es).",
 			 function );
 
@@ -980,10 +980,10 @@ int ewfacquire_read_input(
 
 			if( process_count < 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				"%s: unable to prepare buffer before write.",
 				 function );
 
@@ -997,10 +997,10 @@ int ewfacquire_read_input(
 
 			if( write_count < 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
 				 "%s: unable to write data to file.",
 				 function );
 
@@ -1015,10 +1015,10 @@ int ewfacquire_read_input(
 		     imaging_handle->acquiry_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update process status.",
 			 function );
 
@@ -1033,10 +1033,10 @@ int ewfacquire_read_input(
 	     &storage_media_buffer,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free storage media buffer.",
 		 function );
 
@@ -1046,10 +1046,10 @@ int ewfacquire_read_input(
 	     imaging_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to finalize integrity hash(es).",
 		 function );
 
@@ -1062,10 +1062,10 @@ int ewfacquire_read_input(
 		     &number_of_read_errors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of read errors.",
 			 function );
 
@@ -1082,10 +1082,10 @@ int ewfacquire_read_input(
 			     &read_error_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve read error: %d.",
 				 function,
 				 read_error_iterator );
@@ -1098,10 +1098,10 @@ int ewfacquire_read_input(
 			     read_error_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to append read error: %d to imaging handle.",
 				 function,
 				 read_error_iterator );
@@ -1115,10 +1115,10 @@ int ewfacquire_read_input(
 
 		if( write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to finalize.",
 			 function );
 
@@ -1136,10 +1136,10 @@ int ewfacquire_read_input(
 	     status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to stop process status",
 		 function );
 
@@ -1149,10 +1149,10 @@ int ewfacquire_read_input(
 	     &process_status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free process status",
 		 function );
 
@@ -1165,10 +1165,10 @@ int ewfacquire_read_input(
 		     imaging_handle->notify_stream,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print device read errors.",
 			 function );
 
@@ -1179,10 +1179,10 @@ int ewfacquire_read_input(
 		     imaging_handle->notify_stream,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print hashes.",
 			 function );
 
@@ -1195,10 +1195,10 @@ int ewfacquire_read_input(
 			     log_handle->log_stream,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print device read errors in log handle.",
 				 function );
 
@@ -1209,10 +1209,10 @@ int ewfacquire_read_input(
 			     log_handle->log_stream,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print hashes in log handle.",
 				 function );
 
@@ -1255,7 +1255,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t media_information_model[ 64 ];
 	libcstring_system_character_t media_information_serial_number[ 64 ];
 
-	liberror_error_t *error                                         = NULL;
+	libcerror_error_t *error                                         = NULL;
 
 	libcstring_system_character_t *log_filename                     = NULL;
 	libcstring_system_character_t *option_additional_digest_types   = NULL;
@@ -1298,14 +1298,23 @@ int main( int argc, char * const argv[] )
 	int interactive_mode                                            = 1;
 	int result                                                      = 0;
 
-	libsystem_notify_set_stream(
+	libcnotify_stream_set(
 	 stderr,
 	 NULL );
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 1 );
 
-	if( libsystem_initialize(
-	     "ewftools",
+	if( libclocale_initialize(
+             "ewftools",
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize locale values.\n" );
+
+		goto on_error;
+	}
+	if( libcsystem_initialize(
 	     _IONBF,
 	     &error ) != 1 )
 	{
@@ -1319,7 +1328,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	while( ( option = libsystem_getopt(
+	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
 	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:T:uvVw2:" ) ) ) != (libcstring_system_integer_t) -1 )
@@ -1527,7 +1536,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 verbose );
 	libewf_notify_set_verbose(
 	 verbose );
@@ -1646,9 +1655,9 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to print media information.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	/* Create the imaging handle and set the desired values
@@ -2177,7 +2186,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( resume_acquiry != 0 )
 		{
-			if( libsystem_signal_attach(
+			if( libcsystem_signal_attach(
 			     ewfacquire_signal_handler,
 			     &error ) != 1 )
 			{
@@ -2198,15 +2207,15 @@ int main( int argc, char * const argv[] )
 				 "Unable to resume acquire - starting from scratch.\n" );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libsystem_notify_print_error_backtrace(
+				libcnotify_print_error_backtrace(
 				 error );
 #endif
-				liberror_error_free(
+				libcerror_error_free(
 				 &error );
 
 				resume_acquiry = 0;
 			}
-			if( libsystem_signal_detach(
+			if( libcsystem_signal_detach(
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2226,9 +2235,9 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to determine previous acquiry parameters.\n" );
 
-				libsystem_notify_print_error_backtrace(
+				libcnotify_print_error_backtrace(
 				 error );
-				liberror_error_free(
+				libcerror_error_free(
 				 &error );
 
 				imaging_handle_close(
@@ -2249,9 +2258,9 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to determine resume acquiry offset.\n" );
 
-				libsystem_notify_print_error_backtrace(
+				libcnotify_print_error_backtrace(
 				 error );
-				liberror_error_free(
+				libcerror_error_free(
 				 &error );
 
 				imaging_handle_close(
@@ -2424,9 +2433,9 @@ int main( int argc, char * const argv[] )
 
 				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
+					libcnotify_print_error_backtrace(
 					 error );
-					liberror_error_free(
+					libcerror_error_free(
 					 &error );
 
 					fprintf(
@@ -2447,9 +2456,9 @@ int main( int argc, char * const argv[] )
 
 				if( result == -1 )
 				{
-					libsystem_notify_print_error_backtrace(
+					libcnotify_print_error_backtrace(
 					 error );
-					liberror_error_free(
+					libcerror_error_free(
 					 &error );
 
 					fprintf(
@@ -2685,9 +2694,9 @@ int main( int argc, char * const argv[] )
 			 stdout,
 			 "Unable to retrieve model.\n" );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 		if( result != 1 )
@@ -2708,9 +2717,9 @@ int main( int argc, char * const argv[] )
 			 stdout,
 			 "Unable to retrieve serial number.\n" );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 		if( result != 1 )
@@ -2784,7 +2793,7 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-	if( libsystem_signal_attach(
+	if( libcsystem_signal_attach(
 	     ewfacquire_signal_handler,
 	     &error ) != 1 )
 	{
@@ -2792,9 +2801,9 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( log_filename != NULL )
@@ -2837,9 +2846,9 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to read input.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( log_handle != NULL )
@@ -2866,16 +2875,16 @@ int main( int argc, char * const argv[] )
 		}
 	}
 on_abort:
-	if( libsystem_signal_detach(
+	if( libcsystem_signal_detach(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to detach signal handler.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( imaging_handle_close(
@@ -2946,9 +2955,9 @@ on_abort:
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( log_handle != NULL )

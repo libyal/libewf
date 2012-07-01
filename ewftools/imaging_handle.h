@@ -1,7 +1,7 @@
 /* 
  * Imaging handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,9 +26,8 @@
 #include <file_stream.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "storage_media_buffer.h"
@@ -225,221 +224,221 @@ struct imaging_handle
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_free(
      imaging_handle_t **imaging_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_signal_abort(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *filename,
      uint8_t resume,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_open_secondary_output(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *filename,
      uint8_t resume,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_close(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 ssize_t imaging_handle_prepare_read_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 ssize_t imaging_handle_read_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t read_size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 ssize_t imaging_handle_prepare_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 ssize_t imaging_handle_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 off64_t imaging_handle_seek_offset(
          imaging_handle_t *imaging_handle,
          off64_t offset,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 int imaging_handle_get_offset(
      imaging_handle_t *imaging_handle,
      off64_t *offset,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_swap_byte_pairs(
      imaging_handle_t *imaging_handle,
      storage_media_buffer_t *storage_media_buffer,
      size_t read_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_initialize_integrity_hash(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_update_integrity_hash(
      imaging_handle_t *imaging_handle,
      uint8_t *buffer,
      size_t buffer_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_finalize_integrity_hash(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_get_chunk_size(
      imaging_handle_t *imaging_handle,
      size32_t *chunk_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_string(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_compression_level(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_format(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_media_type(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_media_flags(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_bytes_per_sector(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_sector_error_granularity(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_maximum_segment_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_acquiry_offset(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_prompt_for_acquiry_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_string(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_compression_values(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_format(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_media_type(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_media_flags(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_bytes_per_sector(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_sector_error_granularity(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_maximum_segment_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_acquiry_offset(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_acquiry_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_header_codepage(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_process_buffer_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_additional_digest_types(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
@@ -447,7 +446,7 @@ int imaging_handle_set_output_values(
      libcstring_system_character_t *acquiry_software_version,
      libcstring_system_character_t *model,
      libcstring_system_character_t *serial_number,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_get_header_value(
      imaging_handle_t *imaging_handle,
@@ -455,14 +454,14 @@ int imaging_handle_get_header_value(
      size_t identifier_size,
      libcstring_system_character_t **header_value,
      size_t *header_value_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_header_value(
      imaging_handle_t *imaging_handle,
      const uint8_t *identifier,
      size_t identifier_length,
      const libcstring_system_character_t *header_value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_set_hash_value(
      imaging_handle_t *imaging_handle,
@@ -470,29 +469,29 @@ int imaging_handle_set_hash_value(
      size_t hash_value_identifier_length,
      libcstring_system_character_t *hash_value,
      size_t hash_value_length,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_append_read_error(
      imaging_handle_t *imaging_handle,
      off64_t start_offset,
      size64_t number_of_bytes,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_append_session(
      imaging_handle_t *imaging_handle,
      uint64_t start_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_append_track(
      imaging_handle_t *imaging_handle,
      uint64_t start_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 int imaging_handle_print_parameters(
      imaging_handle_t *imaging_handle,
@@ -500,12 +499,12 @@ int imaging_handle_print_parameters(
      uint8_t read_error_retries,
      uint8_t zero_block_on_read_error,
      uint8_t resume_acquiry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int imaging_handle_print_hashes(
      imaging_handle_t *imaging_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

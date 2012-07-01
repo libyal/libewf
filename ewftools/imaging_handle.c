@@ -1,7 +1,7 @@
 /* 
  * Imaging handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,9 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( WINAPI )
 #include <rpcdce.h>
 
@@ -33,12 +30,15 @@
 #include <uuid/uuid.h>
 #endif
 
-#include <libsystem.h>
-
 #include "byte_size_string.h"
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcnotify.h"
+#include "ewftools_libcsplit.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "guid.h"
@@ -56,16 +56,16 @@
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_initialize";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -73,10 +73,10 @@ int imaging_handle_initialize(
 	}
 	if( *imaging_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid imaging handle value already set.",
 		 function );
 
@@ -87,10 +87,10 @@ int imaging_handle_initialize(
 
 	if( *imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create imaging handle.",
 		 function );
 
@@ -101,10 +101,10 @@ int imaging_handle_initialize(
 	     0,
 	     sizeof( imaging_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear imaging handle.",
 		 function );
 
@@ -120,10 +120,10 @@ int imaging_handle_initialize(
 
 	if( ( *imaging_handle )->input_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create input buffer.",
 		 function );
 
@@ -134,10 +134,10 @@ int imaging_handle_initialize(
 	     0,
 	     sizeof( libcstring_system_character_t ) * IMAGING_HANDLE_INPUT_BUFFER_SIZE ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear imaging handle.",
 		 function );
 
@@ -147,10 +147,10 @@ int imaging_handle_initialize(
 	     &( ( *imaging_handle )->output_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize output handle.",
 		 function );
 
@@ -163,10 +163,10 @@ int imaging_handle_initialize(
 
 		if( ( *imaging_handle )->calculated_md5_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create calculated MD5 digest hash string.",
 			 function );
 
@@ -225,17 +225,17 @@ on_error:
  */
 int imaging_handle_free(
      imaging_handle_t **imaging_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_free";
 	int result            = 1;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -287,10 +287,10 @@ int imaging_handle_free(
 			     &( ( *imaging_handle )->md5_context ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free MD5 context.",
 				 function );
 
@@ -308,10 +308,10 @@ int imaging_handle_free(
 			     &( ( *imaging_handle )->sha1_context ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free SHA1 context.",
 				 function );
 
@@ -329,10 +329,10 @@ int imaging_handle_free(
 			     &( ( *imaging_handle )->sha256_context ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free SHA256 context.",
 				 function );
 
@@ -348,10 +348,10 @@ int imaging_handle_free(
 		     &( ( *imaging_handle )->output_handle ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free output handle.",
 			 function );
 
@@ -363,10 +363,10 @@ int imaging_handle_free(
 			     &( ( *imaging_handle )->secondary_output_handle ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free secondary output handle.",
 				 function );
 
@@ -386,16 +386,16 @@ int imaging_handle_free(
  */
 int imaging_handle_signal_abort(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_signal_abort";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -405,10 +405,10 @@ int imaging_handle_signal_abort(
 	     imaging_handle->output_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to signal output handle to abort.",
 		 function );
 
@@ -420,10 +420,10 @@ int imaging_handle_signal_abort(
 		     imaging_handle->output_handle,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to signal secondary output handle to abort.",
 			 function );
 
@@ -440,7 +440,7 @@ int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *filename,
      uint8_t resume,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
@@ -451,10 +451,10 @@ int imaging_handle_open_output(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -462,10 +462,10 @@ int imaging_handle_open_output(
 	}
 	if( filename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
 		 function );
 
@@ -497,10 +497,10 @@ int imaging_handle_open_output(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to resolve filename(s).",
 			 function );
 
@@ -529,10 +529,10 @@ int imaging_handle_open_output(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open file.",
 		 function );
 
@@ -566,10 +566,10 @@ int imaging_handle_open_output(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free globbed filenames.",
 			 function );
 
@@ -586,7 +586,7 @@ int imaging_handle_open_secondary_output(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *filename,
      uint8_t resume,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
 	libcstring_system_character_t *filenames[ 1 ]    = { NULL };
@@ -597,10 +597,10 @@ int imaging_handle_open_secondary_output(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -608,10 +608,10 @@ int imaging_handle_open_secondary_output(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid imaging handle - secondary output handle already set.",
 		 function );
 
@@ -619,10 +619,10 @@ int imaging_handle_open_secondary_output(
 	}
 	if( filename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
 		 function );
 
@@ -654,10 +654,10 @@ int imaging_handle_open_secondary_output(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to resolve filename(s).",
 			 function );
 
@@ -674,10 +674,10 @@ int imaging_handle_open_secondary_output(
 	     &( imaging_handle->secondary_output_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize secondary output handle.",
 		 function );
 
@@ -713,10 +713,10 @@ int imaging_handle_open_secondary_output(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open file.",
 		 function );
 
@@ -754,10 +754,10 @@ int imaging_handle_open_secondary_output(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free globbed filenames.",
 			 function );
 
@@ -776,16 +776,16 @@ int imaging_handle_open_secondary_output(
  */
 int imaging_handle_close(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_close";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -795,10 +795,10 @@ int imaging_handle_close(
 	     imaging_handle->output_handle,
 	     error ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close output handle.",
 		 function );
 
@@ -810,10 +810,10 @@ int imaging_handle_close(
 		     imaging_handle->secondary_output_handle,
 		     error ) != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 			 "%s: unable to close secondary output handle.",
 			 function );
 
@@ -829,17 +829,17 @@ int imaging_handle_close(
 ssize_t imaging_handle_prepare_read_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_prepare_read_buffer";
 	ssize_t process_count = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -847,10 +847,10 @@ ssize_t imaging_handle_prepare_read_buffer(
 	}
 	if( storage_media_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid storage media buffer.",
 		 function );
 
@@ -872,10 +872,10 @@ ssize_t imaging_handle_prepare_read_buffer(
 
 	if( process_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read storage media buffer.",
 		 function );
 
@@ -902,7 +902,7 @@ ssize_t imaging_handle_read_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t read_size,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function        = "imaging_handle_read_buffer";
 	ssize_t read_count           = 0;
@@ -910,10 +910,10 @@ ssize_t imaging_handle_read_buffer(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -921,10 +921,10 @@ ssize_t imaging_handle_read_buffer(
 	}
 	if( storage_media_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid storage media buffer.",
 		 function );
 
@@ -950,10 +950,10 @@ ssize_t imaging_handle_read_buffer(
 
 	if( read_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read storage media buffer.",
 		 function );
 
@@ -981,10 +981,10 @@ ssize_t imaging_handle_read_buffer(
 
 		if( secondary_read_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read storage media buffer from secondary output handle.",
 			 function );
 
@@ -1006,17 +1006,17 @@ ssize_t imaging_handle_read_buffer(
 ssize_t imaging_handle_prepare_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_prepare_write_buffer";
 	ssize_t process_count = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1024,10 +1024,10 @@ ssize_t imaging_handle_prepare_write_buffer(
 	}
 	if( storage_media_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid storage media buffer.",
 		 function );
 
@@ -1049,10 +1049,10 @@ ssize_t imaging_handle_prepare_write_buffer(
 
 	if( process_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to prepare storage media buffer before writing.",
 		 function );
 
@@ -1072,7 +1072,7 @@ ssize_t imaging_handle_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function         = "imaging_handle_write_buffer";
 	ssize_t secondary_write_count = 0;
@@ -1085,10 +1085,10 @@ ssize_t imaging_handle_write_buffer(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1096,10 +1096,10 @@ ssize_t imaging_handle_write_buffer(
 	}
 	if( storage_media_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid storage media buffer.",
 		 function );
 
@@ -1122,10 +1122,10 @@ ssize_t imaging_handle_write_buffer(
 	}
 	if( write_size != raw_write_buffer_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: mismatch in write size and number of bytes in storage media buffer.",
 		 function );
 
@@ -1151,18 +1151,18 @@ ssize_t imaging_handle_write_buffer(
 
 	if( write_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write storage media buffer.",
 		 function );
 
 		if( ( error != NULL )
-		 && ( liberror_error_matches(
+		 && ( libcerror_error_matches(
 		       *error,
-		       LIBERROR_ERROR_DOMAIN_OUTPUT,
-		       LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
+		       LIBCERROR_ERROR_DOMAIN_OUTPUT,
+		       LIBCERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
 		{
 			return( -1 );
 		}
@@ -1192,18 +1192,18 @@ ssize_t imaging_handle_write_buffer(
 
 		if( secondary_write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write storage media buffer to secondary output handle.",
 			 function );
 
 			if( ( error != NULL )
-			 && ( liberror_error_matches(
+			 && ( libcerror_error_matches(
 			       *error,
-			       LIBERROR_ERROR_DOMAIN_OUTPUT,
-			       LIBERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
+			       LIBCERROR_ERROR_DOMAIN_OUTPUT,
+			       LIBCERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
 			{
 				return( -1 );
 			}
@@ -1220,17 +1220,17 @@ ssize_t imaging_handle_write_buffer(
 off64_t imaging_handle_seek_offset(
          imaging_handle_t *imaging_handle,
          off64_t offset,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function    = "imaging_handle_seek_offset";
 	off64_t secondary_offset = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1244,10 +1244,10 @@ off64_t imaging_handle_seek_offset(
 
 	if( offset == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset in output handle.",
 		 function );
 
@@ -1263,10 +1263,10 @@ off64_t imaging_handle_seek_offset(
 
 		if( secondary_offset == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset in secondary output handle.",
 			 function );
 
@@ -1282,16 +1282,16 @@ off64_t imaging_handle_seek_offset(
 int imaging_handle_get_offset(
      imaging_handle_t *imaging_handle,
      off64_t *offset,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_get_offset";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1299,10 +1299,10 @@ int imaging_handle_get_offset(
 	}
 	if( offset == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset.",
 		 function );
 
@@ -1313,10 +1313,10 @@ int imaging_handle_get_offset(
 	     offset,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve offset.",
 		 function );
 
@@ -1332,7 +1332,7 @@ int imaging_handle_swap_byte_pairs(
      imaging_handle_t *imaging_handle,
      storage_media_buffer_t *storage_media_buffer,
      size_t read_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t *data         = NULL;
 	static char *function = "imaging_handle_swap_byte_pairs";
@@ -1342,10 +1342,10 @@ int imaging_handle_swap_byte_pairs(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1353,10 +1353,10 @@ int imaging_handle_swap_byte_pairs(
 	}
 	if( storage_media_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid storage media buffer.",
 		 function );
 
@@ -1365,10 +1365,10 @@ int imaging_handle_swap_byte_pairs(
 	if( ( read_size == 0 )
 	 || ( read_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid read size value out of bounds.",
 		 function );
 
@@ -1378,10 +1378,10 @@ int imaging_handle_swap_byte_pairs(
 	 */
 	if( ( read_size & 0x01 ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: invalid read size value is odd.",
 		 function );
 
@@ -1393,10 +1393,10 @@ int imaging_handle_swap_byte_pairs(
 	     &data_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve storage media buffer data.",
 		 function );
 
@@ -1404,10 +1404,10 @@ int imaging_handle_swap_byte_pairs(
 	}
 	if( read_size != data_size )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: mismatch in read size and data size.",
 		 function );
 
@@ -1427,16 +1427,16 @@ int imaging_handle_swap_byte_pairs(
  */
 int imaging_handle_initialize_integrity_hash(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_initialize_integrity_hash";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1448,10 +1448,10 @@ int imaging_handle_initialize_integrity_hash(
 		     &( imaging_handle->md5_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
@@ -1465,10 +1465,10 @@ int imaging_handle_initialize_integrity_hash(
 		     &( imaging_handle->sha1_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
@@ -1482,10 +1482,10 @@ int imaging_handle_initialize_integrity_hash(
 		     &( imaging_handle->sha256_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize SHA256 context.",
 			 function );
 
@@ -1518,16 +1518,16 @@ int imaging_handle_update_integrity_hash(
      imaging_handle_t *imaging_handle,
      uint8_t *buffer,
      size_t buffer_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_update_integrity_hash";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1535,10 +1535,10 @@ int imaging_handle_update_integrity_hash(
 	}
 	if( buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
@@ -1547,10 +1547,10 @@ int imaging_handle_update_integrity_hash(
 	if( ( buffer_size == 0 )
 	 || ( buffer_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid buffer size value out of bounds.",
 		 function );
 
@@ -1564,10 +1564,10 @@ int imaging_handle_update_integrity_hash(
 		     buffer_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update MD5 digest hash.",
 			 function );
 
@@ -1582,10 +1582,10 @@ int imaging_handle_update_integrity_hash(
 		     buffer_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update SHA1 digest hash.",
 			 function );
 
@@ -1600,10 +1600,10 @@ int imaging_handle_update_integrity_hash(
 		     buffer_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update SHA256 digest hash.",
 			 function );
 
@@ -1618,7 +1618,7 @@ int imaging_handle_update_integrity_hash(
  */
 int imaging_handle_finalize_integrity_hash(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t calculated_md5_hash[ LIBHMAC_MD5_HASH_SIZE ];
 	uint8_t calculated_sha1_hash[ LIBHMAC_SHA1_HASH_SIZE ];
@@ -1628,10 +1628,10 @@ int imaging_handle_finalize_integrity_hash(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1641,10 +1641,10 @@ int imaging_handle_finalize_integrity_hash(
 	{
 		if( imaging_handle->calculated_md5_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid imaging handle - missing calculated MD5 hash string.",
 			 function );
 
@@ -1656,10 +1656,10 @@ int imaging_handle_finalize_integrity_hash(
 		     LIBHMAC_MD5_HASH_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize MD5 hash.",
 			 function );
 
@@ -1672,9 +1672,9 @@ int imaging_handle_finalize_integrity_hash(
 		     33,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set calculated MD5 hash string.",
 			 function );
@@ -1686,10 +1686,10 @@ int imaging_handle_finalize_integrity_hash(
 	{
 		if( imaging_handle->calculated_sha1_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid imaging handle - missing calculated SHA1 hash string.",
 			 function );
 
@@ -1701,10 +1701,10 @@ int imaging_handle_finalize_integrity_hash(
 		     LIBHMAC_SHA1_HASH_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize SHA1 hash.",
 			 function );
 
@@ -1717,10 +1717,10 @@ int imaging_handle_finalize_integrity_hash(
 		     41,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create calculated SHA1 hash string.",
 			 function );
 
@@ -1731,10 +1731,10 @@ int imaging_handle_finalize_integrity_hash(
 	{
 		if( imaging_handle->calculated_sha256_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid imaging handle - missing calculated SHA256 hash string.",
 			 function );
 
@@ -1746,10 +1746,10 @@ int imaging_handle_finalize_integrity_hash(
 		     LIBHMAC_SHA256_HASH_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize SHA256 hash.",
 			 function );
 
@@ -1762,10 +1762,10 @@ int imaging_handle_finalize_integrity_hash(
 		     65,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create calculated SHA256 hash string.",
 			 function );
 
@@ -1781,16 +1781,16 @@ int imaging_handle_finalize_integrity_hash(
 int imaging_handle_get_chunk_size(
      imaging_handle_t *imaging_handle,
      size32_t *chunk_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_get_chunk_size";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1798,10 +1798,10 @@ int imaging_handle_get_chunk_size(
 	}
 	if( chunk_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk size.",
 		 function );
 
@@ -1812,10 +1812,10 @@ int imaging_handle_get_chunk_size(
 	     chunk_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve chunk size.",
 		 function );
 
@@ -1832,17 +1832,17 @@ int imaging_handle_prompt_for_string(
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_prompt_for_string";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1850,10 +1850,10 @@ int imaging_handle_prompt_for_string(
 	}
 	if( internal_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string.",
 		 function );
 
@@ -1861,10 +1861,10 @@ int imaging_handle_prompt_for_string(
 	}
 	if( internal_string_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string size.",
 		 function );
 
@@ -1885,10 +1885,10 @@ int imaging_handle_prompt_for_string(
 
 	if( *internal_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create internal string.",
 		 function );
 
@@ -1899,10 +1899,10 @@ int imaging_handle_prompt_for_string(
 	     0,
 	     *internal_string_size ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear internal string.",
 		 function );
 
@@ -1917,10 +1917,10 @@ int imaging_handle_prompt_for_string(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve string variable.",
 		 function );
 
@@ -1947,7 +1947,7 @@ on_error:
 int imaging_handle_prompt_for_compression_level(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "imaging_handle_prompt_for_compression_level";
@@ -1955,10 +1955,10 @@ int imaging_handle_prompt_for_compression_level(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -1977,10 +1977,10 @@ int imaging_handle_prompt_for_compression_level(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve fixed string variable.",
 		 function );
 
@@ -1996,10 +1996,10 @@ int imaging_handle_prompt_for_compression_level(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine compression values.",
 			 function );
 
@@ -2015,7 +2015,7 @@ int imaging_handle_prompt_for_compression_level(
 int imaging_handle_prompt_for_format(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "imaging_handle_prompt_for_format";
@@ -2023,10 +2023,10 @@ int imaging_handle_prompt_for_format(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2045,10 +2045,10 @@ int imaging_handle_prompt_for_format(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve fixed string variable.",
 		 function );
 
@@ -2063,10 +2063,10 @@ int imaging_handle_prompt_for_format(
 
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine format.",
 			 function );
 
@@ -2082,7 +2082,7 @@ int imaging_handle_prompt_for_format(
 int imaging_handle_prompt_for_media_type(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "imaging_handle_prompt_for_media_type";
@@ -2091,10 +2091,10 @@ int imaging_handle_prompt_for_media_type(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2129,10 +2129,10 @@ int imaging_handle_prompt_for_media_type(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve fixed string variable.",
 		 function );
 
@@ -2147,10 +2147,10 @@ int imaging_handle_prompt_for_media_type(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine media type.",
 			 function );
 
@@ -2166,7 +2166,7 @@ int imaging_handle_prompt_for_media_type(
 int imaging_handle_prompt_for_media_flags(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "imaging_handle_prompt_for_media_flags";
@@ -2175,10 +2175,10 @@ int imaging_handle_prompt_for_media_flags(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2206,10 +2206,10 @@ int imaging_handle_prompt_for_media_flags(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve fixed string variable.",
 		 function );
 
@@ -2224,10 +2224,10 @@ int imaging_handle_prompt_for_media_flags(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine media flags.",
 			 function );
 
@@ -2243,7 +2243,7 @@ int imaging_handle_prompt_for_media_flags(
 int imaging_handle_prompt_for_bytes_per_sector(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "imaging_handle_prompt_for_bytes_per_sector";
 	uint64_t size_variable = 0;
@@ -2251,10 +2251,10 @@ int imaging_handle_prompt_for_bytes_per_sector(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2273,10 +2273,10 @@ int imaging_handle_prompt_for_bytes_per_sector(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve size variable.",
 		 function );
 
@@ -2295,7 +2295,7 @@ int imaging_handle_prompt_for_bytes_per_sector(
 int imaging_handle_prompt_for_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "imaging_handle_prompt_for_sectors_per_chunk";
@@ -2303,10 +2303,10 @@ int imaging_handle_prompt_for_sectors_per_chunk(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2325,10 +2325,10 @@ int imaging_handle_prompt_for_sectors_per_chunk(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve fixed string variable.",
 		 function );
 
@@ -2343,10 +2343,10 @@ int imaging_handle_prompt_for_sectors_per_chunk(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine sectors per chunk.",
 			 function );
 
@@ -2362,7 +2362,7 @@ int imaging_handle_prompt_for_sectors_per_chunk(
 int imaging_handle_prompt_for_sector_error_granularity(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "imaging_handle_prompt_for_sector_error_granularity";
 	uint64_t size_variable = 0;
@@ -2370,10 +2370,10 @@ int imaging_handle_prompt_for_sector_error_granularity(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2392,10 +2392,10 @@ int imaging_handle_prompt_for_sector_error_granularity(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve size variable.",
 		 function );
 
@@ -2418,7 +2418,7 @@ int imaging_handle_prompt_for_sector_error_granularity(
 int imaging_handle_prompt_for_maximum_segment_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "imaging_handle_prompt_for_maximum_segment_size";
 	uint64_t default_size  = 0;
@@ -2428,10 +2428,10 @@ int imaging_handle_prompt_for_maximum_segment_size(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2462,10 +2462,10 @@ int imaging_handle_prompt_for_maximum_segment_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve size variable.",
 		 function );
 
@@ -2482,7 +2482,7 @@ int imaging_handle_prompt_for_maximum_segment_size(
 int imaging_handle_prompt_for_acquiry_offset(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function        = "imaging_handle_prompt_for_acquiry_offset";
 	uint64_t input_size_variable = 0;
@@ -2490,10 +2490,10 @@ int imaging_handle_prompt_for_acquiry_offset(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2512,10 +2512,10 @@ int imaging_handle_prompt_for_acquiry_offset(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve size variable.",
 		 function );
 
@@ -2532,7 +2532,7 @@ int imaging_handle_prompt_for_acquiry_offset(
 int imaging_handle_prompt_for_acquiry_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function        = "imaging_handle_prompt_for_acquiry_size";
 	uint64_t default_input_size  = 0;
@@ -2542,10 +2542,10 @@ int imaging_handle_prompt_for_acquiry_size(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2576,10 +2576,10 @@ int imaging_handle_prompt_for_acquiry_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve size variable.",
 		 function );
 
@@ -2595,16 +2595,16 @@ int imaging_handle_prompt_for_acquiry_size(
  */
 int imaging_handle_get_output_values(
      imaging_handle_t *imaging_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_get_output_values";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2618,10 +2618,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->case_number_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: case_number.",
 		 function );
 
@@ -2635,10 +2635,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->description_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: description.",
 		 function );
 
@@ -2652,10 +2652,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->evidence_number_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: evidence_number.",
 		 function );
 
@@ -2669,10 +2669,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->examiner_name_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: examiner_name.",
 		 function );
 
@@ -2686,10 +2686,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->notes_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: notes.",
 		 function );
 
@@ -2700,10 +2700,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->bytes_per_sector ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -2714,10 +2714,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->acquiry_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media size.",
 		 function );
 
@@ -2728,10 +2728,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->media_type ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media type.",
 		 function );
 
@@ -2742,10 +2742,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->media_flags ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media flags.",
 		 function );
 
@@ -2757,10 +2757,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->compression_flags ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve compression values.",
 		 function );
 
@@ -2771,10 +2771,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->ewf_format ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve format.",
 		 function );
 
@@ -2785,10 +2785,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->maximum_segment_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve maximum segment size.",
 		 function );
 
@@ -2799,10 +2799,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->sectors_per_chunk ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve sectors per chunk.",
 		 function );
 
@@ -2813,10 +2813,10 @@ int imaging_handle_get_output_values(
 	     &( imaging_handle->sector_error_granularity ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve error granularity.",
 		 function );
 
@@ -2833,17 +2833,17 @@ int imaging_handle_set_string(
      const libcstring_system_character_t *string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_string";
 	size_t string_length  = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2851,10 +2851,10 @@ int imaging_handle_set_string(
 	}
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -2862,10 +2862,10 @@ int imaging_handle_set_string(
 	}
 	if( internal_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string.",
 		 function );
 
@@ -2873,10 +2873,10 @@ int imaging_handle_set_string(
 	}
 	if( internal_string_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid internal string size.",
 		 function );
 
@@ -2900,10 +2900,10 @@ int imaging_handle_set_string(
 
 		if( *internal_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create internal string.",
 			 function );
 
@@ -2914,10 +2914,10 @@ int imaging_handle_set_string(
 		     string,
 		     string_length ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 			 "%s: unable to copy string.",
 			 function );
 
@@ -2948,17 +2948,17 @@ on_error:
 int imaging_handle_set_compression_values(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_compression_values";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -2972,10 +2972,10 @@ int imaging_handle_set_compression_values(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine compression values.",
 		 function );
 
@@ -2990,17 +2990,17 @@ int imaging_handle_set_compression_values(
 int imaging_handle_set_format(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_format";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3013,10 +3013,10 @@ int imaging_handle_set_format(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine format.",
 		 function );
 
@@ -3031,17 +3031,17 @@ int imaging_handle_set_format(
 int imaging_handle_set_media_type(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_media_type";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3054,10 +3054,10 @@ int imaging_handle_set_media_type(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine media type.",
 		 function );
 
@@ -3072,17 +3072,17 @@ int imaging_handle_set_media_type(
 int imaging_handle_set_media_flags(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_media_flags";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3095,10 +3095,10 @@ int imaging_handle_set_media_flags(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine media flags.",
 		 function );
 
@@ -3113,7 +3113,7 @@ int imaging_handle_set_media_flags(
 int imaging_handle_set_bytes_per_sector(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "imaging_handle_set_bytes_per_sector";
 	size_t string_length   = 0;
@@ -3122,10 +3122,10 @@ int imaging_handle_set_bytes_per_sector(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3142,10 +3142,10 @@ int imaging_handle_set_bytes_per_sector(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine bytes per sector.",
 		 function );
 
@@ -3171,17 +3171,17 @@ int imaging_handle_set_bytes_per_sector(
 int imaging_handle_set_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_sectors_per_chunk";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3194,10 +3194,10 @@ int imaging_handle_set_sectors_per_chunk(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine sectors per chunk.",
 		 function );
 
@@ -3212,7 +3212,7 @@ int imaging_handle_set_sectors_per_chunk(
 int imaging_handle_set_sector_error_granularity(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "imaging_handle_set_sector_error_granularity";
 	size_t string_length   = 0;
@@ -3221,10 +3221,10 @@ int imaging_handle_set_sector_error_granularity(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3241,10 +3241,10 @@ int imaging_handle_set_sector_error_granularity(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine sector error granularity.",
 		 function );
 
@@ -3270,7 +3270,7 @@ int imaging_handle_set_sector_error_granularity(
 int imaging_handle_set_maximum_segment_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_maximum_segment_size";
 	size_t string_length  = 0;
@@ -3278,10 +3278,10 @@ int imaging_handle_set_maximum_segment_size(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3298,10 +3298,10 @@ int imaging_handle_set_maximum_segment_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine maximum segment size.",
 		 function );
 
@@ -3329,7 +3329,7 @@ int imaging_handle_set_maximum_segment_size(
 int imaging_handle_set_acquiry_offset(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_acquiry_offset";
 	size_t string_length  = 0;
@@ -3337,10 +3337,10 @@ int imaging_handle_set_acquiry_offset(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3348,10 +3348,10 @@ int imaging_handle_set_acquiry_offset(
 	}
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -3362,16 +3362,16 @@ int imaging_handle_set_acquiry_offset(
 		string_length = libcstring_system_string_length(
 				 string );
 
-		if( libsystem_string_decimal_copy_to_64_bit(
+		if( libcsystem_string_decimal_copy_to_64_bit(
 		     string,
 		     string_length + 1,
 		     &( imaging_handle->acquiry_offset ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine acquiry offset.",
 			 function );
 
@@ -3388,7 +3388,7 @@ int imaging_handle_set_acquiry_offset(
 int imaging_handle_set_acquiry_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_acquiry_size";
 	size_t string_length  = 0;
@@ -3396,10 +3396,10 @@ int imaging_handle_set_acquiry_size(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3407,10 +3407,10 @@ int imaging_handle_set_acquiry_size(
 	}
 	if( string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -3421,16 +3421,16 @@ int imaging_handle_set_acquiry_size(
 		string_length = libcstring_system_string_length(
 				 string );
 
-		if( libsystem_string_decimal_copy_to_64_bit(
+		if( libcsystem_string_decimal_copy_to_64_bit(
 		     string,
 		     string_length + 1,
 		     &( imaging_handle->acquiry_size ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine acquiry size.",
 			 function );
 
@@ -3447,17 +3447,17 @@ int imaging_handle_set_acquiry_size(
 int imaging_handle_set_header_codepage(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_set_header_codepage";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3470,10 +3470,10 @@ int imaging_handle_set_header_codepage(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine header codepage.",
 		 function );
 
@@ -3488,7 +3488,7 @@ int imaging_handle_set_header_codepage(
 int imaging_handle_set_process_buffer_size(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "imaging_handle_set_process_buffer_size";
 	size_t string_length   = 0;
@@ -3497,10 +3497,10 @@ int imaging_handle_set_process_buffer_size(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3517,10 +3517,10 @@ int imaging_handle_set_process_buffer_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine process buffer size.",
 		 function );
 
@@ -3548,25 +3548,30 @@ int imaging_handle_set_process_buffer_size(
 int imaging_handle_set_additional_digest_types(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
-	libcstring_system_character_t *string_segment = NULL;
-	libsystem_split_string_t *string_elements     = NULL;
-	static char *function                         = "imaging_handle_set_additional_digest_types";
-	size_t string_length                          = 0;
-	size_t string_segment_size                    = 0;
-	uint8_t calculate_sha1                        = 0;
-	uint8_t calculate_sha256                      = 0;
-	int number_of_segments                        = 0;
-	int segment_index                             = 0;
-	int result                                    = 0;
+	libcstring_system_character_t *string_segment    = NULL;
+	static char *function                            = "imaging_handle_set_additional_digest_types";
+	size_t string_length                             = 0;
+	size_t string_segment_size                       = 0;
+	uint8_t calculate_sha1                           = 0;
+	uint8_t calculate_sha256                         = 0;
+	int number_of_segments                           = 0;
+	int segment_index                                = 0;
+	int result                                       = 0;
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	libcsplit_wide_split_string_t *string_elements   = NULL;
+#else
+	libcsplit_narrow_split_string_t *string_elements = NULL;
+#endif
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3575,31 +3580,47 @@ int imaging_handle_set_additional_digest_types(
 	string_length = libcstring_system_string_length(
 	                 string );
 
-	if( libsystem_string_split(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_string_split(
 	     string,
 	     string_length + 1,
-	     (libcstring_system_character_t) ',',
+	     (wchar_t) ',',
 	     &string_elements,
 	     error ) != 1 )
+#else
+	if( libcsplit_narrow_string_split(
+	     string,
+	     string_length + 1,
+	     (char) ',',
+	     &string_elements,
+	     error ) != 1 )
+#endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split string.",
 		 function );
 
 		goto on_error;
 	}
-	if( libsystem_split_string_get_number_of_segments(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_split_string_get_number_of_segments(
 	     string_elements,
 	     &number_of_segments,
 	     error ) != 1 )
+#else
+	if( libcsplit_narrow_split_string_get_number_of_segments(
+	     string_elements,
+	     &number_of_segments,
+	     error ) != 1 )
+#endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of segments.",
 		 function );
 
@@ -3609,17 +3630,26 @@ int imaging_handle_set_additional_digest_types(
 	     segment_index < number_of_segments;
 	     segment_index++ )
 	{
-		if( libsystem_split_string_get_segment_by_index(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcsplit_wide_split_string_get_segment_by_index(
 		     string_elements,
 		     segment_index,
 		     &string_segment,
 		     &string_segment_size,
 		     error ) != 1 )
+#else
+		if( libcsplit_narrow_split_string_get_segment_by_index(
+		     string_elements,
+		     segment_index,
+		     &string_segment,
+		     &string_segment_size,
+		     error ) != 1 )
+#endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve string segment: %d.",
 			 function,
 			 segment_index );
@@ -3628,10 +3658,10 @@ int imaging_handle_set_additional_digest_types(
 		}
 		if( string_segment == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing string segment: %d.",
 			 function,
 			 segment_index );
@@ -3743,10 +3773,10 @@ int imaging_handle_set_additional_digest_types(
 
 		if( imaging_handle->calculated_sha1_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create calculated SHA1 digest hash string.",
 			 function );
 
@@ -3762,10 +3792,10 @@ int imaging_handle_set_additional_digest_types(
 
 		if( imaging_handle->calculated_sha256_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create calculated SHA256 digest hash string.",
 			 function );
 
@@ -3773,14 +3803,20 @@ int imaging_handle_set_additional_digest_types(
 		}
 		imaging_handle->calculate_sha256 = 1;
 	}
-	if( libsystem_split_string_free(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_split_string_free(
 	     &string_elements,
 	     error ) != 1 )
+#else
+	if( libcsplit_narrow_split_string_free(
+	     &string_elements,
+	     error ) != 1 )
+#endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split string.",
 		 function );
 
@@ -3791,9 +3827,15 @@ int imaging_handle_set_additional_digest_types(
 on_error:
 	if( string_elements != NULL )
 	{
-		libsystem_split_string_free(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libcsplit_wide_split_string_free(
 		 &string_elements,
 		 NULL );
+#else
+		libcsplit_narrow_split_string_free(
+		 &string_elements,
+		 NULL );
+#endif
 	}
 	return( -1 );
 }
@@ -3812,7 +3854,7 @@ int imaging_handle_set_output_values(
      libcstring_system_character_t *acquiry_software_version,
      libcstring_system_character_t *model,
      libcstring_system_character_t *serial_number,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 
@@ -3826,10 +3868,10 @@ int imaging_handle_set_output_values(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -3844,10 +3886,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->case_number,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: case_number.",
 			 function );
 
@@ -3863,10 +3905,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->description,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: description.",
 			 function );
 
@@ -3882,10 +3924,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->evidence_number,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: evidence_number.",
 			 function );
 
@@ -3901,10 +3943,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->examiner_name,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: examiner_name.",
 			 function );
 
@@ -3920,10 +3962,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->notes,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: notes.",
 			 function );
 
@@ -3944,21 +3986,21 @@ int imaging_handle_set_output_values(
 	     error ) != 1 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to retrieve operating system.",
 		 function );
 
 		if( ( error != NULL )
 		 && ( *error != NULL ) )
 		{
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 *error );
 		}
 #endif
-		liberror_error_free(
+		libcerror_error_free(
 		 error );
 	}
 	else
@@ -3970,10 +4012,10 @@ int imaging_handle_set_output_values(
 		     acquiry_operating_system,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: acquiry_operating_system.",
 			 function );
 
@@ -3989,10 +4031,10 @@ int imaging_handle_set_output_values(
 		     acquiry_software,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: acquiry_software.",
 			 function );
 
@@ -4008,10 +4050,10 @@ int imaging_handle_set_output_values(
 		     acquiry_software_version,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: acquiry_software_version.",
 			 function );
 
@@ -4027,10 +4069,10 @@ int imaging_handle_set_output_values(
 		     model,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: model.",
 			 function );
 
@@ -4046,10 +4088,10 @@ int imaging_handle_set_output_values(
 		     serial_number,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: serial_number.",
 			 function );
 
@@ -4061,10 +4103,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->header_codepage,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header codepage.",
 		 function );
 
@@ -4075,10 +4117,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->bytes_per_sector,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set bytes per sector.",
 		 function );
 
@@ -4089,10 +4131,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->acquiry_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set media size.",
 		 function );
 
@@ -4103,10 +4145,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->media_type,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set media type.",
 		 function );
 
@@ -4117,10 +4159,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->media_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set media flags.",
 		 function );
 
@@ -4132,10 +4174,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->compression_flags,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set compression values.",
 		 function );
 
@@ -4148,10 +4190,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->ewf_format,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set format.",
 		 function );
 
@@ -4162,10 +4204,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->maximum_segment_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set maximum segment size.",
 		 function );
 
@@ -4176,10 +4218,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->sectors_per_chunk,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set sectors per chunk.",
 		 function );
 
@@ -4195,10 +4237,10 @@ int imaging_handle_set_output_values(
 	     imaging_handle->sector_error_granularity,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set error granularity.",
 		 function );
 
@@ -4211,10 +4253,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header codepage in secondary output handle.",
 			 function );
 
@@ -4225,10 +4267,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->bytes_per_sector,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set bytes per sector in secondary output handle.",
 			 function );
 
@@ -4239,10 +4281,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->acquiry_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set media size in secondary output handle.",
 			 function );
 
@@ -4253,10 +4295,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->media_type,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set media type in secondary output handle.",
 			 function );
 
@@ -4267,10 +4309,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->media_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set media flags in secondary output handle.",
 			 function );
 
@@ -4282,10 +4324,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->compression_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set compression values in secondary output handle.",
 			 function );
 
@@ -4298,10 +4340,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->ewf_format,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set format in secondary output handle.",
 			 function );
 
@@ -4312,10 +4354,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->maximum_segment_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set maximum segment size in secondary output handle.",
 			 function );
 
@@ -4326,10 +4368,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->sectors_per_chunk,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set sectors per chunk in secondary output handle.",
 			 function );
 
@@ -4340,10 +4382,10 @@ int imaging_handle_set_output_values(
 		     imaging_handle->sector_error_granularity,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set error granularity in secondary output handle.",
 			 function );
 
@@ -4372,10 +4414,10 @@ int imaging_handle_set_output_values(
 		     guid_type,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to generate GUID.",
 			 function );
 
@@ -4387,10 +4429,10 @@ int imaging_handle_set_output_values(
 		     GUID_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set GUID.",
 			 function );
 
@@ -4404,10 +4446,10 @@ int imaging_handle_set_output_values(
 			     GUID_SIZE,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set GUID in secondary output handle.",
 				 function );
 
@@ -4428,17 +4470,17 @@ int imaging_handle_get_header_value(
      size_t identifier_size,
      libcstring_system_character_t **header_value,
      size_t *header_value_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_get_header_value";
 	int result            = 0;
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -4446,10 +4488,10 @@ int imaging_handle_get_header_value(
 	}
 	if( header_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header value.",
 		 function );
 
@@ -4457,10 +4499,10 @@ int imaging_handle_get_header_value(
 	}
 	if( header_value_size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header value size.",
 		 function );
 
@@ -4491,10 +4533,10 @@ int imaging_handle_get_header_value(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: %s.",
 		 function,
 		 (char *) identifier );
@@ -4509,10 +4551,10 @@ int imaging_handle_get_header_value(
 
 		if( *header_value == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create header value: %s.",
 			 function,
 			 (char *) identifier );
@@ -4538,10 +4580,10 @@ int imaging_handle_get_header_value(
 #endif
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve header value: %s.",
 			 function,
 			 (char *) identifier );
@@ -4572,7 +4614,7 @@ int imaging_handle_set_header_value(
      const uint8_t *identifier,
      size_t identifier_length,
      const libcstring_system_character_t *header_value,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "imaging_handle_set_header_value";
 	size_t header_value_length = 0;
@@ -4580,10 +4622,10 @@ int imaging_handle_set_header_value(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -4591,10 +4633,10 @@ int imaging_handle_set_header_value(
 	}
 	if( header_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header value.",
 		 function );
 
@@ -4624,10 +4666,10 @@ int imaging_handle_set_header_value(
 #endif
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header value: %s.",
 			 function,
 			 (char *) identifier );
@@ -4655,10 +4697,10 @@ int imaging_handle_set_header_value(
 #endif
 			if( result != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set header value: %s in secondary output handle.",
 				 function,
 				 (char *) identifier );
@@ -4679,7 +4721,7 @@ int imaging_handle_set_hash_value(
      size_t hash_value_identifier_length,
      libcstring_system_character_t *hash_value,
      size_t hash_value_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t *utf8_hash_value    = NULL;
 	static char *function       = "imaging_handle_set_hash_value";
@@ -4687,25 +4729,25 @@ int imaging_handle_set_hash_value(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( libsystem_string_size_to_utf8_string(
+	if( libcsystem_string_size_to_utf8_string(
 	     hash_value,
 	     hash_value_length + 1,
 	     &utf8_hash_value_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine UTF-8 hash value size.",
 		 function );
 
@@ -4716,26 +4758,26 @@ int imaging_handle_set_hash_value(
 
 	if( utf8_hash_value == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create UTF-8 hash value.",
 		 function );
 
 		goto on_error;
 	}
-	if( libsystem_string_copy_to_utf8_string(
+	if( libcsystem_string_copy_to_utf8_string(
 	     hash_value,
 	     hash_value_length + 1,
 	     utf8_hash_value,
 	     utf8_hash_value_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set UTF-8 hash value.",
 		 function );
 
@@ -4749,10 +4791,10 @@ int imaging_handle_set_hash_value(
 	     utf8_hash_value_size - 1,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set hash value: %s.",
 		 function,
 		 hash_value_identifier );
@@ -4769,10 +4811,10 @@ int imaging_handle_set_hash_value(
 		     utf8_hash_value_size - 1,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: %s in secondary output handle.",
 			 function,
 			 hash_value_identifier );
@@ -4801,7 +4843,7 @@ int imaging_handle_append_read_error(
       imaging_handle_t *imaging_handle,
       off64_t start_offset,
       size64_t number_of_bytes,
-      liberror_error_t **error )
+      libcerror_error_t **error )
 {
 	static char *function      = "imaging_handle_append_read_error";
 	uint64_t number_of_sectors = 0;
@@ -4809,10 +4851,10 @@ int imaging_handle_append_read_error(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -4820,10 +4862,10 @@ int imaging_handle_append_read_error(
 	}
 	if( imaging_handle->bytes_per_sector == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid imaging handle - invalid bytes per sector value out of bounds.",
 		 function );
 
@@ -4842,10 +4884,10 @@ int imaging_handle_append_read_error(
 	     number_of_sectors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append acquiry error.",
 		 function );
 
@@ -4859,10 +4901,10 @@ int imaging_handle_append_read_error(
 		     number_of_sectors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append acquiry error to secondary output handle.",
 			 function );
 
@@ -4879,16 +4921,16 @@ int imaging_handle_append_session(
      imaging_handle_t *imaging_handle,
      uint64_t start_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_append_session";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -4900,10 +4942,10 @@ int imaging_handle_append_session(
 	     number_of_sectors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append session.",
 		 function );
 
@@ -4917,10 +4959,10 @@ int imaging_handle_append_session(
 		     number_of_sectors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append session to secondary output handle.",
 			 function );
 
@@ -4937,16 +4979,16 @@ int imaging_handle_append_track(
      imaging_handle_t *imaging_handle,
      uint64_t start_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_append_track";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -4958,10 +5000,10 @@ int imaging_handle_append_track(
 	     number_of_sectors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append track.",
 		 function );
 
@@ -4975,10 +5017,10 @@ int imaging_handle_append_track(
 		     number_of_sectors,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append track to secondary output handle.",
 			 function );
 
@@ -4993,7 +5035,7 @@ int imaging_handle_append_track(
  */
 ssize_t imaging_handle_finalize(
          imaging_handle_t *imaging_handle,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function         = "imaging_handle_finalize";
 	ssize_t secondary_write_count = 0;
@@ -5001,10 +5043,10 @@ ssize_t imaging_handle_finalize(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -5020,10 +5062,10 @@ ssize_t imaging_handle_finalize(
 		     32,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: MD5.",
 			 function );
 
@@ -5040,10 +5082,10 @@ ssize_t imaging_handle_finalize(
 		     40,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: SHA1.",
 			 function );
 
@@ -5060,10 +5102,10 @@ ssize_t imaging_handle_finalize(
 		     64,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set hash value: SHA256.",
 			 function );
 
@@ -5076,10 +5118,10 @@ ssize_t imaging_handle_finalize(
 
 	if( write_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to finalize output handle.",
 		 function );
 
@@ -5093,10 +5135,10 @@ ssize_t imaging_handle_finalize(
 
 		if( secondary_write_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to finalize secondary output handle.",
 			 function );
 
@@ -5115,7 +5157,7 @@ int imaging_handle_print_parameters(
      uint8_t read_error_retries,
      uint8_t zero_block_on_read_error,
      uint8_t resume_acquiry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t acquiry_size_string[ 16 ];
 	libcstring_system_character_t maximum_segment_size_string[ 16 ];
@@ -5125,10 +5167,10 @@ int imaging_handle_print_parameters(
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -5136,10 +5178,10 @@ int imaging_handle_print_parameters(
 	}
 	if( imaging_handle->notify_stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid imaging handle - missing notify stream.",
 		 function );
 
@@ -5147,10 +5189,10 @@ int imaging_handle_print_parameters(
 	}
 	if( imaging_handle->target_filename == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid imaging handle - missing target filename.",
 		 function );
 
@@ -5597,16 +5639,16 @@ int imaging_handle_print_parameters(
 int imaging_handle_print_hashes(
      imaging_handle_t *imaging_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_print_hashes";
 
 	if( imaging_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging handle.",
 		 function );
 
@@ -5614,10 +5656,10 @@ int imaging_handle_print_hashes(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid imaging stream.",
 		 function );
 

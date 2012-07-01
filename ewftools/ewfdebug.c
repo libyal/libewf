@@ -1,7 +1,7 @@
 /*
  * Debugs EWF files
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,17 +23,17 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <libsystem.h>
-
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libclocale.h"
+#include "ewftools_libcnotify.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 
 libewf_handle_t *ewfdebug_input_handle = NULL;
@@ -67,12 +67,12 @@ void usage_fprint(
 /* Signal handler for ewfdebug
  */
 void ewfdebug_signal_handler(
-      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
+      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "ewfdebug_signal_handler";
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfdebug_abort = 1;
 
@@ -81,23 +81,23 @@ void ewfdebug_signal_handler(
 	       ewfdebug_input_handle,
 	       &error ) != 1 ) )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: unable to signal input handle to abort.\n",
 		 function );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return;
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libsystem_file_io_close(
+	if( libcsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
@@ -111,11 +111,11 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                                = NULL;
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	libcsystem_glob_t *glob                                = NULL;
 #endif
 
-	liberror_error_t *error                               = NULL;
+	libcerror_error_t *error                               = NULL;
 
 	libcstring_system_character_t * const *argv_filenames = NULL;
 	libcstring_system_character_t **ewf_filenames         = NULL;
@@ -130,14 +130,23 @@ int main( int argc, char * const argv[] )
 	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
 	int result                                            = 0;
 
-	libsystem_notify_set_stream(
+	libcnotify_stream_set(
 	 stderr,
 	 NULL );
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 1 );
 
-	if( libsystem_initialize(
-	     "ewftools",
+	if( libclocale_initialize(
+             "ewftools",
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize locale values.\n" );
+
+		goto on_error;
+	}
+	if( libcsystem_initialize(
 	     _IONBF,
 	     &error ) != 1 )
 	{
@@ -151,7 +160,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	while( ( option = libsystem_getopt(
+	while( ( option = libcsystem_getopt(
 			   argc,
 			   argv,
 			   _LIBCSTRING_SYSTEM_STRING( "A:hqvV" ) ) ) != (libcstring_system_integer_t) -1 )
@@ -227,7 +236,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 verbose );
 	libewf_notify_set_verbose(
 	 verbose );
@@ -242,9 +251,9 @@ int main( int argc, char * const argv[] )
 		     &header_codepage,
 		     &error ) != 1 )
 		{
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			fprintf(
@@ -254,7 +263,7 @@ int main( int argc, char * const argv[] )
 			header_codepage = LIBEWF_CODEPAGE_ASCII;
 		}
 	}
-	if( libsystem_signal_attach(
+	if( libcsystem_signal_attach(
 	     ewfdebug_signal_handler,
 	     &error ) != 1 )
 	{
@@ -262,13 +271,13 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_initialize(
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -278,7 +287,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libsystem_glob_resolve(
+	if( libcsystem_glob_resolve(
 	     glob,
 	     &( argv[ optind ] ),
 	     argc - optind,
@@ -345,8 +354,8 @@ int main( int argc, char * const argv[] )
 	          LIBEWF_OPEN_READ_WRITE,
 	          &error );
 
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_free(
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -409,16 +418,16 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libsystem_signal_detach(
+	if( libcsystem_signal_detach(
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to detach signal handler.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( ewfdebug_abort != 0 )
@@ -439,15 +448,15 @@ int main( int argc, char * const argv[] )
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
-#if !defined( LIBSYSTEM_HAVE_GLOB )
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
 	if( glob != NULL )
 	{
-		libsystem_glob_free(
+		libcsystem_glob_free(
 		 &glob,
 		 NULL );
 	}

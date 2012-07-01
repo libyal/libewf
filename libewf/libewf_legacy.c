@@ -23,13 +23,12 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_definitions.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
+#include "libewf_libcstring.h"
 #include "libewf_metadata.h"
 #include "libewf_notify.h"
 #include "libewf_types.h"
@@ -74,7 +73,7 @@ uint8_t libewf_get_flags_write_resume(
 int libewf_handle_set_maximum_amount_of_open_handles(
      libewf_handle_t *handle,
      int maximum_amount_of_open_handles,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_set_maximum_number_of_open_handles(
 	         handle,
@@ -88,7 +87,7 @@ int libewf_handle_set_maximum_amount_of_open_handles(
 int libewf_handle_get_segment_file_size(
      libewf_handle_t *handle,
      size64_t *segment_file_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_maximum_segment_size(
 	         handle,
@@ -102,7 +101,7 @@ int libewf_handle_get_segment_file_size(
 int libewf_handle_set_segment_file_size(
      libewf_handle_t *handle,
      size64_t segment_file_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_set_maximum_segment_size(
 	         handle,
@@ -116,7 +115,7 @@ int libewf_handle_set_segment_file_size(
 int libewf_handle_get_delta_segment_file_size(
      libewf_handle_t *handle,
      size64_t *delta_segment_file_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_maximum_delta_segment_size(
 	         handle,
@@ -130,7 +129,7 @@ int libewf_handle_get_delta_segment_file_size(
 int libewf_handle_set_delta_segment_file_size(
      libewf_handle_t *handle,
      size64_t delta_segment_file_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_set_maximum_delta_segment_size(
 	         handle,
@@ -144,7 +143,7 @@ int libewf_handle_set_delta_segment_file_size(
 int libewf_handle_get_amount_of_sectors(
      libewf_handle_t *handle,
      uint64_t *amount_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_sectors(
 	         handle,
@@ -158,7 +157,7 @@ int libewf_handle_get_amount_of_sectors(
 int libewf_handle_get_write_amount_of_chunks(
      libewf_handle_t *handle,
      uint32_t *amount_of_chunks,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_chunks_written(
 	         handle,
@@ -173,7 +172,7 @@ int libewf_handle_get_write_amount_of_chunks(
 int libewf_handle_set_read_wipe_chunk_on_error(
      libewf_handle_t *handle,
      uint8_t wipe_on_error,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_set_read_zero_chunk_on_error(
 	         handle,
@@ -187,7 +186,7 @@ int libewf_handle_set_read_wipe_chunk_on_error(
 int libewf_handle_get_amount_of_acquiry_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_acquiry_errors(
 	         handle,
@@ -202,7 +201,7 @@ int libewf_handle_add_acquiry_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_append_acquiry_error(
 	         handle,
@@ -217,7 +216,7 @@ int libewf_handle_add_acquiry_error(
 int libewf_handle_get_number_of_crc_errors(
      libewf_handle_t *handle,
      uint32_t *number_of_errors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_checksum_errors(
 	         handle,
@@ -231,7 +230,7 @@ int libewf_handle_get_number_of_crc_errors(
 int libewf_handle_get_amount_of_crc_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_checksum_errors(
 	         handle,
@@ -247,7 +246,7 @@ int libewf_handle_get_crc_error(
      uint32_t index,
      uint64_t *first_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_checksum_error(
 	         handle,
@@ -264,7 +263,7 @@ int libewf_handle_add_crc_error(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_append_checksum_error(
 	         handle,
@@ -279,7 +278,7 @@ int libewf_handle_add_crc_error(
 int libewf_handle_get_amount_of_sessions(
      libewf_handle_t *handle,
      uint32_t *amount_of_sessions,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_sessions(
 	         handle,
@@ -294,7 +293,7 @@ int libewf_handle_add_session(
      libewf_handle_t *handle,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_append_session(
 	         handle,
@@ -309,7 +308,7 @@ int libewf_handle_add_session(
 int libewf_handle_get_amount_of_header_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_header_values(
 	         handle,
@@ -326,7 +325,7 @@ int libewf_handle_get_header_value_size(
      const uint8_t *identifier,
      size_t identifier_length,
      size_t *value_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_utf8_header_value_size(
 	         handle,
@@ -346,7 +345,7 @@ int libewf_handle_get_header_value(
      size_t identifier_length,
      uint8_t *value,
      size_t value_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_utf8_header_value(
 	         handle,
@@ -366,7 +365,7 @@ int libewf_handle_set_header_value(
      size_t identifier_length,
      const uint8_t *value,
      size_t value_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_set_utf8_header_value(
 	         handle,
@@ -383,7 +382,7 @@ int libewf_handle_set_header_value(
 int libewf_handle_get_amount_of_hash_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_number_of_hash_values(
 	         handle,
@@ -400,7 +399,7 @@ int libewf_handle_get_hash_value_size(
      const uint8_t *identifier,
      size_t identifier_length,
      size_t *value_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_utf8_hash_value_size(
 	         handle,
@@ -420,7 +419,7 @@ int libewf_handle_get_hash_value(
      size_t identifier_length,
      uint8_t *value,
      size_t value_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_get_utf8_hash_value(
 	         handle,
@@ -440,7 +439,7 @@ int libewf_handle_set_hash_value(
      size_t identifier_length,
      const uint8_t *value,
      size_t value_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_handle_set_utf8_hash_value(
 	         handle,
@@ -457,7 +456,7 @@ int libewf_handle_set_hash_value(
 int libewf_file_entry_get_amount_of_sub_file_entries(
      libewf_file_entry_t *file_entry,
      int *amount_of_sub_file_entries,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_file_entry_get_number_of_sub_file_entries(
 	         file_entry,
@@ -472,7 +471,7 @@ int libewf_file_entry_get_amount_of_sub_file_entries(
 int libewf_file_entry_get_name_size(
      libewf_file_entry_t *file_entry,
      size_t *name_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_file_entry_get_utf8_name_size(
 	         file_entry,
@@ -488,7 +487,7 @@ int libewf_file_entry_get_name(
      libewf_file_entry_t *file_entry,
      uint8_t *name,
      size_t name_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	return( libewf_file_entry_get_utf8_name(
 	         file_entry,
@@ -509,23 +508,23 @@ void libewf_set_notify_values(
       FILE *stream,
       int verbose )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_notify_values";
 
 	if( libewf_notify_set_stream(
 	     stream,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to set notify stream.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	libewf_notify_set_verbose(
@@ -540,23 +539,23 @@ void libewf_set_notify_values(
 int libewf_signal_abort(
      libewf_handle_t *handle )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_signal_abort";
 
 	if( libewf_handle_signal_abort(
 	     handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to signal abort.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -574,7 +573,7 @@ libewf_handle_t *libewf_open(
                   int amount_of_files,
                   uint8_t flags )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	libewf_handle_t *handle = NULL;
 	static char *function   = "libewf_open";
 
@@ -582,16 +581,16 @@ libewf_handle_t *libewf_open(
 	     &handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -603,16 +602,16 @@ libewf_handle_t *libewf_open(
 	     flags,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		libewf_handle_free(
@@ -636,7 +635,7 @@ libewf_handle_t *libewf_open_wide(
                   int amount_of_files,
                   uint8_t flags )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	libewf_handle_t *handle = NULL;
 	static char *function   = "libewf_open_wide";
 
@@ -644,16 +643,16 @@ libewf_handle_t *libewf_open_wide(
 	     &handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -665,16 +664,16 @@ libewf_handle_t *libewf_open_wide(
 	     flags,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -689,23 +688,23 @@ libewf_handle_t *libewf_open_wide(
 int libewf_close(
      libewf_handle_t *handle )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_close";
 
 	if( libewf_handle_close(
 	     handle,
 	     &error ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to close handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -714,16 +713,16 @@ int libewf_close(
 	     &handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to free handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -739,7 +738,7 @@ off64_t libewf_seek_offset(
          libewf_handle_t *handle,
          off64_t offset )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_seek_offset";
 
 	offset = libewf_handle_seek_offset(
@@ -750,16 +749,16 @@ off64_t libewf_seek_offset(
 
 	if( offset == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -773,7 +772,7 @@ off64_t libewf_seek_offset(
 off64_t libewf_get_offset(
          libewf_handle_t *handle )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_offset";
 	off64_t offset          = 0;
 
@@ -782,16 +781,16 @@ off64_t libewf_get_offset(
 	     &offset,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve offset.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -814,7 +813,7 @@ ssize_t libewf_raw_read_prepare_buffer(
          uint32_t chunk_checksum,
          int8_t read_checksum )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_read_prepare_buffer";
 	ssize_t chunk_data_size = 0;
 
@@ -831,16 +830,16 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( chunk_data_size == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to raw read prepare buffer.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -863,7 +862,7 @@ ssize_t libewf_raw_read_buffer(
 {
 	uint8_t checksum_buffer[ 4 ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_read_buffer";
 	ssize_t read_count      = 0;
 
@@ -879,16 +878,16 @@ ssize_t libewf_raw_read_buffer(
 
 	if( read_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to raw read buffer.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -904,7 +903,7 @@ ssize_t libewf_read_buffer(
          void *buffer,
          size_t buffer_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_read_buffer";
 	ssize_t read_count      = 0;
 
@@ -916,16 +915,16 @@ ssize_t libewf_read_buffer(
 
 	if( read_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read buffer.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -942,7 +941,7 @@ ssize_t libewf_read_random(
          size_t buffer_size,
          off64_t offset )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_read_random";
 	ssize_t read_count      = 0;
 
@@ -955,16 +954,16 @@ ssize_t libewf_read_random(
 
 	if( read_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read random.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -988,7 +987,7 @@ ssize_t libewf_raw_write_prepare_buffer(
          uint32_t *chunk_checksum,
          int8_t *write_checksum )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_write_prepare_buffer";
 	ssize_t chunk_data_size = 0;
 
@@ -1005,16 +1004,16 @@ ssize_t libewf_raw_write_prepare_buffer(
 
 	if( chunk_data_size == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to raw write prepare buffer.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1040,7 +1039,7 @@ ssize_t libewf_raw_write_buffer(
 {
 	uint8_t checksum_buffer[ 4 ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_write_buffer";
 	ssize_t write_count     = 0;
 
@@ -1057,16 +1056,16 @@ ssize_t libewf_raw_write_buffer(
 
 	if( write_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to raw write buffer.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1084,7 +1083,7 @@ ssize_t libewf_write_buffer(
          void *buffer,
          size_t buffer_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_write_buffer";
 	ssize_t write_count     = 0;
 
@@ -1096,16 +1095,16 @@ ssize_t libewf_write_buffer(
 
 	if( write_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to write buffer.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1124,7 +1123,7 @@ ssize_t libewf_write_random(
          size_t buffer_size,
          off64_t offset )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_write_random";
 	ssize_t write_count     = 0;
 
@@ -1137,16 +1136,16 @@ ssize_t libewf_write_random(
 
 	if( write_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write random.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1161,7 +1160,7 @@ ssize_t libewf_write_random(
 ssize_t libewf_write_finalize(
          libewf_handle_t *handle )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_write_finalize";
 	ssize_t write_count     = 0;
 
@@ -1171,16 +1170,16 @@ ssize_t libewf_write_finalize(
 
 	if( write_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to finalize write.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1197,7 +1196,7 @@ int libewf_get_segment_filename(
      char *filename,
      size_t filename_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_segment_filename";
 	int result              = 0;
 
@@ -1209,16 +1208,16 @@ int libewf_get_segment_filename(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1234,7 +1233,7 @@ int libewf_set_segment_filename(
      const char *filename,
      size_t filename_length )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_segment_filename";
 
 	if( libewf_handle_set_segment_filename(
@@ -1243,16 +1242,16 @@ int libewf_set_segment_filename(
 	     filename_length,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1271,7 +1270,7 @@ int libewf_get_segment_filename_wide(
      wchar_t *filename,
      size_t filename_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_segment_filename_wide";
 	int result              = 0;
 
@@ -1283,16 +1282,16 @@ int libewf_get_segment_filename_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve wide segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1308,7 +1307,7 @@ int libewf_set_segment_filename_wide(
      const wchar_t *filename,
      size_t filename_length )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_segment_filename_wide";
 
 	if( libewf_handle_set_segment_filename_wide(
@@ -1317,16 +1316,16 @@ int libewf_set_segment_filename_wide(
 	     filename_length,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set wide segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1343,7 +1342,7 @@ int libewf_get_segment_file_size(
      libewf_handle_t *handle,
      size64_t *segment_file_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_segment_file_size";
 
 	if( libewf_handle_get_segment_file_size(
@@ -1351,16 +1350,16 @@ int libewf_get_segment_file_size(
 	     segment_file_size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment file size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1375,7 +1374,7 @@ int libewf_set_segment_file_size(
      libewf_handle_t *handle,
      size64_t segment_file_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_segment_file_size";
 
 	if( libewf_handle_set_segment_file_size(
@@ -1383,16 +1382,16 @@ int libewf_set_segment_file_size(
 	     segment_file_size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set segment file size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1409,7 +1408,7 @@ int libewf_get_delta_segment_filename(
      char *filename,
      size_t filename_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_delta_segment_filename";
 	int result              = 0;
 
@@ -1421,16 +1420,16 @@ int libewf_get_delta_segment_filename(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve delta segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1446,7 +1445,7 @@ int libewf_set_delta_segment_filename(
      const char *filename,
      size_t filename_length )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_delta_segment_filename";
 
 	if( libewf_handle_set_delta_segment_filename(
@@ -1455,16 +1454,16 @@ int libewf_set_delta_segment_filename(
 	     filename_length,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set delta segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1483,7 +1482,7 @@ int libewf_get_delta_segment_filename_wide(
      wchar_t *filename,
      size_t filename_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_delta_segment_filename_wide";
 	int result              = 0;
 
@@ -1495,16 +1494,16 @@ int libewf_get_delta_segment_filename_wide(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve wide delta segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1520,7 +1519,7 @@ int libewf_set_delta_segment_filename_wide(
      const wchar_t *filename,
      size_t filename_length )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_delta_segment_filename_wide";
 
 	if( libewf_handle_set_delta_segment_filename_wide(
@@ -1529,16 +1528,16 @@ int libewf_set_delta_segment_filename_wide(
 	     filename_length,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set wide delta segment filename.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1555,7 +1554,7 @@ int libewf_get_delta_segment_file_size(
      libewf_handle_t *handle,
      size64_t *delta_segment_file_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_delta_segment_file_size";
 
 	if( libewf_handle_get_delta_segment_file_size(
@@ -1563,16 +1562,16 @@ int libewf_get_delta_segment_file_size(
 	     delta_segment_file_size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve delta segment file size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1587,7 +1586,7 @@ int libewf_set_delta_segment_file_size(
      libewf_handle_t *handle,
      size64_t delta_segment_file_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_delta_segment_file_size";
 
 	if( libewf_handle_set_delta_segment_file_size(
@@ -1595,16 +1594,16 @@ int libewf_set_delta_segment_file_size(
 	     delta_segment_file_size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set delta segment file size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1619,7 +1618,7 @@ int libewf_get_sectors_per_chunk(
      libewf_handle_t *handle,
      uint32_t *sectors_per_chunk )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_sectors_per_chunk";
 
 	if( libewf_handle_get_sectors_per_chunk(
@@ -1627,16 +1626,16 @@ int libewf_get_sectors_per_chunk(
 	     sectors_per_chunk,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the amount of sectors per chunk.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1651,7 +1650,7 @@ int libewf_set_sectors_per_chunk(
      libewf_handle_t *handle,
      uint32_t sectors_per_chunk )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_sectors_per_chunk";
 
 	if( libewf_handle_set_sectors_per_chunk(
@@ -1659,16 +1658,16 @@ int libewf_set_sectors_per_chunk(
 	     sectors_per_chunk,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the amount of sectors per chunk.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1683,7 +1682,7 @@ int libewf_get_bytes_per_sector(
      libewf_handle_t *handle,
      uint32_t *bytes_per_sector )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_bytes_per_sector";
 
 	if( libewf_handle_get_bytes_per_sector(
@@ -1691,16 +1690,16 @@ int libewf_get_bytes_per_sector(
 	     bytes_per_sector,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the amount of bytes per sector.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1715,7 +1714,7 @@ int libewf_set_bytes_per_sector(
      libewf_handle_t *handle,
      uint32_t bytes_per_sector )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_bytes_per_sector";
 
 	if( libewf_handle_set_bytes_per_sector(
@@ -1723,16 +1722,16 @@ int libewf_set_bytes_per_sector(
 	     bytes_per_sector,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the amount of bytes per sector.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1747,22 +1746,22 @@ int libewf_get_amount_of_sectors(
      libewf_handle_t *handle,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error         = NULL;
+	libcerror_error_t *error         = NULL;
 	static char *function           = "libewf_get_amount_of_sectors";
 	uint64_t safe_amount_of_sectors = 0;
 
 	if( amount_of_sectors == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1772,32 +1771,32 @@ int libewf_get_amount_of_sectors(
 	     &safe_amount_of_sectors,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the amount of sectors.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
 	}
 	if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid amount of sectors value exceeds maximum.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1814,7 +1813,7 @@ int libewf_get_chunk_size(
      libewf_handle_t *handle,
      size32_t *chunk_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_chunk_size";
 
 	if( libewf_handle_get_chunk_size(
@@ -1822,16 +1821,16 @@ int libewf_get_chunk_size(
 	     chunk_size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the chunk size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1846,7 +1845,7 @@ int libewf_get_error_granularity(
      libewf_handle_t *handle,
      uint32_t *error_granularity )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_error_granularity";
 
 	if( libewf_handle_get_error_granularity(
@@ -1854,16 +1853,16 @@ int libewf_get_error_granularity(
 	     error_granularity,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the error granularity.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1878,7 +1877,7 @@ int libewf_set_error_granularity(
      libewf_handle_t *handle,
      uint32_t error_granularity )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_error_granularity";
 
 	if( libewf_handle_set_error_granularity(
@@ -1886,16 +1885,16 @@ int libewf_set_error_granularity(
 	     error_granularity,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the error granularity.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1911,7 +1910,7 @@ int libewf_get_compression_values(
      int8_t *compression_level,
      uint8_t *compress_empty_block )
 {
-	liberror_error_t *error   = NULL;
+	libcerror_error_t *error   = NULL;
 	static char *function     = "libewf_get_compression_values";
 	uint8_t compression_flags = 0;
 
@@ -1921,16 +1920,16 @@ int libewf_get_compression_values(
 	     &compression_flags,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the compression values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1954,7 +1953,7 @@ int libewf_set_compression_values(
      int8_t compression_level,
      uint8_t compress_empty_block )
 {
-	liberror_error_t *error   = NULL;
+	libcerror_error_t *error   = NULL;
 	static char *function     = "libewf_set_compression_values";
 	uint8_t compression_flags = 0;
 
@@ -1968,16 +1967,16 @@ int libewf_set_compression_values(
 	     compression_flags,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the compression values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1992,7 +1991,7 @@ int libewf_get_media_size(
      libewf_handle_t *handle,
      size64_t *media_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_media_size";
 
 	if( libewf_handle_get_media_size(
@@ -2000,16 +1999,16 @@ int libewf_get_media_size(
 	     media_size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the media size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2024,7 +2023,7 @@ int libewf_set_media_size(
      libewf_handle_t *handle,
      size64_t media_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_media_size";
 
 	if( libewf_handle_set_media_size(
@@ -2032,16 +2031,16 @@ int libewf_set_media_size(
 	     media_size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the media size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2056,7 +2055,7 @@ int libewf_get_media_type(
      libewf_handle_t *handle,
      uint8_t *media_type )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_media_type";
 
 	if( libewf_handle_get_media_type(
@@ -2064,16 +2063,16 @@ int libewf_get_media_type(
 	     media_type,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the media type.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2088,7 +2087,7 @@ int libewf_set_media_type(
      libewf_handle_t *handle,
      uint8_t media_type )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_media_type";
 
 	if( libewf_handle_set_media_type(
@@ -2096,16 +2095,16 @@ int libewf_set_media_type(
 	     media_type,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the media type.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2120,7 +2119,7 @@ int libewf_get_media_flags(
      libewf_handle_t *handle,
      uint8_t *media_flags )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_media_flags";
 
 	if( libewf_handle_get_media_flags(
@@ -2128,16 +2127,16 @@ int libewf_get_media_flags(
 	     media_flags,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the media flags.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2152,7 +2151,7 @@ int libewf_set_media_flags(
      libewf_handle_t *handle,
      uint8_t media_flags )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_media_flags";
 
 	if( libewf_handle_set_media_flags(
@@ -2160,16 +2159,16 @@ int libewf_set_media_flags(
 	     media_flags,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the media flags.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2184,22 +2183,22 @@ int libewf_get_volume_type(
      libewf_handle_t *handle,
      uint8_t *volume_type )
 {
-	liberror_error_t *error                   = NULL;
+	libcerror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_volume_type";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2208,32 +2207,32 @@ int libewf_get_volume_type(
 
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
 	}
 	if( volume_type == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid volume type.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2256,22 +2255,22 @@ int libewf_set_volume_type(
      libewf_handle_t *handle,
      uint8_t volume_type )
 {
-	liberror_error_t *error                   = NULL;
+	libcerror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_volume_type";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2280,16 +2279,16 @@ int libewf_set_volume_type(
 
 	if( internal_handle->media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2298,16 +2297,16 @@ int libewf_set_volume_type(
 	 || ( internal_handle->write_io_handle == NULL )
 	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: volume type cannot be changed.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2324,16 +2323,16 @@ int libewf_set_volume_type(
 	}
 	else
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported volume type.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2348,7 +2347,7 @@ int libewf_get_format(
      libewf_handle_t *handle,
      uint8_t *format )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_format";
 
 	if( libewf_handle_get_format(
@@ -2356,16 +2355,16 @@ int libewf_get_format(
 	     format,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the format.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2380,7 +2379,7 @@ int libewf_set_format(
      libewf_handle_t *handle,
      uint8_t format )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_format";
 
 	if( libewf_handle_set_format(
@@ -2388,16 +2387,16 @@ int libewf_set_format(
 	     format,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the format.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2413,7 +2412,7 @@ int libewf_get_guid(
      uint8_t *guid,
      size_t size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_guid";
 
 	if( libewf_handle_get_guid(
@@ -2422,16 +2421,16 @@ int libewf_get_guid(
 	     size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the GUID.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2447,7 +2446,7 @@ int libewf_set_guid(
      uint8_t *guid,
      size_t size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_guid";
 
 	if( libewf_handle_set_guid(
@@ -2456,16 +2455,16 @@ int libewf_set_guid(
 	     size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the GUID.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2481,7 +2480,7 @@ int libewf_get_md5_hash(
      uint8_t *md5_hash,
      size_t size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_md5_hash";
 
 	if( libewf_handle_get_md5_hash(
@@ -2490,16 +2489,16 @@ int libewf_get_md5_hash(
 	     size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the MD5 hash.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2515,7 +2514,7 @@ int libewf_set_md5_hash(
      uint8_t *md5_hash,
      size_t size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_md5_hash";
 
 	if( libewf_handle_set_md5_hash(
@@ -2524,16 +2523,16 @@ int libewf_set_md5_hash(
 	     size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the MD5 hash.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2549,7 +2548,7 @@ int libewf_get_sha1_hash(
      uint8_t *sha1_hash,
      size_t size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_sha1_hash";
 
 	if( libewf_handle_get_sha1_hash(
@@ -2558,16 +2557,16 @@ int libewf_get_sha1_hash(
 	     size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the SHA1 hash.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2583,7 +2582,7 @@ int libewf_set_sha1_hash(
      uint8_t *sha1_hash,
      size_t size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_sha1_hash";
 
 	if( libewf_handle_set_sha1_hash(
@@ -2592,16 +2591,16 @@ int libewf_set_sha1_hash(
 	     size,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set the SHA1 hash.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2616,7 +2615,7 @@ int libewf_get_write_amount_of_chunks(
      libewf_handle_t *handle,
      uint32_t *amount_of_chunks )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_write_amount_of_chunks";
 
 	if( libewf_handle_get_write_amount_of_chunks(
@@ -2624,16 +2623,16 @@ int libewf_get_write_amount_of_chunks(
 	     amount_of_chunks,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve amount of chunks written.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2649,7 +2648,7 @@ int libewf_set_read_wipe_chunk_on_error(
      libewf_handle_t *handle,
      uint8_t wipe_on_error )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_read_wipe_chunk_on_error";
 
 	if( libewf_handle_set_read_wipe_chunk_on_error(
@@ -2657,16 +2656,16 @@ int libewf_set_read_wipe_chunk_on_error(
 	     wipe_on_error,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set wipe chunk on error during read.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2681,7 +2680,7 @@ int libewf_copy_media_values(
      libewf_handle_t *destination_handle,
      libewf_handle_t *source_handle )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_copy_media_values";
 
 	if( libewf_handle_copy_media_values(
@@ -2689,16 +2688,16 @@ int libewf_copy_media_values(
 	     source_handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy media values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2713,7 +2712,7 @@ int libewf_get_amount_of_acquiry_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_amount_of_acquiry_errors";
 
 	if( libewf_handle_get_amount_of_acquiry_errors(
@@ -2721,16 +2720,16 @@ int libewf_get_amount_of_acquiry_errors(
 	     amount_of_errors,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the amount of acquiry errors.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2747,23 +2746,23 @@ int libewf_get_acquiry_error(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error         = NULL;
+	libcerror_error_t *error         = NULL;
 	static char *function           = "libewf_get_acquiry_error";
 	uint64_t safe_amount_of_sectors = 0;
 	int result                      = 0;
 
 	if( amount_of_sectors == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2777,16 +2776,16 @@ int libewf_get_acquiry_error(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve acquiry error.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2795,16 +2794,16 @@ int libewf_get_acquiry_error(
 	{
 		if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid amount of sectors value exceeds maximum.",
 			 function );
 
-			libnotify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			return( -1 );
@@ -2822,7 +2821,7 @@ int libewf_add_acquiry_error(
      off64_t first_sector,
      uint32_t amount_of_sectors )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_add_acquiry_error";
 
 	if( libewf_handle_add_acquiry_error(
@@ -2831,16 +2830,16 @@ int libewf_add_acquiry_error(
 	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to add acquiry error.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error);
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2855,7 +2854,7 @@ int libewf_get_amount_of_crc_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_amount_of_crc_errors";
 
 	if( libewf_handle_get_number_of_checksum_errors(
@@ -2863,16 +2862,16 @@ int libewf_get_amount_of_crc_errors(
 	     amount_of_errors,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2889,23 +2888,23 @@ int libewf_get_crc_error(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error         = NULL;
+	libcerror_error_t *error         = NULL;
 	static char *function           = "libewf_get_crc_error";
 	uint64_t safe_amount_of_sectors = 0;
 	int result                      = 0;
 
 	if( amount_of_sectors == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2919,16 +2918,16 @@ int libewf_get_crc_error(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve checksum error.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2937,16 +2936,16 @@ int libewf_get_crc_error(
 	{
 		if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid amount of sectors value exceeds maximum.",
 			 function );
 
-			libnotify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			return( -1 );
@@ -2964,7 +2963,7 @@ int libewf_add_crc_error(
      off64_t first_sector,
      uint32_t amount_of_sectors )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_add_crc_error";
 
 	if( libewf_handle_append_checksum_error(
@@ -2973,16 +2972,16 @@ int libewf_add_crc_error(
 	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to add checksum error.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error);
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -2997,7 +2996,7 @@ int libewf_get_amount_of_sessions(
      libewf_handle_t *handle,
      uint32_t *amount_of_sessions )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_amount_of_sessions";
 
 	if( libewf_handle_get_amount_of_sessions(
@@ -3005,16 +3004,16 @@ int libewf_get_amount_of_sessions(
 	     amount_of_sessions,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the amount of sessions.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3031,23 +3030,23 @@ int libewf_get_session(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error         = NULL;
+	libcerror_error_t *error         = NULL;
 	static char *function           = "libewf_get_session";
 	uint64_t safe_amount_of_sectors = 0;
 	int result                      = 0;
 
 	if( amount_of_sectors == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid amount of sectors.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3061,16 +3060,16 @@ int libewf_get_session(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve session.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3079,16 +3078,16 @@ int libewf_get_session(
 	{
 		if( safe_amount_of_sectors > (uint64_t) UINT32_MAX )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid amount of sectors value exceeds maximum.",
 			 function );
 
-			libnotify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 
 			return( -1 );
@@ -3106,7 +3105,7 @@ int libewf_add_session(
      off64_t first_sector,
      uint32_t amount_of_sectors )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_add_session";
 
 	if( libewf_handle_add_session(
@@ -3115,16 +3114,16 @@ int libewf_add_session(
 	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to add session.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error);
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3139,7 +3138,7 @@ int libewf_get_header_codepage(
      libewf_handle_t *handle,
      int *header_codepage )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_header_codepage";
 
 	if( libewf_handle_get_header_codepage(
@@ -3147,16 +3146,16 @@ int libewf_get_header_codepage(
 	     header_codepage,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the header codepage.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3171,7 +3170,7 @@ int libewf_set_header_codepage(
      libewf_handle_t *handle,
      int header_codepage )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_set_header_codepage";
 
 	if( libewf_handle_set_header_codepage(
@@ -3179,16 +3178,16 @@ int libewf_set_header_codepage(
 	     header_codepage,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to set header codepage.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3203,7 +3202,7 @@ int libewf_get_amount_of_header_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_amount_of_header_values";
 	int result              = 0;
 
@@ -3214,16 +3213,16 @@ int libewf_get_amount_of_header_values(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the amount of header values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3240,7 +3239,7 @@ int libewf_get_header_value_identifier_size(
      uint32_t index,
      size_t *identifier_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_header_value_identifier_size";
 	int result              = 0;
 
@@ -3252,16 +3251,16 @@ int libewf_get_header_value_identifier_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value identifier size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -3278,7 +3277,7 @@ int libewf_get_header_value_identifier(
      char *identifier,
      size_t identifier_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_header_value_identifier";
 	int result              = 0;
 
@@ -3291,16 +3290,16 @@ int libewf_get_header_value_identifier(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value identifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -3315,23 +3314,23 @@ int libewf_get_header_value_size(
      const char *identifier,
      size_t *value_size )
 {
-	liberror_error_t *error  = NULL;
+	libcerror_error_t *error  = NULL;
 	static char *function    = "libewf_get_header_value_size";
 	size_t identifier_length = 0;
 	int result               = 0;
 
 	if( identifier == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid indentifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3348,17 +3347,17 @@ int libewf_get_header_value_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value size: %s.",
 		 function,
 		 identifier );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -3375,23 +3374,23 @@ int libewf_get_header_value(
      char *value,
      size_t value_size )
 {
-	liberror_error_t *error  = NULL;
+	libcerror_error_t *error  = NULL;
 	static char *function    = "libewf_get_header_value";
 	size_t identifier_length = 0;
 	int result               = 0;
 
 	if( identifier == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid indentifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3409,17 +3408,17 @@ int libewf_get_header_value(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: %s.",
 		 function,
 		 identifier );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3437,22 +3436,22 @@ int libewf_set_header_value(
      const char *value,
      size_t value_length )
 {
-	liberror_error_t *error  = NULL;
+	libcerror_error_t *error  = NULL;
 	static char *function    = "libewf_set_header_value";
 	size_t identifier_length = 0;
 
 	if( identifier == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3468,17 +3467,17 @@ int libewf_set_header_value(
 	     value_length,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header value: %s.",
 		 function,
 		 identifier );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3493,7 +3492,7 @@ int libewf_copy_header_values(
      libewf_handle_t *destination_handle,
      libewf_handle_t *source_handle )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_copy_header_values";
 
 	if( libewf_handle_copy_header_values(
@@ -3501,16 +3500,16 @@ int libewf_copy_header_values(
 	     source_handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy header values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3527,21 +3526,21 @@ int libewf_parse_header_values(
      uint8_t date_format )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	liberror_error_t *error                   = NULL;
+	libcerror_error_t *error                   = NULL;
 	static char *function                     = "libewf_parse_header_values";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3553,16 +3552,16 @@ int libewf_parse_header_values(
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date format.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3575,16 +3574,16 @@ int libewf_parse_header_values(
 	     internal_handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to parse header values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3602,7 +3601,7 @@ int libewf_get_amount_of_hash_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_amount_of_hash_values";
 
 	if( libewf_handle_get_amount_of_hash_values(
@@ -3610,16 +3609,16 @@ int libewf_get_amount_of_hash_values(
 	     amount_of_values,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the amount of hash values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3636,7 +3635,7 @@ int libewf_get_hash_value_identifier_size(
      uint32_t index,
      size_t *identifier_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_hash_value_identifier_size";
 	int result              = 0;
 
@@ -3648,16 +3647,16 @@ int libewf_get_hash_value_identifier_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve hash value identifier size.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -3675,7 +3674,7 @@ int libewf_get_hash_value_identifier(
      char *identifier,
      size_t identifier_size )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_get_hash_value_identifier";
 	int result              = 0;
 
@@ -3688,16 +3687,16 @@ int libewf_get_hash_value_identifier(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve hash value identifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -3714,23 +3713,23 @@ int libewf_get_hash_value(
      char *value,
      size_t value_size )
 {
-	liberror_error_t *error  = NULL;
+	libcerror_error_t *error  = NULL;
 	static char *function    = "libewf_get_hash_value";
 	size_t identifier_length = 0;
 	int result               = 0;
 
 	if( identifier == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid indentifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3748,17 +3747,17 @@ int libewf_get_hash_value(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve hash value: %s.",
 		 function,
 		 identifier );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -3773,23 +3772,23 @@ int libewf_get_hash_value_size(
      const char *identifier,
      size_t *value_size )
 {
-	liberror_error_t *error  = NULL;
+	libcerror_error_t *error  = NULL;
 	static char *function    = "libewf_get_hash_value_size";
 	size_t identifier_length = 0;
 	int result               = 0;
 
 	if( identifier == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid indentifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3806,17 +3805,17 @@ int libewf_get_hash_value_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve hash value size: %s.",
 		 function,
 		 identifier );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -3832,22 +3831,22 @@ int libewf_set_hash_value(
      const char *value,
      size_t value_length )
 {
-	liberror_error_t *error  = NULL;
+	libcerror_error_t *error  = NULL;
 	static char *function    = "libewf_set_hash_value";
 	size_t identifier_length = 0;
 
 	if( identifier == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3863,17 +3862,17 @@ int libewf_set_hash_value(
 	     value_length,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set hash value: %s.",
 		 function,
 		 identifier );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3888,21 +3887,21 @@ int libewf_parse_hash_values(
      libewf_handle_t *handle )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	liberror_error_t *error                   = NULL;
+	libcerror_error_t *error                   = NULL;
 	static char *function                     = "libewf_parse_hash_values";
 
 	if( handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -3917,16 +3916,16 @@ int libewf_parse_hash_values(
 	     internal_handle,
 	     &error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to parse hash values.",
 		 function );
 
-		libnotify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );

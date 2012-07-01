@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -97,91 +97,91 @@ struct libewf_list
 
 int libewf_list_element_initialize(
      libewf_list_element_t **element,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_element_free(
      libewf_list_element_t **element,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
-     liberror_error_t **error );
+            libcerror_error_t **error ),
+     libcerror_error_t **error );
 
 int libewf_list_element_get_value(
      libewf_list_element_t *element,
      intptr_t **value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_element_set_value(
      libewf_list_element_t *element,
      intptr_t *value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_initialize(
      libewf_list_t **list,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_free(
      libewf_list_t **list,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
-     liberror_error_t **error );
+            libcerror_error_t **error ),
+     libcerror_error_t **error );
 
 int libewf_list_empty(
      libewf_list_t *list,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
-     liberror_error_t **error );
+            libcerror_error_t **error ),
+     libcerror_error_t **error );
 
 int libewf_list_clone(
      libewf_list_t **destination_list,
      libewf_list_t *source_list,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,
             intptr_t *source,
-            liberror_error_t **error ),
-     liberror_error_t **error );
+            libcerror_error_t **error ),
+     libcerror_error_t **error );
 
 int libewf_list_get_number_of_elements(
      libewf_list_t *list,
      int *number_of_elements,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_get_element_by_index(
      libewf_list_t *list,
      int list_element_index,
      libewf_list_element_t **element,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_get_value_by_index(
      libewf_list_t *list,
      int list_element_index,
      intptr_t **value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_prepend_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_prepend_value(
      libewf_list_t *list,
      intptr_t *value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_append_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_append_value(
      libewf_list_t *list,
      intptr_t *value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_insert_element(
      libewf_list_t *list,
@@ -189,9 +189,9 @@ int libewf_list_insert_element(
      int (*value_compare_function)(
             intptr_t *first,
             intptr_t *second,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      uint8_t insert_flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_insert_value(
      libewf_list_t *list,
@@ -199,14 +199,14 @@ int libewf_list_insert_value(
      int (*value_compare_function)(
             intptr_t *first,
             intptr_t *second,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      uint8_t insert_flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_list_remove_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

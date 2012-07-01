@@ -25,10 +25,9 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #include "libewf_chunk_data.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
@@ -53,16 +52,16 @@ struct libewf_read_io_handle
 
 int libewf_read_io_handle_initialize(
      libewf_read_io_handle_t **read_io_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_read_io_handle_free(
      libewf_read_io_handle_t **read_io_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_read_io_handle_clone(
      libewf_read_io_handle_t **destination_read_io_handle,
      libewf_read_io_handle_t *source_read_io_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_read_io_handle_read_chunk_data(
      libewf_read_io_handle_t *read_io_handle,
@@ -73,7 +72,7 @@ int libewf_read_io_handle_read_chunk_data(
      int chunk_index,
      off64_t chunk_offset,
      libewf_chunk_data_t **chunk_data,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

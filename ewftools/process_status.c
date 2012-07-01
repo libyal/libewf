@@ -1,7 +1,7 @@
 /*
  * Process status functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,12 +23,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
-#include <libsystem.h>
-
 #include "byte_size_string.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "process_status.h"
 
 /* Initializes the process status information
@@ -41,16 +39,16 @@ int process_status_initialize(
      const libcstring_system_character_t *status_summary_string,
      FILE *output_stream,
      uint8_t print_status_information,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "process_status_initialize";
 
 	if( process_status == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid process status.",
 		 function );
 
@@ -58,10 +56,10 @@ int process_status_initialize(
 	}
 	if( *process_status != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid process status value already set.",
 		 function );
 
@@ -72,10 +70,10 @@ int process_status_initialize(
 
 	if( *process_status == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create process status.",
 		 function );
 
@@ -86,10 +84,10 @@ int process_status_initialize(
 	     0,
 	     sizeof( process_status_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear process status.",
 		 function );
 
@@ -119,16 +117,16 @@ on_error:
  */
 int process_status_free(
      process_status_t **process_status,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "process_status_free";
 
 	if( process_status == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid process status.",
 		 function );
 
@@ -149,7 +147,7 @@ int process_status_free(
  */
 int process_status_start(
      process_status_t *process_status,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t time_string[ 32 ];
 
@@ -157,24 +155,24 @@ int process_status_start(
 
 	if( process_status == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid process status.",
 		 function );
 
 		return( -1 );
 	}
 	process_status->last_percentage = -1;
-	process_status->start_timestamp = libsystem_date_time_time(
+	process_status->start_timestamp = libcsystem_date_time_time(
 	                                   NULL );
 
 	if( ( process_status->output_stream != NULL )
 	 && ( process_status->print_status_information != 0 )
 	 && ( process_status->status_process_string != NULL ) )
 	{
-		if( libsystem_date_time_get_ctime_string(
+		if( libcsystem_date_time_get_ctime_string(
 		     &( process_status->start_timestamp ),
 		     time_string,
 		     32,
@@ -207,7 +205,7 @@ int process_status_update(
      process_status_t *process_status,
      size64_t bytes_read,
      size64_t bytes_total,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function    = "process_status_update";
 	time_t seconds_current   = 0;
@@ -218,10 +216,10 @@ int process_status_update(
 
 	if( process_status == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid process status.",
 		 function );
 
@@ -317,7 +315,7 @@ int process_status_update(
 int process_status_update_unknown_total(
      process_status_t *process_status,
      size64_t bytes_read,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function    = "process_status_update_unknown_total";
 	time_t seconds_current   = 0;
@@ -325,10 +323,10 @@ int process_status_update_unknown_total(
 
 	if( process_status == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid process status.",
 		 function );
 
@@ -398,7 +396,7 @@ int process_status_stop(
      process_status_t *process_status,
      size64_t bytes_total,
      int status,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t time_string[ 32 ];
 
@@ -408,10 +406,10 @@ int process_status_stop(
 
 	if( process_status == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid process status.",
 		 function );
 
@@ -421,16 +419,16 @@ int process_status_stop(
 	 && ( status != PROCESS_STATUS_COMPLETED )
 	 && ( status != PROCESS_STATUS_FAILED ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported status.",
 		 function );
 
 		return( -1 );
 	}
-	process_status->last_timestamp = libsystem_date_time_time(
+	process_status->last_timestamp = libcsystem_date_time_time(
 	                                  NULL );
 
 	if( ( process_status->output_stream != NULL )
@@ -455,7 +453,7 @@ int process_status_stop(
 		 process_status->status_process_string,
 		 status_string );
 
-		if( libsystem_date_time_get_ctime_string(
+		if( libcsystem_date_time_get_ctime_string(
 		     &( process_status->last_timestamp ),
 		     time_string,
 		     32,
@@ -516,7 +514,7 @@ void process_status_timestamp_fprint(
 	{
 		return;
 	}
-	if( libsystem_date_time_get_time_elements_in_utc(
+	if( libcsystem_date_time_get_time_elements_in_utc(
 	     &timestamp,
 	     &time_elements,
 	     NULL ) == 1 )

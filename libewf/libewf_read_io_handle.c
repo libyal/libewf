@@ -22,12 +22,11 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_chunk_data.h"
 #include "libewf_definitions.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
@@ -39,16 +38,16 @@
  */
 int libewf_read_io_handle_initialize(
      libewf_read_io_handle_t **read_io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_read_io_handle_initialize";
 
 	if( read_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid read IO handle.",
 		 function );
 
@@ -56,10 +55,10 @@ int libewf_read_io_handle_initialize(
 	}
 	if( *read_io_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid read IO handle value already set.",
 		 function );
 
@@ -70,10 +69,10 @@ int libewf_read_io_handle_initialize(
 
 	if( *read_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create read IO handle.",
 		 function );
 
@@ -84,10 +83,10 @@ int libewf_read_io_handle_initialize(
 	     0,
 	     sizeof( libewf_read_io_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear read IO handle.",
 		 function );
 
@@ -97,10 +96,10 @@ int libewf_read_io_handle_initialize(
 	     &( ( *read_io_handle )->checksum_errors ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create checksum errors sector list.",
 		 function );
 
@@ -126,17 +125,17 @@ on_error:
  */
 int libewf_read_io_handle_free(
      libewf_read_io_handle_t **read_io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_read_io_handle_free";
 	int result            = 1;
 
 	if( read_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid read IO handle.",
 		 function );
 
@@ -148,10 +147,10 @@ int libewf_read_io_handle_free(
 		     &( ( *read_io_handle )->checksum_errors ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free checksum errors sector list.",
 			 function );
 
@@ -171,16 +170,16 @@ int libewf_read_io_handle_free(
 int libewf_read_io_handle_clone(
      libewf_read_io_handle_t **destination_read_io_handle,
      libewf_read_io_handle_t *source_read_io_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_read_io_handle_clone";
 
 	if( destination_read_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination read IO handle.",
 		 function );
 
@@ -188,10 +187,10 @@ int libewf_read_io_handle_clone(
 	}
 	if( *destination_read_io_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination read IO handle value already set.",
 		 function );
 
@@ -208,10 +207,10 @@ int libewf_read_io_handle_clone(
 
 	if( *destination_read_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination read IO handle.",
 		 function );
 
@@ -222,10 +221,10 @@ int libewf_read_io_handle_clone(
 	     0,
 	     sizeof( libewf_read_io_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear source to destination read IO handle.",
 		 function );
 
@@ -236,10 +235,10 @@ int libewf_read_io_handle_clone(
 	     source_read_io_handle->checksum_errors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination checksum errors.",
 		 function );
 
@@ -273,7 +272,7 @@ int libewf_read_io_handle_read_chunk_data(
      int chunk_index,
      off64_t chunk_offset,
      libewf_chunk_data_t **chunk_data,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "libewf_read_io_handle_read_chunk_data";
 	size_t chunk_size          = 0;
@@ -283,10 +282,10 @@ int libewf_read_io_handle_read_chunk_data(
 
 	if( read_io_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid read IO handle.",
 		 function );
 
@@ -294,10 +293,10 @@ int libewf_read_io_handle_read_chunk_data(
 	}
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -305,10 +304,10 @@ int libewf_read_io_handle_read_chunk_data(
 	}
 	if( chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data.",
 		 function );
 
@@ -327,26 +326,26 @@ int libewf_read_io_handle_read_chunk_data(
 
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve chunk data: %d.",
 		 function,
 		 chunk_index );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libnotify_verbose != 0 )
+		if( libcnotify_verbose != 0 )
 		{
 			if( ( error != NULL )
 			 && ( *error != NULL ) )
 			{
-				libnotify_print_error_backtrace(
+				libcnotify_print_error_backtrace(
 				 *error );
 			}
 		}
 #endif
-		liberror_error_free(
+		libcerror_error_free(
 		 error );
 
 		chunk_size = media_values->chunk_size;
@@ -360,10 +359,10 @@ int libewf_read_io_handle_read_chunk_data(
 		     chunk_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create chunk data.",
 			 function );
 
@@ -371,10 +370,10 @@ int libewf_read_io_handle_read_chunk_data(
 		}
 		if( *chunk_data == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing chunk data: %d.",
 			 function,
 			 chunk_index );
@@ -389,10 +388,10 @@ int libewf_read_io_handle_read_chunk_data(
 		     0,
 		     ( *chunk_data )->data_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to zero chunk data.",
 			 function );
 
@@ -411,10 +410,10 @@ int libewf_read_io_handle_read_chunk_data(
 		     0,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to set chunk: %d in table.",
 			 function,
 			 chunk_index );
@@ -430,14 +429,14 @@ int libewf_read_io_handle_read_chunk_data(
 		     chunk_table_cache,
 		     chunk_index,
 		     (intptr_t *) *chunk_data,
-		     (int (*)(intptr_t **, liberror_error_t **)) &libewf_chunk_data_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
 		     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to set chunk data: %d as element value.",
 			 function,
 			 chunk_index );
@@ -453,10 +452,10 @@ int libewf_read_io_handle_read_chunk_data(
 	{
 		if( *chunk_data == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing chunk data: %d.",
 			 function,
 			 chunk_index );
@@ -468,10 +467,10 @@ int libewf_read_io_handle_read_chunk_data(
 		     media_values->chunk_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to unpack chunk data: %d.",
 			 function,
 			 chunk_index );
@@ -487,10 +486,10 @@ int libewf_read_io_handle_read_chunk_data(
 				     0,
 				     ( *chunk_data )->data_size ) == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 					 "%s: unable to zero chunk data.",
 					 function );
 
@@ -517,10 +516,10 @@ int libewf_read_io_handle_read_chunk_data(
 		     1,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append checksum error to sectors list.",
 			 function );
 

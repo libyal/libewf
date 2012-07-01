@@ -1,7 +1,7 @@
 /*
  * Output functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
+#include "ewftools_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {

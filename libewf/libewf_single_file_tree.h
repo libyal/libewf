@@ -25,8 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_tree_type.h"
 
@@ -40,7 +39,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
      size_t utf8_string_length,
      libewf_tree_node_t **single_file_tree_sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_single_file_tree_get_sub_node_by_utf16_name(
      libewf_tree_node_t *single_file_tree_node,
@@ -48,7 +47,7 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
      size_t utf16_string_length,
      libewf_tree_node_t **single_file_tree_sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

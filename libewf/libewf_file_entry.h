@@ -25,10 +25,9 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #include "libewf_extern.h"
 #include "libewf_handle.h"
+#include "libewf_libcerror.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_tree_type.h"
 #include "libewf_types.h"
@@ -63,119 +62,119 @@ int libewf_file_entry_initialize(
      libewf_internal_handle_t *internal_handle,
      libewf_tree_node_t *file_entry_tree_node,
      uint8_t flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_free(
      libewf_file_entry_t **file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_type(
      libewf_file_entry_t *file_entry,
      uint8_t *type,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_flags(
      libewf_file_entry_t *file_entry,
      uint32_t *flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_media_data_offset(
      libewf_file_entry_t *file_entry,
      off64_t *media_data_offset,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_media_data_size(
      libewf_file_entry_t *file_entry,
      size64_t *media_data_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_duplicate_media_data_offset(
      libewf_file_entry_t *file_entry,
      off64_t *duplicate_media_data_offset,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf8_name_size(
      libewf_file_entry_t *file_entry,
      size_t *utf8_name_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf8_name(
      libewf_file_entry_t *file_entry,
      uint8_t *utf8_name,
      size_t utf8_name_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf16_name_size(
      libewf_file_entry_t *file_entry,
      size_t *utf16_name_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf16_name(
      libewf_file_entry_t *file_entry,
      uint16_t *utf16_name,
      size_t utf16_name_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_size(
      libewf_file_entry_t *file_entry,
      size64_t *size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_creation_time(
      libewf_file_entry_t *file_entry,
      uint32_t *creation_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_modification_time(
      libewf_file_entry_t *file_entry,
      uint32_t *modification_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_access_time(
      libewf_file_entry_t *file_entry,
      uint32_t *access_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_entry_modification_time(
      libewf_file_entry_t *file_entry,
      uint32_t *entry_modification_time,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf8_hash_value_md5(
      libewf_file_entry_t *file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf16_hash_value_md5(
      libewf_file_entry_t *file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 ssize_t libewf_file_entry_read_buffer(
          libewf_file_entry_t *file_entry,
          void *buffer,
          size_t buffer_size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 ssize_t libewf_file_entry_read_random(
@@ -183,33 +182,33 @@ ssize_t libewf_file_entry_read_random(
          void *buffer,
          size_t buffer_size,
          off64_t offset,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 off64_t libewf_file_entry_seek_offset(
          libewf_file_entry_t *file_entry,
          off64_t offset,
          int whence,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_offset(
      libewf_file_entry_t *file_entry,
      off64_t *offset,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_number_of_sub_file_entries(
      libewf_file_entry_t *file_entry,
      int *number_of_sub_entries,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_sub_file_entry(
      libewf_file_entry_t *file_entry,
      int sub_file_entry_index,
      libewf_file_entry_t **sub_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_sub_file_entry_by_utf8_name(
@@ -217,7 +216,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libewf_file_entry_t **sub_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_sub_file_entry_by_utf8_path(
@@ -225,7 +224,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libewf_file_entry_t **sub_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_sub_file_entry_by_utf16_name(
@@ -233,7 +232,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libewf_file_entry_t **sub_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_sub_file_entry_by_utf16_path(
@@ -241,7 +240,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libewf_file_entry_t **sub_file_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

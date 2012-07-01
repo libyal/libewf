@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -43,16 +43,16 @@ struct libewf_segment_file_handle
 int libewf_segment_file_handle_initialize(
      libewf_segment_file_handle_t **segment_file_handle,
      int file_io_pool_entry,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_file_handle_free(
      libewf_segment_file_handle_t **segment_file_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_segment_file_handle_clone(
      libewf_segment_file_handle_t **destination_segment_file_handle,
      libewf_segment_file_handle_t *source_segment_file_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

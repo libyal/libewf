@@ -1,18 +1,25 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	-I$(top_srcdir)/libcstring \
-	-I$(top_srcdir)/liberror \
-	-I$(top_srcdir)/libsystem \
+	@LIBCSTRING_CPPFLAGS@ \
+	@LIBCERROR_CPPFLAGS@ \
+	@LIBCLOCALE_CPPFLAGS@ \
+	@LIBCNOTIFY_CPPFLAGS@ \
+	@LIBCSPLIT_CPPFLAGS@ \
 	@LIBUNA_CPPFLAGS@ \
+	@LIBCFILE_CPPFLAGS@ \
+	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
+	@LIBFVALUE_CPPFLAGS@ \
 	@LIBMFCACHE_CPPFLAGS@ \
 	@LIBMFDATA_CPPFLAGS@ \
-	@LIBFVALUE_CPPFLAGS@ \
+	@LIBCSYSTEM_CPPFLAGS@ \
+	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBHMAC_CPPFLAGS@ \
 	@LIBODRAW_CPPFLAGS@ \
 	@LIBSMDEV_CPPFLAGS@ \
 	@LIBSMRAW_CPPFLAGS@ \
+	@LIBFUSE_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
@@ -36,6 +43,13 @@ ewfacquire_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcpath.h \
+	ewftools_libcsplit.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -50,18 +64,21 @@ ewfacquire_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfacquire_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
-	@LIBHMAC_LIBADD@ \
 	@LIBODRAW_LIBADD@ \
 	@LIBSMDEV_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
-	@LIBINTL@ \
-	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
+	@LIBCSYSTEM_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 ewfacquirestream_SOURCES = \
@@ -71,6 +88,13 @@ ewfacquirestream_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcpath.h \
+	ewftools_libcsplit.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -85,15 +109,18 @@ ewfacquirestream_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfacquirestream_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
-	@LIBHMAC_LIBADD@ \
-	@LIBINTL@ \
-	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
+	@LIBCSYSTEM_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 ewfdebug_SOURCES = \
@@ -101,6 +128,11 @@ ewfdebug_SOURCES = \
 	ewfdebug.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -109,10 +141,12 @@ ewfdebug_SOURCES = \
 	ewftools_libuna.h
 
 ewfdebug_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
-	../libsystem/libsystem.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
@@ -123,6 +157,14 @@ ewfexport_SOURCES = \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libcfile.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcpath.h \
+	ewftools_libcsplit.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -137,16 +179,19 @@ ewfexport_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfexport_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
-	@LIBHMAC_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
-	@LIBINTL@ \
-	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
+	@LIBCSYSTEM_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 ewfinfo_SOURCES = \
@@ -155,6 +200,12 @@ ewfinfo_SOURCES = \
 	ewfinfo.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcsplit.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -166,12 +217,15 @@ ewfinfo_SOURCES = \
 	platform.c platform.h
 
 ewfinfo_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
-	@LIBINTL@ \
 	@LIBUUID_LIBADD@ \
+	@LIBCSYSTEM_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 ewfmount_SOURCES = \
@@ -180,6 +234,11 @@ ewfmount_SOURCES = \
 	ewfmount.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -191,13 +250,15 @@ ewfmount_SOURCES = \
 	platform.c platform.h
 
 ewfmount_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
-	@LIBINTL@ \
-	@LIBUUID_LIBADD@ \
 	@LIBFUSE_LIBADD@ \
+	@LIBUUID_LIBADD@ \
+	@LIBCSYSTEM_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 ewfrecover_SOURCES = \
@@ -207,6 +268,13 @@ ewfrecover_SOURCES = \
 	ewfrecover.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libcfile.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcpath.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -221,16 +289,18 @@ ewfrecover_SOURCES = \
 	storage_media_buffer.c storage_media_buffer.h
 
 ewfrecover_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
-	@LIBHMAC_LIBADD@ \
 	@LIBSMRAW_LIBADD@ \
-	@LIBINTL@ \
-	@LIBCRYPTO_LIBADD@ \
 	@LIBUUID_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
+	@LIBCSYSTEM_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 ewfverify_SOURCES = \
@@ -239,6 +309,11 @@ ewfverify_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcerror.h \
+	ewftools_libclocale.h \
+	ewftools_libcnotify.h \
+	ewftools_libcstring.h \
+	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -252,14 +327,16 @@ ewfverify_SOURCES = \
 	verification_handle.c verification_handle.h
 
 ewfverify_LDADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
-	../libewf/libewf.la \
-	../libsystem/libsystem.la \
 	@LIBHMAC_LIBADD@ \
-	@LIBINTL@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
+	@LIBCSYSTEM_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@LIBINTL@ \
 	@MEMWATCH_LIBADD@
 
 MAINTAINERCLEANFILES = \

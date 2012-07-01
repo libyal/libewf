@@ -1,7 +1,7 @@
 /*
  * Platform functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -22,19 +22,17 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_SYS_UTSNAME_H )
 #include <sys/utsname.h>
 #endif
 
-#include <libsystem.h>
-
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "platform.h"
 
 #if !defined( LIBEWF_OPERATING_SYSTEM )
-#define LIBEWF_OPERATING_SYSTEM "Unknown"
+#define LIBEWF_OPERATING_SYSTEM		"Unknown"
 #endif
 
 /* Determines the operating system string
@@ -43,7 +41,7 @@
 int platform_get_operating_system(
      libcstring_system_character_t *operating_system_string,
      size_t operating_system_string_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 #if defined( HAVE_UNAME ) && !defined( WINAPI )
 	struct utsname utsname_buffer;
@@ -64,10 +62,10 @@ int platform_get_operating_system(
 
 	if( operating_system_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid operating system string.",
 		 function );
 
@@ -178,26 +176,26 @@ int platform_get_operating_system(
 
 	if( operating_system_string_size < ( operating_system_length + 1 ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: operating system string too small.",
 		 function );
 
 		return( -1 );
 	}	
-	if( libsystem_string_copy_from_utf8_string(
+	if( libcsystem_string_copy_from_utf8_string(
 	     operating_system_string,
 	     operating_system_string_size,
 	     (uint8_t *) operating_system,
 	     operating_system_length + 1,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set operating system string.",
 		 function );
 

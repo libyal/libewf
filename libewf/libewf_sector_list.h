@@ -25,8 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_list_type.h"
 
 #if defined( __cplusplus )
@@ -73,65 +72,65 @@ struct libewf_sector_list
 
 int libewf_sector_list_value_initialize(
      libewf_sector_list_value_t **sector_list_value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_value_free(
      libewf_sector_list_value_t **sector_list_value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_value_clone(
      libewf_sector_list_value_t **destination_sector_list_value,
      libewf_sector_list_value_t *source_sector_list_value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_initialize(
      libewf_sector_list_t **sector_list,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_free(
      libewf_sector_list_t **sector_list,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_empty(
      libewf_sector_list_t *sector_list,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_clone(
      libewf_sector_list_t **destination_sector_list,
      libewf_sector_list_t *source_sector_list,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_get_number_of_elements(
      libewf_sector_list_t *sector_list,
      int *number_of_elements,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_append_sector(
      libewf_sector_list_t *sector_list,
      uint64_t first_sector,
      uint64_t number_of_sectors,
      uint8_t merge_ranges,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_get_sector(
      libewf_sector_list_t *sector_list,
      int index,
      uint64_t *first_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_get_sector_by_value(
      libewf_sector_list_t *sector_list,
      uint64_t sector_value,
      uint64_t *first_sector,
      uint64_t *number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_sector_list_range_is_present(
      libewf_sector_list_t *sector_list,
      uint64_t first_sector,
      uint64_t number_of_sectors,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

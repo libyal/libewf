@@ -1,7 +1,7 @@
 /*
  * User input functions for the ewftools
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,8 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -57,45 +57,45 @@ extern libcstring_system_character_t *ewfinput_yes_no[ 2 ];
 int ewfinput_determine_ewf_format(
      const libcstring_system_character_t *string,
      uint8_t *ewf_format,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_determine_sectors_per_chunk(
      const libcstring_system_character_t *string,
      uint32_t *sectors_per_chunk,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_determine_compression_values(
      const libcstring_system_character_t *string,
      int8_t *compression_level,
      uint8_t *compression_flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_determine_media_type(
      const libcstring_system_character_t *string,
      uint8_t *media_type,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_determine_media_flags(
      const libcstring_system_character_t *string,
      uint8_t *media_flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_determine_header_codepage(
      const libcstring_system_character_t *string,
      int *header_codepage,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_determine_yes_no(
      const libcstring_system_character_t *string,
      uint8_t *yes_no_value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_get_string_variable(
      FILE *stream,
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t *string_variable,
      size_t string_variable_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_get_size_variable(
      FILE *stream,
@@ -106,7 +106,7 @@ int ewfinput_get_size_variable(
      uint64_t maximum_size,
      uint64_t default_size,
      uint64_t *size_variable,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_get_byte_size_variable(
      FILE *stream,
@@ -117,7 +117,7 @@ int ewfinput_get_byte_size_variable(
      uint64_t maximum_size,
      uint64_t default_size,
      uint64_t *byte_size_variable,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int ewfinput_get_fixed_string_variable(
      FILE *stream,
@@ -128,7 +128,7 @@ int ewfinput_get_fixed_string_variable(
      uint8_t number_of_values,
      uint8_t default_value,
      libcstring_system_character_t **fixed_string_variable,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

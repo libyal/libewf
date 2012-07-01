@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120630],
+ [20120701],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -33,8 +33,13 @@ AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+
+dnl Check for libtool
 AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
+
+dnl Check for pkg-config
+AC_PATH_PROG(PKGCONFIG,[pkg-config])
 
 dnl Support of internationalization (i18n)
 AM_GNU_GETTEXT([external])
@@ -54,10 +59,42 @@ AX_TYPES_CHECK_LOCAL
 
 dnl Checks for libraries and library functions
 AX_COMMON_CHECK_LOCAL
-AX_LIBCSTRING_CHECK_LOCAL
-AX_LIBERROR_CHECK_LOCAL
-AX_LIBNOTIFY_CHECK_LOCAL
-AX_LIBSYSTEM_CHECK_LOCAL
+
+dnl Check for enabling libcstring for cross-platform C string functions
+AX_LIBCSTRING_CHECK_ENABLE
+
+dnl Check for enabling libcerror for cross-platform C error functions
+AX_LIBCERROR_CHECK_ENABLE
+
+dnl Check for enabling libclocale for cross-platform C locale functions
+AX_LIBCLOCALE_CHECK_ENABLE
+
+dnl Check for enabling libcnotify for cross-platform C notification functions
+AX_LIBCNOTIFY_CHECK_ENABLE
+
+dnl Check for enabling libcsplit for cross-platform C split string functions
+AX_LIBCSPLIT_CHECK_ENABLE
+
+dnl Check for enabling libuna for Unicode string support
+AX_LIBUNA_CHECK_ENABLE
+
+dnl Check for enabling libcfile for cross-platform C file functions
+AX_LIBCFILE_CHECK_ENABLE
+
+dnl Check for enabling libcpath for cross-platform C path functions
+AX_LIBCPATH_CHECK_ENABLE
+
+dnl Check for enabling libbfio for basic file IO support
+AX_LIBBFIO_CHECK_ENABLE
+
+dnl Check for enabling libfvalue for file value support
+AX_LIBFVALUE_CHECK_ENABLE
+
+dnl Check for enabling libmfcache for multi-file value cache support
+AX_LIBMFCACHE_CHECK_ENABLE
+
+dnl Check for enabling libmfdata for multi-file data types support
+AX_LIBMFDATA_CHECK_ENABLE
 
 dnl Check for zlib compression support
 dnl ac_zlib_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -116,23 +153,20 @@ AC_CHECK_LIB(
   [1])
  ])
 
-dnl Check for enabling libuna for Unicode string support
-AX_LIBUNA_CHECK_ENABLE
+dnl Check for library function support
+AX_LIBEWF_CHECK_LOCAL
 
-dnl Check for enabling libbfio for basic file IO support
-AX_LIBBFIO_CHECK_ENABLE
-
-dnl Check for enabling libfvalue for file value support
-AX_LIBFVALUE_CHECK_ENABLE
-
-dnl Check for enabling libmfcache for multi-file value cache support
-AX_LIBMFCACHE_CHECK_ENABLE
-
-dnl Check for enabling libmfdata for multi-file data types support
-AX_LIBMFDATA_CHECK_ENABLE
+dnl Check for enabling libcsystem for cross-platform C generic system functions
+AX_LIBCSYSTEM_CHECK_ENABLE
 
 dnl Check for enabling libhmac for message digest hash function support
 AX_LIBHMAC_CHECK_ENABLE
+
+dnl Check for enabling GUID/UUID support
+AS_IF(
+ [test "x$ac_cv_enable_guid" = xno],
+ [ac_cv_libuuid=no],
+ [AX_LIBUUID_CHECK_ENABLE])
 
 dnl Check for enabling libodraw for optical disc (split) RAW support
 AX_LIBODRAW_CHECK_ENABLE
@@ -143,17 +177,8 @@ AX_LIBSMDEV_CHECK_ENABLE
 dnl Check for enabling libsmraw for storage media (split) RAW support
 AX_LIBSMRAW_CHECK_ENABLE
 
-dnl Check for enabling GUID/UUID support
-AS_IF(
- [test "x$ac_cv_enable_guid" = xno],
- [ac_cv_libuuid=no],
- [AX_LIBUUID_CHECK_ENABLE])
-
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AX_LIBFUSE_CHECK_ENABLE
-
-dnl Check for library function support
-AX_LIBEWF_CHECK_LOCAL
 
 dnl Check for headers
 AC_CHECK_HEADERS([sys/utsname.h])
@@ -185,6 +210,21 @@ AX_LIBEWF_CHECK_ENABLE_V1_API
 dnl Check for the host operation system will be used as a fall back in the ewftools
 AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM
 
+dnl Check if DLL support is needed in ewftools
+AS_IF(
+ [test "x$enable_shared" = xyes && test "x$ac_cv_enable_static_executables" = xno],
+ [AS_CASE(
+  [$host],
+  [*cygwin* | *mingw*],
+  [AC_SUBST(
+   [LIBEWF_DLL_IMPORT],
+   ["-DLIBEWF_DLL_IMPORT"])
+  ])
+ ])
+
+dnl Set additional compiler flags
+CFLAGS="$CFLAGS -Wall";
+
 dnl Set memwatch support
 ac_cv_enable_memwatch=no
 
@@ -202,21 +242,6 @@ AM_CONDITIONAL(
  [HAVE_MEMWATCH],
  [test "x$ac_cv_enable_memwatch" != xno])
 
-dnl Set additional compiler flags
-CFLAGS="$CFLAGS -Wall";
-
-dnl Check if DLL support is needed in ewftools
-AS_IF(
- [test "x$enable_shared" = xyes && test "x$ac_cv_enable_static_executables" = xno],
- [AS_CASE(
-  [$host],
-  [*cygwin* | *mingw*],
-  [AC_SUBST(
-   [LIBEWF_DLL_IMPORT],
-   ["-DLIBEWF_DLL_IMPORT"])
-  ])
- ])
-
 dnl Set the date for dpkg files
 AC_SUBST(
  [DATE],
@@ -227,9 +252,13 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([common/Makefile])
 AC_CONFIG_FILES([libcstring/Makefile])
-AC_CONFIG_FILES([liberror/Makefile])
-AC_CONFIG_FILES([libnotify/Makefile])
+AC_CONFIG_FILES([libcerror/Makefile])
+AC_CONFIG_FILES([libclocale/Makefile])
+AC_CONFIG_FILES([libcnotify/Makefile])
+AC_CONFIG_FILES([libcsplit/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
+AC_CONFIG_FILES([libcfile/Makefile])
+AC_CONFIG_FILES([libcpath/Makefile])
 AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libfvalue/Makefile])
 AC_CONFIG_FILES([libmfcache/Makefile])
@@ -239,7 +268,7 @@ AC_CONFIG_FILES([libhmac/Makefile])
 AC_CONFIG_FILES([libodraw/Makefile])
 AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])
-AC_CONFIG_FILES([libsystem/Makefile])
+AC_CONFIG_FILES([libcsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([ewf.net/Makefile])
 AC_CONFIG_FILES([pyewf/Makefile])
@@ -275,18 +304,26 @@ AC_OUTPUT
 dnl Print a summary
 AC_MSG_NOTICE([
 Building:
+   libcstring support:                              $ac_cv_libcstring
+   libcerror support:                               $ac_cv_libcerror
+   libclocale support:                              $ac_cv_libclocale
+   libcnotify support:                              $ac_cv_libcnotify
+   libcsplit support:                               $ac_cv_libcsplit
    libuna support:                                  $ac_cv_libuna
+   libcfile support:                                $ac_cv_libcfile
+   libcpath support:                                $ac_cv_libcpath
    libbfio support:                                 $ac_cv_libbfio
    libfvalue support:                               $ac_cv_libfvalue
    libmfcache support:                              $ac_cv_libmfcache
    libmfdata support:                               $ac_cv_libmfdata
    libhmac support:                                 $ac_cv_libhmac
-   libodraw support:                                $ac_cv_libodraw
-   libsmdev support:                                $ac_cv_libsmdev
-   libsmraw support:                                $ac_cv_libsmraw
    MD5 support:                                     $ac_cv_libhmac_md5
    SHA1 support:                                    $ac_cv_libhmac_sha1
    SHA256 support:                                  $ac_cv_libhmac_sha256
+   libodraw support:                                $ac_cv_libodraw
+   libsmdev support:                                $ac_cv_libsmdev
+   libsmraw support:                                $ac_cv_libsmraw
+   libcsystem support:                              $ac_cv_libcsystem
    GUID/UUID support:                               $ac_cv_libuuid
    FUSE support:                                    $ac_cv_libfuse
 

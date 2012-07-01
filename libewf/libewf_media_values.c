@@ -22,8 +22,7 @@
 #include <common.h>
 #include <memory.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_media_values.h"
 
 #include "ewf_definitions.h"
@@ -33,16 +32,16 @@
  */
 int libewf_media_values_initialize(
      libewf_media_values_t **media_values,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_media_values_initialize";
 
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -50,10 +49,10 @@ int libewf_media_values_initialize(
 	}
 	if( *media_values != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid media values value already set.",
 		 function );
 
@@ -64,10 +63,10 @@ int libewf_media_values_initialize(
 
 	if( *media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create media values.",
 		 function );
 
@@ -78,10 +77,10 @@ int libewf_media_values_initialize(
 	     0,
 	     sizeof( libewf_media_values_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear media values.",
 		 function );
 
@@ -110,16 +109,16 @@ on_error:
  */
 int libewf_media_values_free(
      libewf_media_values_t **media_values,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
         static char *function = "libewf_media_values_free";
 
 	if( media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -141,16 +140,16 @@ int libewf_media_values_free(
 int libewf_media_values_clone(
      libewf_media_values_t **destination_media_values,
      libewf_media_values_t *source_media_values,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_media_values_clone";
 
 	if( destination_media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination media values.",
 		 function );
 
@@ -158,10 +157,10 @@ int libewf_media_values_clone(
 	}
 	if( *destination_media_values != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination media values already set.",
 		 function );
 
@@ -178,10 +177,10 @@ int libewf_media_values_clone(
 
 	if( *destination_media_values == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create destination media values.",
 		 function );
 
@@ -192,10 +191,10 @@ int libewf_media_values_clone(
 	     source_media_values,
 	     sizeof( libewf_media_values_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy source to destination media values.",
 		 function );
 

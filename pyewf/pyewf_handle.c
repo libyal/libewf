@@ -2,7 +2,7 @@
  * Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,7 @@
 #include <types.h>
 
 #include <libcstring.h>
-#include <liberror.h>
+#include <libcerror.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -391,7 +391,7 @@ int pyewf_handle_init(
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	static char *function   = "pyewf_handle_init";
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 
 	if( pyewf_handle == NULL )
 	{
@@ -410,7 +410,7 @@ int pyewf_handle_init(
 	     &( pyewf_handle->handle ),
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -428,7 +428,7 @@ int pyewf_handle_init(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( -1 );
@@ -443,7 +443,7 @@ void pyewf_handle_free(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_free";
 	int result              = 0;
 
@@ -493,7 +493,7 @@ void pyewf_handle_free(
 
 	if( result != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -511,7 +511,7 @@ void pyewf_handle_free(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	pyewf_handle->ob_type->tp_free(
@@ -526,7 +526,7 @@ PyObject *pyewf_handle_signal_abort(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_signal_abort";
 
 	if( pyewf_handle == NULL )
@@ -542,7 +542,7 @@ PyObject *pyewf_handle_signal_abort(
 	     pyewf_handle->handle,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -560,7 +560,7 @@ PyObject *pyewf_handle_signal_abort(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -578,7 +578,7 @@ PyObject *pyewf_handle_open(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	char **filenames            = NULL;
 	static char *keyword_list[] = { "filenames", "access_flags", NULL };
 	PyObject *sequence_object   = NULL;
@@ -715,7 +715,7 @@ PyObject *pyewf_handle_open(
 
 	if( result != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -733,7 +733,7 @@ PyObject *pyewf_handle_open(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;
@@ -772,7 +772,7 @@ PyObject *pyewf_handle_close(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_close";
 	int result              = 0;
 
@@ -795,7 +795,7 @@ PyObject *pyewf_handle_close(
 
 	if( result != 0 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -813,7 +813,7 @@ PyObject *pyewf_handle_close(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -831,7 +831,7 @@ PyObject *pyewf_handle_read_buffer(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
@@ -893,7 +893,7 @@ PyObject *pyewf_handle_read_buffer(
 
 	if( read_count != (ssize_t) read_size )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -911,7 +911,7 @@ PyObject *pyewf_handle_read_buffer(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -929,7 +929,7 @@ PyObject *pyewf_handle_read_random(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
@@ -1005,7 +1005,7 @@ PyObject *pyewf_handle_read_random(
 
 	if( read_count != (ssize_t) read_size )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1023,7 +1023,7 @@ PyObject *pyewf_handle_read_random(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1041,7 +1041,7 @@ PyObject *pyewf_handle_write_buffer(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_write_buffer";
 	static char *keyword_list[] = { "size", NULL };
@@ -1104,7 +1104,7 @@ PyObject *pyewf_handle_write_buffer(
 
 	if( write_count != (ssize_t) write_size )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1122,7 +1122,7 @@ PyObject *pyewf_handle_write_buffer(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1140,7 +1140,7 @@ PyObject *pyewf_handle_write_random(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_write_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
@@ -1215,7 +1215,7 @@ PyObject *pyewf_handle_write_random(
 
 	if( write_count != (ssize_t) write_size )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1233,7 +1233,7 @@ PyObject *pyewf_handle_write_random(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1251,7 +1251,7 @@ PyObject *pyewf_handle_seek_offset(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error     = NULL;
+	libcerror_error_t *error     = NULL;
 	static char *function       = "pyewf_handle_seek_offset";
 	static char *keyword_list[] = { "offset", "whence", NULL };
 	off64_t offset              = 0;
@@ -1288,7 +1288,7 @@ PyObject *pyewf_handle_seek_offset(
 
  	if( offset == -1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1306,7 +1306,7 @@ PyObject *pyewf_handle_seek_offset(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1322,7 +1322,7 @@ PyObject *pyewf_handle_get_offset(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "pyewf_handle_get_offset";
 	off64_t current_offset  = 0;
 
@@ -1342,7 +1342,7 @@ PyObject *pyewf_handle_get_offset(
 	     &current_offset,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1360,7 +1360,7 @@ PyObject *pyewf_handle_get_offset(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( NULL );
@@ -1377,7 +1377,7 @@ PyObject *pyewf_handle_get_root_file_entry(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	liberror_error_t *error              = NULL;
+	libcerror_error_t *error              = NULL;
 	libewf_file_entry_t *root_file_entry = NULL;
 	PyObject *file_entry_object          = NULL;
 	static char *function                = "pyewf_handle_get_root_file_entry";
@@ -1396,7 +1396,7 @@ PyObject *pyewf_handle_get_root_file_entry(
 	     &root_file_entry,
 	     &error ) != 1 )
 	{
-		if( liberror_error_backtrace_sprint(
+		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
@@ -1414,7 +1414,7 @@ PyObject *pyewf_handle_get_root_file_entry(
 			 function,
 			 error_string );
 		}
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		goto on_error;

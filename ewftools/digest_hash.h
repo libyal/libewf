@@ -1,7 +1,7 @@
 /*
  * Crypographic digest hash
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,8 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -37,7 +37,7 @@ int digest_hash_copy_to_string(
      size_t digest_hash_size,
      libcstring_system_character_t *string,
      size_t string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

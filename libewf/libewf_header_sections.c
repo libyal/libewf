@@ -23,12 +23,11 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_definitions.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
 #include "libewf_libfvalue.h"
 
 #include "ewf_definitions.h"
@@ -38,16 +37,16 @@
  */
 int libewf_header_sections_initialize(
      libewf_header_sections_t **header_sections,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_header_sections_initialize";
 
 	if( header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header sections.",
 		 function );
 
@@ -55,10 +54,10 @@ int libewf_header_sections_initialize(
 	}
 	if( *header_sections != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid header sections value already set.",
 		 function );
 
@@ -69,10 +68,10 @@ int libewf_header_sections_initialize(
 
 	if( *header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header sections.",
 		 function );
 
@@ -83,10 +82,10 @@ int libewf_header_sections_initialize(
 	     0,
 	     sizeof( libewf_header_sections_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear header sections.",
 		 function );
 
@@ -110,16 +109,16 @@ on_error:
  */
 int libewf_header_sections_free(
       libewf_header_sections_t **header_sections,
-      liberror_error_t **error )
+      libcerror_error_t **error )
 {
         static char *function = "libewf_header_sections_free";
 
 	if( header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header sections.",
 		 function );
 
@@ -156,16 +155,16 @@ int libewf_header_sections_free(
 int libewf_header_sections_clone(
      libewf_header_sections_t **destination_header_sections,
      libewf_header_sections_t *source_header_sections,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_header_sections_clone";
 
 	if( destination_header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination header sections.",
 		 function );
 
@@ -173,10 +172,10 @@ int libewf_header_sections_clone(
 	}
 	if( *destination_header_sections != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid destination header sections already set.",
 		 function );
 
@@ -192,10 +191,10 @@ int libewf_header_sections_clone(
 	     destination_header_sections,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination header sections.",
 		 function );
 
@@ -203,10 +202,10 @@ int libewf_header_sections_clone(
 	}
 	if( *destination_header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing destination header sections.",
 		 function );
 
@@ -219,10 +218,10 @@ int libewf_header_sections_clone(
 
 		if( ( *destination_header_sections )->header == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination header.",
 			 function );
 
@@ -233,10 +232,10 @@ int libewf_header_sections_clone(
 		     source_header_sections->header,
 		     sizeof( uint8_t ) * source_header_sections->header_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination header.",
 			 function );
 
@@ -251,10 +250,10 @@ int libewf_header_sections_clone(
 
 		if( ( *destination_header_sections )->header2 == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination header2.",
 			 function );
 
@@ -265,10 +264,10 @@ int libewf_header_sections_clone(
 		     source_header_sections->header2,
 		     sizeof( uint8_t ) * source_header_sections->header2_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination header2.",
 			 function );
 
@@ -283,10 +282,10 @@ int libewf_header_sections_clone(
 
 		if( ( *destination_header_sections )->xheader == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create destination xheader.",
 			 function );
 
@@ -297,10 +296,10 @@ int libewf_header_sections_clone(
 		     source_header_sections->xheader,
 		     sizeof( uint8_t ) * source_header_sections->xheader_size ) == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy source to destination xheader.",
 			 function );
 
@@ -347,17 +346,17 @@ int libewf_header_sections_create(
      int8_t compression_level,
      uint8_t format,
      int header_codepage,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_header_sections_create";
 	time_t timestamp      = time( NULL );
 
 	if( header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header sections.",
 		 function );
 
@@ -374,10 +373,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -395,10 +394,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -417,10 +416,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -439,10 +438,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -460,10 +459,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -477,10 +476,10 @@ int libewf_header_sections_create(
 		     &( header_sections->header2_size ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header2 section.",
 			 function );
 
@@ -498,10 +497,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -515,10 +514,10 @@ int libewf_header_sections_create(
 		     &( header_sections->header2_size ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header2 sections.",
 			 function );
 
@@ -536,10 +535,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -553,10 +552,10 @@ int libewf_header_sections_create(
 		     &( header_sections->header2_size ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header2 sections.",
 			 function );
 
@@ -574,10 +573,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -595,10 +594,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -616,10 +615,10 @@ int libewf_header_sections_create(
 		     header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header section.",
 			 function );
 
@@ -633,10 +632,10 @@ int libewf_header_sections_create(
 		     &( header_sections->header2_size ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create header2 section.",
 			 function );
 
@@ -649,10 +648,10 @@ int libewf_header_sections_create(
 		     &( header_sections->xheader_size ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create xheader section.",
 			 function );
 
@@ -688,17 +687,17 @@ int libewf_header_sections_determine_format(
      libewf_header_sections_t *header_sections,
      uint8_t ewf_format,
      uint8_t *format,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_header_sections_determine_format";
 	int result            = 0;
 
 	if( header_sections == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header sections.",
 		 function );
 
@@ -706,10 +705,10 @@ int libewf_header_sections_determine_format(
 	}
 	if( format == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid format.",
 		 function );
 
@@ -750,9 +749,9 @@ int libewf_header_sections_determine_format(
 					result  = 1;
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				else if( libnotify_verbose != 0 )
+				else if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: unsupported header2 format: %c%c.\n",
 					 function,
 					 (char) header_sections->header2[ 36 ],
@@ -766,9 +765,9 @@ int libewf_header_sections_determine_format(
 				result  = 1;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			else if( libnotify_verbose != 0 )
+			else if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: unsupported header2 version: %c.\n",
 				 function,
 				 (char) header_sections->header2[ 2 ] );
@@ -795,9 +794,9 @@ int libewf_header_sections_determine_format(
 					result  = 1;
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				else if( libnotify_verbose != 0 )
+				else if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: unsupported header format: %c%c.\n",
 					 function,
 					 (char) header_sections->header[ 17 ],
@@ -819,9 +818,9 @@ int libewf_header_sections_determine_format(
 #if defined( HAVE_VERBOSE_OUTPUT )
 						if( header_sections->number_of_header_sections != 1 )
 						{
-							if( libnotify_verbose != 0 )
+							if( libcnotify_verbose != 0 )
 							{
-								libnotify_printf(
+								libcnotify_printf(
 								 "%s: multiple header sections found.\n",
 								 function );
 							}
@@ -834,9 +833,9 @@ int libewf_header_sections_determine_format(
 						result  = 1;
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
-					else if( libnotify_verbose != 0 )
+					else if( libcnotify_verbose != 0 )
 					{
-						libnotify_printf(
+						libcnotify_printf(
 						 "%s: unsupported header version.\n",
 						 function );
 					}
@@ -852,36 +851,36 @@ int libewf_header_sections_determine_format(
 						result  = 1;
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
-					else if( libnotify_verbose != 0 )
+					else if( libcnotify_verbose != 0 )
 					{
-						libnotify_printf(
+						libcnotify_printf(
 						 "%s: unsupported header version.\n",
 						 function );
 					}
 #endif
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				else if( libnotify_verbose != 0 )
+				else if( libcnotify_verbose != 0 )
 				{
-					libnotify_printf(
+					libcnotify_printf(
 					 "%s: unsupported header version.\n",
 					 function );
 				}
 #endif
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			else if( libnotify_verbose != 0 )
+			else if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: unsupported header version.\n",
 				 function );
 			}
 #endif
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
-		else if( libnotify_verbose != 0 )
+		else if( libcnotify_verbose != 0 )
 		{
-			libnotify_printf(
+			libcnotify_printf(
 			 "%s: missing header information.\n",
 			 function );
 		}
@@ -893,9 +892,9 @@ int libewf_header_sections_determine_format(
 		result  = 1;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	else if( libnotify_verbose != 0 )
+	else if( libcnotify_verbose != 0 )
 	{
-		libnotify_printf(
+		libcnotify_printf(
 		 "%s: unsupported EWF file format.\n",
 		 function );
 	}

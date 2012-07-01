@@ -25,8 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_list_type.h"
 
 #if defined( __cplusplus )
@@ -98,46 +97,46 @@ struct libewf_tree_node
 
 int libewf_tree_node_initialize(
      libewf_tree_node_t **node,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_free(
      libewf_tree_node_t **node,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
-     liberror_error_t **error );
+            libcerror_error_t **error ),
+     libcerror_error_t **error );
 
 int libewf_tree_node_clone(
      libewf_tree_node_t **destination_node,
      libewf_tree_node_t *source_node,
      int (*value_free_function)(
             intptr_t **value,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      int (*value_clone_function)(
             intptr_t **destination,
             intptr_t *source,
-            liberror_error_t **error ),
-     liberror_error_t **error );
+            libcerror_error_t **error ),
+     libcerror_error_t **error );
 
 int libewf_tree_node_get_value(
      libewf_tree_node_t *node,
      intptr_t **value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_set_value(
      libewf_tree_node_t *node,
      intptr_t *value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_append_node(
      libewf_tree_node_t *parent_node,
      libewf_tree_node_t *node,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_append_value(
      libewf_tree_node_t *parent_node,
      intptr_t *value,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_insert_node(
      libewf_tree_node_t *parent_node,
@@ -145,9 +144,9 @@ int libewf_tree_node_insert_node(
      int (*value_compare_function)(
             intptr_t *first_value,
             intptr_t *second_value,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      uint8_t insert_flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_insert_value(
      libewf_tree_node_t *parent_node,
@@ -155,30 +154,30 @@ int libewf_tree_node_insert_value(
      int (*value_compare_function)(
             intptr_t *first_value,
             intptr_t *second_value,
-            liberror_error_t **error ),
+            libcerror_error_t **error ),
      uint8_t insert_flags,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_remove_node(
      libewf_tree_node_t *parent_node,
      libewf_tree_node_t *node,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_get_number_of_sub_nodes(
      libewf_tree_node_t *node,
      int *number_of_sub_nodes,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_get_sub_node_by_index(
      libewf_tree_node_t *node,
      int sub_node_index,
      libewf_tree_node_t **sub_node,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_tree_node_get_leaf_node_list(
      libewf_tree_node_t *node,
      libewf_list_t **leaf_node_list,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

@@ -24,13 +24,12 @@
 #include <memory.h>
 #include <types.h>
 
-#include <liberror.h>
-#include <libnotify.h>
-
 #include "libewf_chunk_data.h"
 #include "libewf_compression.h"
 #include "libewf_definitions.h"
 #include "libewf_empty_block.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
 
 #include "ewf_checksum.h"
 #include "ewf_definitions.h"
@@ -41,16 +40,16 @@
 int libewf_chunk_data_initialize(
      libewf_chunk_data_t **chunk_data,
      size_t data_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_data_initialize";
 
 	if( chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data.",
 		 function );
 
@@ -58,10 +57,10 @@ int libewf_chunk_data_initialize(
 	}
 	if( *chunk_data != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid chunk data value already set.",
 		 function );
 
@@ -69,10 +68,10 @@ int libewf_chunk_data_initialize(
 	}
 	if( data_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
@@ -83,10 +82,10 @@ int libewf_chunk_data_initialize(
 
 	if( *chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create chunk data.",
 		 function );
 
@@ -97,10 +96,10 @@ int libewf_chunk_data_initialize(
 	     0,
 	     sizeof( libewf_chunk_data_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear chunk data.",
 		 function );
 
@@ -111,10 +110,10 @@ int libewf_chunk_data_initialize(
 
 	if( ( *chunk_data )->data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create data.",
 		 function );
 
@@ -140,16 +139,16 @@ on_error:
  */
 int libewf_chunk_data_free(
      libewf_chunk_data_t **chunk_data,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_data_free";
 
 	if( chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data.",
 		 function );
 
@@ -187,7 +186,7 @@ int libewf_chunk_data_pack(
      size32_t chunk_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function        = "libewf_chunk_data_pack";
 	void *reallocation           = NULL;
@@ -197,10 +196,10 @@ int libewf_chunk_data_pack(
 
 	if( chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data.",
 		 function );
 
@@ -208,10 +207,10 @@ int libewf_chunk_data_pack(
 	}
 	if( chunk_data->data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid chunk data - missing data.",
 		 function );
 
@@ -233,10 +232,10 @@ int libewf_chunk_data_pack(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine if chunk data is empty an empty block.",
 			 function );
 
@@ -268,10 +267,10 @@ int libewf_chunk_data_pack(
 
 		if( chunk_data->compressed_data == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create compressed data.",
 			 function );
 
@@ -286,10 +285,10 @@ int libewf_chunk_data_pack(
 			     compressed_zero_byte_empty_block,
 			     compressed_zero_byte_empty_block_size ) == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 				 "%s: unable to copy compressed zero byte empty block to compressed chunk buffer.",
 				 function );
 
@@ -313,7 +312,7 @@ int libewf_chunk_data_pack(
 			if( ( result == -1 )
 			 && ( chunk_data->compressed_data_size > 0 ) )
 			{
-				liberror_error_free(
+				libcerror_error_free(
 				 error );
 
 				reallocation = memory_reallocate(
@@ -322,10 +321,10 @@ int libewf_chunk_data_pack(
 
 				if( reallocation == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 					 "%s: unable to resize compressed data.",
 					 function );
 
@@ -343,10 +342,10 @@ int libewf_chunk_data_pack(
 			}
 			if( result != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_COMPRESSION,
-				 LIBERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+				 LIBCERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
 				 "%s: unable to compress chunk data.",
 				 function );
 
@@ -372,10 +371,10 @@ int libewf_chunk_data_pack(
 	{
 		if( ( chunk_data->data_size + sizeof( uint32_t ) ) > chunk_data->allocated_data_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: chunk data size value out of bounds.",
 			 function );
 
@@ -404,7 +403,7 @@ int libewf_chunk_data_pack(
 int libewf_chunk_data_unpack(
      libewf_chunk_data_t *chunk_data,
      size_t chunk_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function        = "libewf_chunk_data_unpack";
 	uint32_t calculated_checksum = 0;
@@ -413,10 +412,10 @@ int libewf_chunk_data_unpack(
 
 	if( chunk_data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data.",
 		 function );
 
@@ -424,10 +423,10 @@ int libewf_chunk_data_unpack(
 	}
 	if( chunk_data->data == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid chunk data - missing data.",
 		 function );
 
@@ -436,10 +435,10 @@ int libewf_chunk_data_unpack(
 	if( ( chunk_size == 0 )
 	 || ( chunk_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: chunk size value out of bounds.",
 		 function );
 
@@ -454,10 +453,10 @@ int libewf_chunk_data_unpack(
 		if( ( chunk_data->data_size < sizeof( uint32_t ) )
 		 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: chunk data size value out of bounds.",
 			 function );
 
@@ -477,9 +476,9 @@ int libewf_chunk_data_unpack(
 		if( stored_checksum != calculated_checksum )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").\n",
 				 function,
 				 stored_checksum,
@@ -493,10 +492,10 @@ int libewf_chunk_data_unpack(
 	{
 		if( chunk_data->compressed_data != NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 			 "%s: invalid chunk data - compressed data value already set.",
 			 function );
 
@@ -514,10 +513,10 @@ int libewf_chunk_data_unpack(
 
 		if( chunk_data->data == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create data.",
 			 function );
 
@@ -534,10 +533,10 @@ int libewf_chunk_data_unpack(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_COMPRESSION,
-			 LIBERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+			 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
 			 "%s: unable to decompress chunk data.",
 			 function );
 
@@ -546,9 +545,9 @@ int libewf_chunk_data_unpack(
 		else if( result == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			if( libnotify_verbose != 0 )
+			if( libcnotify_verbose != 0 )
 			{
-				libnotify_printf(
+				libcnotify_printf(
 				 "%s: unable to decompress chunk data.\n",
 				 function );
 			}

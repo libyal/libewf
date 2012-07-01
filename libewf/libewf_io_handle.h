@@ -25,9 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
-#include "libewf_libbfio.h"
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -73,16 +71,16 @@ struct libewf_io_handle
 
 int libewf_io_handle_initialize(
      libewf_io_handle_t **io_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_io_handle_free(
      libewf_io_handle_t **io_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int libewf_io_handle_clone(
      libewf_io_handle_t **destination_io_handle,
      libewf_io_handle_t *source_io_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

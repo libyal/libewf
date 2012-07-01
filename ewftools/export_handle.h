@@ -1,7 +1,7 @@
 /* 
  * Export handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,10 +25,9 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #include "digest_hash.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "ewftools_libsmraw.h"
@@ -204,175 +203,175 @@ struct export_handle
 int export_handle_initialize(
      export_handle_t **export_handle,
      uint8_t calculate_md5,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_free(
      export_handle_t **export_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_signal_abort(
      export_handle_t *export_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_open_input(
      export_handle_t *export_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_open_output(
      export_handle_t *export_handle,
      const libcstring_system_character_t *filename,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_close(
      export_handle_t *export_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 ssize_t export_handle_prepare_read_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 ssize_t export_handle_read_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t read_size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 ssize_t export_handle_prepare_write_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 ssize_t export_handle_write_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 off64_t export_handle_seek_offset(
          export_handle_t *export_handle,
          off64_t offset,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 int export_handle_swap_byte_pairs(
      export_handle_t *export_handle,
      storage_media_buffer_t *storage_media_buffer,
      size_t read_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_initialize_integrity_hash(
      export_handle_t *export_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_update_integrity_hash(
      export_handle_t *export_handle,
      uint8_t *buffer,
      size_t buffer_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_finalize_integrity_hash(
      export_handle_t *export_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_input_is_corrupted(
      export_handle_t *export_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_get_output_chunk_size(
      export_handle_t *export_handle,
      size32_t *chunk_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_prompt_for_string(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_prompt_for_compression_level(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_prompt_for_output_format(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_prompt_for_sectors_per_chunk(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_prompt_for_maximum_segment_size(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_prompt_for_export_offset(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_prompt_for_export_size(
      export_handle_t *export_handle,
      const libcstring_system_character_t *request_string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_string(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_compression_values(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_output_format(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_sectors_per_chunk(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_maximum_segment_size(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_export_offset(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_export_size(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_header_codepage(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_process_buffer_size(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_additional_digest_types(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_output_values(
      export_handle_t *export_handle,
@@ -381,7 +380,7 @@ int export_handle_set_output_values(
      libcstring_system_character_t *acquiry_software_version,
      uint8_t zero_chunk_on_error,
      uint8_t copy_input_values,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_set_hash_value(
      export_handle_t *export_handle,
@@ -389,33 +388,33 @@ int export_handle_set_hash_value(
      size_t hash_value_identifier_length,
      libcstring_system_character_t *hash_value,
      size_t hash_value_length,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 int export_handle_append_read_error(
       export_handle_t *export_handle,
       off64_t start_offset,
       size_t number_of_bytes,
-      liberror_error_t **error );
+      libcerror_error_t **error );
 #endif
 
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
-         liberror_error_t **error );
+         libcerror_error_t **error );
 
 int export_handle_export_input(
      export_handle_t *export_handle,
      uint8_t swap_byte_pairs,
      uint8_t print_status_information,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_export_single_files(
      export_handle_t *export_handle,
      const libcstring_system_character_t *export_path,
      uint8_t print_status_information,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
@@ -424,7 +423,7 @@ int export_handle_export_file_entry(
      size_t export_path_size,
      size_t file_entry_path_index,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_export_file_entry_sub_file_entries(
      export_handle_t *export_handle,
@@ -433,17 +432,17 @@ int export_handle_export_file_entry_sub_file_entries(
      size_t export_path_size,
      size_t file_entry_path_index,
      log_handle_t *log_handle,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_hash_values_fprint(
      export_handle_t *export_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 int export_handle_checksum_errors_fprint(
      export_handle_t *export_handle,
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

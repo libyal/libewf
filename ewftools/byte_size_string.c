@@ -1,7 +1,7 @@
 /*
  * Byte size string functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -22,12 +22,11 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
-#include <libsystem.h>
-
 #include "byte_size_string.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libclocale.h"
+#include "ewftools_libcnotify.h"
+#include "ewftools_libcstring.h"
 
 /* Creates a human readable byte size string
  * Returns 1 if successful or -1 on error
@@ -37,7 +36,7 @@ int byte_size_string_create(
      size_t byte_size_string_length,
      uint64_t size,
      int units,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	const libcstring_system_character_t *factor_string = NULL;
 	const libcstring_system_character_t *units_string  = NULL;
@@ -51,10 +50,10 @@ int byte_size_string_create(
 
 	if( byte_size_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid byte size string.",
 		 function );
 
@@ -64,10 +63,10 @@ int byte_size_string_create(
 	 */
 	if( byte_size_string_length < 9 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: byte size string too small.",
 		 function );
 
@@ -101,10 +100,10 @@ int byte_size_string_create(
 	}
 	if( factor > 8 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: factor size greater than 8 unsupported.",
 		 function );
 
@@ -146,14 +145,14 @@ int byte_size_string_create(
 	}
 	if( remainder >= 0 )
 	{
-		decimal_point = libcstring_locale_get_decimal_point();
-
-		if( decimal_point == -1 )
+		if( libclocale_locale_get_decimal_point(
+		     &decimal_point,
+		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve locale decimal point.",
 			 function );
 
@@ -188,10 +187,10 @@ int byte_size_string_create(
 	if( ( print_count < 0 )
 	 || ( (size_t) print_count > byte_size_string_length ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set byte size string.",
 		 function );
 
@@ -207,7 +206,7 @@ int byte_size_string_convert(
      const libcstring_system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function            = "byte_size_string_convert";
 	size_t byte_size_string_iterator = 0;
@@ -219,10 +218,10 @@ int byte_size_string_convert(
 
 	if( byte_size_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid byte size string.",
 		 function );
 
@@ -230,23 +229,23 @@ int byte_size_string_convert(
 	}
 	if( size == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid size.",
 		 function );
 
 		return( -1 );
 	}
-	decimal_point = libcstring_locale_get_decimal_point();
-
-	if( decimal_point == -1 )
+	if( libclocale_locale_get_decimal_point(
+	     &decimal_point,
+	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve locale decimal point.",
 		 function );
 
@@ -337,10 +336,10 @@ int byte_size_string_convert(
 	}
 	if( factor < 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid factor.",
 		 function );
 
@@ -369,10 +368,10 @@ int byte_size_string_convert(
 	}
 	else
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid units.",
 		 function );
 
@@ -396,7 +395,7 @@ int byte_size_string_convert(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	else if( remainder >= 0 )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: ignoring byte value remainder.\n",
 		 function );
 	}
@@ -407,7 +406,7 @@ int byte_size_string_convert(
 	 && ( byte_size_string[ byte_size_string_iterator ] != (libcstring_system_character_t) '\n' )
 	 && ( byte_size_string[ byte_size_string_iterator ] != (libcstring_system_character_t) '\r' ) )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: trailing data in byte size string.\n",
 		 function );
 	}

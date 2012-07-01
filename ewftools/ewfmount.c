@@ -1,7 +1,7 @@
 /*
  * Mounts an EWF file
  *
- * Copyright (C) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (C) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,9 +24,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_ERRNO_H )
 #include <errno.h>
 #endif
@@ -39,21 +36,24 @@
 #include <stdlib.h>
 #endif
 
-#include <libsystem.h>
-
-#if defined( HAVE_FUSE_H ) || defined( HAVE_OSXFUSE_FUSE_H )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 #define FUSE_USE_VERSION	26
 
-#if defined( HAVE_FUSE_H )
+#if defined( HAVE_LIBFUSE )
 #include <fuse.h>
 
-#elif defined( HAVE_OSXFUSE_FUSE_H )
+#elif defined( HAVE_LIBOSXFUSE )
 #include <osxfuse/fuse.h>
 #endif
 
-#endif /* defined( HAVE_FUSE_H ) || defined( HAVE_OSXFUSE_FUSE_H ) */
+#endif /* defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE ) */
 
 #include "ewfoutput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libclocale.h"
+#include "ewftools_libcnotify.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "mount_handle.h"
 
@@ -88,12 +88,12 @@ void usage_fprint(
 /* Signal handler for ewfmount
  */
 void ewfmount_signal_handler(
-      libsystem_signal_t signal LIBSYSTEM_ATTRIBUTE_UNUSED )
+      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "ewfmount_signal_handler";
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( signal )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
 
 	ewfmount_abort = 1;
 
@@ -103,28 +103,28 @@ void ewfmount_signal_handler(
 		     ewfmount_mount_handle,
 		     &error ) != 1 )
 		{
-			libsystem_notify_printf(
+			libcnotify_printf(
 			 "%s: unable to signal mount handle to abort.\n",
 			 function );
 
-			libsystem_notify_print_error_backtrace(
+			libcnotify_print_error_backtrace(
 			 error );
-			liberror_error_free(
+			libcerror_error_free(
 			 &error );
 		}
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libsystem_file_io_close(
+	if( libcsystem_file_io_close(
 	     0 ) != 0 )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
 		 function );
 	}
 }
 
-#if defined( HAVE_LIBFUSE )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 
 #if ( SIZEOF_OFF_T != 8 ) && ( SIZEOF_OFF_T != 4 )
 #error Size of off_t not supported
@@ -140,7 +140,7 @@ int ewfmount_fuse_open(
      const char *path,
      struct fuse_file_info *file_info )
 {
-	liberror_error_t *error         = NULL;
+	libcerror_error_t *error         = NULL;
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "ewfmount_fuse_open";
 	size_t path_length              = 0;
@@ -148,10 +148,10 @@ int ewfmount_fuse_open(
 
 	if( path == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid path.",
 		 function );
 
@@ -161,10 +161,10 @@ int ewfmount_fuse_open(
 	}
 	if( file_info == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file info.",
 		 function );
 
@@ -184,10 +184,10 @@ int ewfmount_fuse_open(
 		     &file_entry,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve file entry for: %s.",
 			 function,
 			 path );
@@ -200,10 +200,10 @@ int ewfmount_fuse_open(
 		     &file_entry,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free file entry.",
 			 function );
 
@@ -216,10 +216,10 @@ int ewfmount_fuse_open(
 	{
 		if( path_length != ewfmount_fuse_path_length )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported path length.",
 			 function );
 
@@ -232,10 +232,10 @@ int ewfmount_fuse_open(
 		     ewfmount_fuse_path,
 		     ewfmount_fuse_path_length ) != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported path.",
 			 function );
 
@@ -246,10 +246,10 @@ int ewfmount_fuse_open(
 	}
 	if( ( file_info->flags & 0x03 ) != O_RDONLY )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: write access currently not supported.",
 		 function );
 
@@ -262,9 +262,9 @@ int ewfmount_fuse_open(
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -278,23 +278,23 @@ int ewfmount_fuse_read(
      char *buffer,
      size_t size,
      off_t offset,
-     struct fuse_file_info *file_info LIBSYSTEM_ATTRIBUTE_UNUSED )
+     struct fuse_file_info *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error         = NULL;
+	libcerror_error_t *error         = NULL;
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "ewfmount_fuse_read";
 	size_t path_length              = 0;
 	ssize_t read_count              = 0;
 	int result                      = 0;
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid path.",
 		 function );
 
@@ -304,10 +304,10 @@ int ewfmount_fuse_read(
 	}
 	if( size > (size_t) INT_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid size value exceeds maximum.",
 		 function );
 
@@ -327,10 +327,10 @@ int ewfmount_fuse_read(
 		     &file_entry,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve file entry for: %s.",
 			 function,
 			 path );
@@ -345,10 +345,10 @@ int ewfmount_fuse_read(
 		     SEEK_SET,
 		     &error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset in file entry.",
 			 function );
 
@@ -364,10 +364,10 @@ int ewfmount_fuse_read(
 
 		if( read_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read from file entry.",
 			 function );
 
@@ -379,10 +379,10 @@ int ewfmount_fuse_read(
 		     &file_entry,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free file entry.",
 			 function );
 
@@ -395,10 +395,10 @@ int ewfmount_fuse_read(
 	{
 		if( path_length != ewfmount_fuse_path_length )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported path length.",
 			 function );
 
@@ -411,10 +411,10 @@ int ewfmount_fuse_read(
 		     ewfmount_fuse_path,
 		     ewfmount_fuse_path_length ) != 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported path.",
 			 function );
 
@@ -428,10 +428,10 @@ int ewfmount_fuse_read(
 		     SEEK_SET,
 		     &error ) == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek offset in mount handle.",
 			 function );
 
@@ -447,10 +447,10 @@ int ewfmount_fuse_read(
 
 		if( read_count == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read from mount handle.",
 			 function );
 
@@ -464,9 +464,9 @@ int ewfmount_fuse_read(
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -479,10 +479,10 @@ int ewfmount_fuse_readdir(
      const char *path,
      void *buffer,
      fuse_fill_dir_t filler,
-     off_t offset LIBSYSTEM_ATTRIBUTE_UNUSED,
-     struct fuse_file_info *file_info LIBSYSTEM_ATTRIBUTE_UNUSED )
+     off_t offset LIBCSYSTEM_ATTRIBUTE_UNUSED,
+     struct fuse_file_info *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error             = NULL;
+	libcerror_error_t *error             = NULL;
 	libewf_file_entry_t *file_entry     = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
 	char *name                          = NULL;
@@ -494,15 +494,15 @@ int ewfmount_fuse_readdir(
 	int result                          = 0;
 	int sub_file_entry_index            = 0;
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( offset )
-	LIBSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( offset )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid path.",
 		 function );
 
@@ -522,10 +522,10 @@ int ewfmount_fuse_readdir(
 		     &file_entry,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve file entry for: %s.",
 			 function,
 			 path );
@@ -540,10 +540,10 @@ int ewfmount_fuse_readdir(
 		if( ( path_length != 1 )
 		 || ( path[ 0 ] != '/' ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported path.",
 			 function );
 
@@ -558,10 +558,10 @@ int ewfmount_fuse_readdir(
 	     NULL,
 	     0 ) == 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set directory entry.",
 		 function );
 
@@ -575,10 +575,10 @@ int ewfmount_fuse_readdir(
 	     NULL,
 	     0 ) == 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set directory entry.",
 		 function );
 
@@ -593,10 +593,10 @@ int ewfmount_fuse_readdir(
 		     &number_of_sub_file_entries,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of sub file entries.",
 			 function );
 
@@ -614,10 +614,10 @@ int ewfmount_fuse_readdir(
 			     &sub_file_entry,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to free retrieve sub file entry: %d.",
 				 function,
 				 sub_file_entry_index );
@@ -639,10 +639,10 @@ int ewfmount_fuse_readdir(
 #endif
 			if( result != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the sub file entry name size.",
 				 function );
 
@@ -657,10 +657,10 @@ int ewfmount_fuse_readdir(
 
 				if( name == NULL )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 &error,
-					 LIBERROR_ERROR_DOMAIN_MEMORY,
-					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 					 "%s: unable to create sub file entry name.",
 					 function );
 
@@ -683,10 +683,10 @@ int ewfmount_fuse_readdir(
 #endif
 				if( result != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 &error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 					 "%s: unable to retrieve the sub file entry name.",
 					 function );
 
@@ -711,10 +711,10 @@ int ewfmount_fuse_readdir(
 				     NULL,
 				     0 ) == 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 &error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 					 "%s: unable to set directory entry.",
 					 function );
 
@@ -731,10 +731,10 @@ int ewfmount_fuse_readdir(
 			     &sub_file_entry,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free sub file entry: %d.",
 				 function,
 				 sub_file_entry_index );
@@ -748,10 +748,10 @@ int ewfmount_fuse_readdir(
 		     &file_entry,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free file entry.",
 			 function );
 
@@ -768,10 +768,10 @@ int ewfmount_fuse_readdir(
 		     NULL,
 		     0 ) == 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set directory entry.",
 			 function );
 
@@ -785,9 +785,9 @@ int ewfmount_fuse_readdir(
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( name != NULL )
@@ -817,7 +817,7 @@ int ewfmount_fuse_getattr(
      const char *path,
      struct stat *stat_info )
 {
-	liberror_error_t *error         = NULL;
+	libcerror_error_t *error         = NULL;
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "ewfmount_fuse_getattr";
 	size64_t file_size              = 0;
@@ -828,10 +828,10 @@ int ewfmount_fuse_getattr(
 
 	if( path == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid path.",
 		 function );
 
@@ -841,10 +841,10 @@ int ewfmount_fuse_getattr(
 	}
 	if( stat_info == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stat info.",
 		 function );
 
@@ -857,10 +857,10 @@ int ewfmount_fuse_getattr(
 	     0,
 	     sizeof( struct stat ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 &error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear stat info.",
 		 function );
 
@@ -892,10 +892,10 @@ int ewfmount_fuse_getattr(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve file entry for: %s.",
 			 function,
 			 path );
@@ -911,10 +911,10 @@ int ewfmount_fuse_getattr(
 			     &number_of_sub_file_entries,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve number of sub file entries.",
 				 function );
 
@@ -937,10 +937,10 @@ int ewfmount_fuse_getattr(
 			     &file_size,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve file entry size.",
 				 function );
 
@@ -951,10 +951,10 @@ int ewfmount_fuse_getattr(
 #if SIZEOF_OFF_T == 4
 			if( file_size > (size64_t) UINT32_MAX )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: invalid to file entry size value out of bounds.",
 				 function );
 
@@ -970,10 +970,10 @@ int ewfmount_fuse_getattr(
 			     &value_32bit,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve file entry modification time.",
 				 function );
 
@@ -988,10 +988,10 @@ int ewfmount_fuse_getattr(
 			     &value_32bit,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve file entry access time.",
 				 function );
 
@@ -1006,10 +1006,10 @@ int ewfmount_fuse_getattr(
 			     &value_32bit,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve file entry entry modification time.",
 				 function );
 
@@ -1023,10 +1023,10 @@ int ewfmount_fuse_getattr(
 			     &file_entry,
 			     &error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 &error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free file entry.",
 				 function );
 
@@ -1054,10 +1054,10 @@ int ewfmount_fuse_getattr(
 				     &file_size,
 				     &error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 &error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 					 "%s: unable to retrieve media size.",
 					 function );
 
@@ -1068,10 +1068,10 @@ int ewfmount_fuse_getattr(
 #if SIZEOF_OFF_T == 4
 				if( file_size > (size64_t) UINT32_MAX )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 &error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 					 "%s: invalid media size value out of bounds.",
 					 function );
 
@@ -1082,13 +1082,13 @@ int ewfmount_fuse_getattr(
 #endif
 				stat_info->st_size = (off_t) file_size;
 
-				stat_info->st_atime = libsystem_date_time_time(
+				stat_info->st_atime = libcsystem_date_time_time(
 				                       NULL );
 
-				stat_info->st_mtime = libsystem_date_time_time(
+				stat_info->st_mtime = libcsystem_date_time_time(
 				                       NULL );
 
-				stat_info->st_ctime = libsystem_date_time_time(
+				stat_info->st_ctime = libcsystem_date_time_time(
 				                       NULL );
 				result = 0;
 			}
@@ -1112,9 +1112,9 @@ int ewfmount_fuse_getattr(
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( file_entry != NULL )
@@ -1129,12 +1129,12 @@ on_error:
 /* Cleans up when fuse is done
  */
 void ewfmount_fuse_destroy(
-      void *private_data LIBSYSTEM_ATTRIBUTE_UNUSED )
+      void *private_data LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	liberror_error_t *error = NULL;
+	libcerror_error_t *error = NULL;
 	static char *function   = "ewfmount_fuse_destroy";
 
-	LIBSYSTEM_UNREFERENCED_PARAMETER( private_data )
+	LIBCSYSTEM_UNREFERENCED_PARAMETER( private_data )
 
 	if( ewfmount_mount_handle != NULL )
 	{
@@ -1142,10 +1142,10 @@ void ewfmount_fuse_destroy(
 		     &ewfmount_mount_handle,
 		     &error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free mount handle.",
 			 function );
 
@@ -1157,15 +1157,15 @@ void ewfmount_fuse_destroy(
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return;
 }
 
-#endif /* defined( HAVE_LIBFUSE ) */
+#endif /* defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE ) */
 
 /* The main program
  */
@@ -1186,24 +1186,33 @@ int main( int argc, char * const argv[] )
 	int result                                            = 0;
 	int verbose                                           = 0;
 
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	libsystem_glob_t *glob                                = NULL;
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	libcsystem_glob_t *glob                                = NULL;
 #endif
 
-#if defined( HAVE_LIBFUSE )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations ewfmount_fuse_operations;
 	struct fuse_chan *ewfmount_fuse_channel               = NULL;
 	struct fuse *ewfmount_fuse_handle                     = NULL;
 #endif
 
-	libsystem_notify_set_stream(
+	libcnotify_stream_set(
 	 stderr,
 	 NULL );
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 1 );
 
-        if( libsystem_initialize(
+	if( libclocale_initialize(
              "ewftools",
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize locale values.\n" );
+
+		goto on_error;
+	}
+        if( libcsystem_initialize(
              _IONBF,
              &error ) != 1 )
 	{
@@ -1211,9 +1220,9 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to initialize system values.\n" );
 
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 
 		return( EXIT_FAILURE );
@@ -1222,7 +1231,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = libsystem_getopt(
+	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
 	                   _LIBCSTRING_SYSTEM_STRING( "f:hvV" ) ) ) != (libcstring_system_integer_t) -1 )
@@ -1289,7 +1298,7 @@ int main( int argc, char * const argv[] )
 	}
 	mount_point = argv[ argc - 1 ];
 
-	libsystem_notify_set_verbose(
+	libcnotify_verbose_set(
 	 verbose );
 	libewf_notify_set_stream(
 	 stderr,
@@ -1297,8 +1306,8 @@ int main( int argc, char * const argv[] )
 	libewf_notify_set_verbose(
 	 verbose );
 
-#if !defined( LIBSYSTEM_HAVE_GLOB )
-	if( libsystem_glob_initialize(
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -1308,7 +1317,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libsystem_glob_resolve(
+	if( libcsystem_glob_resolve(
 	     glob,
 	     &( argv[ optind ] ),
 	     argc - optind - 1,
@@ -1371,7 +1380,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( HAVE_LIBFUSE )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	if( memory_set(
 	     &ewfmount_fuse_operations,
 	     0,
@@ -1454,12 +1463,12 @@ int main( int argc, char * const argv[] )
 on_error:
 	if( error != NULL )
 	{
-		libsystem_notify_print_error_backtrace(
+		libcnotify_print_error_backtrace(
 		 error );
-		liberror_error_free(
+		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_LIBFUSE )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	if( ewfmount_fuse_handle != NULL )
 	{
 		fuse_destroy(

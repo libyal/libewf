@@ -23,13 +23,11 @@
 #define _LIBEWF_NOTIFY_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
 
-#include <liberror.h>
-
-#include <stdio.h>
-
 #include "libewf_extern.h"
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -44,16 +42,16 @@ void libewf_notify_set_verbose(
 LIBEWF_EXTERN \
 int libewf_notify_set_stream(
      FILE *stream,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_notify_stream_open(
      const char *filename,
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_notify_stream_close(
-     liberror_error_t **error );
+     libcerror_error_t **error );
 
 #endif
 

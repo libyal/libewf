@@ -1,7 +1,7 @@
 /* 
  * Verification handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,15 +23,14 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
-#include <libsystem.h>
-
 #include "byte_size_string.h"
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcpath.h"
+#include "ewftools_libcsplit.h"
+#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "log_handle.h"
@@ -49,16 +48,16 @@
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_initialize";
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -66,10 +65,10 @@ int verification_handle_initialize(
 	}
 	if( *verification_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid verification handle value already set.",
 		 function );
 
@@ -80,10 +79,10 @@ int verification_handle_initialize(
 
 	if( *verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create verification handle.",
 		 function );
 
@@ -94,10 +93,10 @@ int verification_handle_initialize(
 	     0,
 	     sizeof( verification_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear verification handle.",
 		 function );
 
@@ -112,10 +111,10 @@ int verification_handle_initialize(
 	     &( ( *verification_handle )->input_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize input handle.",
 		 function );
 
@@ -128,10 +127,10 @@ int verification_handle_initialize(
 	     1000,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set maximum number of open handles.",
 		 function );
 
@@ -145,10 +144,10 @@ int verification_handle_initialize(
 
 		if( ( *verification_handle )->calculated_md5_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create calculated MD5 digest hash string.",
 			 function );
 
@@ -160,10 +159,10 @@ int verification_handle_initialize(
 
 	if( ( *verification_handle )->stored_md5_hash_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create stored MD5 digest hash string.",
 		 function );
 
@@ -174,10 +173,10 @@ int verification_handle_initialize(
 
 	if( ( *verification_handle )->stored_sha1_hash_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create stored SHA1 digest hash string.",
 		 function );
 
@@ -188,10 +187,10 @@ int verification_handle_initialize(
 
 	if( ( *verification_handle )->stored_sha256_hash_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create stored SHA256 digest hash string.",
 		 function );
 
@@ -247,17 +246,17 @@ on_error:
  */
 int verification_handle_free(
      verification_handle_t **verification_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_free";
 	int result            = 1;
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -270,10 +269,10 @@ int verification_handle_free(
 		       &( ( *verification_handle )->input_handle ),
 		       error ) != 1 ) )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free input handle.",
 			 function );
 
@@ -285,10 +284,10 @@ int verification_handle_free(
 			     &( ( *verification_handle )->md5_context ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free MD5 context.",
 				 function );
 
@@ -311,10 +310,10 @@ int verification_handle_free(
 			     &( ( *verification_handle )->sha1_context ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free SHA1 context.",
 				 function );
 
@@ -337,10 +336,10 @@ int verification_handle_free(
 			     &( ( *verification_handle )->sha256_context ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free SHA256 context.",
 				 function );
 
@@ -370,16 +369,16 @@ int verification_handle_free(
  */
 int verification_handle_signal_abort(
      verification_handle_t *verification_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_signal_abort";
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -391,10 +390,10 @@ int verification_handle_signal_abort(
 		     verification_handle->input_handle,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to signal input handle to abort.",
 			 function );
 
@@ -413,7 +412,7 @@ int verification_handle_open_input(
      verification_handle_t *verification_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
 	static char *function                            = "verification_handle_open_input";
@@ -421,10 +420,10 @@ int verification_handle_open_input(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -432,10 +431,10 @@ int verification_handle_open_input(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -443,10 +442,10 @@ int verification_handle_open_input(
 	}
 	if( number_of_filenames <= 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid number of filenames.",
 		 function );
 
@@ -475,10 +474,10 @@ int verification_handle_open_input(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to resolve filename(s).",
 			 function );
 
@@ -493,10 +492,10 @@ int verification_handle_open_input(
 		     verification_handle->header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header codepage.",
 			 function );
 
@@ -519,10 +518,10 @@ int verification_handle_open_input(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open files.",
 		 function );
 
@@ -542,10 +541,10 @@ int verification_handle_open_input(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free globbed filenames.",
 			 function );
 
@@ -558,10 +557,10 @@ int verification_handle_open_input(
 	     &( verification_handle->chunk_size ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve chunk size.",
 		 function );
 
@@ -572,10 +571,10 @@ int verification_handle_open_input(
 	     &( verification_handle->bytes_per_sector ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -607,16 +606,16 @@ on_error:
  */
 int verification_handle_close(
      verification_handle_t *verification_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_close";
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -626,10 +625,10 @@ int verification_handle_close(
 	     verification_handle->input_handle,
 	     error ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close input handle.",
 		 function );
 
@@ -644,17 +643,17 @@ int verification_handle_close(
 ssize_t verification_handle_prepare_read_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "verification_handle_prepare_read_buffer";
 	ssize_t process_count = 0;
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -662,10 +661,10 @@ ssize_t verification_handle_prepare_read_buffer(
 	}
 	if( storage_media_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid storage media buffer.",
 		 function );
 
@@ -687,7 +686,7 @@ ssize_t verification_handle_prepare_read_buffer(
 
 	if( process_count == -1 )
 	{
-		liberror_error_free(
+		libcerror_error_free(
 		 error );
 
 		/* Wipe the chunk if nescessary
@@ -700,10 +699,10 @@ ssize_t verification_handle_prepare_read_buffer(
 			       0,
 			       storage_media_buffer->raw_buffer_size ) == NULL ) )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 				 "%s: unable to zero raw buffer.",
 				 function );
 
@@ -714,10 +713,10 @@ ssize_t verification_handle_prepare_read_buffer(
 			     0,
 			     storage_media_buffer->compression_buffer_size ) == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 				 "%s: unable to zero compression buffer.",
 				 function );
 
@@ -734,10 +733,10 @@ ssize_t verification_handle_prepare_read_buffer(
 		     process_count,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append read error.",
 			 function );
 
@@ -767,17 +766,17 @@ ssize_t verification_handle_read_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t read_size,
-         liberror_error_t **error )
+         libcerror_error_t **error )
 {
 	static char *function = "verification_handle_read_buffer";
 	ssize_t read_count    = 0;
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -785,10 +784,10 @@ ssize_t verification_handle_read_buffer(
 	}
 	if( storage_media_buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid storage media buffer.",
 		 function );
 
@@ -814,10 +813,10 @@ ssize_t verification_handle_read_buffer(
 
 	if( read_count == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read storage media buffer.",
 		 function );
 
@@ -837,16 +836,16 @@ ssize_t verification_handle_read_buffer(
  */
 int verification_handle_initialize_integrity_hash(
      verification_handle_t *verification_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_initialize_integrity_hash";
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -858,10 +857,10 @@ int verification_handle_initialize_integrity_hash(
 		     &( verification_handle->md5_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize MD5 context.",
 			 function );
 
@@ -875,10 +874,10 @@ int verification_handle_initialize_integrity_hash(
 		     &( verification_handle->sha1_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize SHA1 context.",
 			 function );
 
@@ -892,10 +891,10 @@ int verification_handle_initialize_integrity_hash(
 		     &( verification_handle->sha256_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize SHA256 context.",
 			 function );
 
@@ -928,16 +927,16 @@ int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
      uint8_t *buffer,
      size_t buffer_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_update_integrity_hash";
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -945,10 +944,10 @@ int verification_handle_update_integrity_hash(
 	}
 	if( buffer == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
@@ -957,10 +956,10 @@ int verification_handle_update_integrity_hash(
 	if( ( buffer_size == 0 )
 	 || ( buffer_size > (size_t) SSIZE_MAX ) )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid buffer size value out of bounds.",
 		 function );
 
@@ -974,10 +973,10 @@ int verification_handle_update_integrity_hash(
 		     buffer_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update MD5 digest hash.",
 			 function );
 
@@ -992,10 +991,10 @@ int verification_handle_update_integrity_hash(
 		     buffer_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update SHA1 digest hash.",
 			 function );
 
@@ -1010,10 +1009,10 @@ int verification_handle_update_integrity_hash(
 		     buffer_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update SHA256 digest hash.",
 			 function );
 
@@ -1028,7 +1027,7 @@ int verification_handle_update_integrity_hash(
  */
 int verification_handle_finalize_integrity_hash(
      verification_handle_t *verification_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	uint8_t calculated_md5_hash[ LIBHMAC_MD5_HASH_SIZE ];
 	uint8_t calculated_sha1_hash[ LIBHMAC_SHA1_HASH_SIZE ];
@@ -1038,10 +1037,10 @@ int verification_handle_finalize_integrity_hash(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -1051,10 +1050,10 @@ int verification_handle_finalize_integrity_hash(
 	{
 		if( verification_handle->calculated_md5_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid verification handle - missing calculated MD5 hash string.",
 			 function );
 
@@ -1066,10 +1065,10 @@ int verification_handle_finalize_integrity_hash(
 		     LIBHMAC_MD5_HASH_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize MD5 hash.",
 			 function );
 
@@ -1079,10 +1078,10 @@ int verification_handle_finalize_integrity_hash(
 		     &( verification_handle->md5_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free MD5 context.",
 			 function );
 
@@ -1095,9 +1094,9 @@ int verification_handle_finalize_integrity_hash(
 		     33,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set calculated MD5 hash string.",
 			 function );
@@ -1109,10 +1108,10 @@ int verification_handle_finalize_integrity_hash(
 	{
 		if( verification_handle->calculated_sha1_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid verification handle - missing calculated SHA1 hash string.",
 			 function );
 
@@ -1124,10 +1123,10 @@ int verification_handle_finalize_integrity_hash(
 		     LIBHMAC_SHA1_HASH_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize SHA1 hash.",
 			 function );
 
@@ -1137,10 +1136,10 @@ int verification_handle_finalize_integrity_hash(
 		     &( verification_handle->sha1_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free SHA1 context.",
 			 function );
 
@@ -1153,10 +1152,10 @@ int verification_handle_finalize_integrity_hash(
 		     41,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create calculated SHA1 hash string.",
 			 function );
 
@@ -1167,10 +1166,10 @@ int verification_handle_finalize_integrity_hash(
 	{
 		if( verification_handle->calculated_sha256_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid verification handle - missing calculated SHA256 hash string.",
 			 function );
 
@@ -1182,10 +1181,10 @@ int verification_handle_finalize_integrity_hash(
 		     LIBHMAC_SHA256_HASH_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize SHA256 hash.",
 			 function );
 
@@ -1195,10 +1194,10 @@ int verification_handle_finalize_integrity_hash(
 		     &( verification_handle->sha256_context ),
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free SHA256 context.",
 			 function );
 
@@ -1211,10 +1210,10 @@ int verification_handle_finalize_integrity_hash(
 		     65,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create calculated SHA256 hash string.",
 			 function );
 
@@ -1231,7 +1230,7 @@ int verification_handle_verify_input(
      verification_handle_t *verification_handle,
      uint8_t print_status_information,
      log_handle_t *log_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
@@ -1253,10 +1252,10 @@ int verification_handle_verify_input(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -1264,10 +1263,10 @@ int verification_handle_verify_input(
 	}
 	if( verification_handle->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing chunk size.",
 		 function );
 
@@ -1275,10 +1274,10 @@ int verification_handle_verify_input(
 	}
 	if( verification_handle->chunk_size > (size32_t) INT32_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
@@ -1287,10 +1286,10 @@ int verification_handle_verify_input(
 #if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( verification_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid process buffer size value exceeds maximum.",
 		 function );
 
@@ -1302,10 +1301,10 @@ int verification_handle_verify_input(
 	     &media_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media size.",
 		 function );
 
@@ -1328,10 +1327,10 @@ int verification_handle_verify_input(
 	     process_buffer_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create storage media buffer.",
 		 function );
 
@@ -1341,10 +1340,10 @@ int verification_handle_verify_input(
 	     verification_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize integrity hash(es).",
 		 function );
 
@@ -1359,10 +1358,10 @@ int verification_handle_verify_input(
 	     print_status_information,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create process status.",
 		 function );
 
@@ -1372,10 +1371,10 @@ int verification_handle_verify_input(
 	     process_status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to start process status.",
 		 function );
 
@@ -1397,10 +1396,10 @@ int verification_handle_verify_input(
 
 		if( read_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			"%s: unable to read data.",
 			 function );
 
@@ -1408,10 +1407,10 @@ int verification_handle_verify_input(
 		}
 		if( read_count == 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unexpected end of data.",
 			 function );
 
@@ -1424,10 +1423,10 @@ int verification_handle_verify_input(
 
 		if( process_count < 0 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			"%s: unable to prepare buffer after read.",
 			 function );
 
@@ -1435,10 +1434,10 @@ int verification_handle_verify_input(
 		}
 		if( process_count > (ssize_t) read_size )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: more bytes read than requested.",
 			 function );
 
@@ -1460,10 +1459,10 @@ int verification_handle_verify_input(
 		     &data_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine storage media buffer data.",
 			 function );
 
@@ -1475,10 +1474,10 @@ int verification_handle_verify_input(
 		     process_count,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to update integrity hash(es).",
 			 function );
 
@@ -1490,10 +1489,10 @@ int verification_handle_verify_input(
 		     media_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to update process status.",
 			 function );
 
@@ -1508,10 +1507,10 @@ int verification_handle_verify_input(
 	     &storage_media_buffer,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free storage media buffer.",
 		 function );
 
@@ -1521,10 +1520,10 @@ int verification_handle_verify_input(
 	     verification_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to finalize integrity hash(es).",
 		 function );
 
@@ -1534,10 +1533,10 @@ int verification_handle_verify_input(
 	     verification_handle,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to retrieve integrity hash(es) from input.",
 		 function );
 
@@ -1553,10 +1552,10 @@ int verification_handle_verify_input(
 	     status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to stop process status.",
 		 function );
 
@@ -1566,10 +1565,10 @@ int verification_handle_verify_input(
 	     &process_status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free process status.",
 		 function );
 
@@ -1586,10 +1585,10 @@ int verification_handle_verify_input(
 		     verification_handle->notify_stream,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print checksum errors.",
 			 function );
 
@@ -1600,10 +1599,10 @@ int verification_handle_verify_input(
 		     verification_handle->notify_stream,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print hash values.",
 			 function );
 
@@ -1614,10 +1613,10 @@ int verification_handle_verify_input(
 		     verification_handle->notify_stream,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print additional hash values.",
 			 function );
 
@@ -1634,10 +1633,10 @@ int verification_handle_verify_input(
 			     log_handle->log_stream,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print checksum errors in log handle.",
 				 function );
 
@@ -1648,10 +1647,10 @@ int verification_handle_verify_input(
 			     log_handle->log_stream,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print hash values in log handle.",
 				 function );
 
@@ -1662,10 +1661,10 @@ int verification_handle_verify_input(
 			     log_handle->log_stream,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print additional hash values in log handle.",
 				 function );
 
@@ -1679,10 +1678,10 @@ int verification_handle_verify_input(
 
 	if( is_corrupted == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if segment files are corrupted.",
 		 function );
 
@@ -1693,10 +1692,10 @@ int verification_handle_verify_input(
 	     &number_of_checksum_errors,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
@@ -1766,7 +1765,7 @@ int verification_handle_verify_single_files(
      verification_handle_t *verification_handle,
      uint8_t print_status_information,
      log_handle_t *log_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_file_entry_t *file_entry    = NULL;
 	process_status_t *process_status   = NULL;
@@ -1776,10 +1775,10 @@ int verification_handle_verify_single_files(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -1790,10 +1789,10 @@ int verification_handle_verify_single_files(
 	     &file_entry,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve root file entry.",
 		 function );
 
@@ -1808,10 +1807,10 @@ int verification_handle_verify_single_files(
 	     print_status_information,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create process status.",
 		 function );
 
@@ -1821,10 +1820,10 @@ int verification_handle_verify_single_files(
 	     process_status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to start process status.",
 		 function );
 
@@ -1840,10 +1839,10 @@ int verification_handle_verify_single_files(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
 		 "%s: unable to verify root file entry.",
 		 function );
 
@@ -1855,10 +1854,10 @@ int verification_handle_verify_single_files(
 	     PROCESS_STATUS_COMPLETED,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to stop process status.",
 		 function );
 
@@ -1868,10 +1867,10 @@ int verification_handle_verify_single_files(
 	     &process_status,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free process status.",
 		 function );
 
@@ -1881,10 +1880,10 @@ int verification_handle_verify_single_files(
 	     &file_entry,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free root file entry.",
 		 function );
 
@@ -1895,10 +1894,10 @@ int verification_handle_verify_single_files(
 	     &number_of_checksum_errors,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
@@ -1941,7 +1940,7 @@ int verification_handle_verify_file_entry(
      const libcstring_system_character_t *file_entry_path,
      size_t file_entry_path_length,
      log_handle_t *log_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *name        = NULL;
 	libcstring_system_character_t *target_path = NULL;
@@ -1962,10 +1961,10 @@ int verification_handle_verify_file_entry(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -1973,10 +1972,10 @@ int verification_handle_verify_file_entry(
 	}
 	if( verification_handle->chunk_size == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing chunk size.",
 		 function );
 
@@ -1984,10 +1983,10 @@ int verification_handle_verify_file_entry(
 	}
 	if( verification_handle->chunk_size > (size32_t) INT32_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
@@ -1995,10 +1994,10 @@ int verification_handle_verify_file_entry(
 	}
 	if( verification_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid process buffer size value exceeds maximum.",
 		 function );
 
@@ -2017,10 +2016,10 @@ int verification_handle_verify_file_entry(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the name.",
 		 function );
 
@@ -2033,10 +2032,10 @@ int verification_handle_verify_file_entry(
 
 		if( name == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create name.",
 			 function );
 
@@ -2057,10 +2056,10 @@ int verification_handle_verify_file_entry(
 #endif
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the name.",
 			 function );
 
@@ -2069,19 +2068,30 @@ int verification_handle_verify_file_entry(
 
 			goto on_error;
 		}
-		if( libsystem_path_create(
-		     name,
-		     name_size - 1,
-		     file_entry_path,
-		     file_entry_path_length,
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcpath_path_join_wide(
 		     &target_path,
 		     &target_path_size,
+		     file_entry_path,
+		     file_entry_path_length,
+		     name,
+		     name_size - 1,
 		     error ) != 1 )
+#else
+		if( libcpath_path_join(
+		     &target_path,
+		     &target_path_size,
+		     file_entry_path,
+		     file_entry_path_length,
+		     name,
+		     name_size - 1,
+		     error ) != 1 )
+#endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create target path.",
 			 function );
 
@@ -2103,10 +2113,10 @@ int verification_handle_verify_file_entry(
 	     &file_entry_type,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file entry type.",
 		 function );
 
@@ -2133,10 +2143,10 @@ int verification_handle_verify_file_entry(
 		     &file_entry_data_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve file entry data size.",
 			 function );
 
@@ -2146,10 +2156,10 @@ int verification_handle_verify_file_entry(
 		     verification_handle,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize integrity hash(es).",
 			 function );
 
@@ -2176,10 +2186,10 @@ int verification_handle_verify_file_entry(
 			     SEEK_SET,
 			     error ) != 0 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_IO,
-				 LIBERROR_IO_ERROR_READ_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to seek the start of the file entry data.",
 				 function );
 
@@ -2190,10 +2200,10 @@ int verification_handle_verify_file_entry(
 
 			if( file_entry_data == NULL )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_MEMORY,
-				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 				 "%s: unable to create file entry data.",
 				 function );
 
@@ -2217,10 +2227,10 @@ int verification_handle_verify_file_entry(
 
 				if( read_count == (ssize_t) -1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_READ_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
 					 "%s: unable to read file entry data.",
 					 function );
 
@@ -2240,10 +2250,10 @@ int verification_handle_verify_file_entry(
 				     read_count,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GENERIC,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GENERIC,
 					 "%s: unable to update integrity hash(es).",
 					 function );
 
@@ -2259,10 +2269,10 @@ int verification_handle_verify_file_entry(
 		     verification_handle,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to finalize integrity hash(es).",
 			 function );
 
@@ -2275,10 +2285,10 @@ int verification_handle_verify_file_entry(
 			     file_entry,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to retrieve integrity hash(es) from file entry.",
 				 function );
 
@@ -2289,10 +2299,10 @@ int verification_handle_verify_file_entry(
 			     verification_handle->notify_stream,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print hash values.",
 				 function );
 
@@ -2305,10 +2315,10 @@ int verification_handle_verify_file_entry(
 				     log_handle->log_stream,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 					 "%s: unable to print hash values in log handle.",
 					 function );
 
@@ -2377,10 +2387,10 @@ int verification_handle_verify_file_entry(
 
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to verify sub file entries.",
 			 function );
 
@@ -2418,7 +2428,7 @@ int verification_handle_verify_sub_file_entries(
      const libcstring_system_character_t *file_entry_path,
      size_t file_entry_path_length,
      log_handle_t *log_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_file_entry_t *sub_file_entry = NULL;
 	static char *function               = "verification_handle_verify_sub_file_entries";
@@ -2429,10 +2439,10 @@ int verification_handle_verify_sub_file_entries(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -2443,10 +2453,10 @@ int verification_handle_verify_sub_file_entries(
 	     &number_of_sub_file_entries,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of sub file entries.",
 		 function );
 
@@ -2462,10 +2472,10 @@ int verification_handle_verify_sub_file_entries(
 		     &sub_file_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to free retrieve sub file entry: %d.",
 			 function,
 			 sub_file_entry_index );
@@ -2482,10 +2492,10 @@ int verification_handle_verify_sub_file_entries(
 
 		if( sub_file_entry_result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to verification sub file entry: %d.",
 			 function,
 			 sub_file_entry_index );
@@ -2500,10 +2510,10 @@ int verification_handle_verify_sub_file_entries(
 		     &sub_file_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sub file entry: %d.",
 			 function,
 			 sub_file_entry_index );
@@ -2528,7 +2538,7 @@ on_error:
  */
 int verification_handle_get_integrity_hash_from_input(
      verification_handle_t *verification_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 #if defined( USE_LIBEWF_GET_MD5_HASH )
         uint8_t stored_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
@@ -2539,10 +2549,10 @@ int verification_handle_get_integrity_hash_from_input(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -2550,10 +2560,10 @@ int verification_handle_get_integrity_hash_from_input(
 	}
 	if( verification_handle->stored_md5_hash_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid verification handle - missing stored MD5 hash string.",
 		 function );
 
@@ -2561,10 +2571,10 @@ int verification_handle_get_integrity_hash_from_input(
 	}
 	if( verification_handle->stored_sha1_hash_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid verification handle - missing stored SHA1 hash string.",
 		 function );
 
@@ -2572,10 +2582,10 @@ int verification_handle_get_integrity_hash_from_input(
 	}
 	if( verification_handle->stored_sha256_hash_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid verification handle - missing stored SHA256 hash string.",
 		 function );
 
@@ -2590,10 +2600,10 @@ int verification_handle_get_integrity_hash_from_input(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine stored MD5 hash string.",
 		 function );
 
@@ -2607,9 +2617,9 @@ int verification_handle_get_integrity_hash_from_input(
 	     verification_handle->stored_md5_hash_string,
 	     33 ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set stored MD5 hash string.",
 		 function );
@@ -2636,10 +2646,10 @@ int verification_handle_get_integrity_hash_from_input(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine stored MD5 hash string.",
 		 function );
 
@@ -2666,10 +2676,10 @@ int verification_handle_get_integrity_hash_from_input(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine stored SHA1 hash string.",
 		 function );
 
@@ -2696,10 +2706,10 @@ int verification_handle_get_integrity_hash_from_input(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine stored SHA256 hash string.",
 		 function );
 
@@ -2716,17 +2726,17 @@ int verification_handle_get_integrity_hash_from_input(
 int verification_handle_get_integrity_hash_from_file_entry(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_get_integrity_hash_from_file_entry";
 	int result            = 0;
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -2734,10 +2744,10 @@ int verification_handle_get_integrity_hash_from_file_entry(
 	}
 	if( verification_handle->stored_md5_hash_string == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid verification handle - missing stored MD5 hash string.",
 		 function );
 
@@ -2758,10 +2768,10 @@ int verification_handle_get_integrity_hash_from_file_entry(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine stored MD5 hash string.",
 		 function );
 
@@ -2782,17 +2792,17 @@ int verification_handle_get_integrity_hash_from_file_entry(
 int verification_handle_set_header_codepage(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_set_header_codepage";
 	int result            = 0;
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -2805,10 +2815,10 @@ int verification_handle_set_header_codepage(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine header codepage.",
 		 function );
 
@@ -2823,10 +2833,10 @@ int verification_handle_set_header_codepage(
 			     verification_handle->header_codepage,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set header codepage.",
 				 function );
 
@@ -2843,7 +2853,7 @@ int verification_handle_set_header_codepage(
 int verification_handle_set_format(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_set_format";
 	size_t string_length  = 0;
@@ -2851,10 +2861,10 @@ int verification_handle_set_format(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -2894,7 +2904,7 @@ int verification_handle_set_format(
 int verification_handle_set_process_buffer_size(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function  = "verification_handle_set_process_buffer_size";
 	size_t string_length   = 0;
@@ -2903,10 +2913,10 @@ int verification_handle_set_process_buffer_size(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -2923,10 +2933,10 @@ int verification_handle_set_process_buffer_size(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine process buffer size.",
 		 function );
 
@@ -2952,25 +2962,30 @@ int verification_handle_set_process_buffer_size(
 int verification_handle_set_additional_digest_types(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
-	libcstring_system_character_t *string_segment = NULL;
-	libsystem_split_string_t *string_elements     = NULL;
-	static char *function                         = "verification_handle_set_additional_digest_types";
-	size_t string_length                          = 0;
-	size_t string_segment_size                    = 0;
-	uint8_t calculate_sha1                        = 0;
-	uint8_t calculate_sha256                      = 0;
-	int number_of_segments                        = 0;
-	int segment_index                             = 0;
-	int result                                    = 0;
+	libcstring_system_character_t *string_segment    = NULL;
+	static char *function                            = "verification_handle_set_additional_digest_types";
+	size_t string_length                             = 0;
+	size_t string_segment_size                       = 0;
+	uint8_t calculate_sha1                           = 0;
+	uint8_t calculate_sha256                         = 0;
+	int number_of_segments                           = 0;
+	int segment_index                                = 0;
+	int result                                       = 0;
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	libcsplit_wide_split_string_t *string_elements   = NULL;
+#else
+	libcsplit_narrow_split_string_t *string_elements = NULL;
+#endif
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -2979,31 +2994,47 @@ int verification_handle_set_additional_digest_types(
 	string_length = libcstring_system_string_length(
 	                 string );
 
-	if( libsystem_string_split(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_string_split(
 	     string,
 	     string_length + 1,
-	     (libcstring_system_character_t) ',',
+	     (wchar_t) ',',
 	     &string_elements,
 	     error ) != 1 )
+#else
+	if( libcsplit_narrow_string_split(
+	     string,
+	     string_length + 1,
+	     (char) ',',
+	     &string_elements,
+	     error ) != 1 )
+#endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split string.",
 		 function );
 
 		goto on_error;
 	}
-	if( libsystem_split_string_get_number_of_segments(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_split_string_get_number_of_segments(
 	     string_elements,
 	     &number_of_segments,
 	     error ) != 1 )
+#else
+	if( libcsplit_narrow_split_string_get_number_of_segments(
+	     string_elements,
+	     &number_of_segments,
+	     error ) != 1 )
+#endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of segments.",
 		 function );
 
@@ -3013,17 +3044,26 @@ int verification_handle_set_additional_digest_types(
 	     segment_index < number_of_segments;
 	     segment_index++ )
 	{
-		if( libsystem_split_string_get_segment_by_index(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcsplit_wide_split_string_get_segment_by_index(
 		     string_elements,
 		     segment_index,
 		     &string_segment,
 		     &string_segment_size,
 		     error ) != 1 )
+#else
+		if( libcsplit_narrow_split_string_get_segment_by_index(
+		     string_elements,
+		     segment_index,
+		     &string_segment,
+		     &string_segment_size,
+		     error ) != 1 )
+#endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve string segment: %d.",
 			 function,
 			 segment_index );
@@ -3032,10 +3072,10 @@ int verification_handle_set_additional_digest_types(
 		}
 		if( string_segment == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing string segment: %d.",
 			 function,
 			 segment_index );
@@ -3143,14 +3183,14 @@ int verification_handle_set_additional_digest_types(
 	 && ( verification_handle->calculate_sha1 == 0 ) )
 	{
 		verification_handle->calculated_sha1_hash_string = libcstring_system_string_allocate(
-		                                               41 );
+		                                                    41 );
 
 		if( verification_handle->calculated_sha1_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create calculated SHA1 digest hash string.",
 			 function );
 
@@ -3162,14 +3202,14 @@ int verification_handle_set_additional_digest_types(
 	 && ( verification_handle->calculate_sha256 == 0 ) )
 	{
 		verification_handle->calculated_sha256_hash_string = libcstring_system_string_allocate(
-		                                                 65 );
+		                                                      65 );
 
 		if( verification_handle->calculated_sha256_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create calculated SHA256 digest hash string.",
 			 function );
 
@@ -3177,14 +3217,20 @@ int verification_handle_set_additional_digest_types(
 		}
 		verification_handle->calculate_sha256 = 1;
 	}
-	if( libsystem_split_string_free(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_split_string_free(
 	     &string_elements,
 	     error ) != 1 )
+#else
+	if( libcsplit_narrow_split_string_free(
+	     &string_elements,
+	     error ) != 1 )
+#endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split string.",
 		 function );
 
@@ -3195,9 +3241,15 @@ int verification_handle_set_additional_digest_types(
 on_error:
 	if( string_elements != NULL )
 	{
-		libsystem_split_string_free(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libcsplit_wide_split_string_free(
 		 &string_elements,
 		 NULL );
+#else
+		libcsplit_narrow_split_string_free(
+		 &string_elements,
+		 NULL );
+#endif
 	}
 	return( -1 );
 }
@@ -3208,16 +3260,16 @@ on_error:
 int verification_handle_set_zero_chunk_on_error(
      verification_handle_t *verification_handle,
      uint8_t zero_chunk_on_error,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_set_zero_chunk_on_error";
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -3228,10 +3280,10 @@ int verification_handle_set_zero_chunk_on_error(
 	     zero_chunk_on_error,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set zero chunk on error in input handle.",
 		 function );
 
@@ -3251,7 +3303,7 @@ int verification_handle_append_read_error(
       verification_handle_t *verification_handle,
       off64_t start_offset,
       size_t number_of_bytes,
-      liberror_error_t **error )
+      libcerror_error_t **error )
 {
 	static char *function      = "verification_handle_append_read_error";
 	uint64_t start_sector      = 0;
@@ -3259,10 +3311,10 @@ int verification_handle_append_read_error(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -3270,10 +3322,10 @@ int verification_handle_append_read_error(
 	}
 	if( verification_handle->bytes_per_sector == 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing bytes per sector.",
 		 function );
 
@@ -3292,10 +3344,10 @@ int verification_handle_append_read_error(
 	     number_of_sectors,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append checksum error.",
 		 function );
 
@@ -3311,16 +3363,16 @@ int verification_handle_append_read_error(
 int verification_handle_hash_values_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "verification_handle_hash_values_fprint";
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -3328,10 +3380,10 @@ int verification_handle_hash_values_fprint(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -3406,7 +3458,7 @@ int verification_handle_hash_values_fprint(
 int verification_handle_additional_hash_values_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	char hash_value_identifier[ VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE ];
 	libcstring_system_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
@@ -3421,10 +3473,10 @@ int verification_handle_additional_hash_values_fprint(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -3432,10 +3484,10 @@ int verification_handle_additional_hash_values_fprint(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -3446,10 +3498,10 @@ int verification_handle_additional_hash_values_fprint(
 	     &number_of_values,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of hash values.",
 		 function );
 
@@ -3465,10 +3517,10 @@ int verification_handle_additional_hash_values_fprint(
 		     &hash_value_identifier_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the hash value identifier size for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
@@ -3479,10 +3531,10 @@ int verification_handle_additional_hash_values_fprint(
 		}
 		if( hash_value_identifier_size > VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: hash value identifier size value out of bounds for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
@@ -3498,10 +3550,10 @@ int verification_handle_additional_hash_values_fprint(
 		     hash_value_identifier_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
@@ -3567,10 +3619,10 @@ int verification_handle_additional_hash_values_fprint(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the hash value for identifier: %s.",
 			 function,
 			 hash_value_identifier );
@@ -3603,7 +3655,7 @@ int verification_handle_additional_hash_values_fprint(
 int verification_handle_checksum_errors_fprint(
      verification_handle_t *verification_handle,
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *filename      = NULL;
 	libcstring_system_character_t *last_filename = NULL;
@@ -3620,10 +3672,10 @@ int verification_handle_checksum_errors_fprint(
 
 	if( verification_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid verification handle.",
 		 function );
 
@@ -3631,10 +3683,10 @@ int verification_handle_checksum_errors_fprint(
 	}
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -3645,10 +3697,10 @@ int verification_handle_checksum_errors_fprint(
 	     &number_of_errors,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of checksum errors.",
 		 function );
 
@@ -3675,10 +3727,10 @@ int verification_handle_checksum_errors_fprint(
 			     &number_of_sectors,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the checksum error: %" PRIu32 ".",
 				 function,
 				 error_index );
@@ -3714,10 +3766,10 @@ int verification_handle_checksum_errors_fprint(
 				     SEEK_SET,
 				     error ) == -1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_IO,
-					 LIBERROR_IO_ERROR_SEEK_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_SEEK_FAILED,
 					 "%s: unable to seek offset: %" PRIi64 ".",
 					 function,
 					 start_sector );
@@ -3737,10 +3789,10 @@ int verification_handle_checksum_errors_fprint(
 #endif
 				if( result == -1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 					 "%s: unable to retrieve filename size.",
 					 function );
 
@@ -3753,10 +3805,10 @@ int verification_handle_checksum_errors_fprint(
 
 					if( filename == NULL )
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_MEMORY,
-						 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+						 LIBCERROR_ERROR_DOMAIN_MEMORY,
+						 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 						 "%s: unable to create filename.",
 						 function );
 
@@ -3776,10 +3828,10 @@ int verification_handle_checksum_errors_fprint(
 					     error ) != 1 )
 #endif
 					{
-						liberror_error_set(
+						libcerror_error_set(
 						 error,
-						 LIBERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 						 "%s: unable to retrieve filename.",
 						 function );
 

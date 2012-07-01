@@ -284,53 +284,66 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_LIB],
    ])
   ])
 
- ac_cv_libcrypto=no
-
- dnl Check for libcrypto (openssl) EVP support
  AS_IF(
-  [test "x$ac_cv_with_openssl" != xno],
-  [AC_CHECK_HEADERS([openssl/opensslv.h])
-
-  AX_LIBCRYPTO_CHECK_OPENSSL_EVP
+  [test "x$ac_cv_with_openssl" = xno],
+  [ac_cv_libcrypto=no],
+  [dnl Check for a pkg-config file
+  AS_IF(
+   [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
+   [PKG_CHECK_MODULES(
+    [openssl],
+    [openssl >= 1.0],
+    [ac_cv_libcrypto=yes],
+    [ac_cv_libcrypto=no])
+   ])
 
   AS_IF(
-   [test "x$ac_cv_libcrypto" != xevp && test "$ac_cv_header_openssl_opensslv" = xyes],
-   [ac_cv_libcrypto=yes])
-  ])
+   [test "x$ac_cv_libcrypto" = xyes],
+   [ac_cv_libcrypto_CPPFLAGS="$pkg_cv_openssl_CFLAGS"
+   ac_cv_libcrypto_LIBADD="$pkg_cv_openssl_LIBS"],
+   [dnl Check for headers
+   AC_CHECK_HEADERS([openssl/opensslv.h])
 
- dnl Setup libcrypto (openssl) parameters
- AS_IF(
-  [test "x$ac_cv_libcrypto" = xevp],
-  [AC_DEFINE(
-   [HAVE_OPENSSL_EVP_H],
-   [1],
-   [Define to 1 if you have the <openssl/evp.h> header file.])
-  AC_SUBST(
-   [HAVE_OPENSSL_EVP_H],
-   [1]) ],
-  [AC_SUBST(
-   [HAVE_OPENSSL_EVP_H],
-   [0])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_libcrypto" != xno],
-  [AC_SUBST(
-   [LIBCRYPTO_LIBADD],
-   ["-lcrypto"])
-  AC_DEFINE(
-   [HAVE_LIBCRYPTO],
-   [1],
-   [Define to 1 if you have the 'crypto' library (-lcrypto).])
+   AX_LIBCRYPTO_CHECK_OPENSSL_EVP
 
-  dnl Enforce the dynamic loader library to be included if available
-  AC_CHECK_LIB(
-   dl,
-   dlopen,
+   AS_IF(
+    [test "x$ac_cv_libcrypto" != xevp && test "$ac_cv_header_openssl_opensslv" = xyes],
+    [ac_cv_libcrypto=yes])
+   ])
+
+  dnl Setup libcrypto (openssl) parameters
+  AS_IF(
+   [test "x$ac_cv_libcrypto" = xevp],
+   [AC_DEFINE(
+    [HAVE_OPENSSL_EVP_H],
+    [1],
+    [Define to 1 if you have the <openssl/evp.h> header file.])
+   AC_SUBST(
+    [HAVE_OPENSSL_EVP_H],
+    [1]) ],
    [AC_SUBST(
-    [LIBDL_LIBADD],
-    ["-ldl"])],
-   [])
+    [HAVE_OPENSSL_EVP_H],
+    [0])
+   ])
+  
+  AS_IF(
+   [test "x$ac_cv_libcrypto" != xno],
+   [AC_DEFINE(
+    [HAVE_LIBCRYPTO],
+    [1],
+    [Define to 1 if you have the 'crypto' library (-lcrypto).])
+ 
+   ac_cv_libcrypto_LIBADD="-lcrypto"
+
+   dnl Enforce the dynamic loader library to be included if available
+   AC_CHECK_LIB(
+    dl,
+    dlopen,
+    [AC_SUBST(
+     [LIBDL_LIBADD],
+     ["-ldl"])],
+    [])
+   ])
   ])
  ])
  
@@ -423,7 +436,21 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_ENABLE],
   [auto-detect],
   [DIR])
 
+ dnl Check for a shared library version
  AX_LIBCRYPTO_CHECK_LIB
+
+ AS_IF(
+  [test "x$ac_cv_libcrypto_CPPFLAGS" != "x"],
+  [AC_SUBST(
+   [LIBCRYPTO_CPPFLAGS],
+   [$ac_cv_libcrypto_CPPFLAGS])
+  ])
+ AS_IF(
+  [test "x$ac_cv_libcrypto_LIBADD" != "x"],
+  [AC_SUBST(
+   [LIBCRYPTO_LIBADD],
+   [$ac_cv_libcrypto_LIBADD])
+  ])
 
  AS_IF(
   [test "x$ac_cv_libcrypto" != xno],

@@ -22,8 +22,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
+#include "libewf_libcerror.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
@@ -38,7 +37,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
      size_t utf8_string_length,
      libewf_tree_node_t **sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function   = "libewf_single_file_tree_get_sub_node_by_utf8_name";
 	int number_of_sub_nodes = 0;
@@ -47,10 +46,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -58,10 +57,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 	}
 	if( sub_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sub node.",
 		 function );
 
@@ -69,10 +68,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 	}
 	if( sub_single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sub single file entry.",
 		 function );
 
@@ -83,10 +82,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 	     &number_of_sub_nodes,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of sub nodes.",
 		 function );
 
@@ -100,10 +99,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 	{
 		if( *sub_node == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing sub node: %d.",
 			 function,
 			 sub_node_index );
@@ -114,10 +113,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 		if( *sub_single_file_entry == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sub single file entry: %d.",
 			 function,
 			 sub_node_index );
@@ -135,10 +134,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 		}
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to compare UTF-8 string.",
 			 function );
 
@@ -175,7 +174,7 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
      size_t utf16_string_length,
      libewf_tree_node_t **sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function   = "libewf_single_file_tree_get_sub_node_by_utf16_name";
 	int number_of_sub_nodes = 0;
@@ -184,10 +183,10 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 	if( node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid node.",
 		 function );
 
@@ -195,10 +194,10 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 	}
 	if( sub_node == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sub node.",
 		 function );
 
@@ -206,10 +205,10 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 	}
 	if( sub_single_file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sub single file entry.",
 		 function );
 
@@ -220,10 +219,10 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 	     &number_of_sub_nodes,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of sub nodes.",
 		 function );
 
@@ -237,10 +236,10 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 	{
 		if( *sub_node == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing sub node: %d.",
 			 function,
 			 sub_node_index );
@@ -251,10 +250,10 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 		if( *sub_single_file_entry == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing sub single file entry: %d.",
 			 function,
 			 sub_node_index );
@@ -272,10 +271,10 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 		}
 		if( result == -1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to compare UTF-16 string.",
 			 function );
 

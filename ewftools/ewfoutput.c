@@ -1,7 +1,7 @@
 /*
  * Output functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -22,8 +22,6 @@
 #include <common.h>
 #include <memory.h>
 #include <types.h>
-
-#include <libcstring.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -51,7 +49,7 @@
 #include <zlib.h>
 #endif
 
-#if defined( HAVE_OPENSSL_OPENSSLV_H )
+#if defined( HAVE_OPENSSL_OPENSSLV_H ) || defined( HAVE_LIBCRYPTO )
 #include <openssl/opensslv.h>
 #endif
 
@@ -59,9 +57,12 @@
 #include <uuid/uuid.h>
 #endif
 
-#include <libsystem.h>
-
 #include "ewfoutput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libclocale.h"
+#include "ewftools_libcnotify.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "ewftools_libodraw.h"
@@ -78,7 +79,7 @@ void ewfoutput_copyright_fprint(
 
 	if( stream == NULL )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: invalid stream.\n",
 		 function );
 
@@ -102,7 +103,7 @@ void ewfoutput_version_fprint(
 
 	if( stream == NULL )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: invalid stream.\n",
 		 function );
 
@@ -110,7 +111,7 @@ void ewfoutput_version_fprint(
 	}
 	if( program == NULL )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: invalid program name.\n",
 		 function );
 
@@ -133,7 +134,7 @@ void ewfoutput_version_detailed_fprint(
 
 	if( stream == NULL )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: invalid stream.\n",
 		 function );
 
@@ -141,7 +142,7 @@ void ewfoutput_version_detailed_fprint(
 	}
 	if( program == NULL )
 	{
-		libsystem_notify_printf(
+		libcnotify_printf(
 		 "%s: invalid program name.\n",
 		 function );
 
@@ -185,7 +186,7 @@ void ewfoutput_version_detailed_fprint(
 	fprintf(
 	 stream,
 	 ", libsystem %s",
-	 LIBSYSTEM_VERSION_STRING );
+	 LIBCSYSTEM_VERSION_STRING );
 
 #if defined( HAVE_LIBHMAC ) || defined( HAVE_LOCAL_LIBHMAC )
 	fprintf(

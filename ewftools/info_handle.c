@@ -1,7 +1,7 @@
 /* 
  * Info handle
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,18 +24,17 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <liberror.h>
-
 #if defined( HAVE_SYS_UTSNAME_H )
 #include <sys/utsname.h>
 #endif
 
-#include <libsystem.h>
-
 #include "byte_size_string.h"
 #include "digest_hash.h"
 #include "ewfinput.h"
+#include "ewftools_libcerror.h"
+#include "ewftools_libcsplit.h"
+#include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "guid.h"
 #include "info_handle.h"
@@ -54,16 +53,16 @@
  */
 int info_handle_initialize(
      info_handle_t **info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_initialize";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -71,10 +70,10 @@ int info_handle_initialize(
 	}
 	if( *info_handle != NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid info handle value already set.",
 		 function );
 
@@ -85,10 +84,10 @@ int info_handle_initialize(
 
 	if( *info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create info handle.",
 		 function );
 
@@ -99,10 +98,10 @@ int info_handle_initialize(
 	     0,
 	     sizeof( info_handle_t ) ) == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear info handle.",
 		 function );
 
@@ -112,10 +111,10 @@ int info_handle_initialize(
 	     &( ( *info_handle )->input_handle ),
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize input handle.",
 		 function );
 
@@ -144,17 +143,17 @@ on_error:
  */
 int info_handle_free(
      info_handle_t **info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_free";
 	int result            = 1;
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -168,10 +167,10 @@ int info_handle_free(
 			     &( ( *info_handle )->input_handle ),
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free input handle.",
 				 function );
 
@@ -191,16 +190,16 @@ int info_handle_free(
  */
 int info_handle_signal_abort(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_signal_abort";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -212,10 +211,10 @@ int info_handle_signal_abort(
 		     info_handle->input_handle,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to signal input handle to abort.",
 			 function );
 
@@ -232,7 +231,7 @@ int info_handle_open_input(
      info_handle_t *info_handle,
      libcstring_system_character_t * const * filenames,
      int number_of_filenames,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t **libewf_filenames = NULL;
 	static char *function                            = "info_handle_open_input";
@@ -241,10 +240,10 @@ int info_handle_open_input(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -252,10 +251,10 @@ int info_handle_open_input(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -263,10 +262,10 @@ int info_handle_open_input(
 	}
 	if( filenames == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
 		 function );
 
@@ -274,10 +273,10 @@ int info_handle_open_input(
 	}
 	if( number_of_filenames <= 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid number of filenames.",
 		 function );
 
@@ -306,10 +305,10 @@ int info_handle_open_input(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to resolve filename(s).",
 			 function );
 
@@ -333,10 +332,10 @@ int info_handle_open_input(
 	     error ) != 1 )
 #endif
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open file(s).",
 		 function );
 
@@ -368,10 +367,10 @@ int info_handle_open_input(
 		     info_handle->header_codepage,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header codepage.",
 			 function );
 
@@ -392,10 +391,10 @@ int info_handle_open_input(
 		     error ) != 1 )
 #endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free globbed filenames.",
 			 function );
 
@@ -428,16 +427,16 @@ on_error:
  */
 int info_handle_close(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_close";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -445,10 +444,10 @@ int info_handle_close(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -458,10 +457,10 @@ int info_handle_close(
 	     info_handle->input_handle,
 	     error ) != 0 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close input handle.",
 		 function );
 
@@ -476,7 +475,7 @@ int info_handle_close(
 int info_handle_set_output_format(
      info_handle_t *info_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_set_output_format";
 	size_t string_length  = 0;
@@ -484,10 +483,10 @@ int info_handle_set_output_format(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -521,10 +520,10 @@ int info_handle_set_output_format(
 	}
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine output format.",
 		 function );
 
@@ -539,7 +538,7 @@ int info_handle_set_output_format(
 int info_handle_set_date_format(
      info_handle_t *info_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_set_date_format";
 	size_t string_length  = 0;
@@ -547,10 +546,10 @@ int info_handle_set_date_format(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -602,10 +601,10 @@ int info_handle_set_date_format(
 	}
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine date format.",
 		 function );
 
@@ -620,17 +619,17 @@ int info_handle_set_date_format(
 int info_handle_set_header_codepage(
      info_handle_t *info_handle,
      const libcstring_system_character_t *string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_set_header_codepage";
 	int result            = 0;
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -643,10 +642,10 @@ int info_handle_set_header_codepage(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine header codepage.",
 		 function );
 
@@ -661,10 +660,10 @@ int info_handle_set_header_codepage(
 			     info_handle->header_codepage,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set header codepage.",
 				 function );
 
@@ -682,16 +681,16 @@ int info_handle_section_header_fprint(
      info_handle_t *info_handle,
      const char *identifier,
      const char *description,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_section_header_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -720,16 +719,16 @@ int info_handle_section_header_fprint(
 int info_handle_section_footer_fprint(
      info_handle_t *info_handle,
      const char *identifier,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_section_footer_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -761,16 +760,16 @@ int info_handle_section_value_string_fprint(
      const char *description,
      size_t description_length,
      const libcstring_system_character_t *value_string,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_section_value_string_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -856,16 +855,16 @@ int info_handle_section_value_32bit_fprint(
      const char *description,
      size_t description_length,
      uint32_t value_32bit,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_section_value_32bit_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -914,16 +913,16 @@ int info_handle_section_value_64bit_fprint(
      const char *description,
      size_t description_length,
      uint64_t value_64bit,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_section_value_64bit_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -972,7 +971,7 @@ int info_handle_section_value_size_fprint(
      const char *description,
      size_t description_length,
      size64_t value_size,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
         libcstring_system_character_t value_size_string[ 16 ];
 
@@ -981,10 +980,10 @@ int info_handle_section_value_size_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -1064,16 +1063,16 @@ int info_handle_section_value_boolean_fprint(
      const char *description,
      size_t description_length,
      int value_boolean,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_section_value_boolean_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -1140,7 +1139,7 @@ int info_handle_header_value_fprint(
      size_t identifier_length,
      const char *description,
      size_t description_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
@@ -1150,10 +1149,10 @@ int info_handle_header_value_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -1179,10 +1178,10 @@ int info_handle_header_value_fprint(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: %s.",
 		 function,
 		 identifier );
@@ -1200,10 +1199,10 @@ int info_handle_header_value_fprint(
 		     header_value,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section value string: %s.",
 			 function,
 			 identifier );
@@ -1219,7 +1218,7 @@ int info_handle_header_value_fprint(
  */
 int info_handle_header_values_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	char header_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
 
@@ -1233,10 +1232,10 @@ int info_handle_header_values_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -1244,10 +1243,10 @@ int info_handle_header_values_fprint(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -1258,10 +1257,10 @@ int info_handle_header_values_fprint(
 	     info_handle->date_format,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header values date format.",
 		 function );
 
@@ -1272,10 +1271,10 @@ int info_handle_header_values_fprint(
 	     &number_of_values,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of header values.",
 		 function );
 
@@ -1287,10 +1286,10 @@ int info_handle_header_values_fprint(
 	     "Acquiry information",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section header: acquiry_information.",
 		 function );
 
@@ -1317,10 +1316,10 @@ int info_handle_header_values_fprint(
 			     &header_value_identifier_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the header identifier size for index: %" PRIu32 ".",
 				 function,
 				 header_value_iterator );
@@ -1331,10 +1330,10 @@ int info_handle_header_values_fprint(
 			}
 			if( header_value_identifier_size > INFO_HANDLE_VALUE_IDENTIFIER_SIZE )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: header identifier size value out of bounds for index: %" PRIu32 ".",
 				 function,
 				 header_value_iterator );
@@ -1350,10 +1349,10 @@ int info_handle_header_values_fprint(
 			     header_value_identifier_size,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the header identifier for index: %" PRIu32 ".",
 				 function,
 				 header_value_iterator );
@@ -1519,10 +1518,10 @@ int info_handle_header_values_fprint(
 						     info_handle,
 						     error ) != 1 )
 						{
-							liberror_error_set(
+							libcerror_error_set(
 							 error,
-							 LIBERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 							 "%s: unable to print header value: extents.",
 							 function );
 
@@ -1541,10 +1540,10 @@ int info_handle_header_values_fprint(
 						     info_handle,
 						     error ) != 1 )
 						{
-							liberror_error_set(
+							libcerror_error_set(
 							 error,
-							 LIBERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 							 "%s: unable to print header value: password.",
 							 function );
 
@@ -1563,10 +1562,10 @@ int info_handle_header_values_fprint(
 						     info_handle,
 						     error ) != 1 )
 						{
-							liberror_error_set(
+							libcerror_error_set(
 							 error,
-							 LIBERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 							 "%s: unable to print header value: compression_level.",
 							 function );
 
@@ -1590,10 +1589,10 @@ int info_handle_header_values_fprint(
 				     description_length,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 					 "%s: unable to print header value: %s.",
 					 function,
 					 header_value_identifier );
@@ -1608,10 +1607,10 @@ int info_handle_header_values_fprint(
 	     "acquiry_information",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section footer: acquiry_information.",
 		 function );
 
@@ -1625,7 +1624,7 @@ int info_handle_header_values_fprint(
  */
 int info_handle_header_value_password_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
@@ -1635,10 +1634,10 @@ int info_handle_header_value_password_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -1663,10 +1662,10 @@ int info_handle_header_value_password_fprint(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: password.",
 		 function );
 
@@ -1706,7 +1705,7 @@ int info_handle_header_value_password_fprint(
  */
 int info_handle_header_value_compression_level_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
@@ -1717,10 +1716,10 @@ int info_handle_header_value_compression_level_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -1745,10 +1744,10 @@ int info_handle_header_value_compression_level_fprint(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: compression_level.",
 		 function );
 
@@ -1790,10 +1789,10 @@ int info_handle_header_value_compression_level_fprint(
 		     value_string,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section value string: compression_level.",
 			 function );
 
@@ -1808,26 +1807,31 @@ int info_handle_header_value_compression_level_fprint(
  */
 int info_handle_header_value_extents_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t header_value[ INFO_HANDLE_VALUE_SIZE ];
 
-	libcstring_system_character_t *string_segment = NULL;
-	libsystem_split_string_t *extents_elements    = NULL;
-	static char *function                         = "info_handle_header_value_extents_fprint";
-	size_t header_value_length                    = 0;
-	size_t header_value_size                      = INFO_HANDLE_VALUE_SIZE;
-	size_t string_segment_size                    = 0;
-	int number_of_segments                        = 0;
-	int result                                    = 0;
-	int segment_index                             = 0;
+	libcstring_system_character_t *string_segment     = NULL;
+	static char *function                             = "info_handle_header_value_extents_fprint";
+	size_t header_value_length                        = 0;
+	size_t header_value_size                          = INFO_HANDLE_VALUE_SIZE;
+	size_t string_segment_size                        = 0;
+	int number_of_segments                            = 0;
+	int result                                        = 0;
+	int segment_index                                 = 0;
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	libcsplit_wide_split_string_t *extents_elements   = NULL;
+#else
+	libcsplit_narrow_split_string_t *extents_elements = NULL;
+#endif
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -1852,10 +1856,10 @@ int info_handle_header_value_extents_fprint(
 #endif
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: extents.",
 		 function );
 
@@ -1863,36 +1867,52 @@ int info_handle_header_value_extents_fprint(
 	}
 	else if( result != 0 )
 	{
-		/* Want the effective length of the string
+		/* Need the effective length of the string
 		 */
 		header_value_length = libcstring_system_string_length(
 		                       header_value );
 
-		if( libsystem_string_split(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcsplit_wide_string_split(
 		     header_value,
 		     header_value_length + 1,
-		     (libcstring_system_character_t) ' ',
+		     (wchar_t) ' ',
 		     &extents_elements,
 		     error ) != 1 )
+#else
+		if( libcsplit_narrow_string_split(
+		     header_value,
+		     header_value_length + 1,
+		     (char) ' ',
+		     &extents_elements,
+		     error ) != 1 )
+#endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to split string.",
 			 function );
 
 			goto on_error;
 		}
-		if( libsystem_split_string_get_number_of_segments(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcsplit_wide_split_string_get_number_of_segments(
 		     extents_elements,
 		     &number_of_segments,
 		     error ) != 1 )
+#else
+		if( libcsplit_narrow_split_string_get_number_of_segments(
+		     extents_elements,
+		     &number_of_segments,
+		     error ) != 1 )
+#endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of segments.",
 			 function );
 
@@ -1900,10 +1920,10 @@ int info_handle_header_value_extents_fprint(
 		}
 		if( ( number_of_segments % 4 ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported number of segments.",
 			 function );
 
@@ -1911,17 +1931,26 @@ int info_handle_header_value_extents_fprint(
 		}
 		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
-			if( libsystem_split_string_get_segment_by_index(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			if( libcsplit_wide_split_string_get_segment_by_index(
 			     extents_elements,
 			     0,
 			     &string_segment,
 			     &string_segment_size,
 			     error ) != 1 )
+#else
+			if( libcsplit_narrow_split_string_get_segment_by_index(
+			     extents_elements,
+			     0,
+			     &string_segment,
+			     &string_segment_size,
+			     error ) != 1 )
+#endif
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve string segment: 0.",
 				 function );
 
@@ -1960,17 +1989,26 @@ int info_handle_header_value_extents_fprint(
 						 "<extent>" );
 					}
 				}
-				if( libsystem_split_string_get_segment_by_index(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+				if( libcsplit_wide_split_string_get_segment_by_index(
 				     extents_elements,
 				     segment_index,
 				     &string_segment,
 				     &string_segment_size,
 				     error ) != 1 )
+#else
+				if( libcsplit_narrow_split_string_get_segment_by_index(
+				     extents_elements,
+				     segment_index,
+				     &string_segment,
+				     &string_segment_size,
+				     error ) != 1 )
+#endif
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 					 "%s: unable to retrieve string segment: %d.",
 					 function,
 					 segment_index );
@@ -2010,14 +2048,20 @@ int info_handle_header_value_extents_fprint(
 				 "\t\t\t</extents>\n" );
 			}
 		}
-		if( libsystem_split_string_free(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcsplit_wide_split_string_free(
 		     &extents_elements,
 		     error ) != 1 )
+#else
+		if( libcsplit_narrow_split_string_free(
+		     &extents_elements,
+		     error ) != 1 )
+#endif
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free split string.",
 			 function );
 
@@ -2029,9 +2073,15 @@ int info_handle_header_value_extents_fprint(
 on_error:
 	if( extents_elements != NULL )
 	{
-		libsystem_split_string_free(
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libcsplit_wide_split_string_free(
 		 &extents_elements,
 		 NULL );
+#else
+		libcsplit_narrow_split_string_free(
+		 &extents_elements,
+		 NULL );
+#endif
 	}
 	return( -1 );
 }
@@ -2041,7 +2091,7 @@ on_error:
  */
 int info_handle_media_information_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
         libcstring_system_character_t guid_string[ GUID_STRING_SIZE ];
         uint8_t guid[ GUID_SIZE ];
@@ -2061,10 +2111,10 @@ int info_handle_media_information_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -2072,10 +2122,10 @@ int info_handle_media_information_fprint(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -2087,10 +2137,10 @@ int info_handle_media_information_fprint(
 	     "EWF information",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section header: ewf_information.",
 		 function );
 
@@ -2101,10 +2151,10 @@ int info_handle_media_information_fprint(
 	     &format,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve format.",
 		 function );
 
@@ -2179,10 +2229,10 @@ int info_handle_media_information_fprint(
 	     value_string,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section value string: file_format.",
 		 function );
 
@@ -2199,10 +2249,10 @@ int info_handle_media_information_fprint(
 		     &value_32bit,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve sectors per chunk.",
 			 function );
 
@@ -2218,10 +2268,10 @@ int info_handle_media_information_fprint(
 			     value_32bit,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section 32-bit value: sectors_per_chunk.",
 				 function );
 
@@ -2233,10 +2283,10 @@ int info_handle_media_information_fprint(
 		     &value_32bit,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve error granularity.",
 			 function );
 
@@ -2252,10 +2302,10 @@ int info_handle_media_information_fprint(
 			     value_32bit,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section 32-bit value: error_granularity.",
 				 function );
 
@@ -2268,10 +2318,10 @@ int info_handle_media_information_fprint(
 		     &compression_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve compression values.",
 			 function );
 
@@ -2304,10 +2354,10 @@ int info_handle_media_information_fprint(
 			     value_string,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section value string: compression_level.",
 				 function );
 
@@ -2320,10 +2370,10 @@ int info_handle_media_information_fprint(
 		     GUID_SIZE,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve GUID.",
 			 function );
 
@@ -2339,10 +2389,10 @@ int info_handle_media_information_fprint(
 			     GUID_STRING_SIZE,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to create GUID string.",
 				 function );
 
@@ -2359,10 +2409,10 @@ int info_handle_media_information_fprint(
 				     guid_string,
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 					 "%s: unable to print section value string: guid.",
 					 function );
 
@@ -2377,10 +2427,10 @@ int info_handle_media_information_fprint(
 
 	if( is_corrupted == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if segment files are corrupted.",
 		 function );
 
@@ -2396,10 +2446,10 @@ int info_handle_media_information_fprint(
 		     is_corrupted,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section boolean value: is_corrupted.",
 			 function );
 
@@ -2411,10 +2461,10 @@ int info_handle_media_information_fprint(
 	     "ewf_information",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section footer: ewf_information.",
 		 function );
 
@@ -2426,10 +2476,10 @@ int info_handle_media_information_fprint(
 	     "Media information",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section header: media_information.",
 		 function );
 
@@ -2443,10 +2493,10 @@ int info_handle_media_information_fprint(
 		     &media_type,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media type.",
 			 function );
 
@@ -2487,10 +2537,10 @@ int info_handle_media_information_fprint(
 			     value_string,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section value string: media_type.",
 				 function );
 
@@ -2502,10 +2552,10 @@ int info_handle_media_information_fprint(
 		     &media_flags,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve media flags.",
 			 function );
 
@@ -2530,10 +2580,10 @@ int info_handle_media_information_fprint(
 			     media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section boolean value: is_physical.",
 				 function );
 
@@ -2550,10 +2600,10 @@ int info_handle_media_information_fprint(
 				     _LIBCSTRING_SYSTEM_STRING( "Fastbloc" ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 					 "%s: unable to print section value string: write_blocked.",
 					 function );
 
@@ -2571,10 +2621,10 @@ int info_handle_media_information_fprint(
 				     _LIBCSTRING_SYSTEM_STRING( "Tableau" ),
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 					 "%s: unable to print section value string: write_blocked.",
 					 function );
 
@@ -2590,10 +2640,10 @@ int info_handle_media_information_fprint(
 		     &value_32bit,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve bytes per sector.",
 			 function );
 
@@ -2609,10 +2659,10 @@ int info_handle_media_information_fprint(
 			     value_32bit,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section 32-bit value: bytes_per_sector.",
 				 function );
 
@@ -2624,10 +2674,10 @@ int info_handle_media_information_fprint(
 		     &value_64bit,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of sectors.",
 			 function );
 
@@ -2643,10 +2693,10 @@ int info_handle_media_information_fprint(
 			     value_64bit,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section 64-bit value: number_of_sectors.",
 				 function );
 
@@ -2659,10 +2709,10 @@ int info_handle_media_information_fprint(
 		     &value_32bit,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve chunk size.",
 			 function );
 
@@ -2678,10 +2728,10 @@ int info_handle_media_information_fprint(
 			     value_32bit,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 				 "%s: unable to print section 32-bit value: number_of_sectors.",
 				 function );
 
@@ -2695,10 +2745,10 @@ int info_handle_media_information_fprint(
 	     &media_size,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve media size.",
 		 function );
 
@@ -2714,10 +2764,10 @@ int info_handle_media_information_fprint(
 		     media_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section 64-bit value: media_size.",
 			 function );
 
@@ -2729,10 +2779,10 @@ int info_handle_media_information_fprint(
 	     "media_information",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section footer: media_information.",
 		 function );
 
@@ -2748,7 +2798,7 @@ int info_handle_hash_value_fprint(
      info_handle_t *info_handle,
      const char *identifier,
      size_t identifier_length,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t hash_value[ INFO_HANDLE_VALUE_SIZE ];
 
@@ -2758,10 +2808,10 @@ int info_handle_hash_value_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -2787,10 +2837,10 @@ int info_handle_hash_value_fprint(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve hash value: %s.",
 		 function,
 		 identifier );
@@ -2844,7 +2894,7 @@ int info_handle_hash_value_fprint(
  */
 int info_handle_hash_values_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	char hash_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
 
@@ -2863,10 +2913,10 @@ int info_handle_hash_values_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -2874,10 +2924,10 @@ int info_handle_hash_values_fprint(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -2892,10 +2942,10 @@ int info_handle_hash_values_fprint(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve MD5 hash.",
 		 function );
 
@@ -2908,10 +2958,10 @@ int info_handle_hash_values_fprint(
 
 		if( stored_md5_hash_string == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create MD5 hash string.",
 			 function );
 
@@ -2924,10 +2974,10 @@ int info_handle_hash_values_fprint(
 		     DIGEST_HASH_STRING_SIZE_MD5,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set MD5 hash string.",
 			 function );
 
@@ -2946,10 +2996,10 @@ int info_handle_hash_values_fprint(
 				     "Digest hash information",
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 					 "%s: unable to print section header: digest_hash_information.",
 					 function );
 
@@ -2981,10 +3031,10 @@ int info_handle_hash_values_fprint(
 	     &number_of_values,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of hash values.",
 		 function );
 
@@ -3000,10 +3050,10 @@ int info_handle_hash_values_fprint(
 		     &hash_value_identifier_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the hash value identifier size for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
@@ -3014,10 +3064,10 @@ int info_handle_hash_values_fprint(
 		}
 		if( hash_value_identifier_size > INFO_HANDLE_VALUE_IDENTIFIER_SIZE )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: hash value identifier size value out of bounds for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
@@ -3033,10 +3083,10 @@ int info_handle_hash_values_fprint(
 		     hash_value_identifier_size,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the hash value identifier for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
@@ -3067,10 +3117,10 @@ int info_handle_hash_values_fprint(
 				     "Digest hash information",
 				     error ) != 1 )
 				{
-					liberror_error_set(
+					libcerror_error_set(
 					 error,
-					 LIBERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 					 "%s: unable to print section header: digest_hash_information.",
 					 function );
 
@@ -3085,10 +3135,10 @@ int info_handle_hash_values_fprint(
 		     hash_value_identifier_size - 1,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print hash value: %s.",
 			 function,
 			 hash_value_identifier );
@@ -3103,10 +3153,10 @@ int info_handle_hash_values_fprint(
 		     "digest_hash_information.",
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section footer: digest_hash_information.",
 			 function );
 
@@ -3121,7 +3171,7 @@ int info_handle_hash_values_fprint(
  */
 int info_handle_acquiry_errors_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "info_handle_acquiry_errors_fprint";
 	uint64_t last_sector       = 0;
@@ -3134,10 +3184,10 @@ int info_handle_acquiry_errors_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -3145,10 +3195,10 @@ int info_handle_acquiry_errors_fprint(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -3159,10 +3209,10 @@ int info_handle_acquiry_errors_fprint(
 	     &bytes_per_sector,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -3173,10 +3223,10 @@ int info_handle_acquiry_errors_fprint(
 	     &number_of_errors,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of acquiry errors.",
 		 function );
 
@@ -3190,10 +3240,10 @@ int info_handle_acquiry_errors_fprint(
 		     "Read errors during acquiry",
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section header: acquisition_read_errors.",
 			 function );
 
@@ -3217,10 +3267,10 @@ int info_handle_acquiry_errors_fprint(
 			     &number_of_sectors,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the acquiry error: %" PRIu32 ".",
 				 function,
 				 error_iterator );
@@ -3259,10 +3309,10 @@ int info_handle_acquiry_errors_fprint(
 		     "acquisition_read_errors",
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section footer: acquisition_read_errors.",
 			 function );
 
@@ -3277,7 +3327,7 @@ int info_handle_acquiry_errors_fprint(
  */
 int info_handle_sessions_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function       = "info_handle_sessions_fprint";
 	uint64_t last_sector        = 0;
@@ -3290,10 +3340,10 @@ int info_handle_sessions_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -3301,10 +3351,10 @@ int info_handle_sessions_fprint(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -3315,10 +3365,10 @@ int info_handle_sessions_fprint(
 	     &bytes_per_sector,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -3329,10 +3379,10 @@ int info_handle_sessions_fprint(
 	     &number_of_sessions,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of sessions.",
 		 function );
 
@@ -3346,10 +3396,10 @@ int info_handle_sessions_fprint(
 		     "Sessions",
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section header: sessions.",
 			 function );
 
@@ -3373,10 +3423,10 @@ int info_handle_sessions_fprint(
 			     &number_of_sectors,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the session: %" PRIu32 ".",
 				 function,
 				 session_iterator );
@@ -3415,10 +3465,10 @@ int info_handle_sessions_fprint(
 		     "sessions",
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section footer: sessions.",
 			 function );
 
@@ -3433,7 +3483,7 @@ int info_handle_sessions_fprint(
  */
 int info_handle_tracks_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "info_handle_tracks_fprint";
 	uint64_t last_sector        = 0;
@@ -3446,10 +3496,10 @@ int info_handle_tracks_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -3457,10 +3507,10 @@ int info_handle_tracks_fprint(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -3471,10 +3521,10 @@ int info_handle_tracks_fprint(
 	     &bytes_per_sector,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve bytes per sector.",
 		 function );
 
@@ -3485,10 +3535,10 @@ int info_handle_tracks_fprint(
 	     &number_of_tracks,
 	     error ) == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the number of tracks.",
 		 function );
 
@@ -3502,10 +3552,10 @@ int info_handle_tracks_fprint(
 		     "Tracks",
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section header: tracks.",
 			 function );
 
@@ -3529,10 +3579,10 @@ int info_handle_tracks_fprint(
 			     &number_of_sectors,
 			     error ) != 1 )
 			{
-				liberror_error_set(
+				libcerror_error_set(
 				 error,
-				 LIBERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve the track: %" PRIu32 ".",
 				 function,
 				 track_iterator );
@@ -3571,10 +3621,10 @@ int info_handle_tracks_fprint(
 		     "tracks",
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section footer: tracks.",
 			 function );
 
@@ -3589,7 +3639,7 @@ int info_handle_tracks_fprint(
  */
 int info_handle_single_files_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "info_handle_single_files_fprint";
@@ -3597,10 +3647,10 @@ int info_handle_single_files_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -3608,10 +3658,10 @@ int info_handle_single_files_fprint(
 	}
 	if( info_handle->input_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid info handle - missing input handle.",
 		 function );
 
@@ -3624,10 +3674,10 @@ int info_handle_single_files_fprint(
 
 	if( result == -1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve root file entry.",
 		 function );
 
@@ -3643,10 +3693,10 @@ int info_handle_single_files_fprint(
 	     "Single files",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section header: single_files.",
 		 function );
 
@@ -3658,10 +3708,10 @@ int info_handle_single_files_fprint(
 	     0,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print root file entry.",
 		 function );
 
@@ -3672,10 +3722,10 @@ int info_handle_single_files_fprint(
 	     "single_files",
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print section footer: single_files.",
 		 function );
 
@@ -3685,10 +3735,10 @@ int info_handle_single_files_fprint(
 	     &file_entry,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free root file entry.",
 		 function );
 
@@ -3704,7 +3754,7 @@ int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
      int indentation_level,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t *name = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
@@ -3717,10 +3767,10 @@ int info_handle_file_entry_fprint(
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -3728,10 +3778,10 @@ int info_handle_file_entry_fprint(
 	}
 	if( file_entry == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3756,10 +3806,10 @@ int info_handle_file_entry_fprint(
 #endif
 	if( result != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve the name size.",
 		 function );
 
@@ -3772,10 +3822,10 @@ int info_handle_file_entry_fprint(
 
 		if( name == NULL )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_MEMORY,
-			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create name.",
 			 function );
 
@@ -3796,10 +3846,10 @@ int info_handle_file_entry_fprint(
 #endif
 		if( result != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve the name.",
 			 function );
 
@@ -3848,10 +3898,10 @@ int info_handle_file_entry_fprint(
 	     &number_of_sub_file_entries,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of sub file entries.",
 		 function );
 
@@ -3867,10 +3917,10 @@ int info_handle_file_entry_fprint(
 		     &sub_file_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to free retrieve sub file entry: %d.",
 			 function,
 			 sub_file_entry_index );
@@ -3883,10 +3933,10 @@ int info_handle_file_entry_fprint(
 		     indentation_level + 1,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print sub file entry: %d.",
 			 function,
 			 sub_file_entry_index );
@@ -3897,10 +3947,10 @@ int info_handle_file_entry_fprint(
 		     &sub_file_entry,
 		     error ) != 1 )
 		{
-			liberror_error_set(
+			libcerror_error_set(
 			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free sub file entry: %d.",
 			 function,
 			 sub_file_entry_index );
@@ -3936,16 +3986,16 @@ on_error:
  */
 int info_handle_dfxml_header_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_dfxml_header_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -3980,10 +4030,10 @@ int info_handle_dfxml_header_fprint(
 	     info_handle->notify_stream,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print build environment.",
 		 function );
 
@@ -3993,10 +4043,10 @@ int info_handle_dfxml_header_fprint(
 	     info_handle->notify_stream,
 	     error ) != 1 )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 		 "%s: unable to print execution environment.",
 		 function );
 
@@ -4015,16 +4065,16 @@ int info_handle_dfxml_header_fprint(
  */
 int info_handle_dfxml_footer_fprint(
      info_handle_t *info_handle,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function = "info_handle_dfxml_footer_fprint";
 
 	if( info_handle == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
 		 function );
 
@@ -4044,7 +4094,7 @@ int info_handle_dfxml_footer_fprint(
  */
 int dfxml_build_environment_fprint(
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 	static char *function      = "dfxml_build_environment_fprint";
 
@@ -4055,10 +4105,10 @@ int dfxml_build_environment_fprint(
 
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
@@ -4215,7 +4265,7 @@ int dfxml_build_environment_fprint(
  */
 int dfxml_execution_environment_fprint(
      FILE *stream,
-     liberror_error_t **error )
+     libcerror_error_t **error )
 {
 #if defined( HAVE_UNAME ) && !defined( WINAPI )
 	struct utsname utsname_buffer;
@@ -4228,10 +4278,10 @@ int dfxml_execution_environment_fprint(
 
 	if( stream == NULL )
 	{
-		liberror_error_set(
+		libcerror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid stream.",
 		 function );
 
