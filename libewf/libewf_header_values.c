@@ -1482,7 +1482,7 @@ on_error:
 	return( -1 );
 }
 
-/* Parse an UTF-8 encoded header string for the values
+/* Parses an UTF-8 encoded header string for the values
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_utf8_header_string(
@@ -1937,7 +1937,7 @@ int libewf_header_values_parse_utf8_header_string(
 							  &date_time_values_string_size,
 						          error );
 					}
-					if( result == -1 )
+					if( result != 1 )
 					{
 						libcerror_error_set(
 						 error,
@@ -2168,7 +2168,7 @@ on_error:
 	return( -1 );
 }
 
-/* Parse an EWF header for the values
+/* Parses EWF version 1 header for values
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header(
@@ -2233,8 +2233,8 @@ int libewf_header_values_parse_header(
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -2269,7 +2269,7 @@ on_error:
 	return( -1 );
 }
 
-/* Parse an EWF header2 for the values
+/* Parses EWF version 1 header2 for values
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header2(
@@ -2333,8 +2333,8 @@ int libewf_header_values_parse_header2(
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 

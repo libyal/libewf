@@ -34,7 +34,6 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
-#include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
@@ -132,17 +131,13 @@ struct libewf_internal_handle
 	 */
 	libmfcache_cache_t *chunk_table_cache;
 
-	/* The stored header sections
-	 */
-	libewf_header_sections_t *header_sections;
-
-	/* The stored hash sections
-	 */
-	libewf_hash_sections_t *hash_sections;
-
 	/* The date format for certain header values
 	 */
 	int date_format;
+
+	/* The hash sections
+	 */
+	libewf_hash_sections_t *hash_sections;
 
 	/* The header values
 	 */

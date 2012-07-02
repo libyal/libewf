@@ -69,13 +69,17 @@ struct libewf_section
 	 */
 	off64_t end_offset;
 
-	/* The size the section
+	/* The size of the section
 	 */
 	size64_t size;
 
-	/* The data size the section
+	/* The data size
 	 */
 	size64_t data_size;
+
+	/* The padding size
+	 */
+	uint32_t padding_size;
 };
 
 int libewf_section_test_zero(
@@ -104,7 +108,7 @@ int libewf_section_set(
      off64_t end_offset,
      libcerror_error_t **error );
 
-ssize_t libewf_section_start_read(
+ssize_t libewf_section_descriptor_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -204,13 +208,15 @@ ssize_t libewf_section_error2_write(
          libewf_sector_list_t *acquiry_errors,
          libcerror_error_t **error );
 
-ssize_t libewf_section_hash_read(
+ssize_t libewf_section_md5_hash_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error );
 
+/* TODO rename */
 ssize_t libewf_section_hash_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
@@ -218,6 +224,15 @@ ssize_t libewf_section_hash_write(
          off64_t section_offset,
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error );
+
+ssize_t libewf_section_sha1_hash_read(
+         libewf_section_t *section,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         libewf_hash_sections_t *hash_sections,
+         libcerror_error_t **error );
+
+/* TODO add write */
 
 ssize_t libewf_section_header_read(
          libewf_section_t *section,
@@ -302,7 +317,7 @@ ssize_t libewf_section_table_write(
          size_t type_string_length,
          off64_t section_offset,
          off64_t base_offset,
-         ewf_table_offset_t *table_offsets,
+         ewf_table_entry_v1_t *table_offsets,
          uint32_t number_of_offsets,
          size64_t chunks_data_size,
          uint8_t ewf_format,

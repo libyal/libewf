@@ -60,6 +60,11 @@ struct libewf_io_handle
 	 */
 	uint8_t compression_flags;
 
+	/* Value to indicate compression is forces
+	 * Used by EWF-S01
+	 */
+	uint8_t force_compression;
+
 	/* The header codepage
 	 */
 	int header_codepage;

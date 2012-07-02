@@ -507,7 +507,7 @@ int libewf_chunk_table_read_offsets(
 
 		goto on_error;
 	}
-	read_count = libewf_section_start_read(
+	read_count = libewf_section_descriptor_read(
 		      section,
 		      file_io_pool,
 		      file_io_pool_entry,
@@ -521,7 +521,7 @@ int libewf_chunk_table_read_offsets(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read section start.",
+		 "%s: unable to read section descriptor.",
 		 function );
 
 		goto on_error;
@@ -572,7 +572,7 @@ int libewf_chunk_table_read_offsets(
 
 		goto on_error;
 	}
-	table_offsets_data_size = sizeof( ewf_table_offset_t ) * number_of_offsets;
+	table_offsets_data_size = sizeof( ewf_table_entry_v1_t ) * number_of_offsets;
 
 	if( table_offsets_data_size > (size_t) SSIZE_MAX )
 	{
@@ -724,7 +724,7 @@ int libewf_chunk_table_read_offsets(
 		     file_io_pool_entry,
 		     section,
 		     (off64_t) base_offset,
-		     (ewf_table_offset_t *) table_offsets_data,
+		     (ewf_table_entry_v1_t *) table_offsets_data,
 		     number_of_offsets,
 		     table_offsets_corrupted,
 		     error ) != 1 )
@@ -748,7 +748,7 @@ int libewf_chunk_table_read_offsets(
 		     file_io_pool_entry,
 		     section,
 		     (off64_t) base_offset,
-		     (ewf_table_offset_t *) table_offsets_data,
+		     (ewf_table_entry_v1_t *) table_offsets_data,
 		     number_of_offsets,
 		     table_offsets_corrupted,
 		     error ) != 1 )
@@ -897,7 +897,7 @@ int libewf_chunk_table_fill(
      int file_io_pool_entry,
      libewf_section_t *table_section,
      off64_t base_offset,
-     ewf_table_offset_t *table_offsets,
+     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
      uint8_t tainted,
      libcerror_error_t **error )
@@ -970,7 +970,7 @@ int libewf_chunk_table_fill(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].offset,
+	 table_offsets[ table_offset_index ].chunk_data_offset,
 	 stored_offset );
 
 	while( table_offset_index < ( number_of_offsets - 1 ) )
@@ -985,7 +985,7 @@ int libewf_chunk_table_fill(
 			current_offset = stored_offset;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 table_offsets[ table_offset_index + 1 ].offset,
+		 table_offsets[ table_offset_index + 1 ].chunk_data_offset,
 		 stored_offset );
 
 		if( overflow == 0 )
@@ -1196,7 +1196,7 @@ int libewf_chunk_table_fill(
 		table_offset_index++;
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].offset,
+	 table_offsets[ table_offset_index ].chunk_data_offset,
 	 stored_offset );
 
 	if( overflow == 0 )
@@ -1413,7 +1413,7 @@ int libewf_chunk_table_correct(
      int file_io_pool_entry,
      libewf_section_t *table_section,
      off64_t base_offset,
-     ewf_table_offset_t *table_offsets,
+     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
      uint8_t tainted,
      libcerror_error_t **error )
@@ -1488,7 +1488,7 @@ int libewf_chunk_table_correct(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].offset,
+	 table_offsets[ table_offset_index ].chunk_data_offset,
 	 stored_offset );
 
 	while( table_offset_index < ( number_of_offsets - 1 ) )
@@ -1503,7 +1503,7 @@ int libewf_chunk_table_correct(
 			current_offset = stored_offset;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 table_offsets[ table_offset_index + 1 ].offset,
+		 table_offsets[ table_offset_index + 1 ].chunk_data_offset,
 		 stored_offset );
 
 		if( overflow == 0 )
@@ -1789,7 +1789,7 @@ int libewf_chunk_table_correct(
 		table_offset_index++;
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].offset,
+	 table_offsets[ table_offset_index ].chunk_data_offset,
 	 stored_offset );
 
 	if( overflow == 0 )
@@ -2080,7 +2080,7 @@ int libewf_chunk_table_fill_offsets(
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
      off64_t base_offset,
-     ewf_table_offset_t *table_offsets,
+     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
      libcerror_error_t **error )
 {
@@ -2170,7 +2170,7 @@ int libewf_chunk_table_fill_offsets(
 			table_offset |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
 		byte_stream_copy_from_uint32_little_endian(
-		 table_offsets[ table_offset_index ].offset,
+		 table_offsets[ table_offset_index ].chunk_data_offset,
 		 table_offset );
 
 		chunk_index++;

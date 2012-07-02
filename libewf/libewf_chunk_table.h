@@ -109,7 +109,7 @@ int libewf_chunk_table_fill(
      int file_io_pool_entry,
      libewf_section_t *table_section,
      off64_t base_chunk,
-     ewf_table_offset_t *table_offsets,
+     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
      uint8_t tainted,
      libcerror_error_t **error );
@@ -121,7 +121,7 @@ int libewf_chunk_table_correct(
      int file_io_pool_entry,
      libewf_section_t *table_section,
      off64_t base_chunk,
-     ewf_table_offset_t *table_offsets,
+     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
      uint8_t tainted,
      libcerror_error_t **error );
@@ -130,7 +130,7 @@ int libewf_chunk_table_fill_offsets(
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
      off64_t base_offset,
-     ewf_table_offset_t *table_offsets,
+     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
      libcerror_error_t **error );
 

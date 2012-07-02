@@ -5,6 +5,30 @@ TODO
   - add glob tests
   - add support for section MD5 hashes
   - add generic way to parse file object data
+  - rename table offsets to table entries
+  - rename table to sector table ?
+  - add SHA1 hash support in
+    - libewf_handle_set_sha1_hash set functions
+    - libewf_handle_set_utf8_hash_value
+    - libewf_handle_set_utf16_hash_value
+  - rename section start to section descriptor
+  - check alignment of debug output in section descriptor read for non EWF2 file
+  - validate SMART forced compression of uncompressed chunks
+  - refactor: libewf_header_sections_determine_format
+  - parse drive information for header values as well
+  - get the GUID from the segment files
+  - libewf_case_data_parse do this directly from the UTF16 stream ?
+  - rename libewf_section_compressed_string_read to libewf_section_compressed_file_object_string_read
+  - remove header value sections, just parse them while reading ? like case data
+    or parse them after reading all sections ?
+  - remove on demand libewf_handle_parse_header_values
+  - fix issue with libfvalue_utf8_string_with_index_copy_from_integer calling from libewf_convert_date_header2_value
+  - move header sections to write IO handle
+  - move libewf_header_sections_determine_format into libewf_header_sections_parse ?
+  - test with memwatch
+  - update msvscpp and borlandc files
+    - add case data files
+    - add device info files
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount

@@ -56,7 +56,7 @@ struct libewf_media_values
 
         /* The number of chunks
          */
-        uint32_t number_of_chunks;
+        uint64_t number_of_chunks;
 
         /* The number of sectors
          */

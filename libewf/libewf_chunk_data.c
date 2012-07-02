@@ -182,7 +182,7 @@ int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
      int8_t compression_level,
      uint8_t compression_flags,
-     uint8_t ewf_format,
+     uint8_t force_compression,
      size32_t chunk_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
@@ -222,7 +222,7 @@ int libewf_chunk_data_pack(
 	}
 	chunk_data->is_compressed = 0;
 
-	if( ( ewf_format != EWF_FORMAT_S01 )
+	if( ( force_compression == 0 )
 	 && ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
 	{
 		result = libewf_empty_block_test(
@@ -257,7 +257,7 @@ int libewf_chunk_data_pack(
 			compression_level = EWF_COMPRESSION_NONE;
 		}
 	}
-	if( ( ewf_format == EWF_FORMAT_S01 )
+	if( ( force_compression != 0 )
 	 || ( compression_level != EWF_COMPRESSION_NONE ) )
 	{
 		chunk_data->compressed_data_size = 2 * chunk_data->data_size;
@@ -352,7 +352,7 @@ int libewf_chunk_data_pack(
 				return( -1 );
 			}
 		}
-	 	if( ( ewf_format == EWF_FORMAT_S01 )
+	 	if( ( force_compression != 0 )
 		 || ( chunk_data->compressed_data_size < chunk_data->data_size ) )
 		{
 			memory_free(

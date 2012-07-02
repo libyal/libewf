@@ -25,15 +25,12 @@
 #include <common.h>
 #include <types.h>
 
-/* The minimum chunk size is 32k (32 * 1024)
- * 64 * 512 (64 sectors)
+/* The minimum chunk size is 32k or ( 64 sectors * 512 )
  */
 #define EWF_MINIMUM_CHUNK_SIZE			32768
 
-/* The possible EWF file formats
+/* The EWF file format definitions
  */
-#define EWF_FORMAT_UNKNOWN			(uint8_t) 'u'
-#define EWF_FORMAT_D01				(uint8_t) 'd'
 #define EWF_FORMAT_E01				(uint8_t) 'e'
 #define EWF_FORMAT_L01				(uint8_t) 'l'
 #define EWF_FORMAT_S01				(uint8_t) 's'

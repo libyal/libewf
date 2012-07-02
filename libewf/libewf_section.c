@@ -376,10 +376,10 @@ int libewf_section_set_values(
 	return( 1 );
 }
 
-/* Reads a section start
+/* Reads a section descriptor
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_section_start_read(
+ssize_t libewf_section_descriptor_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -389,11 +389,10 @@ ssize_t libewf_section_start_read(
 {
 	uint8_t section_start_data[ 76 ];
 
-	static char *function          = "libewf_section_start_read";
+	static char *function          = "libewf_section_descriptor_read";
 	size_t section_start_data_size = 0;
 	ssize_t read_count             = 0;
 	uint32_t calculated_checksum   = 0;
-	uint32_t padding_size          = 0;
 	uint32_t section_start_size    = 0;
 	uint32_t stored_checksum       = 0;
 
@@ -539,7 +538,7 @@ ssize_t libewf_section_start_read(
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_start_v2_t *) section_start_data )->padding_size,
-		 padding_size );
+		 section->padding_size );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_start_v2_t *) section_start_data )->start_size,
@@ -555,17 +554,17 @@ ssize_t libewf_section_start_read(
 		if( format_version == 1 )
 		{
 			libcnotify_printf(
-			 "%s: type string\t\t\t\t\t: %s\n",
+			 "%s: type string\t\t\t\t: %s\n",
 			 function,
 			 (char *) section->type_string );
 
 			libcnotify_printf(
-			 "%s: next offset\t\t\t\t\t: 0x%08" PRIx64 "\n",
+			 "%s: next offset\t\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
 			 section->end_offset );
 
 			libcnotify_printf(
-			 "%s: size\t\t\t\t\t\t: %" PRIu64 "\n",
+			 "%s: size\t\t\t\t\t: %" PRIu64 "\n",
 			 function,
 			 section->size );
 
@@ -580,7 +579,7 @@ ssize_t libewf_section_start_read(
 		else if( format_version == 2 )
 		{
 			libcnotify_printf(
-			 "%s: type\t\t\t\t\t\t: 0x%08" PRIx32 " (",
+			 "%s: type\t\t\t\t\t: 0x%08" PRIx32 " (",
 			 function,
 			 section->type );
 			libewf_debug_print_section_type(
@@ -592,7 +591,7 @@ ssize_t libewf_section_start_read(
 			 ( (ewf_section_start_v2_t *) section_start_data )->data_flags,
 			 value_32bit );
 			libcnotify_printf(
-			 "%s: data flags\t\t\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: data flags\t\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 value_32bit );
 
@@ -602,19 +601,19 @@ ssize_t libewf_section_start_read(
 			 section->start_offset );
 
 			libcnotify_printf(
-			 "%s: data size\t\t\t\t\t: %" PRIu64 "\n",
+			 "%s: data size\t\t\t\t: %" PRIu64 "\n",
 			 function,
 			 section->data_size );
 
 			libcnotify_printf(
-			 "%s: section start size\t\t\t\t: %" PRIu32 "\n",
+			 "%s: section start size\t\t\t: %" PRIu32 "\n",
 			 function,
 			 section_start_size );
 
 			libcnotify_printf(
-			 "%s: padding size\t\t\t\t\t: %" PRIu32 "\n",
+			 "%s: padding size\t\t\t\t: %" PRIu32 "\n",
 			 function,
-			 padding_size );
+			 section->padding_size );
 
 			libcnotify_printf(
 			 "%s: data integrity hash:\n",
@@ -633,7 +632,7 @@ ssize_t libewf_section_start_read(
 			 0 );
 		}
 		libcnotify_printf(
-		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 
@@ -666,7 +665,7 @@ ssize_t libewf_section_start_read(
 	}
 	else if( format_version == 2 )
 	{
-/* TODO check sanity of start offset and data size */
+/* TODO check sanity of start offset and data size, padding size */
 		section->start_offset = file_offset - section->data_size;
 		section->size         = section->data_size + sizeof( ewf_section_start_v2_t );
 		section->end_offset   = file_offset + sizeof( ewf_section_start_v2_t );
@@ -708,10 +707,54 @@ ssize_t libewf_section_start_read(
 			}
 			else if( memory_compare(
 			          section->type_string,
+			          "hash",
+			          4 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_MD5_HASH;
+			}
+			else if( memory_compare(
+			          section->type_string,
 			          "next",
 			          4 ) == 0 )
 			{
 				section->type = LIBEWF_SECTION_TYPE_NEXT;
+			}
+		}
+		else if( section->type_string_length == 5 )
+		{
+			if( memory_compare(
+			     section->type_string,
+			     "table",
+			     5 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_SECTOR_TABLE;
+			}
+		}
+		else if( section->type_string_length == 6 )
+		{
+			if( memory_compare(
+			     section->type_string,
+			     "error2",
+			     6 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_ERROR_TABLE;
+			}
+		}
+		else if( section->type_string_length == 7 )
+		{
+			if( memory_compare(
+			     section->type_string,
+			     "sectors",
+			     7 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_SECTOR_DATA;
+			}
+			else if( memory_compare(
+			          section->type_string,
+			          "session",
+			          7 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_SESSION_TABLE;
 			}
 		}
 		/* Make sure to check if the section next value is sane
@@ -1841,7 +1884,7 @@ ssize_t libewf_section_data_read(
 		goto on_error;
 	}
 	if( ( number_of_chunks != 0 )
-	 && ( number_of_chunks != media_values->number_of_chunks ) )
+	 && ( (uint64_t) number_of_chunks != media_values->number_of_chunks ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2033,6 +2076,7 @@ ssize_t libewf_section_data_write(
 
 		return( -1 );
 	}
+/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
 	section_size = sizeof( ewf_section_start_v1_t )
 	             + sizeof( ewf_data_t );
 
@@ -2116,7 +2160,7 @@ ssize_t libewf_section_data_write(
 			 media_values->media_type );
 
 			libcnotify_printf(
-			 "%s: number of chunks\t\t\t\t: %" PRIu32 "\n",
+			 "%s: number of chunks\t\t\t\t: %" PRIu64 "\n",
 			 function,
 			 media_values->number_of_chunks );
 
@@ -3243,19 +3287,21 @@ on_error:
 	return( -1 );
 }
 
-/* Reads a hash section
+/* Reads a version 1 hash section or a version 2 MD5 hash section
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_section_hash_read(
+ssize_t libewf_section_md5_hash_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error )
 {
-	ewf_hash_t hash;
+	uint8_t section_data[ 36 ];
 
-	static char *function        = "libewf_section_hash_read";
+	static char *function        = "libewf_section_md5_hash_read";
+	size_t section_data_size     = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -3283,7 +3329,26 @@ ssize_t libewf_section_hash_read(
 
 		return( -1 );
 	}
-	if( section->data_size != (size64_t) sizeof( ewf_hash_t ) )
+	if( format_version == 1 )
+	{
+		section_data_size = sizeof( ewf_hash_t );
+	}
+	else if( format_version == 2 )
+	{
+		section_data_size = sizeof( ewf_md5_hash_t ) + section->padding_size;
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
+		 function );
+
+		return( -1 );
+	}
+	if( section->data_size != (size64_t) section_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -3297,17 +3362,17 @@ ssize_t libewf_section_hash_read(
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              (uint8_t *) &hash,
-	              sizeof( ewf_hash_t ),
+	              section_data,
+	              section_data_size,
 	              error );
 
-	if( read_count != (ssize_t) sizeof( ewf_hash_t ) )
+	if( read_count != (ssize_t) section_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read hash.",
+		 "%s: unable to read section data.",
 		 function );
 
 		return( -1 );
@@ -3316,18 +3381,26 @@ ssize_t libewf_section_hash_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: hash data:\n",
+	 	 "%s: section data:\n",
 		 function );
 		libcnotify_print_data(
-		 (uint8_t *) &hash,
-		 sizeof( ewf_hash_t ),
+		 section_data,
+		 section_data_size,
 		 0 );
 	}
 #endif
-	byte_stream_copy_to_uint32_little_endian(
-	 hash.checksum,
-	 stored_checksum );
-
+	if( format_version == 1 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_hash_t *) section_data )->checksum,
+		 stored_checksum );
+	}
+	else if( format_version == 2 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_md5_hash_t *) section_data )->checksum,
+		 stored_checksum );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -3335,30 +3408,49 @@ ssize_t libewf_section_hash_read(
 		 "%s: MD5 hash:\n",
 		 function );
 		libcnotify_print_data(
-		 hash.md5_hash,
+		 section_data,
 		 16,
 		 0 );
 
-		libcnotify_printf(
-		 "%s: unknown1:\n",
-		 function );
-		libcnotify_print_data(
-		 hash.unknown1,
-		 16,
-		 0 );
-
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "%s: unknown1:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_hash_t *) section_data )->unknown1,
+			 16,
+			 0 );
+		}
 		libcnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 
-		libcnotify_printf(
-		 "\n" );
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
+		else if( format_version == 2 )
+		{
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 &( section_data[ sizeof( ewf_md5_hash_t ) ] ),
+			 (size_t) section->padding_size,
+			 0 );
+		}
 	}
 #endif
+	if( format_version == 2 )
+	{
+		section_data_size -= section->padding_size;
+	}
 	calculated_checksum = ewf_checksum_calculate(
-	                       &hash,
-	                       sizeof( ewf_hash_t ) - sizeof( uint32_t ),
+	                       section_data,
+	                       section_data_size - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -3375,7 +3467,7 @@ ssize_t libewf_section_hash_read(
 		return( -1 );
 	}
 	result = libewf_section_test_zero(
-		  hash.md5_hash,
+		  section_data,
 		  16,
 		  error );
 
@@ -3394,7 +3486,7 @@ ssize_t libewf_section_hash_read(
 	{
 		if( memory_copy(
 		     hash_sections->md5_hash,
-		     hash.md5_hash,
+		     section_data,
 		     16 ) == NULL )
 		{
 			libcerror_error_set(
@@ -3568,6 +3660,180 @@ ssize_t libewf_section_hash_write(
 	total_write_count += write_count;
 
 	return( total_write_count );
+}
+
+/* Reads a version 2 SHA1 hash section
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libewf_section_sha1_hash_read(
+         libewf_section_t *section,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         libewf_hash_sections_t *hash_sections,
+         libcerror_error_t **error )
+{
+	uint8_t section_data[ 32 ];
+
+	static char *function        = "libewf_section_sha1_hash_read";
+	size_t section_data_size     = 0;
+	ssize_t read_count           = 0;
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
+	int result                   = 0;
+
+	if( section == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section.",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_sections == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash sections.",
+		 function );
+
+		return( -1 );
+	}
+	section_data_size = sizeof( ewf_sha1_hash_t ) + section->padding_size;
+
+	if( section->data_size != (size64_t) section_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid section size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libbfio_pool_read_buffer(
+	              file_io_pool,
+	              file_io_pool_entry,
+	              section_data,
+	              section_data_size,
+	              error );
+
+	if( read_count != (ssize_t) section_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read section data.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	 "%s: section data:\n",
+		 function );
+		libcnotify_print_data(
+		 section_data,
+		 section_data_size,
+		 0 );
+	}
+#endif
+	byte_stream_copy_to_uint32_little_endian(
+	 ( (ewf_sha1_hash_t *) section_data )->checksum,
+	 stored_checksum );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: SHA1 hash:\n",
+		 function );
+		libcnotify_print_data(
+		 section_data,
+		 20,
+		 0 );
+
+		libcnotify_printf(
+		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 function,
+		 stored_checksum );
+
+		libcnotify_printf(
+		 "%s: padding:\n",
+		 function );
+		libcnotify_print_data(
+		 &( section_data[ sizeof( ewf_sha1_hash_t ) ] ),
+		 (size_t) section->padding_size,
+		 0 );
+	}
+#endif
+	section_data_size -= section->padding_size;
+
+	calculated_checksum = ewf_checksum_calculate(
+	                       section_data,
+	                       section_data_size - 4,
+	                       1 );
+
+	if( stored_checksum != calculated_checksum )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_INPUT,
+		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 function,
+		 stored_checksum,
+		 calculated_checksum );
+
+		return( -1 );
+	}
+	result = libewf_section_test_zero(
+		  section_data,
+		  16,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if SHA1 hash is empty.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		if( memory_copy(
+		     hash_sections->sha1_hash,
+		     section_data,
+		     20 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set SHA1 hash in hash sections.",
+			 function );
+
+			return( -1 );
+		}
+		hash_sections->sha1_hash_set = 1;
+	}
+	else
+	{
+		hash_sections->sha1_hash_set = 0;
+	}
+	return( read_count );
 }
 
 /* Reads a header section
@@ -5314,7 +5580,7 @@ ssize_t libewf_section_table_header_read(
          uint64_t *base_offset,
          libcerror_error_t **error )
 {
-	ewf_table_header_t table_header;
+	ewf_table_header_v1_t table_header;
 
 	static char *function        = "libewf_section_table_header_read";
 	ssize_t read_count           = 0;
@@ -5356,7 +5622,7 @@ ssize_t libewf_section_table_header_read(
 
 		return( -1 );
 	}
-	if( section->data_size < (size64_t) sizeof( ewf_table_header_t ) )
+	if( section->data_size < (size64_t) sizeof( ewf_table_header_v1_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -5371,10 +5637,10 @@ ssize_t libewf_section_table_header_read(
 	              file_io_pool,
 	              file_io_pool_entry,
 	              (uint8_t *) &table_header,
-	              sizeof( ewf_table_header_t ),
+	              sizeof( ewf_table_header_v1_t ),
 	              error );
 	
-	if( read_count != (ssize_t) sizeof( ewf_table_header_t ) )
+	if( read_count != (ssize_t) sizeof( ewf_table_header_v1_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -5393,7 +5659,7 @@ ssize_t libewf_section_table_header_read(
 		 function );
 		libcnotify_print_data(
 		 (uint8_t *) &table_header,
-		 sizeof( ewf_table_header_t ),
+		 sizeof( ewf_table_header_v1_t ),
 		 0 );
 	}
 #endif
@@ -5449,7 +5715,7 @@ ssize_t libewf_section_table_header_read(
 #endif
 	calculated_checksum = ewf_checksum_calculate(
 	                       &table_header,
-	                       sizeof( ewf_table_header_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_table_header_v1_t ) - sizeof( uint32_t ),
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -5501,13 +5767,13 @@ ssize_t libewf_section_table_write(
          size_t type_string_length,
          off64_t section_offset,
          off64_t base_offset,
-         ewf_table_offset_t *table_offsets,
+         ewf_table_entry_v1_t *table_offsets,
          uint32_t number_of_offsets,
          size64_t chunks_data_size,
          uint8_t ewf_format,
          libcerror_error_t **error )
 {
-	ewf_table_header_t table_header;
+	ewf_table_header_v1_t table_header;
 	uint8_t calculated_checksum_buffer[ 4 ];
 
 	static char *function        = "libewf_section_table_write";
@@ -5562,10 +5828,10 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	table_offsets_size = sizeof( ewf_table_offset_t ) * number_of_offsets;
+	table_offsets_size = sizeof( ewf_table_entry_v1_t ) * number_of_offsets;
 
 	section_size = sizeof( ewf_section_start_v1_t )
-	             + sizeof( ewf_table_header_t )
+	             + sizeof( ewf_table_header_v1_t )
 	             + table_offsets_size
 	             + chunks_data_size;
 
@@ -5615,7 +5881,7 @@ ssize_t libewf_section_table_write(
 	if( memory_set(
 	     &table_header,
 	     0,
-	     sizeof( ewf_table_header_t ) ) == NULL )
+	     sizeof( ewf_table_header_v1_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -5636,7 +5902,7 @@ ssize_t libewf_section_table_write(
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       &table_header,
-	                       sizeof( ewf_table_header_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_table_header_v1_t ) - sizeof( uint32_t ),
 	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -5647,10 +5913,10 @@ ssize_t libewf_section_table_write(
 	               file_io_pool,
 	               file_io_pool_entry,
 	               (uint8_t *) &table_header,
-	               sizeof( ewf_table_header_t ),
+	               sizeof( ewf_table_header_v1_t ),
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_table_header_t ) )
+	if( write_count != (ssize_t) sizeof( ewf_table_header_v1_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -5809,7 +6075,7 @@ ssize_t libewf_section_volume_read(
 
 		return( -1 );
 	}
-	if( media_values->number_of_chunks > (uint32_t) INT_MAX )
+	if( media_values->number_of_chunks > (uint64_t) INT_MAX )
 	{
 		libcerror_error_set(
 		 error,
@@ -5864,7 +6130,7 @@ ssize_t libewf_section_volume_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+		 "%s: volume has %" PRIu64 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 		 function,
 		 media_values->number_of_chunks,
 		 media_values->chunk_size,
@@ -6050,7 +6316,7 @@ ssize_t libewf_section_volume_e01_read(
 		 0 );
 
 		libcnotify_printf(
-		 "%s: number of chunks\t\t: %" PRIu32 "\n",
+		 "%s: number of chunks\t\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_chunks );
 
@@ -6281,6 +6547,7 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
+/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
 	section_size = sizeof( ewf_section_start_v1_t )
 	             + sizeof( ewf_volume_t );
 
@@ -6357,7 +6624,7 @@ ssize_t libewf_section_volume_e01_write(
 		 media_values->media_type );
 
 		libcnotify_printf(
-		 "%s: number of chunks\t\t\t\t: %" PRIu32 "\n",
+		 "%s: number of chunks\t\t\t\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_chunks );
 
@@ -6461,7 +6728,7 @@ ssize_t libewf_section_volume_e01_write(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+		 "%s: volume has %" PRIu64 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 		 function,
 		 media_values->number_of_chunks,
 		 media_values->chunk_size,
@@ -6645,7 +6912,7 @@ ssize_t libewf_section_volume_s01_read(
 		 0 );
 
 		libcnotify_printf(
-		 "%s: number of chunks\t: %" PRIu32 "\n",
+		 "%s: number of chunks\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_chunks );
 
@@ -6794,6 +7061,7 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
+/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
 	section_size = sizeof( ewf_section_start_v1_t )
 	             + sizeof( ewf_volume_smart_t );
 
@@ -6870,7 +7138,7 @@ ssize_t libewf_section_volume_s01_write(
 		 media_values->media_type );
 
 		libcnotify_printf(
-		 "%s: number of chunks\t\t\t\t: %" PRIu32 "\n",
+		 "%s: number of chunks\t\t\t\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_chunks );
 
@@ -6932,7 +7200,7 @@ ssize_t libewf_section_volume_s01_write(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+		 "%s: volume has %" PRIu64 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 		 function,
 		 media_values->number_of_chunks,
 		 media_values->chunk_size,

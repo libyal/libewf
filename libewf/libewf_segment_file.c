@@ -721,7 +721,8 @@ int libewf_segment_file_read(
 
 			goto on_error;
 		}
-		read_count = libewf_section_start_read(
+/* TODO set version */
+		read_count = libewf_section_descriptor_read(
 		              section,
 		              file_io_pool,
 		              file_io_pool_entry,
@@ -735,7 +736,7 @@ int libewf_segment_file_read(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read section start.",
+			 "%s: unable to read section descriptor.",
 			 function );
 
 			goto on_error;
@@ -891,25 +892,33 @@ ssize_t libewf_segment_file_read_table_section(
 	}
 	chunk_table->previous_last_chunk_filled = chunk_table->last_chunk_filled;
 
-	read_count = libewf_section_table_header_read(
-	              section,
-	              file_io_pool,
-	              file_io_pool_entry,
-	              io_handle->format,
-	              &number_of_offsets,
-	              &base_offset,
-	              error );
-	
-	if( read_count == -1 )
+	if( segment_file->major_version == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table section header.",
-		 function );
+		read_count = libewf_section_table_header_read(
+			      section,
+			      file_io_pool,
+			      file_io_pool_entry,
+			      io_handle->format,
+			      &number_of_offsets,
+			      &base_offset,
+			      error );
+		
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read table section header.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+	}
+	else if( segment_file->major_version == 2 )
+	{
+/* TODO check bounds */
+		number_of_offsets = (uint32_t) ( section->data_size / sizeof( ewf_table_entry_v2_t ) );
 	}
 	if( number_of_offsets > 0 )
 	{
@@ -2197,7 +2206,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
-         ewf_table_offset_t *table_offsets,
+         ewf_table_entry_v1_t *table_offsets,
          uint32_t number_of_table_offsets,
          uint32_t number_of_chunks_written,
          uint32_t chunks_per_section,
@@ -2378,7 +2387,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
-         ewf_table_offset_t *table_offsets,
+         ewf_table_entry_v1_t *table_offsets,
          uint32_t number_of_table_offsets,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,

@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include "libewf_definitions.h"
+#include "libewf_io_handle.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
@@ -900,5 +901,190 @@ int libewf_header_sections_determine_format(
 	}
 #endif
 	return( result );
+}
+
+/* Parses the header, header2 and/or xheader section for header values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_header_sections_parse(
+     libewf_header_sections_t *header_sections,
+     libewf_io_handle_t *io_handle,
+     libfvalue_table_t *header_values,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *header_value = NULL;
+	uint8_t *header_value_data      = NULL;
+	static char *function           = "libewf_header_sections_parse";
+	size_t header_value_data_size   = 0;
+	int encoding                    = 0;
+	int result                      = 0;
+	int result_header               = 1;
+	int result_header2              = 1;
+	int result_xheader              = 1;
+
+	if( header_sections == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header sections.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( header_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header values.",
+		 function );
+
+		return( -1 );
+	}
+	/* For EWF version 1 format read all the header sections
+	 * and overwrite values by the most specific data
+	 */
+	if( header_sections->header != NULL )
+	{
+		if( libewf_header_values_parse_header(
+		     header_values,
+		     header_sections->header,
+		     header_sections->header_size,
+		     io_handle->header_codepage,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header.",
+			 function );
+
+			result_header = -1;
+		}
+	}
+	if( header_sections->header2 != NULL )
+	{
+		if( libewf_header_values_parse_header2(
+		     header_values,
+		     header_sections->header2,
+		     header_sections->header2_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header2.",
+			 function );
+
+			result_header2 = -1;
+		}
+	}
+	if( header_sections->xheader != NULL )
+	{
+		if( libewf_header_values_parse_xheader(
+		     header_values,
+		     header_sections->xheader,
+		     header_sections->xheader_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse xheader.",
+			 function );
+
+			result_xheader = -1;
+		}
+	}
+	if( ( result_header != 1 )
+	 && ( result_header2 != 1 )
+	 && ( result_xheader != 1 ) )
+	{
+		return( -1 );
+	}
+	if( ( result_header != 1 )
+	 || ( result_header2 != 1 )
+	 || ( result_xheader != 1 ) )
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				libcnotify_print_error_backtrace(
+				 *error );
+			}
+		}
+#endif
+		libcerror_error_free(
+		 error );
+	}
+	/* The EnCase2 and EnCase3 format are the same
+	 * only the acquiry software version provides insight in which version of EnCase was used
+	 */
+	if( io_handle->format == LIBEWF_FORMAT_ENCASE2 )
+	{
+		result = libfvalue_table_get_value_by_identifier(
+			  header_values,
+			  (uint8_t *) "acquiry_software_version",
+			  25,
+			  &header_value,
+			  0,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value: acquiry_software_version.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			if( libfvalue_value_get_data(
+			     header_value,
+			     &header_value_data,
+			     &header_value_data_size,
+			     &encoding,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve header value data.",
+				 function );
+
+				return( -1 );
+			}
+			if( header_value_data[ 0 ] == (uint8_t) '3' )
+			{
+				io_handle->format = LIBEWF_FORMAT_ENCASE3;
+			}
+		}
+	}
+	return( 1 );
 }
 

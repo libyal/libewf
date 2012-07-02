@@ -683,7 +683,6 @@ int libewf_glob(
 		if( format == LIBEWF_FORMAT_LVF )
 		{
 			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
-			ewf_format        = EWF_FORMAT_L01;
 		}
 		else if( format == LIBEWF_FORMAT_SMART )
 		{
@@ -1041,11 +1040,11 @@ int libewf_glob_wide(
 		{
 			if( filename[ filename_length - 4 ] == (wchar_t) 'E' )
 			{
-				format = LIBEWF_FORMAT_ENCASE5;
+				segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
 			}
 			else if( filename[ filename_length - 4 ] == (wchar_t) 'L' )
 			{
-				format = LIBEWF_FORMAT_LVF;
+				segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL;
 			}
 			else
 			{
@@ -1088,20 +1087,22 @@ int libewf_glob_wide(
 	{
 		additional_length = 4;
 	}
-	if( format == LIBEWF_FORMAT_LVF )
+	if( segment_file_type == 0 )
 	{
-		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
-		ewf_format        = EWF_FORMAT_L01;
-	}
-	else if( format == LIBEWF_FORMAT_SMART )
-	{
-		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-		ewf_format        = EWF_FORMAT_S01;
-	}
-	else
-	{
-		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-		ewf_format        = EWF_FORMAT_E01;
+		if( format == LIBEWF_FORMAT_LVF )
+		{
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
+		}
+		else if( format == LIBEWF_FORMAT_SMART )
+		{
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
+			ewf_format        = EWF_FORMAT_S01;
+		}
+		else
+		{
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
+			ewf_format        = EWF_FORMAT_E01;
+		}
 	}
 	if( libbfio_file_initialize(
 	     &file_io_handle,

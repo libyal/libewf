@@ -34,6 +34,7 @@ libewf_la_SOURCES = \
 	ewfx_delta_chunk.h \
 	libewf.c \
 	libewf_array_type.c libewf_array_type.h \
+	libewf_case_data.c libewf_case_data.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
 	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \
@@ -42,6 +43,7 @@ libewf_la_SOURCES = \
 	libewf_date_time_values.c libewf_date_time_values.h \
 	libewf_debug.c libewf_debug.h \
 	libewf_definitions.h \
+	libewf_device_information.c libewf_device_information.h \
 	libewf_empty_block.c libewf_empty_block.h \
 	libewf_error.c libewf_error.h \
 	libewf_extern.h \

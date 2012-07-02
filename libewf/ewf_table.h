@@ -29,54 +29,70 @@
 extern "C" {
 #endif
 
-typedef struct ewf_table_header ewf_table_header_t;
+/* The EWF version 1 table header
+ */
+typedef struct ewf_table_header_v1 ewf_table_header_v1_t;
 
-struct ewf_table_header
+struct ewf_table_header_v1
 {
 	/* The number of offsets
-	 * consists of 4 bytes (32 bits)
+	 * Consists of 4 bytes
 	 */
 	uint8_t number_of_offsets[ 4 ];
 
 	/* Padding
-	 * consists of 4 bytes
-	 * value should be 0x00
+	 * Consists of 4 bytes
 	 */
 	uint8_t padding1[ 4 ];
 
 	/* The base offset
-	 * consists of 8 bytes
+	 * Consists of 8 bytes
 	 */
 	uint8_t base_offset[ 8 ];
 
 	/* Padding
-	 * consists of 4 bytes
-	 * value should be 0x00
+	 * Consists of 4 bytes
 	 */
 	uint8_t padding2[ 4 ];
 
 	/* The section checksum of all (previous) table data
-	 * consists of 4 bytes
-	 * starts with offset 76
+	 * Consists of 4 bytes
 	 */
 	uint8_t checksum[ 4 ];
-
-	/* The offset array
-	 * consists of mulitple 4 byte offsets
-	 */
-
-	/* The last offset is followed by a 4 byte checksum
-	 */
 };
 
-typedef struct ewf_table_offset ewf_table_offset_t;
+/* The EWF version 1 table entry (chunk descriptor)
+ */
+typedef struct ewf_table_entry_v1 ewf_table_entry_v1_t;
 
-struct ewf_table_offset
+struct ewf_table_entry_v1
 {
-	/* An offset
-	 * consists of 4 bytes
+	/* The chunk data offset
+	 * Consists of 4 bytes
 	 */
-	uint8_t offset[ 4 ];
+	uint8_t chunk_data_offset[ 4 ];
+};
+
+/* The EWF version 2 table entry (chunk descriptor)
+ */
+typedef struct ewf_table_entry_v2 ewf_table_entry_v2_t;
+
+struct ewf_table_entry_v2
+{
+	/* The chunk data offset
+	 * Consists of 8 bytes
+	 */
+	uint8_t chunk_data_offset[ 8 ];
+
+	/* The chunk data size
+	 * Consists of 4 bytes
+	 */
+	uint8_t chunk_data_size[ 4 ];
+
+	/* The chunk data flags
+	 * Consists of 4 bytes
+	 */
+	uint8_t chunk_data_flags[ 4 ];
 };
 
 #if defined( __cplusplus )

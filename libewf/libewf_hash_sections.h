@@ -45,7 +45,7 @@ struct libewf_hash_sections
 	 */
 	size_t xhash_size;
 
-	/* The MD5 hash of the data as found in the hash section
+	/* The MD5 hash of the data as found in the corresponding hash section
 	 */
 	uint8_t md5_hash[ 16 ];
 
@@ -60,6 +60,14 @@ struct libewf_hash_sections
 	/* Value to indicate if the MD5 digest was set
 	 */
 	uint8_t md5_digest_set;
+
+	/* The SHA1 hash of the data as found in the corresponding hash section
+	 */
+	uint8_t sha1_hash[ 20 ];
+
+	/* Value to indicate if the SHA1 hash was set
+	 */
+	uint8_t sha1_hash_set;
 
 	/* The SHA1 hash of the data as found in the digest section
 	 */

@@ -3526,7 +3526,7 @@ int libewf_parse_header_values(
      uint8_t date_format )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	libcerror_error_t *error                   = NULL;
+	libcerror_error_t *error                  = NULL;
 	static char *function                     = "libewf_parse_header_values";
 
 	if( handle == NULL )
@@ -3566,32 +3566,7 @@ int libewf_parse_header_values(
 
 		return( -1 );
 	}
-	if( internal_handle->header_values_parsed != 0 )
-	{
-		return( 0 );
-	}
-	if( libewf_handle_parse_header_values(
-	     internal_handle,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to parse header values.",
-		 function );
-
-		libcnotify_print_error_backtrace(
-		 error );
-		libcerror_error_free(
-		 &error );
-
-		return( -1 );
-	}
-	internal_handle->header_values_parsed = 1;
-	internal_handle->date_format          = date_format;
-
-	return( 1 );
+	return( 0 );
 }
 
 /* Retrieves the amount of hash values

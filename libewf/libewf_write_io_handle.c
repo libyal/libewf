@@ -279,10 +279,10 @@ int libewf_write_io_handle_clone(
 	}
 	if( source_write_io_handle->table_offsets != NULL )
 	{
-		offsets_size = sizeof( ewf_table_offset_t ) * source_write_io_handle->number_of_table_offsets;
+		offsets_size = sizeof( ewf_table_entry_v1_t ) * source_write_io_handle->number_of_table_offsets;
 
-		( *destination_write_io_handle )->table_offsets = (ewf_table_offset_t *) memory_allocate(
-		                                                                          offsets_size );
+		( *destination_write_io_handle )->table_offsets = (ewf_table_entry_v1_t *) memory_allocate(
+		                                                                            offsets_size );
 
 		if( ( *destination_write_io_handle )->table_offsets == NULL )
 		{
@@ -480,122 +480,132 @@ int libewf_write_io_handle_initialize_values(
 			goto on_error;
 		}
 	}
-	if( write_io_handle->compressed_zero_byte_empty_block == NULL )
+/* TODO make this a set once value ? */
+	if( io_handle->ewf_format == EWF_FORMAT_S01 )
 	{
-		zero_byte_empty_block = (uint8_t *) memory_allocate(
-		                                     sizeof( uint8_t ) * (size_t) media_values->chunk_size );
+		io_handle->force_compression = 1;
+	}
+	else
+	{
+		io_handle->force_compression = 0;
 
-		if( zero_byte_empty_block == NULL )
-		{	
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create zero byte empty block.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_set(
-		     zero_byte_empty_block,
-		     0,
-		     sizeof( uint8_t ) * (size_t) media_values->chunk_size ) == NULL )
+		if( write_io_handle->compressed_zero_byte_empty_block == NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear zero byte empty block.",
-			 function );
+			zero_byte_empty_block = (uint8_t *) memory_allocate(
+			                                     sizeof( uint8_t ) * (size_t) media_values->chunk_size );
 
-			goto on_error;
-		}
-		write_io_handle->compressed_zero_byte_empty_block_size = 512;
-
-		compressed_zero_byte_empty_block = (uint8_t *) memory_allocate(
-				                                sizeof( uint8_t ) * write_io_handle->compressed_zero_byte_empty_block_size );
-
-		if( compressed_zero_byte_empty_block == NULL )
-		{	
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create compressed zero byte empty block.",
-			 function );
-
-			goto on_error;
-		}
-		result = libewf_compress(
-			  compressed_zero_byte_empty_block,
-			  &( write_io_handle->compressed_zero_byte_empty_block_size ),
-			  zero_byte_empty_block,
-			  (size_t) media_values->chunk_size,
-			  io_handle->compression_level,
-			  error );
-
-		/* Check if the compressed buffer was too small
-		 * and a new compressed data size buffer was passed back
-		 */
-		if( ( result == -1 )
-		 && ( write_io_handle->compressed_zero_byte_empty_block_size > 0 ) )
-		{
-#if !defined( HAVE_COMPRESS_BOUND ) && !defined( WINAPI )
-			/* The some version of zlib require a fairly large buffer
-			 * if compressBound() was not used but 2 x 512 then assume
-			 * the chunk size + 16 is sufficient
-			 */
-			write_io_handle->compressed_zero_byte_empty_block_size = media_values->chunk_size + 16;
-#endif
-
-			libcerror_error_free(
-			 error );
-
-			reallocation = memory_reallocate(
-			                compressed_zero_byte_empty_block,
-			                sizeof( uint8_t ) * write_io_handle->compressed_zero_byte_empty_block_size );
-
-			if( reallocation == NULL )
-			{
+			if( zero_byte_empty_block == NULL )
+			{	
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_MEMORY,
 				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to resize compressed zero byte empty block.",
+				 "%s: unable to create zero byte empty block.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
-			compressed_zero_byte_empty_block = (uint8_t *) reallocation;
+			if( memory_set(
+			     zero_byte_empty_block,
+			     0,
+			     sizeof( uint8_t ) * (size_t) media_values->chunk_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear zero byte empty block.",
+				 function );
 
+				goto on_error;
+			}
+			write_io_handle->compressed_zero_byte_empty_block_size = 512;
+
+			compressed_zero_byte_empty_block = (uint8_t *) memory_allocate(
+			                                                sizeof( uint8_t ) * write_io_handle->compressed_zero_byte_empty_block_size );
+
+			if( compressed_zero_byte_empty_block == NULL )
+			{	
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create compressed zero byte empty block.",
+				 function );
+
+				goto on_error;
+			}
 			result = libewf_compress(
-			          compressed_zero_byte_empty_block,
-			          &( write_io_handle->compressed_zero_byte_empty_block_size ),
-			          zero_byte_empty_block,
-			          (size_t) media_values->chunk_size,
-			          io_handle->compression_level,
-			          error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_free(
-			 error );
+				  compressed_zero_byte_empty_block,
+				  &( write_io_handle->compressed_zero_byte_empty_block_size ),
+				  zero_byte_empty_block,
+				  (size_t) media_values->chunk_size,
+				  io_handle->compression_level,
+				  error );
+
+			/* Check if the compressed buffer was too small
+			 * and a new compressed data size buffer was passed back
+			 */
+			if( ( result == -1 )
+			 && ( write_io_handle->compressed_zero_byte_empty_block_size > 0 ) )
+			{
+#if !defined( HAVE_COMPRESS_BOUND ) && !defined( WINAPI )
+				/* The some version of zlib require a fairly large buffer
+				 * if compressBound() was not used but 2 x 512 then assume
+				 * the chunk size + 16 is sufficient
+				 */
+				write_io_handle->compressed_zero_byte_empty_block_size = media_values->chunk_size + 16;
+#endif
+
+				libcerror_error_free(
+				 error );
+
+				reallocation = memory_reallocate(
+				                compressed_zero_byte_empty_block,
+				                sizeof( uint8_t ) * write_io_handle->compressed_zero_byte_empty_block_size );
+
+				if( reallocation == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to resize compressed zero byte empty block.",
+					 function );
+
+					return( -1 );
+				}
+				compressed_zero_byte_empty_block = (uint8_t *) reallocation;
+
+				result = libewf_compress(
+					  compressed_zero_byte_empty_block,
+					  &( write_io_handle->compressed_zero_byte_empty_block_size ),
+					  zero_byte_empty_block,
+					  (size_t) media_values->chunk_size,
+					  io_handle->compression_level,
+					  error );
+			}
+			if( result != 1 )
+			{
+				libcerror_error_free(
+				 error );
+
+				memory_free(
+				 compressed_zero_byte_empty_block );
+
+				write_io_handle->compressed_zero_byte_empty_block_size = 0;
+			}
+			else
+			{
+				write_io_handle->compressed_zero_byte_empty_block = compressed_zero_byte_empty_block;
+			}
+			compressed_zero_byte_empty_block = NULL;
 
 			memory_free(
-			 compressed_zero_byte_empty_block );
+			 zero_byte_empty_block );
 
-			write_io_handle->compressed_zero_byte_empty_block_size = 0;
+			zero_byte_empty_block = NULL;
 		}
-		else
-		{
-			write_io_handle->compressed_zero_byte_empty_block = compressed_zero_byte_empty_block;
-		}
-		compressed_zero_byte_empty_block = NULL;
-
-		memory_free(
-		 zero_byte_empty_block );
-
-		zero_byte_empty_block = NULL;
 	}
 	/* Flag that the write values were initialized
 	 */
@@ -1312,6 +1322,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 
 		return( -1 );
 	}
+/* TODO check if media values -> number of chunks is in bounds */
 	/* Calculate the maximum number of chunks within this segment file
 	 */
 	maximum_chunks_per_segment_file = remaining_segment_file_size;
@@ -1349,7 +1360,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the table offsets
 		 */
 		calculated_chunks_per_segment_file -= maximum_chunks_per_segment_file
-		                                    * sizeof( ewf_table_offset_t );
+		                                    * sizeof( ewf_table_entry_v1_t );
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE1 )
 	{
@@ -1361,7 +1372,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the table offsets
 		 */
 		calculated_chunks_per_segment_file -= maximum_chunks_per_segment_file
-		                                    * sizeof( ewf_table_offset_t );
+		                                    * sizeof( ewf_table_entry_v1_t );
 	}
 	else
 	{
@@ -1373,7 +1384,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the table and table2 offsets
 		 */
 		calculated_chunks_per_segment_file -= 2 * maximum_chunks_per_segment_file
-		                                    * sizeof( ewf_table_offset_t );
+		                                    * sizeof( ewf_table_entry_v1_t );
 	}
 	/* Calculate the number of chunks within this segment file
 	 */
@@ -1519,7 +1530,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	/* Check if the maximum number of chunks has been reached
 	 */
 	if( ( media_values->number_of_chunks != 0 )
-	 && ( media_values->number_of_chunks == number_of_chunks_written ) )
+	 && ( media_values->number_of_chunks == (uint32_t) number_of_chunks_written ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1665,7 +1676,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	/* Check if the maximum number of chunks has been reached
 	 */
 	if( ( media_values->number_of_chunks != 0 )
-	 && ( media_values->number_of_chunks == number_of_chunks_written ) )
+	 && ( media_values->number_of_chunks == (uint32_t) number_of_chunks_written ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -2216,7 +2227,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	/* Allocate the necessary number of chunk offsets
 	 * this reduces the number of reallocations
 	 */
-	if( (uint32_t) number_of_chunks < media_values->number_of_chunks )
+	if( (uint64_t) number_of_chunks < media_values->number_of_chunks )
         {
 		if( libmfdata_list_resize(
 		     chunk_table_list,
@@ -2647,7 +2658,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			reallocation = memory_reallocate(
 			                write_io_handle->table_offsets,
-			                sizeof( ewf_table_offset_t ) * write_io_handle->chunks_per_section );
+			                sizeof( ewf_table_entry_v1_t ) * write_io_handle->chunks_per_section );
 
 			if( reallocation == NULL )
 			{
@@ -2660,7 +2671,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 				return( -1 );
 			}
-			write_io_handle->table_offsets           = (ewf_table_offset_t *) reallocation;
+			write_io_handle->table_offsets           = (ewf_table_entry_v1_t *) reallocation;
 			write_io_handle->number_of_table_offsets = write_io_handle->chunks_per_section;
 		}
 		/* Write the section start of the chunks section
@@ -2775,13 +2786,13 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			/* Leave space for the chunk offset in the offset table
 			 */
-			write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_offset_t );
+			write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_entry_v1_t );
 		}
 		else
 		{
 			/* Leave space for the chunk offset in the table and table2 sections
 			 */
-			write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_offset_t );
+			write_io_handle->remaining_segment_file_size -= 2 * sizeof( ewf_table_entry_v1_t );
 		}
 		if( libbfio_pool_get_offset(
 		     file_io_pool,
@@ -2864,7 +2875,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			reallocation = memory_reallocate(
 			                write_io_handle->table_offsets,
-			                sizeof( ewf_table_offset_t ) * write_io_handle->number_of_chunks_written_to_section );
+			                sizeof( ewf_table_entry_v1_t ) * write_io_handle->number_of_chunks_written_to_section );
 
 			if( reallocation == NULL )
 			{
@@ -2877,7 +2888,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 				return( -1 );
 			}
-			write_io_handle->table_offsets           = (ewf_table_offset_t *) reallocation;
+			write_io_handle->table_offsets           = (ewf_table_entry_v1_t *) reallocation;
 			write_io_handle->number_of_table_offsets = write_io_handle->number_of_chunks_written_to_section;
 		}
 

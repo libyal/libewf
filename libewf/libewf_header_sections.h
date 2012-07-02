@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_io_handle.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 
@@ -34,8 +35,6 @@ extern "C" {
 
 typedef struct libewf_header_sections libewf_header_sections_t;
 
-/* Additional subhandle for media specific parameters
- */
 struct libewf_header_sections
 {
 	/* The stored header
@@ -92,6 +91,12 @@ int libewf_header_sections_determine_format(
      libewf_header_sections_t *header_sections,
      uint8_t ewf_format,
      uint8_t *format,
+     libcerror_error_t **error );
+
+int libewf_header_sections_parse(
+     libewf_header_sections_t *header_sections,
+     libewf_io_handle_t *io_handle,
+     libfvalue_table_t *header_values,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
