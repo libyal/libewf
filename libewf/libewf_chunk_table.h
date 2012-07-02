@@ -50,6 +50,10 @@ struct libewf_chunk_table
 	 */
 	uint32_t chunk_size;
 
+	/* The format version
+	 */
+	uint8_t format_version;
+
 	/* The previous last chunk that was filled
 	 */
 	int previous_last_chunk_filled;
@@ -102,15 +106,16 @@ int libewf_chunk_table_read_offsets(
      uint8_t read_flags,
      libcerror_error_t **error );
 
-int libewf_chunk_table_fill(
+int libewf_chunk_table_fill_v1(
      libewf_chunk_table_t *chunk_table,
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
      int file_io_pool_entry,
      libewf_section_t *table_section,
      off64_t base_chunk,
-     ewf_table_entry_v1_t *table_offsets,
-     uint32_t number_of_offsets,
+     uint32_t number_of_table_entries,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
      uint8_t tainted,
      libcerror_error_t **error );
 

@@ -74,9 +74,10 @@ struct libewf_media_values
 	 */
 	uint8_t media_flags;
 
-        /* The GUID of the acquiry system
+        /* The segment file set identifier
+	 * Contains a GUID
          */
-        uint8_t guid[ 16 ];
+        uint8_t set_identifier[ 16 ];
 };
 
 int libewf_media_values_initialize(

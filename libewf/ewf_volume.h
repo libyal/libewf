@@ -133,10 +133,12 @@ struct ewf_volume
 	 */
 	uint8_t unknown5[ 4 ];
 
-	/* The GUID (Encase 5 or later)
-	 * consists of 16 bytes
+	/* The segment file set identifier
+	 * (Encase 5 or later)
+	 * Consists of 16 bytes
+	 * Contains a GUID
 	 */
-	uint8_t guid[ 16 ];
+	uint8_t set_identifier[ 16 ];
 
 	/* Unknown
 	 * consists of 963 bytes

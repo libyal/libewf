@@ -144,16 +144,16 @@ int libewf_handle_set_format(
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-int libewf_handle_get_guid(
+int libewf_handle_get_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *guid,
+     uint8_t *set_identifier,
      size_t size,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-int libewf_handle_set_guid(
+int libewf_handle_set_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *guid,
+     uint8_t *set_identifier,
      size_t size,
      libcerror_error_t **error );
 

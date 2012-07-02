@@ -420,8 +420,12 @@ int libewf_case_data_parse_string(
 						libcerror_error_free(
 						 error );
 					}
-					else
+					if( date_time_values_string != NULL )
 					{
+						value_string      = date_time_values_string;
+						value_string_size = 1 + libcstring_narrow_string_length(
+						                         (char *) date_time_values_string );
+
 						identifier      = (uint8_t *) "acquiry_date";
 						identifier_size = 13;
 					}
@@ -582,8 +586,12 @@ int libewf_case_data_parse_string(
 						libcerror_error_free(
 						 error );
 					}
-					else
+					if( date_time_values_string != NULL )
 					{
+						value_string      = date_time_values_string;
+						value_string_size = 1 + libcstring_narrow_string_length(
+						                         (char *) date_time_values_string );
+
 						identifier      = (uint8_t *) "system_date";
 						identifier_size = 12;
 					}
@@ -727,6 +735,13 @@ int libewf_case_data_parse_string(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	"\n" );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -834,6 +849,15 @@ int libewf_case_data_parse(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	"%s: case data string:\n%s",
+		 function,
+		 case_data_string );
+	}
+#endif
 	if( libewf_case_data_parse_string(
 	     case_data_string,
 	     case_data_string_size,

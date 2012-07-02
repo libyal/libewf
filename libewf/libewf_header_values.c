@@ -1145,7 +1145,7 @@ int libewf_convert_date_header2_value(
 	}
 	if( libfvalue_utf8_string_copy_to_integer(
 	     header_value,
-	     header_value_size,
+	     header_value_size - 1,
 	     &value_64bit,
 	     64,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,

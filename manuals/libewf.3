@@ -1,4 +1,4 @@
-.Dd February 12, 2012
+.Dd July 2, 2012
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -193,9 +193,9 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_set_format "libewf_handle_t *handle, uint8_t format, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_guid "libewf_handle_t *handle, uint8_t *guid, size_t size, libewf_error_t **error"
+.Fn libewf_handle_get_segment_file_set_identifier "libewf_handle_t *handle, uint8_t *set_identifier, size_t size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_guid "libewf_handle_t *handle, uint8_t *guid, size_t size, libewf_error_t **error"
+.Fn libewf_handle_set_segment_file_set_identifier "libewf_handle_t *handle, uint8_t *set_identifier, size_t size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_md5_hash "libewf_handle_t *handle, uint8_t *md5_hash, size_t size, libewf_error_t **error"
 .Ft int

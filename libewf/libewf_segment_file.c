@@ -1248,7 +1248,7 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 		return( -1 );
 	}
 	chunk_offset = section->start_offset
-	             + sizeof( ewf_section_start_v1_t )
+	             + sizeof( ewf_section_descriptor_v1_t )
 	             + sizeof( ewfx_delta_chunk_header_t );
 
 	if( libmfdata_list_set_element_by_index(
@@ -3163,7 +3163,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		goto on_error;
 	}
 	chunk_offset = section_offset
-	             + sizeof( ewf_section_start_v1_t )
+	             + sizeof( ewf_section_descriptor_v1_t )
 	             + sizeof( ewfx_delta_chunk_header_t );
 
 	if( libewf_section_initialize(

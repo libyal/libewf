@@ -540,6 +540,20 @@ int libewf_set_guid(
      size_t size );
 
 LIBEWF_EXTERN \
+int libewf_handle_get_guid(
+     libewf_handle_t *handle,
+     uint8_t *guid,
+     size_t size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_handle_set_guid(
+     libewf_handle_t *handle,
+     uint8_t *guid,
+     size_t size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_get_md5_hash(
      libewf_handle_t *handle,
      uint8_t *md5_hash,

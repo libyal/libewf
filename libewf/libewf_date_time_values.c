@@ -51,8 +51,8 @@ int libewf_date_time_values_copy_from_timestamp(
 {
 	struct tm time_elements;
 
-	static char *function                = "libewf_date_time_values_copy_from_timestamp";
-	size_t date_time_values_string_index = 0;
+	static char *function = "libewf_date_time_values_copy_from_timestamp";
+	size_t string_index   = 0;
 
 	if( date_time_values_string == NULL )
 	{
@@ -177,7 +177,7 @@ int libewf_date_time_values_copy_from_timestamp(
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
-	     &date_time_values_string_index,
+	     &string_index,
 	     (uint64_t) time_elements.tm_year + 1900,
 	     16,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -192,16 +192,16 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) ' ';
+	date_time_values_string[ string_index - 1 ] = (uint8_t) ' ';
 
 	if( ( time_elements.tm_mon + 1 ) < 10 )
 	{
-		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
+		date_time_values_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
-	     &date_time_values_string_index,
+	     &string_index,
 	     (uint64_t) time_elements.tm_mon + 1,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -216,16 +216,16 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) ' ';
+	date_time_values_string[ string_index - 1 ] = (uint8_t) ' ';
 
 	if( time_elements.tm_mday < 10 )
 	{
-		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
+		date_time_values_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
-	     &date_time_values_string_index,
+	     &string_index,
 	     (uint64_t) time_elements.tm_mday,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -240,16 +240,16 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) ' ';
+	date_time_values_string[ string_index - 1 ] = (uint8_t) ' ';
 
 	if( time_elements.tm_hour < 10 )
 	{
-		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
+		date_time_values_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
-	     &date_time_values_string_index,
+	     &string_index,
 	     (uint64_t) time_elements.tm_hour,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -264,16 +264,16 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) ' ';
+	date_time_values_string[ string_index - 1 ] = (uint8_t) ' ';
 
 	if( time_elements.tm_min < 10 )
 	{
-		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
+		date_time_values_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
-	     &date_time_values_string_index,
+	     &string_index,
 	     (uint64_t) time_elements.tm_min,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -288,16 +288,16 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) ' ';
+	date_time_values_string[ string_index - 1 ] = (uint8_t) ' ';
 
 	if( time_elements.tm_sec < 10 )
 	{
-		date_time_values_string[ date_time_values_string_index++ ] = (uint8_t) '0';
+		date_time_values_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     date_time_values_string,
 	     date_time_values_string_size,
-	     &date_time_values_string_index,
+	     &string_index,
 	     (uint64_t) time_elements.tm_sec,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -312,7 +312,7 @@ int libewf_date_time_values_copy_from_timestamp(
 
 		return( -1 );
 	}
-	date_time_values_string[ date_time_values_string_index ] = 0;
+	date_time_values_string[ string_index - 1 ] = 0;
 
 	return( 1 );
 }
@@ -718,6 +718,7 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 {
 	const char *day_of_week = NULL;
 	static char *function   = "libewf_utf8_string_day_of_week_copy_from_time_elements";
+	size_t string_index     = 0;
 
 	if( utf8_string == NULL )
 	{
@@ -797,6 +798,8 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 
 		return( -1 );
 	}
+	string_index = *utf8_string_index;
+	
 	switch( time_elements->tm_wday )
 	{
 		case 0:
@@ -821,11 +824,11 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 			day_of_week = "Sat";
 			break;
 	}
-	utf8_string[ *utf8_string_index     ] = (uint8_t) day_of_week[ 0 ];
-	utf8_string[ *utf8_string_index + 1 ] = (uint8_t) day_of_week[ 1 ];
-	utf8_string[ *utf8_string_index + 2 ] = (uint8_t) day_of_week[ 2 ];
+	utf8_string[ string_index++ ] = (uint8_t) day_of_week[ 0 ];
+	utf8_string[ string_index++ ] = (uint8_t) day_of_week[ 1 ];
+	utf8_string[ string_index++ ] = (uint8_t) day_of_week[ 2 ];
 
-	*utf8_string_index += 3;
+	*utf8_string_index = string_index;
 
 	return( 1 );
 }
@@ -1050,6 +1053,7 @@ int libewf_utf8_string_month_copy_from_time_elements(
 {
 	const char *month     = NULL;
 	static char *function = "libewf_utf8_string_month_copy_from_time_elements";
+	size_t string_index   = 0;
 
 	if( utf8_string == NULL )
 	{
@@ -1129,6 +1133,8 @@ int libewf_utf8_string_month_copy_from_time_elements(
 
 		return( -1 );
 	}
+	string_index = *utf8_string_index;
+
 	switch( time_elements->tm_mon )
 	{
 		case 0:
@@ -1168,11 +1174,11 @@ int libewf_utf8_string_month_copy_from_time_elements(
 			month = "Dec";
 			break;
 	}
-	utf8_string[ *utf8_string_index     ] = (uint8_t) month[ 0 ];
-	utf8_string[ *utf8_string_index + 1 ] = (uint8_t) month[ 1 ];
-	utf8_string[ *utf8_string_index + 2 ] = (uint8_t) month[ 2 ];
+	utf8_string[ string_index++ ] = (uint8_t) month[ 0 ];
+	utf8_string[ string_index++ ] = (uint8_t) month[ 1 ];
+	utf8_string[ string_index++ ] = (uint8_t) month[ 2 ];
 
-	*utf8_string_index += 3;
+	*utf8_string_index = string_index;
 
 	return( 1 );
 }
@@ -1480,6 +1486,7 @@ int libewf_utf8_string_time_copy_from_time_elements(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_utf8_string_time_copy_from_time_elements";
+	size_t string_index   = 0;
 
 	if( utf8_string == NULL )
 	{
@@ -1585,16 +1592,16 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
+	string_index = *utf8_string_index;
+
 	if( time_elements->tm_hour < 10 )
 	{
-		utf8_string[ *utf8_string_index ] = (uint8_t) '0';
-
-		*utf8_string_index += 1;
+		utf8_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     utf8_string_index,
+	     &string_index,
 	     (uint64_t) time_elements->tm_hour,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -1609,20 +1616,16 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-	utf8_string[ *utf8_string_index ] = (uint8_t) ':';
-
-	*utf8_string_index += 1;
+	utf8_string[ string_index - 1 ] = (uint8_t) ':';
 
 	if( time_elements->tm_min < 10 )
 	{
-		utf8_string[ *utf8_string_index ] = (uint8_t) '0';
-
-		*utf8_string_index += 1;
+		utf8_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     utf8_string_index,
+	     &string_index,
 	     (uint64_t) time_elements->tm_min,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -1637,20 +1640,16 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-	utf8_string[ *utf8_string_index ] = (uint8_t) ':';
-
-	*utf8_string_index += 1;
+	utf8_string[ string_index - 1 ] = (uint8_t) ':';
 
 	if( time_elements->tm_sec < 10 )
 	{
-		utf8_string[ *utf8_string_index ] = (uint8_t) '0';
-
-		*utf8_string_index += 1;
+		utf8_string[ string_index++ ] = (uint8_t) '0';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     utf8_string,
 	     utf8_string_size,
-	     utf8_string_index,
+	     &string_index,
 	     (uint64_t) time_elements->tm_sec,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -1665,6 +1664,8 @@ int libewf_utf8_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
+	*utf8_string_index = string_index - 1;
+
 	return( 1 );
 }
 
@@ -1947,6 +1948,7 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 {
 	const char *day_of_week = NULL;
 	static char *function   = "libewf_utf16_string_day_of_week_copy_from_time_elements";
+	size_t string_index     = 0;
 
 	if( utf16_string == NULL )
 	{
@@ -2026,6 +2028,8 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 
 		return( -1 );
 	}
+	string_index = *utf16_string_index;
+
 	switch( time_elements->tm_wday )
 	{
 		case 0:
@@ -2050,11 +2054,11 @@ int libewf_utf16_string_day_of_week_copy_from_time_elements(
 			day_of_week = "Sat";
 			break;
 	}
-	utf16_string[ *utf16_string_index     ] = (uint16_t) day_of_week[ 0 ];
-	utf16_string[ *utf16_string_index + 1 ] = (uint16_t) day_of_week[ 1 ];
-	utf16_string[ *utf16_string_index + 2 ] = (uint16_t) day_of_week[ 2 ];
+	utf16_string[ string_index++ ] = (uint16_t) day_of_week[ 0 ];
+	utf16_string[ string_index++ ] = (uint16_t) day_of_week[ 1 ];
+	utf16_string[ string_index++ ] = (uint16_t) day_of_week[ 2 ];
 
-	*utf16_string_index += 3;
+	*utf16_string_index = string_index;
 
 	return( 1 );
 }
@@ -2071,6 +2075,7 @@ int libewf_utf16_string_month_copy_from_time_elements(
 {
 	const char *month     = NULL;
 	static char *function = "libewf_utf16_string_month_copy_from_time_elements";
+	size_t string_index   = 0;
 
 	if( utf16_string == NULL )
 	{
@@ -2150,6 +2155,8 @@ int libewf_utf16_string_month_copy_from_time_elements(
 
 		return( -1 );
 	}
+	string_index = *utf16_string_index;
+
 	switch( time_elements->tm_mon )
 	{
 		case 0:
@@ -2189,11 +2196,11 @@ int libewf_utf16_string_month_copy_from_time_elements(
 			month = "Dec";
 			break;
 	}
-	utf16_string[ *utf16_string_index     ] = (uint16_t) month[ 0 ];
-	utf16_string[ *utf16_string_index + 1 ] = (uint16_t) month[ 1 ];
-	utf16_string[ *utf16_string_index + 2 ] = (uint16_t) month[ 2 ];
+	utf16_string[ string_index++ ] = (uint16_t) month[ 0 ];
+	utf16_string[ string_index++ ] = (uint16_t) month[ 1 ];
+	utf16_string[ string_index++ ] = (uint16_t) month[ 2 ];
 
-	*utf16_string_index += 3;
+	*utf16_string_index = string_index;
 
 	return( 1 );
 }
@@ -2209,6 +2216,7 @@ int libewf_utf16_string_time_copy_from_time_elements(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_utf16_string_time_copy_from_time_elements";
+	size_t string_index   = 0;
 
 	if( utf16_string == NULL )
 	{
@@ -2314,16 +2322,16 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
+	string_index = *utf16_string_index;
+
 	if( time_elements->tm_hour < 10 )
 	{
-		utf16_string[ *utf16_string_index ] = (uint16_t) '0';
-
-		*utf16_string_index += 1;
+		utf16_string[ string_index++ ] = (uint16_t) '0';
 	}
 	if( libfvalue_utf16_string_with_index_copy_from_integer(
 	     utf16_string,
 	     utf16_string_size,
-	     utf16_string_index,
+	     &string_index,
 	     (uint64_t) time_elements->tm_hour,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -2338,20 +2346,16 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-	utf16_string[ *utf16_string_index ] = (uint16_t) ':';
-
-	*utf16_string_index += 1;
+	utf16_string[ string_index - 1 ] = (uint16_t) ':';
 
 	if( time_elements->tm_min < 10 )
 	{
-		utf16_string[ *utf16_string_index ] = (uint16_t) '0';
-
-		*utf16_string_index += 1;
+		utf16_string[ string_index++ ] = (uint16_t) '0';
 	}
 	if( libfvalue_utf16_string_with_index_copy_from_integer(
 	     utf16_string,
 	     utf16_string_size,
-	     utf16_string_index,
+	     &string_index,
 	     (uint64_t) time_elements->tm_min,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -2366,20 +2370,16 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-	utf16_string[ *utf16_string_index ] = (uint16_t) ':';
-
-	*utf16_string_index += 1;
+	utf16_string[ string_index - 1 ] = (uint16_t) ':';
 
 	if( time_elements->tm_sec < 10 )
 	{
-		utf16_string[ *utf16_string_index ] = (uint16_t) '0';
-
-		*utf16_string_index += 1;
+		utf16_string[ string_index++ ] = (uint16_t) '0';
 	}
 	if( libfvalue_utf16_string_with_index_copy_from_integer(
 	     utf16_string,
 	     utf16_string_size,
-	     utf16_string_index,
+	     &string_index,
 	     (uint64_t) time_elements->tm_sec,
 	     8,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
@@ -2394,6 +2394,8 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
+	*utf16_string_index = string_index - 1;
+
 	return( 1 );
 }
 
@@ -2596,7 +2598,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 			return( -1 );
 		}
-		utf8_string[ utf8_string_index++ ] = (uint8_t) ' ';
+		utf8_string[ utf8_string_index - 1 ] = (uint8_t) ' ';
 
 		if( libewf_utf8_string_time_copy_from_time_elements(
 		     utf8_string,
@@ -2634,6 +2636,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 			return( -1 );
 		}
+		utf8_string_index--;
 	}
 	else if( ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	      || ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
@@ -2690,7 +2693,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 					return( -1 );
 				}
-				utf8_string[ utf8_string_index++ ] = (uint8_t) '/';
+				utf8_string[ utf8_string_index - 1 ] = (uint8_t) '/';
 
 				if( time_elements.tm_mday < 10 )
 				{
@@ -2714,6 +2717,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 					return( -1 );
 				}
+				utf8_string_index--;
 			}
 			else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 			{
@@ -2739,7 +2743,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 					return( -1 );
 				}
-				utf8_string[ utf8_string_index++ ] = (uint8_t) '/';
+				utf8_string[ utf8_string_index - 1 ] = (uint8_t) '/';
 
 				if( ( time_elements.tm_mon + 1 ) < 10 )
 				{
@@ -2763,6 +2767,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 					return( -1 );
 				}
+				utf8_string_index--;
 			}
 			utf8_string[ utf8_string_index++ ] = (uint8_t) '/';
 
@@ -2784,7 +2789,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 				return( -1 );
 			}
-			utf8_string[ utf8_string_index++ ] = (uint8_t) ' ';
+			utf8_string[ utf8_string_index - 1 ] = (uint8_t) ' ';
 		}
 		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 		{
@@ -2806,7 +2811,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 				return( -1 );
 			}
-			utf8_string[ utf8_string_index++ ] = (uint8_t) '-';
+			utf8_string[ utf8_string_index - 1 ] = (uint8_t) '-';
 
 			if( ( time_elements.tm_mon + 1 ) < 10 )
 			{
@@ -2830,7 +2835,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 				return( -1 );
 			}
-			utf8_string[ utf8_string_index++ ] = (uint8_t) '-';
+			utf8_string[ utf8_string_index - 1 ] = (uint8_t) '-';
 
 			if( time_elements.tm_mday < 10 )
 			{
@@ -2854,7 +2859,7 @@ int libewf_date_time_values_copy_to_utf8_string(
 
 				return( -1 );
 			}
-			utf8_string[ utf8_string_index++ ] = (uint8_t) 'T';
+			utf8_string[ utf8_string_index - 1 ] = (uint8_t) 'T';
 		}
 		if( libewf_utf8_string_time_copy_from_time_elements(
 		     utf8_string,
@@ -3136,7 +3141,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 			return( -1 );
 		}
-		utf16_string[ utf16_string_index++ ] = (uint16_t) ' ';
+		utf16_string[ utf16_string_index - 1 ] = (uint16_t) ' ';
 
 		if( libewf_utf16_string_time_copy_from_time_elements(
 		     utf16_string,
@@ -3174,6 +3179,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 			return( -1 );
 		}
+		utf16_string_index--;
 	}
 	else if( ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	      || ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
@@ -3230,7 +3236,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 					return( -1 );
 				}
-				utf16_string[ utf16_string_index++ ] = (uint16_t) '/';
+				utf16_string[ utf16_string_index - 1 ] = (uint16_t) '/';
 
 				if( time_elements.tm_mday < 10 )
 				{
@@ -3254,6 +3260,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 					return( -1 );
 				}
+				utf16_string_index--;
 			}
 			else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 			{
@@ -3279,7 +3286,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 					return( -1 );
 				}
-				utf16_string[ utf16_string_index++ ] = (uint16_t) '/';
+				utf16_string[ utf16_string_index - 1 ] = (uint16_t) '/';
 
 				if( ( time_elements.tm_mon + 1 ) < 10 )
 				{
@@ -3304,7 +3311,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 					return( -1 );
 				}
 			}
-			utf16_string[ utf16_string_index++ ] = (uint16_t) '/';
+			utf16_string[ utf16_string_index - 1 ] = (uint16_t) '/';
 
 			if( libfvalue_utf16_string_with_index_copy_from_integer(
 			     utf16_string,
@@ -3324,7 +3331,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 				return( -1 );
 			}
-			utf16_string[ utf16_string_index++ ] = (uint16_t) ' ';
+			utf16_string[ utf16_string_index - 1 ] = (uint16_t) ' ';
 		}
 		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 		{
@@ -3346,7 +3353,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 				return( -1 );
 			}
-			utf16_string[ utf16_string_index++ ] = (uint16_t) '-';
+			utf16_string[ utf16_string_index - 1 ] = (uint16_t) '-';
 
 			if( ( time_elements.tm_mon + 1 ) < 10 )
 			{
@@ -3370,7 +3377,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 				return( -1 );
 			}
-			utf16_string[ utf16_string_index++ ] = (uint16_t) '-';
+			utf16_string[ utf16_string_index - 1 ] = (uint16_t) '-';
 
 			if( time_elements.tm_mday < 10 )
 			{
@@ -3394,7 +3401,7 @@ int libewf_date_time_values_copy_to_utf16_string(
 
 				return( -1 );
 			}
-			utf16_string[ utf16_string_index++ ] = (uint16_t) 'T';
+			utf16_string[ utf16_string_index - 1 ] = (uint16_t) 'T';
 		}
 		if( libewf_utf16_string_time_copy_from_time_elements(
 		     utf16_string,

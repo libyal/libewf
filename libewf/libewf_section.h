@@ -116,7 +116,7 @@ ssize_t libewf_section_descriptor_read(
          uint8_t format_version,
          libcerror_error_t **error );
 
-ssize_t libewf_section_start_write(
+ssize_t libewf_section_descriptor_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,

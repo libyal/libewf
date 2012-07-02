@@ -1,5 +1,6 @@
 TODO
 * Ex01/Lx01
+  - complete: libewf_chunk_table_fill_v2
   - file naming schema ?
   - add types for globbing
   - add glob tests
@@ -11,12 +12,10 @@ TODO
     - libewf_handle_set_sha1_hash set functions
     - libewf_handle_set_utf8_hash_value
     - libewf_handle_set_utf16_hash_value
-  - rename section start to section descriptor
   - check alignment of debug output in section descriptor read for non EWF2 file
   - validate SMART forced compression of uncompressed chunks
   - refactor: libewf_header_sections_determine_format
   - parse drive information for header values as well
-  - get the GUID from the segment files
   - libewf_case_data_parse do this directly from the UTF16 stream ?
   - rename libewf_section_compressed_string_read to libewf_section_compressed_file_object_string_read
   - remove header value sections, just parse them while reading ? like case data
@@ -30,9 +29,15 @@ TODO
     - add case data files
     - add device info files
 
+* Ex01/Lx01 write support
+  - rename libewf_segment_file_write_chunks_section_start ?
+
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount
 * add support for device label header value
+
+* ewftools:
+  - replace GUID by set identifier
 
 Check:
 libewf_utf8_string_day_of_month_copy_to_time_elements: UTF-8 string too small.

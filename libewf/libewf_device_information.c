@@ -627,6 +627,13 @@ int libewf_device_information_parse_string(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	"\n" );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -729,6 +736,15 @@ int libewf_device_information_parse(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	"%s: device information string:\n%s",
+		 function,
+		 device_information_string );
+	}
+#endif
 	if( libewf_device_information_parse_string(
 	     device_information_string,
 	     device_information_string_size,

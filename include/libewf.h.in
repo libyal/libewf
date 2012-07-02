@@ -1018,23 +1018,25 @@ int libewf_handle_set_format(
      uint8_t format,
      libewf_error_t **error );
 
-/* Retrieves the GUID
+/* Retrieves the segment file set identifier
+ * The identifier is a GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
-int libewf_handle_get_guid(
+int libewf_handle_get_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *guid,
+     uint8_t *set_identifier,
      size_t size,
      libewf_error_t **error );
 
-/* Sets the GUID
+/* Sets the segment file set identifier
+ * The identifier is a GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
-int libewf_handle_set_guid(
+int libewf_handle_set_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *guid,
+     uint8_t *set_identifier,
      size_t size,
      libewf_error_t **error );
 
@@ -3029,6 +3031,32 @@ LIBEWF_EXTERN int libewf_set_guid(
                    libewf_handle_t *handle,
                    uint8_t *guid,
                    size_t size );
+
+/* Retrieves the GUID
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_segment_file_get_identifier instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN \
+int libewf_handle_get_guid(
+     libewf_handle_t *handle,
+     uint8_t *guid,
+     size_t size,
+     libewf_error_t **error );
+
+/* Sets the GUID
+ * Returns 1 if successful or -1 on error
+ *
+ * This function is deprecated use libewf_handle_set_segment_file_set_identifier instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN \
+int libewf_handle_set_guid(
+     libewf_handle_t *handle,
+     uint8_t *guid,
+     size_t size,
+     libewf_error_t **error );
 
 /* Retrieves the MD5 hash
  * Returns 1 if successful, 0 if value not present or -1 on error

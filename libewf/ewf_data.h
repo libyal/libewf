@@ -108,7 +108,7 @@ struct ewf_data
 	 */
 	uint8_t smart_logs_start_sector[ 4 ];
 
-	/* Compression level (Encase 5 or later)
+	/* Compression level
 	 * consists of 1 byte
 	 * 0x00 => no compression,
 	 * 0x01 => fast/good compression
@@ -133,10 +133,11 @@ struct ewf_data
 	 */
 	uint8_t unknown5[ 4 ];
 
-	/* The GUID (Encase 5 or later)
-	 * consists of 16 bytes
+	/* The segment file set identifier
+	 * Consists of 16 bytes
+	 * Contains a GUID
 	 */
-	uint8_t guid[ 16 ];
+	uint8_t set_identifier[ 16 ];
 
 	/* Unknown
 	 * consists of 963 bytes

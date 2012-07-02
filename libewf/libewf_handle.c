@@ -2570,6 +2570,17 @@ int libewf_handle_open_read_segment_files(
 
 		return( -1 );
 	}
+	if( internal_handle->media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		goto on_error;
+	}
 	if( internal_handle->segment_table == NULL )
 	{
 		libcerror_error_set(
@@ -2737,6 +2748,7 @@ int libewf_handle_open_read_segment_files(
 		}
 		if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
 		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 		{
@@ -2767,6 +2779,73 @@ int libewf_handle_open_read_segment_files(
 			 NULL );
 
 			goto on_error;
+		}
+		if( segment_files_list_index == 0 )
+		{
+			internal_handle->io_handle->major_version = segment_file->major_version;
+			internal_handle->io_handle->minor_version = segment_file->minor_version;
+
+			if( segment_file->major_version == 2 )
+			{
+				if( memory_copy(
+				     internal_handle->media_values->set_identifier,
+				     segment_file->set_identifier,
+				     16 ) == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+					 "%s: unable to copy segment file set identifier to media values.",
+					 function );
+
+					libewf_segment_file_free(
+					 &segment_file,
+					 NULL );
+
+					goto on_error;
+				}
+			}
+		}
+		else
+		{
+			if( ( segment_file->major_version != internal_handle->io_handle->major_version )
+			 || ( segment_file->minor_version != internal_handle->io_handle->minor_version ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_INPUT,
+				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+				 "%s: segment file format version mismatch.",
+				 function );
+
+				libewf_segment_file_free(
+				 &segment_file,
+				 NULL );
+
+				goto on_error;
+			}
+			if( segment_file->major_version == 2 )
+			{
+				if( memory_compare(
+				     internal_handle->media_values->set_identifier,
+				     segment_file->set_identifier,
+				     16 ) != 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_INPUT,
+					 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+					 "%s: mismatch in segment file set identifier.",
+					 function );
+
+					libewf_segment_file_free(
+					 &segment_file,
+					 NULL );
+
+					goto on_error;
+				}
+			}
 		}
 		/* The segment file is cached here in case of resume
 		 */
@@ -2801,7 +2880,7 @@ int libewf_handle_open_read_segment_files(
 		}
 		else if( segment_file->major_version == 2 )
 		{
-			section_offset = (off64_t) segment_file_size - sizeof( ewf_section_start_v2_t );
+			section_offset = (off64_t) segment_file_size - sizeof( ewf_section_descriptor_v2_t );
 		}
 		last_section = 0;
 
@@ -3440,7 +3519,7 @@ size_t data_size = 0;
 				if( ( last_section != 0 )
 				 && ( section->size == 0 ) )
 				{
-					section_offset += sizeof( ewf_section_start_v1_t );
+					section_offset += sizeof( ewf_section_descriptor_v1_t );
 				}
 			}
 			else if( segment_file->major_version == 2 )
@@ -3951,7 +4030,7 @@ int libewf_handle_open_read_delta_segment_files(
 			if( ( last_section != 0 )
 			 && ( section->size == 0 ) )
 			{
-				section_offset += sizeof( ewf_section_start_v1_t );
+				section_offset += sizeof( ewf_section_descriptor_v1_t );
 			}
 			if( libewf_list_append_value(
 			     segment_file->section_list,

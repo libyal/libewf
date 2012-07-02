@@ -1355,7 +1355,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk section starts
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * sizeof( ewf_section_start_v1_t );
+		                                    * sizeof( ewf_section_descriptor_v1_t );
 
 		/* Leave space for the table offsets
 		 */
@@ -1367,7 +1367,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk section starts and the offset table checksum
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * ( sizeof( ewf_section_start_v1_t ) + sizeof( uint32_t ) );
+		                                    * ( sizeof( ewf_section_descriptor_v1_t ) + sizeof( uint32_t ) );
 
 		/* Leave space for the table offsets
 		 */
@@ -1379,7 +1379,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * ( ( 3 * sizeof( ewf_section_start_v1_t ) ) + ( 2 * sizeof( uint32_t ) ) );
+		                                    * ( ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * sizeof( uint32_t ) ) );
 
 		/* Leave space for the table and table2 offsets
 		 */
@@ -2428,7 +2428,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		/* Reserve space for the done or next section
 		 */
 		write_io_handle->remaining_segment_file_size = segment_table->maximum_segment_size
-		                                             - sizeof( ewf_section_start_v1_t );
+		                                             - sizeof( ewf_section_descriptor_v1_t );
 
 		/* Write the start of the segment file
 		 * like the file header, the header, volume and/or data section, etc.
@@ -2560,19 +2560,19 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			/* Leave space for the chunk section start
 			 */
-			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_start_v1_t );
+			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_descriptor_v1_t );
 		}
 		else if( io_handle->format == LIBEWF_FORMAT_ENCASE1 )
 		{
 			/* Leave space for the chunk section start and the offset table checksum
 			 */
-			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_start_v1_t ) + sizeof( uint32_t );
+			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_descriptor_v1_t ) + sizeof( uint32_t );
 		}
 		else
 		{
 			/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 			 */
-			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_start_v1_t ) ) + ( 2 * sizeof( uint32_t ) );
+			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * sizeof( uint32_t ) );
 		}
 		if( libbfio_pool_get_offset(
 		     file_io_pool,
@@ -3324,7 +3324,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			required_segment_file_size = (size64_t) last_section->start_offset
 					           + chunk_buffer_size
 					           + sizeof( uint32_t )
-					           + sizeof( ewf_section_start_v1_t );
+					           + sizeof( ewf_section_descriptor_v1_t );
 
 			/* Check if chunk fits in exisiting delta segment file
 			 */
@@ -3482,7 +3482,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			return( -1 );
 		}
 		segment_file_offset = existing_chunk_offset
-		                    - sizeof( ewf_section_start_v1_t )
+		                    - sizeof( ewf_section_descriptor_v1_t )
 		                    - sizeof( ewfx_delta_chunk_header_t );
 
 		if( libbfio_pool_seek_offset(

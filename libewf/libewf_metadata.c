@@ -1146,17 +1146,18 @@ int libewf_handle_set_format(
 	return( 1 );
 }
 
-/* Retrieves the GUID
+/* Retrieves the segment file set identifier
+ * The identifier is a GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_get_guid(
+int libewf_handle_get_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *guid,
+     uint8_t *set_identifier,
      size_t size,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_guid";
+	static char *function                     = "libewf_handle_get_segment_file_set_identifier";
 
 	if( handle == NULL )
 	{
@@ -1182,13 +1183,13 @@ int libewf_handle_get_guid(
 
 		return( -1 );
 	}
-	if( guid == NULL )
+	if( set_identifier == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid GUID.",
+		 "%s: invalid set identifier.",
 		 function );
 
 		return( -1 );
@@ -1199,21 +1200,21 @@ int libewf_handle_get_guid(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: GUID too small.",
+		 "%s: set identifier too small.",
 		 function );
 
 		return( -1 );
 	}
 	if( memory_copy(
-	     guid,
-	     internal_handle->media_values->guid,
+	     set_identifier,
+	     internal_handle->media_values->set_identifier,
 	     16 ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set GUID.",
+		 "%s: unable to set set identifier.",
 		 function );
 
 		return( -1 );
@@ -1221,17 +1222,18 @@ int libewf_handle_get_guid(
 	return( 1 );
 }
 
-/* Sets the GUID
+/* Sets the segment file set identifier
+ * The identifier is a GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_set_guid(
+int libewf_handle_set_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *guid,
+     uint8_t *set_identifier,
      size_t size,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_guid";
+	static char *function                     = "libewf_handle_set_segment_file_set_identifier";
 
 	if( handle == NULL )
 	{
@@ -1257,13 +1259,13 @@ int libewf_handle_set_guid(
 
 		return( -1 );
 	}
-	if( guid == NULL )
+	if( set_identifier == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid GUID.",
+		 "%s: invalid set identifier.",
 		 function );
 
 		return( -1 );
@@ -1274,7 +1276,7 @@ int libewf_handle_set_guid(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: GUID too small.",
+		 "%s: set identifier too small.",
 		 function );
 
 		return( -1 );
@@ -1287,21 +1289,21 @@ int libewf_handle_set_guid(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: GUID cannot be changed.",
+		 "%s: set identifier cannot be changed.",
 		 function );
 
 		return( -1 );
 	}
 	if( memory_copy(
-	     internal_handle->media_values->guid,
-	     guid,
+	     internal_handle->media_values->set_identifier,
+	     set_identifier,
 	     16 ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set GUID.",
+		 "%s: unable to copy set indentifier.",
 		 function );
 
 		return( -1 );

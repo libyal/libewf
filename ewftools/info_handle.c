@@ -2364,7 +2364,7 @@ int info_handle_media_information_fprint(
 				result = -1;
 			}
 		}
-		if( libewf_handle_get_guid(
+		if( libewf_handle_get_segment_file_set_identifier(
 		     info_handle->input_handle,
 		     guid,
 		     GUID_SIZE,
@@ -2374,7 +2374,7 @@ int info_handle_media_information_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve GUID.",
+			 "%s: unable to retrieve segment file set identifier.",
 			 function );
 
 			result = -1;
@@ -2402,10 +2402,10 @@ int info_handle_media_information_fprint(
 			{
 				if( info_handle_section_value_string_fprint(
 				     info_handle,
-				     "guid",
-				     4,
-				     "GUID",
-				     4,
+				     "set_identifier",
+				     14,
+				     "Set identifier",
+				     14,
 				     guid_string,
 				     error ) != 1 )
 				{
@@ -2413,7 +2413,7 @@ int info_handle_media_information_fprint(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-					 "%s: unable to print section value string: guid.",
+					 "%s: unable to print section value string: set_identifier.",
 					 function );
 
 					result = -1;

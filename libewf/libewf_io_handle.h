@@ -51,6 +51,14 @@ struct libewf_io_handle
 	 */
 	uint8_t ewf_format;
 
+	/* The format major version
+	 */
+	uint8_t major_version;
+
+	/* The format minor version
+	 */
+	uint8_t minor_version;
+
 	/* Value to indicate the compression level used
 	 */
 	int8_t compression_level;

@@ -449,19 +449,20 @@ int libewf_chunk_table_read_offsets(
      uint8_t read_flags,
      libcerror_error_t **error )
 {
-	uint8_t table_offsets_checksum[ 4 ];
+	uint8_t table_entries_checksum[ 4 ];
 
 	libewf_chunk_table_t *chunk_table = NULL;
 	libewf_section_t *section         = NULL;
-	uint8_t *table_offsets_data       = NULL;
+	uint8_t *table_entries_data       = NULL;
 	static char *function             = "libewf_chunk_table_read_offsets";
-	size_t table_offsets_data_size    = 0;
+	size_t table_entries_data_size    = 0;
 	ssize_t read_count                = 0;
 	uint64_t base_offset              = 0;
 	uint32_t calculated_checksum      = 0;
 	uint32_t number_of_offsets        = 0;
 	uint32_t stored_checksum          = 0;
-	uint8_t table_offsets_corrupted   = 0;
+	uint8_t table_entries_corrupted   = 0;
+	int result                        = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint8_t *trailing_data            = NULL;
@@ -512,7 +513,7 @@ int libewf_chunk_table_read_offsets(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      element_group_offset,
-		      1,
+		      chunk_table->io_handle->major_version,
 		      error );
 
 	if( read_count == -1 )
@@ -539,67 +540,74 @@ int libewf_chunk_table_read_offsets(
 	}
 	element_group_size -= read_count;
 
-	read_count = libewf_section_table_header_read(
-	              section,
-	              file_io_pool,
-	              file_io_pool_entry,
-	              chunk_table->io_handle->format,
-	              &number_of_offsets,
-	              &base_offset,
-	              error );
-	
-	if( read_count < 0 )
+	if( chunk_table->io_handle->major_version == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table section header.",
-		 function );
+		read_count = libewf_section_table_header_read(
+			      section,
+			      file_io_pool,
+			      file_io_pool_entry,
+			      chunk_table->io_handle->format,
+			      &number_of_offsets,
+			      &base_offset,
+			      error );
+		
+		if( read_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read table section header.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		element_group_size -= read_count;
+
+		if( number_of_offsets == 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_INVALID_DATA,
+			 "%s: invalid number of offsets.",
+			 function );
+
+			goto on_error;
+		}
+		table_entries_data_size = sizeof( ewf_table_entry_v1_t ) * number_of_offsets;
 	}
-	element_group_size -= read_count;
-
-	if( number_of_offsets == 0 )
+	else if( chunk_table->io_handle->major_version == 2 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_INVALID_DATA,
-		 "%s: invalid number of offsets.",
-		 function );
-
-		goto on_error;
+/* TODO check bounds */
+		table_entries_data_size = (size_t) section->data_size;
 	}
-	table_offsets_data_size = sizeof( ewf_table_entry_v1_t ) * number_of_offsets;
-
-	if( table_offsets_data_size > (size_t) SSIZE_MAX )
+	if( table_entries_data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid table offsets data size value exceeds maximum.",
+		 "%s: invalid table entries data size value exceeds maximum.",
 		 function );
 
 		goto on_error;
 	}
-	table_offsets_data = (uint8_t *) memory_allocate(
-	                                  table_offsets_data_size );
+	table_entries_data = (uint8_t *) memory_allocate(
+	                                  sizeof( uint8_t ) * table_entries_data_size );
 
-	if( table_offsets_data == NULL )
+	if( table_entries_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create table offsets data.",
+		 "%s: unable to create table entries data.",
 		 function );
 
 		goto on_error;
 	}
-	if( element_group_size < (size64_t) table_offsets_data_size )
+	if( element_group_size < (size64_t) table_entries_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -613,11 +621,11 @@ int libewf_chunk_table_read_offsets(
 	read_count = libbfio_pool_read_buffer(
 		      file_io_pool,
 		      file_io_pool_entry,
-		      table_offsets_data,
-		      table_offsets_data_size,
+		      table_entries_data,
+		      table_entries_data_size,
 		      error );
 
-	if( read_count != (ssize_t) table_offsets_data_size )
+	if( read_count != (ssize_t) table_entries_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -634,11 +642,11 @@ int libewf_chunk_table_read_offsets(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: table offsets data:\n",
+	 	 "%s: table entries data:\n",
 		 function );
 		libcnotify_print_data(
-		 table_offsets_data,
-		 table_offsets_data_size,
+		 table_entries_data,
+		 table_entries_data_size,
 		 0 );
 	}
 #endif
@@ -660,7 +668,7 @@ int libewf_chunk_table_read_offsets(
 		read_count = libbfio_pool_read_buffer(
 			      file_io_pool,
 			      file_io_pool_entry,
-			      table_offsets_checksum,
+			      table_entries_checksum,
 			      sizeof( uint32_t ),
 			      error );
 
@@ -670,7 +678,7 @@ int libewf_chunk_table_read_offsets(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read checksum from file descriptor.",
+			 "%s: unable to read checksum.",
 			 function );
 
 			goto on_error;
@@ -678,24 +686,24 @@ int libewf_chunk_table_read_offsets(
 		element_group_size -= read_count;
 
 		byte_stream_copy_to_uint32_little_endian(
-		 table_offsets_checksum,
+		 table_entries_checksum,
 		 stored_checksum );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-	 		 "%s: table offsets checksum\t\t\t: 0x%" PRIx32 "\n",
+	 		 "%s: table entries checksum\t\t\t: 0x%" PRIx32 "\n",
 			 function,
-			 table_offsets_checksum );
+			 table_entries_checksum );
 
 			libcnotify_printf(
 	 		 "\n" );
 		}
 #endif
 		calculated_checksum = ewf_checksum_calculate(
-				       table_offsets_data,
-				       table_offsets_data_size,
+				       table_entries_data,
+				       table_entries_data_size,
 				       1 );
 
 		if( stored_checksum != calculated_checksum )
@@ -712,22 +720,38 @@ int libewf_chunk_table_read_offsets(
 #endif
 			/* The table offsets cannot be fully trusted therefore mark them as corrupted
 			 */
-			table_offsets_corrupted = 1;
+			table_entries_corrupted = 1;
 		}
 	}
 	if( ( read_flags & LIBMFDATA_READ_FLAG_IS_BACKUP_RANGE ) == 0 )
 	{
-		if( libewf_chunk_table_fill(
-		     chunk_table,
-		     chunk_table_list,
-		     element_index,
-		     file_io_pool_entry,
-		     section,
-		     (off64_t) base_offset,
-		     (ewf_table_entry_v1_t *) table_offsets_data,
-		     number_of_offsets,
-		     table_offsets_corrupted,
-		     error ) != 1 )
+		if( chunk_table->io_handle->major_version == 1 )
+		{
+			result = libewf_chunk_table_fill_v1(
+			          chunk_table,
+			          chunk_table_list,
+			          element_index,
+			          file_io_pool_entry,
+			          section,
+			          (off64_t) base_offset,
+			          number_of_offsets,
+			          table_entries_data,
+			          table_entries_data_size,
+			          table_entries_corrupted,
+			          error );
+		}
+		else if( chunk_table->io_handle->major_version == 2 )
+		{
+			result = libewf_chunk_table_fill_v2(
+			          chunk_table,
+			          chunk_table_list,
+			          element_index,
+			          file_io_pool_entry,
+			          table_entries_data,
+			          table_entries_data_size,
+			          error );
+		}
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -748,9 +772,9 @@ int libewf_chunk_table_read_offsets(
 		     file_io_pool_entry,
 		     section,
 		     (off64_t) base_offset,
-		     (ewf_table_entry_v1_t *) table_offsets_data,
+		     (ewf_table_entry_v1_t *) table_entries_data,
 		     number_of_offsets,
-		     table_offsets_corrupted,
+		     table_entries_corrupted,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -764,9 +788,9 @@ int libewf_chunk_table_read_offsets(
 		}
 	}
 	memory_free(
-	 table_offsets_data );
+	 table_entries_data );
 
-	table_offsets_data = NULL;
+	table_entries_data = NULL;
 
 	if( libewf_section_free(
 	     &section,
@@ -859,7 +883,7 @@ int libewf_chunk_table_read_offsets(
 		}
 	}
 #endif
-	if( table_offsets_corrupted != 0 )
+	if( table_entries_corrupted != 0 )
 	{
 		return( 0 );
 	}
@@ -873,10 +897,10 @@ on_error:
 		 trailing_data );
 	}
 #endif
-	if( table_offsets_data != NULL )
+	if( table_entries_data != NULL )
 	{
 		memory_free(
-		 table_offsets_data );
+		 table_entries_data );
 	}
 	if( section != NULL )
 	{
@@ -887,22 +911,23 @@ on_error:
 	return( -1 );
 }
 
-/* Fills the chunk table from the offsets
+/* Fills the chunk table from the EWF version 1 sector table entries
  * Returns 1 if successful or -1 on error
  */
-int libewf_chunk_table_fill(
+int libewf_chunk_table_fill_v1(
      libewf_chunk_table_t *chunk_table,
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
      int file_io_pool_entry,
      libewf_section_t *table_section,
      off64_t base_offset,
-     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
      uint8_t tainted,
      libcerror_error_t **error )
 {
-	static char *function           = "libewf_chunk_table_fill";
+	static char *function           = "libewf_chunk_table_fill_v1";
 	off64_t last_chunk_offset       = 0;
 	off64_t last_chunk_size         = 0;
 	off64_t previous_chunk_offset   = 0;
@@ -958,19 +983,30 @@ int libewf_chunk_table_fill(
 
 		return( -1 );
 	}
-	if( table_offsets == NULL )
+	if( table_entries_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid table offsets.",
+		 "%s: invalid table entries data.",
+		 function );
+
+		return( -1 );
+	}
+	if( table_entries_data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid table entries data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].chunk_data_offset,
+	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_offset_index ] ).chunk_data_offset,
 	 stored_offset );
 
 	while( table_offset_index < ( number_of_offsets - 1 ) )
@@ -985,7 +1021,7 @@ int libewf_chunk_table_fill(
 			current_offset = stored_offset;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 table_offsets[ table_offset_index + 1 ].chunk_data_offset,
+		 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_offset_index + 1 ] ).chunk_data_offset,
 		 stored_offset );
 
 		if( overflow == 0 )
@@ -1196,7 +1232,7 @@ int libewf_chunk_table_fill(
 		table_offset_index++;
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].chunk_data_offset,
+	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_offset_index ] ).chunk_data_offset,
 	 stored_offset );
 
 	if( overflow == 0 )
@@ -1401,6 +1437,56 @@ int libewf_chunk_table_fill(
 	}
 #endif
 	return( 1 );
+}
+
+/* Fills the chunk table from the EWF version 1 sector table entries
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_table_fill_v2(
+     libewf_chunk_table_t *chunk_table,
+     libmfdata_list_t *chunk_table_list,
+     int chunk_index,
+     int file_io_pool_entry,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_chunk_table_fill_v2";
+
+	if( chunk_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk table.",
+		 function );
+
+		return( -1 );
+	}
+	if( table_entries_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid table entries data.",
+		 function );
+
+		return( -1 );
+	}
+	if( table_entries_data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid table entries data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	return( -1 );
 }
 
 /* Corrects the chunk table from the offsets
