@@ -25,12 +25,106 @@
 #include <types.h>
 
 #include "libewf_debug.h"
+#include "libewf_definitions.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
 #include "libewf_libuna.h"
 
 #include "ewf_checksum.h"
+
+/* Prints the section type
+ */
+void libewf_debug_print_section_type(
+      uint32_t section_type )
+{
+	switch( section_type )
+	{
+		case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
+			libcnotify_printf(
+			 "Device information" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_CASE_DATA:
+			libcnotify_printf(
+			 "Case data" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_SECTOR_DATA:
+			libcnotify_printf(
+			 "Sector data" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
+			libcnotify_printf(
+			 "Sector table" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_ERROR_TABLE:
+			libcnotify_printf(
+			 "Error table" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_SESSION_TABLE:
+			libcnotify_printf(
+			 "Session table" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_INCREMENT_DATA:
+			libcnotify_printf(
+			 "Increment data" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_MD5_HASH:
+			libcnotify_printf(
+			 "MD5 hash" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_SHA1_HASH:
+			libcnotify_printf(
+			 "SHA1 hash" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_RESTART_DATA:
+			libcnotify_printf(
+			 "Restart data" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS:
+			libcnotify_printf(
+			 "Encryption keys" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_MEMORY_EXTENTS_TABLE:
+			libcnotify_printf(
+			 "Memory extents" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_NEXT:
+			libcnotify_printf(
+			 "Next" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_FINAL_INFORMATION:
+			libcnotify_printf(
+			 "Final information" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_DONE:
+			libcnotify_printf(
+			 "Done" );
+			break;
+
+		case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
+			libcnotify_printf(
+			 "Analytical data" );
+			break;
+
+		default:
+			libcnotify_printf(
+			 "UNKNOWN" );
+	}
+}
 
 /* Prints a dump of data
  * Returns 1 if successful or -1 on error

@@ -2922,7 +2922,202 @@ int libewf_handle_open_read_segment_files(
 
 				break;
 			}
-			if( section->type_string_length == 4 )
+			if( section->type != 0 )
+			{
+/* TODO */
+uint8_t *data    = NULL;
+size_t data_size = 0;
+
+				switch( section->type )
+				{
+					case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
+						if( libbfio_pool_seek_offset(
+						     file_io_pool,
+						     file_io_pool_entry,
+						     section->start_offset,
+						     SEEK_SET,
+						     error ) == -1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_IO,
+							 LIBCERROR_IO_ERROR_OPEN_FAILED,
+							 "%s: unable to seek section offset: %" PRIi64 " in segment file: %d.",
+							 function,
+							 section->start_offset,
+							 segment_files_list_index + 1 );
+
+							return( -1 );
+						}
+						read_count = libewf_section_compressed_string_read(
+							      section,
+							      file_io_pool,
+							      file_io_pool_entry,
+							      &data,
+							      &data_size,
+							      error );
+
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_CASE_DATA:
+						if( libbfio_pool_seek_offset(
+						     file_io_pool,
+						     file_io_pool_entry,
+						     section->start_offset,
+						     SEEK_SET,
+						     error ) == -1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_IO,
+							 LIBCERROR_IO_ERROR_OPEN_FAILED,
+							 "%s: unable to seek section offset: %" PRIi64 " in segment file: %d.",
+							 function,
+							 section->start_offset,
+							 segment_files_list_index + 1 );
+
+							return( -1 );
+						}
+						read_count = libewf_section_compressed_string_read(
+							      section,
+							      file_io_pool,
+							      file_io_pool_entry,
+							      &data,
+							      &data_size,
+							      error );
+
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_SECTOR_DATA:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_ERROR_TABLE:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_SESSION_TABLE:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_INCREMENT_DATA:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_MD5_HASH:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_SHA1_HASH:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_RESTART_DATA:
+						if( libbfio_pool_seek_offset(
+						     file_io_pool,
+						     file_io_pool_entry,
+						     section->start_offset,
+						     SEEK_SET,
+						     error ) == -1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_IO,
+							 LIBCERROR_IO_ERROR_OPEN_FAILED,
+							 "%s: unable to seek section offset: %" PRIi64 " in segment file: %d.",
+							 function,
+							 section->start_offset,
+							 segment_files_list_index + 1 );
+
+							return( -1 );
+						}
+						read_count = libewf_section_compressed_string_read(
+							      section,
+							      file_io_pool,
+							      file_io_pool_entry,
+							      &data,
+							      &data_size,
+							      error );
+
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_MEMORY_EXTENTS_TABLE:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_NEXT:
+						/* Nothing to do for the next section
+						 */
+						known_section = 1;
+						last_section  = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_FINAL_INFORMATION:
+						known_section = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_DONE:
+						if( ( segment_files_list_index + 1 ) != number_of_segment_files )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_INPUT,
+							 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+							 "%s: last segment number mismatch.",
+							 function );
+
+							goto on_error;
+						}
+						/* Nothing to do for the done section
+						 */
+						known_section     = 1;
+						last_section      = 1;
+						last_segment_file = 1;
+						break;
+
+					case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
+						if( libbfio_pool_seek_offset(
+						     file_io_pool,
+						     file_io_pool_entry,
+						     section->start_offset,
+						     SEEK_SET,
+						     error ) == -1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_IO,
+							 LIBCERROR_IO_ERROR_OPEN_FAILED,
+							 "%s: unable to seek section offset: %" PRIi64 " in segment file: %d.",
+							 function,
+							 section->start_offset,
+							 segment_files_list_index + 1 );
+
+							return( -1 );
+						}
+						read_count = libewf_section_compressed_string_read(
+							      section,
+							      file_io_pool,
+							      file_io_pool_entry,
+							      &data,
+							      &data_size,
+							      error );
+
+						known_section = 1;
+						break;
+				}
+			}
+			else if( section->type_string_length == 4 )
 			{
 				if( memory_compare(
 				     (void *) section->type_string,
@@ -2978,28 +3173,6 @@ int libewf_handle_open_read_segment_files(
 				}
 				else if( memory_compare(
 					  (void *) section->type_string,
-					  (void *) "done",
-					  4 ) == 0 )
-				{
-					if( ( segment_files_list_index + 1 ) != number_of_segment_files )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_INPUT,
-						 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-						 "%s: last segment number mismatch.",
-						 function );
-
-						goto on_error;
-					}
-					/* Nothing to do for the done section
-					 */
-					known_section     = 1;
-					last_section      = 1;
-					last_segment_file = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
 					  (void *) "hash",
 					  4 ) == 0 )
 				{
@@ -3011,16 +3184,6 @@ int libewf_handle_open_read_segment_files(
 						      error );
 
 					known_section = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
-					  (void *) "next",
-					  4 ) == 0 )
-				{
-					/* Nothing to do for the next section
-					 */
-					known_section = 1;
-					last_section  = 1;
 				}
 			}
 			else if( section->type_string_length == 5 )
@@ -3284,39 +3447,25 @@ int libewf_handle_open_read_segment_files(
 					known_section = 1;
 				}
 			}
-			else if( section->type_string_length == 0 )
-			{
-				switch( section->type )
-				{
-					case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
-					case LIBEWF_SECTION_TYPE_CASE_DATA:
-					case LIBEWF_SECTION_TYPE_SECTOR_DATA:
-					case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
-					case LIBEWF_SECTION_TYPE_ERROR_TABLE:
-					case LIBEWF_SECTION_TYPE_SESSION_TABLE:
-					case LIBEWF_SECTION_TYPE_INCREMENT_DATA:
-					case LIBEWF_SECTION_TYPE_MD5_HASH:
-					case LIBEWF_SECTION_TYPE_SHA1_HASH:
-					case LIBEWF_SECTION_TYPE_RESTART_DATA:
-					case LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS:
-					case LIBEWF_SECTION_TYPE_MEMORY_EXTENTS_TABLE:
-					case LIBEWF_SECTION_TYPE_NEXT:
-					case LIBEWF_SECTION_TYPE_FINAL_INFORMATION:
-					case LIBEWF_SECTION_TYPE_DONE:
-					case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
-						known_section = 0;
-						break;
-				}
-			}
 			if( known_section == 0 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					libcnotify_printf(
-					 "%s: unsupported section type: %s.\n",
-					 function,
-					 (char *) section->type_string );
+					if( segment_file->major_version == 1 )
+					{
+						libcnotify_printf(
+						 "%s: unsupported section type: %s.\n",
+						 function,
+						 (char *) section->type_string );
+					}
+					else if( segment_file->major_version == 2 )
+					{
+						libcnotify_printf(
+						 "%s: unsupported section type: 0x%08" PRIx32 ".\n",
+						 function,
+						 section->type );
+					}
 				}
 #elif defined( HAVE_DEBUG_OUTPUT )
 				if( segment_file->major_version == 1 )
@@ -3372,11 +3521,14 @@ int libewf_handle_open_read_segment_files(
 			}
 			section = NULL;
 
-			segment_file->last_section_offset = section_offset;
-
-			if( last_section != 0 )
+			if( segment_file->major_version == 1 )
 			{
-				break;
+				segment_file->last_section_offset = section_offset;
+
+				if( last_section != 0 )
+				{
+					break;
+				}
 			}
 		}
 		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED ) == 0 )

@@ -3,7 +3,8 @@ TODO
   - file naming schema ?
   - add types for globbing
   - add glob tests
-* add debug function for section types
+  - add support for section MD5 hashes
+  - add generic way to parse file object data
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount
@@ -302,10 +303,14 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120702
+* worked on Ex01 and Lx01 support
+
 20120701
 * changes due to updates
 * code clean up in export handle
 * added support for exporting EnCase 7 L01 files
+* worked on Ex01 and Lx01 support
 
 20120630
 * worked on EnCase 7 and linen 7 support

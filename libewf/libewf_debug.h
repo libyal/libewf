@@ -33,6 +33,9 @@
 extern "C" {
 #endif
 
+void libewf_debug_print_section_type(
+      uint32_t section_type );
+
 int libewf_debug_dump_data(
      const char *header_string,
      const uint8_t *data,

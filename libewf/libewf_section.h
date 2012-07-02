@@ -72,6 +72,10 @@ struct libewf_section
 	/* The size the section
 	 */
 	size64_t size;
+
+	/* The data size the section
+	 */
+	size64_t data_size;
 };
 
 int libewf_section_test_zero(

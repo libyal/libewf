@@ -535,7 +535,7 @@ ssize_t libewf_section_start_read(
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_start_v2_t *) section_start_data )->data_size,
-		 section->size );
+		 section->data_size );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_start_v2_t *) section_start_data )->padding_size,
@@ -580,9 +580,13 @@ ssize_t libewf_section_start_read(
 		else if( format_version == 2 )
 		{
 			libcnotify_printf(
-			 "%s: type\t\t\t\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: type\t\t\t\t\t\t: 0x%08" PRIx32 " (",
 			 function,
 			 section->type );
+			libewf_debug_print_section_type(
+			 section->type );
+			libcnotify_printf(
+			 ")\n" );
 
 			byte_stream_copy_to_uint32_little_endian(
 			 ( (ewf_section_start_v2_t *) section_start_data )->data_flags,
@@ -600,7 +604,7 @@ ssize_t libewf_section_start_read(
 			libcnotify_printf(
 			 "%s: data size\t\t\t\t\t: %" PRIu64 "\n",
 			 function,
-			 section->size );
+			 section->data_size );
 
 			libcnotify_printf(
 			 "%s: section start size\t\t\t\t: %" PRIu32 "\n",
@@ -658,12 +662,14 @@ ssize_t libewf_section_start_read(
 	if( format_version == 1 )
 	{
 		section->start_offset = file_offset;
+		section->data_size    = section->size - sizeof( ewf_section_start_v1_t );
 	}
 	else if( format_version == 2 )
 	{
-		section->start_offset += sizeof( ewf_section_start_v2_t );
-		section->size         += sizeof( ewf_section_start_v2_t );
-		section->end_offset    = file_offset + sizeof( ewf_section_start_v2_t );
+/* TODO check sanity of start offset and data size */
+		section->start_offset = file_offset - section->data_size;
+		section->size         = section->data_size + sizeof( ewf_section_start_v2_t );
+		section->end_offset   = file_offset + sizeof( ewf_section_start_v2_t );
 	}
 	if( ( section->size != 0 )
 	 && ( ( section->size < (size64_t) section_start_data_size )
@@ -691,21 +697,31 @@ ssize_t libewf_section_start_read(
 	}
 	if( format_version == 1 )
 	{
+		if( section->type_string_length == 4 )
+		{
+			if( memory_compare(
+			     section->type_string,
+			     "done",
+			     4 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_DONE;
+			}
+			else if( memory_compare(
+			          section->type_string,
+			          "next",
+			          4 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_NEXT;
+			}
+		}
 		/* Make sure to check if the section next value is sane
 		 * the end offset of the next and done sections point back at themselves
 		 */
 		if( ( section->end_offset == section->start_offset )
 		 && ( section->size == sizeof( ewf_section_start_v1_t ) ) )
 		{
-			if( ( section->type_string_length != 4 )
-			 || ( ( memory_compare(
-				 section->type_string,
-				 "next",
-				 4 ) != 0 )
-			  &&  ( memory_compare(
-				 section->type_string,
-				 "done",
-				 4 ) != 0 ) ) )
+			if( ( section->type != LIBEWF_SECTION_TYPE_DONE )
+			 || ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -746,7 +762,7 @@ ssize_t libewf_section_start_read(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: section start size value mismatch.",
+			 "%s: mismatch in section start size.",
 			 function );
 
 			return( -1 );
@@ -1102,7 +1118,6 @@ ssize_t libewf_section_compressed_string_read(
 	uint8_t *compressed_string = NULL;
 	static char *function      = "libewf_section_compressed_string_read";
 	void *reallocation         = NULL;
-	size64_t section_data_size = 0;
 	ssize_t read_count         = 0;
 	int result                 = 0;
 
@@ -1150,9 +1165,7 @@ ssize_t libewf_section_compressed_string_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size > (size64_t) SSIZE_MAX )
+	if( section->data_size > (size64_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
@@ -1164,7 +1177,7 @@ ssize_t libewf_section_compressed_string_read(
 		return( -1 );
 	}
 	compressed_string = (uint8_t *) memory_allocate(
-	                                 sizeof( uint8_t ) * (size_t) section_data_size );
+	                                 sizeof( uint8_t ) * (size_t) section->data_size );
 
 	if( compressed_string == NULL )
 	{
@@ -1181,10 +1194,10 @@ ssize_t libewf_section_compressed_string_read(
 	              file_io_pool,
 	              file_io_pool_entry,
 	              compressed_string,
-	              (size_t) section_data_size,
+	              (size_t) section->data_size,
 	              error );
 
-	if( read_count != (ssize_t) section_data_size )
+	if( read_count != (ssize_t) section->data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -1195,9 +1208,21 @@ ssize_t libewf_section_compressed_string_read(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: compressed string:\n",
+		 function );
+		libcnotify_print_data(
+		 compressed_string,
+		 (size_t) section->data_size,
+		 0 );
+	}
+#endif
 	/* On average the uncompressed string will be twice as large as the compressed string
 	 */
-	*uncompressed_string_size = 2 * (size_t) section_data_size;
+	*uncompressed_string_size = 2 * (size_t) section->data_size;
 
 	*uncompressed_string = (uint8_t *) memory_allocate(
 	                                    sizeof( uint8_t ) * *uncompressed_string_size );
@@ -1217,7 +1242,7 @@ ssize_t libewf_section_compressed_string_read(
 	          *uncompressed_string,
 	          uncompressed_string_size,
 	          compressed_string,
-	          (size_t) section_data_size,
+	          (size_t) section->data_size,
 	          error );
 
 	while( ( result == -1 )
@@ -1247,7 +1272,7 @@ ssize_t libewf_section_compressed_string_read(
 		          *uncompressed_string,
 		          uncompressed_string_size,
 		          compressed_string,
-		          (size_t) section_data_size,
+		          (size_t) section->data_size,
 		          error );
 	}
 	if( result == -1 )
@@ -1505,7 +1530,6 @@ ssize_t libewf_section_data_read(
 	ewf_data_t *data             = NULL;
 	static char *function        = "libewf_section_data_read";
 	ssize_t read_count           = 0;
-	size64_t section_data_size   = 0;
 	uint64_t number_of_sectors   = 0;
 	uint32_t bytes_per_sector    = 0;
 	uint32_t calculated_checksum = 0;
@@ -1551,9 +1575,7 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size != (size64_t) sizeof( ewf_data_t ) )
+	if( section->data_size != (size64_t) sizeof( ewf_data_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2236,7 +2258,6 @@ ssize_t libewf_section_digest_read(
 	ewf_digest_t digest;
 
 	static char *function        = "libewf_section_digest_read";
-	size64_t section_data_size   = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -2264,9 +2285,7 @@ ssize_t libewf_section_digest_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size != (size64_t) sizeof( ewf_digest_t ) )
+	if( section->data_size != (size64_t) sizeof( ewf_digest_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2672,9 +2691,7 @@ ssize_t libewf_section_error2_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size < (size64_t) sizeof( ewf_error2_header_t ) )
+	if( section->data_size < (size64_t) sizeof( ewf_error2_header_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2685,7 +2702,7 @@ ssize_t libewf_section_error2_read(
 
 		goto on_error;
 	}
-	section_data_size -= sizeof( ewf_error2_header_t );
+	section_data_size = section->data_size - sizeof( ewf_error2_header_t );
 
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
@@ -3239,7 +3256,6 @@ ssize_t libewf_section_hash_read(
 	ewf_hash_t hash;
 
 	static char *function        = "libewf_section_hash_read";
-	size64_t section_data_size   = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -3267,9 +3283,7 @@ ssize_t libewf_section_hash_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size != (size64_t) sizeof( ewf_hash_t ) )
+	if( section->data_size != (size64_t) sizeof( ewf_hash_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -3959,9 +3973,7 @@ ssize_t libewf_section_ltree_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size < (size64_t) sizeof( ewf_ltree_header_t ) )
+	if( section->data_size < (size64_t) sizeof( ewf_ltree_header_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -3972,7 +3984,7 @@ ssize_t libewf_section_ltree_read(
 
 		goto on_error;
 	}
-	section_data_size -= sizeof( ewf_ltree_header_t );
+	section_data_size = section->data_size - sizeof( ewf_ltree_header_t );
 
 	ltree_header = memory_allocate_structure(
 	                ewf_ltree_header_t );
@@ -4296,9 +4308,7 @@ ssize_t libewf_section_session_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size < (size64_t) sizeof( ewf_session_header_t ) )
+	if( section->data_size < (size64_t) sizeof( ewf_session_header_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -4309,7 +4319,7 @@ ssize_t libewf_section_session_read(
 
 		goto on_error;
 	}
-	section_data_size -= sizeof( ewf_session_header_t );
+	section_data_size = section->data_size - sizeof( ewf_session_header_t );
 
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
@@ -5307,7 +5317,6 @@ ssize_t libewf_section_table_header_read(
 	ewf_table_header_t table_header;
 
 	static char *function        = "libewf_section_table_header_read";
-	size64_t section_data_size   = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -5347,9 +5356,7 @@ ssize_t libewf_section_table_header_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size < (size64_t) sizeof( ewf_table_header_t ) )
+	if( section->data_size < (size64_t) sizeof( ewf_table_header_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -5721,10 +5728,9 @@ ssize_t libewf_section_volume_read(
          libewf_media_values_t *media_values,
          libcerror_error_t **error )
 {
-	static char *function      = "libewf_section_volume_read";
-	ssize_t read_count         = 0;
-	size64_t bytes_per_chunk   = 0;
-	size64_t section_data_size = 0;
+	static char *function    = "libewf_section_volume_read";
+	ssize_t read_count       = 0;
+	size64_t bytes_per_chunk = 0;
 
 	if( section == NULL )
 	{
@@ -5748,21 +5754,7 @@ ssize_t libewf_section_volume_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( ( section_data_size != (size64_t) sizeof( ewf_volume_t ) )
-	 && ( section_data_size != (size64_t) sizeof( ewf_volume_smart_t ) ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( section_data_size == (size64_t) sizeof( ewf_volume_t ) )
+	if( section->data_size == (size64_t) sizeof( ewf_volume_t ) )
 	{
 		read_count = libewf_section_volume_e01_read(
 		              section,
@@ -5772,7 +5764,7 @@ ssize_t libewf_section_volume_read(
 		              media_values,
 		              error );
 
-		if( read_count != (ssize_t) section_data_size )
+		if( read_count != (ssize_t) section->data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -5784,7 +5776,7 @@ ssize_t libewf_section_volume_read(
 			return( -1 );
 		}
 	}
-	else if( section_data_size == (size64_t) sizeof( ewf_volume_smart_t ) )
+	else if( section->data_size == (size64_t) sizeof( ewf_volume_smart_t ) )
 	{
 		read_count = libewf_section_volume_s01_read(
 		              section,
@@ -5794,7 +5786,7 @@ ssize_t libewf_section_volume_read(
 		              media_values,
 		              error );
 
-		if( read_count != (ssize_t) section_data_size )
+		if( read_count != (ssize_t) section->data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -5805,6 +5797,17 @@ ssize_t libewf_section_volume_read(
 
 			return( -1 );
 		}
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid section size value out of bounds.",
+		 function );
+
+		return( -1 );
 	}
 	if( media_values->number_of_chunks > (uint32_t) INT_MAX )
 	{
@@ -5890,7 +5893,6 @@ ssize_t libewf_section_volume_e01_read(
 {
 	ewf_volume_t *volume         = NULL;
 	static char *function        = "libewf_io_handle_read_volume_e01_section";
-	size64_t section_data_size   = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -5932,9 +5934,7 @@ ssize_t libewf_section_volume_e01_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size != (size64_t) sizeof( ewf_volume_t ) )
+	if( section->data_size != (size64_t) sizeof( ewf_volume_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -6521,7 +6521,6 @@ ssize_t libewf_section_volume_s01_read(
 {
 	ewf_volume_smart_t *volume   = NULL;
 	static char *function        = "libewf_io_handle_read_volume_s01_section";
-	size64_t section_data_size   = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -6559,9 +6558,7 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size != (size64_t) sizeof( ewf_volume_smart_t ) )
+	if( section->data_size != (size64_t) sizeof( ewf_volume_smart_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -7380,9 +7377,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	section_data_size = section->size - sizeof( ewf_section_start_v1_t );
-
-	if( section_data_size < (size64_t) sizeof( ewfx_delta_chunk_header_t ) )
+	if( section->data_size < (size64_t) sizeof( ewfx_delta_chunk_header_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -7393,7 +7388,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	section_data_size -= sizeof( ewfx_delta_chunk_header_t );
+	section_data_size = section->data_size - sizeof( ewfx_delta_chunk_header_t );
 
 	if( section_data_size > (size64_t) INT32_MAX )
 	{
