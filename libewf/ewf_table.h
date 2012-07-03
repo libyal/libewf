@@ -35,10 +35,10 @@ typedef struct ewf_table_header_v1 ewf_table_header_v1_t;
 
 struct ewf_table_header_v1
 {
-	/* The number of offsets
+	/* The number of entries
 	 * Consists of 4 bytes
 	 */
-	uint8_t number_of_offsets[ 4 ];
+	uint8_t number_of_entries[ 4 ];
 
 	/* Padding
 	 * Consists of 4 bytes
@@ -55,7 +55,7 @@ struct ewf_table_header_v1
 	 */
 	uint8_t padding2[ 4 ];
 
-	/* The section checksum of all (previous) table data
+	/* The section checksum of all (previous) table header data
 	 * Consists of 4 bytes
 	 */
 	uint8_t checksum[ 4 ];
@@ -71,6 +71,38 @@ struct ewf_table_entry_v1
 	 * Consists of 4 bytes
 	 */
 	uint8_t chunk_data_offset[ 4 ];
+};
+
+/* The EWF version 2 table header
+ */
+typedef struct ewf_table_header_v2 ewf_table_header_v2_t;
+
+struct ewf_table_header_v2
+{
+	/* Unknown
+	 * Consists of 8 bytes
+	 */
+	uint8_t unknown1[ 8 ];
+
+	/* The number of entries
+	 * Consists of 4 bytes
+	 */
+	uint8_t number_of_entries[ 4 ];
+
+	/* Unknown
+	 * Consists of 4 bytes
+	 */
+	uint8_t unknown2[ 4 ];
+
+	/* The section checksum of all (previous) table header data
+	 * Consists of 4 bytes
+	 */
+	uint8_t checksum[ 4 ];
+
+	/* Padding
+	 * Consists of 12 bytes
+	 */
+	uint8_t padding[ 12 ];
 };
 
 /* The EWF version 2 table entry (chunk descriptor)

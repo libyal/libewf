@@ -1,7 +1,9 @@
 TODO
 * change chunk data indication values to flags
+* libewf_filename_create split off wide variant ?
 
 * Ex01/Lx01
+  - what about section read order and filling of chunk table
   - sector table correct padding size
   - deal with chunk size
   - libewf_chunk_table_read_chunk: add support for patten fill

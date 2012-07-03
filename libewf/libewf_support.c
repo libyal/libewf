@@ -594,7 +594,8 @@ int libewf_glob(
 	}
 	if( format == LIBEWF_FORMAT_UNKNOWN )
 	{
-		if( filename[ filename_length - 4 ] == '.' )
+		if( ( filename_length > 4 )
+		 && ( filename[ filename_length - 4 ] == '.' ) )
 		{
 			if( filename[ filename_length - 3 ] == 'E' )
 			{
@@ -626,7 +627,8 @@ int libewf_glob(
 			}
 			segment_extention_length = 4;
 		}
-		else if( filename[ filename_length - 5 ] == '.' )
+		else if( ( filename_length > 5 )
+		      && ( filename[ filename_length - 5 ] == '.' ) )
 		{
 			if( filename[ filename_length - 4 ] == 'E' )
 			{
@@ -714,8 +716,8 @@ int libewf_glob(
 	{
 		segment_filename_length = filename_length + additional_length;
 
-		segment_filename = (char * ) memory_allocate(
-			                      sizeof( char ) * ( segment_filename_length + 1 ) );
+		segment_filename = (char *) memory_allocate(
+			                     sizeof( char ) * ( segment_filename_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -772,7 +774,7 @@ int libewf_glob(
 
 			goto on_error;
 		}
-		segment_filename[ segment_filename_index ] = 0;
+		/* The libewf_filename_set_extension also adds the end-of-string character */
 
 		if( libbfio_file_set_name(
 		     file_io_handle,
@@ -1005,7 +1007,8 @@ int libewf_glob_wide(
 	}
 	if( format == LIBEWF_FORMAT_UNKNOWN )
 	{
-		if( filename[ filename_length - 4 ] == (wchar_t) '.' )
+		if( ( filename_length > 4 )
+		 && ( filename[ filename_length - 4 ] == (wchar_t) '.' ) )
 		{
 			if( filename[ filename_length - 3 ] == (wchar_t) 'E' )
 			{
@@ -1036,7 +1039,8 @@ int libewf_glob_wide(
 				return( -1 );
 			}
 		}
-		else if( filename[ filename_length - 5 ] == (wchar_t) '.' )
+		else if( ( filename_length > 5 )
+		      && ( filename[ filename_length - 5 ] == (wchar_t) '.' ) )
 		{
 			if( filename[ filename_length - 4 ] == (wchar_t) 'E' )
 			{
@@ -1181,7 +1185,7 @@ int libewf_glob_wide(
 
 			goto on_error;
 		}
-		segment_filename[ segment_filename_index ] = 0;
+		/* The libewf_filename_set_extension_wide also adds the end-of-string character */
 
 		if( libbfio_file_set_name_wide(
 		     file_io_handle,

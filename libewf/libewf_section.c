@@ -5575,17 +5575,24 @@ ssize_t libewf_section_table_header_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          uint8_t format LIBEWF_ATTRIBUTE_UNUSED,
-         uint32_t *number_of_offsets,
+         uint32_t *number_of_entries,
          uint64_t *base_offset,
          libcerror_error_t **error )
 {
-	ewf_table_header_v1_t table_header;
+	uint8_t section_data[ 32 ];
 
 	static char *function        = "libewf_section_table_header_read";
+	size_t section_data_size     = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	uint64_t value_64bit         = 0;
+	uint32_t value_32bit         = 0;
+#endif
 
 	LIBEWF_UNREFERENCED_PARAMETER( format )
 
@@ -5600,13 +5607,32 @@ ssize_t libewf_section_table_header_read(
 
 		return( -1 );
 	}
-	if( number_of_offsets == NULL )
+	if( format_version == 1 )
+	{
+		section_data_size = sizeof( ewf_table_header_v1_t );
+	}
+	else if( format_version == 2 )
+	{
+		section_data_size = sizeof( ewf_table_header_v2_t );
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_entries == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of offsets.",
+		 "%s: invalid number of entries.",
 		 function );
 
 		return( -1 );
@@ -5622,13 +5648,13 @@ ssize_t libewf_section_table_header_read(
 
 		return( -1 );
 	}
-	if( section->data_size < (size64_t) sizeof( ewf_table_header_v1_t ) )
+	if( section->data_size < (size64_t) section_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section size value out of bounds.",
+		 "%s: invalid section data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -5636,11 +5662,11 @@ ssize_t libewf_section_table_header_read(
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              (uint8_t *) &table_header,
-	              sizeof( ewf_table_header_v1_t ),
+	              section_data,
+	              section_data_size,
 	              error );
 	
-	if( read_count != (ssize_t) sizeof( ewf_table_header_v1_t ) )
+	if( read_count != (ssize_t) section_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -5655,67 +5681,118 @@ ssize_t libewf_section_table_header_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: table header:\n",
+	 	 "%s: table header data:\n",
 		 function );
 		libcnotify_print_data(
-		 (uint8_t *) &table_header,
-		 sizeof( ewf_table_header_v1_t ),
+		 section_data,
+		 section_data_size,
 		 0 );
 	}
 #endif
-	byte_stream_copy_to_uint32_little_endian(
-	 table_header.number_of_offsets,
-	 *number_of_offsets );
+	if( format_version == 1 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_table_header_v1_t *) section_data )->number_of_entries,
+		 *number_of_entries );
 
-	byte_stream_copy_to_uint64_little_endian(
-	 table_header.base_offset,
-	 *base_offset );
+		byte_stream_copy_to_uint64_little_endian(
+		 ( (ewf_table_header_v1_t *) section_data )->base_offset,
+		 *base_offset );
 
-	byte_stream_copy_to_uint32_little_endian(
-	 table_header.checksum,
-	 stored_checksum );
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_table_header_v1_t *) section_data )->checksum,
+		 stored_checksum );
+	}
+	else if( format_version == 2 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_table_header_v2_t *) section_data )->number_of_entries,
+		 *number_of_entries );
 
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_table_header_v2_t *) section_data )->checksum,
+		 stored_checksum );
+
+		/* The 12 byte alignment padding is not part of the table header
+		 */
+		section_data_size -= 12;
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
+		if( format_version == 2 )
+		{
+			byte_stream_copy_to_uint64_little_endian(
+			 ( (ewf_table_header_v2_t *) section_data )->unknown1,
+			 value_64bit );
+			libcnotify_printf(
+			 "%s: unknown1\t\t\t\t: 0x%08" PRIx64 "\n",
+			 function,
+			 value_64bit );
+		}
 		libcnotify_printf(
-		 "%s: number of offsets\t\t\t: %" PRIu32 "\n",
+		 "%s: number of entries\t\t\t: %" PRIu32 "\n",
 		 function,
-		 *number_of_offsets );
+		 *number_of_entries );
 
-		libcnotify_printf(
-		 "%s: padding1:\n",
-		 function );
-		libcnotify_print_data(
-		 table_header.padding1,
-		 4,
-		 0 );
+		if( format_version == 1 )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 ( (ewf_table_header_v1_t *) section_data )->padding1,
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: padding1\t\t\t\t: 0x%08" PRIx32 "\n",
+			 function,
+			 value_32bit );
 
-		libcnotify_printf(
-		 "%s: base offset\t\t\t\t: 0x%08" PRIx64 "\n",
-		 function,
-		 *base_offset );
+			libcnotify_printf(
+			 "%s: base offset\t\t\t\t: 0x%08" PRIx64 "\n",
+			 function,
+			 *base_offset );
 
-		libcnotify_printf(
-		 "%s: padding2:\n",
-		 function );
-		libcnotify_print_data(
-		 table_header.padding2,
-		 4,
-		 0 );
-
+			byte_stream_copy_to_uint32_little_endian(
+			 ( (ewf_table_header_v1_t *) section_data )->padding2,
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: padding2\t\t\t\t: 0x%08" PRIx32 "\n",
+			 function,
+			 value_32bit );
+		}
+		else if( format_version == 2 )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 ( (ewf_table_header_v2_t *) section_data )->unknown2,
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: unknown2\t\t\t\t: 0x%08" PRIx32 "\n",
+			 function,
+			 value_32bit );
+		}
 		libcnotify_printf(
 		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 
-		libcnotify_printf(
-		 "\n" );
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
+		else if( format_version == 2 )
+		{
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_table_header_v2_t *) section_data )->padding,
+			 12,
+			 0 );
+		}
 	}
 #endif
 	calculated_checksum = ewf_checksum_calculate(
-	                       &table_header,
-	                       sizeof( ewf_table_header_v1_t ) - sizeof( uint32_t ),
+	                       section_data,
+	                       section_data_size - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -5734,21 +5811,21 @@ ssize_t libewf_section_table_header_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( *number_of_offsets == 0 )
+		if( *number_of_entries == 0 )
 		{
 			libcnotify_printf(
-			 "%s: table contains no offsets.\n",
+			 "%s: table contains no entries.\n",
 			 function );
 		}
 		else if( ( ( format != LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( *number_of_offsets > EWF_MAXIMUM_OFFSETS_IN_TABLE ) )
+		       &&  ( *number_of_entries > EWF_MAXIMUM_OFFSETS_IN_TABLE ) )
 		      || ( ( format == LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( *number_of_offsets > EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6 ) ) )
+		       &&  ( *number_of_entries > EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6 ) ) )
 		{
 			libcnotify_printf(
-			 "%s: number of offsets: %" PRIu32 " exceeds maximum: %d.\n",
+			 "%s: number of entries: %" PRIu32 " exceeds maximum: %d.\n",
 			 function,
-			 number_of_offsets,
+			 number_of_entries,
 			 EWF_MAXIMUM_OFFSETS_IN_TABLE );
 		}
 	}
@@ -5768,7 +5845,7 @@ ssize_t libewf_section_table_write(
          off64_t section_offset,
          off64_t base_offset,
          ewf_table_entry_v1_t *table_offsets,
-         uint32_t number_of_offsets,
+         uint32_t number_of_entries,
          size64_t chunks_data_size,
          uint8_t ewf_format,
          libcerror_error_t **error )
@@ -5828,7 +5905,7 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	table_offsets_size = sizeof( ewf_table_entry_v1_t ) * number_of_offsets;
+	table_offsets_size = sizeof( ewf_table_entry_v1_t ) * number_of_entries;
 
 	section_size = sizeof( ewf_section_descriptor_v1_t )
 	             + sizeof( ewf_table_header_v1_t )
@@ -5893,8 +5970,8 @@ ssize_t libewf_section_table_write(
 		return( -1 );
 	}
 	byte_stream_copy_from_uint32_little_endian(
-	 table_header.number_of_offsets,
-	 number_of_offsets );
+	 table_header.number_of_entries,
+	 number_of_entries );
 
 	byte_stream_copy_from_uint64_little_endian(
 	 table_header.base_offset,

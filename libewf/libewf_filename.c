@@ -49,7 +49,6 @@ int libewf_filename_set_extension(
 	size_t string_index        = 0;
 	char additional_characters = 0;
 	char first_character       = 0;
-	uint8_t major_version      = 1;
 
 	if( filename == NULL )
 	{
@@ -137,13 +136,11 @@ int libewf_filename_set_extension(
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
 	{
-		major_version         = 2;
 		first_character       = 'E';
 		additional_characters = 'A';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
 	{
-		major_version         = 2;
 		first_character       = 'L';
 		additional_characters = 'A';
 	}
@@ -165,7 +162,8 @@ int libewf_filename_set_extension(
 	}
 	filename[ string_index++ ] = first_character;
 
-	if( major_version == 2 )
+	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
 		filename[ string_index++ ] = 'x';
 	}
@@ -242,7 +240,6 @@ int libewf_filename_set_extension_wide(
 	size_t string_index           = 0;
 	wchar_t additional_characters = 0;
 	wchar_t first_character       = 0;
-	uint8_t major_version         = 1;
 
 	if( filename == NULL )
 	{
@@ -330,13 +327,11 @@ int libewf_filename_set_extension_wide(
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
 	{
-		major_version         = 2;
 		first_character       = 'E';
 		additional_characters = 'A';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
 	{
-		major_version         = 2;
 		first_character       = 'L';
 		additional_characters = 'A';
 	}
@@ -358,7 +353,8 @@ int libewf_filename_set_extension_wide(
 	}
 	filename[ string_index++ ] = first_character;
 
-	if( major_version == 2 )
+	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
 		filename[ string_index++ ] = 'x';
 	}

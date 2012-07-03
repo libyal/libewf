@@ -304,8 +304,9 @@ ssize_t libewf_section_table_header_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          uint8_t format,
-         uint32_t *number_of_offsets,
+         uint32_t *number_of_entries,
          uint64_t *base_offset,
          libcerror_error_t **error );
 
@@ -318,7 +319,7 @@ ssize_t libewf_section_table_write(
          off64_t section_offset,
          off64_t base_offset,
          ewf_table_entry_v1_t *table_offsets,
-         uint32_t number_of_offsets,
+         uint32_t number_of_entries,
          size64_t chunks_data_size,
          uint8_t ewf_format,
          libcerror_error_t **error );

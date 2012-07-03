@@ -846,7 +846,7 @@ ssize_t libewf_segment_file_read_table_section(
 	size64_t element_group_size  = 0;
 	ssize_t read_count           = 0;
 	uint64_t base_offset         = 0;
-	uint32_t number_of_offsets   = 0;
+	uint32_t number_of_entries   = 0;
 
 	if( segment_file == NULL )
 	{
@@ -894,28 +894,29 @@ ssize_t libewf_segment_file_read_table_section(
 	}
 	chunk_table->previous_last_chunk_filled = chunk_table->last_chunk_filled;
 
+	read_count = libewf_section_table_header_read(
+		      section,
+		      file_io_pool,
+		      file_io_pool_entry,
+		      io_handle->major_version,
+		      io_handle->format,
+		      &number_of_entries,
+		      &base_offset,
+		      error );
+	
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read table section header.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file->major_version == 1 )
 	{
-		read_count = libewf_section_table_header_read(
-			      section,
-			      file_io_pool,
-			      file_io_pool_entry,
-			      io_handle->format,
-			      &number_of_offsets,
-			      &base_offset,
-			      error );
-		
-		if( read_count == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read table section header.",
-			 function );
-
-			return( -1 );
-		}
 		/* For EWF version 1 the entire table section is considered the group
 		 * because the section descriptor is need to determine the chunk data
 		 * offset and size values
@@ -925,15 +926,12 @@ ssize_t libewf_segment_file_read_table_section(
 	}
 	else if( segment_file->major_version == 2 )
 	{
-/* TODO check bounds */
-		number_of_offsets = (uint32_t) ( section->data_size / sizeof( ewf_table_entry_v2_t ) );
-
-		/* For EWF version 2 the table entries are considered the group
+		/* For EWF version 2 the table (section data) is considered the group
 		 */
 		element_group_offset = section->start_offset;
 		element_group_size   = (size64_t) section->data_size;
 	}
-	if( number_of_offsets > 0 )
+	if( number_of_entries > 0 )
 	{
 		/* The EWF-L01 does not define the number of chunks in the volume
 		 */
@@ -942,7 +940,7 @@ ssize_t libewf_segment_file_read_table_section(
 			if( libmfdata_list_append_group(
 			     chunk_table_list,
 			     &( chunk_table->last_chunk_filled ),
-			     (int) number_of_offsets,
+			     (int) number_of_entries,
 			     file_io_pool_entry,
 			     element_group_offset,
 			     element_group_size,
@@ -964,7 +962,7 @@ ssize_t libewf_segment_file_read_table_section(
 			if( libmfdata_list_set_group_by_index(
 			     chunk_table_list,
 			     chunk_table->last_chunk_filled,
-			     (int) number_of_offsets,
+			     (int) number_of_entries,
 			     file_io_pool_entry,
 			     element_group_offset,
 			     element_group_size,
@@ -978,14 +976,14 @@ ssize_t libewf_segment_file_read_table_section(
 				 "%s: unable to set chunk group: %d - %d.",
 				 function,
 				 chunk_table->last_chunk_filled,
-				 chunk_table->last_chunk_filled + number_of_offsets );
+				 chunk_table->last_chunk_filled + number_of_entries );
 
 				return( -1 );
 			}
 		}
-		chunk_table->last_chunk_filled += (int) number_of_offsets;
+		chunk_table->last_chunk_filled += (int) number_of_entries;
 
-		segment_file->number_of_chunks += number_of_offsets;
+		segment_file->number_of_chunks += number_of_entries;
 	}
 	return( 1 );
 }
@@ -1009,8 +1007,8 @@ ssize_t libewf_segment_file_read_table2_section(
 	ssize_t read_count           = 0;
 	uint64_t base_offset         = 0;
 	uint32_t group_flags         = 0;
-	uint32_t number_of_offsets   = 0;
-	int group_number_of_offsets  = 0;
+	uint32_t number_of_entries   = 0;
+	int group_number_of_entries  = 0;
 	int group_file_io_pool_entry = 0;
 
 	if( segment_file == NULL )
@@ -1061,8 +1059,9 @@ ssize_t libewf_segment_file_read_table2_section(
 	              section,
 	              file_io_pool,
 	              file_io_pool_entry,
+	              io_handle->major_version,
 	              io_handle->format,
-	              &number_of_offsets,
+	              &number_of_entries,
 	              &base_offset,
 	              error );
 	
@@ -1077,12 +1076,12 @@ ssize_t libewf_segment_file_read_table2_section(
 
 		return( -1 );
 	}
-	if( number_of_offsets > 0 )
+	if( number_of_entries > 0 )
 	{
 		if( libmfdata_list_get_group_by_index(
 		     chunk_table_list,
 		     chunk_table->last_chunk_compared,
-		     &group_number_of_offsets,
+		     &group_number_of_entries,
 		     &group_file_io_pool_entry,
 		     &group_offset,
 		     &group_size,
@@ -1096,17 +1095,17 @@ ssize_t libewf_segment_file_read_table2_section(
 			 "%s: unable to retrieve chunk group: %d - %d.",
 			 function,
 			 chunk_table->last_chunk_compared,
-			 chunk_table->last_chunk_compared + number_of_offsets );
+			 chunk_table->last_chunk_compared + number_of_entries );
 
 			return( -1 );
 		}
-		if( (int) number_of_offsets != group_number_of_offsets )
+		if( (int) number_of_entries != group_number_of_entries )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: mismatch between number of offsets in table and table2.",
+			 "%s: mismatch between number of entries in table and table2.",
 			 function );
 
 			return( -1 );
@@ -1127,11 +1126,11 @@ ssize_t libewf_segment_file_read_table2_section(
 			 "%s: unable to set backup data range of chunk group: %d - %d.",
 			 function,
 			 chunk_table->last_chunk_compared,
-			 chunk_table->last_chunk_compared + number_of_offsets );
+			 chunk_table->last_chunk_compared + number_of_entries );
 
 			return( -1 );
 		}
-		chunk_table->last_chunk_compared += (int) number_of_offsets;
+		chunk_table->last_chunk_compared += (int) number_of_entries;
 	}
 	return( 1 );
 }

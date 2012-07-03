@@ -2521,32 +2521,19 @@ on_error:
 	return( -1 );
 }
 
-/* Opens the segment files for reading
+/* Opens a segment file for reading
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_open_read_segment_files(
+int libewf_handle_open_read_segment_file(
      libewf_internal_handle_t *internal_handle,
+     uint32_t segment_number,
+     libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
-     libewf_chunk_table_t *chunk_table,
+     int file_io_pool_entry,
      libcerror_error_t **error )
 {
-	libewf_header_sections_t *header_sections = NULL;
-	libewf_hash_sections_t *hash_sections     = NULL;
-	libewf_section_t *section                 = NULL;
-	libewf_segment_file_t *segment_file       = NULL;
-	uint8_t *file_object_string               = NULL;
-	static char *function                     = "libewf_handle_open_read_segment_files";
-	off64_t section_offset                    = 0;
-	size64_t maximum_segment_size             = 0;
-	size64_t segment_file_size                = 0;
-	size_t file_object_string_size            = 0;
-	ssize_t read_count                        = 0;
-	int file_io_pool_entry                    = 0;
-	int number_of_segment_files               = 0;
-	int known_section                         = 0;
-	int last_section                          = 0;
-	int last_segment_file                     = 0;
-	int segment_files_list_index              = 0;
+	static char *function = "libewf_handle_open_read_segment_file";
+	ssize_t read_count    = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2579,15 +2566,170 @@ int libewf_handle_open_read_segment_files(
 		 "%s: invalid handle - missing media values.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	if( internal_handle->segment_table == NULL )
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libewf_segment_file_read_file_header(
+		      segment_file,
+		      file_io_pool,
+		      file_io_pool_entry,
+		      error );
+
+	if( read_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read segment file header.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported segment file type.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->segment_number != segment_number )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_INPUT,
+		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+		 "%s: segment number mismatch.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->segment_number == 1 )
+	{
+		internal_handle->io_handle->major_version = segment_file->major_version;
+		internal_handle->io_handle->minor_version = segment_file->minor_version;
+
+		if( segment_file->major_version == 2 )
+		{
+			if( memory_copy(
+			     internal_handle->media_values->set_identifier,
+			     segment_file->set_identifier,
+			     16 ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy segment file set identifier to media values.",
+				 function );
+
+				return( -1 );
+			}
+		}
+	}
+	else
+	{
+		if( ( segment_file->major_version != internal_handle->io_handle->major_version )
+		 || ( segment_file->minor_version != internal_handle->io_handle->minor_version ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: segment file format version mismatch.",
+			 function );
+
+			return( -1 );
+		}
+		if( segment_file->major_version == 2 )
+		{
+			if( memory_compare(
+			     internal_handle->media_values->set_identifier,
+			     segment_file->set_identifier,
+			     16 ) != 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_INPUT,
+				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+				 "%s: mismatch in segment file set identifier.",
+				 function );
+
+				return( -1 );
+			}
+		}
+	}
+	return( 1 );
+}
+
+/* Reads the section data from a segment file
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_open_read_section_data(
+     libewf_internal_handle_t *internal_handle,
+     libewf_chunk_table_t *chunk_table,
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     int file_io_pool_entry,
+     libcerror_error_t **error )
+{
+	libewf_header_sections_t *header_sections   = NULL;
+	libewf_list_element_t *section_list_element = NULL;
+	libewf_section_t *section                   = NULL;
+	uint8_t *file_object_string                 = NULL;
+	static char *function                       = "libewf_handle_open_read_section_data";
+	size_t file_object_string_size              = 0;
+	ssize_t read_count                          = 0;
+	int header_section_found                    = 0;
+	int known_section                           = 0;
+
+	if( internal_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -2599,6 +2741,28 @@ int libewf_handle_open_read_segment_files(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->section_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file - missing section list.",
 		 function );
 
 		return( -1 );
@@ -2616,18 +2780,754 @@ int libewf_handle_open_read_segment_files(
 
 		goto on_error;
 	}
-	if( libewf_hash_sections_initialize(
-	     &hash_sections,
+	section_list_element = segment_file->section_list->first_element;
+
+	if( section_list_element == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing first section list element.",
+		 function );
+
+		 return( -1 );
+	}
+	while( section_list_element != NULL )
+	{
+		section = (libewf_section_t *) section_list_element->value;
+
+		if( section == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing section.",
+			 function );
+
+			return( -1 );
+		}
+		if( section->type != 0 )
+		{
+			if( section->data_size != 0 )
+			{
+				if( libbfio_pool_seek_offset(
+				     file_io_pool,
+				     file_io_pool_entry,
+				     section->start_offset,
+				     SEEK_SET,
+				     error ) == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_OPEN_FAILED,
+					 "%s: unable to seek section offset: %" PRIi64 ".",
+					 function,
+					 section->start_offset );
+
+					goto on_error;
+				}
+			}
+			switch( section->type )
+			{
+				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
+					read_count = libewf_section_compressed_string_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      &file_object_string,
+						      &file_object_string_size,
+						      error );
+
+					if( read_count == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read device information file object string.",
+						 function );
+
+						goto on_error;
+					}
+					if( libewf_device_information_parse(
+					     file_object_string,
+					     file_object_string_size,
+					     internal_handle->media_values,
+					     internal_handle->header_values,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+						 "%s: unable to parse device information.",
+						 function );
+
+						goto on_error;
+					}
+					memory_free(
+					 file_object_string );
+
+					file_object_string = NULL;
+
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_CASE_DATA:
+					read_count = libewf_section_compressed_string_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      &file_object_string,
+						      &file_object_string_size,
+						      error );
+
+					if( read_count == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read case data file object string.",
+						 function );
+
+						goto on_error;
+					}
+					if( libewf_case_data_parse(
+					     file_object_string,
+					     file_object_string_size,
+					     internal_handle->media_values,
+					     internal_handle->header_values,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+						 "%s: unable to parse case data.",
+						 function );
+
+						goto on_error;
+					}
+					memory_free(
+					 file_object_string );
+
+					file_object_string = NULL;
+
+					if( internal_handle->media_values->number_of_chunks > 0 )
+					{
+						if( libmfdata_list_resize(
+						     internal_handle->chunk_table_list,
+						     (int) internal_handle->media_values->number_of_chunks,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
+							 "%s: unable to resize chunk table list.",
+							 function );
+
+							return( -1 );
+						}
+					}
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_SECTOR_DATA:
+#if defined( HAVE_VERBOSE_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+						{
+							libcnotify_printf(
+							 "%s: found sectors section in EWF-S01 format.\n",
+							 function );
+						}
+					}
+#endif
+					/* Nothing to do for the sectors section
+					 */
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
+					read_count = libewf_segment_file_read_table_section(
+						      segment_file,
+						      section,
+						      internal_handle->io_handle,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->media_values,
+						      chunk_table,
+						      internal_handle->chunk_table_list,
+						      error );
+
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_ERROR_TABLE:
+#if defined( HAVE_VERBOSE_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+						{
+							libcnotify_printf(
+							 "%s: found error2 section in EWF-S01 format.\n",
+							 function );
+						}
+					}
+#endif
+					read_count = libewf_section_error2_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->acquiry_errors,
+						      error );
+
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_SESSION_TABLE:
+#if defined( HAVE_VERBOSE_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+						{
+							libcnotify_printf(
+							 "%s: found session section in EWF-S01 format.\n",
+							 function );
+						}
+					}
+#endif
+					read_count = libewf_section_session_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->media_values,
+						      internal_handle->sessions,
+						      internal_handle->tracks,
+						      error );
+
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_INCREMENT_DATA:
+/* TODO */
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_MD5_HASH:
+					read_count = libewf_section_md5_hash_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      segment_file->major_version,
+						      internal_handle->hash_sections,
+						      error );
+
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_SHA1_HASH:
+					read_count = libewf_section_sha1_hash_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->hash_sections,
+						      error );
+
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_RESTART_DATA:
+					read_count = libewf_section_compressed_string_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      &file_object_string,
+						      &file_object_string_size,
+						      error );
+
+					if( read_count == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read restart data file object string.",
+						 function );
+
+						goto on_error;
+					}
+/* TODO */
+					memory_free(
+					 file_object_string );
+
+					file_object_string = NULL;
+
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS:
+/* TODO */
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_MEMORY_EXTENTS_TABLE:
+/* TODO */
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_NEXT:
+					/* Nothing to do for the next section
+					 */
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_FINAL_INFORMATION:
+/* TODO */
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_DONE:
+					/* Nothing to do for the done section
+					 */
+					known_section = 1;
+					break;
+
+				case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
+					read_count = libewf_section_compressed_string_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      &file_object_string,
+						      &file_object_string_size,
+						      error );
+
+					if( read_count == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read analytical data file object string.",
+						 function );
+
+						goto on_error;
+					}
+/* TODO */
+					memory_free(
+					 file_object_string );
+
+					file_object_string = NULL;
+
+					known_section = 1;
+					break;
+			}
+		}
+		else if( section->type_string_length == 4 )
+		{
+			if( memory_compare(
+			     (void *) section->type_string,
+			     (void *) "data",
+			     4 ) == 0 )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+					{
+						libcnotify_printf(
+						 "%s: found data section in EWF-S01 format.\n",
+						 function );
+					}
+				}
+#endif
+				read_count = libewf_section_data_read(
+					      section,
+					      internal_handle->io_handle,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      internal_handle->media_values,
+					      error );
+
+				known_section = 1;
+			}
+			else if( memory_compare(
+				  (void *) section->type_string,
+				  (void *) "disk",
+				  4 ) == 0 )
+			{
+				read_count = libewf_segment_file_read_volume_section(
+					      segment_file,
+					      section,
+					      internal_handle->io_handle,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      internal_handle->media_values,
+					      internal_handle->chunk_table_list,
+					      error );
+
+				/* Check if the EWF file format is that of EnCase1
+				 * this allows the table read function to reduce verbose
+				 * output of additional data in table section
+				 */
+				if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
+				 && ( header_sections->number_of_header_sections == 1 ) )
+				{
+					internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
+				}
+				known_section = 1;
+			}
+		}
+		else if( section->type_string_length == 5 )
+		{
+			if( memory_compare(
+			     (void *) section->type_string,
+			     (void *) "ltree",
+			     5 ) == 0 )
+			{
+				if( internal_handle->io_handle->ewf_format != EWF_FORMAT_L01 )
+				{
+#if defined( HAVE_VERBOSE_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+						 "%s: found ltree section in EWF-E01 or EWF-S01 format.\n",
+						 function );
+					}
+#endif
+					internal_handle->io_handle->ewf_format = EWF_FORMAT_L01;
+				}
+				read_count = libewf_section_ltree_read(
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      &( internal_handle->single_files->ltree_data ),
+					      &( internal_handle->single_files->ltree_data_size ),
+					      error );
+
+				known_section = 1;
+			}
+			else if( memory_compare(
+				  (void *) section->type_string,
+				  (void *) "xhash",
+				  5 ) == 0 )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+					{
+						libcnotify_printf(
+						 "%s: found xhash section in EWF-S01 format.\n",
+						 function );
+					}
+				}
+#endif
+				read_count = libewf_section_xhash_read(
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      internal_handle->hash_sections,
+					      error );
+
+				known_section = 1;
+			}
+		}
+		else if( section->type_string_length == 6 )
+		{
+			if( memory_compare(
+			     (void *) section->type_string,
+			     (void *) "digest",
+			     6 ) == 0 )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+					{
+						libcnotify_printf(
+						 "%s: found digest section in EWF-S01 format.\n",
+						 function );
+					}
+				}
+#endif
+				read_count = libewf_section_digest_read(
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      internal_handle->hash_sections,
+					      error );
+
+				known_section = 1;
+			}
+			else if( memory_compare(
+				  (void *) section->type_string,
+				  (void *) "header",
+				  6 ) == 0 )
+			{
+				read_count = libewf_section_header_read(
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      header_sections,
+					      error );
+
+				known_section = 1;
+/* TODO change */
+				header_section_found = 1;
+			}
+			else if( memory_compare(
+				  (void *) section->type_string,
+				  (void *) "table2",
+				  6 ) == 0 )
+			{
+				read_count = libewf_segment_file_read_table2_section(
+					      segment_file,
+					      section,
+					      internal_handle->io_handle,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      chunk_table,
+					      internal_handle->chunk_table_list,
+					      error );
+
+				known_section = 1;
+			}
+			else if( memory_compare(
+				  (void *) section->type_string,
+				  (void *) "volume",
+				  6 ) == 0 )
+			{
+				read_count = libewf_segment_file_read_volume_section(
+					      segment_file,
+					      section,
+					      internal_handle->io_handle,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      internal_handle->media_values,
+					      internal_handle->chunk_table_list,
+					      error );
+
+				/* Check if the EWF file format is that of EnCase1
+				 * this allows the table read function to reduce verbose
+				 * output of additional data in table section
+				 */
+				if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
+				 && ( header_sections->number_of_header_sections == 1 ) )
+				{
+					internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
+				}
+				known_section = 1;
+			}
+		}
+		else if( section->type_string_length == 7 )
+		{
+			if( memory_compare(
+			     (void *) section->type_string,
+			     (void *) "header2",
+			     7 ) == 0 )
+			{
+				read_count = libewf_section_header2_read(
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      header_sections,
+					      error );
+
+				known_section = 1;
+/* TODO change */
+				header_section_found = 1;
+			}
+			else if( memory_compare(
+				  (void *) section->type_string,
+				  (void *) "xheader",
+				  7 ) == 0 )
+			{
+				read_count = libewf_section_xheader_read(
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      header_sections,
+					      error );
+
+				known_section = 1;
+/* TODO change */
+				header_section_found = 1;
+			}
+		}
+		if( known_section == 0 )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( segment_file->major_version == 1 )
+				{
+					libcnotify_printf(
+					 "%s: unsupported section type: %s.\n",
+					 function,
+					 (char *) section->type_string );
+				}
+				else if( segment_file->major_version == 2 )
+				{
+					libcnotify_printf(
+					 "%s: unsupported section type: 0x%08" PRIx32 ".\n",
+					 function,
+					 section->type );
+				}
+			}
+#elif defined( HAVE_DEBUG_OUTPUT )
+/* TODO remove this limitation */
+			if( segment_file->major_version == 1 )
+			{
+				read_count = libewf_section_debug_read(
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      section_size,
+					      error );
+			}
+#endif
+		}
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read section: %s.",
+			 function,
+			 (char *) section->type_string );
+
+			goto on_error;
+		}
+		section_list_element = section_list_element->next_element;
+	}
+	if( header_section_found != 0 )
+	{
+/* TODO change */
+		/* Determine the EWF format
+		 */
+		if( libewf_header_sections_determine_format(
+		     header_sections,
+		     internal_handle->io_handle->ewf_format,
+		     &( internal_handle->io_handle->format ),
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine format.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_header_sections_parse(
+		     header_sections,
+		     internal_handle->io_handle,
+		     internal_handle->header_values,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse header sections.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libewf_header_sections_free(
+	     &header_sections,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create hash sections.",
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free header sections.",
 		 function );
 
 		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( file_object_string != NULL )
+	{
+		memory_free(
+		 file_object_string );
+	}
+	if( header_sections != NULL )
+	{
+		libewf_header_sections_free(
+		 &header_sections,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Opens the segment files for reading
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_open_read_segment_files(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_chunk_table_t *chunk_table,
+     libcerror_error_t **error )
+{
+	libewf_section_t *section           = NULL;
+	libewf_segment_file_t *segment_file = NULL;
+	static char *function               = "libewf_handle_open_read_segment_files";
+	off64_t section_offset              = 0;
+	size64_t maximum_segment_size       = 0;
+	size64_t segment_file_size          = 0;
+	ssize_t read_count                  = 0;
+	int file_io_pool_entry              = 0;
+	int number_of_segment_files         = 0;
+	int last_section                    = 0;
+	int last_segment_file               = 0;
+	int segment_files_list_index        = 0;
+
+	if( internal_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.",
+		 function );
+
+		return( -1 );
 	}
 	if( libmfdata_file_list_get_number_of_files(
 	     internal_handle->segment_files_list,
@@ -2641,7 +3541,7 @@ int libewf_handle_open_read_segment_files(
 		 "%s: unable to retrieve number of segment files in list.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( number_of_segment_files <= 0 )
 	{
@@ -2652,7 +3552,7 @@ int libewf_handle_open_read_segment_files(
 		 "%s: number of segment files value out of bounds.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	for( segment_files_list_index = 0;
 	     segment_files_list_index < number_of_segment_files;
@@ -2672,7 +3572,7 @@ int libewf_handle_open_read_segment_files(
 			 function,
 			 segment_files_list_index + 1 );
 
-			goto on_error;
+			return( -1 );
 		}
 		if( libbfio_pool_get_size(
 		     file_io_pool,
@@ -2688,7 +3588,7 @@ int libewf_handle_open_read_segment_files(
 			 function,
 			 file_io_pool_entry );
 
-			goto on_error;
+			return( -1 );
 		}
 		if( ( segment_files_list_index == 0 )
 		 && ( number_of_segment_files > 1 ) )
@@ -2709,7 +3609,7 @@ int libewf_handle_open_read_segment_files(
 				 "%s: unable to set maximum segment size in segment table.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 		}
 		if( libewf_segment_file_initialize(
@@ -2720,132 +3620,33 @@ int libewf_handle_open_read_segment_files(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment file.",
-			 function );
+			 "%s: unable to create segment file: %d.",
+			 function,
+			 segment_files_list_index + 1 );
 
-			goto on_error;
+			return( -1 );
 		}
-		read_count = libewf_segment_file_read_file_header(
-			      segment_file,
-			      file_io_pool,
-			      file_io_pool_entry,
-			      error );
-
-		if( read_count < 0 )
+		if( libewf_handle_open_read_segment_file(
+		     internal_handle,
+		     (uint32_t) ( segment_files_list_index + 1 ),
+		     segment_file,
+		     file_io_pool,
+		     file_io_pool_entry,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read segment file header.",
-			 function );
+			 "%s: unable to read segment file: %d.",
+			 function,
+			 segment_files_list_index + 1 );
 
 			libewf_segment_file_free(
 			 &segment_file,
 			 NULL );
 
-			goto on_error;
-		}
-		if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported segment file type.",
-			 function );
-
-			libewf_segment_file_free(
-			 &segment_file,
-			 NULL );
-
-			goto on_error;
-		}
-		if( segment_file->segment_number != (uint32_t) ( segment_files_list_index + 1 ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_INPUT,
-			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: segment number mismatch.",
-			 function );
-
-			libewf_segment_file_free(
-			 &segment_file,
-			 NULL );
-
-			goto on_error;
-		}
-		if( segment_files_list_index == 0 )
-		{
-			internal_handle->io_handle->major_version = segment_file->major_version;
-			internal_handle->io_handle->minor_version = segment_file->minor_version;
-
-			if( segment_file->major_version == 2 )
-			{
-				if( memory_copy(
-				     internal_handle->media_values->set_identifier,
-				     segment_file->set_identifier,
-				     16 ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-					 "%s: unable to copy segment file set identifier to media values.",
-					 function );
-
-					libewf_segment_file_free(
-					 &segment_file,
-					 NULL );
-
-					goto on_error;
-				}
-			}
-		}
-		else
-		{
-			if( ( segment_file->major_version != internal_handle->io_handle->major_version )
-			 || ( segment_file->minor_version != internal_handle->io_handle->minor_version ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_INPUT,
-				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-				 "%s: segment file format version mismatch.",
-				 function );
-
-				libewf_segment_file_free(
-				 &segment_file,
-				 NULL );
-
-				goto on_error;
-			}
-			if( segment_file->major_version == 2 )
-			{
-				if( memory_compare(
-				     internal_handle->media_values->set_identifier,
-				     segment_file->set_identifier,
-				     16 ) != 0 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_INPUT,
-					 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-					 "%s: mismatch in segment file set identifier.",
-					 function );
-
-					libewf_segment_file_free(
-					 &segment_file,
-					 NULL );
-
-					goto on_error;
-				}
-			}
+			return( -1 );
 		}
 		/* The segment file is cached here in case of resume
 		 */
@@ -2870,9 +3671,16 @@ int libewf_handle_open_read_segment_files(
 			 &segment_file,
 			 NULL );
 
-			goto on_error;
+			return( -1 );
 		}
 		/* The segment file is now handled by the segment files list
+		 * and no longer needs to be explicitly freed
+		 */
+
+/* TODO refactor to function read section descriptors */
+		/* Read the section descriptors:
+		 * EWF version 1 read from front to back
+		 * EWF version 2 read from back to front
 		 */
 		if( segment_file->major_version == 1 )
 		{
@@ -2898,7 +3706,7 @@ int libewf_handle_open_read_segment_files(
 				 "%s: unable to create section.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 			read_count = libewf_section_descriptor_read(
 			              section,
@@ -2917,19 +3725,6 @@ int libewf_handle_open_read_segment_files(
 				 "%s: unable to read section descriptor.",
 				 function );
 
-				if( libewf_section_free(
-				     &section,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free section.",
-					 function );
-
-					goto on_error;
-				}
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
@@ -2944,612 +3739,98 @@ int libewf_handle_open_read_segment_files(
 				libcerror_error_free(
 				 error );
 
+				libewf_section_free(
+				 &section,
+				 NULL );
+
 				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
 
 				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
 
 				break;
 			}
-			if( section->type != 0 )
-			{
-				if( ( segment_file->major_version == 2 )
-				 && ( section->data_size != 0 ) )
-				{
-					if( libbfio_pool_seek_offset(
-					     file_io_pool,
-					     file_io_pool_entry,
-					     section->start_offset,
-					     SEEK_SET,
-					     error ) == -1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_OPEN_FAILED,
-						 "%s: unable to seek section offset: %" PRIi64 " in segment file: %d.",
-						 function,
-						 section->start_offset,
-						 segment_files_list_index + 1 );
-
-						goto on_error;
-					}
-				}
-/* TODO */
-uint8_t *data    = NULL;
-size_t data_size = 0;
-
-				switch( section->type )
-				{
-					case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
-						read_count = libewf_section_compressed_string_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      &file_object_string,
-							      &file_object_string_size,
-							      error );
-
-						if( read_count == -1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_IO,
-							 LIBCERROR_IO_ERROR_READ_FAILED,
-							 "%s: unable to read device information file object string.",
-							 function );
-
-							goto on_error;
-						}
-						if( libewf_device_information_parse(
-						     file_object_string,
-						     file_object_string_size,
-						     internal_handle->media_values,
-						     internal_handle->header_values,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-							 "%s: unable to parse device information.",
-							 function );
-
-							goto on_error;
-						}
-						memory_free(
-						 file_object_string );
-
-						file_object_string = NULL;
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_CASE_DATA:
-						read_count = libewf_section_compressed_string_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      &file_object_string,
-							      &file_object_string_size,
-							      error );
-
-						if( read_count == -1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_IO,
-							 LIBCERROR_IO_ERROR_READ_FAILED,
-							 "%s: unable to read case data file object string.",
-							 function );
-
-							goto on_error;
-						}
-						if( libewf_case_data_parse(
-						     file_object_string,
-						     file_object_string_size,
-						     internal_handle->media_values,
-						     internal_handle->header_values,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-							 "%s: unable to parse case data.",
-							 function );
-
-							goto on_error;
-						}
-						memory_free(
-						 file_object_string );
-
-						file_object_string = NULL;
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_SECTOR_DATA:
-#if defined( HAVE_VERBOSE_OUTPUT )
-	                			if( libcnotify_verbose != 0 )
-					        {
-							if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
-					                {
-					                        libcnotify_printf(
-					                         "%s: found sectors section in EWF-S01 format.\n",
-					                         function );
-					                }
-					        }
-#endif
-						/* Nothing to do for the sectors section
-						 */
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
-						read_count = libewf_segment_file_read_table_section(
-							      segment_file,
-							      section,
-							      internal_handle->io_handle,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      internal_handle->media_values,
-							      chunk_table,
-							      internal_handle->chunk_table_list,
-							      error );
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_ERROR_TABLE:
-#if defined( HAVE_VERBOSE_OUTPUT )
-	                			if( libcnotify_verbose != 0 )
-					        {
-							if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
-					                {
-					                        libcnotify_printf(
-					                         "%s: found error2 section in EWF-S01 format.\n",
-					                         function );
-					                }
-					        }
-#endif
-						read_count = libewf_section_error2_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      internal_handle->acquiry_errors,
-							      error );
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_SESSION_TABLE:
-#if defined( HAVE_VERBOSE_OUTPUT )
-	                			if( libcnotify_verbose != 0 )
-					        {
-							if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
-					                {
-					                        libcnotify_printf(
-					                         "%s: found session section in EWF-S01 format.\n",
-					                         function );
-					                }
-					        }
-#endif
-						read_count = libewf_section_session_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      internal_handle->media_values,
-							      internal_handle->sessions,
-							      internal_handle->tracks,
-							      error );
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_INCREMENT_DATA:
-/* TODO */
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_MD5_HASH:
-						read_count = libewf_section_md5_hash_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-						              segment_file->major_version,
-							      internal_handle->hash_sections,
-							      error );
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_SHA1_HASH:
-						read_count = libewf_section_sha1_hash_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      internal_handle->hash_sections,
-							      error );
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_RESTART_DATA:
-/* TODO */
-						read_count = libewf_section_compressed_string_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      &data,
-							      &data_size,
-							      error );
-
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS:
-/* TODO */
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_MEMORY_EXTENTS_TABLE:
-/* TODO */
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_NEXT:
-						/* Nothing to do for the next section
-						 */
-						known_section = 1;
-						last_section  = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_FINAL_INFORMATION:
-/* TODO */
-						known_section = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_DONE:
-						if( ( segment_files_list_index + 1 ) != number_of_segment_files )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_INPUT,
-							 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-							 "%s: last segment number mismatch.",
-							 function );
-
-							goto on_error;
-						}
-						/* Nothing to do for the done section
-						 */
-						known_section     = 1;
-						last_section      = 1;
-						last_segment_file = 1;
-						break;
-
-					case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
-/* TODO */
-						read_count = libewf_section_compressed_string_read(
-							      section,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      &data,
-							      &data_size,
-							      error );
-
-						known_section = 1;
-						break;
-				}
-			}
-			else if( section->type_string_length == 4 )
-			{
-				if( memory_compare(
-				     (void *) section->type_string,
-				     (void *) "data",
-				     4 ) == 0 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libcnotify_verbose != 0 )
-				        {
-						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
-				                {
-				                        libcnotify_printf(
-				                         "%s: found data section in EWF-S01 format.\n",
-				                         function );
-				                }
-				        }
-#endif
-					read_count = libewf_section_data_read(
-						      section,
-						      internal_handle->io_handle,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->media_values,
-						      error );
-
-					known_section = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
-					  (void *) "disk",
-					  4 ) == 0 )
-				{
-					read_count = libewf_segment_file_read_volume_section(
-						      segment_file,
-						      section,
-						      internal_handle->io_handle,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->media_values,
-						      internal_handle->chunk_table_list,
-						      error );
-
-					/* Check if the EWF file format is that of EnCase1
-					 * this allows the table read function to reduce verbose
-					 * output of additional data in table section
-					 */
-					if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
-					 && ( header_sections->number_of_header_sections == 1 ) )
-					{
-						internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
-					}
-					known_section = 1;
-				}
-			}
-			else if( section->type_string_length == 5 )
-			{
-				if( memory_compare(
-				     (void *) section->type_string,
-				     (void *) "ltree",
-				     5 ) == 0 )
-				{
-					if( internal_handle->io_handle->ewf_format != EWF_FORMAT_L01 )
-				        {
-#if defined( HAVE_VERBOSE_OUTPUT )
-                				if( libcnotify_verbose != 0 )
-				                {
-				                        libcnotify_printf(
-				                         "%s: found ltree section in EWF-E01 or EWF-S01 format.\n",
-				                         function );
-				                }
-#endif
-						internal_handle->io_handle->ewf_format = EWF_FORMAT_L01;
-				        }
-					read_count = libewf_section_ltree_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      &( internal_handle->single_files->ltree_data ),
-						      &( internal_handle->single_files->ltree_data_size ),
-						      error );
-
-					known_section = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
-					  (void *) "xhash",
-					  5 ) == 0 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libcnotify_verbose != 0 )
-				        {
-						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
-				                {
-				                        libcnotify_printf(
-				                         "%s: found xhash section in EWF-S01 format.\n",
-				                         function );
-				                }
-				        }
-#endif
-					read_count = libewf_section_xhash_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->hash_sections,
-						      error );
-
-					known_section = 1;
-				}
-			}
-			else if( section->type_string_length == 6 )
-			{
-				if( memory_compare(
-				     (void *) section->type_string,
-				     (void *) "digest",
-				     6 ) == 0 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-                			if( libcnotify_verbose != 0 )
-				        {
-						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
-				                {
-				                        libcnotify_printf(
-				                         "%s: found digest section in EWF-S01 format.\n",
-				                         function );
-				                }
-				        }
-#endif
-					read_count = libewf_section_digest_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->hash_sections,
-						      error );
-
-					known_section = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
-					  (void *) "header",
-					  6 ) == 0 )
-				{
-					read_count = libewf_section_header_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      header_sections,
-						      error );
-
-					known_section = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
-					  (void *) "table2",
-					  6 ) == 0 )
-				{
-					read_count = libewf_segment_file_read_table2_section(
-						      segment_file,
-						      section,
-						      internal_handle->io_handle,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      chunk_table,
-						      internal_handle->chunk_table_list,
-						      error );
-
-					known_section = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
-					  (void *) "volume",
-					  6 ) == 0 )
-				{
-					read_count = libewf_segment_file_read_volume_section(
-						      segment_file,
-						      section,
-						      internal_handle->io_handle,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->media_values,
-						      internal_handle->chunk_table_list,
-						      error );
-
-					/* Check if the EWF file format is that of EnCase1
-					 * this allows the table read function to reduce verbose
-					 * output of additional data in table section
-					 */
-					if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
-					 && ( header_sections->number_of_header_sections == 1 ) )
-					{
-						internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
-					}
-					known_section = 1;
-				}
-			}
-			else if( section->type_string_length == 7 )
-			{
-				if( memory_compare(
-				     (void *) section->type_string,
-				     (void *) "header2",
-				     7 ) == 0 )
-				{
-					read_count = libewf_section_header2_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      header_sections,
-						      error );
-
-					known_section = 1;
-				}
-				else if( memory_compare(
-					  (void *) section->type_string,
-					  (void *) "xheader",
-					  7 ) == 0 )
-				{
-					read_count = libewf_section_xheader_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      header_sections,
-						      error );
-
-					known_section = 1;
-				}
-			}
-			if( known_section == 0 )
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					if( segment_file->major_version == 1 )
-					{
-						libcnotify_printf(
-						 "%s: unsupported section type: %s.\n",
-						 function,
-						 (char *) section->type_string );
-					}
-					else if( segment_file->major_version == 2 )
-					{
-						libcnotify_printf(
-						 "%s: unsupported section type: 0x%08" PRIx32 ".\n",
-						 function,
-						 section->type );
-					}
-				}
-#elif defined( HAVE_DEBUG_OUTPUT )
-				if( segment_file->major_version == 1 )
-				{
-					read_count = libewf_section_debug_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      section_size,
-						      error );
-				}
-#endif
-			}
-			if( read_count == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read section: %s.",
-				 function,
-				 (char *) section->type_string );
-
-				goto on_error;
-			}
 			if( segment_file->major_version == 1 )
 			{
 				section_offset += section->size;
 
+				if( section->type == LIBEWF_SECTION_TYPE_NEXT )
+				{
+					last_section  = 1;
+				}
+				else if( section->type == LIBEWF_SECTION_TYPE_DONE )
+				{
+					last_section      = 1;
+					last_segment_file = 1;
+				}
+				segment_file->last_section_offset = section_offset;
+
+/* TODO move into section descriptor read ? */
 				if( ( last_section != 0 )
 				 && ( section->size == 0 ) )
 				{
 					section_offset += sizeof( ewf_section_descriptor_v1_t );
 				}
+				if( libewf_list_append_value(
+				     segment_file->section_list,
+				     (intptr_t *) section,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append section to list.",
+					 function );
+
+					libewf_section_free(
+					 &section,
+					 NULL );
+
+					return( -1 );
+				}
 			}
 			else if( segment_file->major_version == 2 )
 			{
+				if( segment_file->last_section_offset == 0 )
+				{
+					if( section->type == LIBEWF_SECTION_TYPE_NEXT )
+					{
+						last_section  = 1;
+					}
+					else if( section->type == LIBEWF_SECTION_TYPE_DONE )
+					{
+						last_section      = 1;
+						last_segment_file = 1;
+					}
+					segment_file->last_section_offset = section_offset;
+				}
 				section_offset -= section->size;
-			}
-			if( libewf_list_append_value(
-			     segment_file->section_list,
-			     (intptr_t *) section,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append section to list.",
-				 function );
 
-				goto on_error;
+				if( libewf_list_prepend_value(
+				     segment_file->section_list,
+				     (intptr_t *) section,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to prepend section to list.",
+					 function );
+
+					libewf_section_free(
+					 &section,
+					 NULL );
+
+					return( -1 );
+				}
 			}
 			section = NULL;
 
-			if( segment_file->major_version == 1 )
+			if( ( segment_file->major_version == 1 )
+			 && ( last_section != 0 ) )
 			{
-				segment_file->last_section_offset = section_offset;
-
-				if( last_section != 0 )
-				{
-					break;
-				}
+				break;
 			}
 		}
 		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED ) == 0 )
@@ -3596,6 +3877,24 @@ size_t data_size = 0;
 			}
 #endif
 		}
+		if( libewf_handle_open_read_section_data(
+		     internal_handle,
+		     chunk_table,
+		     segment_file,
+		     file_io_pool,
+		     file_io_pool_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read section data from segment file: %d.",
+			 function,
+			 segment_files_list_index + 1 );
+
+			return( -1 );
+		}
 		segment_file = NULL;
 	}
 	if( last_segment_file == 0 )
@@ -3623,72 +3922,7 @@ size_t data_size = 0;
 
 		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
 	}
-	/* Determine the EWF format
-	 */
-	if( libewf_header_sections_determine_format(
-	     header_sections,
-	     internal_handle->io_handle->ewf_format,
-	     &( internal_handle->io_handle->format ),
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine format.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_header_sections_parse(
-	     header_sections,
-	     internal_handle->io_handle,
-	     internal_handle->header_values,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to parse header sections.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_header_sections_free(
-	     &header_sections,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free header sections.",
-		 function );
-
-		goto on_error;
-	}
 	return( 1 );
-
-on_error:
-	if( file_object_string != NULL )
-	{
-		memory_free(
-		 file_object_string );
-	}
-	if( section != NULL )
-	{
-		libewf_section_free(
-		 &section,
-		 NULL );
-	}
-	if( header_sections != NULL )
-	{
-		libewf_header_sections_free(
-		 &header_sections,
-		 NULL );
-	}
-	return( -1 );
 }
 
 /* Opens the delta segment files for reading

@@ -454,17 +454,18 @@ int libewf_chunk_table_read_offsets(
      uint8_t read_flags,
      libcerror_error_t **error )
 {
-	uint8_t table_entries_checksum[ 4 ];
+	uint8_t table_footer_data[ 16 ];
 
 	libewf_chunk_table_t *chunk_table = NULL;
 	libewf_section_t *section         = NULL;
 	uint8_t *table_entries_data       = NULL;
 	static char *function             = "libewf_chunk_table_read_offsets";
 	size_t table_entries_data_size    = 0;
+	size_t table_footer_data_size     = 0;
 	ssize_t read_count                = 0;
 	uint64_t base_offset              = 0;
 	uint32_t calculated_checksum      = 0;
-	uint32_t number_of_offsets        = 0;
+	uint32_t number_of_entries        = 0;
 	uint32_t stored_checksum          = 0;
 	uint8_t table_entries_corrupted   = 0;
 	int result                        = 0;
@@ -511,21 +512,21 @@ int libewf_chunk_table_read_offsets(
 
 		goto on_error;
 	}
+	if( libewf_section_initialize(
+	     &section,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create section.",
+		 function );
+
+		goto on_error;
+	}
 	if( chunk_table->io_handle->major_version == 1 )
 	{
-		if( libewf_section_initialize(
-		     &section,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create section.",
-			 function );
-
-			goto on_error;
-		}
 		read_count = libewf_section_descriptor_read(
 			      section,
 			      file_io_pool,
@@ -557,41 +558,6 @@ int libewf_chunk_table_read_offsets(
 			goto on_error;
 		}
 		element_group_size -= read_count;
-
-		read_count = libewf_section_table_header_read(
-			      section,
-			      file_io_pool,
-			      file_io_pool_entry,
-			      chunk_table->io_handle->format,
-			      &number_of_offsets,
-			      &base_offset,
-			      error );
-		
-		if( read_count < 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read table section header.",
-			 function );
-
-			goto on_error;
-		}
-		element_group_size -= read_count;
-
-		if( number_of_offsets == 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_INPUT,
-			 LIBCERROR_INPUT_ERROR_INVALID_DATA,
-			 "%s: invalid number of offsets.",
-			 function );
-
-			goto on_error;
-		}
-		table_entries_data_size = sizeof( ewf_table_entry_v1_t ) * number_of_offsets;
 	}
 	else if( chunk_table->io_handle->major_version == 2 )
 	{
@@ -613,7 +579,53 @@ int libewf_chunk_table_read_offsets(
 
 			goto on_error;
 		}
-		table_entries_data_size = (size_t) element_group_size;
+/* TODO check bounds */
+		section->start_offset = element_group_offset;
+		section->data_size    = (uint32_t) element_group_size;
+	}
+	read_count = libewf_section_table_header_read(
+		      section,
+		      file_io_pool,
+		      file_io_pool_entry,
+		      chunk_table->io_handle->major_version,
+		      chunk_table->io_handle->format,
+		      &number_of_entries,
+		      &base_offset,
+		      error );
+	
+	if( read_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read table section header.",
+		 function );
+
+		goto on_error;
+	}
+	element_group_size -= read_count;
+
+	if( number_of_entries == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_INPUT,
+		 LIBCERROR_INPUT_ERROR_INVALID_DATA,
+		 "%s: invalid number of entries.",
+		 function );
+
+		goto on_error;
+	}
+	table_entries_data_size = number_of_entries;
+
+	if( chunk_table->io_handle->major_version == 1 )
+	{
+		table_entries_data_size *= sizeof( ewf_table_entry_v1_t );
+	}
+	else if( chunk_table->io_handle->major_version == 2 )
+	{
+		table_entries_data_size *= sizeof( ewf_table_entry_v2_t );
 	}
 	if( table_entries_data_size > (size_t) SSIZE_MAX )
 	{
@@ -685,10 +697,17 @@ int libewf_chunk_table_read_offsets(
 #endif
 	/* The original EWF and SMART (EWF-S01) formats do not contain a checksum after the table offsets
 	 */
-	if( ( chunk_table->io_handle->major_version == 1 )
-	 && ( chunk_table->io_handle->ewf_format != EWF_FORMAT_S01 ) )
+	if( chunk_table->io_handle->ewf_format != EWF_FORMAT_S01 )
 	{
-		if( element_group_size < (size64_t) sizeof( uint32_t ) )
+		if( chunk_table->io_handle->major_version == 1 )
+		{
+			table_footer_data_size = 4;
+		}
+		else if( chunk_table->io_handle->major_version == 2 )
+		{
+			table_footer_data_size = 16;
+		}
+		if( element_group_size < (size64_t) table_footer_data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -702,25 +721,37 @@ int libewf_chunk_table_read_offsets(
 		read_count = libbfio_pool_read_buffer(
 			      file_io_pool,
 			      file_io_pool_entry,
-			      table_entries_checksum,
-			      sizeof( uint32_t ),
+			      table_footer_data,
+			      table_footer_data_size,
 			      error );
 
-		if( read_count != (ssize_t) sizeof( uint32_t ) )
+		if( read_count != (ssize_t) table_footer_data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read checksum.",
+			 "%s: unable to read table footer.",
 			 function );
 
 			goto on_error;
 		}
 		element_group_size -= read_count;
 
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: table footer data:\n",
+			 function );
+			libcnotify_print_data(
+			 table_footer_data,
+			 table_footer_data_size,
+			 0 );
+		}
+#endif
 		byte_stream_copy_to_uint32_little_endian(
-		 table_entries_checksum,
+		 table_footer_data,
 		 stored_checksum );
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -729,10 +760,23 @@ int libewf_chunk_table_read_offsets(
 			libcnotify_printf(
 	 		 "%s: table entries checksum\t\t\t: 0x%" PRIx32 "\n",
 			 function,
-			 table_entries_checksum );
+			 stored_checksum );
 
-			libcnotify_printf(
-	 		 "\n" );
+			if( chunk_table->io_handle->major_version == 1 )
+			{
+				libcnotify_printf(
+				 "\n" );
+			}
+			else if( chunk_table->io_handle->major_version == 2 )
+			{
+				libcnotify_printf(
+				 "%s: padding:\n",
+				 function );
+				libcnotify_print_data(
+				 &( table_footer_data[ 4 ] ),
+				 12,
+				 0 );
+			}
 		}
 #endif
 		calculated_checksum = ewf_checksum_calculate(
@@ -768,7 +812,7 @@ int libewf_chunk_table_read_offsets(
 			          file_io_pool_entry,
 			          section,
 			          (off64_t) base_offset,
-			          number_of_offsets,
+			          number_of_entries,
 			          table_entries_data,
 			          table_entries_data_size,
 			          table_entries_corrupted,
@@ -776,6 +820,7 @@ int libewf_chunk_table_read_offsets(
 		}
 		else if( chunk_table->io_handle->major_version == 2 )
 		{
+/* TODO pass table_entries_corrupted */
 			result = libewf_chunk_table_fill_v2(
 			          chunk_table,
 			          chunk_table_list,
@@ -808,7 +853,7 @@ int libewf_chunk_table_read_offsets(
 				  file_io_pool_entry,
 				  section,
 				  (off64_t) base_offset,
-				  number_of_offsets,
+				  number_of_entries,
 				  table_entries_data,
 				  table_entries_data_size,
 				  table_entries_corrupted,
@@ -831,23 +876,20 @@ int libewf_chunk_table_read_offsets(
 
 	table_entries_data = NULL;
 
-	if( chunk_table->io_handle->major_version == 1 )
+	if( libewf_section_free(
+	     &section,
+	     error ) != 1 )
 	{
-		if( libewf_section_free(
-		     &section,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free section.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free section.",
+		 function );
 
-			section = NULL;
+		section = NULL;
 
-			goto on_error;
-		}
+		goto on_error;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -1543,39 +1585,44 @@ int libewf_chunk_table_fill_v2(
 	while( table_entries_data_size >= sizeof( ewf_table_entry_v2_t ) )
 	{
 		byte_stream_copy_to_uint64_little_endian(
-		 ( ( (ewf_table_entry_v2_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
+		 ( (ewf_table_entry_v2_t *) table_entries_data )->chunk_data_offset,
 		 chunk_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( ( (ewf_table_entry_v2_t *) table_entries_data )[ table_entry_index ] ).chunk_data_size,
+		 ( (ewf_table_entry_v2_t *) table_entries_data )->chunk_data_size,
 		 chunk_size );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( ( (ewf_table_entry_v2_t *) table_entries_data )[ table_entry_index ] ).chunk_data_flags,
+		 ( (ewf_table_entry_v2_t *) table_entries_data )->chunk_data_flags,
 		 chunk_data_flags );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: table entry: %03" PRIzd " chunk data offset:\t\t0x%08" PRIx64 ".\n",
+			 "%s: table entry: %03" PRIzd " chunk data offset:\t\t0x%08" PRIx64 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_offset );
 
 			libcnotify_printf(
-			 "%s: table entry: %03" PRIzd " chunk data size:\t\t%" PRIu32 ".\n",
+			 "%s: table entry: %03" PRIzd " chunk data size:\t\t%" PRIu32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_size );
 
 			libcnotify_printf(
-			 "%s: table entry: %03" PRIzd " chunk data flags:\t\t0x%08" PRIx32 ".\n",
+			 "%s: table entry: %03" PRIzd " chunk data flags:\t\t0x%08" PRIx32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_flags );
 		}
 #endif
+		table_entries_data      += sizeof( ewf_table_entry_v2_t );
+		table_entries_data_size -= sizeof( ewf_table_entry_v2_t );
+
+		table_entry_index++;
+
 		if( ( chunk_data_flags & ~( 0x00000007UL ) ) != 0 )
 		{
 			libcerror_error_set(
@@ -1676,10 +1723,6 @@ int libewf_chunk_table_fill_v2(
 			/* No need to overwrite the data range of a delta chunk */
 		}
 		chunk_index++;
-
-		table_entries_data      += sizeof( ewf_table_entry_v2_t );
-		table_entries_data_size -= sizeof( ewf_table_entry_v2_t );
-		table_entry_index++;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
