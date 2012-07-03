@@ -3,9 +3,8 @@ TODO
 * libewf_filename_create split off wide variant ?
 
 * Ex01/Lx01
-  - what about section read order and filling of chunk table
-  - sector table correct padding size
-  - deal with chunk size
+  - set media type, media flags
+  - rename error2 to error
   - libewf_chunk_table_read_chunk: add support for patten fill
   - write chunk make sure has checksum flag is handled
   - complete: libewf_chunk_table_fill_v2
@@ -36,6 +35,7 @@ TODO
   - update msvscpp and borlandc files
     - add case data files
     - add device info files
+    - change ewf_error2.h to ewf_error.h
 
 * Ex01/Lx01 write support
   - rename libewf_segment_file_write_chunks_section_start ?

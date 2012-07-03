@@ -2522,15 +2522,15 @@ on_error:
 }
 
 /* Opens a segment file for reading
- * Returns 1 if successful or -1 on error
+ * Returns the number of bytes read if successful or -1 on error
  */
-int libewf_handle_open_read_segment_file(
-     libewf_internal_handle_t *internal_handle,
-     uint32_t segment_number,
-     libewf_segment_file_t *segment_file,
-     libbfio_pool_t *file_io_pool,
-     int file_io_pool_entry,
-     libcerror_error_t **error )
+ssize_t libewf_handle_open_read_segment_file(
+         libewf_internal_handle_t *internal_handle,
+         uint32_t segment_number,
+         libewf_segment_file_t *segment_file,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         libcerror_error_t **error )
 {
 	static char *function = "libewf_handle_open_read_segment_file";
 	ssize_t read_count    = 0;
@@ -2677,7 +2677,7 @@ int libewf_handle_open_read_segment_file(
 			}
 		}
 	}
-	return( 1 );
+	return( read_count );
 }
 
 /* Reads the section data from a segment file
@@ -2696,6 +2696,7 @@ int libewf_handle_open_read_section_data(
 	libewf_section_t *section                   = NULL;
 	uint8_t *file_object_string                 = NULL;
 	static char *function                       = "libewf_handle_open_read_section_data";
+	off64_t section_data_offset                 = 0;
 	size_t file_object_string_size              = 0;
 	ssize_t read_count                          = 0;
 	int initialize_chunk_table                  = 0;
@@ -2809,28 +2810,44 @@ int libewf_handle_open_read_section_data(
 
 			return( -1 );
 		}
+		if( section->data_size != 0 )
+		{
+			section_data_offset = section->start_offset;
+
+			if( segment_file->major_version == 1 )
+			{
+				section_data_offset += sizeof( ewf_section_descriptor_v1_t );
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: reading section data from file IO pool entry: %d at offset: 0x%08" PRIx64 "\n",
+				 function,
+				 file_io_pool_entry,
+				 section_data_offset );
+			}
+#endif
+			if( libbfio_pool_seek_offset(
+			     file_io_pool,
+			     file_io_pool_entry,
+			     section_data_offset,
+			     SEEK_SET,
+			     error ) == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_OPEN_FAILED,
+				 "%s: unable to seek section data offset: %" PRIi64 ".",
+				 function,
+				 section_data_offset );
+
+				goto on_error;
+			}
+		}
 		if( section->type != 0 )
 		{
-			if( section->data_size != 0 )
-			{
-				if( libbfio_pool_seek_offset(
-				     file_io_pool,
-				     file_io_pool_entry,
-				     section->start_offset,
-				     SEEK_SET,
-				     error ) == -1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_OPEN_FAILED,
-					 "%s: unable to seek section offset: %" PRIi64 ".",
-					 function,
-					 section->start_offset );
-
-					goto on_error;
-				}
-			}
 			switch( section->type )
 			{
 				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
@@ -2927,7 +2944,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
-						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+						if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 						{
 							libcnotify_printf(
 							 "%s: found sectors section in EWF-S01 format.\n",
@@ -2959,18 +2976,19 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
-						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+						if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 						{
 							libcnotify_printf(
-							 "%s: found error2 section in EWF-S01 format.\n",
+							 "%s: found error section in EWF-S01 format.\n",
 							 function );
 						}
 					}
 #endif
-					read_count = libewf_section_error2_read(
+					read_count = libewf_section_error_read(
 						      section,
 						      file_io_pool,
 						      file_io_pool_entry,
+						      segment_file->major_version,
 						      internal_handle->acquiry_errors,
 						      error );
 
@@ -2981,7 +2999,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
-						if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+						if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 						{
 							libcnotify_printf(
 							 "%s: found session section in EWF-S01 format.\n",
@@ -2993,6 +3011,7 @@ int libewf_handle_open_read_section_data(
 						      section,
 						      file_io_pool,
 						      file_io_pool_entry,
+						      segment_file->major_version,
 						      internal_handle->media_values,
 						      internal_handle->sessions,
 						      internal_handle->tracks,
@@ -3125,7 +3144,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+					if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 					{
 						libcnotify_printf(
 						 "%s: found data section in EWF-S01 format.\n",
@@ -3155,7 +3174,6 @@ int libewf_handle_open_read_section_data(
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->media_values,
-					      internal_handle->chunk_table_list,
 					      error );
 
 				known_section = 1;
@@ -3200,7 +3218,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+					if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 					{
 						libcnotify_printf(
 						 "%s: found xhash section in EWF-S01 format.\n",
@@ -3228,7 +3246,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					if( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+					if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 					{
 						libcnotify_printf(
 						 "%s: found digest section in EWF-S01 format.\n",
@@ -3290,7 +3308,6 @@ int libewf_handle_open_read_section_data(
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->media_values,
-					      internal_handle->chunk_table_list,
 					      error );
 
 				known_section = 1;
@@ -3642,13 +3659,15 @@ int libewf_handle_open_read_segment_files(
 
 			return( -1 );
 		}
-		if( libewf_handle_open_read_segment_file(
-		     internal_handle,
-		     (uint32_t) ( segment_files_list_index + 1 ),
-		     segment_file,
-		     file_io_pool,
-		     file_io_pool_entry,
-		     error ) != 1 )
+		read_count = libewf_handle_open_read_segment_file(
+		              internal_handle,
+		              (uint32_t) ( segment_files_list_index + 1 ),
+		              segment_file,
+		              file_io_pool,
+		              file_io_pool_entry,
+		              error );
+
+		if( read_count == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3767,8 +3786,6 @@ int libewf_handle_open_read_segment_files(
 			}
 			if( segment_file->major_version == 1 )
 			{
-				section_offset += section->size;
-
 				if( section->type == LIBEWF_SECTION_TYPE_NEXT )
 				{
 					last_section  = 1;
@@ -3779,6 +3796,8 @@ int libewf_handle_open_read_segment_files(
 					last_segment_file = 1;
 				}
 				segment_file->last_section_offset = section_offset;
+
+				section_offset += section->size;
 
 /* TODO move into section descriptor read ? */
 				if( ( last_section != 0 )
@@ -3811,7 +3830,7 @@ int libewf_handle_open_read_segment_files(
 				{
 					if( section->type == LIBEWF_SECTION_TYPE_NEXT )
 					{
-						last_section  = 1;
+						last_section = 1;
 					}
 					else if( section->type == LIBEWF_SECTION_TYPE_DONE )
 					{

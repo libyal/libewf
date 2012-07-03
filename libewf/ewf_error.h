@@ -1,5 +1,5 @@
 /*
- * EWF session section (EWF-E01)
+ * EWF error section
  *
  * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWF_SESSION_H )
-#define _EWF_SESSION_H
+#if !defined( _EWF_ERROR2_H )
+#define _EWF_ERROR2_H
 
 #include <common.h>
 #include <types.h>
@@ -29,51 +29,45 @@
 extern "C" {
 #endif
 
-typedef struct ewf_session_header_v1 ewf_session_header_v1_t;
+typedef struct ewf_error_header_v1 ewf_error_header_v1_t;
 
-struct ewf_session_header_v1
+struct ewf_error_header_v1
 {
-	/* Number of entries
+	/* The number of entries
 	 * Consists of 4 bytes
 	 */
 	uint8_t number_of_entries[ 4 ];
 
 	/* Unknown
-	 * Consists of 28 bytes
+	 * Consists of 512 bytes
 	 * Contains 0x00
 	 */
-	uint8_t unknown1[ 28 ];
+	uint8_t unknown1[ 512 ];
 
-	/* The section checksum of all (previous) session header data
+	/* The section checksum of all (previous) error header data
 	 * Consists of 4 bytes
 	 */
 	uint8_t checksum[ 4 ];
 };
 
-typedef struct ewf_session_entry_v1 ewf_session_entry_v1_t;
+typedef struct ewf_error_entry_v1 ewf_error_entry_v1_t;
 
-struct ewf_session_entry_v1
+struct ewf_error_entry_v1
 {
-	/* The flags
-	 * Consists of 4 bytes
-	 */
-	uint8_t flags[ 4 ];
-
-	/* The first sector of the session
+	/* The first sector
 	 * Consists of 4 bytes
 	 */
 	uint8_t first_sector[ 4 ];
 
-	/* Unknown
-	 * Consists of 24 bytes
-	 * Contains 0x00
+	/* The number of sectors
+	 * Consists of 4 bytes
 	 */
-	uint8_t unknown1[ 24 ];
+	uint8_t number_of_sectors[ 4 ];
 };
 
-typedef struct ewf_session_header_v2 ewf_session_header_v2_t;
+typedef struct ewf_error_header_v2 ewf_error_header_v2_t;
 
-struct ewf_session_header_v2
+struct ewf_error_header_v2
 {
 	/* Number of entries
 	 * Consists of 4 bytes
@@ -85,7 +79,7 @@ struct ewf_session_header_v2
 	 */
 	uint8_t unknown1[ 12 ];
 
-	/* The section checksum of all (previous) session header data
+	/* The section checksum of all (previous) error header data
 	 * Consists of 4 bytes
 	 */
 	uint8_t checksum[ 4 ];
@@ -96,25 +90,24 @@ struct ewf_session_header_v2
 	uint8_t padding[ 12 ];
 };
 
-typedef struct ewf_session_entry_v2 ewf_session_entry_v2_t;
+typedef struct ewf_error_entry_v2 ewf_error_entry_v2_t;
 
-struct ewf_session_entry_v2
+struct ewf_error_entry_v2
 {
-	/* The first sector of the session
+	/* The first sector
 	 * Consists of 8 bytes
 	 */
 	uint8_t first_sector[ 8 ];
 
-	/* The flags
+	/* The number of sectors
 	 * Consists of 4 bytes
 	 */
-	uint8_t flags[ 4 ];
+	uint8_t number_of_sectors[ 4 ];
 
-	/* Unknown
-	 * Consists of 20 bytes
-	 * Contains 0x00
+	/* Padding
+	 * Consists of 4 bytes
 	 */
-	uint8_t unknown1[ 20 ];
+	uint8_t padding[ 4 ];
 };
 
 #if defined( __cplusplus )

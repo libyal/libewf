@@ -46,7 +46,7 @@
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_digest.h"
-#include "ewf_error2.h"
+#include "ewf_error.h"
 #include "ewf_file_header.h"
 #include "ewf_hash.h"
 #include "ewf_ltree.h"
@@ -434,7 +434,7 @@ ssize_t libewf_section_descriptor_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: reading section start from file IO pool entry: %d at offset: %" PRIi64 "\n",
+		 "%s: reading section start from file IO pool entry: %d at offset: 0x%08" PRIx64 "\n",
 		 function,
 		 file_io_pool_entry,
 		 file_offset );
@@ -2687,31 +2687,36 @@ ssize_t libewf_section_digest_write(
 	return( total_write_count );
 }
 
-/* Reads an error2 section
+/* Reads a version 1 error2 section or version 2 error table section
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_section_error2_read(
+ssize_t libewf_section_error_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          libewf_sector_list_t *acquiry_errors,
          libcerror_error_t **error )
 {
-	ewf_error2_header_t error2_header;
-	uint8_t stored_checksum_buffer[ 4 ];
+	uint8_t error_header_data[ 36 ];
+	uint8_t error_footer_data[ 16 ];
 
-	ewf_error2_sector_t *error2_sectors = NULL;
-	static char *function               = "libewf_section_error2_read";
-	size64_t section_data_size          = 0;
-	size_t error2_sectors_size          = 0;
-	ssize_t read_count                  = 0;
-	ssize_t total_read_count            = 0;
-	uint32_t calculated_checksum        = 0;
-	uint32_t error_index                = 0;
-	uint32_t first_sector               = 0;
-	uint32_t number_of_errors           = 0;
-	uint32_t number_of_sectors          = 0;
-	uint32_t stored_checksum            = 0;
+	uint8_t *error_entry_data      = NULL;
+	uint8_t *error_entries_data    = NULL;
+	static char *function          = "libewf_section_error_read";
+	size64_t section_data_size     = 0;
+	size_t error_entry_data_size   = 0;
+	size_t error_entries_data_size = 0;
+	size_t error_footer_data_size  = 0;
+	size_t error_header_data_size  = 0;
+	ssize_t read_count             = 0;
+	ssize_t total_read_count       = 0;
+	uint64_t first_sector          = 0;
+	uint32_t calculated_checksum   = 0;
+	uint32_t entry_index           = 0;
+	uint32_t number_of_entries     = 0;
+	uint32_t number_of_sectors     = 0;
+	uint32_t stored_checksum       = 0;
 
 	if( section == NULL )
 	{
@@ -2735,7 +2740,30 @@ ssize_t libewf_section_error2_read(
 
 		return( -1 );
 	}
-	if( section->data_size < (size64_t) sizeof( ewf_error2_header_t ) )
+	if( format_version == 1 )
+	{
+		error_header_data_size = sizeof( ewf_error_header_v1_t );
+		error_entry_data_size  = sizeof( ewf_error_entry_v1_t );
+		error_footer_data_size = 4;
+	}
+	else if( format_version == 2 )
+	{
+		error_header_data_size = sizeof( ewf_error_header_v2_t );
+		error_entry_data_size  = sizeof( ewf_error_entry_v2_t );
+		error_footer_data_size = 16;
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
+		 function );
+
+		return( -1 );
+	}
+	if( section->data_size < (size64_t) error_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -2746,22 +2774,22 @@ ssize_t libewf_section_error2_read(
 
 		goto on_error;
 	}
-	section_data_size = section->data_size - sizeof( ewf_error2_header_t );
+	section_data_size = section->data_size;
 
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              (uint8_t *) &error2_header,
-	              sizeof( ewf_error2_header_t ),
+	              error_header_data,
+	              error_header_data_size,
 	              error );
 	
-	if( read_count != (ssize_t) sizeof( ewf_error2_header_t ) )
+	if( read_count != (ssize_t) error_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read error2 header.",
+		 "%s: unable to read error header data.",
 		 function );
 
 		goto on_error;
@@ -2772,50 +2800,92 @@ ssize_t libewf_section_error2_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: error2 header data:\n",
+		 "%s: error header data:\n",
 		 function );
 		libcnotify_print_data(
-		 (uint8_t *) &error2_header,
-		 sizeof( ewf_error2_header_t ),
+		 error_header_data,
+		 error_header_data_size,
 		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
-	byte_stream_copy_to_uint32_little_endian(
-	 error2_header.number_of_errors,
-	 number_of_errors );
+	if( format_version == 1 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_error_header_v1_t *) error_header_data )->number_of_entries,
+		 number_of_entries );
 
-	byte_stream_copy_to_uint32_little_endian(
-	 error2_header.checksum,
-	 stored_checksum);
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_error_header_v1_t *) error_header_data )->checksum,
+		 stored_checksum);
+	}
+	else if( format_version == 2 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_error_header_v2_t *) error_header_data )->number_of_entries,
+		 number_of_entries );
+
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_error_header_v2_t *) error_header_data )->checksum,
+		 stored_checksum);
+	}
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: number of errors\t\t\t\t: %" PRIu32 "\n",
+		 "%s: number of entries\t\t\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_errors );
+		 number_of_entries );
 
 		libcnotify_printf(
-		 "%s: unknown:\n",
+		 "%s: unknown1:\n",
 		 function );
-		libcnotify_print_data(
-		 error2_header.unknown,
-		 200,
-		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 
+		if( format_version == 1 )
+		{
+			libcnotify_print_data(
+			 ( (ewf_error_header_v1_t *) error_header_data )->unknown1,
+			 200,
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
+		}
+		else if( format_version == 1 )
+		{
+			libcnotify_print_data(
+			 ( (ewf_error_header_v2_t *) error_header_data )->unknown1,
+			 12,
+			 0 );
+		}
 		libcnotify_printf(
 	 	 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 
-		libcnotify_printf(
-	 	 "\n" );
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
+		else if( format_version == 2 )
+		{
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_error_header_v2_t *) error_header_data )->padding,
+			 12,
+			 0 );
+		}
 	}
 #endif
+	section_data_size -= error_header_data_size;
+
+	if( format_version == 2 )
+	{
+		error_header_data_size -= 12;
+	}
 	calculated_checksum = ewf_checksum_calculate(
-	                       &error2_header,
-	                       sizeof( ewf_error2_header_t ) - sizeof( uint32_t ),
+	                       error_header_data,
+	                       error_header_data_size - 4,
 	                       1 );
 
 	if( stored_checksum!= calculated_checksum)
@@ -2831,11 +2901,11 @@ ssize_t libewf_section_error2_read(
 
 		goto on_error;
 	}
-	if( number_of_errors > 0 )
+	if( number_of_entries > 0 )
 	{
-		error2_sectors_size = sizeof( ewf_error2_sector_t ) * number_of_errors;
+		error_entries_data_size = number_of_entries * error_entry_data_size;
 
-		if( section_data_size < error2_sectors_size )
+		if( section_data_size < error_entries_data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -2846,16 +2916,17 @@ ssize_t libewf_section_error2_read(
 
 			goto on_error;
 		}
-		error2_sectors = (ewf_error2_sector_t *) memory_allocate(
-		                                          error2_sectors_size );
+/* TODO check SSIZE_MAX bounds */
+		error_entries_data = (uint8_t *) memory_allocate(
+		                                  sizeof( uint8_t ) * error_entries_data_size );
 
-		if( error2_sectors == NULL )
+		if( error_entries_data == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create error2 sectors.",
+			 "%s: unable to create error entries data.",
 			 function );
 
 			goto on_error;
@@ -2863,17 +2934,17 @@ ssize_t libewf_section_error2_read(
 		read_count = libbfio_pool_read_buffer(
 		              file_io_pool,
 		              file_io_pool_entry,
-		              (uint8_t *) error2_sectors,
-		              error2_sectors_size,
+		              error_entries_data,
+		              error_entries_data_size,
 	                      error );
 	
-		if( read_count != (ssize_t) error2_sectors_size )
+		if( read_count != (ssize_t) error_entries_data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read error2 sectors.",
+			 "%s: unable to read error entries data.",
 			 function );
 
 			goto on_error;
@@ -2884,28 +2955,28 @@ ssize_t libewf_section_error2_read(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: error2 sectors data:\n",
+			 "%s: error entries data:\n",
 			 function );
 			libcnotify_print_data(
-			 (uint8_t *) error2_sectors,
-			 error2_sectors_size,
+			 error_entries_data,
+			 error_entries_data_size,
 			 0 );
 		}
 #endif
 		read_count = libbfio_pool_read_buffer(
 		              file_io_pool,
 		              file_io_pool_entry,
-		              stored_checksum_buffer,
-		              sizeof( uint32_t ),
+		              error_footer_data,
+		              error_footer_data_size,
 	                      error );
 
-		if( read_count != (ssize_t) sizeof( uint32_t ) )
+		if( read_count != (ssize_t) error_footer_data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read checksum.",
+			 "%s: unable to read error footer data.",
 			 function );
 
 			goto on_error;
@@ -2913,24 +2984,37 @@ ssize_t libewf_section_error2_read(
 		total_read_count += read_count;
 
 		byte_stream_copy_to_uint32_little_endian(
-		 stored_checksum_buffer,
+		 error_footer_data,
 		 stored_checksum );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: error2 sectors checksum\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: error entries checksum\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 stored_checksum );
 
-			libcnotify_printf(
-			 "\n" );
+			if( format_version == 1 )
+			{
+				libcnotify_printf(
+				 "\n" );
+			}
+			else if( format_version == 2 )
+			{
+				libcnotify_printf(
+				 "%s: padding:\n",
+				 function );
+				libcnotify_print_data(
+				 &( error_footer_data[ 4 ] ),
+				 12,
+				 0 );
+			}
 		}
 #endif
 		calculated_checksum = ewf_checksum_calculate(
-		                       error2_sectors,
-		                       error2_sectors_size,
+		                       error_entries_data,
+		                       error_entries_data_size,
 		                       1 );
 
 		if( stored_checksum != calculated_checksum )
@@ -2959,37 +3043,64 @@ ssize_t libewf_section_error2_read(
 
 			goto on_error;
 		}
-		for( error_index = 0;
-		     error_index < number_of_errors;
-		     error_index++ )
-		{
-			byte_stream_copy_to_uint32_little_endian(
-			 error2_sectors[ error_index ].first_sector,
-			 first_sector );
+		error_entry_data = error_entries_data;
 
-			byte_stream_copy_to_uint32_little_endian(
-			 error2_sectors[ error_index ].number_of_sectors,
-			 number_of_sectors );
+		for( entry_index = 0;
+		     entry_index < number_of_entries;
+		     entry_index++ )
+		{
+			if( format_version == 1 )
+			{
+				byte_stream_copy_to_uint32_little_endian(
+				 ( (ewf_error_entry_v1_t *) error_entry_data )->first_sector,
+				 first_sector );
+
+				byte_stream_copy_to_uint32_little_endian(
+				 ( (ewf_error_entry_v1_t *) error_entry_data )->number_of_sectors,
+				 number_of_sectors );
+			}
+			else if( format_version == 2 )
+			{
+				byte_stream_copy_to_uint64_little_endian(
+				 ( (ewf_error_entry_v2_t *) error_entry_data )->first_sector,
+				 first_sector );
+
+				byte_stream_copy_to_uint32_little_endian(
+				 ( (ewf_error_entry_v2_t *) error_entry_data )->number_of_sectors,
+				 number_of_sectors );
+			}
 
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: error2: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
+				 "%s: error entry: %02" PRIu32 " first sector\t\t\t: %" PRIu64 "\n",
 				 function,
-				 error_index,
+				 entry_index,
 				 first_sector );
 
 				libcnotify_printf(
-				 "%s: error2: %02" PRIu32 " number of sectors\t\t: %" PRIu32 "\n",
+				 "%s: error entry: %02" PRIu32 " number of sectors\t\t: %" PRIu32 "\n",
 				 function,
-				 error_index,
+				 entry_index,
 				 number_of_sectors );
+
+				if( format_version == 2 )
+				{
+					libcnotify_printf(
+					 "%s: error entry: %02" PRIu32 " padding:\n",
+					 function,
+					 entry_index );
+					libcnotify_print_data(
+					 ( (ewf_error_entry_v2_t *) error_entry_data )->padding,
+					 12,
+					 0 );
+				}
 			}
 #endif
 			if( libewf_sector_list_append_sector(
 			     acquiry_errors,
-			     (uint64_t) first_sector,
+			     first_sector,
 			     (uint64_t) number_of_sectors,
 			     0,
 			     error ) != 1 )
@@ -3003,27 +3114,28 @@ ssize_t libewf_section_error2_read(
 
 				goto on_error;
 			}
+			error_entry_data += error_entry_data_size;
 		}
 		memory_free(
-		 error2_sectors );
+		 error_entries_data );
 
-		error2_sectors = NULL;
+		error_entries_data = NULL;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	else if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: error2 section contains no error sectors.\n",
+		 "%s: error section contains no entries.\n",
 		 function );
 	}
 #endif
 	return( total_read_count );
 
 on_error:
-	if( error2_sectors != NULL )
+	if( error_entries_data != NULL )
 	{
 		memory_free(
-		 error2_sectors );
+		 error_entries_data );
 	}
 	return( -1 );
 }
@@ -3039,20 +3151,20 @@ ssize_t libewf_section_error2_write(
          libewf_sector_list_t *acquiry_errors,
          libcerror_error_t **error )
 {
-	ewf_error2_header_t error2_header;
+	ewf_error_header_v1_t error2_header;
 	uint8_t calculated_checksum_buffer[ 4 ];
 
-	ewf_error2_sector_t *error2_sectors = NULL;
-	static char *function               = "libewf_section_error2_write";
-	size64_t section_size               = 0;
-	size_t error2_sectors_size          = 0;
-	ssize_t total_write_count           = 0;
-	ssize_t write_count                 = 0;
-	uint64_t first_sector               = 0;
-	uint64_t number_of_sectors          = 0;
-	uint32_t calculated_checksum        = 0;
-	int error_index                     = 0;
-	int number_of_errors                = 0;
+	ewf_error_entry_v1_t *error2_sectors = NULL;
+	static char *function                = "libewf_section_error2_write";
+	size64_t section_size                = 0;
+	size_t error2_sectors_size           = 0;
+	ssize_t total_write_count            = 0;
+	ssize_t write_count                  = 0;
+	uint64_t first_sector                = 0;
+	uint64_t number_of_sectors           = 0;
+	uint32_t calculated_checksum         = 0;
+	int entry_index                      = 0;
+	int number_of_entries                = 0;
 
 	if( section == NULL )
 	{
@@ -3067,7 +3179,7 @@ ssize_t libewf_section_error2_write(
 	}
 	if( libewf_sector_list_get_number_of_elements(
 	     acquiry_errors,
-	     &number_of_errors,
+	     &number_of_entries,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3079,7 +3191,7 @@ ssize_t libewf_section_error2_write(
 
 		goto on_error;
 	}
-	if( number_of_errors <= 0 )
+	if( number_of_entries <= 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3090,10 +3202,10 @@ ssize_t libewf_section_error2_write(
 
 		goto on_error;
 	}
-	error2_sectors_size = sizeof( ewf_error2_sector_t ) * number_of_errors;
+	error2_sectors_size = sizeof( ewf_error_entry_v1_t ) * number_of_entries;
 
 	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + sizeof( ewf_error2_header_t )
+	             + sizeof( ewf_error_header_v1_t )
 	             + error2_sectors_size
 	             + sizeof( uint32_t );
 
@@ -3136,7 +3248,7 @@ ssize_t libewf_section_error2_write(
 	if( memory_set(
 	     &error2_header,
 	     0,
-	     sizeof( ewf_error2_header_t ) ) == NULL )
+	     sizeof( ewf_error_header_v1_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -3148,12 +3260,12 @@ ssize_t libewf_section_error2_write(
 		goto on_error;
 	}
 	byte_stream_copy_from_uint32_little_endian(
-	 error2_header.number_of_errors,
-	 number_of_errors );
+	 error2_header.number_of_entries,
+	 number_of_entries );
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       &error2_header,
-	                       sizeof( ewf_error2_header_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_error_header_v1_t ) - sizeof( uint32_t ),
 	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -3164,10 +3276,10 @@ ssize_t libewf_section_error2_write(
 	               file_io_pool,
 	               file_io_pool_entry,
 	               (uint8_t *) &error2_header,
-	               sizeof( ewf_error2_header_t ),
+	               sizeof( ewf_error_header_v1_t ),
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_error2_header_t ) )
+	if( write_count != (ssize_t) sizeof( ewf_error_header_v1_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -3181,8 +3293,8 @@ ssize_t libewf_section_error2_write(
 	total_write_count += write_count;
 
 /* TODO EnCase compatible way to handle > 32-bit sector values */
-	error2_sectors = (ewf_error2_sector_t *) memory_allocate(
-						  error2_sectors_size );
+	error2_sectors = (ewf_error_entry_v1_t *) memory_allocate(
+	                                           error2_sectors_size );
 
 	if( error2_sectors == NULL )
 	{
@@ -3195,13 +3307,13 @@ ssize_t libewf_section_error2_write(
 
 		goto on_error;
 	}
-	for( error_index = 0;
-	     error_index < number_of_errors;
-	     error_index++ )
+	for( entry_index = 0;
+	     entry_index < number_of_entries;
+	     entry_index++ )
 	{
 		if( libewf_sector_list_get_sector(
 		     acquiry_errors,
-		     error_index,
+		     entry_index,
 		     &first_sector,
 		     &number_of_sectors,
 		     error ) != 1 )
@@ -3212,16 +3324,16 @@ ssize_t libewf_section_error2_write(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve acquiry error: %d from sector list.",
 			 function,
-			 error_index );
+			 entry_index );
 
 			goto on_error;
 		}
 		byte_stream_copy_from_uint32_little_endian(
-		 error2_sectors[ error_index ].first_sector,
+		 error2_sectors[ entry_index ].first_sector,
 		 (uint32_t) first_sector );
 
 		byte_stream_copy_from_uint32_little_endian(
-		 error2_sectors[ error_index ].number_of_sectors,
+		 error2_sectors[ entry_index ].number_of_sectors,
 		 (uint32_t) number_of_sectors );
 	}
 	write_count = libbfio_pool_write_buffer(
@@ -3298,10 +3410,10 @@ ssize_t libewf_section_md5_hash_read(
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error )
 {
-	uint8_t section_data[ 36 ];
+	uint8_t md5_hash_data[ 36 ];
 
 	static char *function        = "libewf_section_md5_hash_read";
-	size_t section_data_size     = 0;
+	size_t md5_hash_data_size    = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -3331,11 +3443,11 @@ ssize_t libewf_section_md5_hash_read(
 	}
 	if( format_version == 1 )
 	{
-		section_data_size = sizeof( ewf_hash_t );
+		md5_hash_data_size = sizeof( ewf_hash_t );
 	}
 	else if( format_version == 2 )
 	{
-		section_data_size = sizeof( ewf_md5_hash_t ) + section->padding_size;
+		md5_hash_data_size = sizeof( ewf_md5_hash_t ) + section->padding_size;
 	}
 	else
 	{
@@ -3348,7 +3460,7 @@ ssize_t libewf_section_md5_hash_read(
 
 		return( -1 );
 	}
-	if( section->data_size != (size64_t) section_data_size )
+	if( section->data_size != (size64_t) md5_hash_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -3362,17 +3474,17 @@ ssize_t libewf_section_md5_hash_read(
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              section_data,
-	              section_data_size,
+	              md5_hash_data,
+	              md5_hash_data_size,
 	              error );
 
-	if( read_count != (ssize_t) section_data_size )
+	if( read_count != (ssize_t) md5_hash_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read section data.",
+		 "%s: unable to read MD5 hash data.",
 		 function );
 
 		return( -1 );
@@ -3381,24 +3493,24 @@ ssize_t libewf_section_md5_hash_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: section data:\n",
+	 	 "%s: MD5 hash data:\n",
 		 function );
 		libcnotify_print_data(
-		 section_data,
-		 section_data_size,
+		 md5_hash_data,
+		 md5_hash_data_size,
 		 0 );
 	}
 #endif
 	if( format_version == 1 )
 	{
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_hash_t *) section_data )->checksum,
+		 ( (ewf_hash_t *) md5_hash_data )->checksum,
 		 stored_checksum );
 	}
 	else if( format_version == 2 )
 	{
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_md5_hash_t *) section_data )->checksum,
+		 ( (ewf_md5_hash_t *) md5_hash_data )->checksum,
 		 stored_checksum );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -3408,7 +3520,7 @@ ssize_t libewf_section_md5_hash_read(
 		 "%s: MD5 hash:\n",
 		 function );
 		libcnotify_print_data(
-		 section_data,
+		 md5_hash_data,
 		 16,
 		 0 );
 
@@ -3418,7 +3530,7 @@ ssize_t libewf_section_md5_hash_read(
 			 "%s: unknown1:\n",
 			 function );
 			libcnotify_print_data(
-			 ( (ewf_hash_t *) section_data )->unknown1,
+			 ( (ewf_hash_t *) md5_hash_data )->unknown1,
 			 16,
 			 0 );
 		}
@@ -3438,7 +3550,7 @@ ssize_t libewf_section_md5_hash_read(
 			 "%s: padding:\n",
 			 function );
 			libcnotify_print_data(
-			 &( section_data[ sizeof( ewf_md5_hash_t ) ] ),
+			 &( md5_hash_data[ sizeof( ewf_md5_hash_t ) ] ),
 			 (size_t) section->padding_size,
 			 0 );
 		}
@@ -3446,11 +3558,11 @@ ssize_t libewf_section_md5_hash_read(
 #endif
 	if( format_version == 2 )
 	{
-		section_data_size -= section->padding_size;
+		md5_hash_data_size -= section->padding_size;
 	}
 	calculated_checksum = ewf_checksum_calculate(
-	                       section_data,
-	                       section_data_size - 4,
+	                       md5_hash_data,
+	                       md5_hash_data_size - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -3467,7 +3579,7 @@ ssize_t libewf_section_md5_hash_read(
 		return( -1 );
 	}
 	result = libewf_section_test_zero(
-		  section_data,
+		  md5_hash_data,
 		  16,
 		  error );
 
@@ -3486,7 +3598,7 @@ ssize_t libewf_section_md5_hash_read(
 	{
 		if( memory_copy(
 		     hash_sections->md5_hash,
-		     section_data,
+		     md5_hash_data,
 		     16 ) == NULL )
 		{
 			libcerror_error_set(
@@ -3672,10 +3784,10 @@ ssize_t libewf_section_sha1_hash_read(
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error )
 {
-	uint8_t section_data[ 32 ];
+	uint8_t sha1_hash_data[ 32 ];
 
 	static char *function        = "libewf_section_sha1_hash_read";
-	size_t section_data_size     = 0;
+	size_t sha1_hash_data_size   = 0;
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -3703,9 +3815,9 @@ ssize_t libewf_section_sha1_hash_read(
 
 		return( -1 );
 	}
-	section_data_size = sizeof( ewf_sha1_hash_t ) + section->padding_size;
+	sha1_hash_data_size = sizeof( ewf_sha1_hash_t ) + section->padding_size;
 
-	if( section->data_size != (size64_t) section_data_size )
+	if( section->data_size != (size64_t) sha1_hash_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -3719,17 +3831,17 @@ ssize_t libewf_section_sha1_hash_read(
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              section_data,
-	              section_data_size,
+	              sha1_hash_data,
+	              sha1_hash_data_size,
 	              error );
 
-	if( read_count != (ssize_t) section_data_size )
+	if( read_count != (ssize_t) sha1_hash_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read section data.",
+		 "%s: unable to read SHA1 hash data.",
 		 function );
 
 		return( -1 );
@@ -3738,16 +3850,16 @@ ssize_t libewf_section_sha1_hash_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: section data:\n",
+	 	 "%s: SHA1 hash data:\n",
 		 function );
 		libcnotify_print_data(
-		 section_data,
-		 section_data_size,
+		 sha1_hash_data,
+		 sha1_hash_data_size,
 		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (ewf_sha1_hash_t *) section_data )->checksum,
+	 ( (ewf_sha1_hash_t *) sha1_hash_data )->checksum,
 	 stored_checksum );
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -3757,7 +3869,7 @@ ssize_t libewf_section_sha1_hash_read(
 		 "%s: SHA1 hash:\n",
 		 function );
 		libcnotify_print_data(
-		 section_data,
+		 sha1_hash_data,
 		 20,
 		 0 );
 
@@ -3770,16 +3882,16 @@ ssize_t libewf_section_sha1_hash_read(
 		 "%s: padding:\n",
 		 function );
 		libcnotify_print_data(
-		 &( section_data[ sizeof( ewf_sha1_hash_t ) ] ),
+		 &( sha1_hash_data[ sizeof( ewf_sha1_hash_t ) ] ),
 		 (size_t) section->padding_size,
 		 0 );
 	}
 #endif
-	section_data_size -= section->padding_size;
+	sha1_hash_data_size -= section->padding_size;
 
 	calculated_checksum = ewf_checksum_calculate(
-	                       section_data,
-	                       section_data_size - 4,
+	                       sha1_hash_data,
+	                       sha1_hash_data_size - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -3796,7 +3908,7 @@ ssize_t libewf_section_sha1_hash_read(
 		return( -1 );
 	}
 	result = libewf_section_test_zero(
-		  section_data,
+		  sha1_hash_data,
 		  16,
 		  error );
 
@@ -3815,7 +3927,7 @@ ssize_t libewf_section_sha1_hash_read(
 	{
 		if( memory_copy(
 		     hash_sections->sha1_hash,
-		     section_data,
+		     sha1_hash_data,
 		     20 ) == NULL )
 		{
 			libcerror_error_set(
@@ -4508,38 +4620,43 @@ ssize_t libewf_section_sectors_write(
 	return( write_count );
 }
 
-/* Reads a session section
+/* Reads a version 1 session section or version 2 session table section
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_session_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          libewf_media_values_t *media_values,
          libewf_sector_list_t *sessions,
          libewf_sector_list_t *tracks,
          libcerror_error_t **error )
 {
-	ewf_session_header_t session_header;
-	uint8_t stored_checksum_buffer[ 4 ];
+	uint8_t session_header_data[ 36 ];
+	uint8_t session_footer_data[ 16 ];
 
-	ewf_session_entry_t *session_entries = NULL;
-	static char *function                = "libewf_section_session_read";
-	size64_t section_data_size           = 0;
-	size_t session_entries_size          = 0;
-	ssize_t read_count                   = 0;
-	ssize_t total_read_count             = 0;
-	uint32_t calculated_checksum         = 0;
-	uint32_t first_sector                = 0;
-	uint32_t previous_first_sector       = 0;
-	uint32_t previous_type               = 0;
-	uint32_t number_of_sectors           = 0;
-	uint32_t number_of_sessions_entries  = 0;
-	uint32_t session_first_sector        = 0;
-	uint32_t sessions_entry_index        = 0;
-	uint32_t stored_checksum             = 0;
-	uint32_t track_first_sector          = 0;
-	uint32_t type                        = 0;
+	uint8_t *session_entry_data      = NULL;
+	uint8_t *session_entries_data    = NULL;
+	static char *function            = "libewf_section_session_read";
+	size64_t section_data_size       = 0;
+	size_t session_entry_data_size   = 0;
+	size_t session_entries_data_size = 0;
+	size_t session_footer_data_size  = 0;
+	size_t session_header_data_size  = 0;
+	ssize_t read_count               = 0;
+	ssize_t total_read_count         = 0;
+	uint64_t first_sector            = 0;
+	uint64_t previous_first_sector   = 0;
+	uint64_t session_first_sector    = 0;
+	uint64_t track_first_sector      = 0;
+	uint32_t calculated_checksum     = 0;
+	uint32_t entry_index             = 0;
+	uint32_t flags                   = 0;
+	uint32_t number_of_entries       = 0;
+	uint32_t number_of_sectors       = 0;
+	uint32_t previous_flags          = 0;
+	uint32_t stored_checksum         = 0;
 
 	if( section == NULL )
 	{
@@ -4548,6 +4665,29 @@ ssize_t libewf_section_session_read(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section.",
+		 function );
+
+		return( -1 );
+	}
+	if( format_version == 1 )
+	{
+		session_header_data_size = sizeof( ewf_session_header_v1_t );
+		session_entry_data_size  = sizeof( ewf_session_entry_v1_t );
+		session_footer_data_size = 4;
+	}
+	else if( format_version == 2 )
+	{
+		session_header_data_size = sizeof( ewf_session_header_v2_t );
+		session_entry_data_size  = sizeof( ewf_session_entry_v2_t );
+		session_footer_data_size = 16;
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
 		 function );
 
 		return( -1 );
@@ -4574,7 +4714,7 @@ ssize_t libewf_section_session_read(
 
 		return( -1 );
 	}
-	if( section->data_size < (size64_t) sizeof( ewf_session_header_t ) )
+	if( section->data_size < (size64_t) session_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -4585,22 +4725,22 @@ ssize_t libewf_section_session_read(
 
 		goto on_error;
 	}
-	section_data_size = section->data_size - sizeof( ewf_session_header_t );
+	section_data_size = section->data_size;
 
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              (uint8_t *) &session_header,
-	              sizeof( ewf_session_header_t ),
+	              session_header_data,
+	              session_header_data_size,
 	              error );
 
-	if( read_count != (ssize_t) sizeof( ewf_session_header_t ) )
+	if( read_count != (ssize_t) session_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read session.",
+		 "%s: unable to read session header data.",
 		 function );
 
 		goto on_error;
@@ -4614,47 +4754,88 @@ ssize_t libewf_section_session_read(
 		 "%s: session header data:\n",
 		 function );
 		libcnotify_print_data(
-		 (uint8_t *) &session_header,
-		 sizeof( ewf_session_header_t ),
+		 session_header_data,
+		 session_header_data_size,
 		 0 );
 	}
 #endif
-	byte_stream_copy_to_uint32_little_endian(
-	 session_header.number_of_sessions,
-	 number_of_sessions_entries );
+	if( format_version == 1 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_session_header_v1_t *) session_header_data )->number_of_entries,
+		 number_of_entries );
 
-	byte_stream_copy_to_uint32_little_endian(
-	 session_header.checksum,
-	 stored_checksum );
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_session_header_v1_t *) session_header_data )->checksum,
+		 stored_checksum );
+	}
+	else if( format_version == 2 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_session_header_v2_t *) session_header_data )->number_of_entries,
+		 number_of_entries );
 
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_session_header_v2_t *) session_header_data )->checksum,
+		 stored_checksum );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: number of sessions entries\t\t: %" PRIu32 "\n",
+		 "%s: number of entries\t\t\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_sessions_entries );
+		 number_of_entries );
 
 		libcnotify_printf(
 		 "%s: unknown1:\n",
 		 function );
-		libcnotify_print_data(
-		 session_header.unknown1,
-		 28,
-		 0 );
 
+		if( format_version == 1 )
+		{
+			libcnotify_print_data(
+			 ( (ewf_session_header_v1_t *) session_header_data )->unknown1,
+			 28,
+			 0 );
+		}
+		else if( format_version == 2 )
+		{
+			libcnotify_print_data(
+			 ( (ewf_session_header_v2_t *) session_header_data )->unknown1,
+			 12,
+			 0 );
+		}
 		libcnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 
-		libcnotify_printf(
-		 "\n" );
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
+		else if( format_version == 2 )
+		{
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_session_header_v2_t *) session_header_data )->padding,
+			 12,
+			 0 );
+		}
 	}
 #endif
+	section_data_size -= session_header_data_size;
+
+	if( format_version == 2 )
+	{
+		session_header_data_size -= 12;
+	}
 	calculated_checksum = ewf_checksum_calculate(
-	                       &session_header,
-	                       sizeof( ewf_session_header_t ) - sizeof( uint32_t ),
+	                       session_header_data,
+	                       session_header_data_size - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -4670,11 +4851,11 @@ ssize_t libewf_section_session_read(
 
 		goto on_error;
 	}
-	if( number_of_sessions_entries > 0 )
+	if( number_of_entries > 0 )
 	{
-		session_entries_size = sizeof( ewf_session_entry_t ) * number_of_sessions_entries;
+		session_entries_data_size = number_of_entries * session_entry_data_size;
 
-		if( section_data_size < (size64_t) session_entries_size )
+		if( section_data_size < (size64_t) session_entries_data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -4685,16 +4866,17 @@ ssize_t libewf_section_session_read(
 
 			goto on_error;
 		}
-		session_entries = (ewf_session_entry_t *) memory_allocate(
-		                                           session_entries_size );
+/* TODO check SSIZE_MAX bounds */
+		session_entries_data = (uint8_t *) memory_allocate(
+		                                    sizeof( uint8_t ) * session_entries_data_size );
 
-		if( session_entries == NULL )
+		if( session_entries_data == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create session entries.",
+			 "%s: unable to create session entries data.",
 			 function );
 
 			goto on_error;
@@ -4702,17 +4884,17 @@ ssize_t libewf_section_session_read(
 		read_count = libbfio_pool_read_buffer(
 		              file_io_pool,
 		              file_io_pool_entry,
-		              (uint8_t *) session_entries,
-		              session_entries_size,
+		              session_entries_data,
+		              session_entries_data_size,
 		              error );
 	
-		if( read_count != (ssize_t) session_entries_size )
+		if( read_count != (ssize_t) session_entries_data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read session entries.",
+			 "%s: unable to read session entries data.",
 			 function );
 
 			goto on_error;
@@ -4726,25 +4908,25 @@ ssize_t libewf_section_session_read(
 			 "%s: session entries data:\n",
 			 function );
 			libcnotify_print_data(
-			 (uint8_t *) session_entries,
-			 session_entries_size,
+			 session_entries_data,
+			 session_entries_data_size,
 			 0 );
 		}
 #endif
 		read_count = libbfio_pool_read_buffer(
 		              file_io_pool,
 		              file_io_pool_entry,
-		              stored_checksum_buffer,
-		              sizeof( uint32_t ),
+		              session_footer_data,
+		              session_footer_data_size,
 		              error );
 
-		if( read_count != (ssize_t) sizeof( uint32_t ) )
+		if( read_count != (ssize_t) session_footer_data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read checksum.",
+			 "%s: unable to read session footer data.",
 			 function );
 
 			goto on_error;
@@ -4752,7 +4934,7 @@ ssize_t libewf_section_session_read(
 		total_read_count += read_count;
 
 		byte_stream_copy_to_uint32_little_endian(
-		 stored_checksum_buffer,
+		 session_footer_data,
 		 stored_checksum );
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -4763,13 +4945,26 @@ ssize_t libewf_section_session_read(
 			 function,
 			 stored_checksum );
 
-			libcnotify_printf(
-			 "\n" );
+			if( format_version == 1 )
+			{
+				libcnotify_printf(
+				 "\n" );
+			}
+			else if( format_version == 2 )
+			{
+				libcnotify_printf(
+				 "%s: padding:\n",
+				 function );
+				libcnotify_print_data(
+				 &( session_footer_data[ 4 ] ),
+				 12,
+				 0 );
+			}
 		}
 #endif
 		calculated_checksum = ewf_checksum_calculate(
-		                       session_entries,
-		                       session_entries_size,
+		                       session_entries_data,
+		                       session_entries_data_size,
 		                       1 );
 
 		if( stored_checksum != calculated_checksum )
@@ -4798,39 +4993,82 @@ ssize_t libewf_section_session_read(
 
 			goto on_error;
 		}
-		byte_stream_copy_to_uint32_little_endian(
-		 ( session_entries[ sessions_entry_index ] ).type,
-		 previous_type );
+		session_entry_data = session_entries_data;
 
-		byte_stream_copy_to_uint32_little_endian(
-		 ( session_entries[ sessions_entry_index ] ).first_sector,
-		 previous_first_sector );
+		if( format_version == 1 )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 ( (ewf_session_entry_v1_t *) session_entry_data )->flags,
+			 previous_flags );
 
+			byte_stream_copy_to_uint32_little_endian(
+			 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
+			 previous_first_sector );
+		}
+		else if( format_version == 2 )
+		{
+			byte_stream_copy_to_uint64_little_endian(
+			 ( (ewf_session_entry_v2_t *) session_entry_data )->first_sector,
+			 previous_first_sector );
+
+			byte_stream_copy_to_uint32_little_endian(
+			 ( (ewf_session_entry_v2_t *) session_entry_data )->flags,
+			 previous_flags );
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-			libcnotify_printf(
-			 "%s: entry: %02" PRIu32 " type\t\t\t\t: %" PRIu32 "\n",
-			 function,
-			 sessions_entry_index,
-			 previous_type );
+			if( format_version == 1 )
+			{
+				libcnotify_printf(
+				 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
+				 function,
+				 entry_index,
+				 previous_flags );
 
-			libcnotify_printf(
-			 "%s: entry: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu32 ")\n",
-			 function,
-			 sessions_entry_index,
-			 previous_first_sector );
+				libcnotify_printf(
+				 "%s: entry: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu64 ")\n",
+				 function,
+				 entry_index,
+				 previous_first_sector );
+			}
+			else if( format_version == 2 )
+			{
+				libcnotify_printf(
+				 "%s: entry: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu64 ")\n",
+				 function,
+				 entry_index,
+				 previous_first_sector );
 
+				libcnotify_printf(
+				 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
+				 function,
+				 entry_index,
+				 previous_flags );
+			}
 			libcnotify_printf(
-			 "%s: entry: %02" PRIu32 " unknown2:\n",
+			 "%s: entry: %02" PRIu32 " unknown1:\n",
 			 function,
-			 sessions_entry_index );
-			libcnotify_print_data(
-			 ( session_entries[ sessions_entry_index ] ).unknown2,
-			 24,
-			 0 );
+			 entry_index );
+
+			if( format_version == 1 )
+			{
+				libcnotify_print_data(
+				 ( (ewf_session_entry_v1_t *) session_entry_data )->unknown1,
+				 24,
+				 0 );
+			}
+			else if( format_version == 2 )
+			{
+				libcnotify_print_data(
+				 ( (ewf_session_entry_v2_t *) session_entry_data )->unknown1,
+				 20,
+				 0 );
+			}
 		}
 #endif
+		session_entry_data += session_entry_data_size;
+
 		/* Note that EnCase says the first session starts at session 16
 		 * This is either some EnCase specific behavior or the value is used for
 		 * other purposes.
@@ -4838,43 +5076,84 @@ ssize_t libewf_section_session_read(
 		session_first_sector = 0;
 		track_first_sector   = 0;
 
-		for( sessions_entry_index = 1;
-		     sessions_entry_index < number_of_sessions_entries;
-		     sessions_entry_index++ )
+		for( entry_index = 1;
+		     entry_index < number_of_entries;
+		     entry_index++ )
 		{
-			byte_stream_copy_to_uint32_little_endian(
-			 ( session_entries[ sessions_entry_index ] ).type,
-			 type );
+			if( format_version == 1 )
+			{
+				byte_stream_copy_to_uint32_little_endian(
+				 ( (ewf_session_entry_v1_t *) session_entry_data )->flags,
+				 flags );
 
-			byte_stream_copy_to_uint32_little_endian(
-			 session_entries[ sessions_entry_index ].first_sector,
-			 first_sector );
+				byte_stream_copy_to_uint64_little_endian(
+				 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
+				 first_sector );
+			}
+			else if( format_version == 2 )
+			{
+				byte_stream_copy_to_uint64_little_endian(
+				 ( (ewf_session_entry_v2_t *) session_entry_data )->first_sector,
+				 first_sector );
 
+				byte_stream_copy_to_uint32_little_endian(
+				 ( (ewf_session_entry_v2_t *) session_entry_data )->flags,
+				 flags );
+			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
-				libcnotify_printf(
-				 "%s: entry: %02" PRIu32 " type\t\t\t\t: %" PRIu32 "\n",
-				 function,
-				 sessions_entry_index,
-				 type );
+				if( format_version == 1 )
+				{
+					libcnotify_printf(
+					 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
+					 function,
+					 entry_index,
+					 flags );
 
-				libcnotify_printf(
-				 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
-				 function,
-				 sessions_entry_index,
-				 first_sector );
+					libcnotify_printf(
+					 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu64 "\n",
+					 function,
+					 entry_index,
+					 first_sector );
+				}
+				else if( format_version == 2 )
+				{
+					libcnotify_printf(
+					 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu64 "\n",
+					 function,
+					 entry_index,
+					 first_sector );
 
+					libcnotify_printf(
+					 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
+					 function,
+					 entry_index,
+					 flags );
+				}
 				libcnotify_printf(
-				 "%s: entry: %02" PRIu32 " unknown2:\n",
+				 "%s: entry: %02" PRIu32 " unknown1:\n",
 				 function,
-				 sessions_entry_index );
-				libcnotify_print_data(
-				 ( session_entries[ sessions_entry_index ] ).unknown2,
-				 24,
-				 0 );
+				 entry_index );
+
+				if( format_version == 1 )
+				{
+					libcnotify_print_data(
+					 ( (ewf_session_entry_v1_t *) session_entry_data )->unknown1,
+					 24,
+					 0 );
+				}
+				else if( format_version == 2 )
+				{
+					libcnotify_print_data(
+					 ( (ewf_session_entry_v2_t *) session_entry_data )->unknown1,
+					 20,
+					 0 );
+				}
 			}
 #endif
+			session_entry_data += session_entry_data_size;
+
 			if( first_sector < previous_first_sector )
 			{
 				libcerror_error_set(
@@ -4887,13 +5166,13 @@ ssize_t libewf_section_session_read(
 
 				goto on_error;
 			}
-			if( type == 0 )
+			if( ( flags & 0x00000001UL ) == 0 )
 			{
 				number_of_sectors = first_sector - session_first_sector;
 
 				if( libewf_sector_list_append_sector(
 				     sessions,
-				     (uint64_t) session_first_sector,
+				     session_first_sector,
 				     (uint64_t) number_of_sectors,
 				     0,
 				     error ) != 1 )
@@ -4909,13 +5188,13 @@ ssize_t libewf_section_session_read(
 				}
 				session_first_sector = first_sector;
 			}
-			if( previous_type == 1 )
+			if( ( previous_flags & 0x00000001UL ) != 0 )
 			{
 				number_of_sectors = first_sector - track_first_sector;
 
 				if( libewf_sector_list_append_sector(
 				     tracks,
-				     (uint64_t) track_first_sector,
+				     track_first_sector,
 				     (uint64_t) number_of_sectors,
 				     0,
 				     error ) != 1 )
@@ -4931,13 +5210,13 @@ ssize_t libewf_section_session_read(
 				}
 				track_first_sector = first_sector;
 			}
-			previous_type         = type;
 			previous_first_sector = first_sector;
+			previous_flags        = flags;
 		}
 		memory_free(
-		 session_entries );
+		 session_entries_data );
 
-		session_entries = NULL;
+		session_entries_data = NULL;
 
 		if( media_values->number_of_sectors > session_first_sector )
 		{
@@ -4949,7 +5228,7 @@ ssize_t libewf_section_session_read(
 		}
 		if( libewf_sector_list_append_sector(
 		     sessions,
-		     (uint64_t) session_first_sector,
+		     session_first_sector,
 		     (uint64_t) number_of_sectors,
 		     0,
 		     error ) != 1 )
@@ -4963,7 +5242,7 @@ ssize_t libewf_section_session_read(
 
 			goto on_error;
 		}
-		if( type == 1 )
+		if( ( flags & 0x00000001UL ) != 0 )
 		{
 			if( media_values->number_of_sectors > track_first_sector )
 			{
@@ -4975,7 +5254,7 @@ ssize_t libewf_section_session_read(
 			}
 			if( libewf_sector_list_append_sector(
 			     tracks,
-			     (uint64_t) track_first_sector,
+			     track_first_sector,
 			     (uint64_t) number_of_sectors,
 			     0,
 			     error ) != 1 )
@@ -5002,10 +5281,10 @@ ssize_t libewf_section_session_read(
 	return( total_read_count );
 
 on_error:
-	if( session_entries != NULL )
+	if( session_entries_data != NULL )
 	{
 		memory_free(
-		 session_entries );
+		 session_entries_data );
 	}
 	return( -1 );
 }
@@ -5022,29 +5301,29 @@ ssize_t libewf_section_session_write(
          libewf_sector_list_t *tracks,
          libcerror_error_t **error )
 {
-	ewf_session_header_t session_header;
+	ewf_session_header_v1_t session_header;
 	uint8_t calculated_checksum_buffer[ 4 ];
 
-	ewf_session_entry_t *session_entries = NULL;
-	static char *function                = "libewf_section_session_write";
-	size64_t section_size                = 0;
-	size_t session_entries_size          = 0;
-	ssize_t total_write_count            = 0;
-	ssize_t write_count                  = 0;
-	uint64_t current_sector              = 0;
-	uint64_t session_first_sector        = 0;
-	uint64_t session_last_sector         = 0;
-	uint64_t session_number_of_sectors   = 0;
-	uint64_t track_first_sector          = 0;
-	uint64_t track_last_sector           = 0;
-	uint64_t track_number_of_sectors     = 0;
-	uint32_t calculated_checksum         = 0;
-	int number_of_sessions               = 0;
-	int number_of_sessions_entries       = 0;
-	int number_of_tracks                 = 0;
-	int session_index                    = 0;
-	int sessions_entry_index             = 0;
-	int track_index                      = 0;
+	ewf_session_entry_v1_t *session_entries = NULL;
+	static char *function                   = "libewf_section_session_write";
+	size64_t section_size                   = 0;
+	size_t session_entries_size             = 0;
+	ssize_t total_write_count               = 0;
+	ssize_t write_count                     = 0;
+	uint64_t current_sector                 = 0;
+	uint64_t session_first_sector           = 0;
+	uint64_t session_last_sector            = 0;
+	uint64_t session_number_of_sectors      = 0;
+	uint64_t track_first_sector             = 0;
+	uint64_t track_last_sector              = 0;
+	uint64_t track_number_of_sectors        = 0;
+	uint32_t calculated_checksum            = 0;
+	uint32_t entry_index                    = 0;
+	int number_of_sessions                  = 0;
+	int number_of_entries                   = 0;
+	int number_of_tracks                    = 0;
+	int session_index                       = 0;
+	int track_index                         = 0;
 
 	if( section == NULL )
 	{
@@ -5110,12 +5389,12 @@ ssize_t libewf_section_session_write(
 	if( ( number_of_sessions != 0 )
 	 && ( number_of_tracks == 0 ) )
 	{
-		number_of_sessions_entries = number_of_sessions;
+		number_of_entries = number_of_sessions;
 	}
 	else if( ( number_of_sessions == 0 )
 	      && ( number_of_tracks != 0 ) )
 	{
-		number_of_sessions_entries = number_of_tracks;
+		number_of_entries = number_of_tracks;
 	}
 	else if( ( number_of_sessions != 0 )
 	      && ( number_of_tracks != 0 ) )
@@ -5180,7 +5459,7 @@ ssize_t libewf_section_session_write(
 			 && ( current_sector >= track_first_sector )
 			 && ( current_sector < track_last_sector ) )
 			{
-				number_of_sessions_entries++;
+				number_of_entries++;
 
 				current_sector = track_last_sector;
 			}
@@ -5191,7 +5470,7 @@ ssize_t libewf_section_session_write(
 				if( ( track_last_sector == 0 )
 				 || ( track_last_sector < session_first_sector ) ) 
 				{
-					number_of_sessions_entries++;
+					number_of_entries++;
 				}
 				current_sector = session_last_sector;
 			}
@@ -5199,7 +5478,7 @@ ssize_t libewf_section_session_write(
 		while( ( session_index < number_of_sessions )
 		    || ( track_index < number_of_tracks ) );
 	}
-	if( number_of_sessions_entries == 0 )
+	if( number_of_entries == 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5214,19 +5493,19 @@ ssize_t libewf_section_session_write(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: number of sessions entries\t\t: %" PRIu32 "\n",
+		 "%s: number of entries\t\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_sessions_entries );
+		 number_of_entries );
 
 		libcnotify_printf(
 		 "\n" );
 	}
 #endif
-	session_entries_size = sizeof( ewf_session_entry_t )
-	                     * number_of_sessions_entries;
+	session_entries_size = sizeof( ewf_session_entry_v1_t )
+	                     * number_of_entries;
 
 	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + sizeof( ewf_session_header_t )
+	             + sizeof( ewf_session_header_v1_t )
 	             + session_entries_size
 	             + sizeof( uint32_t );
 
@@ -5269,7 +5548,7 @@ ssize_t libewf_section_session_write(
 	if( memory_set(
 	     &session_header,
 	     0,
-	     sizeof( ewf_session_header_t ) ) == NULL )
+	     sizeof( ewf_session_header_v1_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -5280,13 +5559,14 @@ ssize_t libewf_section_session_write(
 
 		goto on_error;
 	}
+/* TODO check if number_of_entries is in bounds */
 	byte_stream_copy_from_uint32_little_endian(
-	 session_header.number_of_sessions,
-	 (uint32_t) number_of_sessions_entries );
+	 session_header.number_of_entries,
+	 (uint32_t) number_of_entries );
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       &session_header,
-	                       sizeof( ewf_session_header_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_session_header_v1_t ) - sizeof( uint32_t ),
 	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -5297,10 +5577,10 @@ ssize_t libewf_section_session_write(
 	               file_io_pool,
 	               file_io_pool_entry,
 	               (uint8_t *) &session_header,
-	               sizeof( ewf_session_header_t ),
+	               sizeof( ewf_session_header_v1_t ),
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_session_header_t ) )
+	if( write_count != (ssize_t) sizeof( ewf_session_header_v1_t ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -5313,8 +5593,8 @@ ssize_t libewf_section_session_write(
 	}
 	total_write_count += write_count;
 
-	session_entries = (ewf_session_entry_t *) memory_allocate(
-	                                           session_entries_size );
+	session_entries = (ewf_session_entry_v1_t *) memory_allocate(
+	                                              session_entries_size );
 
 	if( session_entries == NULL )
 	{
@@ -5409,20 +5689,20 @@ ssize_t libewf_section_session_write(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: entry: %02" PRIu32 " type\t\t\t\t: 1\n",
+				 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 1\n",
 				 function,
-				 sessions_entry_index );
+				 entry_index );
 
 				libcnotify_printf(
 				 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
 				 function,
-				 sessions_entry_index,
+				 entry_index,
 				 track_first_sector );
 
 				libcnotify_printf(
 				 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
 				 function,
-				 sessions_entry_index,
+				 entry_index,
 				 track_last_sector );
 
 				libcnotify_printf(
@@ -5433,19 +5713,19 @@ ssize_t libewf_section_session_write(
 			 * This is either some EnCase specific behavior or the value is used for
 			 * other purposes.
 			 */
-			if( ( sessions_entry_index == 0 )
+			if( ( entry_index == 0 )
 			 && ( track_first_sector == 0 ) )
 			{
 				track_first_sector = 16;
 			}
 			byte_stream_copy_from_uint32_little_endian(
-			 ( session_entries[ sessions_entry_index ] ).type,
+			 ( session_entries[ entry_index ] ).flags,
 			 1 );
 			byte_stream_copy_from_uint32_little_endian(
-			 ( session_entries[ sessions_entry_index ] ).first_sector,
+			 ( session_entries[ entry_index ] ).first_sector,
 			 (uint32_t) track_first_sector );
 
-			sessions_entry_index++;
+			entry_index++;
 
 			current_sector = track_last_sector;
 		}
@@ -5460,20 +5740,20 @@ ssize_t libewf_section_session_write(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: entry: %02" PRIu32 " type\t\t\t\t: 0\n",
+					 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0\n",
 					 function,
-					 sessions_entry_index );
+					 entry_index );
 
 					libcnotify_printf(
 					 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
 					 function,
-					 sessions_entry_index,
+					 entry_index,
 					 session_first_sector );
 
 					libcnotify_printf(
 					 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
 					 function,
-					 sessions_entry_index,
+					 entry_index,
 					 session_last_sector );
 
 					libcnotify_printf(
@@ -5484,20 +5764,20 @@ ssize_t libewf_section_session_write(
 				 * This is either some EnCase specific behavior or the value is used for
 				 * other purposes.
 				 */
-				if( ( sessions_entry_index == 0 )
+				if( ( entry_index == 0 )
 				 && ( session_first_sector == 0 ) )
 				{
 					session_first_sector = 16;
 				}
 				byte_stream_copy_from_uint32_little_endian(
-				 ( session_entries[ sessions_entry_index ] ).first_sector,
+				 ( session_entries[ entry_index ] ).first_sector,
 				 (uint32_t) session_first_sector );
 
-				sessions_entry_index++;
+				entry_index++;
 			}
 			current_sector = session_last_sector;
 		}
-		if( sessions_entry_index >= number_of_sessions_entries )
+		if( entry_index >= (uint32_t) number_of_entries )
 		{
 			break;
 		}
@@ -5568,7 +5848,7 @@ on_error:
 	return( -1 );
 }
 
-/* Reads a table section header
+/* Reads a version 1 table or table2 section header or version 2 sector table section header
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_table_header_read(
@@ -5581,17 +5861,17 @@ ssize_t libewf_section_table_header_read(
          uint64_t *base_offset,
          libcerror_error_t **error )
 {
-	uint8_t section_data[ 32 ];
+	uint8_t table_header_data[ 32 ];
 
-	static char *function        = "libewf_section_table_header_read";
-	size_t section_data_size     = 0;
-	ssize_t read_count           = 0;
-	uint32_t calculated_checksum = 0;
-	uint32_t stored_checksum     = 0;
+	static char *function         = "libewf_section_table_header_read";
+	size_t table_header_data_size = 0;
+	ssize_t read_count            = 0;
+	uint32_t calculated_checksum  = 0;
+	uint32_t stored_checksum      = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint64_t value_64bit         = 0;
-	uint32_t value_32bit         = 0;
+	uint64_t value_64bit          = 0;
+	uint32_t value_32bit          = 0;
 #endif
 
 	LIBEWF_UNREFERENCED_PARAMETER( format )
@@ -5609,11 +5889,11 @@ ssize_t libewf_section_table_header_read(
 	}
 	if( format_version == 1 )
 	{
-		section_data_size = sizeof( ewf_table_header_v1_t );
+		table_header_data_size = sizeof( ewf_table_header_v1_t );
 	}
 	else if( format_version == 2 )
 	{
-		section_data_size = sizeof( ewf_table_header_v2_t );
+		table_header_data_size = sizeof( ewf_table_header_v2_t );
 	}
 	else
 	{
@@ -5648,7 +5928,7 @@ ssize_t libewf_section_table_header_read(
 
 		return( -1 );
 	}
-	if( section->data_size < (size64_t) section_data_size )
+	if( section->data_size < (size64_t) table_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -5662,17 +5942,17 @@ ssize_t libewf_section_table_header_read(
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
 	              file_io_pool_entry,
-	              section_data,
-	              section_data_size,
+	              table_header_data,
+	              table_header_data_size,
 	              error );
 	
-	if( read_count != (ssize_t) section_data_size )
+	if( read_count != (ssize_t) table_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table header.",
+		 "%s: unable to read table header data.",
 		 function );
 
 		return( -1 );
@@ -5684,38 +5964,38 @@ ssize_t libewf_section_table_header_read(
 	 	 "%s: table header data:\n",
 		 function );
 		libcnotify_print_data(
-		 section_data,
-		 section_data_size,
+		 table_header_data,
+		 table_header_data_size,
 		 0 );
 	}
 #endif
 	if( format_version == 1 )
 	{
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_table_header_v1_t *) section_data )->number_of_entries,
+		 ( (ewf_table_header_v1_t *) table_header_data )->number_of_entries,
 		 *number_of_entries );
 
 		byte_stream_copy_to_uint64_little_endian(
-		 ( (ewf_table_header_v1_t *) section_data )->base_offset,
+		 ( (ewf_table_header_v1_t *) table_header_data )->base_offset,
 		 *base_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_table_header_v1_t *) section_data )->checksum,
+		 ( (ewf_table_header_v1_t *) table_header_data )->checksum,
 		 stored_checksum );
 	}
 	else if( format_version == 2 )
 	{
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_table_header_v2_t *) section_data )->number_of_entries,
+		 ( (ewf_table_header_v2_t *) table_header_data )->number_of_entries,
 		 *number_of_entries );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_table_header_v2_t *) section_data )->checksum,
+		 ( (ewf_table_header_v2_t *) table_header_data )->checksum,
 		 stored_checksum );
 
 		/* The 12 byte alignment padding is not part of the table header
 		 */
-		section_data_size -= 12;
+		table_header_data_size -= 12;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -5723,7 +6003,7 @@ ssize_t libewf_section_table_header_read(
 		if( format_version == 2 )
 		{
 			byte_stream_copy_to_uint64_little_endian(
-			 ( (ewf_table_header_v2_t *) section_data )->unknown1,
+			 ( (ewf_table_header_v2_t *) table_header_data )->unknown1,
 			 value_64bit );
 			libcnotify_printf(
 			 "%s: unknown1\t\t\t\t: 0x%08" PRIx64 "\n",
@@ -5738,7 +6018,7 @@ ssize_t libewf_section_table_header_read(
 		if( format_version == 1 )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 ( (ewf_table_header_v1_t *) section_data )->padding1,
+			 ( (ewf_table_header_v1_t *) table_header_data )->padding1,
 			 value_32bit );
 			libcnotify_printf(
 			 "%s: padding1\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -5751,7 +6031,7 @@ ssize_t libewf_section_table_header_read(
 			 *base_offset );
 
 			byte_stream_copy_to_uint32_little_endian(
-			 ( (ewf_table_header_v1_t *) section_data )->padding2,
+			 ( (ewf_table_header_v1_t *) table_header_data )->padding2,
 			 value_32bit );
 			libcnotify_printf(
 			 "%s: padding2\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -5761,7 +6041,7 @@ ssize_t libewf_section_table_header_read(
 		else if( format_version == 2 )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 ( (ewf_table_header_v2_t *) section_data )->unknown2,
+			 ( (ewf_table_header_v2_t *) table_header_data )->unknown2,
 			 value_32bit );
 			libcnotify_printf(
 			 "%s: unknown2\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -5784,15 +6064,15 @@ ssize_t libewf_section_table_header_read(
 			 "%s: padding:\n",
 			 function );
 			libcnotify_print_data(
-			 ( (ewf_table_header_v2_t *) section_data )->padding,
+			 ( (ewf_table_header_v2_t *) table_header_data )->padding,
 			 12,
 			 0 );
 		}
 	}
 #endif
 	calculated_checksum = ewf_checksum_calculate(
-	                       section_data,
-	                       section_data_size - 4,
+	                       table_header_data,
+	                       table_header_data_size - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )

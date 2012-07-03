@@ -1145,7 +1145,6 @@ ssize_t libewf_segment_file_read_volume_section(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
-         libmfdata_list_t *chunk_table_list,
          libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_file_read_volume_section";

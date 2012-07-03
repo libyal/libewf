@@ -22,7 +22,7 @@ libewf_la_SOURCES = \
 	ewf_data.h \
 	ewf_definitions.h \
 	ewf_digest.h \
-	ewf_error2.h \
+	ewf_error.h \
 	ewf_file_header.h \
 	ewf_hash.h \
 	ewf_ltree.h \
@@ -98,7 +98,7 @@ libewf_la_LIBADD = \
 	@LIBMFCACHE_LIBADD@ \
 	@LIBMFDATA_LIBADD@
 
-libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
+libewf_la_LDFLAGS = -no-undefined -version-info 2:1:0
 
 EXTRA_DIST = \
 	libewf_definitions.h.in \

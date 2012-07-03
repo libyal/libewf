@@ -193,10 +193,11 @@ ssize_t libewf_section_digest_write(
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error );
 
-ssize_t libewf_section_error2_read(
+ssize_t libewf_section_error_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          libewf_sector_list_t *acquiry_errors,
          libcerror_error_t **error );
 
@@ -286,6 +287,7 @@ ssize_t libewf_section_session_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          libewf_media_values_t *media_values,
          libewf_sector_list_t *sessions,
          libewf_sector_list_t *tracks,
