@@ -399,7 +399,12 @@ int libewf_chunk_table_read_chunk(
 
 	if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
+		chunk_data->has_checksum  = 1;
 		chunk_data->is_compressed = 1;
+	}
+	else if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_USER_DEFINED_1 ) != 0 )
+	{
+		chunk_data->has_checksum = 1;
 	}
 	chunk_data->is_packed = 1;
 
@@ -495,53 +500,64 @@ int libewf_chunk_table_read_offsets(
 
 		return( -1 );
 	}
-	if( libewf_section_initialize(
-	     &section,
-	     error ) != 1 )
+	if( element_group_size > (size64_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create section.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid element group size value exceeds maximum.",
 		 function );
 
 		goto on_error;
 	}
-	read_count = libewf_section_descriptor_read(
-		      section,
-		      file_io_pool,
-		      file_io_pool_entry,
-		      element_group_offset,
-		      chunk_table->io_handle->major_version,
-		      error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read section descriptor.",
-		 function );
-
-		goto on_error;
-	}
-	if( element_group_size != section->size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid element group size value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
-	element_group_size -= read_count;
-
 	if( chunk_table->io_handle->major_version == 1 )
 	{
+		if( libewf_section_initialize(
+		     &section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create section.",
+			 function );
+
+			goto on_error;
+		}
+		read_count = libewf_section_descriptor_read(
+			      section,
+			      file_io_pool,
+			      file_io_pool_entry,
+			      element_group_offset,
+			      chunk_table->io_handle->major_version,
+			      error );
+
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read section descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		if( element_group_size != section->size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid element group size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
+		element_group_size -= read_count;
+
 		read_count = libewf_section_table_header_read(
 			      section,
 			      file_io_pool,
@@ -579,8 +595,25 @@ int libewf_chunk_table_read_offsets(
 	}
 	else if( chunk_table->io_handle->major_version == 2 )
 	{
-/* TODO check bounds */
-		table_entries_data_size = (size_t) section->data_size;
+		if( libbfio_pool_seek_offset(
+		     file_io_pool,
+		     file_io_pool_entry,
+		     element_group_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek chunk table offset: %" PRIi64 " in file IO pool entry: %d.",
+			 function,
+			 element_group_offset,
+			 file_io_pool_entry );
+
+			goto on_error;
+		}
+		table_entries_data_size = (size_t) element_group_size;
 	}
 	if( table_entries_data_size > (size_t) SSIZE_MAX )
 	{
@@ -650,9 +683,10 @@ int libewf_chunk_table_read_offsets(
 		 0 );
 	}
 #endif
-	/* The EWF-S01 format does not contain a checksum after the table offsets
+	/* The original EWF and SMART (EWF-S01) formats do not contain a checksum after the table offsets
 	 */
-	if( chunk_table->io_handle->ewf_format != EWF_FORMAT_S01 )
+	if( ( chunk_table->io_handle->major_version == 1 )
+	 && ( chunk_table->io_handle->ewf_format != EWF_FORMAT_S01 ) )
 	{
 		if( element_group_size < (size64_t) sizeof( uint32_t ) )
 		{
@@ -765,17 +799,22 @@ int libewf_chunk_table_read_offsets(
 	}
 	else
 	{
-		if( libewf_chunk_table_correct(
-		     chunk_table,
-		     chunk_table_list,
-		     element_index,
-		     file_io_pool_entry,
-		     section,
-		     (off64_t) base_offset,
-		     (ewf_table_entry_v1_t *) table_entries_data,
-		     number_of_offsets,
-		     table_entries_corrupted,
-		     error ) != 1 )
+		if( chunk_table->io_handle->major_version == 1 )
+		{
+			result = libewf_chunk_table_correct_v1(
+				  chunk_table,
+				  chunk_table_list,
+				  element_index,
+				  file_io_pool_entry,
+				  section,
+				  (off64_t) base_offset,
+				  number_of_offsets,
+				  table_entries_data,
+				  table_entries_data_size,
+				  table_entries_corrupted,
+				  error );
+		}
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -792,20 +831,23 @@ int libewf_chunk_table_read_offsets(
 
 	table_entries_data = NULL;
 
-	if( libewf_section_free(
-	     &section,
-	     error ) != 1 )
+	if( chunk_table->io_handle->major_version == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free section.",
-		 function );
+		if( libewf_section_free(
+		     &section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free section.",
+			 function );
 
-		section = NULL;
+			section = NULL;
 
-		goto on_error;
+			goto on_error;
+		}
 	}
 #if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -938,7 +980,7 @@ int libewf_chunk_table_fill_v1(
 	uint32_t next_offset            = 0;
 	uint32_t previous_chunk_flags   = 0;
 	uint32_t stored_offset          = 0;
-	uint32_t table_offset_index     = 0;
+	uint32_t table_entry_index      = 0;
 	uint8_t corrupted               = 0;
 	uint8_t is_compressed           = 0;
 	uint8_t overflow                = 0;
@@ -1006,27 +1048,27 @@ int libewf_chunk_table_fill_v1(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_offset_index ] ).chunk_data_offset,
+	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
 	 stored_offset );
 
-	while( table_offset_index < ( number_of_offsets - 1 ) )
+	while( table_entry_index < ( number_of_offsets - 1 ) )
 	{
 		if( overflow == 0 )
 		{
 			is_compressed  = (uint8_t) ( stored_offset >> 31 );
-			current_offset = stored_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+			current_offset = stored_offset & 0x7fffffffUL;
 		}
 		else
 		{
 			current_offset = stored_offset;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_offset_index + 1 ] ).chunk_data_offset,
+		 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index + 1 ] ).chunk_data_offset,
 		 stored_offset );
 
 		if( overflow == 0 )
 		{
-			next_offset = stored_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+			next_offset = stored_offset & 0x7fffffffUL;
 		}
 		else
 		{
@@ -1229,16 +1271,16 @@ int libewf_chunk_table_fill_v1(
 		}
 		chunk_index++;
 
-		table_offset_index++;
+		table_entry_index++;
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_offset_index ] ).chunk_data_offset,
+	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
 	 stored_offset );
 
 	if( overflow == 0 )
 	{
 		is_compressed  = (uint8_t) ( stored_offset >> 31 );
-		current_offset = stored_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+		current_offset = stored_offset & 0x7fffffffUL;
 	}
 	else
 	{
@@ -1307,7 +1349,9 @@ int libewf_chunk_table_fill_v1(
 #endif
 		corrupted = 1;
 	}
-	chunk_flags = 0;
+	/* Used to indicate the chunk has a checksum
+	 */
+	chunk_flags = LIBMFDATA_RANGE_FLAG_USER_DEFINED_1;
 
 	if( is_compressed != 0 )
 	{
@@ -1439,7 +1483,7 @@ int libewf_chunk_table_fill_v1(
 	return( 1 );
 }
 
-/* Fills the chunk table from the EWF version 1 sector table entries
+/* Fills the chunk table from the EWF version 2 sector table entries
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_table_fill_v2(
@@ -1451,7 +1495,17 @@ int libewf_chunk_table_fill_v2(
      size_t table_entries_data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_chunk_table_fill_v2";
+	static char *function           = "libewf_chunk_table_fill_v2";
+	off64_t previous_chunk_offset   = 0;
+	size64_t previous_chunk_size    = 0;
+	size_t table_entry_index        = 0;
+	uint64_t chunk_offset           = 0;
+	uint32_t chunk_data_flags       = 0;
+	uint32_t chunk_flags            = 0;
+	uint32_t chunk_size             = 0;
+	uint32_t previous_chunk_flags   = 0;
+	int previous_file_io_pool_entry = 0;
+	int result                      = 0;
 
 	if( chunk_table == NULL )
 	{
@@ -1486,25 +1540,174 @@ int libewf_chunk_table_fill_v2(
 
 		return( -1 );
 	}
-	return( -1 );
+	while( table_entries_data_size >= sizeof( ewf_table_entry_v2_t ) )
+	{
+		byte_stream_copy_to_uint64_little_endian(
+		 ( ( (ewf_table_entry_v2_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
+		 chunk_offset );
+
+		byte_stream_copy_to_uint32_little_endian(
+		 ( ( (ewf_table_entry_v2_t *) table_entries_data )[ table_entry_index ] ).chunk_data_size,
+		 chunk_size );
+
+		byte_stream_copy_to_uint32_little_endian(
+		 ( ( (ewf_table_entry_v2_t *) table_entries_data )[ table_entry_index ] ).chunk_data_flags,
+		 chunk_data_flags );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: table entry: %03" PRIzd " chunk data offset:\t\t0x%08" PRIx64 ".\n",
+			 function,
+			 table_entry_index,
+			 chunk_offset );
+
+			libcnotify_printf(
+			 "%s: table entry: %03" PRIzd " chunk data size:\t\t%" PRIu32 ".\n",
+			 function,
+			 table_entry_index,
+			 chunk_size );
+
+			libcnotify_printf(
+			 "%s: table entry: %03" PRIzd " chunk data flags:\t\t0x%08" PRIx32 ".\n",
+			 function,
+			 table_entry_index,
+			 chunk_data_flags );
+		}
+#endif
+		if( ( chunk_data_flags & ~( 0x00000007UL ) ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported chunk data flags.",
+			 function );
+
+			return( -1 );
+		}
+		chunk_flags = 0;
+
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
+		{
+			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+		}
+		else if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
+		{
+			chunk_flags |= LIBMFDATA_RANGE_FLAG_USER_DEFINED_1;
+		}
+		else if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_SPARSE_PATTERN_FILL ) != 0 )
+		{
+			chunk_flags |= LIBMFDATA_RANGE_FLAG_USER_DEFINED_2;
+		}
+		result = libmfdata_list_is_group(
+		          chunk_table_list,
+		          chunk_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if chunk: %d is a group.",
+			 function,
+			 chunk_index );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			if( libmfdata_list_set_element_by_index(
+			     chunk_table_list,
+			     chunk_index,
+			     file_io_pool_entry,
+			     chunk_offset,
+			     (size64_t) chunk_size,
+			     chunk_flags,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set chunk: %d.",
+				 function,
+				 chunk_index );
+
+				return( -1 );
+			}
+		}
+		else
+		{
+			if( libmfdata_list_get_data_range_by_index(
+			     chunk_table_list,
+			     chunk_index,
+			     &previous_file_io_pool_entry,
+			     &previous_chunk_offset,
+			     &previous_chunk_size,
+			     &previous_chunk_flags,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve data range of chunk: %d.",
+				 function,
+				 chunk_index );
+
+				return( -1 );
+			}
+			if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: unable to set data range of chunk: %d value already set.",
+				 function,
+				 chunk_index );
+
+				return( -1 );
+			}
+			/* No need to overwrite the data range of a delta chunk */
+		}
+		chunk_index++;
+
+		table_entries_data      += sizeof( ewf_table_entry_v2_t );
+		table_entries_data_size -= sizeof( ewf_table_entry_v2_t );
+		table_entry_index++;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
+	return( 1 );
 }
 
 /* Corrects the chunk table from the offsets
  * Returns 1 if successful or -1 on error
  */
-int libewf_chunk_table_correct(
+int libewf_chunk_table_correct_v1(
      libewf_chunk_table_t *chunk_table,
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
      int file_io_pool_entry,
      libewf_section_t *table_section,
      off64_t base_offset,
-     ewf_table_entry_v1_t *table_offsets,
      uint32_t number_of_offsets,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
      uint8_t tainted,
      libcerror_error_t **error )
 {
-	static char *function           = "libewf_chunk_table_correct";
+	static char *function           = "libewf_chunk_table_correct_v1";
 	off64_t last_chunk_offset       = 0;
 	off64_t last_chunk_size         = 0;
 	off64_t previous_chunk_offset   = 0;
@@ -1515,7 +1718,7 @@ int libewf_chunk_table_correct(
 	uint32_t next_offset            = 0;
 	uint32_t previous_chunk_flags   = 0;
 	uint32_t stored_offset          = 0;
-	uint32_t table_offset_index     = 0;
+	uint32_t table_entry_index      = 0;
 	uint8_t corrupted               = 0;
 	uint8_t is_compressed           = 0;
 	uint8_t mismatch                = 0;
@@ -1562,39 +1765,50 @@ int libewf_chunk_table_correct(
 
 		return( -1 );
 	}
-	if( table_offsets == NULL )
+	if( table_entries_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid table offsets.",
+		 "%s: invalid table entries data.",
+		 function );
+
+		return( -1 );
+	}
+	if( table_entries_data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid table entries data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].chunk_data_offset,
+	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
 	 stored_offset );
 
-	while( table_offset_index < ( number_of_offsets - 1 ) )
+	while( table_entry_index < ( number_of_offsets - 1 ) )
 	{
 		if( overflow == 0 )
 		{
 			is_compressed  = (uint8_t) ( stored_offset >> 31 );
-			current_offset = stored_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+			current_offset = stored_offset & 0x7fffffffUL;
 		}
 		else
 		{
 			current_offset = stored_offset;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 table_offsets[ table_offset_index + 1 ].chunk_data_offset,
+		 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index + 1 ] ).chunk_data_offset,
 		 stored_offset );
 
 		if( overflow == 0 )
 		{
-			next_offset = stored_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+			next_offset = stored_offset & 0x7fffffffUL;
 		}
 		else
 		{
@@ -1872,16 +2086,16 @@ int libewf_chunk_table_correct(
 		}
 		chunk_index++;
 
-		table_offset_index++;
+		table_entry_index++;
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 table_offsets[ table_offset_index ].chunk_data_offset,
+	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
 	 stored_offset );
 
 	if( overflow == 0 )
 	{
 		is_compressed  = (uint8_t) ( stored_offset >> 31 );
-		current_offset = stored_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+		current_offset = stored_offset & 0x7fffffffUL;
 	}
 	else
 	{
@@ -2253,7 +2467,7 @@ int libewf_chunk_table_fill_offsets(
 
 		if( ( chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
-			table_offset |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
+			table_offset |= 0x80000000UL;
 		}
 		byte_stream_copy_from_uint32_little_endian(
 		 table_offsets[ table_offset_index ].chunk_data_offset,

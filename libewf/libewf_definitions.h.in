@@ -246,6 +246,23 @@ enum LIBEWF_SEGMENT_FILE_FLAGS
 	LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN			= 0x02
 };
 
+/* The chunk data flag definitions
+ */
+enum LIBEWF_CHUNK_DATA_FLAGS
+{
+	/* The chunk data is compressed
+	 */
+	LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED			= 0x00000001UL,
+
+	/* The chunk data has a checksum
+	 */
+	LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM			= 0x00000002UL,
+
+	/* The chunk data is sparse and uses pattern fill
+	 */
+	LIBEWF_CHUNK_DATA_FLAG_IS_SPARSE_PATTERN_FILL		= 0x00000004UL
+};
+
 #if defined( HAVE_DEBUG_OUTPUT )
 #define LIBEWF_ITEM_FLAGS_DEFAULT				LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE
 #else

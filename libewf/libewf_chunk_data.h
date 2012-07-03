@@ -55,6 +55,10 @@ struct libewf_chunk_data
 	 */
 	size_t compressed_data_size;
 
+	/* Value to indicate the chunk has a checksum
+	 */
+	uint8_t has_checksum;
+
 	/* Value to indicate the chunk is compressed
 	 */
 	uint8_t is_compressed;

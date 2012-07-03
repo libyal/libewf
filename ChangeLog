@@ -1,5 +1,11 @@
 TODO
+* change chunk data indication values to flags
+
 * Ex01/Lx01
+  - sector table correct padding size
+  - deal with chunk size
+  - libewf_chunk_table_read_chunk: add support for patten fill
+  - write chunk make sure has checksum flag is handled
   - complete: libewf_chunk_table_fill_v2
   - file naming schema ?
   - add types for globbing
@@ -331,6 +337,9 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120703
+* worked on Ex01 and Lx01 support
 
 20120702
 * worked on Ex01 and Lx01 support

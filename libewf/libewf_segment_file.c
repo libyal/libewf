@@ -841,10 +841,12 @@ ssize_t libewf_segment_file_read_table_section(
          libmfdata_list_t *chunk_table_list,
          libcerror_error_t **error )
 {
-	static char *function      = "libewf_segment_file_read_table_section";
-	ssize_t read_count         = 0;
-	uint64_t base_offset       = 0;
-	uint32_t number_of_offsets = 0;
+	static char *function        = "libewf_segment_file_read_table_section";
+	off64_t element_group_offset = 0;
+	size64_t element_group_size  = 0;
+	ssize_t read_count           = 0;
+	uint64_t base_offset         = 0;
+	uint32_t number_of_offsets   = 0;
 
 	if( segment_file == NULL )
 	{
@@ -914,11 +916,22 @@ ssize_t libewf_segment_file_read_table_section(
 
 			return( -1 );
 		}
+		/* For EWF version 1 the entire table section is considered the group
+		 * because the section descriptor is need to determine the chunk data
+		 * offset and size values
+		 */
+		element_group_offset = section->start_offset;
+		element_group_size   = (size64_t) section->size;
 	}
 	else if( segment_file->major_version == 2 )
 	{
 /* TODO check bounds */
 		number_of_offsets = (uint32_t) ( section->data_size / sizeof( ewf_table_entry_v2_t ) );
+
+		/* For EWF version 2 the table entries are considered the group
+		 */
+		element_group_offset = section->start_offset;
+		element_group_size   = (size64_t) section->data_size;
 	}
 	if( number_of_offsets > 0 )
 	{
@@ -931,8 +944,8 @@ ssize_t libewf_segment_file_read_table_section(
 			     &( chunk_table->last_chunk_filled ),
 			     (int) number_of_offsets,
 			     file_io_pool_entry,
-			     section->start_offset,
-			     section->size,
+			     element_group_offset,
+			     element_group_size,
 			     0,
 			     error ) != 1 )
 			{
@@ -953,8 +966,8 @@ ssize_t libewf_segment_file_read_table_section(
 			     chunk_table->last_chunk_filled,
 			     (int) number_of_offsets,
 			     file_io_pool_entry,
-			     section->start_offset,
-			     section->size,
+			     element_group_offset,
+			     element_group_size,
 			     0,
 			     error ) != 1 )
 			{

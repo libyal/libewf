@@ -367,6 +367,10 @@ int libewf_chunk_data_pack(
 			chunk_data->is_compressed = 1;
 		}
 	}
+/* TODO
+	if( ( chunk_data->is_compressed == 0 )
+	 && ( chunk_data->has_checksum != 0 ) )
+*/
 	if( chunk_data->is_compressed == 0 )
 	{
 		if( ( chunk_data->data_size + sizeof( uint32_t ) ) > chunk_data->allocated_data_size )
@@ -450,42 +454,45 @@ int libewf_chunk_data_unpack(
 	}
 	if( chunk_data->is_compressed == 0 )
 	{
-		if( ( chunk_data->data_size < sizeof( uint32_t ) )
-		 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
+		if( chunk_data->has_checksum != 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: chunk data size value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		chunk_data->data_size -= sizeof( uint32_t );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 &( ( chunk_data->data )[ chunk_data->data_size ] ),
-		 stored_checksum );
-
-		calculated_checksum = ewf_checksum_calculate(
-				       chunk_data->data,
-				       chunk_data->data_size,
-				       1 );
-
-		if( stored_checksum != calculated_checksum )
-		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libcnotify_verbose != 0 )
+			if( ( chunk_data->data_size < sizeof( uint32_t ) )
+			 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
 			{
-				libcnotify_printf(
-				 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").\n",
-				 function,
-				 stored_checksum,
-				 calculated_checksum );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: chunk data size value out of bounds.",
+				 function );
+
+				return( -1 );
 			}
+			chunk_data->data_size -= sizeof( uint32_t );
+
+			byte_stream_copy_to_uint32_little_endian(
+			 &( ( chunk_data->data )[ chunk_data->data_size ] ),
+			 stored_checksum );
+
+			calculated_checksum = ewf_checksum_calculate(
+					       chunk_data->data,
+					       chunk_data->data_size,
+					       1 );
+
+			if( stored_checksum != calculated_checksum )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").\n",
+					 function,
+					 stored_checksum,
+					 calculated_checksum );
+				}
 #endif
-			chunk_data->is_corrupt = 1;
+				chunk_data->is_corrupt = 1;
+			}
 		}
 	}
 	else
