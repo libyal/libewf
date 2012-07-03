@@ -1181,23 +1181,6 @@ ssize_t libewf_segment_file_read_volume_section(
 
 		return( -1 );
 	}
-	if( media_values->number_of_chunks > 0 )
-	{
-		if( libmfdata_list_resize(
-		     chunk_table_list,
-		     (int) media_values->number_of_chunks,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize chunk table list.",
-			 function );
-
-			return( -1 );
-		}
-	}
 	return( read_count );
 }
 

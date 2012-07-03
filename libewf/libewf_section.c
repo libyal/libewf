@@ -6071,9 +6071,8 @@ ssize_t libewf_section_volume_read(
          libewf_media_values_t *media_values,
          libcerror_error_t **error )
 {
-	static char *function    = "libewf_section_volume_read";
-	ssize_t read_count       = 0;
-	size64_t bytes_per_chunk = 0;
+	static char *function = "libewf_section_volume_read";
+	ssize_t read_count    = 0;
 
 	if( section == NULL )
 	{
@@ -6082,17 +6081,6 @@ ssize_t libewf_section_volume_read(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section.",
-		 function );
-
-		return( -1 );
-	}
-	if( media_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -6152,74 +6140,6 @@ ssize_t libewf_section_volume_read(
 
 		return( -1 );
 	}
-	if( media_values->number_of_chunks > (uint64_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid number of chunks value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( media_values->sectors_per_chunk > (uint32_t) INT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid sectors per chunk value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( media_values->bytes_per_sector > (uint32_t) INT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid bytes per sector value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	bytes_per_chunk = (size64_t) media_values->sectors_per_chunk
-	                * (size64_t) media_values->bytes_per_sector;
-
-	if( bytes_per_chunk > (size64_t) INT32_MAX )
-	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: chunk size value exceeds maximum defaulting to: %d.\n",
-			 function,
-			 EWF_MINIMUM_CHUNK_SIZE );
-		}
-#endif
-		bytes_per_chunk = (size64_t) EWF_MINIMUM_CHUNK_SIZE;
-	}
-	media_values->chunk_size = (uint32_t) bytes_per_chunk;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: volume has %" PRIu64 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
-		 function,
-		 media_values->number_of_chunks,
-		 media_values->chunk_size,
-		 media_values->sectors_per_chunk );
-
-		libcnotify_printf(
-		 "%s: volume has %" PRIu64 " sectors of %" PRIi32 " bytes each.\n",
-		 function,
-		 media_values->number_of_sectors,
-		 media_values->bytes_per_sector );
-	}
-#endif
 	return( read_count );
 }
 

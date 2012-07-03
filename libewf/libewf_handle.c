@@ -2698,6 +2698,7 @@ int libewf_handle_open_read_section_data(
 	static char *function                       = "libewf_handle_open_read_section_data";
 	size_t file_object_string_size              = 0;
 	ssize_t read_count                          = 0;
+	int initialize_chunk_table                  = 0;
 	int header_section_found                    = 0;
 	int known_section                           = 0;
 
@@ -2917,24 +2918,9 @@ int libewf_handle_open_read_section_data(
 
 					file_object_string = NULL;
 
-					if( internal_handle->media_values->number_of_chunks > 0 )
-					{
-						if( libmfdata_list_resize(
-						     internal_handle->chunk_table_list,
-						     (int) internal_handle->media_values->number_of_chunks,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
-							 "%s: unable to resize chunk table list.",
-							 function );
-
-							return( -1 );
-						}
-					}
 					known_section = 1;
+
+					initialize_chunk_table = 1;
 					break;
 
 				case LIBEWF_SECTION_TYPE_SECTOR_DATA:
@@ -3172,16 +3158,9 @@ int libewf_handle_open_read_section_data(
 					      internal_handle->chunk_table_list,
 					      error );
 
-				/* Check if the EWF file format is that of EnCase1
-				 * this allows the table read function to reduce verbose
-				 * output of additional data in table section
-				 */
-				if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
-				 && ( header_sections->number_of_header_sections == 1 ) )
-				{
-					internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
-				}
 				known_section = 1;
+
+				initialize_chunk_table = 1;
 			}
 		}
 		else if( section->type_string_length == 5 )
@@ -3314,16 +3293,9 @@ int libewf_handle_open_read_section_data(
 					      internal_handle->chunk_table_list,
 					      error );
 
-				/* Check if the EWF file format is that of EnCase1
-				 * this allows the table read function to reduce verbose
-				 * output of additional data in table section
-				 */
-				if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
-				 && ( header_sections->number_of_header_sections == 1 ) )
-				{
-					internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
-				}
 				known_section = 1;
+
+				initialize_chunk_table = 1;
 			}
 		}
 		else if( section->type_string_length == 7 )
@@ -3360,6 +3332,50 @@ int libewf_handle_open_read_section_data(
 /* TODO change */
 				header_section_found = 1;
 			}
+		}
+		if( initialize_chunk_table != 0 )
+		{
+			if( libewf_media_values_calculate_chunk_size(
+			     internal_handle->media_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to calculate chunk size.",
+				 function );
+
+				return( -1 );
+			}
+			if( internal_handle->media_values->number_of_chunks > 0 )
+			{
+				if( libmfdata_list_resize(
+				     internal_handle->chunk_table_list,
+				     (int) internal_handle->media_values->number_of_chunks,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
+					 "%s: unable to resize chunk table list.",
+					 function );
+
+					return( -1 );
+				}
+			}
+/* TODO check if this can be moved */
+			/* Check if the EWF file format is that of EnCase1
+			 * this allows the table read function to reduce verbose
+			 * output of additional data in table section
+			 */
+			if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
+			 && ( header_sections->number_of_header_sections == 1 ) )
+			{
+				internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
+			}
+			initialize_chunk_table = 0;
 		}
 		if( known_section == 0 )
 		{
