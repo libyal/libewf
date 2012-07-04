@@ -3,8 +3,6 @@ TODO
 * libewf_filename_create split off wide variant ?
 
 * Ex01/Lx01
-  - set media type, media flags
-  - rename error2 to error
   - libewf_chunk_table_read_chunk: add support for patten fill
   - write chunk make sure has checksum flag is handled
   - complete: libewf_chunk_table_fill_v2
@@ -40,6 +38,7 @@ TODO
     - add restart data files
   - add support for no-compression and bzip2 compression
   - make sure the encryption keys are read first
+  - change api to deal with compression method stored in the segment files ?
 
 * Ex01/Lx01 test images
 * memory image -> winen and encase ?
@@ -49,6 +48,7 @@ TODO
 
 * Ex01/Lx01 write support
   - rename libewf_segment_file_write_chunks_section_start ?
+  - move type string generation into the section functions and pass the section type ?
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount

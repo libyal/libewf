@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_definitions.h"
 #include "libewf_device_information.h"
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
@@ -439,7 +440,62 @@ int libewf_device_information_parse_string(
 				else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 				      && ( type_string[ 1 ] == (uint8_t) 't' ) )
 				{
-/* TODO device type */
+					if( value_string_size == 2 )
+					{
+						switch( value_string[ 0 ] )
+						{
+/* TODO need the EWF1 equivalent value
+							case (uint8_t) 'a':
+								media_values->media_type = LIBEWF_MEDIA_TYPE_RAM_DISK;
+								break;
+*/
+
+							case (uint8_t) 'c':
+								media_values->media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
+								break;
+
+							case (uint8_t) 'f':
+								media_values->media_type = LIBEWF_MEDIA_TYPE_FIXED;
+								break;
+
+							case (uint8_t) 'l':
+								media_values->media_type = LIBEWF_MEDIA_TYPE_SINGLE_FILES;
+								break;
+
+							case (uint8_t) 'm':
+								media_values->media_type = LIBEWF_MEDIA_TYPE_MEMORY;
+								break;
+
+/* TODO need the EWF1 equivalent value
+							case (uint8_t) 'p':
+								media_values->media_type = LIBEWF_MEDIA_TYPE_PALM;
+								break;
+*/
+
+							case (uint8_t) 'r':
+								media_values->media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
+								break;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+							default:
+								if( libcnotify_verbose != 0 )
+								{
+									libcnotify_printf(
+								 	"%s: unsupported is drive type.\n",
+									 function );
+								}
+								break;
+#endif
+						}
+					}
+#if defined( HAVE_DEBUG_OUTPUT )
+					else if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+					 	"%s: unsupported drive type.\n",
+						 function );
+					}
+#endif
 				}
 				else if( ( type_string[ 0 ] == (uint8_t) 'h' )
 				      && ( type_string[ 1 ] == (uint8_t) 's' ) )
@@ -483,7 +539,22 @@ int libewf_device_information_parse_string(
 				else if( ( type_string[ 0 ] == (uint8_t) 'p' )
 				      && ( type_string[ 1 ] == (uint8_t) 'h' ) )
 				{
-/* TODO is physical */
+					if( ( value_string_size == 2 )
+					 && ( value_string[ 0 ] == (uint8_t) '1' ) )
+					{
+						media_values->media_flags |= LIBEWF_MEDIA_FLAG_PHYSICAL;
+					}
+#if defined( HAVE_DEBUG_OUTPUT )
+					else
+					{
+						if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+						 	"%s: unsupported is physical.\n",
+							 function );
+						}
+					}
+#endif
 				}
 				else if( ( type_string[ 0 ] == (uint8_t) 'r' )
 				      && ( type_string[ 1 ] == (uint8_t) 's' ) )

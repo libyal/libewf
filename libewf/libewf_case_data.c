@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include "libewf_case_data.h"
+#include "libewf_definitions.h"
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
@@ -457,7 +458,35 @@ int libewf_case_data_parse_string(
 
 						goto on_error;
 					}
-/* TODO compression method */
+					if( value_64bit == 0 )
+					{
+						value_string      = (uint8_t *) "none";
+						value_string_size = 5;
+					}
+					else if( value_64bit == 1 )
+					{
+						value_string      = (uint8_t *) "deflate";
+						value_string_size = 8;
+					}
+					else if( value_64bit == 2 )
+					{
+						value_string      = (uint8_t *) "bzip2";
+						value_string_size = 6;
+					}
+#if defined( HAVE_DEBUG_OUTPUT )
+					else
+					{
+						if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+						 	"%s: unsupported compression method: %" PRIu64 ".\n",
+							 function,
+							 value_64bit );
+						}
+					}
+#endif
+					identifier      = (uint8_t *) "compression_method";
+					identifier_size = 19;
 				}
 				else if( ( type_string[ 0 ] == (uint8_t) 'e' )
 				      && ( type_string[ 1 ] == (uint8_t) 'n' ) )
@@ -617,7 +646,27 @@ int libewf_case_data_parse_string(
 
 						goto on_error;
 					}
-/* TODO write blocker type (media flags) */
+					/* The EnCase specification indicates these are flags and not an enumeration
+					 */
+					if( ( value_64bit & 0x00000001 ) != 0 )
+					{
+						media_values->media_flags |= LIBEWF_MEDIA_FLAG_FASTBLOC;
+					}
+					if( ( value_64bit & 0x00000002 ) != 0 )
+					{
+						media_values->media_flags |= LIBEWF_MEDIA_FLAG_TABLEAU;
+					}
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( ( value_64bit & ~( 0x00000003 ) ) != 0 )
+					{
+						if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+						 	"%s: unsupported write blocker type.\n",
+							 function );
+						}
+					}
+#endif
 				}
 			}
 			if( identifier != NULL )

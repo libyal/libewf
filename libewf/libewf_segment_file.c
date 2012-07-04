@@ -2303,7 +2303,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               5,
 		               section_offset,
 		               0,
-		               table_offsets,
+		               (uint8_t *) table_offsets,
 		               chunks_per_section,
 		               0,
 		               io_handle->ewf_format,
@@ -2544,7 +2544,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               5,
 		               chunks_section_offset,
 		               0,
-		               table_offsets,
+		               (uint8_t *) table_offsets,
 		               section_number_of_chunks,
 		               chunks_section_size,
 		               io_handle->ewf_format,
@@ -2661,7 +2661,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               5,
 		               section_offset,
 		               base_offset,
-		               table_offsets,
+		               (uint8_t *) table_offsets,
 		               section_number_of_chunks,
 		               0,
 		               io_handle->ewf_format,
@@ -2720,7 +2720,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               6,
 		               section_offset,
 		               base_offset,
-		               table_offsets,
+		               (uint8_t *) table_offsets,
 		               section_number_of_chunks,
 		               0,
 		               io_handle->format,
@@ -3463,6 +3463,7 @@ ssize_t libewf_segment_file_write_close(
 					       section,
 					       file_io_pool,
 					       file_io_pool_entry,
+					       segment_file->major_version,
 					       section_offset,
 					       sessions,
 					       tracks,
@@ -3538,10 +3539,11 @@ ssize_t libewf_segment_file_write_close(
 
 					goto on_error;
 				}
-				write_count = libewf_section_error2_write(
+				write_count = libewf_section_error_write(
 					       section,
 					       file_io_pool,
 					       file_io_pool_entry,
+					       segment_file->major_version,
 					       section_offset,
 					       acquiry_errors,
 					       error );
@@ -3552,7 +3554,7 @@ ssize_t libewf_segment_file_write_close(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable to write error2 section.",
+					 "%s: unable to write error section.",
 					 function );
 
 					goto on_error;
@@ -3653,10 +3655,11 @@ ssize_t libewf_segment_file_write_close(
 
 				goto on_error;
 			}
-			write_count = libewf_section_hash_write(
+			write_count = libewf_section_md5_hash_write(
 			               section,
 			               file_io_pool,
 			               file_io_pool_entry,
+			               segment_file->major_version,
 			               section_offset,
 			               hash_sections,
 			               error );
@@ -3667,7 +3670,7 @@ ssize_t libewf_segment_file_write_close(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write hash section.",
+				 "%s: unable to write MD5 hash section.",
 				 function );
 
 				goto on_error;
