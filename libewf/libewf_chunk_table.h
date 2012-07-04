@@ -119,6 +119,16 @@ int libewf_chunk_table_fill_v1(
      uint8_t tainted,
      libcerror_error_t **error );
 
+int libewf_chunk_table_fill_v2(
+     libewf_chunk_table_t *chunk_table,
+     libmfdata_list_t *chunk_table_list,
+     int chunk_index,
+     int file_io_pool_entry,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
+     uint8_t tainted,
+     libcerror_error_t **error );
+
 int libewf_chunk_table_correct_v1(
      libewf_chunk_table_t *chunk_table,
      libmfdata_list_t *chunk_table_list,

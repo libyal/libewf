@@ -3676,7 +3676,7 @@ int export_handle_set_output_values(
 
 					return( -1 );
 				}
-				if( libewf_handle_set_guid(
+				if( libewf_handle_set_segment_file_set_identifier(
 				     export_handle->ewf_output_handle,
 				     guid,
 				     16,
@@ -3686,7 +3686,7 @@ int export_handle_set_output_values(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set GUID.",
+					 "%s: unable to set segment file set identifier.",
 					 function );
 
 					return( -1 );

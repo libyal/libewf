@@ -36,6 +36,13 @@ TODO
     - add case data files
     - add device info files
     - change ewf_error2.h to ewf_error.h
+  - add support for no-compression and bzip2 compression
+
+* Ex01/Lx01 test images
+* memory image -> winen and encase ?
+* resumed ?
+* encrypted
+* open single files ?
 
 * Ex01/Lx01 write support
   - rename libewf_segment_file_write_chunks_section_start ?
@@ -339,6 +346,9 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120704
+* worked on Ex01 and Lx01 support
 
 20120703
 * worked on Ex01 and Lx01 support

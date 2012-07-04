@@ -828,6 +828,7 @@ int libewf_chunk_table_read_offsets(
 			          file_io_pool_entry,
 			          table_entries_data,
 			          table_entries_data_size,
+			          table_entries_corrupted,
 			          error );
 		}
 		if( result != 1 )
@@ -1535,6 +1536,7 @@ int libewf_chunk_table_fill_v2(
      int file_io_pool_entry,
      const uint8_t *table_entries_data,
      size_t table_entries_data_size,
+     uint8_t tainted,
      libcerror_error_t **error )
 {
 	static char *function           = "libewf_chunk_table_fill_v2";
@@ -1640,13 +1642,17 @@ int libewf_chunk_table_fill_v2(
 		{
 			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 		}
-		else if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
 		{
 			chunk_flags |= LIBMFDATA_RANGE_FLAG_USER_DEFINED_1;
 		}
-		else if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_SPARSE_PATTERN_FILL ) != 0 )
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_SPARSE_PATTERN_FILL ) != 0 )
 		{
 			chunk_flags |= LIBMFDATA_RANGE_FLAG_USER_DEFINED_2;
+		}
+		if( tainted != 0 )
+		{
+			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
 		}
 		result = libmfdata_list_is_group(
 		          chunk_table_list,

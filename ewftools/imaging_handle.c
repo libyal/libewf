@@ -4423,7 +4423,7 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( libewf_handle_set_guid(
+		if( libewf_handle_set_segment_file_set_identifier(
 		     imaging_handle->output_handle,
 		     guid,
 		     GUID_SIZE,
@@ -4433,14 +4433,14 @@ int imaging_handle_set_output_values(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set GUID.",
+			 "%s: unable to set segment file set identifier.",
 			 function );
 
 			return( -1 );
 		}
 		if( imaging_handle->secondary_output_handle != NULL )
 		{
-			if( libewf_handle_set_guid(
+			if( libewf_handle_set_segment_file_set_identifier(
 			     imaging_handle->secondary_output_handle,
 			     guid,
 			     GUID_SIZE,
@@ -4450,7 +4450,7 @@ int imaging_handle_set_output_values(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set GUID in secondary output handle.",
+				 "%s: unable to set segment file set identifier in secondary output handle.",
 				 function );
 
 				return( -1 );
