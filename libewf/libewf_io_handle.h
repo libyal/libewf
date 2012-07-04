@@ -73,6 +73,10 @@ struct libewf_io_handle
 	 */
 	uint8_t force_compression;
 
+	/* Value to indicate the data and some metadata is encrypted
+	 */
+	uint8_t is_encrypted;
+
 	/* The header codepage
 	 */
 	int header_codepage;

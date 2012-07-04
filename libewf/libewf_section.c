@@ -666,9 +666,16 @@ ssize_t libewf_section_descriptor_read(
 	else if( format_version == 2 )
 	{
 /* TODO check sanity of start offset and data size, padding size */
-		section->start_offset = file_offset - section->data_size;
-		section->size         = section->data_size + sizeof( ewf_section_descriptor_v2_t );
-		section->end_offset   = file_offset + sizeof( ewf_section_descriptor_v2_t );
+		if( section->start_offset == 0 )
+		{
+			section->start_offset = sizeof( ewf_file_header_v2_t );
+		}
+		else
+		{
+			section->start_offset += sizeof( ewf_section_descriptor_v2_t );
+		}
+		section->end_offset = file_offset + sizeof( ewf_section_descriptor_v2_t );
+		section->size       = (size64_t) ( section->end_offset - section->start_offset );
 	}
 	if( ( section->size != 0 )
 	 && ( ( section->size < (size64_t) section_descriptor_data_size )

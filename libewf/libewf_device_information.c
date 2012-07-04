@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_device_information.h"
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"

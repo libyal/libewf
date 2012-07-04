@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_analytical_data.h"
 #include "libewf_case_data.h"
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
@@ -44,6 +45,7 @@
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_metadata.h"
+#include "libewf_restart_data.h"
 #include "libewf_sector_list.h"
 #include "libewf_segment_file.h"
 #include "libewf_single_file_entry.h"
@@ -2851,6 +2853,12 @@ int libewf_handle_open_read_section_data(
 			switch( section->type )
 			{
 				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
+					if( internal_handle->io_handle->is_encrypted != 0 )
+					{
+/* TODO: read, decrypt, decompress
+ */
+						break;
+					}
 					read_count = libewf_section_compressed_string_read(
 						      section,
 						      file_io_pool,
@@ -2895,6 +2903,12 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_CASE_DATA:
+					if( internal_handle->io_handle->is_encrypted != 0 )
+					{
+/* TODO: read, decrypt, decompress
+ */
+						break;
+					}
 					read_count = libewf_section_compressed_string_read(
 						      section,
 						      file_io_pool,
@@ -2958,6 +2972,12 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
+					if( internal_handle->io_handle->is_encrypted != 0 )
+					{
+/* TODO: read, decrypt, decompress
+ */
+						break;
+					}
 					read_count = libewf_segment_file_read_table_section(
 						      segment_file,
 						      section,
@@ -3026,6 +3046,12 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_MD5_HASH:
+					if( internal_handle->io_handle->is_encrypted != 0 )
+					{
+/* TODO: read, decrypt, decompress
+ */
+						break;
+					}
 					read_count = libewf_section_md5_hash_read(
 						      section,
 						      file_io_pool,
@@ -3038,6 +3064,12 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_SHA1_HASH:
+					if( internal_handle->io_handle->is_encrypted != 0 )
+					{
+/* TODO: read, decrypt, decompress
+ */
+						break;
+					}
 					read_count = libewf_section_sha1_hash_read(
 						      section,
 						      file_io_pool,
@@ -3068,7 +3100,20 @@ int libewf_handle_open_read_section_data(
 
 						goto on_error;
 					}
-/* TODO */
+					if( libewf_restart_data_parse(
+					     file_object_string,
+					     file_object_string_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+						 "%s: unable to parse restart data.",
+						 function );
+
+						goto on_error;
+					}
 					memory_free(
 					 file_object_string );
 
@@ -3105,6 +3150,12 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
+					if( internal_handle->io_handle->is_encrypted != 0 )
+					{
+/* TODO: read, decrypt, decompress
+ */
+						break;
+					}
 					read_count = libewf_section_compressed_string_read(
 						      section,
 						      file_io_pool,
@@ -3124,7 +3175,20 @@ int libewf_handle_open_read_section_data(
 
 						goto on_error;
 					}
-/* TODO */
+					if( libewf_analytical_data_parse(
+					     file_object_string,
+					     file_object_string_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+						 "%s: unable to parse analytical data.",
+						 function );
+
+						goto on_error;
+					}
 					memory_free(
 					 file_object_string );
 
@@ -3788,7 +3852,7 @@ int libewf_handle_open_read_segment_files(
 			{
 				if( section->type == LIBEWF_SECTION_TYPE_NEXT )
 				{
-					last_section  = 1;
+					last_section = 1;
 				}
 				else if( section->type == LIBEWF_SECTION_TYPE_DONE )
 				{
@@ -3826,6 +3890,11 @@ int libewf_handle_open_read_segment_files(
 			}
 			else if( segment_file->major_version == 2 )
 			{
+				if( section->type == LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS )
+				{
+/* TODO */
+					internal_handle->io_handle->is_encrypted = 1;
+				}
 				if( segment_file->last_section_offset == 0 )
 				{
 					if( section->type == LIBEWF_SECTION_TYPE_NEXT )

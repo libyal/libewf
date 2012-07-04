@@ -36,7 +36,10 @@ TODO
     - add case data files
     - add device info files
     - change ewf_error2.h to ewf_error.h
+    - add analytical data files
+    - add restart data files
   - add support for no-compression and bzip2 compression
+  - make sure the encryption keys are read first
 
 * Ex01/Lx01 test images
 * memory image -> winen and encase ?

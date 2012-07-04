@@ -33,6 +33,7 @@ libewf_la_SOURCES = \
 	ewf_volume_smart.h \
 	ewfx_delta_chunk.h \
 	libewf.c \
+	libewf_analytical_data.c libewf_analytical_data.h \
 	libewf_array_type.c libewf_array_type.h \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
@@ -70,6 +71,7 @@ libewf_la_SOURCES = \
 	libewf_metadata.c libewf_metadata.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
+	libewf_restart_data.c libewf_restart_data.h \
 	libewf_section.c libewf_section.h \
 	libewf_sector_list.c libewf_sector_list.h \
 	libewf_segment_file.c libewf_segment_file.h \
