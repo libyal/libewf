@@ -128,7 +128,7 @@ int libewf_write_io_handle_initialize(
 	( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
 	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_OFFSETS_IN_TABLE;
-	( *write_io_handle )->maximum_number_of_segments  = (uint16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
+	( *write_io_handle )->maximum_number_of_segments  = (uint32_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
 
 	return( 1 );
 
@@ -1833,9 +1833,9 @@ int libewf_write_io_handle_create_segment_file(
      libmfdata_file_list_t *segment_files_list,
      libmfcache_cache_t *segment_files_cache,
      libewf_segment_table_t *segment_table,
-     uint16_t segment_number,
-     uint16_t maximum_number_of_segments,
      uint8_t segment_file_type,
+     uint32_t segment_number,
+     uint32_t maximum_number_of_segments,
      libewf_segment_file_t **segment_file,
      int *segment_files_list_index,
      int *file_io_pool_entry,
@@ -1865,6 +1865,18 @@ int libewf_write_io_handle_create_segment_file(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( io_handle->major_version != 1 )
+	 && ( io_handle->major_version != 2 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: invalid IO handle - unsupported major version.",
 		 function );
 
 		return( -1 );
@@ -2053,6 +2065,8 @@ int libewf_write_io_handle_create_segment_file(
 		goto on_error;
 	}
 	( *segment_file )->type           = segment_file_type;
+	( *segment_file )->major_version  = io_handle->major_version;
+	( *segment_file )->minor_version  = io_handle->minor_version;
 	( *segment_file )->segment_number = segment_number;
 	( *segment_file )->flags         |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
 
@@ -2436,9 +2450,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     segment_files_list,
 		     segment_files_cache,
 		     segment_table,
-		     (uint16_t) ( segment_files_list_index + 1 ),
-		     write_io_handle->maximum_number_of_segments,
 		     LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+		     (uint32_t) ( segment_files_list_index + 1 ),
+		     write_io_handle->maximum_number_of_segments,
 		     &segment_file,
 		     &segment_files_list_index,
 		     &file_io_pool_entry,
@@ -3430,9 +3444,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     delta_segment_files_list,
 			     segment_files_cache,
 			     delta_segment_table,
-			     (uint16_t) ( segment_files_list_index + 1 ),
-			     write_io_handle->maximum_number_of_segments,
 			     LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA,
+			     (uint32_t) ( segment_files_list_index + 1 ),
+			     write_io_handle->maximum_number_of_segments,
 			     &segment_file,
 			     &segment_files_list_index,
 			     &file_io_pool_entry,

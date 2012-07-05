@@ -7243,9 +7243,9 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->segment_files_list,
 		     internal_handle->segment_files_cache,
 		     internal_handle->segment_table,
+		     LIBEWF_SEGMENT_FILE_TYPE_EWF1,
 		     1,
 		     internal_handle->write_io_handle->maximum_number_of_segments,
-		     LIBEWF_SEGMENT_FILE_TYPE_EWF1,
 		     &segment_file,
 		     &segment_files_list_index,
 		     &file_io_pool_entry,
@@ -9155,7 +9155,7 @@ int libewf_handle_get_file_io_handle(
  */
 int libewf_internal_handle_get_write_maximum_number_of_segments(
      uint8_t ewf_format,
-     uint16_t *maximum_number_of_segments,
+     uint32_t *maximum_number_of_segments,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_internal_handle_get_write_maximum_number_of_segments";
@@ -9175,13 +9175,13 @@ int libewf_internal_handle_get_write_maximum_number_of_segments(
 	{
 		/* ( ( ( 'z' - 's' ) * 26 * 26 ) + 99 ) = 4831
 		 */
-		*maximum_number_of_segments = (uint16_t) 4831;
+		*maximum_number_of_segments = (uint32_t) 4831;
 	}
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
 		/* ( ( ( 'Z' - 'E' ) * 26 * 26 ) + 99 ) = 14295
 		 */
-		*maximum_number_of_segments = (uint16_t) 14295;
+		*maximum_number_of_segments = (uint32_t) 14295;
 	}
 	else
 	{

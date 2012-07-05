@@ -472,7 +472,7 @@ int libewf_handle_get_file_io_handle(
 
 int libewf_internal_handle_get_write_maximum_number_of_segments(
      uint8_t ewf_format,
-     uint16_t *maximum_number_of_segments,
+     uint32_t *maximum_number_of_segments,
      libcerror_error_t **error );
 
 int libewf_internal_handle_get_media_values(

@@ -540,10 +540,11 @@ ssize_t libewf_segment_file_write_file_header(
          int file_io_pool_entry,
          libcerror_error_t **error )
 {
-	ewf_file_header_v1_t file_header;
+	uint8_t file_header_data[ 32 ];
 
 	static char *function         = "libewf_segment_file_write_file_header";
 	const uint8_t *file_signature = NULL;
+	size_t file_header_data_size  = 0;
 	ssize_t write_count           = 0;
 
 	if( segment_file == NULL )
@@ -553,6 +554,25 @@ ssize_t libewf_segment_file_write_file_header(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->major_version == 1 )
+	{
+		file_header_data_size = sizeof( ewf_file_header_v1_t );
+	}
+	else if( segment_file->major_version == 2 )
+	{
+		file_header_data_size = sizeof( ewf_file_header_v2_t );
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
 		 function );
 
 		return( -1 );
@@ -568,19 +588,33 @@ ssize_t libewf_segment_file_write_file_header(
 
 		return( -1 );
 	}
-	if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	if( segment_file->major_version == 1 )
 	{
-		file_signature = ewf1_evf_file_signature;
+		if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+		{
+			file_signature = ewf1_evf_file_signature;
+		}
+		else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+		{
+			file_signature = ewf1_lvf_file_signature;
+		}
+		else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
+		{
+			file_signature = ewf1_dvf_file_signature;
+		}
 	}
-	else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+	else if( segment_file->major_version == 2 )
 	{
-		file_signature = ewf1_lvf_file_signature;
+		if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+		{
+			file_signature = ewf2_evf_file_signature;
+		}
+		else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
+		{
+			file_signature = ewf2_lef_file_signature;
+		}
 	}
-	else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
-	{
-		file_signature = ewf1_dvf_file_signature;
-	}
-	else
+	if( file_signature == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -592,7 +626,7 @@ ssize_t libewf_segment_file_write_file_header(
 		return( -1 );
 	}
 	if( memory_copy(
-	     file_header.signature,
+	     file_header_data,
 	     file_signature,
 	     8 ) == NULL )
 	{
@@ -605,22 +639,32 @@ ssize_t libewf_segment_file_write_file_header(
 
 		return( -1 );
 	}
-	byte_stream_copy_from_uint16_little_endian(
-	 file_header.segment_number,
-	 segment_file->segment_number );
+	if( segment_file->major_version == 1 )
+	{
+		( (ewf_file_header_v1_t *) file_header_data )->fields_start = 1;
 
-	file_header.fields_start    = 1;
-	file_header.fields_end[ 0 ] = 0;
-	file_header.fields_end[ 1 ] = 0;
+		byte_stream_copy_from_uint16_little_endian(
+		 ( (ewf_file_header_v1_t *) file_header_data )->segment_number,
+		 segment_file->segment_number );
 
+		( (ewf_file_header_v1_t *) file_header_data )->fields_end[ 0 ] = 0;
+		( (ewf_file_header_v1_t *) file_header_data )->fields_end[ 1 ] = 0;
+	}
+	else if( segment_file->major_version == 2 )
+	{
+/* TODO add EWF2 support */
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_file_header_v2_t *) file_header_data )->segment_number,
+		 segment_file->segment_number );
+	}
 	write_count = libbfio_pool_write_buffer(
 	               file_io_pool,
 	               file_io_pool_entry,
-	               (uint8_t *) &file_header,
-	               sizeof( ewf_file_header_v1_t ),
+	               file_header_data,
+	               file_header_data_size,
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_file_header_v1_t ) )
+	if( write_count != (ssize_t) file_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -1951,8 +1995,8 @@ ssize_t libewf_segment_file_write_last_section(
 		       file_io_pool,
 		       file_io_pool_entry,
 		       segment_file->major_version,
-		       last_section_type,
 		       section_offset,
+		       last_section_type,
 		       io_handle->ewf_format,
 	               error );
 

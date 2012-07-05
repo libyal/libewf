@@ -80,7 +80,7 @@ struct libewf_write_io_handle
 
 	/* The maximum number of segments
 	 */
-	uint16_t maximum_number_of_segments;
+	uint32_t maximum_number_of_segments;
 
 	/* The number of bytes written to a section containing chunks
 	 */
@@ -228,9 +228,9 @@ int libewf_write_io_handle_create_segment_file(
      libmfdata_file_list_t *segment_files_list,
      libmfcache_cache_t *segment_files_cache,
      libewf_segment_table_t *segment_table,
-     uint16_t segment_number,
-     uint16_t maximum_number_of_segments,
      uint8_t segment_file_type,
+     uint32_t segment_number,
+     uint32_t maximum_number_of_segments,
      libewf_segment_file_t **segment_file,
      int *segment_files_list_index,
      int *file_io_pool_entry,

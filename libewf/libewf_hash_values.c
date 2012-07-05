@@ -498,7 +498,7 @@ int libewf_hash_values_generate_xhash(
 		 "%s: unable to retrieve number of hash values.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	xml_head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
@@ -537,7 +537,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 hash_value_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_value_get_identifier(
 		     hash_value,
@@ -553,7 +553,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 hash_value_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( ( identifier == NULL )
 		 || ( identifier_size == 0 ) )
@@ -583,7 +583,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 (char *) identifier );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -605,7 +605,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 (char *) identifier );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( value_string_size > 1 )
 		{
@@ -630,9 +630,7 @@ int libewf_hash_values_generate_xhash(
 		 "%s: unable to create xhash.",
 		 function );
 
-		*xhash_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	( *xhash )[ xhash_index++ ] = 0xef;
 	( *xhash )[ xhash_index++ ] = 0xbb;
@@ -650,13 +648,7 @@ int libewf_hash_values_generate_xhash(
 		 "%s: unable to copy XML head string.",
 		 function );
 
-		memory_free(
-		 *xhash );
-
-		*xhash      = NULL;
-		*xhash_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	xhash_index += xml_head_length;
 
@@ -672,13 +664,7 @@ int libewf_hash_values_generate_xhash(
 		 "%s: unable to copy xhash open tag string.",
 		 function );
 
-		memory_free(
-		 *xhash );
-
-		*xhash      = NULL;
-		*xhash_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	xhash_index += xml_xhash_open_tag_length;
 
@@ -700,13 +686,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 hash_value_index );
 
-			memory_free(
-			 *xhash );
-
-			*xhash      = NULL;
-			*xhash_size = 0;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( libfvalue_value_get_identifier(
 		     hash_value,
@@ -722,13 +702,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 hash_value_index );
 
-			memory_free(
-			 *xhash );
-
-			*xhash      = NULL;
-			*xhash_size = 0;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( ( identifier == NULL )
 		 || ( identifier_size == 0 ) )
@@ -758,13 +732,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 (char *) identifier );
 
-			memory_free(
-			 *xhash );
-
-			*xhash      = NULL;
-			*xhash_size = 0;
-
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -776,7 +744,7 @@ int libewf_hash_values_generate_xhash(
 		          &value_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -786,13 +754,7 @@ int libewf_hash_values_generate_xhash(
 			 function,
 			 (char *) identifier );
 
-			memory_free(
-			 *xhash );
-
-			*xhash      = NULL;
-			*xhash_size = 0;
-
-			return( -1 );
+			goto on_error;
 		}
 		if( value_string_size > 1 )
 		{
@@ -812,26 +774,18 @@ int libewf_hash_values_generate_xhash(
 				 function,
 				 (char *) identifier );
 
-				memory_free(
-				 *xhash );
-
-				*xhash      = NULL;
-				*xhash_size = 0;
-
-				return( -1 );
+				goto on_error;
 			}
 			xhash_index += identifier_size - 1;
 
 			( *xhash )[ xhash_index++ ] = (uint8_t) '>';
 
-			result = libfvalue_value_copy_to_utf8_string(
-				  hash_value,
-				  0,
-				  &( ( *xhash )[ xhash_index ] ),
-				  value_string_size,
-				  error );
-
-			if( result != 1 )
+			if( libfvalue_value_copy_to_utf8_string(
+			     hash_value,
+			     0,
+			     &( ( *xhash )[ xhash_index ] ),
+			     value_string_size,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -841,13 +795,7 @@ int libewf_hash_values_generate_xhash(
 				 function,
 				 (char *) identifier );
 
-				memory_free(
-				 *xhash );
-
-				*xhash      = NULL;
-				*xhash_size = 0;
-
-				return( -1 );
+				goto on_error;
 			}
 			xhash_index += value_string_size - 1;
 
@@ -867,13 +815,7 @@ int libewf_hash_values_generate_xhash(
 				 function,
 				 (char *) identifier );
 
-				memory_free(
-				 *xhash );
-
-				*xhash      = NULL;
-				*xhash_size = 0;
-
-				return( -1 );
+				goto on_error;
 			}
 			xhash_index += identifier_size - 1;
 
@@ -893,13 +835,7 @@ int libewf_hash_values_generate_xhash(
 		 "%s: unable to copy xhash close tag string.",
 		 function );
 
-		memory_free(
-		 *xhash );
-
-		*xhash      = NULL;
-		*xhash_size = 0;
-
-		return( -1 );
+		goto on_error;
 	}
 	xhash_index += xml_xhash_close_tag_length;
 
@@ -908,6 +844,18 @@ int libewf_hash_values_generate_xhash(
 	( *xhash )[ xhash_index ] = 0;
 
 	return( 1 );
+
+on_error:
+	if( *xhash != NULL )
+	{
+		memory_free(
+		 *xhash );
+
+		*xhash = NULL;
+	}
+	*xhash_size = 0;
+
+	return( -1 );
 }
 
 /* Generate a MD5 hash

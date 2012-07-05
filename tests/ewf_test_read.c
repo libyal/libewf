@@ -545,6 +545,15 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+/*
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_set_verbose(
+	 1 );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
+*/
 	/* Initialization
 	 */
 	if( libewf_handle_initialize(
@@ -557,16 +566,6 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-/*
-#if defined( HAVE_DEBUG_OUTPUT )
-	libewf_notify_set_verbose(
-	 1 );
-	libewf_notify_set_stream(
-	 stderr,
-	 NULL );
-#endif
-*/
-
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     handle,

@@ -3124,7 +3124,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &case_number_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3150,7 +3150,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &description_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3176,7 +3176,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &examiner_name_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3202,7 +3202,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &evidence_number_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3228,7 +3228,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &notes_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3254,7 +3254,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &acquiry_date_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3332,7 +3332,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &system_date_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3418,7 +3418,7 @@ int libewf_header_values_generate_utf8_header_string(
 				  &acquiry_software_version_string_length,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3444,7 +3444,7 @@ int libewf_header_values_generate_utf8_header_string(
 				  &acquiry_operating_system_string_length,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3471,7 +3471,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          &password_string_length,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3507,7 +3507,7 @@ int libewf_header_values_generate_utf8_header_string(
 				  &compression_level_string_length,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3554,7 +3554,7 @@ int libewf_header_values_generate_utf8_header_string(
 				  &model_string_length,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3580,7 +3580,7 @@ int libewf_header_values_generate_utf8_header_string(
 				  &serial_number_string_length,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3609,7 +3609,7 @@ int libewf_header_values_generate_utf8_header_string(
 				  &device_label_string_length,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3640,7 +3640,7 @@ int libewf_header_values_generate_utf8_header_string(
 				  &unknown_dc_string_length,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3886,7 +3886,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3911,7 +3911,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          *header_string_size - header_string_index,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3936,7 +3936,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          *header_string_size - header_string_index,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3965,7 +3965,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3991,7 +3991,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          *header_string_size - header_string_index,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4016,7 +4016,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          *header_string_size - header_string_index,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4044,7 +4044,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4069,7 +4069,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4097,7 +4097,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4131,7 +4131,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4156,7 +4156,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4181,7 +4181,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          *header_string_size - header_string_index,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4230,7 +4230,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          *header_string_size - header_string_index,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4279,7 +4279,7 @@ int libewf_header_values_generate_utf8_header_string(
 		          *header_string_size - header_string_index,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4324,7 +4324,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4370,7 +4370,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4401,7 +4401,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -4430,7 +4430,7 @@ int libewf_header_values_generate_utf8_header_string(
 			          *header_string_size - header_string_index,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -6417,7 +6417,7 @@ int libewf_header_values_generate_xheader(
 		          &value_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -6566,7 +6566,7 @@ int libewf_header_values_generate_xheader(
 		          &value_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -6609,7 +6609,7 @@ int libewf_header_values_generate_xheader(
 				  value_string_size,
 				  error );
 
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
