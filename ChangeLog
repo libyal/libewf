@@ -44,6 +44,12 @@ TODO
   - make sure the encryption keys are read first
   - change api to deal with compression method stored in the segment files ?
 
+* Ex01/Lx01 format feature support
+  - pattern fill chunk support
+  - bzip2 compression support
+  - encryption support
+  - section integrity MD5 hash support
+
 * Ex01/Lx01 test images
 * memory image -> winen and encase ?
 * resumed ?

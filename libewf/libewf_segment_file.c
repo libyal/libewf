@@ -1897,8 +1897,8 @@ ssize_t libewf_segment_file_write_last_section(
          libcerror_error_t **error )
 {
 	libewf_section_t *section  = NULL;
-	uint8_t *last_section_type = NULL;
 	static char *function      = "libewf_segment_file_write_last_section";
+	uint32_t last_section_type = 0;
 	ssize_t write_count        = 0;
 
 	if( segment_file == NULL )
@@ -1925,11 +1925,11 @@ ssize_t libewf_segment_file_write_last_section(
 	}
 	if( last_segment_file == 0 )
 	{
-		last_section_type = (uint8_t *) "next";
+		last_section_type = LIBEWF_SECTION_TYPE_NEXT;
 	}
 	else
 	{
-		last_section_type = (uint8_t *) "done";
+		last_section_type = LIBEWF_SECTION_TYPE_DONE;
 	}
 	/* Write next or done section
 	 */
@@ -1950,8 +1950,8 @@ ssize_t libewf_segment_file_write_last_section(
 		       section,
 		       file_io_pool,
 		       file_io_pool_entry,
+		       segment_file->major_version,
 		       last_section_type,
-		       4,
 		       section_offset,
 		       io_handle->ewf_format,
 	               error );
@@ -1962,9 +1962,8 @@ ssize_t libewf_segment_file_write_last_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write %s section.",
-		 function,
-		 (char *) last_section_type );
+		 "%s: unable to write section.",
+		 function );
 
 		goto on_error;
 	}
@@ -2299,6 +2298,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               section,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               segment_file->major_version,
 		               (uint8_t *) "table",
 		               5,
 		               section_offset,
@@ -2327,6 +2327,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               section,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               segment_file->major_version,
 		               section_offset,
 		               0,
 		               error );
@@ -2540,6 +2541,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               section,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               segment_file->major_version,
 		               (uint8_t *) "table",
 		               5,
 		               chunks_section_offset,
@@ -2580,6 +2582,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               section,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               segment_file->major_version,
 		               chunks_section_offset,
 		               chunks_section_size,
 		               error );
@@ -2657,6 +2660,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               section,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               segment_file->major_version,
 		               (uint8_t *) "table",
 		               5,
 		               section_offset,
@@ -2716,6 +2720,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               section,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               segment_file->major_version,
 		               (uint8_t *) "table2",
 		               6,
 		               section_offset,

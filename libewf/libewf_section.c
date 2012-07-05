@@ -287,10 +287,13 @@ on_error:
  */
 int libewf_section_set_values(
      libewf_section_t *section,
-     uint8_t *type,
-     size_t type_length,
-     off64_t offset,
-     size64_t size,
+     uint32_t type,
+     const uint8_t *type_string,
+     size_t type_string_length,
+     off64_t section_offset,
+     size64_t section_size,
+     size64_t data_size,
+     uint32_t padding_size,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_section_set_values";
@@ -306,72 +309,96 @@ int libewf_section_set_values(
 
 		return( -1 );
 	}
-	if( type == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid type.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( type_length == 0 )
-	 || ( type_length > 16 ) )
+	if( ( section_offset < 0 )
+	 || ( section_offset > (off64_t) INT64_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid type length value out of bounds.",
+		 "%s: invalid section offset value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( offset < 0 )
-	 || ( offset > (off64_t) INT64_MAX ) )
+	if( data_size > (size64_t) INT64_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid offset value out of bounds.",
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( size > (size64_t) INT64_MAX )
+	if( (size64_t) padding_size > data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid size value out of bounds.",
+		 "%s: invalid padding size value exceeds data size.",
 		 function );
 
 		return( -1 );
 	}
-	if( memory_copy(
-	     section->type_string,
-	     type,
-	     type_length ) == NULL )
+	if( type_string != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set type string.",
-		 function );
+		if( ( type_string_length == 0 )
+		 || ( type_string_length > 16 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid type string length value out of bounds.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		if( memory_copy(
+		     section->type_string,
+		     type_string,
+		     type_string_length ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy type string.",
+			 function );
+
+			return( -1 );
+		}
+		section->type_string[ type_string_length ] = 0;
+
+		section->type_string_length = type_string_length;
 	}
-	section->type_string[ type_length ] = 0;
+	else
+	{
+		if( memory_set(
+		     section->type_string,
+		     0,
+		     17 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to set type string.",
+			 function );
 
-	section->type_string_length = type_length;
-	section->start_offset       = offset;
-	section->end_offset         = (off64_t) ( offset + size );
-	section->size               = size;
+			return( -1 );
+		}
+		section->type_string_length = 0;
+	}
+	section->type         = type;
+	section->start_offset = section_offset;
+	section->end_offset   = (off64_t) ( section_offset + section_size );
+	section->size         = section_size;
+	section->data_size    = data_size;
+	section->padding_size = padding_size;
 
 	return( 1 );
 }
@@ -528,6 +555,10 @@ ssize_t libewf_section_descriptor_read(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->type,
 		 section->type );
 
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_flags,
+		 section->data_flags );
+
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->previous_offset,
 		 section->start_offset );
@@ -587,13 +618,10 @@ ssize_t libewf_section_descriptor_read(
 			libcnotify_printf(
 			 ")\n" );
 
-			byte_stream_copy_to_uint32_little_endian(
-			 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_flags,
-			 value_32bit );
 			libcnotify_printf(
 			 "%s: data flags\t\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
-			 value_32bit );
+			 section->data_flags );
 
 			libcnotify_printf(
 			 "%s: previous offset\t\t\t\t: 0x%08" PRIx64 "\n",
@@ -912,11 +940,25 @@ ssize_t libewf_section_descriptor_write(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->type,
 		 section->type );
 
-/* TODO set values */
+/* TODO set data flags
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_flags,
+		 section->data_flags );
+*/
+
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_size,
+		 section->data_size );
+
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->descriptor_size,
 		 (uint32_t) section_descriptor_data_size );
 
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->padding_size,
+		 section->padding_size );
+
+/* TODO set data_integrity_hash */
 	}
 	calculated_checksum = ewf_checksum_calculate(
 	                       section_descriptor_data,
@@ -1223,15 +1265,18 @@ ssize_t libewf_section_last_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
-         uint8_t *type_string,
-         size_t type_string_length,
+         uint8_t format_version,
          off64_t section_offset,
+         uint32_t type,
          uint8_t ewf_format,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_section_last_write";
-	size64_t section_size = 0;
-	ssize_t write_count   = 0;
+	uint8_t *type_string                = NULL;
+	static char *function               = "libewf_section_last_write";
+	size64_t section_size               = 0;
+	size_t section_descriptor_data_size = 0;
+	size_t type_string_length           = 0;
+	ssize_t write_count                 = 0;
 
 	if( section == NULL )
 	{
@@ -1244,18 +1289,63 @@ ssize_t libewf_section_last_write(
 
 		return( -1 );
 	}
-	/* The EnCase (EWF-E01) format leaves the size of this section empty
-	 */
-	if( ewf_format == EWF_FORMAT_S01 )
+	if( format_version == 1 )
 	{
-		section_size = (uint64_t) sizeof( ewf_section_descriptor_v1_t );
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
+	}
+	else if( format_version == 2 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
+		 function );
+
+		return( -1 );
+	}
+	if( type == LIBEWF_SECTION_TYPE_NEXT )
+	{
+		type_string        = (uint8_t *) "next";
+		type_string_length = 4;
+	}
+	else if( type == LIBEWF_SECTION_TYPE_DONE )
+	{
+		type_string        = (uint8_t *) "done";
+		type_string_length = 4;
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported type: 0x08%" PRIx32 ".",
+		 function,
+		 type );
+
+		return( -1 );
+	}
+	/* The version 1 (EWF-E01) format leaves the size of this section empty
+	 */
+	if( ( format_version == 2 )
+	 || ( ewf_format == EWF_FORMAT_S01 ) )
+	{
+		section_size = section_descriptor_data_size;
 	}
 	if( libewf_section_set_values(
 	     section,
+	     type,
 	     type_string,
 	     type_string_length,
 	     section_offset,
-	     section_size,
+	     section_descriptor_data_size,
+	     0,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1274,15 +1364,14 @@ ssize_t libewf_section_last_write(
 	               1,
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_section_descriptor_v1_t ) )
+	if( write_count != (ssize_t) section_descriptor_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write %d section descriptor.",
-		 function,
-		 (char *) type_string );
+		 "%s: unable to write section descriptor data.",
+		 function );
 
 		return( -1 );
 	}
@@ -1522,7 +1611,6 @@ ssize_t libewf_section_write_compressed_string(
 	uint8_t *compressed_string    = NULL;
 	static char *function         = "libewf_section_write_compressed_string";
 	void *reallocation            = NULL;
-	size64_t section_size         = 0;
 	size_t compressed_string_size = 0;
 	ssize_t total_write_count     = 0;
 	ssize_t write_count           = 0;
@@ -1627,15 +1715,16 @@ ssize_t libewf_section_write_compressed_string(
 
 		goto on_error;
 	}
-	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + compressed_string_size;
-
+/* TODO add support for EWF2 */
 	if( libewf_section_set_values(
 	     section,
+	     0,
 	     type_string,
 	     type_string_length,
 	     section_offset,
-	     section_size,
+	     sizeof( ewf_section_descriptor_v1_t ) + compressed_string_size,
+	     compressed_string_size,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2170,7 +2259,6 @@ ssize_t libewf_section_data_write(
          libcerror_error_t **error )
 {
 	static char *function        = "libewf_section_data_write";
-	size64_t section_size        = 0;
 	ssize_t total_write_count    = 0;
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
@@ -2219,16 +2307,15 @@ ssize_t libewf_section_data_write(
 
 		return( -1 );
 	}
-/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
-	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + sizeof( ewf_data_t );
-
 	if( libewf_section_set_values(
 	     section,
+	     0,
 	     (uint8_t *) "data",
 	     4,
 	     section_offset,
-	     section_size,
+	     sizeof( ewf_section_descriptor_v1_t ) + sizeof( ewf_data_t ),
+	     sizeof( ewf_data_t ),
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2353,6 +2440,7 @@ ssize_t libewf_section_data_write(
 		( *cached_data_section )->media_type = media_values->media_type;
 		( *cached_data_section )->media_flags = media_values->media_flags;
 
+/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
 		byte_stream_copy_from_uint32_little_endian(
 		 ( *cached_data_section )->number_of_chunks,
 		 media_values->number_of_chunks );
@@ -2665,7 +2753,6 @@ ssize_t libewf_section_digest_write(
 	ewf_digest_t digest;
 
 	static char *function        = "libewf_section_digest_write";
-	size64_t section_size        = 0;
 	ssize_t total_write_count    = 0;
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
@@ -2692,15 +2779,15 @@ ssize_t libewf_section_digest_write(
 
 		return( -1 );
 	}
-	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + sizeof( ewf_digest_t );
-
 	if( libewf_section_set_values(
 	     section,
+	     0,
 	     (uint8_t *) "digest",
 	     6,
 	     section_offset,
-	     section_size,
+	     sizeof( ewf_section_descriptor_v1_t ) + sizeof( ewf_digest_t ),
+	     sizeof( ewf_digest_t ),
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3303,7 +3390,7 @@ ssize_t libewf_section_error_write(
 	uint8_t *error_entry_data           = NULL;
 	uint8_t *error_entries_data         = NULL;
 	static char *function               = "libewf_section_error_write";
-	size64_t section_size               = 0;
+	size64_t section_data_size          = 0;
 	size_t error_entry_data_size        = 0;
 	size_t error_entries_data_size      = 0;
 	size_t error_footer_data_size       = 0;
@@ -3314,6 +3401,7 @@ ssize_t libewf_section_error_write(
 	uint64_t first_sector               = 0;
 	uint64_t number_of_sectors          = 0;
 	uint32_t calculated_checksum        = 0;
+	uint32_t section_padding_size       = 0;
 	int entry_index                     = 0;
 	int number_of_entries               = 0;
 
@@ -3341,6 +3429,7 @@ ssize_t libewf_section_error_write(
 		error_header_data_size       = sizeof( ewf_error_header_v2_t );
 		error_entry_data_size        = sizeof( ewf_error_entry_v2_t );
 		error_footer_data_size       = 16;
+		section_padding_size         = 24;
 	}
 	else
 	{
@@ -3380,18 +3469,19 @@ ssize_t libewf_section_error_write(
 	}
 	error_entries_data_size = number_of_entries * error_entry_data_size;
 
-	section_size = section_descriptor_data_size
-	             + error_header_data_size
-	             + error_entries_data_size
-	             + error_footer_data_size;
+	section_data_size = error_header_data_size
+	                  + error_entries_data_size
+	                  + error_footer_data_size;
 
-/* TODO add support for EWF2 */
 	if( libewf_section_set_values(
 	     section,
+	     LIBEWF_SECTION_TYPE_ERROR_TABLE,
 	     (uint8_t *) "error2",
 	     6,
 	     section_offset,
-	     section_size,
+	     section_descriptor_data_size + section_data_size,
+	     section_data_size,
+	     section_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3939,12 +4029,12 @@ ssize_t libewf_section_md5_hash_write(
 	uint8_t md5_hash_data[ 36 ];
 
 	static char *function               = "libewf_section_md5_hash_write";
-	size64_t section_size               = 0;
 	size_t md5_hash_data_size           = 0;
 	size_t section_descriptor_data_size = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
+	uint32_t section_padding_size       = 0;
 
 	if( section == NULL )
 	{
@@ -3967,6 +4057,7 @@ ssize_t libewf_section_md5_hash_write(
 		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
 /* TODO put padding structure ? */
 		md5_hash_data_size           = sizeof( ewf_md5_hash_t ) + 12;
+		section_padding_size         = 12;
 	}
 	else
 	{
@@ -3990,16 +4081,15 @@ ssize_t libewf_section_md5_hash_write(
 
 		return( -1 );
 	}
-	section_size = section_descriptor_data_size
-	             + md5_hash_data_size;
-
-/* TODO add support for EWF2 */
 	if( libewf_section_set_values(
 	     section,
+	     LIBEWF_SECTION_TYPE_MD5_HASH,
 	     (uint8_t *) "hash",
 	     4,
 	     section_offset,
-	     section_size,
+	     section_descriptor_data_size + md5_hash_data_size,
+	     md5_hash_data_size,
+	     section_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -4925,13 +5015,14 @@ ssize_t libewf_section_sectors_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          off64_t section_offset,
          size64_t chunks_data_size,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_section_sectors_write";
-	size64_t section_size = 0;
-	ssize_t write_count   = 0;
+	static char *function               = "libewf_section_sectors_write";
+	size_t section_descriptor_data_size = 0;
+	ssize_t write_count                 = 0;
 
 	if( section == NULL )
 	{
@@ -4944,15 +5035,34 @@ ssize_t libewf_section_sectors_write(
 
 		return( -1 );
 	}
-	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + chunks_data_size;
+	if( format_version == 1 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
+	}
+	else if( format_version == 2 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
+		 function );
 
+		return( -1 );
+	}
 	if( libewf_section_set_values(
 	     section,
+	     LIBEWF_SECTION_TYPE_SECTOR_DATA,
 	     (uint8_t *) "sectors",
 	     7,
 	     section_offset,
-	     section_size,
+	     section_descriptor_data_size + chunks_data_size,
+	     chunks_data_size,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -4968,16 +5078,16 @@ ssize_t libewf_section_sectors_write(
 	               section,
 	               file_io_pool,
 	               file_io_pool_entry,
-	               1,
+	               format_version,
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_section_descriptor_v1_t ) )
+	if( write_count != (ssize_t) section_descriptor_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write section descriptor.",
+		 "%s: unable to write section descriptor data.",
 		 function );
 
 		return( -1 );
@@ -5673,7 +5783,7 @@ ssize_t libewf_section_session_write(
 	uint8_t *session_entry_data         = NULL;
 	uint8_t *session_entries_data       = NULL;
 	static char *function               = "libewf_section_session_write";
-	size64_t section_size               = 0;
+	size64_t section_data_size          = 0;
 	size_t section_descriptor_data_size = 0;
 	size_t session_entry_data_size      = 0;
 	size_t session_entries_data_size    = 0;
@@ -5690,6 +5800,7 @@ ssize_t libewf_section_session_write(
 	uint64_t track_number_of_sectors    = 0;
 	uint32_t calculated_checksum        = 0;
 	uint32_t entry_index                = 0;
+	uint32_t section_padding_size       = 0;
 	int number_of_sessions              = 0;
 	int number_of_entries               = 0;
 	int number_of_tracks                = 0;
@@ -5720,6 +5831,7 @@ ssize_t libewf_section_session_write(
 		session_header_data_size     = sizeof( ewf_session_header_v2_t );
 		session_entry_data_size      = sizeof( ewf_session_entry_v2_t );
 		session_footer_data_size     = 16;
+		section_padding_size         = 24;
 	}
 	else
 	{
@@ -5899,18 +6011,19 @@ ssize_t libewf_section_session_write(
 #endif
 	session_entries_data_size = number_of_entries * session_entry_data_size;
 
-	section_size = section_descriptor_data_size
-	             + session_header_data_size
-	             + session_entries_data_size
-	             + session_footer_data_size;
+	section_data_size = session_header_data_size
+	                  + session_entries_data_size
+	                  + session_footer_data_size;
 
-/* TODO add support for EWF2 */
 	if( libewf_section_set_values(
 	     section,
+	     LIBEWF_SECTION_TYPE_SESSION_TABLE,
 	     (uint8_t *) "session",
 	     7,
 	     section_offset,
-	     section_size,
+	     section_descriptor_data_size + section_data_size,
+	     section_data_size,
+	     section_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -6639,6 +6752,7 @@ ssize_t libewf_section_table_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
@@ -6649,14 +6763,11 @@ ssize_t libewf_section_table_write(
          uint8_t ewf_format,
          libcerror_error_t **error )
 {
-/* TODO replace by argument */
-	uint8_t format_version = 1;
-
 	uint8_t table_header_data[ 32 ];
 	uint8_t table_footer_data[ 16 ];
 
 	static char *function               = "libewf_section_table_write";
-	size64_t section_size               = 0;
+	size64_t section_data_size          = 0;
 	size_t section_descriptor_data_size = 0;
 	size_t table_entry_data_size        = 0;
 	size_t table_entries_data_size      = 0;
@@ -6665,6 +6776,7 @@ ssize_t libewf_section_table_write(
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
+	uint32_t section_padding_size       = 0;
 
 	if( section == NULL )
 	{
@@ -6673,6 +6785,32 @@ ssize_t libewf_section_table_write(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section.",
+		 function );
+
+		return( -1 );
+	}
+	if( format_version == 1 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
+		table_header_data_size       = sizeof( ewf_table_header_v1_t );
+		table_entry_data_size        = sizeof( ewf_table_entry_v1_t );
+		table_footer_data_size       = 4;
+	}
+	else if( format_version == 2 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
+		table_header_data_size       = sizeof( ewf_table_header_v2_t );
+		table_entry_data_size        = sizeof( ewf_table_entry_v2_t );
+		table_footer_data_size       = 16;
+		section_padding_size         = 24;
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
 		 function );
 
 		return( -1 );
@@ -6710,50 +6848,25 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-/* TODO move once replaced by argument */
-	if( format_version == 1 )
-	{
-		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
-		table_header_data_size       = sizeof( ewf_table_header_v1_t );
-		table_entry_data_size        = sizeof( ewf_table_entry_v1_t );
-		table_footer_data_size       = 4;
-	}
-	else if( format_version == 2 )
-	{
-		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
-		table_header_data_size       = sizeof( ewf_table_header_v2_t );
-		table_entry_data_size        = sizeof( ewf_table_entry_v2_t );
-		table_footer_data_size       = 16;
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported format version.",
-		 function );
-
-		return( -1 );
-	}
 	table_entries_data_size = number_of_entries * table_entry_data_size;
 
-	section_size = section_descriptor_data_size
-	             + table_header_data_size
-	             + table_entries_data_size
-	             + chunks_data_size;
+	section_data_size = table_header_data_size
+	                  + table_entries_data_size
+	                  + chunks_data_size;
 
 	if( ewf_format != EWF_FORMAT_S01 )
 	{
-		section_size += table_footer_data_size;
+		section_data_size += table_footer_data_size;
 	}
-/* TODO add support for EWF2 */
 	if( libewf_section_set_values(
 	     section,
+	     LIBEWF_SECTION_TYPE_SECTOR_TABLE,
 	     type_string,
 	     type_string_length,
 	     section_offset,
-	     section_size,
+	     section_descriptor_data_size + section_data_size,
+	     section_data_size,
+	     section_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -7430,7 +7543,6 @@ ssize_t libewf_section_volume_e01_write(
 {
 	ewf_volume_t *volume         = NULL;
 	static char *function        = "libewf_section_volume_e01_write";
-	size64_t section_size        = 0;
 	ssize_t total_write_count    = 0;
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
@@ -7468,16 +7580,15 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
-/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
-	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + sizeof( ewf_volume_t );
-
 	if( libewf_section_set_values(
 	     section,
+	     0,
 	     (uint8_t *) "volume",
 	     6,
 	     section_offset,
-	     section_size,
+	     sizeof( ewf_section_descriptor_v1_t ) + sizeof( ewf_volume_t ),
+	     sizeof( ewf_volume_t ),
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -7595,6 +7706,7 @@ ssize_t libewf_section_volume_e01_write(
 	volume->media_type = media_values->media_type;
 	volume->media_flags = media_values->media_flags;
 
+/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
 	byte_stream_copy_from_uint32_little_endian(
 	 volume->number_of_chunks,
 	 media_values->number_of_chunks );
@@ -7945,7 +8057,6 @@ ssize_t libewf_section_volume_s01_write(
 {
 	ewf_volume_smart_t *volume   = NULL;
 	static char *function        = "libewf_section_volume_s01_write";
-	size64_t section_size        = 0;
 	ssize_t total_write_count    = 0;
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
@@ -7983,16 +8094,15 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
-/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
-	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + sizeof( ewf_volume_smart_t );
-
 	if( libewf_section_set_values(
 	     section,
+	     0,
 	     (uint8_t *) "volume",
 	     6,
 	     section_offset,
-	     section_size,
+	     sizeof( ewf_section_descriptor_v1_t ) + sizeof( ewf_volume_smart_t ),
+	     sizeof( ewf_volume_smart_t ),
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -8086,6 +8196,7 @@ ssize_t libewf_section_volume_s01_write(
 #endif
 	volume->unknown1[ 0 ] = 1;
 
+/* TODO check if media values -> number of chunks does not exceed the 32-bit maximum */
 	byte_stream_copy_from_uint32_little_endian(
 	 volume->number_of_chunks,
 	 media_values->number_of_chunks );
@@ -8733,7 +8844,7 @@ ssize_t libewf_section_delta_chunk_write(
 	ewfx_delta_chunk_header_t delta_chunk_header;
 
 	static char *function        = "libewf_section_delta_chunk_write";
-	size64_t section_size        = 0;
+	size64_t section_data_size   = 0;
 	ssize_t total_write_count    = 0;
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
@@ -8800,16 +8911,18 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	section_size = sizeof( ewf_section_descriptor_v1_t )
-	             + sizeof( ewfx_delta_chunk_header_t )
-	             + write_size;
+	section_data_size = sizeof( ewfx_delta_chunk_header_t )
+	                  + write_size;
 
 	if( libewf_section_set_values(
 	     section,
+	     0,
 	     (uint8_t *) "delta_chunk",
 	     11,
 	     section_offset,
-	     section_size,
+	     sizeof( ewf_section_descriptor_v1_t ) + section_data_size,
+	     section_data_size,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

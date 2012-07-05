@@ -61,6 +61,10 @@ struct libewf_section
 	 */
 	size_t type_string_length;
 
+	/* The data flags
+	 */
+	uint32_t data_flags;
+
 	/* The start offset of the section
 	 */
 	off64_t start_offset;
@@ -100,12 +104,15 @@ int libewf_section_clone(
      libewf_section_t *source_section,
      libcerror_error_t **error );
 
-int libewf_section_set(
+int libewf_section_set_values(
      libewf_section_t *sections,
-     uint8_t *type,
-     size_t type_length,
-     off64_t start_offset,
-     off64_t end_offset,
+     uint32_t type,
+     const uint8_t *type_string,
+     size_t type_string_length,
+     off64_t section_offset,
+     size64_t section_size,
+     size64_t data_size,
+     uint32_t padding_size,
      libcerror_error_t **error );
 
 ssize_t libewf_section_descriptor_read(
@@ -135,9 +142,9 @@ ssize_t libewf_section_last_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
-         uint8_t *type_string,
-         size_t type_string_length,
+         uint8_t format_version,
          off64_t section_offset,
+         uint32_t type,
          uint8_t ewf_format,
          libcerror_error_t **error );
 
@@ -281,6 +288,7 @@ ssize_t libewf_section_sectors_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          off64_t section_offset,
          size64_t chunks_data_size,
          libcerror_error_t **error );
@@ -319,6 +327,7 @@ ssize_t libewf_section_table_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
