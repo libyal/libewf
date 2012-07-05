@@ -174,12 +174,12 @@ int libewf_debug_dump_data(
 	}
 	calculated_checksum = ewf_checksum_calculate(
 	                       data,
-	                       data_size - sizeof( uint32_t ),
+	                       data_size - 4,
 	                       1 );
 
 
 	byte_stream_copy_to_uint32_little_endian(
-	 &( data[ data_size - sizeof( uint32_t ) ] ),
+	 &( data[ data_size - 4 ] ),
 	 stored_checksum );
 
 	libcnotify_printf(

@@ -771,7 +771,7 @@ ssize_t libewf_section_descriptor_read(
 		 && ( section->size == sizeof( ewf_section_descriptor_v1_t ) ) )
 		{
 			if( ( section->type != LIBEWF_SECTION_TYPE_DONE )
-			 || ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
+			 && ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -1998,7 +1998,7 @@ ssize_t libewf_section_data_read(
 #endif
 	calculated_checksum = ewf_checksum_calculate(
 	                       data,
-	                       sizeof( ewf_data_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_data_t ) - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -2403,7 +2403,7 @@ ssize_t libewf_section_data_write(
 		}
 		calculated_checksum = ewf_checksum_calculate(
 		                       *cached_data_section,
-		                       sizeof( ewf_data_t ) - sizeof( uint32_t ),
+		                       sizeof( ewf_data_t ) - 4,
 		                       1 );
 
 		byte_stream_copy_from_uint32_little_endian(
@@ -2556,7 +2556,7 @@ ssize_t libewf_section_digest_read(
 #endif
 	calculated_checksum = ewf_checksum_calculate(
 	                       &digest,
-	                       sizeof( ewf_digest_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_digest_t ) - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -2802,7 +2802,7 @@ ssize_t libewf_section_digest_write(
 #endif
 	calculated_checksum = ewf_checksum_calculate(
 	                       &digest,
-	                       sizeof( ewf_digest_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_digest_t ) - 4,
 	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -5451,7 +5451,7 @@ ssize_t libewf_section_session_read(
 				 ( (ewf_session_entry_v1_t *) session_entry_data )->flags,
 				 flags );
 
-				byte_stream_copy_to_uint64_little_endian(
+				byte_stream_copy_to_uint32_little_endian(
 				 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
 				 first_sector );
 			}
@@ -7378,7 +7378,7 @@ ssize_t libewf_section_volume_e01_read(
 #endif
 	calculated_checksum = ewf_checksum_calculate(
 	                       volume,
-	                       sizeof( ewf_volume_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_volume_t ) - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -7639,7 +7639,7 @@ ssize_t libewf_section_volume_e01_write(
 	}
 	calculated_checksum = ewf_checksum_calculate(
 	                       volume,
-	                       sizeof( ewf_volume_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_volume_t ) - 4,
 	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -7899,7 +7899,7 @@ ssize_t libewf_section_volume_s01_read(
 	}
 	calculated_checksum = ewf_checksum_calculate(
 	                       volume,
-	                       sizeof( ewf_volume_smart_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_volume_smart_t ) - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -8112,7 +8112,7 @@ ssize_t libewf_section_volume_s01_write(
 	}
 	calculated_checksum = ewf_checksum_calculate(
 	                       volume,
-	                       sizeof( ewf_volume_smart_t ) - sizeof( uint32_t ),
+	                       sizeof( ewf_volume_smart_t ) - 4,
 	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -8666,7 +8666,7 @@ ssize_t libewf_section_delta_chunk_read(
 #endif
 	calculated_checksum = ewf_checksum_calculate(
 	                       &delta_chunk_header,
-	                       sizeof( ewfx_delta_chunk_header_t ) - sizeof( uint32_t ),
+	                       sizeof( ewfx_delta_chunk_header_t ) - 4,
 	                       1 );
 
 	if( stored_checksum != calculated_checksum )
@@ -8787,7 +8787,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 	if( write_checksum != 0 )
 	{
-		write_size += sizeof( uint32_t );
+		write_size += 4;
 	}
 	if( write_size > (uint32_t) INT32_MAX )
 	{
@@ -8875,7 +8875,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       &delta_chunk_header,
-	                       sizeof( ewfx_delta_chunk_header_t ) - sizeof( uint32_t ),
+	                       sizeof( ewfx_delta_chunk_header_t ) - 4,
 	                       1 );
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -8923,7 +8923,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 		if( checksum_buffer == &( chunk_buffer[ chunk_size ] ) )
 		{
-			write_size += sizeof( uint32_t );
+			write_size += 4;
 
 			write_checksum = 0;
 		}
@@ -8934,7 +8934,7 @@ ssize_t libewf_section_delta_chunk_write(
 		if( write_checksum == 0 )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 &( chunk_buffer[ chunk_size - sizeof( uint32_t ) ] ),
+			 &( chunk_buffer[ chunk_size - 4 ] ),
 			 calculated_checksum );
 		}
 		else
@@ -8976,10 +8976,10 @@ ssize_t libewf_section_delta_chunk_write(
 		               file_io_pool,
 		               file_io_pool_entry,
 			       checksum_buffer,
-			       sizeof( uint32_t ),
+			       4,
 		               error );
 
-		if( write_count != (ssize_t) sizeof( uint32_t ) )
+		if( write_count != (ssize_t) 4 )
 		{
 			libcerror_error_set(
 			 error,

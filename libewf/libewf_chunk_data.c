@@ -367,20 +367,18 @@ int libewf_chunk_data_pack(
 			chunk_data->is_compressed = 1;
 		}
 	}
-/* TODO
 	if( ( chunk_data->is_compressed == 0 )
 	 && ( chunk_data->has_checksum != 0 ) )
-*/
-	if( chunk_data->is_compressed == 0 )
 	{
-		if( ( chunk_data->data_size + sizeof( uint32_t ) ) > chunk_data->allocated_data_size )
+		if( ( chunk_data->data_size + 4 ) > chunk_data->allocated_data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: chunk data size value out of bounds.",
-			 function );
+			 "%s: chunk data size value: %" PRIzd " out of bounds.",
+			 function,
+			 chunk_data->data_size + 4 );
 
 			return( -1 );
 		}
@@ -393,7 +391,7 @@ int libewf_chunk_data_pack(
 		 &( ( chunk_data->data )[ chunk_data->data_size ] ),
 		 calculated_checksum );
 
-		chunk_data->data_size += sizeof( uint32_t );
+		chunk_data->data_size += 4;
 	}
 	chunk_data->is_packed = 1;
 
@@ -454,21 +452,21 @@ int libewf_chunk_data_unpack(
 	}
 	if( chunk_data->is_compressed == 0 )
 	{
+		if( ( chunk_data->data_size < 4 )
+		 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: chunk data size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 		if( chunk_data->has_checksum != 0 )
 		{
-			if( ( chunk_data->data_size < sizeof( uint32_t ) )
-			 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: chunk data size value out of bounds.",
-				 function );
-
-				return( -1 );
-			}
-			chunk_data->data_size -= sizeof( uint32_t );
+			chunk_data->data_size -= 4;
 
 			byte_stream_copy_to_uint32_little_endian(
 			 &( ( chunk_data->data )[ chunk_data->data_size ] ),
@@ -513,7 +511,7 @@ int libewf_chunk_data_unpack(
 
 		/* Reserve 4 bytes for the checksum
 		 */
-		chunk_data->allocated_data_size = chunk_size + sizeof( uint32_t );
+		chunk_data->allocated_data_size = chunk_size + 4;
 
 		chunk_data->data = (uint8_t *) memory_allocate(
 		                                sizeof( uint8_t ) * chunk_data->allocated_data_size );

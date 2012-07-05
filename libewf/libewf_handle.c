@@ -2823,11 +2823,26 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
-				libcnotify_printf(
-				 "%s: reading section data from file IO pool entry: %d at offset: 0x%08" PRIx64 "\n",
-				 function,
-				 file_io_pool_entry,
-				 section_data_offset );
+				if( segment_file->major_version == 1 )
+				{
+					libcnotify_printf(
+					 "%s: reading %s section data from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
+					 function,
+					 (char *) section->type_string,
+					 file_io_pool_entry,
+					 section_data_offset,
+					 section_data_offset );
+				}
+				else if( segment_file->major_version == 2 )
+				{
+					libcnotify_printf(
+					 "%s: reading 0x%08" PRIx32 " section data from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
+					 function,
+					 section->type,
+					 file_io_pool_entry,
+					 section_data_offset,
+					 section_data_offset );
+				}
 			}
 #endif
 			if( libbfio_pool_seek_offset(
@@ -4849,7 +4864,7 @@ ssize_t libewf_handle_prepare_read_chunk(
 	}
 	if( is_compressed == 0 )
 	{
-		if( chunk_buffer_size < sizeof( uint32_t ) )
+		if( chunk_buffer_size < 4 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4860,7 +4875,7 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 			return( -1 );
 		}
-		chunk_buffer_size -= sizeof( uint32_t );
+		chunk_buffer_size -= 4;
 
 		if( read_checksum == 0 )
 		{
@@ -5165,7 +5180,7 @@ ssize_t libewf_handle_read_chunk(
 	{
 		if( chunk_data->is_packed != 0 )
 		{
-			if( ( chunk_data->data_size < sizeof( uint32_t ) )
+			if( ( chunk_data->data_size < 4 )
 			 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
 			{
 				libcerror_error_set(
@@ -5177,7 +5192,10 @@ ssize_t libewf_handle_read_chunk(
 
 				return( -1 );
 			}
-			read_size -= sizeof( uint32_t );
+			if( chunk_data->has_checksum != 0 )
+			{
+				read_size -= 4;
+			}
 		}
 		if( chunk_buffer_size < read_size )
 		{
@@ -5190,16 +5208,21 @@ ssize_t libewf_handle_read_chunk(
 
 			return( -1 );
 		}
-		/* If the chunk and checksum buffers are not aligned
-		 * read the chunk and checksum separately
+		/* If the chunk data has a checksum
+		 * read the chunk and checksum separately if the checksum buffer is not aligned
+		 * with the chunk buffer otherwise the checksum will be read at the same time
+		 * as the chunk buffer
 		 */
-	 	if( &( ( (uint8_t *) chunk_buffer )[ read_size ] ) != checksum_buffer )
+		if( chunk_data->has_checksum != 0 )
 		{
-			*read_checksum = 1;
-		}
-		else
-		{
-			read_size += sizeof( uint32_t );
+		 	if( &( ( (uint8_t *) chunk_buffer )[ read_size ] ) != checksum_buffer )
+			{
+				*read_checksum = 1;
+			}
+			else
+			{
+				read_size += 4;
+			}
 		}
 	}
 	else if( chunk_data->is_packed == 0 )
@@ -5226,7 +5249,7 @@ ssize_t libewf_handle_read_chunk(
 		if( memory_copy(
 		     checksum_buffer,
 		     &( chunk_data_buffer[ read_size ] ),
-		     sizeof( uint32_t ) ) == NULL )
+		     4 ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -5237,7 +5260,7 @@ ssize_t libewf_handle_read_chunk(
 
 			return( -1 );
 		}
-		read_size += sizeof( uint32_t );
+		read_size += 4;
 
 		byte_stream_copy_to_uint32_little_endian(
 		 (uint8_t *) checksum_buffer,
@@ -5906,8 +5929,8 @@ ssize_t libewf_handle_prepare_write_chunk(
 		 */
 		if( memory_copy(
 		     chunk_checksum,
-		     &( ( (uint8_t *) compressed_chunk_buffer )[ *compressed_chunk_buffer_size - sizeof( uint32_t ) ] ),
-		     sizeof( uint32_t ) ) == NULL )
+		     &( ( (uint8_t *) compressed_chunk_buffer )[ *compressed_chunk_buffer_size - 4 ] ),
+		     4 ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -6171,7 +6194,6 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->segment_files_cache,
 		               internal_handle->delta_segment_table,
 		               internal_handle->chunk_table_list,
-		               internal_handle->write_io_handle->header_sections,
 		               (int) chunk_index,
 		               (uint8_t *) chunk_buffer,
 		               chunk_buffer_size,
@@ -6195,7 +6217,6 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->chunk_table_list,
 		               internal_handle->header_values,
 		               internal_handle->hash_values,
-		               internal_handle->write_io_handle->header_sections,
 		               internal_handle->hash_sections,
 		               internal_handle->sessions,
 		               internal_handle->tracks,
@@ -6532,7 +6553,7 @@ ssize_t libewf_handle_write_buffer(
 				 */
 				if( libewf_chunk_data_initialize(
 				     &chunk_data,
-				     (size_t) internal_handle->media_values->chunk_size + sizeof( uint32_t ),
+				     (size_t) internal_handle->media_values->chunk_size + 4,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -6601,6 +6622,9 @@ ssize_t libewf_handle_write_buffer(
 			buffer_offset += write_size;
 			buffer_size   -= write_size;
 
+/* TODO is there a need to be able to set this to 0 ? */
+			chunk_data->has_checksum = 1;
+
 			chunk_data_size = chunk_data->data_size;
 
 			if( libewf_chunk_data_pack(
@@ -6632,7 +6656,6 @@ ssize_t libewf_handle_write_buffer(
 				       internal_handle->segment_files_cache,
 				       internal_handle->delta_segment_table,
 				       internal_handle->chunk_table_list,
-				       internal_handle->write_io_handle->header_sections,
 				       (int) chunk_index,
 				       chunk_data->data,
 				       chunk_data->data_size,
@@ -6679,7 +6702,7 @@ ssize_t libewf_handle_write_buffer(
 				 */
 				if( libewf_chunk_data_initialize(
 				     &( internal_handle->chunk_data ),
-				     (size_t) internal_handle->media_values->chunk_size + sizeof( uint32_t ),
+				     (size_t) internal_handle->media_values->chunk_size + 4,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -6772,6 +6795,9 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( write_chunk != 0 )
 			{
+/* TODO is there a need to be able to set this to 0 ? */
+				internal_handle->chunk_data->has_checksum = 1;
+
 				chunk_data_size = internal_handle->chunk_data->data_size;
 
 				if( libewf_chunk_data_pack(
@@ -6805,7 +6831,6 @@ ssize_t libewf_handle_write_buffer(
 					       internal_handle->chunk_table_list,
 					       internal_handle->header_values,
 					       internal_handle->hash_values,
-					       internal_handle->write_io_handle->header_sections,
 					       internal_handle->hash_sections,
 					       internal_handle->sessions,
 					       internal_handle->tracks,
@@ -7051,6 +7076,9 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
+/* TODO is there a need to be able to set this to 0 ? */
+		internal_handle->chunk_data->has_checksum = 1;
+
 		chunk_data_size = internal_handle->chunk_data->data_size;
 
 		if( libewf_chunk_data_pack(
@@ -7084,7 +7112,6 @@ ssize_t libewf_handle_write_finalize(
 			       internal_handle->chunk_table_list,
 			       internal_handle->header_values,
 			       internal_handle->hash_values,
-			       internal_handle->write_io_handle->header_sections,
 			       internal_handle->hash_sections,
 			       internal_handle->sessions,
 			       internal_handle->tracks,
@@ -7174,6 +7201,7 @@ ssize_t libewf_handle_write_finalize(
 		{
 			return( write_finalize_count );
 		}
+/* TODO refactor to write IO handle */
 		/* Create the headers if required
 		 */
 		if( internal_handle->write_io_handle->header_sections == NULL )

@@ -1,4 +1,8 @@
 TODO
+* check .so library version
+* fix libfvalue_data_handle_get_value_entry: invalid data handle - missing data.
+  on write
+
 * change chunk data indication values to flags
 * libewf_filename_create split off wide variant ?
 
@@ -52,6 +56,8 @@ TODO
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount
+  - support for volume letter in -t argument
+
 * add support for device label header value
 
 * ewftools:
@@ -181,6 +187,7 @@ Recovery and analysis:
   - like alternative segment file path in EnCase
     however EnCase seems to fully test if the segment file upfront by
     allocating the necessary disk space
+    how to detect the destination has no available space ?
 * recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
 * check into resume write error for 32-bit compile (different zlib sizes)
@@ -349,6 +356,9 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120705
+* fixes due to recent changes
 
 20120704
 * worked on Ex01 and Lx01 support

@@ -1,7 +1,7 @@
 /*
  * Expert Witness Compression Format (EWF) library read testing program
  *
- * Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -384,7 +384,7 @@ int ewf_test_read_buffer_at_offset(
 	{
 		libcerror_error_backtrace_fprint(
 		 error,
-		 stdout );
+		 stderr );
 
 		libcerror_error_free(
 		 &error );
@@ -514,7 +514,7 @@ int ewf_test_read_chunk_at_offset(
 	{
 		libcerror_error_backtrace_fprint(
 		 error,
-		 stdout );
+		 stderr );
 
 		libcerror_error_free(
 		 &error );

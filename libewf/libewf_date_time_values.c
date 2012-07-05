@@ -996,7 +996,7 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
 
 		return( -1 );
 	}
-	if( utf8_string_size < 3 )
+	if( utf8_string_size < 2 )
 	{
 		libcerror_error_set(
 		 error,

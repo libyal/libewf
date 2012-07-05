@@ -315,20 +315,22 @@ int libewf_chunk_table_read_chunk(
 		if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
 			libcnotify_printf(
-			 "%s: reading compressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " of size: %" PRIu64 "\n",
+			 "%s: reading compressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIu64 "\n",
 			 function,
 			 element_index,
 			 file_io_pool_entry,
+			 element_data_offset,
 			 element_data_offset,
 			 element_data_size );
 		}
 		else
 		{
 			libcnotify_printf(
-			 "%s: reading uncompressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " of size: %" PRIu64 "\n",
+			 "%s: reading uncompressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIu64 "\n",
 			 function,
 			 element_index,
 			 file_io_pool_entry,
+			 element_data_offset,
 			 element_data_offset,
 			 element_data_size );
 		}
@@ -1173,7 +1175,7 @@ int libewf_chunk_table_fill_v1(
 			}
 			corrupted = 1;
 		}
-		chunk_flags = 0;
+		chunk_flags = LIBMFDATA_RANGE_FLAG_USER_DEFINED_1;
 
 		if( is_compressed != 0 )
 		{

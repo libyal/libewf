@@ -2949,7 +2949,7 @@ ssize_t libewf_segment_file_write_chunk(
 
 		if( write_checksum != 0 )
 		{
-			write_size += sizeof( uint32_t );
+			write_size += 4;
 		}
 		if( is_compressed == 0 )
 		{
@@ -2996,7 +2996,7 @@ ssize_t libewf_segment_file_write_chunk(
 		if( ( is_compressed == 0 )
 		 && ( &( chunk_buffer[ chunk_buffer_size ] ) == checksum_buffer ) )
 		{
-			write_size += sizeof( uint32_t );
+			write_size += 4;
 
 			write_checksum = 0;
 		}
@@ -3033,10 +3033,10 @@ ssize_t libewf_segment_file_write_chunk(
 			       file_io_pool,
 			       file_io_pool_entry,
 			       checksum_buffer,
-			       sizeof( uint32_t ),
+			       4,
 			       error );
 
-		if( write_count != (ssize_t) sizeof( uint32_t ) )
+		if( write_count != (ssize_t) 4 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3235,7 +3235,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	}
 	if( write_checksum != 0 )
 	{
-		chunk_size += sizeof( uint32_t );
+		chunk_size += 4;
 	}
 	if( libmfdata_list_set_element_by_index(
 	     chunk_table_list,

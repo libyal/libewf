@@ -290,17 +290,17 @@ int libewf_media_values_calculate_chunk_size(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: sectors per chunk:\t\t%" PRIu32 "\n",
+		 "%s: sectors per chunk\t\t: %" PRIu32 "\n",
 		 function,
 		 media_values->sectors_per_chunk );
 
 		libcnotify_printf(
-		 "%s: bytes per sector:\t\t%" PRIu32 "\n",
+		 "%s: bytes per sector\t\t: %" PRIu32 "\n",
 		 function,
 		 media_values->bytes_per_sector );
 
 		libcnotify_printf(
-		 "%s: chunk size:\t\t\t%" PRIu32 "\n",
+		 "%s: chunk size\t\t\t: %" PRIu32 "\n",
 		 function,
 		 media_values->chunk_size );
 

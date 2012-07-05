@@ -2,7 +2,7 @@
 #
 # Expert Witness Compression Format (EWF) library seek offset testing script
 #
-# Copyright (c) 2006-2012, Joachim Metz <jbmetz@users.sourceforge.net>
+# Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #

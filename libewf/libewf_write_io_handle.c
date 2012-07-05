@@ -112,6 +112,19 @@ int libewf_write_io_handle_initialize(
 
 		goto on_error;
 	}
+	if( libewf_header_sections_initialize(
+	     &( ( *write_io_handle )->header_sections ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create header sections.",
+		 function );
+
+		goto on_error;
+	}
 	( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
 	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_OFFSETS_IN_TABLE;
@@ -138,6 +151,7 @@ int libewf_write_io_handle_free(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_free";
+	int result            = 1;
 
 	if( write_io_handle == NULL )
 	{
@@ -157,6 +171,22 @@ int libewf_write_io_handle_free(
 			memory_free(
 			 ( *write_io_handle )->data_section );
 		}
+		if( ( *write_io_handle )->header_sections != NULL )
+		{
+			if( libewf_header_sections_free(
+			     &( ( *write_io_handle )->header_sections ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free header sections.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *write_io_handle )->table_offsets != NULL )
 		{
 			memory_free(
@@ -172,7 +202,7 @@ int libewf_write_io_handle_free(
 
 		*write_io_handle = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Clones the write IO handle
@@ -1335,7 +1365,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	else
 	{
-		maximum_chunks_per_segment_file /= media_values->chunk_size + sizeof( uint32_t );
+		maximum_chunks_per_segment_file /= media_values->chunk_size + 4;
 	}
 	/* Determine the number of required chunk sections
 	 */
@@ -1367,7 +1397,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk section starts and the offset table checksum
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * ( sizeof( ewf_section_descriptor_v1_t ) + sizeof( uint32_t ) );
+		                                    * ( sizeof( ewf_section_descriptor_v1_t ) + 4 );
 
 		/* Leave space for the table offsets
 		 */
@@ -1379,7 +1409,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
-		                                    * ( ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * sizeof( uint32_t ) ) );
+		                                    * ( ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * 4 ) );
 
 		/* Leave space for the table and table2 offsets
 		 */
@@ -1396,7 +1426,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	else
 	{
-		calculated_chunks_per_segment_file /= media_values->chunk_size + sizeof( uint32_t );
+		calculated_chunks_per_segment_file /= media_values->chunk_size + 4;
 	}
 	/* If the input size is known determine the remaining number of chunks
 	 */
@@ -1580,7 +1610,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	}
 	/* Determine if a chunk would fit in the segment file
 	 */
-	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
+	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + 4 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1768,7 +1798,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	/* Determine if a chunk would fit in the segment file
 	 */
-	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( uint32_t ) ) )
+	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + 4 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -2102,7 +2132,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libmfdata_list_t *chunk_table_list,
          libfvalue_table_t *header_values,
          libfvalue_table_t *hash_values,
-         libewf_header_sections_t *header_sections,
          libewf_hash_sections_t *hash_sections,
          libewf_sector_list_t *sessions,
          libewf_sector_list_t *tracks,
@@ -2138,6 +2167,17 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( write_io_handle->header_sections == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid write IO handle - missing header sections.",
 		 function );
 
 		return( -1 );
@@ -2355,23 +2395,12 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	if( segment_file == NULL )
 	{
-		if( header_sections == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid header sections.",
-			 function );
-
-			return( -1 );
-		}
-		if( ( header_sections->header == NULL )
-		 && ( header_sections->header2 == NULL )
-		 && ( header_sections->xheader == NULL ) )
+		if( ( write_io_handle->header_sections->header == NULL )
+		 && ( write_io_handle->header_sections->header2 == NULL )
+		 && ( write_io_handle->header_sections->xheader == NULL ) )
 		{
 			if( libewf_header_sections_create(
-			     header_sections,
+			     write_io_handle->header_sections,
 			     header_values,
 			     io_handle->compression_level,
 			     io_handle->format,
@@ -2439,7 +2468,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		               file_io_pool,
 		               file_io_pool_entry,
 		               media_values,
-		               header_sections,
+		               write_io_handle->header_sections,
 		               &( write_io_handle->data_section ),
 		               error );
 
@@ -2566,13 +2595,13 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			/* Leave space for the chunk section start and the offset table checksum
 			 */
-			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_descriptor_v1_t ) + sizeof( uint32_t );
+			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_descriptor_v1_t ) + 4;
 		}
 		else
 		{
 			/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
 			 */
-			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * sizeof( uint32_t ) );
+			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * 4 );
 		}
 		if( libbfio_pool_get_offset(
 		     file_io_pool,
@@ -3028,7 +3057,6 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          libmfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *delta_segment_table,
          libmfdata_list_t *chunk_table_list,
-         libewf_header_sections_t *header_sections,
          int chunk_index,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
@@ -3323,7 +3351,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			}
 			required_segment_file_size = (size64_t) last_section->start_offset
 					           + chunk_buffer_size
-					           + sizeof( uint32_t )
+					           + 4
 					           + sizeof( ewf_section_descriptor_v1_t );
 
 			/* Check if chunk fits in exisiting delta segment file
@@ -3429,7 +3457,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				       file_io_pool,
 				       file_io_pool_entry,
 				       media_values,
-				       header_sections,
+				       write_io_handle->header_sections,
 			               &( write_io_handle->data_section ),
 			               error );
 
