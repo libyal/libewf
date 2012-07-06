@@ -386,6 +386,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+/*
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_set_verbose(
 	 1 );
@@ -393,7 +394,6 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-/*
 */
 	if( option_chunk_size != NULL )
 	{

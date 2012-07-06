@@ -3091,7 +3091,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	size64_t required_segment_file_size      = 0;
 	ssize_t total_write_count                = 0;
 	ssize_t write_count                      = 0;
-	uint32_t existing_chunk_flags            = 0;
+	uint32_t existing_range_flags            = 0;
 	uint8_t no_section_append                = 0;
 	int file_io_pool_entry                   = -1;
 	int number_of_segment_files              = 0;
@@ -3183,7 +3183,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	     &file_io_pool_entry,
 	     &existing_chunk_offset,
 	     &existing_chunk_size,
-	     &existing_chunk_flags,
+	     &existing_range_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3206,7 +3206,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		 chunk_buffer_size );
 	}
 #endif
-	if( ( existing_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
+	if( ( existing_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 	{
 		if( libmfdata_file_list_get_number_of_files(
 		     delta_segment_files_list,

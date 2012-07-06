@@ -404,7 +404,7 @@ int libewf_chunk_table_read_chunk(
 		chunk_data->has_checksum  = 1;
 		chunk_data->is_compressed = 1;
 	}
-	else if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_USER_DEFINED_1 ) != 0 )
+	else if( ( element_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
 	{
 		chunk_data->has_checksum = 1;
 	}
@@ -1019,11 +1019,11 @@ int libewf_chunk_table_fill_v1(
 	off64_t last_chunk_size         = 0;
 	off64_t previous_chunk_offset   = 0;
 	size64_t previous_chunk_size    = 0;
-	uint32_t chunk_flags            = 0;
 	uint32_t chunk_size             = 0;
 	uint32_t current_offset         = 0;
 	uint32_t next_offset            = 0;
-	uint32_t previous_chunk_flags   = 0;
+	uint32_t previous_range_flags   = 0;
+	uint32_t range_flags            = 0;
 	uint32_t stored_offset          = 0;
 	uint32_t table_entry_index      = 0;
 	uint8_t corrupted               = 0;
@@ -1175,19 +1175,19 @@ int libewf_chunk_table_fill_v1(
 			}
 			corrupted = 1;
 		}
-		chunk_flags = LIBMFDATA_RANGE_FLAG_USER_DEFINED_1;
+		range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 
 		if( is_compressed != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 		}
 		if( corrupted != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
 		}
 		if( tainted != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( is_compressed == 0 )
@@ -1248,7 +1248,7 @@ int libewf_chunk_table_fill_v1(
 			     file_io_pool_entry,
 			     base_offset + current_offset,
 			     (size64_t) chunk_size,
-			     chunk_flags,
+			     range_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -1270,7 +1270,7 @@ int libewf_chunk_table_fill_v1(
 			     &previous_file_io_pool_entry,
 			     &previous_chunk_offset,
 			     &previous_chunk_size,
-			     &previous_chunk_flags,
+			     &previous_range_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -1283,7 +1283,7 @@ int libewf_chunk_table_fill_v1(
 
 				return( -1 );
 			}
-			if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
+			if( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 			{
 				libcerror_error_set(
 				 error,
@@ -1396,19 +1396,19 @@ int libewf_chunk_table_fill_v1(
 	}
 	/* Used to indicate the chunk has a checksum
 	 */
-	chunk_flags = LIBMFDATA_RANGE_FLAG_USER_DEFINED_1;
+	range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 
 	if( is_compressed != 0 )
 	{
-		chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+		range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 	}
 	if( corrupted != 0 )
 	{
-		chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+		range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
 	}
 	if( tainted != 0 )
 	{
-		chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+		range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( is_compressed == 0 )
@@ -1469,7 +1469,7 @@ int libewf_chunk_table_fill_v1(
 		     file_io_pool_entry,
 		     last_chunk_offset,
 		     (size64_t) last_chunk_size,
-		     chunk_flags,
+		     range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1491,7 +1491,7 @@ int libewf_chunk_table_fill_v1(
 		     &previous_file_io_pool_entry,
 		     &previous_chunk_offset,
 		     &previous_chunk_size,
-		     &previous_chunk_flags,
+		     &previous_range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1504,7 +1504,7 @@ int libewf_chunk_table_fill_v1(
 
 			return( -1 );
 		}
-		if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
+		if( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1547,9 +1547,9 @@ int libewf_chunk_table_fill_v2(
 	size_t table_entry_index        = 0;
 	uint64_t chunk_offset           = 0;
 	uint32_t chunk_data_flags       = 0;
-	uint32_t chunk_flags            = 0;
 	uint32_t chunk_size             = 0;
-	uint32_t previous_chunk_flags   = 0;
+	uint32_t previous_range_flags   = 0;
+	uint32_t range_flags            = 0;
 	int previous_file_io_pool_entry = 0;
 	int result                      = 0;
 
@@ -1638,23 +1638,23 @@ int libewf_chunk_table_fill_v2(
 
 			return( -1 );
 		}
-		chunk_flags = 0;
+		range_flags = 0;
 
 		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 		}
 		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_USER_DEFINED_1;
+			range_flags |= LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 		}
-		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_SPARSE_PATTERN_FILL ) != 0 )
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL ) != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_USER_DEFINED_2;
+			range_flags |= LIBEWF_RANGE_FLAG_USES_PATTERN_FILL;
 		}
 		if( tainted != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
 		}
 		result = libmfdata_list_is_group(
 		          chunk_table_list,
@@ -1681,7 +1681,7 @@ int libewf_chunk_table_fill_v2(
 			     file_io_pool_entry,
 			     chunk_offset,
 			     (size64_t) chunk_size,
-			     chunk_flags,
+			     range_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -1703,7 +1703,7 @@ int libewf_chunk_table_fill_v2(
 			     &previous_file_io_pool_entry,
 			     &previous_chunk_offset,
 			     &previous_chunk_size,
-			     &previous_chunk_flags,
+			     &previous_range_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -1716,7 +1716,7 @@ int libewf_chunk_table_fill_v2(
 
 				return( -1 );
 			}
-			if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
+			if( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 			{
 				libcerror_error_set(
 				 error,
@@ -1763,11 +1763,11 @@ int libewf_chunk_table_correct_v1(
 	off64_t last_chunk_size         = 0;
 	off64_t previous_chunk_offset   = 0;
 	size64_t previous_chunk_size    = 0;
-	uint32_t chunk_flags            = 0;
 	uint32_t chunk_size             = 0;
 	uint32_t current_offset         = 0;
 	uint32_t next_offset            = 0;
-	uint32_t previous_chunk_flags   = 0;
+	uint32_t previous_range_flags   = 0;
+	uint32_t range_flags            = 0;
 	uint32_t stored_offset          = 0;
 	uint32_t table_entry_index      = 0;
 	uint8_t corrupted               = 0;
@@ -1921,19 +1921,19 @@ int libewf_chunk_table_correct_v1(
 			}
 			corrupted = 1;
 		}
-		chunk_flags = 0;
+		range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 
 		if( is_compressed != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 		}
 		if( corrupted != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
 		}
 		if( tainted != 0 )
 		{
-			chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+			range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( is_compressed == 0 )
@@ -1994,7 +1994,7 @@ int libewf_chunk_table_correct_v1(
 			     file_io_pool_entry,
 			     base_offset + current_offset,
 			     (size64_t) chunk_size,
-			     chunk_flags,
+			     range_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2016,7 +2016,7 @@ int libewf_chunk_table_correct_v1(
 			     &previous_file_io_pool_entry,
 			     &previous_chunk_offset,
 			     &previous_chunk_size,
-			     &previous_chunk_flags,
+			     &previous_range_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2029,7 +2029,7 @@ int libewf_chunk_table_correct_v1(
 
 				return( -1 );
 			}
-			if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
+			if( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 			{
 				if( (off64_t) ( base_offset + current_offset ) != previous_chunk_offset )
 				{
@@ -2057,8 +2057,8 @@ int libewf_chunk_table_correct_v1(
 #endif
 					mismatch = 1;
 				}
-				else if( ( chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED )
-				      != ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
+				else if( ( range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED )
+				      != ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
 				{
 #if defined( HAVE_DEBUG_OUTPUT )
 					if( libcnotify_verbose != 0 )
@@ -2084,13 +2084,13 @@ int libewf_chunk_table_correct_v1(
 					{
 						update_data_range = 1;
 					}
-					else if( ( ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_CORRUPTED ) != 0 )
+					else if( ( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_CORRUPTED ) != 0 )
 					      && ( corrupted == 0 ) )
 					{
 						update_data_range = 1;
 					}
 				}
-				else if( ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_TAINTED ) != 0 )
+				else if( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_TAINTED ) != 0 )
 				{
 					update_data_range = 1;
 				}
@@ -2102,7 +2102,7 @@ int libewf_chunk_table_correct_v1(
 					     file_io_pool_entry,
 					     base_offset + current_offset,
 					     (size64_t) chunk_size,
-					     chunk_flags,
+					     range_flags,
 					     error ) != 1 )
 					{
 						libcerror_error_set(
@@ -2217,19 +2217,19 @@ int libewf_chunk_table_correct_v1(
 #endif
 		corrupted = 1;
 	}
-	chunk_flags = 0;
+	range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 
 	if( is_compressed != 0 )
 	{
-		chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+		range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 	}
 	if( corrupted != 0 )
 	{
-		chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+		range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
 	}
 	if( tainted != 0 )
 	{
-		chunk_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+		range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( is_compressed == 0 )
@@ -2290,7 +2290,7 @@ int libewf_chunk_table_correct_v1(
 		     file_io_pool_entry,
 		     last_chunk_offset,
 		     (size64_t) last_chunk_size,
-		     chunk_flags,
+		     range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2312,7 +2312,7 @@ int libewf_chunk_table_correct_v1(
 		     &previous_file_io_pool_entry,
 		     &previous_chunk_offset,
 		     &previous_chunk_size,
-		     &previous_chunk_flags,
+		     &previous_range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2325,7 +2325,7 @@ int libewf_chunk_table_correct_v1(
 
 			return( -1 );
 		}
-		if( ( previous_chunk_flags & LIBEWF_CHUNK_FLAG_IS_DELTA ) == 0 )
+		if( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 		{
 				if( (off64_t) ( base_offset + current_offset ) != previous_chunk_offset )
 				{
@@ -2353,8 +2353,8 @@ int libewf_chunk_table_correct_v1(
 #endif
 				mismatch = 1;
 			}
-			else if( ( chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED )
-			      != ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
+			else if( ( range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED )
+			      != ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
@@ -2380,13 +2380,13 @@ int libewf_chunk_table_correct_v1(
 				{
 					update_data_range = 1;
 				}
-				else if( ( ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_CORRUPTED ) != 0 )
+				else if( ( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_CORRUPTED ) != 0 )
 				      && ( corrupted == 0 ) )
 				{
 					update_data_range = 1;
 				}
 			}
-			else if( ( previous_chunk_flags & LIBMFDATA_RANGE_FLAG_IS_TAINTED ) != 0 )
+			else if( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_TAINTED ) != 0 )
 			{
 				update_data_range = 1;
 			}
@@ -2398,7 +2398,7 @@ int libewf_chunk_table_correct_v1(
 				     file_io_pool_entry,
 				     base_offset + current_offset,
 				     (size64_t) chunk_size,
-				     chunk_flags,
+				     range_flags,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -2438,7 +2438,7 @@ int libewf_chunk_table_fill_offsets(
 	static char *function       = "libewf_chunk_table_fill_offsets";
 	off64_t chunk_offset        = 0;
 	size64_t chunk_size         = 0;
-	uint32_t chunk_flags        = 0;
+	uint32_t range_flags        = 0;
 	uint32_t table_offset       = 0;
 	uint32_t table_offset_index = 0;
 	int file_io_pool_entry      = 0;
@@ -2486,7 +2486,7 @@ int libewf_chunk_table_fill_offsets(
 		     &file_io_pool_entry,
 		     &chunk_offset,
 		     &chunk_size,
-		     &chunk_flags,
+		     &range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2516,7 +2516,7 @@ int libewf_chunk_table_fill_offsets(
 		}
 		table_offset = (uint32_t) chunk_offset;
 
-		if( ( chunk_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+		if( ( range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
 			table_offset |= 0x80000000UL;
 		}

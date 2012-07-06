@@ -2890,7 +2890,7 @@ ssize_t libewf_segment_file_write_chunk(
 	size_t write_size           = 0;
 	ssize_t write_count         = 0;
 	ssize_t total_write_count   = 0;
-	uint8_t chunk_flags         = 0;
+	uint32_t range_flags        = 0;
 	int number_of_chunks        = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -3099,13 +3099,11 @@ ssize_t libewf_segment_file_write_chunk(
 		}
 		total_write_count += write_count;
 	}
+	range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
+
 	if( is_compressed != 0 )
 	{
-		chunk_flags = LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
-	}
-	else
-	{
-		chunk_flags = 0;
+		range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
 	}
 	if( libmfdata_list_set_element_by_index(
 	     chunk_table_list,
@@ -3113,7 +3111,7 @@ ssize_t libewf_segment_file_write_chunk(
 	     file_io_pool_entry,
 	     segment_file_offset,
 	     (size64_t) total_write_count,
-	     chunk_flags,
+	     range_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3292,7 +3290,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	     file_io_pool_entry,
 	     chunk_offset,
 	     (size64_t) chunk_size,
-	     LIBEWF_CHUNK_FLAG_IS_DELTA,
+	     LIBEWF_RANGE_FLAG_IS_DELTA,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

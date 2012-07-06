@@ -1,20 +1,6 @@
 TODO
 * check .so library version
 
-* fix:
-libfvalue_utf8_string_with_index_copy_from_integer: invalid UTF-8 string index
-value out of bounds.
-libewf_generate_date_header_value: unable to copy seconds to date time values
-string.
-libewf_header_values_generate_utf8_header_string: unable to generate acquiry
-date header value.
-libfvalue_utf8_string_with_index_copy_from_integer: invalid UTF-8 string index
-value out of bounds.
-libewf_generate_date_header_value: unable to copy seconds to date time values
-string.
-libewf_header_values_generate_utf8_header_string: unable to generate system
-date header value.
-
 * change chunk data indication values to flags
 * libewf_filename_create split off wide variant ?
 
@@ -375,8 +361,11 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120706
+* fixes and improvement for recent changes
+
 20120705
-* fixes due to recent changes
+* fixes and improvement for recent changes
 
 20120704
 * worked on Ex01 and Lx01 support

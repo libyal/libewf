@@ -9034,7 +9034,7 @@ int libewf_handle_get_file_io_handle(
 	off64_t chunk_offset                      = 0;
 	size64_t chunk_size                       = 0;
 	uint64_t chunk_index                      = 0;
-	uint32_t chunk_flags                      = 0;
+	uint32_t range_flags                      = 0;
 	int file_io_pool_entry                    = 0;
 
 	if( handle == NULL )
@@ -9113,7 +9113,7 @@ int libewf_handle_get_file_io_handle(
 	     &file_io_pool_entry,
 	     &chunk_offset,
 	     &chunk_size,
-	     &chunk_flags,
+	     &range_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
