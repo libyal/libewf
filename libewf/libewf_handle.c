@@ -6268,6 +6268,7 @@ ssize_t libewf_handle_write_buffer(
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
 	uint64_t chunk_data_offset                = 0;
+	uint8_t pack_flags                        = 0;
 	int chunk_exists                          = 0;
 	int write_chunk                           = 0;
 
@@ -6622,19 +6623,25 @@ ssize_t libewf_handle_write_buffer(
 			buffer_offset += write_size;
 			buffer_size   -= write_size;
 
-/* TODO is there a need to be able to set this to 0 ? */
-			chunk_data->has_checksum = 1;
-
+/* TODO add EWF2 support ? Pass pack flags form IO handle */
+			if( internal_handle->io_handle->major_version == 1 )
+			{
+				pack_flags = LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
+			}
+			else
+			{
+				pack_flags = 0;
+			}
 			chunk_data_size = chunk_data->data_size;
 
 			if( libewf_chunk_data_pack(
 			     chunk_data,
 			     EWF_COMPRESSION_NONE,
 			     0,
-			     0,
 			     internal_handle->media_values->chunk_size,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
+			     pack_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -6795,19 +6802,23 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( write_chunk != 0 )
 			{
-/* TODO is there a need to be able to set this to 0 ? */
-				internal_handle->chunk_data->has_checksum = 1;
+/* TODO add EWF2 support ? Pass pack flags form IO handle */
+				pack_flags = internal_handle->io_handle->force_compression;
 
+				if( internal_handle->io_handle->major_version == 1 )
+				{
+					pack_flags |= LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
+				}
 				chunk_data_size = internal_handle->chunk_data->data_size;
 
 				if( libewf_chunk_data_pack(
 				     internal_handle->chunk_data,
 				     internal_handle->io_handle->compression_level,
 				     internal_handle->io_handle->compression_flags,
-				     internal_handle->io_handle->force_compression,
 				     internal_handle->media_values->chunk_size,
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
+				     pack_flags,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -6964,6 +6975,7 @@ ssize_t libewf_handle_write_finalize(
 	ssize_t write_count                       = 0;
 	ssize_t write_finalize_count              = 0;
 	uint64_t chunk_index                      = 0;
+	uint8_t pack_flags                        = 0;
 	int file_io_pool_entry                    = -1;
 	int number_of_segment_files               = 0;
 	int segment_files_list_index              = 0;
@@ -7076,19 +7088,23 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-/* TODO is there a need to be able to set this to 0 ? */
-		internal_handle->chunk_data->has_checksum = 1;
+/* TODO add EWF2 support ? Pass pack flags form IO handle */
+		pack_flags = internal_handle->io_handle->force_compression;
 
+		if( internal_handle->io_handle->major_version == 1 )
+		{
+			pack_flags |= LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
+		}
 		chunk_data_size = internal_handle->chunk_data->data_size;
 
 		if( libewf_chunk_data_pack(
 		     internal_handle->chunk_data,
 		     internal_handle->io_handle->compression_level,
 		     internal_handle->io_handle->compression_flags,
-		     internal_handle->io_handle->force_compression,
 		     internal_handle->media_values->chunk_size,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
+		     pack_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

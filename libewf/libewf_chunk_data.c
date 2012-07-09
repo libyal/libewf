@@ -182,10 +182,10 @@ int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
      int8_t compression_level,
      uint8_t compression_flags,
-     uint8_t force_compression,
      size32_t chunk_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
+     uint8_t pack_flags,
      libcerror_error_t **error )
 {
 	static char *function        = "libewf_chunk_data_pack";
@@ -222,7 +222,7 @@ int libewf_chunk_data_pack(
 	}
 	chunk_data->is_compressed = 0;
 
-	if( ( force_compression == 0 )
+	if( ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 )
 	 && ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
 	{
 		result = libewf_empty_block_test(
@@ -257,7 +257,7 @@ int libewf_chunk_data_pack(
 			compression_level = EWF_COMPRESSION_NONE;
 		}
 	}
-	if( ( force_compression != 0 )
+	if( ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) != 0 )
 	 || ( compression_level != EWF_COMPRESSION_NONE ) )
 	{
 		chunk_data->compressed_data_size = 2 * chunk_data->data_size;
@@ -352,7 +352,7 @@ int libewf_chunk_data_pack(
 				return( -1 );
 			}
 		}
-	 	if( ( force_compression != 0 )
+		if( ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) != 0 )
 		 || ( chunk_data->compressed_data_size < chunk_data->data_size ) )
 		{
 			memory_free(
@@ -368,7 +368,7 @@ int libewf_chunk_data_pack(
 		}
 	}
 	if( ( chunk_data->is_compressed == 0 )
-	 && ( chunk_data->has_checksum != 0 ) )
+	 && ( ( pack_flags & LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM ) != 0 ) )
 	{
 		if( ( chunk_data->data_size + 4 ) > chunk_data->allocated_data_size )
 		{
@@ -383,15 +383,17 @@ int libewf_chunk_data_pack(
 			return( -1 );
 		}
 		calculated_checksum = ewf_checksum_calculate(
-		                       chunk_data->data,
-		                       chunk_data->data_size,
-		                       1 );
+				       chunk_data->data,
+				       chunk_data->data_size,
+				       1 );
 
 		byte_stream_copy_from_uint32_little_endian(
 		 &( ( chunk_data->data )[ chunk_data->data_size ] ),
 		 calculated_checksum );
 
 		chunk_data->data_size += 4;
+
+		chunk_data->has_checksum = 1;
 	}
 	chunk_data->is_packed = 1;
 

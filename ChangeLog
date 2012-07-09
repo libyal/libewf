@@ -1,4 +1,10 @@
 TODO
+* delta chunk already sets checksum, is that behavior necessary?
+  or can it be moved to pack?
+  - no checksum is necessary
+  - checksum needs to be calculated
+  - checksum is already set in data
+* pack flags add pattern fill ?
 * check .so library version
 
 * change chunk data indication values to flags
