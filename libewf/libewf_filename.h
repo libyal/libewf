@@ -41,7 +41,6 @@ int libewf_filename_set_extension(
      uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format,
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -53,7 +52,6 @@ int libewf_filename_set_extension_wide(
      uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format,
      libcerror_error_t **error );
 #endif
 
@@ -66,7 +64,6 @@ int libewf_filename_create(
      uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

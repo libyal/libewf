@@ -1205,6 +1205,28 @@ ssize_t libewf_segment_file_read_volume_section(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
 	read_count = libewf_section_volume_read(
 		      section,
 		      io_handle,
@@ -1223,6 +1245,15 @@ ssize_t libewf_segment_file_read_volume_section(
 		 function );
 
 		return( -1 );
+	}
+/* TODO still needed ? */
+	if( media_values->media_type == LIBEWF_MEDIA_TYPE_SINGLE_FILES )
+	{
+		io_handle->ewf_format = EWF_FORMAT_L01;
+	}
+	else
+	{
+		io_handle->ewf_format = EWF_FORMAT_E01;
 	}
 	return( read_count );
 }

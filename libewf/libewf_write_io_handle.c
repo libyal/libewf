@@ -1934,7 +1934,6 @@ int libewf_write_io_handle_create_segment_file(
 	     maximum_number_of_segments,
 	     segment_file_type,
 	     io_handle->format,
-	     io_handle->ewf_format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

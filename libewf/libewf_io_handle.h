@@ -43,10 +43,15 @@ struct libewf_io_handle
 	 */
 	off64_t current_offset;
 
+	/* The segment file type
+	 */
+	uint8_t segment_file_type;
+
 	/* Value to indicate which file format is used
 	 */
 	uint8_t format;
 
+/* TODO deprecate */
 	/* Value to indicate which ewf format is used
 	 */
 	uint8_t ewf_format;

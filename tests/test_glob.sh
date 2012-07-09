@@ -272,6 +272,8 @@ fi
 
 rm -rf ${TMP};
 
+# .e01
+
 if ! test_glob "PREFIX.e01" ".e01" "PREFIX.e01";
 then
 	exit ${EXIT_FAILURE};
@@ -296,6 +298,8 @@ if ! test_glob_sequence "PREFIX.e01" ".e01" "PREFIX" "faa";
 then
 	exit ${EXIT_FAILURE};
 fi
+
+# .s01
 
 if ! test_glob "PREFIX.s01" ".s01" "PREFIX.s01";
 then
@@ -322,6 +326,8 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+# .E01
+
 if ! test_glob "PREFIX.E01" ".E01" "PREFIX.E01";
 then
 	exit ${EXIT_FAILURE};
@@ -347,6 +353,8 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+# .L01
+
 if ! test_glob "PREFIX.L01" ".L01" "PREFIX.L01";
 then
 	exit ${EXIT_FAILURE};
@@ -368,6 +376,40 @@ then
 fi
 
 if ! test_glob_sequence "PREFIX.L01" ".L01" "PREFIX" "MAA";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+# .Ex01
+
+if ! test_glob "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01 PREFIX.Ex02 PREFIX.Ex03 PREFIX.Ex04 PREFIX.Ex05 PREFIX.Ex06 PREFIX.Ex07 PREFIX.Ex08 PREFIX.Ex09";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01 PREFIX.Ex02 PREFIX.Ex03 PREFIX.Ex04 PREFIX.Ex05 PREFIX.Ex06 PREFIX.Ex07 PREFIX.Ex08 PREFIX.Ex09 PREFIX.Ex10 PREFIX.Ex11";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+# .Lx01
+
+if ! test_glob "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01 PREFIX.Lx02 PREFIX.Lx03 PREFIX.Lx04 PREFIX.Lx05 PREFIX.Lx06 PREFIX.Lx07 PREFIX.Lx08 PREFIX.Lx09";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01 PREFIX.Lx02 PREFIX.Lx03 PREFIX.Lx04 PREFIX.Lx05 PREFIX.Lx06 PREFIX.Lx07 PREFIX.Lx08 PREFIX.Lx09 PREFIX.Lx10 PREFIX.Lx11";
 then
 	exit ${EXIT_FAILURE};
 fi

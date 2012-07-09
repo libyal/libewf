@@ -42,7 +42,6 @@ int libewf_filename_set_extension(
      uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format,
      libcerror_error_t **error )
 {
 	static char *function      = "libewf_filename_set_extension";
@@ -118,11 +117,6 @@ int libewf_filename_set_extension(
 			first_character       = 'e';
 			additional_characters = 'a';
 		}
-		else if( ewf_format == EWF_FORMAT_S01 )
-		{
-			first_character       = 's';
-			additional_characters = 'a';
-		}
 		else
 		{
 			first_character       = 'E';
@@ -133,6 +127,11 @@ int libewf_filename_set_extension(
 	{
 		first_character       = 'L';
 		additional_characters = 'A';
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+	{
+		first_character       = 's';
+		additional_characters = 'a';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
 	{
@@ -233,7 +232,6 @@ int libewf_filename_set_extension_wide(
      uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format,
      libcerror_error_t **error )
 {
 	static char *function         = "libewf_filename_set_extension_wide";
@@ -309,11 +307,6 @@ int libewf_filename_set_extension_wide(
 			first_character       = (wchar_t) 'e';
 			additional_characters = (wchar_t) 'a';
 		}
-		else if( ewf_format == EWF_FORMAT_S01 )
-		{
-			first_character       = (wchar_t) 's';
-			additional_characters = (wchar_t) 'a';
-		}
 		else
 		{
 			first_character       = (wchar_t) 'E';
@@ -324,6 +317,11 @@ int libewf_filename_set_extension_wide(
 	{
 		first_character       = (wchar_t) 'L';
 		additional_characters = (wchar_t) 'A';
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+	{
+		first_character       = (wchar_t) 's';
+		additional_characters = (wchar_t) 'a';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
 	{
@@ -424,7 +422,6 @@ int libewf_filename_create(
      uint32_t maximum_number_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_filename_create";
@@ -516,7 +513,6 @@ int libewf_filename_create(
 	     maximum_number_of_segments,
 	     segment_file_type,
 	     format,
-	     ewf_format,
 	     error ) != 1 )
 #else
 	if( libewf_filename_set_extension(
@@ -527,7 +523,6 @@ int libewf_filename_create(
 	     maximum_number_of_segments,
 	     segment_file_type,
 	     format,
-	     ewf_format,
 	     error ) != 1 )
 #endif
 	{

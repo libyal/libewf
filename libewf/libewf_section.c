@@ -7506,14 +7506,6 @@ ssize_t libewf_section_volume_e01_read(
 	memory_free(
 	 volume );
 
-	if( media_values->media_type == LIBEWF_MEDIA_TYPE_SINGLE_FILES )
-	{
-		io_handle->ewf_format = EWF_FORMAT_L01;
-	}
-	else
-	{
-		io_handle->ewf_format = EWF_FORMAT_E01;
-	}
 	return( read_count );
 
 on_error:

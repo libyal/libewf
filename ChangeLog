@@ -1,4 +1,6 @@
 TODO
+* Update glob test in test plan
+
 * delta chunk already sets checksum, is that behavior necessary?
   or can it be moved to pack?
   - no checksum is necessary
@@ -16,7 +18,7 @@ TODO
   - complete: libewf_chunk_table_fill_v2
   - file naming schema ?
   - add types for globbing
-  - add glob tests
+  - add glob tests (+/-)
   - add support for section MD5 hashes
   - add generic way to parse file object data
   - rename table offsets to table entries
@@ -367,11 +369,14 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120709
+* fixes and improvements for recent changes
+
 20120706
-* fixes and improvement for recent changes
+* fixes and improvements for recent changes
 
 20120705
-* fixes and improvement for recent changes
+* fixes and improvements for recent changes
 
 20120704
 * worked on Ex01 and Lx01 support

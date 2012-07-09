@@ -520,7 +520,6 @@ int libewf_glob(
 	size_t segment_filename_index    = 0;
 	size_t segment_filename_length   = 0;
 	uint8_t segment_file_type        = 0;
-	uint8_t ewf_format               = 0;
 	int result                       = 0;
 
 	if( filename == NULL )
@@ -632,6 +631,7 @@ int libewf_glob(
 		{
 			if( filename[ filename_length - 4 ] == 'E' )
 			{
+/* TODO replace by format */
 				segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
 			}
 			else if( filename[ filename_length - 4 ] == 'L' )
@@ -688,13 +688,11 @@ int libewf_glob(
 		}
 		else if( format == LIBEWF_FORMAT_SMART )
 		{
-			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-			ewf_format        = EWF_FORMAT_S01;
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
 		}
 		else
 		{
 			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-			ewf_format        = EWF_FORMAT_E01;
 		}
 	}
 	if( libbfio_file_initialize(
@@ -762,7 +760,6 @@ int libewf_glob(
 		     (uint32_t) UINT16_MAX,
 		     segment_file_type,
 		     format,
-		     ewf_format,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -934,7 +931,6 @@ int libewf_glob_wide(
 	size_t segment_filename_length   = 0;
 	int result                       = 0;
 	uint8_t segment_file_type        = 0;
-	uint8_t ewf_format               = 0;
 
 	if( filename == NULL )
 	{
@@ -1099,13 +1095,11 @@ int libewf_glob_wide(
 		}
 		else if( format == LIBEWF_FORMAT_SMART )
 		{
-			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-			ewf_format        = EWF_FORMAT_S01;
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
 		}
 		else
 		{
 			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-			ewf_format        = EWF_FORMAT_E01;
 		}
 	}
 	if( libbfio_file_initialize(
@@ -1173,7 +1167,6 @@ int libewf_glob_wide(
 		     (uint32_t) UINT16_MAX,
 		     segment_file_type,
 		     format,
-		     ewf_format,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

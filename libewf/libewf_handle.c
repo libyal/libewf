@@ -2626,8 +2626,9 @@ ssize_t libewf_handle_open_read_segment_file(
 	}
 	if( segment_file->segment_number == 1 )
 	{
-		internal_handle->io_handle->major_version = segment_file->major_version;
-		internal_handle->io_handle->minor_version = segment_file->minor_version;
+		internal_handle->io_handle->segment_file_type = segment_file->type;
+		internal_handle->io_handle->major_version     = segment_file->major_version;
+		internal_handle->io_handle->minor_version     = segment_file->minor_version;
 
 		if( segment_file->major_version == 2 )
 		{
@@ -2649,6 +2650,17 @@ ssize_t libewf_handle_open_read_segment_file(
 	}
 	else
 	{
+		if( segment_file->type != internal_handle->io_handle->segment_file_type )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: segment file type value mismatch.",
+			 function );
+
+			return( -1 );
+		}
 		if( ( segment_file->major_version != internal_handle->io_handle->major_version )
 		 || ( segment_file->minor_version != internal_handle->io_handle->minor_version ) )
 		{
@@ -2656,12 +2668,12 @@ ssize_t libewf_handle_open_read_segment_file(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: segment file format version mismatch.",
+			 "%s: segment file format version value mismatch.",
 			 function );
 
 			return( -1 );
 		}
-		if( segment_file->major_version == 2 )
+		if( internal_handle->io_handle->major_version == 2 )
 		{
 			if( memory_compare(
 			     internal_handle->media_values->set_identifier,
@@ -2672,7 +2684,7 @@ ssize_t libewf_handle_open_read_segment_file(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_INPUT,
 				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-				 "%s: mismatch in segment file set identifier.",
+				 "%s: segment file set identifier value mismatch.",
 				 function );
 
 				return( -1 );
@@ -2973,7 +2985,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
-						if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+						if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 						{
 							libcnotify_printf(
 							 "%s: found sectors section in EWF-S01 format.\n",
@@ -3011,7 +3023,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
-						if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+						if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 						{
 							libcnotify_printf(
 							 "%s: found error section in EWF-S01 format.\n",
@@ -3034,7 +3046,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
-						if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+						if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 						{
 							libcnotify_printf(
 							 "%s: found session section in EWF-S01 format.\n",
@@ -3223,7 +3235,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+					if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 					{
 						libcnotify_printf(
 						 "%s: found data section in EWF-S01 format.\n",
@@ -3267,18 +3279,17 @@ int libewf_handle_open_read_section_data(
 			     (void *) "ltree",
 			     5 ) == 0 )
 			{
-				if( internal_handle->io_handle->ewf_format != EWF_FORMAT_L01 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
+				if( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+				{
 					if( libcnotify_verbose != 0 )
 					{
 						libcnotify_printf(
-						 "%s: found ltree section in EWF-E01 or EWF-S01 format.\n",
+						 "%s: found ltree section in none EWF-L01 format.\n",
 						 function );
 					}
-#endif
-					internal_handle->io_handle->ewf_format = EWF_FORMAT_L01;
 				}
+#endif
 				read_count = libewf_section_ltree_read(
 					      section,
 					      file_io_pool,
@@ -3297,7 +3308,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+					if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 					{
 						libcnotify_printf(
 						 "%s: found xhash section in EWF-S01 format.\n",
@@ -3325,7 +3336,7 @@ int libewf_handle_open_read_section_data(
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+					if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 					{
 						libcnotify_printf(
 						 "%s: found digest section in EWF-S01 format.\n",
@@ -3429,50 +3440,6 @@ int libewf_handle_open_read_section_data(
 				header_section_found = 1;
 			}
 		}
-		if( initialize_chunk_table != 0 )
-		{
-			if( libewf_media_values_calculate_chunk_size(
-			     internal_handle->media_values,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to calculate chunk size.",
-				 function );
-
-				return( -1 );
-			}
-			if( internal_handle->media_values->number_of_chunks > 0 )
-			{
-				if( libmfdata_list_resize(
-				     internal_handle->chunk_table_list,
-				     (int) internal_handle->media_values->number_of_chunks,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
-					 "%s: unable to resize chunk table list.",
-					 function );
-
-					return( -1 );
-				}
-			}
-/* TODO check if this can be moved */
-			/* Check if the EWF file format is that of EnCase1
-			 * this allows the table read function to reduce verbose
-			 * output of additional data in table section
-			 */
-			if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
-			 && ( header_sections->number_of_header_sections == 1 ) )
-			{
-				internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
-			}
-			initialize_chunk_table = 0;
-		}
 		if( known_section == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -3517,6 +3484,50 @@ int libewf_handle_open_read_section_data(
 			 (char *) section->type_string );
 
 			goto on_error;
+		}
+		if( initialize_chunk_table != 0 )
+		{
+			if( libewf_media_values_calculate_chunk_size(
+			     internal_handle->media_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to calculate chunk size.",
+				 function );
+
+				return( -1 );
+			}
+			if( internal_handle->media_values->number_of_chunks > 0 )
+			{
+				if( libmfdata_list_resize(
+				     internal_handle->chunk_table_list,
+				     (int) internal_handle->media_values->number_of_chunks,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
+					 "%s: unable to resize chunk table list.",
+					 function );
+
+					return( -1 );
+				}
+			}
+/* TODO check if this can be moved */
+			/* Check if the EWF file format is that of EnCase1
+			 * this allows the table read function to reduce verbose
+			 * output of additional data in table section
+			 */
+			if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
+			 && ( header_sections->number_of_header_sections == 1 ) )
+			{
+				internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
+			}
+			initialize_chunk_table = 0;
 		}
 		section_list_element = section_list_element->next_element;
 	}
@@ -9600,15 +9611,15 @@ int libewf_internal_handle_set_format(
 	if( ( format == LIBEWF_FORMAT_EWF )
 	 || ( format == LIBEWF_FORMAT_SMART ) )
 	{
-		internal_handle->io_handle->ewf_format = EWF_FORMAT_S01;
+		internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
 	}
 	else if( format == LIBEWF_FORMAT_LVF )
 	{
-		internal_handle->io_handle->ewf_format = EWF_FORMAT_L01;
+		internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
 	}
 	else
 	{
-		internal_handle->io_handle->ewf_format = EWF_FORMAT_E01;
+		internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
 	}
 	if( internal_handle->write_io_handle != NULL )
 	{
