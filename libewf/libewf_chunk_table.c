@@ -401,10 +401,9 @@ int libewf_chunk_table_read_chunk(
 
 	if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
-		chunk_data->has_checksum  = 1;
 		chunk_data->is_compressed = 1;
 	}
-	else if( ( element_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
+	if( ( element_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
 	{
 		chunk_data->has_checksum = 1;
 	}
@@ -697,9 +696,9 @@ int libewf_chunk_table_read_offsets(
 		 0 );
 	}
 #endif
-	/* The original EWF and SMART (EWF-S01) formats do not contain a checksum after the table offsets
+	/* The original EWF and SMART (EWF-S01) formats do not contain a table footer
 	 */
-	if( chunk_table->io_handle->ewf_format != EWF_FORMAT_S01 )
+	if( chunk_table->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
 		if( chunk_table->io_handle->major_version == 1 )
 		{
@@ -792,7 +791,7 @@ int libewf_chunk_table_read_offsets(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").\n",
+				 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").\n",
 				 function,
 				 stored_checksum,
 				 calculated_checksum );
@@ -898,7 +897,7 @@ int libewf_chunk_table_read_offsets(
 	if( libcnotify_verbose != 0 )
 	{
 		if( ( element_group_size > (size64_t) 0 )
-		 && ( chunk_table->io_handle->ewf_format != EWF_FORMAT_S01 )
+		 && ( chunk_table->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		 && ( chunk_table->io_handle->format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )

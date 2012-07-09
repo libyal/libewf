@@ -87,16 +87,11 @@ int libewf_header_sections_create(
      int header_codepage,
      libcerror_error_t **error );
 
-int libewf_header_sections_determine_format(
-     libewf_header_sections_t *header_sections,
-     uint8_t ewf_format,
-     uint8_t *format,
-     libcerror_error_t **error );
-
 int libewf_header_sections_parse(
      libewf_header_sections_t *header_sections,
      libewf_io_handle_t *io_handle,
      libfvalue_table_t *header_values,
+     uint8_t *format,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

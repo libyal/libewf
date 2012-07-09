@@ -29,12 +29,6 @@
  */
 #define EWF_MINIMUM_CHUNK_SIZE			32768
 
-/* The EWF file format definitions
- */
-#define EWF_FORMAT_E01				(uint8_t) 'e'
-#define EWF_FORMAT_L01				(uint8_t) 'l'
-#define EWF_FORMAT_S01				(uint8_t) 's'
-
 /* The EWF compression levels
  */
 #define EWF_COMPRESSION_UNKNOWN 		-2
@@ -43,14 +37,13 @@
 #define EWF_COMPRESSION_FAST			 1
 #define EWF_COMPRESSION_BEST			 2
 
-/* EWF the initial maximum number of offsets in a table section
+/* The maximum number of table entries for EWF
  */
-#define EWF_MAXIMUM_OFFSETS_IN_TABLE		16375
+#define EWF_MAXIMUM_TABLE_ENTRIES		16375
 
-/* EWF maximum number of offsets in a table section
- * as of EnCase 6
+/* The maximum number of table entries for EWF as of EnCase 6
  */
-#define EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6	65534
+#define EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6	65534
 
 #endif
 

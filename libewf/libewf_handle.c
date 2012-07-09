@@ -2391,30 +2391,25 @@ int libewf_handle_open_file_io_pool(
 			}
 		}
 	}
-	/* Make sure format specific values are set
-	 */
-	if( internal_handle->io_handle->format != 0 )
-	{
-		if( libewf_internal_handle_set_format(
-		     internal_handle,
-		     internal_handle->io_handle->format,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set format.",
-			 function );
-
-			goto on_error;
-		}
-	}
 	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
 	 && ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		if( internal_handle->write_io_handle->values_initialized == 0 )
 		{
+			if( ( internal_handle->io_handle->format == LIBEWF_FORMAT_EWF )
+			 || ( internal_handle->io_handle->format == LIBEWF_FORMAT_SMART ) )
+			{
+				internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
+			}
+			else if( internal_handle->io_handle->format == LIBEWF_FORMAT_LVF )
+			{
+				internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
+			}
+			else
+			{
+				internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
+			}
+/* TODO add EWF2 support */
 			if( libewf_write_io_handle_initialize_values(
 			     internal_handle->write_io_handle,
 			     internal_handle->io_handle,
@@ -2650,7 +2645,12 @@ ssize_t libewf_handle_open_read_segment_file(
 	}
 	else
 	{
-		if( segment_file->type != internal_handle->io_handle->segment_file_type )
+		if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+		 && ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 ) )
+		{
+			segment_file->type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
+		}
+		else if( segment_file->type != internal_handle->io_handle->segment_file_type )
 		{
 			libcerror_error_set(
 			 error,
@@ -3522,7 +3522,7 @@ int libewf_handle_open_read_section_data(
 			 * this allows the table read function to reduce verbose
 			 * output of additional data in table section
 			 */
-			if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_E01 )
+			if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 			 && ( header_sections->number_of_header_sections == 1 ) )
 			{
 				internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
@@ -3533,28 +3533,11 @@ int libewf_handle_open_read_section_data(
 	}
 	if( header_section_found != 0 )
 	{
-/* TODO change */
-		/* Determine the EWF format
-		 */
-		if( libewf_header_sections_determine_format(
-		     header_sections,
-		     internal_handle->io_handle->ewf_format,
-		     &( internal_handle->io_handle->format ),
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine format.",
-			 function );
-
-			goto on_error;
-		}
 		if( libewf_header_sections_parse(
 		     header_sections,
 		     internal_handle->io_handle,
 		     internal_handle->header_values,
+		     &( internal_handle->io_handle->format ),
 		     error ) == -1 )
 		{
 			libcerror_error_set(
@@ -4907,7 +4890,7 @@ ssize_t libewf_handle_prepare_read_chunk(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-			 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+			 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 			 function,
 			 chunk_checksum,
 			 calculated_checksum );
@@ -5823,7 +5806,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 				compression_level = EWF_COMPRESSION_NONE;
 			}
 		}
-		if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+		if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		 || ( compression_level != EWF_COMPRESSION_NONE ) )
 		{
 			if( compressed_chunk_buffer == NULL )
@@ -5916,7 +5899,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 					return( -1 );
 				}
 			}
-			if( ( internal_handle->io_handle->ewf_format == EWF_FORMAT_S01 )
+			if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 			 || ( *compressed_chunk_buffer_size < chunk_buffer_size ) )
 			{
 				*is_compressed = 1;
@@ -9177,53 +9160,6 @@ int libewf_handle_get_file_io_handle(
 	return( 1 );
 }
 
-/* Retrieves the maximum number of supported segment files to write
- * Returns 1 if successful or -1 on error
- */
-int libewf_internal_handle_get_write_maximum_number_of_segments(
-     uint8_t ewf_format,
-     uint32_t *maximum_number_of_segments,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_internal_handle_get_write_maximum_number_of_segments";
-
-	if( maximum_number_of_segments == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum number of segments.",
-		 function );
-
-		return( -1 );
-	}
-	if( ewf_format == EWF_FORMAT_S01 )
-	{
-		/* ( ( ( 'z' - 's' ) * 26 * 26 ) + 99 ) = 4831
-		 */
-		*maximum_number_of_segments = (uint32_t) 4831;
-	}
-	else if( ewf_format == EWF_FORMAT_E01 )
-	{
-		/* ( ( ( 'Z' - 'E' ) * 26 * 26 ) + 99 ) = 14295
-		 */
-		*maximum_number_of_segments = (uint32_t) 14295;
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported EWF format.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
 /* Retrieves the media values
  * Returns 1 if successful or -1 on error
  */
@@ -9546,115 +9482,6 @@ int libewf_internal_handle_set_media_values(
 			return( -1 );
 		}
 		internal_handle->media_values->number_of_sectors = number_of_sectors;
-	}
-	return( 1 );
-}
-
-/* Sets internal values based on the EWF file format
- * Returns 1 if successful or -1 on error
- */
-int libewf_internal_handle_set_format(
-     libewf_internal_handle_t *internal_handle,
-     uint8_t format,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_internal_handle_set_format";
-
-	if( internal_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( format != LIBEWF_FORMAT_ENCASE1 )
-	 && ( format != LIBEWF_FORMAT_ENCASE2 )
-	 && ( format != LIBEWF_FORMAT_ENCASE3 )
-	 && ( format != LIBEWF_FORMAT_ENCASE4 )
-	 && ( format != LIBEWF_FORMAT_ENCASE5 )
-	 && ( format != LIBEWF_FORMAT_ENCASE6 )
-	 && ( format != LIBEWF_FORMAT_LINEN5 )
-	 && ( format != LIBEWF_FORMAT_LINEN6 )
-	 && ( format != LIBEWF_FORMAT_SMART )
-	 && ( format != LIBEWF_FORMAT_FTK )
-	 && ( format != LIBEWF_FORMAT_LVF )
-	 && ( format != LIBEWF_FORMAT_EWF )
-	 && ( format != LIBEWF_FORMAT_EWFX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported format: %d.",
-		 function,
-	         format );
-
-		return( -1 );
-	}
-	internal_handle->io_handle->format = format;
-
-	if( ( format == LIBEWF_FORMAT_EWF )
-	 || ( format == LIBEWF_FORMAT_SMART ) )
-	{
-		internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
-	}
-	else if( format == LIBEWF_FORMAT_LVF )
-	{
-		internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
-	}
-	else
-	{
-		internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-	}
-	if( internal_handle->write_io_handle != NULL )
-	{
-		if( format == LIBEWF_FORMAT_ENCASE6 )
-		{
-			internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
-			internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6;
-		}
-		else if( format == LIBEWF_FORMAT_EWFX )
-		{
-			internal_handle->write_io_handle->unrestrict_offset_table    = 1;
-			internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-			internal_handle->write_io_handle->maximum_chunks_per_section = INT32_MAX;
-		}
-		else
-		{
-			internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-			internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_OFFSETS_IN_TABLE;
-		}
-		/* Determine the maximum number of segments allowed to write
-		 */
-		if( libewf_internal_handle_get_write_maximum_number_of_segments(
-		     internal_handle->io_handle->ewf_format,
-		     &( internal_handle->write_io_handle->maximum_number_of_segments ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine the maximum number of allowed segment files.",
-			 function );
-
-			return( -1 );
-		}
 	}
 	return( 1 );
 }

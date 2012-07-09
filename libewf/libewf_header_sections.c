@@ -681,228 +681,6 @@ on_error:
 	return( -1 );
 }
 
-/* Determines the EWF file format based on known characteristics
- * Returns 1 if the format was determined, 0 if not or -1 on error
- */
-int libewf_header_sections_determine_format(
-     libewf_header_sections_t *header_sections,
-     uint8_t ewf_format,
-     uint8_t *format,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_header_sections_determine_format";
-	int result            = 0;
-
-	if( header_sections == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.",
-		 function );
-
-		return( -1 );
-	}
-	if( format == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid format.",
-		 function );
-
-		return( -1 );
-	}
-	if( ewf_format == EWF_FORMAT_S01 )
-	{
-		/* The format identifier for the EWF-S01 format was already set
-		 * while reading the volume section
-		 */
-	}
-	else if( ewf_format == EWF_FORMAT_E01 )
-	{
-		if( header_sections->xheader != NULL )
-		{
-			*format = LIBEWF_FORMAT_EWFX;
-			result  = 1;
-		}
-		/* The header2 in raw format starts with 0xff 0xfe <number>
-		 */
-		else if( header_sections->header2 != NULL )
-		{
-			if( header_sections->header2[ 2 ] == (uint8_t) '3' )
-			{
-				/* The EnCase5 header2 contains av on the 6th position (36 ... 38 ...)
-				 * the header2 is an UTF16 string
-				 */
-				if( ( header_sections->header2[ 36 ] == (uint8_t) 'a' )
-				 && ( header_sections->header2[ 38 ] == (uint8_t) 'v' ) )
-				{
-					*format = LIBEWF_FORMAT_ENCASE5;
-					result  = 1;
-				}
-				else if( ( header_sections->header2[ 36 ] == (uint8_t) 'm' )
-				 && ( header_sections->header2[ 38 ] == (uint8_t) 'd' ) )
-				{
-					*format = LIBEWF_FORMAT_ENCASE6;
-					result  = 1;
-				}
-#if defined( HAVE_VERBOSE_OUTPUT )
-				else if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: unsupported header2 format: %c%c.\n",
-					 function,
-					 (char) header_sections->header2[ 36 ],
-					 (char) header_sections->header2[ 38 ] );
-				}
-#endif
-			}
-			else if( header_sections->header2[ 2 ] == (uint8_t) '1' )
-			{
-				*format = LIBEWF_FORMAT_ENCASE4;
-				result  = 1;
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			else if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: unsupported header2 version: %c.\n",
-				 function,
-				 (char) header_sections->header2[ 2 ] );
-			}
-#endif
-		}
-		else if( header_sections->header != NULL )
-		{
-			if( header_sections->header[ 0 ] == (uint8_t) '3' )
-			{
-				/* The linen5 header2 contains av on the 6th position (17 18)
-				 * the header2 is an UTF16 string
-				 */
-				if( ( header_sections->header[ 17 ] == (uint8_t) 'a' )
-				 && ( header_sections->header[ 18 ] == (uint8_t) 'v' ) )
-				{
-					*format = LIBEWF_FORMAT_LINEN5;
-					result  = 1;
-				}
-				else if( ( header_sections->header[ 17 ] == (uint8_t) 'm' )
-				 && ( header_sections->header[ 18 ] == (uint8_t) 'd' ) )
-				{
-					*format = LIBEWF_FORMAT_LINEN6;
-					result  = 1;
-				}
-#if defined( HAVE_VERBOSE_OUTPUT )
-				else if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: unsupported header format: %c%c.\n",
-					 function,
-					 (char) header_sections->header[ 17 ],
-					 (char) header_sections->header[ 18 ] );
-				}
-#endif
-			}
-			else if( header_sections->header[ 0 ] == (uint8_t) '1' )
-			{
-				/* EnCase uses \r\n
-				 */
-				if( header_sections->header[ 1 ] == (uint8_t) '\r' )
-				{
-					if( header_sections->header[ 25 ] == (uint8_t) 'r' )
-					{
-						*format = LIBEWF_FORMAT_ENCASE1;
-						result  = 1;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-						if( header_sections->number_of_header_sections != 1 )
-						{
-							if( libcnotify_verbose != 0 )
-							{
-								libcnotify_printf(
-								 "%s: multiple header sections found.\n",
-								 function );
-							}
-						}
-#endif
-					}
-					else if( header_sections->header[ 31 ] == (uint8_t) 'r' )
-					{
-						*format = LIBEWF_FORMAT_ENCASE2;
-						result  = 1;
-					}
-#if defined( HAVE_VERBOSE_OUTPUT )
-					else if( libcnotify_verbose != 0 )
-					{
-						libcnotify_printf(
-						 "%s: unsupported header version.\n",
-						 function );
-					}
-#endif
-				}
-				/* FTK Imager uses \n
-				 */
-				else if( header_sections->header[ 1 ] == (uint8_t) '\n' )
-				{
-					if( header_sections->header[ 29 ] == (uint8_t) 'r' )
-					{
-						*format = LIBEWF_FORMAT_FTK;
-						result  = 1;
-					}
-#if defined( HAVE_VERBOSE_OUTPUT )
-					else if( libcnotify_verbose != 0 )
-					{
-						libcnotify_printf(
-						 "%s: unsupported header version.\n",
-						 function );
-					}
-#endif
-				}
-#if defined( HAVE_VERBOSE_OUTPUT )
-				else if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: unsupported header version.\n",
-					 function );
-				}
-#endif
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			else if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: unsupported header version.\n",
-				 function );
-			}
-#endif
-		}
-#if defined( HAVE_VERBOSE_OUTPUT )
-		else if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: missing header information.\n",
-			 function );
-		}
-#endif
-	}
-	else if( ewf_format == EWF_FORMAT_L01 )
-	{
-		*format = LIBEWF_FORMAT_LVF;
-		result  = 1;
-	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	else if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: unsupported EWF file format.\n",
-		 function );
-	}
-#endif
-	return( result );
-}
-
 /* Parses the header, header2 and/or xheader section for header values
  * Returns 1 if successful or -1 on error
  */
@@ -910,17 +688,13 @@ int libewf_header_sections_parse(
      libewf_header_sections_t *header_sections,
      libewf_io_handle_t *io_handle,
      libfvalue_table_t *header_values,
+     uint8_t *format,
      libcerror_error_t **error )
 {
-	libfvalue_value_t *header_value = NULL;
-	uint8_t *header_value_data      = NULL;
-	static char *function           = "libewf_header_sections_parse";
-	size_t header_value_data_size   = 0;
-	int encoding                    = 0;
-	int result                      = 0;
-	int result_header               = 1;
-	int result_header2              = 1;
-	int result_xheader              = 1;
+	static char *function = "libewf_header_sections_parse";
+	int result_header     = 1;
+	int result_header2    = 1;
+	int result_xheader    = 1;
 
 	if( header_sections == NULL )
 	{
@@ -944,19 +718,20 @@ int libewf_header_sections_parse(
 
 		return( -1 );
 	}
-	if( header_values == NULL )
+	if( format == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header values.",
+		 "%s: invalid format.",
 		 function );
 
 		return( -1 );
 	}
 	/* For EWF version 1 format read all the header sections
 	 * and overwrite values by the most specific data
+	 * This also applied to the format
 	 */
 	if( header_sections->header != NULL )
 	{
@@ -965,6 +740,7 @@ int libewf_header_sections_parse(
 		     header_sections->header,
 		     header_sections->header_size,
 		     io_handle->header_codepage,
+		     format,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -983,6 +759,7 @@ int libewf_header_sections_parse(
 		     header_values,
 		     header_sections->header2,
 		     header_sections->header2_size,
+		     format,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1012,6 +789,7 @@ int libewf_header_sections_parse(
 
 			result_xheader = -1;
 		}
+		*format = LIBEWF_FORMAT_EWFX;
 	}
 	if( ( result_header != 1 )
 	 && ( result_header2 != 1 )
@@ -1036,54 +814,6 @@ int libewf_header_sections_parse(
 #endif
 		libcerror_error_free(
 		 error );
-	}
-	/* The EnCase2 and EnCase3 format are the same
-	 * only the acquiry software version provides insight in which version of EnCase was used
-	 */
-	if( io_handle->format == LIBEWF_FORMAT_ENCASE2 )
-	{
-		result = libfvalue_table_get_value_by_identifier(
-			  header_values,
-			  (uint8_t *) "acquiry_software_version",
-			  25,
-			  &header_value,
-			  0,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve header value: acquiry_software_version.",
-			 function );
-
-			return( -1 );
-		}
-		else if( result != 0 )
-		{
-			if( libfvalue_value_get_data(
-			     header_value,
-			     &header_value_data,
-			     &header_value_data_size,
-			     &encoding,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve header value data.",
-				 function );
-
-				return( -1 );
-			}
-			if( header_value_data[ 0 ] == (uint8_t) '3' )
-			{
-				io_handle->format = LIBEWF_FORMAT_ENCASE3;
-			}
-		}
 	}
 	return( 1 );
 }

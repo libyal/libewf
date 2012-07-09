@@ -485,7 +485,7 @@ int libewf_chunk_data_unpack(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").\n",
+					 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").\n",
 					 function,
 					 stored_checksum,
 					 calculated_checksum );

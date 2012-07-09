@@ -149,6 +149,8 @@ int libewf_header_values_parse_utf8_header_string(
      libfvalue_table_t *header_values,
      const uint8_t *header_string,
      size_t header_string_size,
+     uint8_t header_section_number,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_header_values_parse_header(
@@ -156,12 +158,14 @@ int libewf_header_values_parse_header(
      uint8_t *header,
      size_t header_size,
      int codepage,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_header_values_parse_header2(
      libfvalue_table_t *header_values,
      uint8_t *header2,
      size_t header2_size,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_header_values_convert_utf8_header_string_to_header(

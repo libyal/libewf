@@ -1116,6 +1116,17 @@ int libewf_handle_set_format(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( internal_handle->read_io_handle != NULL )
 	 || ( internal_handle->write_io_handle == NULL )
 	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
@@ -1129,20 +1140,32 @@ int libewf_handle_set_format(
 
 		return( -1 );
 	}
-	if( libewf_internal_handle_set_format(
-	     internal_handle,
-	     format,
-	     error ) != 1 )
+/* TODO add EnCase7 and linen7 support ? */
+	if( ( format != LIBEWF_FORMAT_ENCASE1 )
+	 && ( format != LIBEWF_FORMAT_ENCASE2 )
+	 && ( format != LIBEWF_FORMAT_ENCASE3 )
+	 && ( format != LIBEWF_FORMAT_ENCASE4 )
+	 && ( format != LIBEWF_FORMAT_ENCASE5 )
+	 && ( format != LIBEWF_FORMAT_ENCASE6 )
+	 && ( format != LIBEWF_FORMAT_LINEN5 )
+	 && ( format != LIBEWF_FORMAT_LINEN6 )
+	 && ( format != LIBEWF_FORMAT_SMART )
+	 && ( format != LIBEWF_FORMAT_FTK )
+	 && ( format != LIBEWF_FORMAT_EWF )
+	 && ( format != LIBEWF_FORMAT_EWFX ) )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set format.",
-		 function );
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format: %d.",
+		 function,
+	         format );
 
 		return( -1 );
 	}
+	internal_handle->io_handle->format = format;
+
 	return( 1 );
 }
 

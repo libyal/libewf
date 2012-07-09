@@ -1489,6 +1489,8 @@ int libewf_header_values_parse_utf8_header_string(
      libfvalue_table_t *header_values,
      const uint8_t *header_string,
      size_t header_string_size,
+     uint8_t header_section_number,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *lines  = NULL;
@@ -1506,6 +1508,9 @@ int libewf_header_values_parse_utf8_header_string(
 	size_t line_string_size               = 0;
 	size_t type_string_size               = 0;
 	size_t value_string_size              = 0;
+	uint8_t acquiry_software_version      = 0;
+	uint8_t has_carriage_return           = 0;
+	uint8_t number_of_sections            = 0;
 	int number_of_lines                   = 0;
 	int number_of_types                   = 0;
 	int number_of_values                  = 0;
@@ -1519,6 +1524,29 @@ int libewf_header_values_parse_utf8_header_string(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( header_section_number != 1 )
+	 && ( header_section_number != 2 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported header section number.",
+		 function );
+
+		goto on_error;
+	}
+	if( format == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid format.",
 		 function );
 
 		return( -1 );
@@ -1614,8 +1642,8 @@ int libewf_header_values_parse_utf8_header_string(
 
 			goto on_error;
 		}
-		if( ( line_string[ 0 ] < (uint8_t) '0' )
-		 || ( line_string[ 0 ] > (uint8_t) '9' ) )
+		if( ( line_string[ 0 ] != (uint8_t) '1' )
+		 && ( line_string[ 0 ] != (uint8_t) '3' ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -1625,6 +1653,22 @@ int libewf_header_values_parse_utf8_header_string(
 			 function );
 
 			goto on_error;
+		}
+		number_of_sections = line_string[ 0 ];
+
+		if( header_section_number == 1 )
+		{
+			/* If the header string contains 3 object the version is at least linen5
+			 * otherwise the version is at least EnCase1
+			 */
+			if( number_of_sections == (uint8_t) '3' )
+			{
+				*format = LIBEWF_FORMAT_LINEN5;
+			}
+			else
+			{
+				*format = LIBEWF_FORMAT_ENCASE1;
+			}
 		}
 		if( libfvalue_split_utf8_string_get_segment_by_index(
 		     lines,
@@ -1771,6 +1815,8 @@ int libewf_header_values_parse_utf8_header_string(
 				type_string[ type_string_size - 2 ] = 0;
 
 				type_string_size -= 1;
+
+				has_carriage_return = 1;
 			}
 			if( value_index < number_of_values )
 			{
@@ -1822,12 +1868,6 @@ int libewf_header_values_parse_utf8_header_string(
 				 (char *) value_string );
 			}
 #endif
-			/* Ignore empty values
-			 */
-			if( value_string == NULL )
-			{
-				continue;
-			}
 			identifier      = NULL;
 			identifier_size = 0;
 
@@ -1855,6 +1895,38 @@ int libewf_header_values_parse_utf8_header_string(
 				{
 					identifier      = (uint8_t *) "acquiry_software_version";
 					identifier_size = 25;
+
+					if( value_index == 5 )
+					{
+						/* The linen5 header contains av on the 6th position
+						 */
+						if( header_section_number == 1 )
+						{
+							*format = LIBEWF_FORMAT_LINEN5;
+						}
+						else if( header_section_number == 2 )
+						{
+							/* The EnCase4 header2 contains av on the 6th position
+							 * and the header2 consist of 1 sections
+							 */
+							if( number_of_sections == (uint8_t) '1' )
+							{
+								*format = LIBEWF_FORMAT_ENCASE4;
+							}
+							/* The EnCase5 header2 contains av on the 6th position
+							 * and the header2 consist of 3 sections
+							 */
+							else if( number_of_sections == (uint8_t) '3' )
+							{
+								*format = LIBEWF_FORMAT_ENCASE5;
+							}
+						}
+					}
+					if( ( value_string != NULL )
+					 && ( value_string_size > 1 ) )
+					{
+						acquiry_software_version = value_string[ 0 ];
+					}
 				}
 				else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 				      && ( type_string[ 1 ] == (uint8_t) 'c' ) )
@@ -1867,6 +1939,22 @@ int libewf_header_values_parse_utf8_header_string(
 				{
 					identifier      = (uint8_t *) "model";
 					identifier_size = 6;
+
+					if( value_index == 5 )
+					{
+						/* The linen6 header contains md on the 6th position
+						 */
+						if( header_section_number == 1 )
+						{
+							*format = LIBEWF_FORMAT_LINEN6;
+						}
+						/* The EnCase6 header2 contains md on the 6th position
+						 */
+						else if( header_section_number == 2 )
+						{
+							*format = LIBEWF_FORMAT_ENCASE6;
+						}
+					}
 				}
 				else if( ( type_string[ 0 ] == (uint8_t) 'o' )
 				      && ( type_string[ 1 ] == (uint8_t) 'v' ) )
@@ -1902,6 +1990,19 @@ int libewf_header_values_parse_utf8_header_string(
 				{
 					identifier      = (uint8_t *) "device_label";
 					identifier_size = 13;
+
+					/* The linen7 header contains l
+					 */
+					if( header_section_number == 1 )
+					{
+						*format = LIBEWF_FORMAT_LINEN7;
+					}
+					/* The EnCase7 header2 contains l
+					 */
+					else if( header_section_number == 2 )
+					{
+						*format = LIBEWF_FORMAT_ENCASE7;
+					}
 				}
 				else if( ( type_string[ 0 ] == (uint8_t) 'm' )
 				      || ( type_string[ 0 ] == (uint8_t) 'u' ) )
@@ -2010,12 +2111,53 @@ int libewf_header_values_parse_utf8_header_string(
 				{
 					identifier      = (uint8_t *) "compression_level";
 					identifier_size = 18;
+
+					if( header_section_number == 1 )
+					{
+						/* The EnCase1 header contains r on the 9th position
+						 */
+						if( value_index == 8 )
+						{
+							*format = LIBEWF_FORMAT_ENCASE1;
+						}
+						else if( value_index == 10 )
+						{
+							/* The EnCase2 and EnCase3 header contains r on the 11th position
+							 * and uses \r\n as line ends. The only way to tell both version
+							 * apart is to look at the acquiry software version
+							 */
+							if( has_carriage_return != 0 )
+							{
+								if( acquiry_software_version == (uint8_t) '2' )
+								{
+									*format = LIBEWF_FORMAT_ENCASE2;
+								}
+								else if( acquiry_software_version == (uint8_t) '3' )
+								{
+									*format = LIBEWF_FORMAT_ENCASE3;
+								}
+							}
+							/* The FTK imager header contains r on the 11th position
+							 * and uses \n as line ends
+							 */
+							else
+							{
+								*format = LIBEWF_FORMAT_FTK;
+							}
+						}
+					}
 				}
 				else if( type_string[ 0 ] == (uint8_t) 't' )
 				{
 					identifier      = (uint8_t *) "notes";
 					identifier_size = 6;
 				}
+			}
+			/* Ignore empty values
+			 */
+			if( value_string == NULL )
+			{
+				continue;
 			}
 			if( identifier != NULL )
 			{
@@ -2176,6 +2318,7 @@ int libewf_header_values_parse_header(
      uint8_t *header,
      size_t header_size,
      int codepage,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	uint8_t *header_string    = NULL;
@@ -2244,6 +2387,8 @@ int libewf_header_values_parse_header(
 	     header_values,
 	     header_string,
 	     header_string_size,
+	     1,
+	     format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2276,6 +2421,7 @@ int libewf_header_values_parse_header2(
      libfvalue_table_t *header_values,
      uint8_t *header2,
      size_t header2_size,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	uint8_t *header_string    = NULL;
@@ -2344,6 +2490,8 @@ int libewf_header_values_parse_header2(
 	     header_values,
 	     header_string,
 	     header_string_size,
+	     2,
+	     format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

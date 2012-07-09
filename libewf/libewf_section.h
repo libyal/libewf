@@ -145,7 +145,7 @@ ssize_t libewf_section_last_write(
          uint8_t format_version,
          off64_t section_offset,
          uint32_t type,
-         uint8_t ewf_format,
+         uint8_t segment_file_type,
          libcerror_error_t **error );
 
 ssize_t libewf_section_compressed_string_read(
@@ -335,15 +335,7 @@ ssize_t libewf_section_table_write(
          const uint8_t *table_entries_data,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
-         uint8_t ewf_format,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_volume_read(
-         libewf_section_t *section,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_media_values_t *media_values,
+         uint8_t segment_file_type,
          libcerror_error_t **error );
 
 ssize_t libewf_section_volume_e01_read(
@@ -429,7 +421,6 @@ ssize_t libewf_section_delta_chunk_write(
          uint8_t *chunk_buffer,
          uint32_t chunk_size,
          uint8_t *checksum_buffer,
-         uint32_t *chunk_checksum,
          uint8_t write_checksum,
          libcerror_error_t **error );
 

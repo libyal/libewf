@@ -66,6 +66,11 @@ struct ewf_md5_hash
 	 * Consists of 4 bytes
 	 */
 	uint8_t checksum[ 4 ];
+
+	/* Padding
+	 * Consists of 12 bytes
+	 */
+	uint8_t padding[ 12 ];
 };
 
 /* The version 2 SHA1 hash section
@@ -83,6 +88,11 @@ struct ewf_sha1_hash
 	 * Consists of 4 bytes
 	 */
 	uint8_t checksum[ 4 ];
+
+	/* Padding
+	 * Consists of 12 bytes
+	 */
+	uint8_t padding[ 12 ];
 };
 
 #if defined( __cplusplus )

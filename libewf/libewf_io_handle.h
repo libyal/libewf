@@ -51,11 +51,6 @@ struct libewf_io_handle
 	 */
 	uint8_t format;
 
-/* TODO deprecate */
-	/* Value to indicate which ewf format is used
-	 */
-	uint8_t ewf_format;
-
 	/* The format major version
 	 */
 	uint8_t major_version;

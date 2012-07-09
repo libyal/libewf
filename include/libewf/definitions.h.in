@@ -52,11 +52,6 @@ enum LIBEWF_ACCESS_FLAGS
 #define LIBEWF_OPEN_WRITE					( LIBEWF_ACCESS_FLAG_WRITE )
 #define LIBEWF_OPEN_WRITE_RESUME				( LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME )
 
-/* TODO deprecated remove after a while */
-#define LIBEWF_FLAG_READ					LIBEWF_ACCESS_FLAG_READ
-#define LIBEWF_FLAG_WRITE					LIBEWF_ACCESS_FLAG_WRITE
-#define LIBEWF_FLAG_RESUME					LIBEWF_ACCESS_FLAG_RESUME
-
 /* The file formats
  */
 enum LIBEWF_FORMAT
@@ -68,11 +63,15 @@ enum LIBEWF_FORMAT
 	LIBEWF_FORMAT_ENCASE4					= 0x04,
 	LIBEWF_FORMAT_ENCASE5					= 0x05,
 	LIBEWF_FORMAT_ENCASE6					= 0x06,
+	LIBEWF_FORMAT_ENCASE7					= 0x07,
+
 	LIBEWF_FORMAT_SMART					= 0x0e,
 	LIBEWF_FORMAT_FTK					= 0x0f,
 	LIBEWF_FORMAT_LVF					= 0x10,
+
 	LIBEWF_FORMAT_LINEN5					= 0x25,
 	LIBEWF_FORMAT_LINEN6					= 0x26,
+	LIBEWF_FORMAT_LINEN7					= 0x27,
 
 	/* The format as specified by Andrew Rosen
 	 */
@@ -147,13 +146,6 @@ enum LIBEWF_DATE_FORMATS
 #define LIBEWF_COMPRESSION_LEVEL_NONE				"n"
 #define LIBEWF_COMPRESSION_LEVEL_FAST				"f"
 #define LIBEWF_COMPRESSION_LEVEL_BEST				"b"
-
-/* TODO deprecated remove after a while */
-/* The compression types
- */
-#define LIBEWF_COMPRESSION_TYPE_NONE				"n"
-#define LIBEWF_COMPRESSION_TYPE_FAST				"f"
-#define LIBEWF_COMPRESSION_TYPE_BEST				"b"
 
 /* The segment file type definitions
  */

@@ -259,7 +259,7 @@ on_error:
 	return( -1 );
 }
 
-/* Reads a certain chunk of data
+/* Reads a specific chunk of data
  * Adds a checksum error if the data is corrupted
  * Returns 1 if successful or -1 on error
  */

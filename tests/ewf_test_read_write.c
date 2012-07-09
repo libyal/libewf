@@ -664,6 +664,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+/*
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_set_verbose(
 	 1 );
@@ -671,7 +672,6 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-/*
 */
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )

@@ -45,8 +45,8 @@
  */
 
 /* Enable the v1 API
- */
 #define HAVE_V1_API		1
+ */
 
 #endif
 

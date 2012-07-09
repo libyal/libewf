@@ -1433,6 +1433,14 @@ int info_handle_header_values_fprint(
 					description        = "Acquisition date";
 					description_length = 16;
 				}
+				else if( libcstring_narrow_string_compare(
+				          header_value_identifier,
+				          "device_label",
+				          12 ) == 0 )
+				{
+					description        = "Device label";
+					description_length = 12;
+				}
 			}
 			else if( header_value_identifier_size == 14 )
 			{
@@ -2198,6 +2206,10 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 6" );
 			break;
 
+		case LIBEWF_FORMAT_ENCASE7:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 7" );
+			break;
+
 		case LIBEWF_FORMAT_LINEN5:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 5" );
 			break;
@@ -2206,12 +2218,16 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 6" );
 			break;
 
+		case LIBEWF_FORMAT_LINEN7:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 7" );
+			break;
+
 		case LIBEWF_FORMAT_EWFX:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "EWFX (extended EWF)" );
 			break;
 
 		case LIBEWF_FORMAT_LVF:
-			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase Logical File Evidence (LVF)" );
+			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF)" );
 			break;
 
 		case LIBEWF_FORMAT_UNKNOWN:
@@ -2240,8 +2256,10 @@ int info_handle_media_information_fprint(
 	}
 	if( ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( format == LIBEWF_FORMAT_ENCASE7 )
 	 || ( format == LIBEWF_FORMAT_LINEN5 )
 	 || ( format == LIBEWF_FORMAT_LINEN6 )
+	 || ( format == LIBEWF_FORMAT_LINEN7 )
 	 || ( format == LIBEWF_FORMAT_EWFX ) )
 	{
 		if( libewf_handle_get_sectors_per_chunk(

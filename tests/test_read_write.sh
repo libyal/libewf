@@ -83,15 +83,31 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-for BASENAME in `${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+# Run tests for: E01, e01, s01
+BASENAMES=`${LS} ${INPUT}/*.??? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+
+for BASENAME in ${BASENAMES};
 do
-	FILENAMES=`${LS} ${INPUT}/${BASENAME}.* | ${TR} '\n' ' '`;
+	FILENAMES=`${LS} ${BASENAME}.??? | ${TR} '\n' ' '`;
 
 	if ! test_read_write ${FILENAMES};
 	then
 		exit ${EXIT_FAILURE};
 	fi
 done
+
+# Run tests for: Ex01
+# BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+#
+# for BASENAME in ${BASENAMES};
+# do
+# 	FILENAMES=`${LS} ${BASENAME}.???? | ${TR} '\n' ' '`;
+#
+# 	if ! test_read_write ${FILENAMES};
+# 	then
+# 		exit ${EXIT_FAILURE};
+# 	fi
+# done
 
 exit ${EXIT_SUCCESS};
 

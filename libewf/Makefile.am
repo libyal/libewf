@@ -30,7 +30,6 @@ libewf_la_SOURCES = \
 	ewf_session.h \
 	ewf_table.h \
 	ewf_volume.h \
-	ewf_volume_smart.h \
 	ewfx_delta_chunk.h \
 	libewf.c \
 	libewf_analytical_data.c libewf_analytical_data.h \
@@ -100,7 +99,7 @@ libewf_la_LIBADD = \
 	@LIBMFCACHE_LIBADD@ \
 	@LIBMFDATA_LIBADD@
 
-libewf_la_LDFLAGS = -no-undefined -version-info 2:0:1
+libewf_la_LDFLAGS = -no-undefined -version-info 2:1:1
 
 EXTRA_DIST = \
 	libewf_definitions.h.in \

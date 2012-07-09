@@ -37,7 +37,7 @@ AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_V1_API],
   [v1-api],
   [v1_api],
   [enable version 1 API],
-  [yes])
+  [no])
 
  AS_IF(
   [test "x$ac_cv_enable_v1_api" != xno],

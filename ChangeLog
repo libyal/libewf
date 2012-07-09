@@ -46,6 +46,7 @@ TODO
     - change ewf_error2.h to ewf_error.h
     - add analytical data files
     - add restart data files
+    - remove ewf_volume_smart.h
   - add support for no-compression and bzip2 compression
   - make sure the encryption keys are read first
   - change api to deal with compression method stored in the segment files ?
@@ -65,6 +66,7 @@ TODO
 * Ex01/Lx01 write support
   - rename libewf_segment_file_write_chunks_section_start ?
   - move type string generation into the section functions and pass the section type ?
+  - enable tests in test_read_write.sh
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount
@@ -371,6 +373,7 @@ Closed:
 
 20120709
 * fixes and improvements for recent changes
+* v1 api no longer enabled by default
 
 20120706
 * fixes and improvements for recent changes

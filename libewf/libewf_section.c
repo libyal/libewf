@@ -53,7 +53,6 @@
 #include "ewf_session.h"
 #include "ewf_table.h"
 #include "ewf_volume.h"
-#include "ewf_volume_smart.h"
 #include "ewfx_delta_chunk.h"
 
 /* Tests if a buffer entirely consists of zero values
@@ -675,7 +674,7 @@ ssize_t libewf_section_descriptor_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -1264,7 +1263,7 @@ ssize_t libewf_section_last_write(
          uint8_t format_version,
          off64_t section_offset,
          uint32_t type,
-         uint8_t ewf_format,
+         uint8_t segment_file_type,
          libcerror_error_t **error )
 {
 	uint8_t *type_string                = NULL;
@@ -1326,10 +1325,10 @@ ssize_t libewf_section_last_write(
 
 		return( -1 );
 	}
-	/* The version 1 (EWF-E01) format leaves the size of this section empty
+	/* The version 1 EWF-E01 and EWF-L01 formats leave the size of this section empty
 	 */
-	if( ( format_version == 2 )
-	 || ( ewf_format == EWF_FORMAT_S01 ) )
+	if( ( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	 && ( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL ) )
 	{
 		section_size = section_descriptor_data_size;
 	}
@@ -2092,7 +2091,7 @@ ssize_t libewf_section_data_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -2649,7 +2648,7 @@ ssize_t libewf_section_digest_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -3122,7 +3121,7 @@ ssize_t libewf_section_error_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -3251,7 +3250,7 @@ ssize_t libewf_section_error_read(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-			 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+			 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 			 function,
 			 stored_checksum,
 			 calculated_checksum );
@@ -3838,7 +3837,7 @@ ssize_t libewf_section_md5_hash_read(
 	}
 	else if( format_version == 2 )
 	{
-		md5_hash_data_size = sizeof( ewf_md5_hash_t ) + section->padding_size;
+		md5_hash_data_size = sizeof( ewf_md5_hash_t );
 	}
 	else
 	{
@@ -3941,15 +3940,15 @@ ssize_t libewf_section_md5_hash_read(
 			 "%s: padding:\n",
 			 function );
 			libcnotify_print_data(
-			 &( md5_hash_data[ sizeof( ewf_md5_hash_t ) ] ),
-			 (size_t) section->padding_size,
+			 ( (ewf_md5_hash_t *) md5_hash_data )->padding,
+			 12,
 			 0 );
 		}
 	}
 #endif
 	if( format_version == 2 )
 	{
-		md5_hash_data_size -= section->padding_size;
+		md5_hash_data_size -= 12;
 	}
 	calculated_checksum = ewf_checksum_calculate(
 	                       md5_hash_data,
@@ -3962,7 +3961,7 @@ ssize_t libewf_section_md5_hash_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -4027,10 +4026,10 @@ ssize_t libewf_section_md5_hash_write(
 	static char *function               = "libewf_section_md5_hash_write";
 	size_t md5_hash_data_size           = 0;
 	size_t section_descriptor_data_size = 0;
+	size_t section_padding_size         = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
-	uint32_t section_padding_size       = 0;
 
 	if( section == NULL )
 	{
@@ -4051,8 +4050,7 @@ ssize_t libewf_section_md5_hash_write(
 	else if( format_version == 2 )
 	{
 		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
-/* TODO put padding structure ? */
-		md5_hash_data_size           = sizeof( ewf_md5_hash_t ) + 12;
+		md5_hash_data_size           = sizeof( ewf_md5_hash_t );
 		section_padding_size         = 12;
 	}
 	else
@@ -4150,9 +4148,13 @@ ssize_t libewf_section_md5_hash_write(
 			return( -1 );
 		}
 	}
+	if( format_version == 2 )
+	{
+		md5_hash_data_size -= 12;
+	}
 	calculated_checksum = ewf_checksum_calculate(
 	                       md5_hash_data,
-	                       16,
+	                       md5_hash_data_size - 4,
 	                       1 );
 
 	if( format_version == 1 )
@@ -4166,6 +4168,8 @@ ssize_t libewf_section_md5_hash_write(
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_md5_hash_t *) md5_hash_data )->checksum,
 		 calculated_checksum );
+
+		md5_hash_data_size += 12;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -4177,6 +4181,49 @@ ssize_t libewf_section_md5_hash_write(
 		 md5_hash_data,
 		 md5_hash_data_size,
 		 0 );
+	}
+#endif
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: MD5 hash:\n",
+		 function );
+		libcnotify_print_data(
+		 md5_hash_data,
+		 16,
+		 0 );
+
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "%s: unknown1:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_hash_t *) md5_hash_data )->unknown1,
+			 16,
+			 0 );
+		}
+		libcnotify_printf(
+		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 function,
+		 calculated_checksum );
+
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
+		else if( format_version == 2 )
+		{
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_md5_hash_t *) md5_hash_data )->padding,
+			 12,
+			 0 );
+		}
 	}
 #endif
 	write_count = libbfio_pool_write_buffer(
@@ -4265,7 +4312,7 @@ ssize_t libewf_section_sha1_hash_read(
 
 		return( -1 );
 	}
-	sha1_hash_data_size = sizeof( ewf_sha1_hash_t ) + section->padding_size;
+	sha1_hash_data_size = sizeof( ewf_sha1_hash_t );
 
 	if( section->data_size != (size64_t) sha1_hash_data_size )
 	{
@@ -4332,12 +4379,12 @@ ssize_t libewf_section_sha1_hash_read(
 		 "%s: padding:\n",
 		 function );
 		libcnotify_print_data(
-		 &( sha1_hash_data[ sizeof( ewf_sha1_hash_t ) ] ),
-		 (size_t) section->padding_size,
+		 ( (ewf_sha1_hash_t *) sha1_hash_data )->padding,
+		 12,
 		 0 );
 	}
 #endif
-	sha1_hash_data_size -= section->padding_size;
+	sha1_hash_data_size -= 12;
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       sha1_hash_data,
@@ -4350,7 +4397,7 @@ ssize_t libewf_section_sha1_hash_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -5315,7 +5362,7 @@ ssize_t libewf_section_session_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -5444,7 +5491,7 @@ ssize_t libewf_section_session_read(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-			 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+			 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 			 function,
 			 stored_checksum,
 			 calculated_checksum );
@@ -6709,7 +6756,7 @@ ssize_t libewf_section_table_header_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -6726,15 +6773,14 @@ ssize_t libewf_section_table_header_read(
 			 function );
 		}
 		else if( ( ( format != LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( *number_of_entries > EWF_MAXIMUM_OFFSETS_IN_TABLE ) )
+		       &&  ( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES ) )
 		      || ( ( format == LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( *number_of_entries > EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6 ) ) )
+		       &&  ( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 ) ) )
 		{
 			libcnotify_printf(
-			 "%s: number of entries: %" PRIu32 " exceeds maximum: %d.\n",
+			 "%s: number of entries: %" PRIu32 " exceeds maximum.\n",
 			 function,
-			 number_of_entries,
-			 EWF_MAXIMUM_OFFSETS_IN_TABLE );
+			 number_of_entries );
 		}
 	}
 #endif
@@ -6756,7 +6802,7 @@ ssize_t libewf_section_table_write(
          const uint8_t *table_entries_data,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
-         uint8_t ewf_format,
+         uint8_t segment_file_type,
          libcerror_error_t **error )
 {
 	uint8_t table_header_data[ 32 ];
@@ -6850,7 +6896,7 @@ ssize_t libewf_section_table_write(
 	                  + table_entries_data_size
 	                  + chunks_data_size;
 
-	if( ewf_format != EWF_FORMAT_S01 )
+	if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
 		section_data_size += table_footer_data_size;
 	}
@@ -7011,7 +7057,7 @@ ssize_t libewf_section_table_write(
 	}
 	total_write_count += write_count;
 
-	if( ewf_format != EWF_FORMAT_S01 )
+	if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
 		calculated_checksum = ewf_checksum_calculate(
 		                       table_entries_data,
@@ -7091,89 +7137,6 @@ ssize_t libewf_section_table_write(
 		total_write_count += write_count;
 	}
 	return( total_write_count );
-}
-
-/* Reads a volume section
- * Returns the number of bytes read or -1 on error
- */
-ssize_t libewf_section_volume_read(
-         libewf_section_t *section,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_media_values_t *media_values,
-         libcerror_error_t **error )
-{
-	static char *function = "libewf_section_volume_read";
-	ssize_t read_count    = 0;
-
-	if( section == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
-		 function );
-
-		return( -1 );
-	}
-	if( section->data_size == (size64_t) sizeof( ewf_volume_t ) )
-	{
-		read_count = libewf_section_volume_e01_read(
-		              section,
-		              io_handle,
-		              file_io_pool,
-		              file_io_pool_entry,
-		              media_values,
-		              error );
-
-		if( read_count != (ssize_t) section->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read EWF-E01 volume section.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else if( section->data_size == (size64_t) sizeof( ewf_volume_smart_t ) )
-	{
-		read_count = libewf_section_volume_s01_read(
-		              section,
-		              io_handle,
-		              file_io_pool,
-		              file_io_pool_entry,
-		              media_values,
-		              error );
-
-		if( read_count != (ssize_t) section->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read EWF-S01 volume section.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	return( read_count );
 }
 
 /* Reads an EWF-E01 (EnCase) volume section
@@ -7496,7 +7459,7 @@ ssize_t libewf_section_volume_e01_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -7806,7 +7769,7 @@ ssize_t libewf_section_volume_s01_read(
          libcerror_error_t **error )
 {
 	ewf_volume_smart_t *volume   = NULL;
-	static char *function        = "libewf_io_handle_read_volume_s01_section";
+	static char *function        = "libewf_section_volume_s01_read";
 	ssize_t read_count           = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
@@ -7931,22 +7894,22 @@ ssize_t libewf_section_volume_s01_read(
 		 0 );
 
 		libcnotify_printf(
-		 "%s: number of chunks\t: %" PRIu64 "\n",
+		 "%s: number of chunks\t\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_chunks );
 
 		libcnotify_printf(
-		 "%s: sectors per chunk\t: %" PRIu32 "\n",
+		 "%s: sectors per chunk\t\t: %" PRIu32 "\n",
 		 function,
 		 media_values->sectors_per_chunk );
 
 		libcnotify_printf(
-		 "%s: bytes per sector\t: %" PRIu32 "\n",
+		 "%s: bytes per sector\t\t: %" PRIu32 "\n",
 		 function,
 		 media_values->bytes_per_sector );
 
 		libcnotify_printf(
-		 "%s: number of sectors\t: %" PRIu64 "\n",
+		 "%s: number of sectors\t\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_sectors );
 
@@ -7975,7 +7938,7 @@ ssize_t libewf_section_volume_s01_read(
 		 0 );
 
 		libcnotify_printf(
-		 "%s: checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 
@@ -8005,7 +7968,7 @@ ssize_t libewf_section_volume_s01_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 " calculated: 0x%08" PRIx32 ").",
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -8014,8 +7977,6 @@ ssize_t libewf_section_volume_s01_read(
 	}
 	memory_free(
 	 volume );
-
-	io_handle->ewf_format = EWF_FORMAT_S01;
 
 	return( read_count );
 
@@ -8771,7 +8732,7 @@ ssize_t libewf_section_delta_chunk_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_INPUT,
 		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: %" PRIu32 " calculated: %" PRIu32 ").",
+		 "%s: checksum does not match (stored: %" PRIu32 ", calculated: %" PRIu32 ").",
 		 function,
 		 stored_checksum,
 		 calculated_checksum );
@@ -8822,7 +8783,6 @@ ssize_t libewf_section_delta_chunk_write(
          uint8_t *chunk_buffer,
          uint32_t chunk_size,
          uint8_t *checksum_buffer,
-         uint32_t *chunk_checksum,
          uint8_t write_checksum,
          libcerror_error_t **error )
 {
@@ -9015,10 +8975,6 @@ ssize_t libewf_section_delta_chunk_write(
 
 			return( -1 );
 		}
-		byte_stream_copy_from_uint32_little_endian(
-		 checksum_buffer,
-		 *chunk_checksum );
-
 		if( checksum_buffer == &( chunk_buffer[ chunk_size ] ) )
 		{
 			write_size += 4;
@@ -9037,7 +8993,9 @@ ssize_t libewf_section_delta_chunk_write(
 		}
 		else
 		{
-			calculated_checksum = *chunk_checksum;
+			byte_stream_copy_from_uint32_little_endian(
+			 checksum_buffer,
+			 calculated_checksum );
 		}
 		libcnotify_printf(
 		 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with checksum: 0x%08" PRIx32 ".\n",

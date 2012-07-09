@@ -470,11 +470,6 @@ int libewf_handle_get_file_io_handle(
      libbfio_handle_t **file_io_handle,
      libcerror_error_t **error );
 
-int libewf_internal_handle_get_write_maximum_number_of_segments(
-     uint8_t ewf_format,
-     uint32_t *maximum_number_of_segments,
-     libcerror_error_t **error );
-
 int libewf_internal_handle_get_media_values(
      libewf_internal_handle_t *internal_handle,
      size64_t *media_size,
@@ -485,11 +480,6 @@ int libewf_internal_handle_set_media_values(
      uint32_t sectors_per_chunk,
      uint32_t bytes_per_sector,
      size64_t media_size,
-     libcerror_error_t **error );
-
-int libewf_internal_handle_set_format(
-     libewf_internal_handle_t *internal_handle,
-     uint8_t format,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
