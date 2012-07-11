@@ -2958,21 +2958,17 @@ ssize_t libewf_segment_file_write_chunk(
          size_t chunk_data_size LIBEWF_ATTRIBUTE_UNUSED,
          int8_t is_compressed,
          uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
          int8_t write_checksum,
          libcerror_error_t **error )
 {
 	static char *function       = "libewf_segment_file_write_chunk";
 	off64_t segment_file_offset = 0;
 	size_t write_size           = 0;
-	ssize_t write_count         = 0;
 	ssize_t total_write_count   = 0;
+	ssize_t write_count         = 0;
 	uint32_t range_flags        = 0;
 	int number_of_chunks        = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	char *chunk_type            = NULL;
-	uint32_t chunk_checksum     = 0;
-#endif
 
 	LIBEWF_UNREFERENCED_PARAMETER( chunk_data_size )
 
@@ -3061,8 +3057,12 @@ ssize_t libewf_segment_file_write_chunk(
 
 	/* Write the checksum if necessary
 	 */
-	if( write_checksum != 0 )
+	if( ( is_compressed == 0 )
+	 && ( write_checksum != 0 ) )
 	{
+		/* Check if the chunk and checksum buffers are aligned
+		 * if so write the chunk and checksum at the same time
+		 */
 		if( checksum_buffer == NULL )
 		{
 			libcerror_error_set(
@@ -3074,11 +3074,11 @@ ssize_t libewf_segment_file_write_chunk(
 
 			return( -1 );
 		}
-		/* Check if the chunk and checksum buffers are aligned
-		 * if so write the chunk and checksum at the same time
-		 */
-		if( ( is_compressed == 0 )
-		 && ( &( chunk_buffer[ chunk_buffer_size ] ) == checksum_buffer ) )
+		byte_stream_copy_from_uint32_little_endian(
+		 checksum_buffer,
+		 chunk_checksum );
+
+		if( checksum_buffer == &( chunk_buffer[ chunk_buffer_size ] ) )
 		{
 			write_size += 4;
 
@@ -3088,34 +3088,57 @@ ssize_t libewf_segment_file_write_chunk(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( write_checksum == 0 )
-		{
-			byte_stream_copy_from_uint32_little_endian(
-			 &( chunk_buffer[ chunk_buffer_size ] ),
-			 chunk_checksum );
-		}
-		else
-		{
-			byte_stream_copy_from_uint32_little_endian(
-			 checksum_buffer,
-			 chunk_checksum );
-		}
-		if( is_compressed == 0 )
-		{
-			chunk_type = "uncompressed";
-		}
-		else
-		{
-			chunk_type = "compressed";
-		}
 		libcnotify_printf(
-		 "%s: writing %s chunk: %d at offset: %" PRIi64 " with size: %" PRIzd ", with checksum: 0x%08" PRIx32 ".\n",
+		 "%s: chunk: %d file IO pool entry\t\t: %d\n",
 		 function,
-		 chunk_type,
+		 chunk_index,
+		 file_io_pool_entry );
+
+		libcnotify_printf(
+		 "%s: chunk: %d offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 function,
 		 chunk_index,
 		 segment_file_offset,
-		 write_size,
+		 segment_file_offset );
+
+		libcnotify_printf(
+		 "%s: chunk: %d size\t\t\t\t: %" PRIzd "\n",
+		 function,
+		 chunk_index,
+		 write_size );
+
+/* TODO what if checksum is not set */
+		if( ( is_compressed != 0 )
+		 && ( write_checksum == 0 ) )
+		{
+			if( chunk_buffer_size >= 4 )
+			{
+				byte_stream_copy_to_uint32_little_endian(
+				 &( chunk_buffer[ chunk_buffer_size - 4 ] ),
+				 chunk_checksum );
+			}
+		}
+		libcnotify_printf(
+		 "%s: chunk: %d checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 function,
+		 chunk_index,
 		 chunk_checksum );
+
+		libcnotify_printf(
+		 "%s: chunk: %d flags:\n",
+		 function,
+		 chunk_index );
+
+		if( is_compressed != 0 )
+		{
+			libcnotify_printf(
+			 "Is compressed\n" );
+		}
+/* TODO what if checksum is not set */
+		libcnotify_printf(
+		 "Has checksum\n" );
+		libcnotify_printf(
+		 "\n" );
 	}
 #endif
 	/* Write the chunk data to the segment file
@@ -3144,7 +3167,8 @@ ssize_t libewf_segment_file_write_chunk(
 	/* Check if the chunk and checksum buffers are aligned
 	 * if not the chunk and checksum need to be written separately
 	 */
-	if( write_checksum != 0 )
+	if( ( is_compressed == 0 )
+	 && ( write_checksum != 0 ) )
 	{
 		write_count = libbfio_pool_write_buffer(
 			       file_io_pool,
@@ -3208,6 +3232,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
          uint8_t *chunk_buffer,
          size_t chunk_size,
          uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
          uint8_t write_checksum,
 	 uint8_t no_section_append,
          libcerror_error_t **error )
@@ -3297,6 +3322,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	               chunk_buffer,
 	               (uint32_t) chunk_size,
 	               checksum_buffer,
+	               chunk_checksum,
 	               write_checksum,
 	               error );
 

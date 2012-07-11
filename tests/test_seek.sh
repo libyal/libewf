@@ -80,9 +80,23 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-for BASENAME in `${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+# Run tests for: E01, e01, s01
+BASENAMES=`${LS} ${INPUT}/*.??? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+
+for BASENAME in ${BASENAMES};
 do
-	if ! test_seek `${LS} ${INPUT}/${BASENAME}.*`;
+	if ! test_seek `${LS} ${BASENAME}.???`;
+	then
+		exit ${EXIT_FAILURE};
+	fi
+done
+
+# Run tests for: Ex01
+BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+
+for BASENAME in ${BASENAMES};
+do
+	if ! test_seek `${LS} ${BASENAME}.????`;
 	then
 		exit ${EXIT_FAILURE};
 	fi

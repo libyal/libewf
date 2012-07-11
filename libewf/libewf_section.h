@@ -421,6 +421,7 @@ ssize_t libewf_section_delta_chunk_write(
          uint8_t *chunk_buffer,
          uint32_t chunk_size,
          uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
          uint8_t write_checksum,
          libcerror_error_t **error );
 

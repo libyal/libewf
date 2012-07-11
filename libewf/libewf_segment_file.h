@@ -234,6 +234,7 @@ ssize_t libewf_segment_file_write_chunk(
          size_t chunk_data_size,
          int8_t is_compressed,
          uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
          int8_t write_checksum,
          libcerror_error_t **error );
 
@@ -247,6 +248,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
          uint8_t *chunk_buffer,
          size_t chunk_size,
          uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
          uint8_t write_checksum,
 	 uint8_t no_section_append,
          libcerror_error_t **error );

@@ -2831,6 +2831,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		       chunk_data_size,
 		       is_compressed,
 		       checksum_buffer,
+		       chunk_checksum,
 		       write_checksum,
 	               error );
 
@@ -3608,6 +3609,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		       chunk_buffer,
 		       chunk_buffer_size,
 		       checksum_buffer,
+	               chunk_checksum,
 	               write_checksum,
 	               no_section_append,
 	               error );

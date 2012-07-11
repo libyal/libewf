@@ -90,9 +90,9 @@ struct ewf_sha1_hash
 	uint8_t checksum[ 4 ];
 
 	/* Padding
-	 * Consists of 12 bytes
+	 * Consists of 8 bytes
 	 */
-	uint8_t padding[ 12 ];
+	uint8_t padding[ 8 ];
 };
 
 #if defined( __cplusplus )

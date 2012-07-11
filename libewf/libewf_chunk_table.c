@@ -258,6 +258,7 @@ int libewf_chunk_table_read_chunk(
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	int element_index               = 0;
+	uint32_t chunk_checksum         = 0;
 #endif
 
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
@@ -295,47 +296,6 @@ int libewf_chunk_table_read_chunk(
 
 		return( -1 );
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( libmfdata_list_element_get_element_index(
-		     list_element,
-		     &element_index,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve element index from list element.",
-			 function );
-
-			goto on_error;
-		}
-		if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-		{
-			libcnotify_printf(
-			 "%s: reading compressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIu64 "\n",
-			 function,
-			 element_index,
-			 file_io_pool_entry,
-			 element_data_offset,
-			 element_data_offset,
-			 element_data_size );
-		}
-		else
-		{
-			libcnotify_printf(
-			 "%s: reading uncompressed chunk: %d from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIu64 "\n",
-			 function,
-			 element_index,
-			 file_io_pool_entry,
-			 element_data_offset,
-			 element_data_offset,
-			 element_data_size );
-		}
-	}
-#endif
 	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     file_io_pool_entry,
@@ -409,6 +369,79 @@ int libewf_chunk_table_read_chunk(
 	}
 	chunk_data->is_packed = 1;
 
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		if( libmfdata_list_element_get_element_index(
+		     list_element,
+		     &element_index,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve element index from list element.",
+			 function );
+
+			goto on_error;
+		}
+		libcnotify_printf(
+		 "%s: chunk: %d file IO pool entry\t\t: %d\n",
+		 function,
+		 element_index,
+		 file_io_pool_entry );
+
+		libcnotify_printf(
+		 "%s: chunk: %d offset\t\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 function,
+		 element_index,
+		 element_data_offset,
+		 element_data_offset );
+
+		libcnotify_printf(
+		 "%s: chunk: %d size\t\t\t\t: %" PRIu64 "\n",
+		 function,
+		 element_index,
+		 element_data_size );
+
+		if( ( ( element_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
+		 && ( chunk_data->data_size >= 4 ) )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 &( ( chunk_data->data )[ chunk_data->data_size - 4 ] ),
+			 chunk_checksum );
+		}
+		libcnotify_printf(
+		 "%s: chunk: %d checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 function,
+		 element_index,
+		 chunk_checksum );
+
+		libcnotify_printf(
+		 "%s: chunk: %d flags:\n",
+		 function,
+		 element_index );
+
+		if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+		{
+			libcnotify_printf(
+			 "Is compressed\n" );
+		}
+		if( ( element_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
+		{
+			libcnotify_printf(
+			 "Has checksum\n" );
+		}
+		if( ( element_data_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) != 0 )
+		{
+			libcnotify_printf(
+			 "Is delta\n" );
+		}
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
 	if( libmfdata_list_element_set_element_value(
 	     list_element,
 	     cache,

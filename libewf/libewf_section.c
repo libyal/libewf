@@ -4380,11 +4380,11 @@ ssize_t libewf_section_sha1_hash_read(
 		 function );
 		libcnotify_print_data(
 		 ( (ewf_sha1_hash_t *) sha1_hash_data )->padding,
-		 12,
+		 8,
 		 0 );
 	}
 #endif
-	sha1_hash_data_size -= 12;
+	sha1_hash_data_size -= 8;
 
 	calculated_checksum = ewf_checksum_calculate(
 	                       sha1_hash_data,
@@ -8783,6 +8783,7 @@ ssize_t libewf_section_delta_chunk_write(
          uint8_t *chunk_buffer,
          uint32_t chunk_size,
          uint8_t *checksum_buffer,
+         uint32_t chunk_checksum,
          uint8_t write_checksum,
          libcerror_error_t **error )
 {
@@ -8975,6 +8976,10 @@ ssize_t libewf_section_delta_chunk_write(
 
 			return( -1 );
 		}
+		byte_stream_copy_from_uint32_little_endian(
+		 checksum_buffer,
+		 chunk_checksum );
+
 		if( checksum_buffer == &( chunk_buffer[ chunk_size ] ) )
 		{
 			write_size += 4;
@@ -8985,25 +8990,49 @@ ssize_t libewf_section_delta_chunk_write(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( write_checksum == 0 )
-		{
-			byte_stream_copy_to_uint32_little_endian(
-			 &( chunk_buffer[ chunk_size - 4 ] ),
-			 calculated_checksum );
-		}
-		else
-		{
-			byte_stream_copy_from_uint32_little_endian(
-			 checksum_buffer,
-			 calculated_checksum );
-		}
 		libcnotify_printf(
-		 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIi64 " with size: %" PRIzu ", with checksum: 0x%08" PRIx32 ".\n",
+		 "%s: chunk: %" PRIu32 " file IO pool entry\t\t: %d\n",
+		 function,
+		 chunk_index - 1,
+		 file_io_pool_entry );
+
+		libcnotify_printf(
+		 "%s: chunk: %" PRIu32 " offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
 		 chunk_index - 1,
 		 section_offset + total_write_count,
-		 chunk_size,
-		 calculated_checksum );
+		 section_offset + total_write_count );
+
+		libcnotify_printf(
+		 "%s: chunk: %" PRIu32 " size\t\t\t\t: %" PRIzd "\n",
+		 function,
+		 chunk_index - 1,
+		 chunk_size );
+
+		if( ( write_checksum == 0 )
+		 && ( chunk_size >= 4 ) )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 &( chunk_buffer[ chunk_size - 4 ] ),
+			 chunk_checksum );
+		}
+		libcnotify_printf(
+		 "%s: chunk: %" PRIu32 " checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 function,
+		 chunk_index - 1,
+		 chunk_checksum );
+
+		libcnotify_printf(
+		 "%s: chunk: %" PRIu32 " flags:\n",
+		 function,
+		 chunk_index - 1 );
+		libcnotify_printf(
+		 "Has checksum\n" );
+		libcnotify_printf(
+		 "Is delta\n" );
+
+		libcnotify_printf(
+		 "\n" );
 	}
 #endif
 	write_count = libbfio_pool_write_buffer(
