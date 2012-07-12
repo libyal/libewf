@@ -280,6 +280,7 @@ ssize_t libewf_section_ltree_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          uint8_t **cached_ltree_data,
          size_t *cached_ltree_data_size,
          libcerror_error_t **error );

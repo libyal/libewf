@@ -754,8 +754,15 @@ ssize_t libewf_section_descriptor_read(
 		{
 			if( memory_compare(
 			     section->type_string,
-			     "table",
+			     "ltree",
 			     5 ) == 0 )
+			{
+				section->type = LIBEWF_SECTION_TYPE_SINGLE_FILES_DATA;
+			}
+			else if( memory_compare(
+			          section->type_string,
+			          "table",
+			          5 ) == 0 )
 			{
 				section->type = LIBEWF_SECTION_TYPE_SECTOR_TABLE;
 			}
@@ -4802,6 +4809,7 @@ ssize_t libewf_section_ltree_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t format_version,
          uint8_t **cached_ltree_data,
          size_t *cached_ltree_data_size,
          libcerror_error_t **error )
@@ -4822,6 +4830,18 @@ ssize_t libewf_section_ltree_read(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( format_version != 1 )
+	 && ( format_version != 2 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
 		 function );
 
 		return( -1 );
@@ -4848,130 +4868,139 @@ ssize_t libewf_section_ltree_read(
 
 		return( -1 );
 	}
-	if( section->data_size < (size64_t) sizeof( ewf_ltree_header_t ) )
+/* TODO check if section->data_size > SSIZE_MAX */
+	if( format_version == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section size value out of bounds.",
-		 function );
+		section_data_size = section->data_size;
 
-		goto on_error;
-	}
-	section_data_size = section->data_size - sizeof( ewf_ltree_header_t );
+		if( section_data_size < (size64_t) sizeof( ewf_ltree_header_t ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid section size value out of bounds.",
+			 function );
 
-	ltree_header = memory_allocate_structure(
-	                ewf_ltree_header_t );
+			goto on_error;
+		}
+		section_data_size -= sizeof( ewf_ltree_header_t );
 
-	if( ltree_header == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create ltree header.",
-		 function );
+		ltree_header = memory_allocate_structure(
+		                ewf_ltree_header_t );
 
-		goto on_error;
-	}
-	read_count = libbfio_pool_read_buffer(
-	              file_io_pool,
-	              file_io_pool_entry,
-	              (uint8_t *) ltree_header,
-	              sizeof( ewf_ltree_header_t ),
-	              error );
-	
-	if( read_count != (ssize_t) sizeof( ewf_ltree_header_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read ltree header.",
-		 function );
+		if( ltree_header == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create ltree header.",
+			 function );
 
-		goto on_error;
-	}
-	total_read_count += read_count;
+			goto on_error;
+		}
+		read_count = libbfio_pool_read_buffer(
+			      file_io_pool,
+			      file_io_pool_entry,
+			      (uint8_t *) ltree_header,
+			      sizeof( ewf_ltree_header_t ),
+			      error );
+		
+		if( read_count != (ssize_t) sizeof( ewf_ltree_header_t ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read ltree header.",
+			 function );
+
+			goto on_error;
+		}
+		total_read_count += read_count;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-	 	 "%s: ltree header data:\n",
-		 function );
-		libcnotify_print_data(
-		 (uint8_t *) ltree_header,
-		 sizeof( ewf_ltree_header_t ),
-		 0 );
-	}
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: ltree header data:\n",
+			 function );
+			libcnotify_print_data(
+			 (uint8_t *) ltree_header,
+			 sizeof( ewf_ltree_header_t ),
+			 0 );
+		}
 #endif
-	byte_stream_copy_to_uint32_little_endian(
-	 ltree_header->tree_size,
-	 ltree_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: unknown1:\n",
-		 function );
-		libcnotify_print_data(
-		 ltree_header->unknown1,
-		 16,
-		 0 );
-
-		libcnotify_printf(
-		 "%s: tree size\t\t\t\t\t: %" PRIu32 "\n",
-		 function,
+		byte_stream_copy_to_uint32_little_endian(
+		 ltree_header->tree_size,
 		 ltree_size );
 
-		libcnotify_printf(
-		 "%s: unknown2:\n",
-		 function );
-		libcnotify_print_data(
-		 ltree_header->unknown2,
-		 4,
-		 0 );
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: unknown1:\n",
+			 function );
+			libcnotify_print_data(
+			 ltree_header->unknown1,
+			 16,
+			 0 );
 
-		libcnotify_printf(
-		 "%s: unknown3:\n",
-		 function );
-		libcnotify_print_data(
-		 ltree_header->unknown3,
-		 4,
-		 0 );
+			libcnotify_printf(
+			 "%s: tree size\t\t\t\t\t: %" PRIu32 "\n",
+			 function,
+			 ltree_size );
 
-		libcnotify_printf(
-		 "%s: unknown4:\n",
-		 function );
-		libcnotify_print_data(
-		 ltree_header->unknown4,
-		 20,
-		 0 );
-	}
+			libcnotify_printf(
+			 "%s: unknown2:\n",
+			 function );
+			libcnotify_print_data(
+			 ltree_header->unknown2,
+			 4,
+			 0 );
+
+			libcnotify_printf(
+			 "%s: unknown3:\n",
+			 function );
+			libcnotify_print_data(
+			 ltree_header->unknown3,
+			 4,
+			 0 );
+
+			libcnotify_printf(
+			 "%s: unknown4:\n",
+			 function );
+			libcnotify_print_data(
+			 ltree_header->unknown4,
+			 20,
+			 0 );
+		}
 #endif
-	memory_free(
-	 ltree_header );
+		memory_free(
+		 ltree_header );
 
-	ltree_header = NULL;
+		ltree_header = NULL;
 
-	if( section_data_size < (size64_t) ltree_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section size value out of bounds.",
-		 function );
+		if( section_data_size < (size64_t) ltree_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid section size value out of bounds.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		ltree_data_size = (size_t) ltree_size;
 	}
-	ltree_data_size = (size_t) ltree_size;
-
+	else if( format_version == 2 )
+	{
+		ltree_data_size = (size_t) section->data_size;
+	}
 	ltree_data = (uint8_t *) memory_allocate(
-                                  ltree_data_size );
+                                  sizeof( uint8_t ) * ltree_data_size );
 
 	if( ltree_data == NULL )
 	{
@@ -5034,6 +5063,7 @@ ssize_t libewf_section_ltree_read(
 		memory_free(
 		 ltree_data );
 	}
+/* TODO print trailing version 1 data */
 	return( total_read_count );
 
 on_error:

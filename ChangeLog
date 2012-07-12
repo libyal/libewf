@@ -1,17 +1,11 @@
 TODO
+* update and check L01 ltree header values
 * test plan
   - update and check tests: glob, read
-
-* tests
-  - fix ewfexport/libsmraw, see next
-libfvalue_value_get_number_of_value_entries: invalid number of value entries value out of bounds.
-libfvalue_value_write_to_file_stream: unable to retrieve number of value entries.
-libsmraw_information_file_write_section: unable to write value: 0 to file stream.
-libfvalue_value_get_number_of_value_entries: invalid number of value entries value out of bounds.
-libfvalue_value_write_to_file_stream: unable to retrieve number of value entries.
-libsmraw_information_file_write_section: unable to write value: 1 to file stream.
-libsmraw_handle_close: unable to write integrity hash values to information file.
-
+* internally mark Ex01 and Lx01 format and have ewfinfo print a string
+  representation
+* update msvscpp and borlandc files
+* make sure to correctly deal with aligment padding
 
 * write debug output
   - make sure header string is printed after section descriptor

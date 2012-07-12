@@ -3209,6 +3209,31 @@ int libewf_handle_open_read_section_data(
 
 					known_section = 1;
 					break;
+
+				case LIBEWF_SECTION_TYPE_SINGLE_FILES_DATA:
+#if defined( HAVE_VERBOSE_OUTPUT )
+					if( ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+					 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+					{
+						if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+							 "%s: found single files data section in none logical evidence format.\n",
+							 function );
+						}
+					}
+#endif
+					read_count = libewf_section_ltree_read(
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      segment_file->major_version,
+						      &( internal_handle->single_files->ltree_data ),
+						      &( internal_handle->single_files->ltree_data_size ),
+						      error );
+
+					known_section = 1;
+					break;
 			}
 		}
 		else if( section->type_string_length == 4 )
@@ -3262,34 +3287,8 @@ int libewf_handle_open_read_section_data(
 		{
 			if( memory_compare(
 			     (void *) section->type_string,
-			     (void *) "ltree",
+			     (void *) "xhash",
 			     5 ) == 0 )
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				if( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
-				{
-					if( libcnotify_verbose != 0 )
-					{
-						libcnotify_printf(
-						 "%s: found ltree section in none EWF-L01 format.\n",
-						 function );
-					}
-				}
-#endif
-				read_count = libewf_section_ltree_read(
-					      section,
-					      file_io_pool,
-					      file_io_pool_entry,
-					      &( internal_handle->single_files->ltree_data ),
-					      &( internal_handle->single_files->ltree_data_size ),
-					      error );
-
-				known_section = 1;
-			}
-			else if( memory_compare(
-				  (void *) section->type_string,
-				  (void *) "xhash",
-				  5 ) == 0 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
 				if( libcnotify_verbose != 0 )
