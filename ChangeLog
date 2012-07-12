@@ -1,10 +1,9 @@
 TODO
-* Update glob test in test plan
+* test plan
+  - update and check tests: glob, read
 
-* write debug output
-  - make sure header string is printed after section descriptor
-
-* Fix libsmraw
+* tests
+  - fix ewfexport/libsmraw, see next
 libfvalue_value_get_number_of_value_entries: invalid number of value entries value out of bounds.
 libfvalue_value_write_to_file_stream: unable to retrieve number of value entries.
 libsmraw_information_file_write_section: unable to write value: 0 to file stream.
@@ -12,6 +11,10 @@ libfvalue_value_get_number_of_value_entries: invalid number of value entries val
 libfvalue_value_write_to_file_stream: unable to retrieve number of value entries.
 libsmraw_information_file_write_section: unable to write value: 1 to file stream.
 libsmraw_handle_close: unable to write integrity hash values to information file.
+
+
+* write debug output
+  - make sure header string is printed after section descriptor
 
 * delta chunk already sets checksum, is that behavior necessary?
   or can it be moved to pack?
@@ -382,6 +385,9 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120712
+* fixes and improvements for recent changes
 
 20120711
 * fixes and improvements for recent changes

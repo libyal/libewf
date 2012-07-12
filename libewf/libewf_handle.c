@@ -3960,8 +3960,6 @@ int libewf_handle_open_read_segment_files(
 				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
 
 				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
-
-				break;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			else if( libcnotify_verbose != 0 )

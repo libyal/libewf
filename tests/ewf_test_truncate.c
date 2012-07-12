@@ -122,7 +122,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( libcfile_file_free(
 	     &file,
-	     &error ) != 0 )
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
