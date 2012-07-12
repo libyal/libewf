@@ -1,7 +1,8 @@
 TODO
 * Update glob test in test plan
 
-* Fix pass the checksum for write chunk
+* write debug output
+  - make sure header string is printed after section descriptor
 
 * Fix libsmraw
 libfvalue_value_get_number_of_value_entries: invalid number of value entries value out of bounds.

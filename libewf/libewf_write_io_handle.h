@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "libewf_chunk_table.h"
-#include "libewf_header_sections.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
@@ -50,21 +49,21 @@ typedef struct libewf_write_io_handle libewf_write_io_handle_t;
 
 struct libewf_write_io_handle
 {
-	/* Cached versions of the header sections
-	 */
-	libewf_header_sections_t *header_sections;
-
 	/* A cached version of the data section
 	 */
 	ewf_data_t *data_section;
 
-	/* A cached version of the table offsets
+	/* Cached version of the table entries
 	 */
-	ewf_table_entry_v1_t *table_offsets;
+	ewf_table_entry_v1_t *table_entries_data;
 
-	/* The number of allocated table offsets
+	/* The size of the cached version of the table entries
 	 */
-	uint32_t number_of_table_offsets;
+	size_t table_entries_data_size;
+
+	/* The number of allocated table entries
+	 */
+	uint32_t number_of_table_entries;
 
 	/* The number of bytes of the input written
 	 */

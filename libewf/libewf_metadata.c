@@ -1140,7 +1140,11 @@ int libewf_handle_set_format(
 
 		return( -1 );
 	}
-/* TODO add EnCase7 and linen7 support ? */
+/* TODO add support for:
+ * EnCase7, linen7
+ * Ex01
+ * L01, Lx01
+ */
 	if( ( format != LIBEWF_FORMAT_ENCASE1 )
 	 && ( format != LIBEWF_FORMAT_ENCASE2 )
 	 && ( format != LIBEWF_FORMAT_ENCASE3 )
@@ -1166,6 +1170,42 @@ int libewf_handle_set_format(
 	}
 	internal_handle->io_handle->format = format;
 
+	/* Determine the segment file type and the maximum number of segments allowed to write
+	 */
+	if( ( format == LIBEWF_FORMAT_EWF )
+	 || ( format == LIBEWF_FORMAT_SMART ) )
+	{
+		/* ( ( ( 'z' - 's' ) * 26 * 26 ) + 99 ) = 4831
+		 */
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 4831;
+		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
+	}
+	else
+	{
+		/* ( ( ( 'Z' - 'E' ) * 26 * 26 ) + 99 ) = 14295
+		 */
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 14295;
+		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
+	}
+	/* Determine the maximum number of table entries
+	 */
+	if( ( format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( format == LIBEWF_FORMAT_ENCASE7 ) )
+	{
+		internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
+	}
+	else if( format == LIBEWF_FORMAT_EWFX )
+	{
+		internal_handle->write_io_handle->unrestrict_offset_table    = 1;
+		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = INT32_MAX;
+	}
+	else
+	{
+		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_TABLE_ENTRIES;
+	}
 	return( 1 );
 }
 

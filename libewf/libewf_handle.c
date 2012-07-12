@@ -2396,20 +2396,6 @@ int libewf_handle_open_file_io_pool(
 	{
 		if( internal_handle->write_io_handle->values_initialized == 0 )
 		{
-			if( ( internal_handle->io_handle->format == LIBEWF_FORMAT_EWF )
-			 || ( internal_handle->io_handle->format == LIBEWF_FORMAT_SMART ) )
-			{
-				internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
-			}
-			else if( internal_handle->io_handle->format == LIBEWF_FORMAT_LVF )
-			{
-				internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
-			}
-			else
-			{
-				internal_handle->io_handle->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-			}
-/* TODO add EWF2 support */
 			if( libewf_write_io_handle_initialize_values(
 			     internal_handle->write_io_handle,
 			     internal_handle->io_handle,
@@ -7211,42 +7197,8 @@ ssize_t libewf_handle_write_finalize(
 		{
 			return( write_finalize_count );
 		}
-/* TODO refactor to write IO handle */
 		/* Create the headers if required
 		 */
-		if( internal_handle->write_io_handle->header_sections == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid header sections.",
-			 function );
-
-			return( -1 );
-		}
-		if( ( internal_handle->write_io_handle->header_sections->header == NULL )
-		 && ( internal_handle->write_io_handle->header_sections->header2 == NULL )
-		 && ( internal_handle->write_io_handle->header_sections->xheader == NULL ) )
-		{
-			if( libewf_header_sections_create(
-			     internal_handle->write_io_handle->header_sections,
-			     internal_handle->header_values,
-			     internal_handle->io_handle->compression_level,
-			     internal_handle->io_handle->format,
-			     internal_handle->io_handle->header_codepage,
-			     error ) == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create header(s).",
-				 function );
-
-				return( -1 );
-			}
-		}
 		if( libewf_write_io_handle_create_segment_file(
 		     internal_handle->io_handle,
 		     internal_handle->file_io_pool,
@@ -7276,7 +7228,7 @@ ssize_t libewf_handle_write_finalize(
 		               internal_handle->file_io_pool,
 		               file_io_pool_entry,
 		               internal_handle->media_values,
-		               internal_handle->write_io_handle->header_sections,
+		               internal_handle->header_values,
 		               &( internal_handle->write_io_handle->data_section ),
 		               error );
 
@@ -7402,10 +7354,10 @@ ssize_t libewf_handle_write_finalize(
 				 function );
 			}
 #endif
-			if( internal_handle->write_io_handle->number_of_table_offsets < internal_handle->write_io_handle->number_of_chunks_written_to_section )
+			if( internal_handle->write_io_handle->number_of_table_entries < internal_handle->write_io_handle->number_of_chunks_written_to_section )
 			{
 				reallocation = memory_reallocate(
-				                internal_handle->write_io_handle->table_offsets,
+				                internal_handle->write_io_handle->table_entries_data,
 				                sizeof( ewf_table_entry_v1_t ) * internal_handle->write_io_handle->number_of_chunks_written_to_section );
 
 				if( reallocation == NULL )
@@ -7414,13 +7366,13 @@ ssize_t libewf_handle_write_finalize(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_MEMORY,
 					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create table offsets.",
+					 "%s: unable to create table entries data.",
 					 function );
 
 					return( -1 );
 				}
-				internal_handle->write_io_handle->table_offsets           = (ewf_table_entry_v1_t *) reallocation;
-				internal_handle->write_io_handle->number_of_table_offsets = internal_handle->write_io_handle->number_of_chunks_written_to_section;
+				internal_handle->write_io_handle->table_entries_data      = (ewf_table_entry_v1_t *) reallocation;
+				internal_handle->write_io_handle->number_of_table_entries = internal_handle->write_io_handle->number_of_chunks_written_to_section;
 			}
 			write_count = libewf_segment_file_write_chunks_section_correction(
 				       segment_file,
@@ -7429,8 +7381,8 @@ ssize_t libewf_handle_write_finalize(
 				       file_io_pool_entry,
 				       segment_file_offset,
 				       internal_handle->chunk_table_list,
-			               internal_handle->write_io_handle->table_offsets,
-			               internal_handle->write_io_handle->number_of_table_offsets,
+			               internal_handle->write_io_handle->table_entries_data,
+			               internal_handle->write_io_handle->number_of_table_entries,
 				       internal_handle->write_io_handle->chunks_section_offset,
 				       (size64_t) internal_handle->write_io_handle->chunks_section_write_count,
 				       internal_handle->write_io_handle->number_of_chunks_written,

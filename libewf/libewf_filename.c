@@ -109,21 +109,20 @@ int libewf_filename_set_extension(
 /* TODO check filename size */
 	string_index = *filename_index;
 
-	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	if( ( format == LIBEWF_FORMAT_EWF )
+	 || ( format == LIBEWF_FORMAT_EWFX ) )
 	{
-		if( ( format == LIBEWF_FORMAT_EWF )
-		 || ( format == LIBEWF_FORMAT_EWFX ) )
-		{
-			first_character       = 'e';
-			additional_characters = 'a';
-		}
-		else
-		{
-			first_character       = 'E';
-			additional_characters = 'A';
-		}
+		first_character       = 'e';
+		additional_characters = 'a';
 	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+	else if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	      || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 ) )
+	{
+		first_character       = 'E';
+		additional_characters = 'A';
+	}
+	else if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+	      || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
 		first_character       = 'L';
 		additional_characters = 'A';
@@ -132,16 +131,6 @@ int libewf_filename_set_extension(
 	{
 		first_character       = 's';
 		additional_characters = 'a';
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-	{
-		first_character       = 'E';
-		additional_characters = 'A';
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
-	{
-		first_character       = 'L';
-		additional_characters = 'A';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
 	{
@@ -299,21 +288,20 @@ int libewf_filename_set_extension_wide(
 /* TODO check filename size */
 	string_index = *filename_index;
 
-	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	if( ( format == LIBEWF_FORMAT_EWF )
+	 || ( format == LIBEWF_FORMAT_EWFX ) )
 	{
-		if( ( format == LIBEWF_FORMAT_EWF )
-		 || ( format == LIBEWF_FORMAT_EWFX ) )
-		{
-			first_character       = (wchar_t) 'e';
-			additional_characters = (wchar_t) 'a';
-		}
-		else
-		{
-			first_character       = (wchar_t) 'E';
-			additional_characters = (wchar_t) 'A';
-		}
+		first_character       = (wchar_t) 'e';
+		additional_characters = (wchar_t) 'a';
 	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+	else if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	      || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 ) )
+	{
+		first_character       = (wchar_t) 'E';
+		additional_characters = (wchar_t) 'A';
+	}
+	else if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+	      || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
 		first_character       = (wchar_t) 'L';
 		additional_characters = (wchar_t) 'A';
@@ -322,16 +310,6 @@ int libewf_filename_set_extension_wide(
 	{
 		first_character       = (wchar_t) 's';
 		additional_characters = (wchar_t) 'a';
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-	{
-		first_character       = 'E';
-		additional_characters = 'A';
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
-	{
-		first_character       = 'L';
-		additional_characters = 'A';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
 	{

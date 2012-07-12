@@ -27,10 +27,12 @@
 #include "libewf_chunk_table.h"
 #include "libewf_definitions.h"
 #include "libewf_hash_values.h"
+#include "libewf_header_values.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
+#include "libewf_libfvalue.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_list_type.h"
@@ -548,6 +550,10 @@ ssize_t libewf_segment_file_write_file_header(
 	size_t file_header_data_size  = 0;
 	ssize_t write_count           = 0;
 
+#if defined( HAVE_DEBUG_OUTPUT )
+	uint16_t value_16bit          = 0;
+#endif
+
 	if( segment_file == NULL )
 	{
 		libcerror_error_set(
@@ -591,7 +597,8 @@ ssize_t libewf_segment_file_write_file_header(
 	}
 	if( segment_file->major_version == 1 )
 	{
-		if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+		if( ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+		 || ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART ) )
 		{
 			file_signature = ewf1_evf_file_signature;
 		}
@@ -658,6 +665,78 @@ ssize_t libewf_segment_file_write_file_header(
 		 ( (ewf_file_header_v2_t *) file_header_data )->segment_number,
 		 segment_file->segment_number );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	 "%s: file header:\n",
+		 function );
+		libcnotify_print_data(
+		 file_header_data,
+		 file_header_data_size,
+		 0 );
+	}
+#endif
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	 "%s: signature:\n",
+		 function );
+		libcnotify_print_data(
+		 file_header_data,
+		 8,
+		 0 );
+
+		if( segment_file->major_version == 1 )
+		{
+			libcnotify_printf(
+		 	 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
+			 function,
+			 ( (ewf_file_header_v1_t *) file_header_data )->fields_start );
+		}
+		else if( segment_file->major_version == 2 )
+		{
+			libcnotify_printf(
+		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
+			 function,
+			 ( (ewf_file_header_v2_t *) file_header_data )->major_version );
+
+			libcnotify_printf(
+		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
+			 function,
+			 ( (ewf_file_header_v2_t *) file_header_data )->minor_version );
+		}
+		libcnotify_printf(
+	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
+		 function,
+		 segment_file->segment_number );
+
+		if( segment_file->major_version == 1 )
+		{
+			byte_stream_copy_to_uint16_little_endian(
+			 ( (ewf_file_header_v1_t *) file_header_data )->fields_end,
+			 value_16bit );
+			libcnotify_printf(
+		 	 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
+			 function,
+			 value_16bit );
+		}
+		else if( segment_file->major_version == 2 )
+		{
+/* TODO replace by GUID print */
+			libcnotify_printf(
+			 "%s: set identifier:\n",
+			 function );
+			libcnotify_print_data(
+			 segment_file->set_identifier,
+			 16,
+			 0 );
+		}
+		libcnotify_printf(
+	 	 "\n" );
+	}
+#endif
 	write_count = libbfio_pool_write_buffer(
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -1397,13 +1476,14 @@ ssize_t libewf_segment_file_write_headers(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
-         libewf_header_sections_t *header_sections,
+         libfvalue_table_t *header_values,
          libcerror_error_t **error )
 {
-	libewf_section_t *section = NULL;
-	static char *function     = "libewf_segment_file_write_headers";
-	ssize_t write_count       = 0;
-	ssize_t total_write_count = 0;
+	libewf_header_sections_t *header_sections = NULL;
+	libewf_section_t *section                 = NULL;
+	static char *function                     = "libewf_segment_file_write_headers";
+	ssize_t write_count                       = 0;
+	ssize_t total_write_count                 = 0;
 
 	if( segment_file == NULL )
 	{
@@ -1427,16 +1507,35 @@ ssize_t libewf_segment_file_write_headers(
 
 		return( -1 );
 	}
-	if( header_sections == NULL )
+	if( libewf_header_sections_initialize(
+	     &header_sections,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create header sections.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+	if( libewf_header_sections_create(
+	     header_sections,
+	     header_values,
+	     io_handle->compression_level,
+	     io_handle->format,
+	     io_handle->header_codepage,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create header(s).",
+		 function );
+
+		goto on_error;
 	}
 	if( ( header_sections->header == NULL )
 	 || ( header_sections->header_size == 0 ) )
@@ -1445,10 +1544,10 @@ ssize_t libewf_segment_file_write_headers(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid header.",
+		 "%s: invalid header sections - missing header.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( ( io_handle->format == LIBEWF_FORMAT_EWF )
 	 || ( io_handle->format == LIBEWF_FORMAT_SMART )
@@ -1633,7 +1732,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid header2.",
+			 "%s: invalid header sections - missing header2.",
 			 function );
 
 			goto on_error;
@@ -1811,7 +1910,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid xheader.",
+			 "%s: invalid header sections - missing xheader.",
 			 function );
 
 			goto on_error;
@@ -1993,6 +2092,19 @@ ssize_t libewf_segment_file_write_headers(
 		}
 		section = NULL;
 	}
+	if( libewf_header_sections_free(
+	     &header_sections,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free header sections.",
+		 function );
+
+		goto on_error;
+	}
 	return( total_write_count );
 
 on_error:
@@ -2000,6 +2112,12 @@ on_error:
 	{
 		libewf_section_free(
 		 &section,
+		 NULL );
+	}
+	if( header_sections != NULL )
+	{
+		libewf_header_sections_free(
+		 &header_sections,
 		 NULL );
 	}
 	return( -1 );
@@ -2074,7 +2192,7 @@ ssize_t libewf_segment_file_write_last_section(
 		       segment_file->major_version,
 		       section_offset,
 		       last_section_type,
-		       io_handle->segment_file_type,
+		       segment_file->type,
 	               error );
 
 	if( write_count == -1 )
@@ -2125,7 +2243,7 @@ ssize_t libewf_segment_file_write_start(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
-         libewf_header_sections_t *header_sections,
+         libfvalue_table_t *header_values,
          ewf_data_t **cached_data_section,
          libcerror_error_t **error )
 {
@@ -2163,7 +2281,7 @@ ssize_t libewf_segment_file_write_start(
 	               file_io_pool_entry,
 	               error );
 
-	if( write_count != (ssize_t) sizeof( ewf_file_header_v1_t ) )
+	if( write_count == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2172,12 +2290,13 @@ ssize_t libewf_segment_file_write_start(
 		 "%s: unable to write file header.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	section_offset    += write_count;
 	total_write_count += write_count;
 
-	if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	if( ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	 || ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART ) )
 	{
 		if( segment_file->segment_number == 1 )
 		{
@@ -2187,7 +2306,7 @@ ssize_t libewf_segment_file_write_start(
 				       file_io_pool,
 				       file_io_pool_entry,
 				       section_offset,
-				       header_sections,
+				       header_values,
 			               error );
 
 			if( write_count == -1 )
@@ -2199,7 +2318,7 @@ ssize_t libewf_segment_file_write_start(
 				 "%s: unable to write header sections.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			total_write_count += write_count;
 			section_offset    += write_count;
@@ -2276,7 +2395,7 @@ ssize_t libewf_segment_file_write_start(
 				 "%s: unable to write data section.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 		}
 		total_write_count += write_count;
@@ -2320,8 +2439,8 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
-         ewf_table_entry_v1_t *table_offsets,
-         uint32_t number_of_table_offsets,
+         ewf_table_entry_v1_t *table_entries_data,
+         uint32_t number_of_table_entries,
          uint32_t number_of_chunks_written,
          uint32_t chunks_per_section,
          libcerror_error_t **error )
@@ -2353,7 +2472,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		return( -1 );
 	}
-	if( number_of_table_offsets < chunks_per_section )
+	if( number_of_table_entries < chunks_per_section )
 	{
 		libcerror_error_set(
 		 error,
@@ -2424,10 +2543,10 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               5,
 		               section_offset,
 		               0,
-		               (uint8_t *) table_offsets,
+		               (uint8_t *) table_entries_data,
 		               chunks_per_section,
 		               0,
-		               io_handle->segment_file_type,
+		               segment_file->type,
 		               error );
 
 		if( write_count == -1 )
@@ -2503,8 +2622,8 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
-         ewf_table_entry_v1_t *table_offsets,
-         uint32_t number_of_table_offsets,
+         ewf_table_entry_v1_t *table_entries_data,
+         uint32_t number_of_table_entries,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,
          uint32_t number_of_chunks,
@@ -2571,7 +2690,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		}
 	}
 	if( ( section_number_of_chunks > number_of_chunks )
-	 || ( section_number_of_chunks > number_of_table_offsets ) )
+	 || ( section_number_of_chunks > number_of_table_entries ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2590,7 +2709,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 	     chunk_table_list,
 	     number_of_chunks - section_number_of_chunks,
 	     base_offset,
-	     table_offsets,
+	     table_entries_data,
 	     section_number_of_chunks,
 	     error ) != 1 )
 	{
@@ -2667,10 +2786,10 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               5,
 		               chunks_section_offset,
 		               0,
-		               (uint8_t *) table_offsets,
+		               (uint8_t *) table_entries_data,
 		               section_number_of_chunks,
 		               chunks_section_size,
-		               io_handle->segment_file_type,
+		               segment_file->type,
 		               error );
 
 		if( write_count == -1 )
@@ -2786,10 +2905,10 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               5,
 		               section_offset,
 		               base_offset,
-		               (uint8_t *) table_offsets,
+		               (uint8_t *) table_entries_data,
 		               section_number_of_chunks,
 		               0,
-		               io_handle->segment_file_type,
+		               segment_file->type,
 		               error );
 
 		if( write_count == -1 )
@@ -2846,10 +2965,10 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 		               6,
 		               section_offset,
 		               base_offset,
-		               (uint8_t *) table_offsets,
+		               (uint8_t *) table_entries_data,
 		               section_number_of_chunks,
 		               0,
-		               io_handle->segment_file_type,
+		               segment_file->type,
 		               error );
 
 		if( write_count == -1 )

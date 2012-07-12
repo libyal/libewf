@@ -8112,27 +8112,27 @@ ssize_t libewf_section_volume_s01_write(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: media type\t\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: media type\t\t\t\t: 0x%02" PRIx8 "\n",
 		 function,
 		 media_values->media_type );
 
 		libcnotify_printf(
-		 "%s: number of chunks\t\t\t\t: %" PRIu64 "\n",
+		 "%s: number of chunks\t\t\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_chunks );
 
 		libcnotify_printf(
-		 "%s: sectors per chunk\t\t\t\t: %" PRIu32 "\n",
+		 "%s: sectors per chunk\t\t\t: %" PRIu32 "\n",
 		 function,
 		 media_values->sectors_per_chunk );
 
 		libcnotify_printf(
-		 "%s: bytes per sector\t\t\t\t: %" PRIu32 "\n",
+		 "%s: bytes per sector\t\t\t: %" PRIu32 "\n",
 		 function,
 		 media_values->bytes_per_sector );
 
 		libcnotify_printf(
-		 "%s: number of sectors\t\t\t\t: %" PRIu64 "\n",
+		 "%s: number of sectors\t\t\t: %" PRIu64 "\n",
 		 function,
 		 media_values->number_of_sectors );
 

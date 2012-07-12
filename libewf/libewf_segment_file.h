@@ -27,10 +27,10 @@
 
 #include "libewf_chunk_table.h"
 #include "libewf_hash_sections.h"
-#include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
+#include "libewf_libfvalue.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_list_type.h"
@@ -172,7 +172,7 @@ ssize_t libewf_segment_file_write_headers(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
-         libewf_header_sections_t *header_sections,
+         libfvalue_table_t *header_values,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_write_last_section(
@@ -190,7 +190,7 @@ ssize_t libewf_segment_file_write_start(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
-         libewf_header_sections_t *header_sections,
+         libfvalue_table_t *header_values,
          ewf_data_t **cached_data_section,
          libcerror_error_t **error );
 
@@ -201,8 +201,8 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
-         ewf_table_entry_v1_t *table_offsets,
-         uint32_t number_of_table_offsets,
+         ewf_table_entry_v1_t *table_entries_data,
+         uint32_t number_of_table_entries,
          uint32_t number_of_chunks_written,
          uint32_t chunks_per_section,
          libcerror_error_t **error );
@@ -214,8 +214,8 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
-         ewf_table_entry_v1_t *table_offsets,
-         uint32_t number_of_table_offsets,
+         ewf_table_entry_v1_t *table_entries_data,
+         uint32_t number_of_table_entries,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,
          uint32_t number_of_chunks,
