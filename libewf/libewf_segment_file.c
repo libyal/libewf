@@ -452,6 +452,10 @@ ssize_t libewf_segment_file_read_file_header(
 		segment_file->major_version = ( (ewf_file_header_v2_t *) file_header_data )->major_version;
 		segment_file->minor_version = ( (ewf_file_header_v2_t *) file_header_data )->minor_version;
 
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (ewf_file_header_v2_t *) file_header_data )->compression_method,
+		 segment_file->compression_method );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_file_header_v2_t *) file_header_data )->segment_number,
 		 segment_file->segment_number );
@@ -494,12 +498,17 @@ ssize_t libewf_segment_file_read_file_header(
 			libcnotify_printf(
 		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
 			 function,
-			 ( (ewf_file_header_v2_t *) file_header_data )->major_version );
+			 segment_file->major_version );
 
 			libcnotify_printf(
 		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
 			 function,
-			 ( (ewf_file_header_v2_t *) file_header_data )->minor_version );
+			 segment_file->minor_version );
+
+			libcnotify_printf(
+		 	 "%s: compression method\t\t: %" PRIu16 "\n",
+			 function,
+			 segment_file->compression_method );
 		}
 		libcnotify_printf(
 	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
@@ -1612,7 +1621,7 @@ ssize_t libewf_segment_file_write_headers(
 	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE3 )
 	      || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
 	      || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
-	      || ( io_handle->format == LIBEWF_FORMAT_FTK ) )
+	      || ( io_handle->format == LIBEWF_FORMAT_FTK_IMAGER ) )
 	{
 		/* The header should be written twice
 		 * the default compression is used

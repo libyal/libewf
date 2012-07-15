@@ -5351,11 +5351,19 @@ int export_handle_export_file_entry_data(
 
 		goto on_error;
 	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcfile_file_open_wide(
+	     file,
+	     export_path,
+	     LIBCFILE_OPEN_WRITE,
+	     error ) != 1 )
+#else
 	if( libcfile_file_open(
 	     file,
 	     export_path,
 	     LIBCFILE_OPEN_WRITE,
 	     error ) != 1 )
+#endif
 	{
 		libcerror_error_set(
 		 error,

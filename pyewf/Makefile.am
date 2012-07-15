@@ -2,8 +2,8 @@ if HAVE_PYTHON
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	-I$(top_srcdir)/libcstring \
-	-I$(top_srcdir)/liberror \
+	@LIBCSTRING_CPPFLAGS@ \
+	@LIBCERROR_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@
 
 pyexec_LTLIBRARIES = pyewf.la
@@ -14,13 +14,15 @@ pyewf_la_SOURCES = \
 	pyewf_datetime.c pyewf_datetime.h \
 	pyewf_file_entry.c pyewf_file_entry.h \
 	pyewf_handle.c pyewf_handle.h \
+	pyewf_libcerror.h \
+	pyewf_libcstring.h \
 	pyewf_libewf.h \
 	pyewf_metadata.c pyewf_metadata.h \
 	pyewf_python.h
 
 pyewf_la_LIBADD = \
-	../libcstring/libcstring.la \
-	../liberror/liberror.la \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
 	../libewf/libewf.la
 
 pyewf_la_CPPFLAGS = $(PYTHON_CPPFLAGS)

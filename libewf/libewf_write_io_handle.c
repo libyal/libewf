@@ -406,19 +406,6 @@ int libewf_write_io_handle_initialize_values(
 
 		return( -1 );
 	}
-	/* Determine the EWF file format
-	 */
-	if( io_handle->format == LIBEWF_FORMAT_LVF )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: writing format LVF currently not supported.",
-		 function );
-
-		return( -1 );
-	}
 	/* Determine the maximum segment size
 	 */
 	if( segment_table->maximum_segment_size == 0 )
@@ -434,9 +421,14 @@ int libewf_write_io_handle_initialize_values(
 		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE4 )
 		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE5 )
 		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE6 )
+		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE7 )
 		 && ( io_handle->format != LIBEWF_FORMAT_LINEN5 )
 		 && ( io_handle->format != LIBEWF_FORMAT_LINEN6 )
-		 && ( io_handle->format != LIBEWF_FORMAT_FTK )
+		 && ( io_handle->format != LIBEWF_FORMAT_LINEN7 )
+		 && ( io_handle->format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+		 && ( io_handle->format != LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+		 && ( io_handle->format != LIBEWF_FORMAT_LOGICAL_ENCASE7 )
+		 && ( io_handle->format != LIBEWF_FORMAT_FTK_IMAGER )
 		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
 			libcerror_error_set(

@@ -64,6 +64,7 @@ int libewf_single_files_free(
 int libewf_single_files_parse(
      libewf_single_files_t *single_files,
      size64_t *media_size,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entries(
@@ -71,6 +72,7 @@ int libewf_single_files_parse_file_entries(
      size64_t *media_size,
      const uint8_t *file_entries_string,
      size_t file_entries_string_size,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_record_values(
@@ -84,6 +86,7 @@ int libewf_single_files_parse_file_entry(
      libfvalue_split_utf8_string_t *lines,
      int *line_iterator,
      libfvalue_split_utf8_string_t *types,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry_number_of_sub_entries(

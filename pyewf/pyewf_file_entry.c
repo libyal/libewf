@@ -23,9 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <libcerror.h>
-
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -33,6 +30,8 @@
 #include "pyewf.h"
 #include "pyewf_datetime.h"
 #include "pyewf_file_entry.h"
+#include "pyewf_libcerror.h"
+#include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"

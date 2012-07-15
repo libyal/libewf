@@ -24,7 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
-#if defined( HAVE_ERRNO_H )
+#if defined( HAVE_ERRNO_H ) || defined( WINAPI )
 #include <errno.h>
 #endif
 

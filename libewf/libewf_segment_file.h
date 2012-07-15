@@ -77,6 +77,10 @@ struct libewf_segment_file
 	 */
 	uint8_t set_identifier[ 16 ];
 
+	/* The compression method
+	 */
+	uint16_t compression_method;
+
 	/* The last section offset
 	 */
 	off64_t last_section_offset;

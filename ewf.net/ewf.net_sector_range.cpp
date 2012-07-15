@@ -22,8 +22,6 @@
 #include <common.h>
 
 #include <stdlib.h>
-
-#include <libcstring.h>
 #pragma managed( pop )
 
 #include <vcclr.h>

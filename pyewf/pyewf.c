@@ -23,9 +23,6 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <libcerror.h>
-
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -33,6 +30,8 @@
 #include "pyewf.h"
 #include "pyewf_file_entry.h"
 #include "pyewf_handle.h"
+#include "pyewf_libcerror.h"
+#include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
 
@@ -415,8 +414,8 @@ PyMODINIT_FUNC initpyewf(
 	 */
 	module = Py_InitModule3(
 	          "pyewf",
-	           pyewf_module_methods,
-	           "Python libewf module (pyewf)." );
+	          pyewf_module_methods,
+	          "Python libewf module (pyewf)." );
 
 	/* Setup the handle type object
 	 */
@@ -434,8 +433,8 @@ PyMODINIT_FUNC initpyewf(
 
 	PyModule_AddObject(
 	 module,
-	"pyewf_handle",
-	(PyObject *) handle_type_object );
+	 "pyewf_handle",
+	 (PyObject *) handle_type_object );
 
 	/* Setup the file entry type object
 	 */
@@ -447,7 +446,7 @@ PyMODINIT_FUNC initpyewf(
 		return;
 	}
 	Py_IncRef(
-	 (PyObject * ) &pyewf_file_entry_type_object );
+	 (PyObject *) &pyewf_file_entry_type_object );
 
 	file_entry_type_object = &pyewf_file_entry_type_object;
 

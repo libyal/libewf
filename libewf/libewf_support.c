@@ -555,8 +555,12 @@ int libewf_glob(
 	 && ( format != LIBEWF_FORMAT_LINEN5 )
 	 && ( format != LIBEWF_FORMAT_LINEN6 )
 	 && ( format != LIBEWF_FORMAT_SMART )
-	 && ( format != LIBEWF_FORMAT_FTK )
-	 && ( format != LIBEWF_FORMAT_LVF )
+	 && ( format != LIBEWF_FORMAT_FTK_IMAGER )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE7 )
+	 && ( format != LIBEWF_FORMAT_V2_ENCASE7 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_V2_ENCASE7 )
 	 && ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_EWFX ) )
 	{
@@ -606,7 +610,7 @@ int libewf_glob(
 			}
 			else if( filename[ filename_length - 3 ] == 'L' )
 			{
-				format = LIBEWF_FORMAT_LVF;
+				format = LIBEWF_FORMAT_LOGICAL_ENCASE5;
 			}
 			else if( filename[ filename_length - 3 ] == 's' )
 			{
@@ -631,12 +635,11 @@ int libewf_glob(
 		{
 			if( filename[ filename_length - 4 ] == 'E' )
 			{
-/* TODO replace by format */
-				segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
+				format = LIBEWF_FORMAT_V2_ENCASE7;
 			}
 			else if( filename[ filename_length - 4 ] == 'L' )
 			{
-				segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL;
+				format = LIBEWF_FORMAT_LOGICAL_V2_ENCASE7;
 			}
 			else
 			{
@@ -682,13 +685,23 @@ int libewf_glob(
 	}
 	if( segment_file_type == 0 )
 	{
-		if( format == LIBEWF_FORMAT_LVF )
+		if( ( format == LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+		 || ( format == LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+		 || ( format == LIBEWF_FORMAT_LOGICAL_ENCASE7 ) )
 		{
 			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
 		}
 		else if( format == LIBEWF_FORMAT_SMART )
 		{
 			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
+		}
+		else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
+		{
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
+		}
+		else if( format == LIBEWF_FORMAT_LOGICAL_V2_ENCASE7 )
+		{
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL;
 		}
 		else
 		{
@@ -927,6 +940,7 @@ int libewf_glob_wide(
 	void *reallocation               = NULL;
 	static char *function            = "libewf_glob_wide";
 	size_t additional_length         = 0;
+	size_t segment_extention_length  = 0;
 	size_t segment_filename_index    = 0;
 	size_t segment_filename_length   = 0;
 	int result                       = 0;
@@ -965,8 +979,12 @@ int libewf_glob_wide(
 	 && ( format != LIBEWF_FORMAT_LINEN5 )
 	 && ( format != LIBEWF_FORMAT_LINEN6 )
 	 && ( format != LIBEWF_FORMAT_SMART )
-	 && ( format != LIBEWF_FORMAT_FTK )
-	 && ( format != LIBEWF_FORMAT_LVF )
+	 && ( format != LIBEWF_FORMAT_FTK_IMAGER )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE7 )
+	 && ( format != LIBEWF_FORMAT_V2_ENCASE7 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_V2_ENCASE7 )
 	 && ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_EWFX ) )
 	{
@@ -1016,7 +1034,7 @@ int libewf_glob_wide(
 			}
 			else if( filename[ filename_length - 3 ] == (wchar_t) 'L' )
 			{
-				format = LIBEWF_FORMAT_LVF;
+				format = LIBEWF_FORMAT_LOGICAL_ENCASE5;
 			}
 			else if( filename[ filename_length - 3 ] == (wchar_t) 's' )
 			{
@@ -1034,17 +1052,18 @@ int libewf_glob_wide(
 
 				return( -1 );
 			}
+			segment_extention_length = 4;
 		}
 		else if( ( filename_length > 5 )
 		      && ( filename[ filename_length - 5 ] == (wchar_t) '.' ) )
 		{
 			if( filename[ filename_length - 4 ] == (wchar_t) 'E' )
 			{
-				segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
+				format = LIBEWF_FORMAT_V2_ENCASE7;
 			}
 			else if( filename[ filename_length - 4 ] == (wchar_t) 'L' )
 			{
-				segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL;
+				format = LIBEWF_FORMAT_LOGICAL_V2_ENCASE7;
 			}
 			else
 			{
@@ -1070,6 +1089,7 @@ int libewf_glob_wide(
 
 				return( -1 );
 			}
+			segment_extention_length = 5;
 		}
 		else
 		{
@@ -1089,13 +1109,23 @@ int libewf_glob_wide(
 	}
 	if( segment_file_type == 0 )
 	{
-		if( format == LIBEWF_FORMAT_LVF )
+		if( ( format == LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+		 || ( format == LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+		 || ( format == LIBEWF_FORMAT_LOGICAL_ENCASE7 ) )
 		{
 			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL;
 		}
 		else if( format == LIBEWF_FORMAT_SMART )
 		{
 			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
+		}
+		else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
+		{
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
+		}
+		else if( format == LIBEWF_FORMAT_LOGICAL_V2_ENCASE7 )
+		{
+			segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL;
 		}
 		else
 		{

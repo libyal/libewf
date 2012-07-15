@@ -15,6 +15,7 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
 			<BCC_PCHUsage>None</BCC_PCHUsage>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
@@ -38,42 +39,30 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libcstring\libcstring_wide_string.h">
-				<BuildOrder>0</BuildOrder>
-			</None>
 			<None Include="..\..\..\libcstring\libcstring.h">
-				<BuildOrder>1</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcstring\libcstring_codepage.h">
-				<BuildOrder>2</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcstring\libcstring_definitions.h">
-				<BuildOrder>3</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcstring\libcstring_locale.c">
-				<BuildOrder>4</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcstring\libcstring_locale.h">
-				<BuildOrder>5</BuildOrder>
 			</None>
-			<None Include="..\..\..\libcstring\libcstring_narrow_string.h">
-				<BuildOrder>6</BuildOrder>
+			<None Include="..\..\..\libcstring\libcstring_narrow.h">
 			</None>
 			<None Include="..\..\..\libcstring\libcstring_string.h">
-				<BuildOrder>7</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcstring\libcstring_system_string.c">
-				<BuildOrder>8</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcstring\libcstring_system_string.h">
-				<BuildOrder>9</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcstring\libcstring_types.h">
-				<BuildOrder>10</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libcstring\libcstring_wide_string.c">
-				<BuildOrder>11</BuildOrder>
+			<CppCompile Include="..\..\..\libcstring\libcstring_wide.c">
 			</CppCompile>
+			<None Include="..\..\..\libcstring\libcstring_wide.h">
+			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

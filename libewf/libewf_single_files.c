@@ -164,6 +164,7 @@ int libewf_single_files_free(
 int libewf_single_files_parse(
      libewf_single_files_t *single_files,
      size64_t *media_size,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	uint8_t *file_entries_string    = NULL;
@@ -244,6 +245,7 @@ int libewf_single_files_parse(
 	     media_size,
 	     file_entries_string,
 	     file_entries_string_size,
+	     format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -277,6 +279,7 @@ int libewf_single_files_parse_file_entries(
      size64_t *media_size,
      const uint8_t *entries_string,
      size_t entries_string_size,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *lines = NULL;
@@ -567,6 +570,7 @@ int libewf_single_files_parse_file_entries(
 			     lines,
 			     &line_index,
 			     types,
+			     format,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -991,6 +995,7 @@ int libewf_single_files_parse_file_entry(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      libfvalue_split_utf8_string_t *types,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	libewf_single_file_entry_t *single_file_entry = NULL;
@@ -1032,6 +1037,17 @@ int libewf_single_files_parse_file_entry(
 		 function );
 
 		return( 1 );
+	}
+	if( format == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid format.",
+		 function );
+
+		return( -1 );
 	}
 	if( libfvalue_split_utf8_string_get_number_of_segments(
 	     types,
@@ -1335,6 +1351,19 @@ int libewf_single_files_parse_file_entry(
 					 function );
 
 					goto on_error;
+				}
+				if( value_index == 19 )
+				{
+					*format = LIBEWF_FORMAT_LOGICAL_ENCASE5;
+				}
+				else if( ( value_index == 20 )
+				      || ( value_index == 21 ) )
+				{
+					*format = LIBEWF_FORMAT_LOGICAL_ENCASE6;
+				}
+				else if( value_index == 2 )
+				{
+					*format = LIBEWF_FORMAT_LOGICAL_ENCASE7;
 				}
 			}
 			/* Creation time
@@ -1671,6 +1700,7 @@ int libewf_single_files_parse_file_entry(
 		     lines,
 		     line_index,
 		     types,
+		     format,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

@@ -26,8 +26,7 @@
 #include <common.h>
 #include <types.h>
 
-#include <libcerror.h>
-
+#include "pyewf_libcerror.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
 

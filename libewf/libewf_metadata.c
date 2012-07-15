@@ -1154,7 +1154,7 @@ int libewf_handle_set_format(
 	 && ( format != LIBEWF_FORMAT_LINEN5 )
 	 && ( format != LIBEWF_FORMAT_LINEN6 )
 	 && ( format != LIBEWF_FORMAT_SMART )
-	 && ( format != LIBEWF_FORMAT_FTK )
+	 && ( format != LIBEWF_FORMAT_FTK_IMAGER )
 	 && ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_EWFX ) )
 	{
@@ -1206,6 +1206,70 @@ int libewf_handle_set_format(
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
 		internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_TABLE_ENTRIES;
 	}
+	return( 1 );
+}
+
+/* Retrieves the segment file version
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_segment_file_version(
+     libewf_handle_t *handle,
+     uint8_t *major_version,
+     uint8_t *minor_version,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_segment_file_version";
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( major_version == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid major version.",
+		 function );
+
+		return( -1 );
+	}
+	if( minor_version == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid minor version.",
+		 function );
+
+		return( -1 );
+	}
+	*major_version = internal_handle->io_handle->major_version;
+	*minor_version = internal_handle->io_handle->minor_version;
+
 	return( 1 );
 }
 

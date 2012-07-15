@@ -393,8 +393,8 @@ int libewf_device_information_parse_string(
 			}
 			else if( type_string_size == 3 )
 			{
-				if( ( type_string[ 0 ] == (uint8_t) 'p' )
-				 && ( type_string[ 1 ] == (uint8_t) 'b' ) )
+				if( ( type_string[ 0 ] == (uint8_t) 'b' )
+				 && ( type_string[ 1 ] == (uint8_t) 'p' ) )
 				{
 					if( libfvalue_utf8_string_copy_to_integer(
 					     value_string,

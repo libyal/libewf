@@ -1709,8 +1709,8 @@ int libewf_handle_open_file_io_pool(
 	libewf_segment_file_t *segment_file       = NULL;
 	static char *function                     = "libewf_handle_open_file_io_pool";
 	ssize_t read_count                        = 0;
-	uint16_t maximum_delta_segment_number     = 0;
-	uint16_t maximum_segment_number           = 0;
+	uint32_t maximum_delta_segment_number     = 0;
+	uint32_t maximum_segment_number           = 0;
 	int file_io_pool_entry                    = 0;
 	int number_of_file_io_handles             = 0;
 
@@ -2356,24 +2356,8 @@ int libewf_handle_open_file_io_pool(
 
 			goto on_error;
 		}
-		if( internal_handle->single_files->ltree_data != NULL )
-		{
-			if( libewf_single_files_parse(
-			     internal_handle->single_files,
-			     &( internal_handle->media_values->media_size ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse single files.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		else
+/* TODO refactor */
+		if( internal_handle->single_files->ltree_data == NULL )
 		{
 			if( libewf_internal_handle_get_media_values(
 			     internal_handle,
@@ -2607,9 +2591,10 @@ ssize_t libewf_handle_open_read_segment_file(
 	}
 	if( segment_file->segment_number == 1 )
 	{
-		internal_handle->io_handle->segment_file_type = segment_file->type;
-		internal_handle->io_handle->major_version     = segment_file->major_version;
-		internal_handle->io_handle->minor_version     = segment_file->minor_version;
+		internal_handle->io_handle->segment_file_type  = segment_file->type;
+		internal_handle->io_handle->major_version      = segment_file->major_version;
+		internal_handle->io_handle->minor_version      = segment_file->minor_version;
+		internal_handle->io_handle->compression_method = segment_file->compression_method;
 
 		if( segment_file->major_version == 2 )
 		{
@@ -2623,6 +2608,18 @@ ssize_t libewf_handle_open_read_segment_file(
 				 LIBCERROR_ERROR_DOMAIN_MEMORY,
 				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 				 "%s: unable to copy segment file set identifier to media values.",
+				 function );
+
+				return( -1 );
+			}
+			if( ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_NONE )
+			 && ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported compression method.",
 				 function );
 
 				return( -1 );
@@ -2661,6 +2658,17 @@ ssize_t libewf_handle_open_read_segment_file(
 		}
 		if( internal_handle->io_handle->major_version == 2 )
 		{
+			if( segment_file->compression_method != internal_handle->io_handle->compression_method )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_INPUT,
+				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+				 "%s: segment file compression method value mismatch.",
+				 function );
+
+				return( -1 );
+			}
 			if( memory_compare(
 			     internal_handle->media_values->set_identifier,
 			     segment_file->set_identifier,
@@ -2702,6 +2710,9 @@ int libewf_handle_open_read_section_data(
 	int initialize_chunk_table                  = 0;
 	int header_section_found                    = 0;
 	int known_section                           = 0;
+	int read_case_data                          = 0;
+	int read_device_information                 = 0;
+	int single_files_section_found              = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2793,7 +2804,7 @@ int libewf_handle_open_read_section_data(
 		 "%s: missing first section list element.",
 		 function );
 
-		 return( -1 );
+		 goto on_error;
 	}
 	while( section_list_element != NULL )
 	{
@@ -2808,7 +2819,7 @@ int libewf_handle_open_read_section_data(
 			 "%s: missing section.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( section->data_size != 0 )
 		{
@@ -2872,46 +2883,55 @@ int libewf_handle_open_read_section_data(
  */
 						break;
 					}
-					read_count = libewf_section_compressed_string_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      &file_object_string,
-						      &file_object_string_size,
-						      error );
-
-					if( read_count == -1 )
+					if( read_device_information == 0 )
 					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_READ_FAILED,
-						 "%s: unable to read device information file object string.",
-						 function );
+						read_count = libewf_section_compressed_string_read(
+							      section,
+							      file_io_pool,
+							      file_io_pool_entry,
+							      &file_object_string,
+							      &file_object_string_size,
+							      error );
 
-						goto on_error;
+						if( read_count == -1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_IO,
+							 LIBCERROR_IO_ERROR_READ_FAILED,
+							 "%s: unable to read device information file object string.",
+							 function );
+
+							goto on_error;
+						}
+						if( libewf_device_information_parse(
+						     file_object_string,
+						     file_object_string_size,
+						     internal_handle->media_values,
+						     internal_handle->header_values,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+							 "%s: unable to parse device information.",
+							 function );
+
+							goto on_error;
+						}
+						memory_free(
+						 file_object_string );
+
+						file_object_string = NULL;
+
+						read_device_information = 1;
+
+						if( read_case_data != 0 )
+						{
+							initialize_chunk_table = 1;
+						}
 					}
-					if( libewf_device_information_parse(
-					     file_object_string,
-					     file_object_string_size,
-					     internal_handle->media_values,
-					     internal_handle->header_values,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to parse device information.",
-						 function );
-
-						goto on_error;
-					}
-					memory_free(
-					 file_object_string );
-
-					file_object_string = NULL;
-
 					known_section = 1;
 					break;
 
@@ -2922,49 +2942,56 @@ int libewf_handle_open_read_section_data(
  */
 						break;
 					}
-					read_count = libewf_section_compressed_string_read(
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      &file_object_string,
-						      &file_object_string_size,
-						      error );
-
-					if( read_count == -1 )
+					if( read_case_data == 0 )
 					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_READ_FAILED,
-						 "%s: unable to read case data file object string.",
-						 function );
+						read_count = libewf_section_compressed_string_read(
+							      section,
+							      file_io_pool,
+							      file_io_pool_entry,
+							      &file_object_string,
+							      &file_object_string_size,
+							      error );
 
-						goto on_error;
+						if( read_count == -1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_IO,
+							 LIBCERROR_IO_ERROR_READ_FAILED,
+							 "%s: unable to read case data file object string.",
+							 function );
+
+							goto on_error;
+						}
+						if( libewf_case_data_parse(
+						     file_object_string,
+						     file_object_string_size,
+						     internal_handle->media_values,
+						     internal_handle->header_values,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+							 "%s: unable to parse case data.",
+							 function );
+
+							goto on_error;
+						}
+						memory_free(
+						 file_object_string );
+
+						file_object_string = NULL;
+
+						read_case_data = 1;
+
+						if( read_device_information != 0 )
+						{
+							initialize_chunk_table = 1;
+						}
 					}
-					if( libewf_case_data_parse(
-					     file_object_string,
-					     file_object_string_size,
-					     internal_handle->media_values,
-					     internal_handle->header_values,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to parse case data.",
-						 function );
-
-						goto on_error;
-					}
-					memory_free(
-					 file_object_string );
-
-					file_object_string = NULL;
-
 					known_section = 1;
-
-					initialize_chunk_table = 1;
 					break;
 
 				case LIBEWF_SECTION_TYPE_SECTOR_DATA:
@@ -3232,6 +3259,8 @@ int libewf_handle_open_read_section_data(
 						      &( internal_handle->single_files->ltree_data_size ),
 						      error );
 
+					single_files_section_found = 1;
+
 					known_section = 1;
 					break;
 			}
@@ -3483,7 +3512,7 @@ int libewf_handle_open_read_section_data(
 				 "%s: unable to calculate chunk size.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			if( internal_handle->media_values->number_of_chunks > 0 )
 			{
@@ -3499,7 +3528,7 @@ int libewf_handle_open_read_section_data(
 					 "%s: unable to resize chunk table list.",
 					 function );
 
-					return( -1 );
+					goto on_error;
 				}
 			}
 /* TODO check if this can be moved */
@@ -3530,6 +3559,24 @@ int libewf_handle_open_read_section_data(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to parse header sections.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( single_files_section_found != 0 )
+	{
+		if( libewf_single_files_parse(
+		     internal_handle->single_files,
+		     &( internal_handle->media_values->media_size ),
+		     &( internal_handle->io_handle->format ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse single files.",
 			 function );
 
 			goto on_error;

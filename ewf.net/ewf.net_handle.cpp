@@ -21,10 +21,9 @@
 #pragma managed( push, off )
 #include <common.h>
 #include <memory.h>
+#include <types.h>
 
 #include <stdlib.h>
-
-#include <libcstring.h>
 
 #include <libewf.h>
 #pragma managed( pop )

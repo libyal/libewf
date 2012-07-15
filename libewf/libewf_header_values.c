@@ -2142,7 +2142,7 @@ int libewf_header_values_parse_utf8_header_string(
 							 */
 							else
 							{
-								*format = LIBEWF_FORMAT_FTK;
+								*format = LIBEWF_FORMAT_FTK_IMAGER;
 							}
 						}
 					}
@@ -3676,15 +3676,15 @@ int libewf_header_values_generate_utf8_header_string(
 		{
 			if( compression_level == EWF_COMPRESSION_NONE )
 			{
-				generated_compression_level = LIBEWF_COMPRESSION_LEVEL_NONE;
+				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_NONE;
 			}
 			else if( compression_level == EWF_COMPRESSION_FAST )
 			{
-				generated_compression_level = LIBEWF_COMPRESSION_LEVEL_FAST;
+				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_FAST;
 			}
 			else if( compression_level == EWF_COMPRESSION_BEST )
 			{
-				generated_compression_level = LIBEWF_COMPRESSION_LEVEL_BEST;
+				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_BEST;
 			}
 			compression_level_string_length = libcstring_narrow_string_length(
 			                                   generated_compression_level );

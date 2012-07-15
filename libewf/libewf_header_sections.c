@@ -427,7 +427,7 @@ int libewf_header_sections_create(
 			goto on_error;
 		}
 	}
-	else if( ( format == LIBEWF_FORMAT_FTK )
+	else if( ( format == LIBEWF_FORMAT_FTK_IMAGER )
 	      || ( format == LIBEWF_FORMAT_SMART ) )
 	{
 		if( libewf_header_values_generate_header_ftk(

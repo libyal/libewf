@@ -24,9 +24,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <libcstring.h>
-#include <libcerror.h>
-
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -34,6 +31,8 @@
 #include "pyewf.h"
 #include "pyewf_file_entry.h"
 #include "pyewf_handle.h"
+#include "pyewf_libcerror.h"
+#include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
@@ -1377,7 +1376,7 @@ PyObject *pyewf_handle_get_root_file_entry(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error              = NULL;
+	libcerror_error_t *error             = NULL;
 	libewf_file_entry_t *root_file_entry = NULL;
 	PyObject *file_entry_object          = NULL;
 	static char *function                = "pyewf_handle_get_root_file_entry";

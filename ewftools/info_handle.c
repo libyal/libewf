@@ -1765,21 +1765,21 @@ int info_handle_header_value_compression_level_fprint(
 	{
 		if( libcstring_system_string_compare(
 		     header_value,
-		     _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_NONE ),
+		     _LIBCSTRING_SYSTEM_STRING( LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_NONE ),
 		     1 ) == 0 )
 		{
 			value_string = _LIBCSTRING_SYSTEM_STRING( "no compression" );
 		}
 		else if( libcstring_system_string_compare(
 			  header_value,
-			  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_FAST ),
+			  _LIBCSTRING_SYSTEM_STRING( LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_FAST ),
 			  1 ) == 0 )
 		{
 			value_string = _LIBCSTRING_SYSTEM_STRING( "good (fast) compression" );
 		}
 		else if( libcstring_system_string_compare(
 			  header_value,
-			  _LIBCSTRING_SYSTEM_STRING( LIBEWF_COMPRESSION_LEVEL_BEST ),
+			  _LIBCSTRING_SYSTEM_STRING( LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_BEST ),
 			  1 ) == 0 )
 		{
 			value_string = _LIBCSTRING_SYSTEM_STRING( "best compression" );
@@ -2110,9 +2110,11 @@ int info_handle_media_information_fprint(
 	uint64_t value_64bit                              = 0;
 	uint32_t value_32bit                              = 0;
 	uint8_t compression_flags                         = 0;
+	uint8_t format                                    = 0;
+	uint8_t major_version                             = 0;
 	uint8_t media_type                                = 0;
 	uint8_t media_flags                               = 0;
-	uint8_t format                                    = 0;
+	uint8_t minor_version                             = 0;
 	int8_t compression_level                          = 0;
 	int is_corrupted                                  = 0;
 	int result                                        = 1;
@@ -2226,8 +2228,24 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "EWFX (extended EWF)" );
 			break;
 
-		case LIBEWF_FORMAT_LVF:
-			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF)" );
+		case LIBEWF_FORMAT_LOGICAL_ENCASE5:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) EnCase 5" );
+			break;
+
+		case LIBEWF_FORMAT_LOGICAL_ENCASE6:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) EnCase 6" );
+			break;
+
+		case LIBEWF_FORMAT_LOGICAL_ENCASE7:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) EnCase 7" );
+			break;
+
+		case LIBEWF_FORMAT_V2_ENCASE7:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "version 2 EnCase 7" );
+			break;
+
+		case LIBEWF_FORMAT_LOGICAL_V2_ENCASE7:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) version 2 EnCase 7" );
 			break;
 
 		case LIBEWF_FORMAT_UNKNOWN:
@@ -2381,6 +2399,25 @@ int info_handle_media_information_fprint(
 
 				result = -1;
 			}
+		}
+		if( libewf_handle_get_segment_file_version(
+		     info_handle->input_handle,
+		     &major_version,
+		     &minor_version,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file version.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+/* TODO print segment file format version */
 		}
 		if( libewf_handle_get_segment_file_set_identifier(
 		     info_handle->input_handle,

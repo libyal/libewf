@@ -26,6 +26,7 @@
 #include "libewf_array_type.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
+#include "libewf_libclocale.h"
 #include "libewf_libcstring.h"
 #include "libewf_libmfdata.h"
 #include "libewf_libuna.h"
@@ -347,7 +348,7 @@ int libewf_segment_table_get_basename_size(
 		return( 0 );
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_size_from_utf32(
@@ -371,14 +372,14 @@ int libewf_segment_table_get_basename_size(
 		result = libuna_byte_stream_size_from_utf32(
 		          (libuna_utf32_character_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          basename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_byte_stream_size_from_utf16(
 		          (libuna_utf16_character_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          basename_size,
 		          error );
 #else
@@ -446,7 +447,7 @@ int libewf_segment_table_get_basename(
 		return( 0 );
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_size_from_utf32(
@@ -470,14 +471,14 @@ int libewf_segment_table_get_basename(
 		result = libuna_byte_stream_size_from_utf32(
 		          (libuna_utf32_character_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &narrow_basename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_byte_stream_size_from_utf16(
 		          (libuna_utf16_character_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &narrow_basename_size,
 		          error );
 #else
@@ -511,7 +512,7 @@ int libewf_segment_table_get_basename(
 		return( -1 );
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_copy_from_utf32(
@@ -537,7 +538,7 @@ int libewf_segment_table_get_basename(
 		result = libuna_byte_stream_copy_from_utf32(
 		          (uint8_t *) basename,
 		          basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf32_character_t *) segment_table->basename,
 		          segment_table->basename_size,
 		          error );
@@ -545,7 +546,7 @@ int libewf_segment_table_get_basename(
 		result = libuna_byte_stream_copy_from_utf16(
 		          (uint8_t *) basename,
 		          basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf16_character_t *) segment_table->basename,
 		          segment_table->basename_size,
 		          error );
@@ -631,7 +632,7 @@ int libewf_segment_table_set_basename(
 		segment_table->basename_size = 0;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf32_string_size_from_utf8(
@@ -655,14 +656,14 @@ int libewf_segment_table_set_basename(
 		result = libuna_utf32_string_size_from_byte_stream(
 		          (uint8_t *) basename,
 		          basename_length + 1,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &( segment_table->basename_size ),
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_utf16_string_size_from_byte_stream(
 		          (uint8_t *) basename,
 		          basename_length + 1,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &( segment_table->basename_size ),
 		          error );
 #else
@@ -700,7 +701,7 @@ int libewf_segment_table_set_basename(
 		return( -1 );
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf32_string_copy_from_utf8(
@@ -728,7 +729,7 @@ int libewf_segment_table_set_basename(
 		          segment_table->basename_size,
 		          (uint8_t *) basename,
 		          basename_length + 1,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_utf16_string_copy_from_byte_stream(
@@ -736,7 +737,7 @@ int libewf_segment_table_set_basename(
 		          segment_table->basename_size,
 		          (uint8_t *) basename,
 		          basename_length + 1,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          error );
 #else
 #error Unsupported size of wchar_t
@@ -830,7 +831,7 @@ int libewf_segment_table_get_basename_size_wide(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	*basename_size = segment_table->basename_size;
 #else
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf32_string_size_from_utf8(
@@ -854,14 +855,14 @@ int libewf_segment_table_get_basename_size_wide(
 		result = libuna_utf32_string_size_from_byte_stream(
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          basename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_utf16_string_size_from_byte_stream(
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          basename_size,
 		          error );
 #else
@@ -928,7 +929,7 @@ int libewf_segment_table_get_basename_wide(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	wide_basename_size = segment_table->basename_size;
 #else
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf32_string_size_from_utf8(
@@ -952,14 +953,14 @@ int libewf_segment_table_get_basename_wide(
 		result = libuna_utf32_string_size_from_byte_stream(
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &wide_basename_size,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_utf16_string_size_from_byte_stream(
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &wide_basename_size,
 		          error );
 #else
@@ -1006,7 +1007,7 @@ int libewf_segment_table_get_basename_wide(
 	}
 	basename[ segment_table->basename_size - 1 ] = 0;
 #else
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf32_string_copy_from_utf8(
@@ -1034,7 +1035,7 @@ int libewf_segment_table_get_basename_wide(
 		          basename_size,
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_utf16_string_copy_from_byte_stream(
@@ -1042,7 +1043,7 @@ int libewf_segment_table_get_basename_wide(
 		          basename_size,
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          error );
 #else
 #error Unsupported size of wchar_t
@@ -1111,7 +1112,7 @@ int libewf_segment_table_set_basename_wide(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	segment_table->basename_size = basename_length + 1;
 #else
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_size_from_utf32(
@@ -1135,14 +1136,14 @@ int libewf_segment_table_set_basename_wide(
 		result = libuna_byte_stream_size_from_utf32(
 		          (libuna_utf32_character_t *) basename,
 		          basename_length + 1,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &( segment_table->basename_size ),
 		          error );
 #elif SIZEOF_WCHAR_T == 2
 		result = libuna_byte_stream_size_from_utf16(
 		          (libuna_utf16_character_t *) basename,
 		          basename_length + 1,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          &( segment_table->basename_size ),
 		          error );
 #else
@@ -1198,7 +1199,7 @@ int libewf_segment_table_set_basename_wide(
 	}
 	segment_table->basename[ basename_length ] = 0;
 #else
-	if( libcstring_narrow_system_string_codepage == 0 )
+	if( libclocale_codepage == 0 )
 	{
 #if SIZEOF_WCHAR_T == 4
 		result = libuna_utf8_string_copy_from_utf32(
@@ -1224,7 +1225,7 @@ int libewf_segment_table_set_basename_wide(
 		result = libuna_byte_stream_copy_from_utf32(
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf32_character_t *) basename,
 		          basename_length + 1,
 		          error );
@@ -1232,7 +1233,7 @@ int libewf_segment_table_set_basename_wide(
 		result = libuna_byte_stream_copy_from_utf16(
 		          (uint8_t *) segment_table->basename,
 		          segment_table->basename_size,
-		          libcstring_narrow_system_string_codepage,
+		          libclocale_codepage,
 		          (libuna_utf16_character_t *) basename,
 		          basename_length + 1,
 		          error );

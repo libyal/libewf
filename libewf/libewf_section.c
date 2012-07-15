@@ -5195,6 +5195,7 @@ ssize_t libewf_section_session_read(
 	ssize_t read_count               = 0;
 	ssize_t total_read_count         = 0;
 	uint64_t first_sector            = 0;
+	uint64_t number_of_sectors       = 0;
 	uint64_t previous_first_sector   = 0;
 	uint64_t session_first_sector    = 0;
 	uint64_t track_first_sector      = 0;
@@ -5202,7 +5203,6 @@ ssize_t libewf_section_session_read(
 	uint32_t entry_index             = 0;
 	uint32_t flags                   = 0;
 	uint32_t number_of_entries       = 0;
-	uint32_t number_of_sectors       = 0;
 	uint32_t previous_flags          = 0;
 	uint32_t stored_checksum         = 0;
 
@@ -5716,6 +5716,7 @@ ssize_t libewf_section_session_read(
 			}
 			if( ( flags & 0x00000001UL ) == 0 )
 			{
+/* TODO bounds check */
 				number_of_sectors = first_sector - session_first_sector;
 
 				if( libewf_sector_list_append_sector(
@@ -5738,6 +5739,7 @@ ssize_t libewf_section_session_read(
 			}
 			if( ( previous_flags & 0x00000001UL ) != 0 )
 			{
+/* TODO bounds check */
 				number_of_sectors = first_sector - track_first_sector;
 
 				if( libewf_sector_list_append_sector(

@@ -1,11 +1,8 @@
 TODO
-* update and check L01 ltree header values
-* test plan
-  - update and check tests: glob, read
+* update codegear and builderc5 files
+
 * internally mark Ex01 and Lx01 format and have ewfinfo print a string
   representation
-* update msvscpp and borlandc files
-* make sure to correctly deal with aligment padding
 
 * write debug output
   - make sure header string is printed after section descriptor
@@ -21,13 +18,17 @@ TODO
 * change chunk data indication values to flags
 * libewf_filename_create split off wide variant ?
 
+* API
+  - get/set compression method
+
+* ewfinfo
+  - print segment file version
+  - print compression method
+
 * Ex01/Lx01
+  - make sure to correctly deal with aligment padding
   - libewf_chunk_table_read_chunk: add support for patten fill
-  - write chunk make sure has checksum flag is handled
   - complete: libewf_chunk_table_fill_v2
-  - file naming schema ?
-  - add types for globbing
-  - add glob tests (+/-)
   - add support for section MD5 hashes
   - add generic way to parse file object data
   - rename table offsets to table entries
@@ -65,6 +66,7 @@ TODO
   - bzip2 compression support
   - encryption support
   - section integrity MD5 hash support
+  - file naming schema, what's after Ex99 ?
 
 * Ex01/Lx01 test images
 * memory image -> winen and encase ?
@@ -379,6 +381,13 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120715
+* fixes and improvements for recent changes
+* fixes for osxfuse detection requiring FUSE_USE_VERSION
+
+20120714
+* changes for Lx01 support
 
 20120712
 * fixes and improvements for recent changes

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="liberror"
-	ProjectGUID="{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}"
-	RootNamespace="liberror"
+	Name="libcsplit"
+	ProjectGUID="{B86FB73A-4ACC-42DE-9545-586D93955B06}"
+	RootNamespace="libcsplit"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -39,8 +39,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libuna"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCSPLIT"
+				SmallerTypeCheck="true"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				WarnAsError="false"
@@ -57,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\liberror.lib"
+				OutputFile="$(OutDir)\libcsplit.lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -102,8 +103,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libuna"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCSPLIT"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
@@ -123,7 +124,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\liberror.lib"
+				OutputFile="$(OutDir)\libcsplit.lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -153,7 +154,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\liberror\liberror_error.c"
+				RelativePath="..\..\libcsplit\libcsplit_error.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_narrow_split_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_narrow_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_support.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_wide_split_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_wide_string.c"
 				>
 			</File>
 		</Filter>
@@ -163,19 +184,51 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\liberror\liberror.h"
+				RelativePath="..\..\libcsplit\libcsplit_definitions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\liberror\liberror_definitions.h"
+				RelativePath="..\..\libcsplit\libcsplit_error.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\liberror\liberror_error.h"
+				RelativePath="..\..\libcsplit\libcsplit_extern.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\liberror\liberror_types.h"
+				RelativePath="..\..\libcsplit\libcsplit_libcerror.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_libcstring.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_narrow_split_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_narrow_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_support.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_unused.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_wide_split_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcsplit\libcsplit_wide_string.h"
 				>
 			</File>
 		</Filter>

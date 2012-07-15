@@ -1018,6 +1018,16 @@ int libewf_handle_set_format(
      uint8_t format,
      libewf_error_t **error );
 
+/* Retrieves the segment file version
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_segment_file_version(
+     libewf_handle_t *handle,
+     uint8_t *major_version,
+     uint8_t *minor_version,
+     libewf_error_t **error );
+
 /* Retrieves the segment file set identifier
  * The identifier is a GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error

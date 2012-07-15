@@ -6,18 +6,22 @@ EXTRA_DIST = \
 	ewfverify/ewfverify.vcproj \
 	ewf.net/ewf.net_dll.vcproj \
 	libbfio/libbfio.vcproj \
+	libcerror/libcerror.vcproj \
+	libcfile/libcfile.vcproj \
+	libclocale/libclocale.vcproj \
+	libcnotify/libcnotify.vcproj \
+	libcpath/libcpath.vcproj \
+	libcsplit/libcsplit.vcproj \
 	libcstring/libcstring.vcproj \
-	liberror/liberror.vcproj \
+	libcsystem/libcsystem.vcproj \
 	libewf_dll/libewf_dll.vcproj \
 	libfvalue/libfvalue.vcproj \
 	libhmac/libhmac.vcproj \
 	libmfcache/libmfcache.vcproj \
 	libmfdata/libmfdata.vcproj \
-	libnotify/libnotify.vcproj \
 	libodraw/libodraw.vcproj \
 	libsmdev/libsmdev.vcproj \
 	libsmraw/libsmraw.vcproj \
-	libsystem/libsystem.vcproj \
 	libuna/libuna.vcproj \
 	zlib_dll/zlib_dll.vcproj \
 	libewf.sln

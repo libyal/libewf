@@ -25,7 +25,7 @@
 #include <common.h>
 #include <byte_stream.h>
 
-#include <libewf_libmfdata.h>
+#include "libewf_libmfdata.h"
 
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */
@@ -75,12 +75,19 @@ enum LIBEWF_FORMAT
 	LIBEWF_FORMAT_ENCASE7					= 0x07,
 
 	LIBEWF_FORMAT_SMART					= 0x0e,
-	LIBEWF_FORMAT_FTK					= 0x0f,
-	LIBEWF_FORMAT_LVF					= 0x10,
+	LIBEWF_FORMAT_FTK_IMAGER				= 0x0f,
+
+	LIBEWF_FORMAT_LOGICAL_ENCASE5				= 0x10,
+	LIBEWF_FORMAT_LOGICAL_ENCASE6				= 0x11,
+	LIBEWF_FORMAT_LOGICAL_ENCASE7				= 0x12,
 
 	LIBEWF_FORMAT_LINEN5					= 0x25,
 	LIBEWF_FORMAT_LINEN6					= 0x26,
 	LIBEWF_FORMAT_LINEN7					= 0x27,
+
+	LIBEWF_FORMAT_V2_ENCASE7				= 0x37,
+
+	LIBEWF_FORMAT_LOGICAL_V2_ENCASE7			= 0x47,
 
 	/* The format as specified by Andrew Rosen
 	 */
@@ -95,10 +102,20 @@ enum LIBEWF_FORMAT
  */
 #define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE			( 1500 * 1024 * 1024 )
 
+/* The compression methods definitions
+ */
+enum LIBEWF_COMPRESSION_METHODS
+{
+	LIBEWF_COMPRESSION_METHOD_NONE				= 0,
+	LIBEWF_COMPRESSION_METHOD_DEFLATE			= 1,
+	LIBEWF_COMPRESSION_METHOD_BZIP2				= 2,
+};
+
 /* The compression level definitions
  */
 enum LIBEWF_COMPRESSION_LEVELS
 {
+/* TODO rename to compression level */
 	LIBEWF_COMPRESSION_NONE					= 0,
 	LIBEWF_COMPRESSION_FAST					= 1,
 	LIBEWF_COMPRESSION_BEST					= 2,
@@ -150,11 +167,11 @@ enum LIBEWF_DATE_FORMATS
 	LIBEWF_DATE_FORMAT_CTIME				= 0x04
 };
 
-/* The compression levels
+/* The header value compression levels definitions
  */
-#define LIBEWF_COMPRESSION_LEVEL_NONE				"n"
-#define LIBEWF_COMPRESSION_LEVEL_FAST				"f"
-#define LIBEWF_COMPRESSION_LEVEL_BEST				"b"
+#define LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_NONE		"n"
+#define LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_FAST		"f"
+#define LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_BEST		"b"
 
 /* The segment file type definitions
  */

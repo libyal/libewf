@@ -24,8 +24,6 @@
 
 #include <stdlib.h>
 
-#include <libcstring.h>
-
 #include <libewf.h>
 #pragma managed( pop )
 

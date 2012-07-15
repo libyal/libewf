@@ -59,16 +59,19 @@ struct libewf_io_handle
 	 */
 	uint8_t minor_version;
 
-	/* Value to indicate the compression level used
+	/* The compression method
+	 */
+	uint16_t compression_method;
+
+	/* The compression level
 	 */
 	int8_t compression_level;
 
-	/* Value to indicate certain compression modes
-	 * like empty block compression
+	/* The compression flags
 	 */
 	uint8_t compression_flags;
 
-	/* Value to indicate compression is forces
+	/* Value to indicate compression is forced
 	 * Used by EWF-S01
 	 */
 	uint8_t force_compression;
