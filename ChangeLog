@@ -1,5 +1,8 @@
 TODO
-* update codegear and builderc5 files
+* update codegear files
+  - see build machine
+  - fix executables
+  - fix static build
 
 * internally mark Ex01 and Lx01 format and have ewfinfo print a string
   representation
@@ -106,7 +109,7 @@ values string.
   - add stat info on readdir (see regfmount)
 * complete ewfrecover
   - max segment size
-  - add project files: msvscpp, builder5, codegear
+  - add project files: msvscpp, codegear
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -381,6 +384,14 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120718
+* removed builder5 files
+* fixed .so library version number
+* worked on codegear files
+
+20120717
+* worked on codegear files
 
 20120715
 * fixes and improvements for recent changes
