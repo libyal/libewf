@@ -266,11 +266,14 @@ int main( int argc, char * const argv[] )
 	}
 	libcnotify_verbose_set(
 	 verbose );
+
+#if !defined( HAVE_LOCAL_LIBEWF )
 	libewf_notify_set_verbose(
 	 verbose );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
+#endif
 
 	if( verification_handle_initialize(
 	     &ewfverify_verification_handle,

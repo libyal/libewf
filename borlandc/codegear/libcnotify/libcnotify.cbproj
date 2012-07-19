@@ -18,14 +18,14 @@
 			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\liberror</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\libcerror;$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;$(Defines)</Defines>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCNOTIFY;$(Defines)</Defines>
 			<IncludePath>..\..\..\libcnotify;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
@@ -38,23 +38,38 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<CppCompile Include="..\..\..\libcnotify\libcnotify_print.c">
-				<BuildOrder>3</BuildOrder>
+			<CppCompile Include="..\..\..\libcnotify\libcnotify_stream.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcnotify\libcnotify_print.h">
-				<BuildOrder>4</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libcnotify\libcnotify_stream.c">
-				<BuildOrder>5</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\..\libcnotify\libcnotify.c">
-				<BuildOrder>1</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libcnotify\libcnotify.h">
-				<BuildOrder>0</BuildOrder>
+				<BuildOrder>6</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcnotify\libcnotify_stream.h">
+				<BuildOrder>8</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcnotify\libcnotify_verbose.c">
+				<BuildOrder>10</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libcnotify\libcnotify_unused.h">
+				<BuildOrder>9</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcnotify\libcnotify_print.c">
+				<BuildOrder>5</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libcnotify\libcnotify_definitions.h">
+				<BuildOrder>1</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcnotify\libcnotify_verbose.h">
+				<BuildOrder>0</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcnotify\libcnotify_extern.h">
 				<BuildOrder>2</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcnotify\libcnotify_libcstring.h">
+				<BuildOrder>4</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcnotify\libcnotify_libcerror.h">
+				<BuildOrder>3</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

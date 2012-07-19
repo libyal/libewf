@@ -13,17 +13,19 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
+			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\libcerror;$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;$(Defines)</Defines>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;$(Defines)</Defines>
 			<IncludePath>..\..\..\libclocale;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
@@ -36,20 +38,38 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libclocale\libclocale.h">
-				<BuildOrder>3</BuildOrder>
-			</None>
-			<None Include="..\..\..\libclocale\libclocale_definitions.h">
-				<BuildOrder>4</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libclocale\libclocale_error.c">
-				<BuildOrder>2</BuildOrder>
+			<CppCompile Include="..\..\..\libclocale\libclocale_locale.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libclocale\libclocale_error.h">
+			<None Include="..\..\..\libclocale\libclocale_libcstring.h">
+				<BuildOrder>6</BuildOrder>
+			</None>
+			<None Include="..\..\..\libclocale\libclocale_locale.h">
+				<BuildOrder>8</BuildOrder>
+			</None>
+			<None Include="..\..\..\libclocale\libclocale_support.h">
+				<BuildOrder>10</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libclocale\libclocale_support.c">
+				<BuildOrder>9</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libclocale\libclocale_libcerror.h">
+				<BuildOrder>5</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libclocale\libclocale_codepage.c">
+				<BuildOrder>1</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libclocale\libclocale_unused.h">
 				<BuildOrder>0</BuildOrder>
 			</None>
-			<None Include="..\..\..\libclocale\libclocale_types.h">
-				<BuildOrder>1</BuildOrder>
+			<None Include="..\..\..\libclocale\libclocale_codepage.h">
+				<BuildOrder>2</BuildOrder>
+			</None>
+			<None Include="..\..\..\libclocale\libclocale_extern.h">
+				<BuildOrder>4</BuildOrder>
+			</None>
+			<None Include="..\..\..\libclocale\libclocale_definitions.h">
+				<BuildOrder>3</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

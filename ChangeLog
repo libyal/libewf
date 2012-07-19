@@ -385,6 +385,10 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 
+20120719
+* worked on codegear files
+* changes for codegear static build of ewftools
+
 20120718
 * removed builder5 files
 * fixed .so library version number

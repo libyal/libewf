@@ -1300,11 +1300,14 @@ int main( int argc, char * const argv[] )
 
 	libcnotify_verbose_set(
 	 verbose );
+
+#if !defined( HAVE_LOCAL_LIBEWF )
+	libewf_notify_set_verbose(
+	 verbose );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
-	libewf_notify_set_verbose(
-	 verbose );
+#endif
 
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
 	if( libcsystem_glob_initialize(

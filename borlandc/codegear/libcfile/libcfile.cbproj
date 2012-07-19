@@ -13,17 +13,19 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
+			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\libcerror;..\..\..\libclocale;..\..\..\libuna;$(BCC_IncludePath)</BCC_IncludePath>
 			<OutputExt>lib</OutputExt>
 			<Multithreaded>true</Multithreaded>
 			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi</PackageImports>
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;$(Defines)</Defines>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;$(Defines)</Defines>
 			<IncludePath>..\..\..\libcfile;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
@@ -36,21 +38,54 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libcfile\libcfile.h">
-				<BuildOrder>3</BuildOrder>
+			<None Include="..\..\..\libcfile\libcfile_libuna.h">
+				<BuildOrder>10</BuildOrder>
 			</None>
-			<None Include="..\..\..\libcfile\libcfile_definitions.h">
-				<BuildOrder>4</BuildOrder>
+			<CppCompile Include="..\..\..\libcfile\libcfile_stream.c">
+				<BuildOrder>11</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libcfile\libcfile_libclocale.h">
+				<BuildOrder>8</BuildOrder>
 			</None>
+			<None Include="..\..\..\libcfile\libcfile_libcstring.h">
+				<BuildOrder>9</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcfile\libcfile_support.h">
+				<BuildOrder>14</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcfile\libcfile_types.h">
+				<BuildOrder>15</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcfile\libcfile_stream.h">
+				<BuildOrder>12</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcfile\libcfile_support.c">
+				<BuildOrder>13</BuildOrder>
+			</CppCompile>
 			<CppCompile Include="..\..\..\libcfile\libcfile_error.c">
 				<BuildOrder>2</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcfile\libcfile_error.h">
+				<BuildOrder>3</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcfile\libcfile_unused.h">
 				<BuildOrder>0</BuildOrder>
 			</None>
-			<None Include="..\..\..\libcfile\libcfile_types.h">
+			<None Include="..\..\..\libcfile\libcfile_definitions.h">
 				<BuildOrder>1</BuildOrder>
 			</None>
+			<None Include="..\..\..\libcfile\libcfile_file.h">
+				<BuildOrder>6</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcfile\libcfile_libcerror.h">
+				<BuildOrder>7</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcfile\libcfile_extern.h">
+				<BuildOrder>4</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcfile\libcfile_file.c">
+				<BuildOrder>5</BuildOrder>
+			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

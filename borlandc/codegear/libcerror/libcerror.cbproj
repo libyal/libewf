@@ -13,6 +13,8 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
+			<BCC_PCHUsage>None</BCC_PCHUsage>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<FinalOutputDir>..\Release</FinalOutputDir>
 			<BCC_waus>false</BCC_waus>
@@ -23,7 +25,7 @@
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;$(Defines)</Defines>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;$(Defines)</Defines>
 			<IncludePath>..\..\..\libcerror;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
@@ -36,20 +38,38 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libcerror\libcerror.h">
-				<BuildOrder>3</BuildOrder>
+			<None Include="..\..\..\libcerror\libcerror_support.h">
+				<BuildOrder>7</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcerror\libcerror_support.c">
+				<BuildOrder>6</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\libcerror\libcerror_system.c">
+				<BuildOrder>8</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libcerror\libcerror_types.h">
+				<BuildOrder>10</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcerror\libcerror_system.h">
+				<BuildOrder>9</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcerror\libcerror_libcstring.h">
+				<BuildOrder>5</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcerror\libcerror_definitions.h">
-				<BuildOrder>4</BuildOrder>
+				<BuildOrder>1</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcerror\libcerror_unused.h">
+				<BuildOrder>0</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcerror\libcerror_error.c">
 				<BuildOrder>2</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libcerror\libcerror_error.h">
-				<BuildOrder>0</BuildOrder>
+			<None Include="..\..\..\libcerror\libcerror_extern.h">
+				<BuildOrder>4</BuildOrder>
 			</None>
-			<None Include="..\..\..\libcerror\libcerror_types.h">
-				<BuildOrder>1</BuildOrder>
+			<None Include="..\..\..\libcerror\libcerror_error.h">
+				<BuildOrder>3</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
